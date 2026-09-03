@@ -24,3 +24,6 @@ Route::get('/recepcion', function () {
 Route::get('/despacho', function () {
     return view('despacho.index');
 });
+Route::get('/trazabilidad', function () {
+    return view('trazabilidad.index');
+});
