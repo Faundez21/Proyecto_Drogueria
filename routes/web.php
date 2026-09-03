@@ -16,5 +16,5 @@ Route::get('/recuperar-password', function () {
 })->name('password.request');
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard');
 });
