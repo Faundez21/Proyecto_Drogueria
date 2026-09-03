@@ -12,7 +12,8 @@
             <p class="text-blue-200 text-sm mb-6">Ingresa el código de lote, número de serie o escanea el código QR para ver el historial completo.</p>
             
             <div class="flex gap-2">
-                <input type="text" placeholder="Ej: LOT-12345" class="flex-1 px-4 py-3 rounded-lg border-0 focus:ring-4 focus:ring-blue-500/50 shadow-sm text-slate-900 font-medium">
+                <!-- CORRECCIÓN: Se agregó bg-white y placeholder:text-slate-400 -->
+                <input type="text" placeholder="Ej: LOT-12345" class="flex-1 px-4 py-3 bg-white rounded-lg border-0 focus:ring-4 focus:ring-blue-500/50 shadow-sm text-slate-900 font-medium placeholder:text-slate-400">
                 <button class="bg-blue-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-400 transition-colors shadow-sm">
                     Rastrear
                 </button>
@@ -23,7 +24,7 @@
     <!-- Resultados del Rastreo -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Detalles del Lote -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
             <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4">Información del Lote</h3>
             <div class="space-y-4 text-sm">
                 <div>
@@ -55,23 +56,24 @@
         <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <h3 class="text-sm font-bold text-slate-800 mb-6">Historial de Movimientos</h3>
             
-            <div class="relative border-l border-slate-200 ml-3 space-y-6">
+            <div class="relative border-l-2 border-slate-100 ml-3 space-y-8">
+                <!-- CORRECCIÓN: Ajuste de posición -left-[9px] para centrar los puntos exactos sobre la línea -->
                 <div class="relative pl-6">
-                    <span class="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-white"></span>
+                    <span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-white"></span>
                     <h4 class="text-sm font-bold text-slate-800">Despacho Completado</h4>
                     <p class="text-xs text-slate-500 mt-1">Enviado a Clínica Santa María (Orden #ORD-0091). Cantidad: 50 cajas.</p>
                     <span class="text-[10px] font-medium text-slate-400 mt-1 block">16 May 2026, 10:15 AM</span>
                 </div>
                 
                 <div class="relative pl-6">
-                    <span class="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-blue-500 ring-4 ring-white"></span>
+                    <span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-blue-500 ring-4 ring-white"></span>
                     <h4 class="text-sm font-bold text-slate-800">Almacenamiento</h4>
                     <p class="text-xs text-slate-500 mt-1">Ubicado en Bodega Principal, Pasillo 3, Estante B-02.</p>
                     <span class="text-[10px] font-medium text-slate-400 mt-1 block">15 May 2026, 09:00 AM</span>
                 </div>
 
                 <div class="relative pl-6">
-                    <span class="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-slate-400 ring-4 ring-white"></span>
+                    <span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-slate-400 ring-4 ring-white"></span>
                     <h4 class="text-sm font-bold text-slate-800">Recepción de Proveedor</h4>
                     <p class="text-xs text-slate-500 mt-1">Ingreso al sistema mediante OC-2026-001. Aprobado por Control de Calidad.</p>
                     <span class="text-[10px] font-medium text-slate-400 mt-1 block">15 May 2026, 08:30 AM</span>
