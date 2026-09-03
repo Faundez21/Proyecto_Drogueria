@@ -13,7 +13,7 @@
     <!-- Overlay Móvil -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/60 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
 
-    <!-- ================= SIDEBAR OSCURO ================= -->
+    <!-- sidebar con tema oscuro -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-slate-900 flex flex-col z-50 transform -translate-x-full lg:translate-x-0 lg:static lg:shrink-0 transition-transform duration-300 ease-in-out border-r border-slate-800">
         
         <!-- Header del Sidebar -->
@@ -124,7 +124,7 @@
         </div>
     </aside>
 
-    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <!-- contenedor principal-->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
         
         <!-- Top Navbar -->
