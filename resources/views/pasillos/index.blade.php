@@ -25,7 +25,7 @@
             </div>
 
             <a href="{{ route('pasillos.create') }}"
-            class="bg-blue-600 text-white px-4 py-2 rounded-lg">+ Nuevo pasillo
+            class="bg-blue-900 text-white px-4 py-2 rounded-lg">+ Nuevo pasillo
             </a>
 
         </div>
@@ -35,7 +35,7 @@
 
             <table class="w-full">
 
-                <thead class="bg-gray-100">
+                <thead class="bg-blue-900 text-white">
 
                     <tr>
 
@@ -77,13 +77,13 @@
 
                         <td class="px-6 py-4 text-center">
 
-                            <a href="#" class="text-blue-600 mr-3">
-                                Ver
-                            </a>
+                            <a href="{{ route('pasillos.show', 1) }}" class="text-gray-600 mr-3">
+                            Ver
+                </a>
 
-                            <a href="#" class="text-yellow-600 mr-3">
-                                Editar
-                            </a>
+                            <a href="{{ route('pasillos.edit', 1) }}" class="text-yellow-600 mr-3">
+                 Editar
+                </a>
 
                             <button class="text-red-600">
                                 Eliminar

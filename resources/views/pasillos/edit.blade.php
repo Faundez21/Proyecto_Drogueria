@@ -16,7 +16,7 @@
 
             <div>
                 <h1 class="text-3xl">
-                    Agregar un nuevo pasillo
+                    Editar pasillo
                 </h1>
 
                 <p class="text-gray-500">
@@ -42,12 +42,12 @@
                 </div>
 
                 <div class="flex justify-end gap-3">
-                <a href="{{ route('pasillos.index') }}"
-            class="bg-green-600 text-white px-4 py-2 rounded-lg">+ Guardar
-            </a>
-            <a href="{{ route('pasillos.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancelar</a>
-        </div>
-        </form>
+                    <a href="{{ route('pasillos.index') }}"
+                        class="bg-green-600 text-white px-4 py-2 rounded-lg">+ Guardar
+                    </a>
+                    <a href="{{ route('pasillos.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancelar</a>
+                </div>
+            </form>
 
         </div>
 
