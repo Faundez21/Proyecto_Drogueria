@@ -18,3 +18,6 @@ Route::get('/recuperar-password', function () {
 Route::get('/', function () {
     return view('dashboard');
 });
+Route::get('/recepcion', function () {
+    return view('recepcion.index');
+});
