@@ -21,3 +21,6 @@ Route::get('/', function () {
 Route::get('/recepcion', function () {
     return view('recepcion.index');
 });
+Route::get('/despacho', function () {
+    return view('despacho.index');
+});
