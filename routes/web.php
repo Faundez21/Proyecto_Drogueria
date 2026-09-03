@@ -14,7 +14,7 @@ Route::post('/login', [LoginController::class, 'authenticate']);
 Route::get('/recuperar-password', function () {
     return "Página de recuperación de contraseña en construcción...";
 })->name('password.request');
-
+// 4. Ruta del dashboard
 Route::get('/', function () {
     return view('dashboard');
 });
