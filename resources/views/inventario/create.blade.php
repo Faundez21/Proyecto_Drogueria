@@ -21,7 +21,7 @@
             <a href="#" class="text-2xl font-extrabold text-slate-800 tracking-wider">DAS</a>
         </div>
     </nav>
-<br>
+    <br>
     <div class="w-full flex justify-center py-8 px-4">
 
         <div class="w-full max-w-4xl p-8 sm:p-12 bg-white rounded-xl shadow-sm border border-gray-100">
