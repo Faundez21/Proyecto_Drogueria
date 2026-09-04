@@ -6,44 +6,60 @@ use Illuminate\Http\Request;
 
 class PasilloController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
+        //dirección del menú del mantenedor pasillo
+
         return view('pasillos.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        //
+        //dirección del menú de crear pasillo
+
+        return view('pasillos.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
-        //
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show($id)
+{
+    $pasillos = [
+        [
+            'id' => 1,
+            'nombre' => 'Pasillo A',
+            'descripcion' => 'Medicamentos generales'
+        ],
+        [
+            'id' => 2,
+            'nombre' => 'Pasillo B',
+            'descripcion' => 'Medicamentos refrigerados'
+        ],
+        [
+            'id' => 3,
+            'nombre' => 'Pasillo C',
+            'descripcion' => 'Medicamentos en cuarentena'
+        ],
+    ];
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    $pasillo = collect($pasillos)->firstWhere('id', $id);
+
+    return view('pasillos.show', compact('pasillo'));
+}
+
+
     public function edit(string $id)
     {
-        //
+        return view('pasillos.edit');
     }
 
     /**
