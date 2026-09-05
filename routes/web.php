@@ -1,20 +1,29 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
+// 1. Redirige la página principal exclusivamente al login
+Route::redirect('/', '/login');
+
+// 2. Rutas del Login
+Route::get('/login', [LoginController::class, 'show'])->name('login');
+Route::post('/login', [LoginController::class, 'authenticate']);
+
+// 3. Ruta de recuperación
+Route::get('/recuperar-password', function () {
+    return "Página de recuperación de contraseña en construcción...";
+})->name('password.request');
+// 4. Ruta del dashboard
 Route::get('/', function () {
-    return view('inventario.recepcion');
-});
-
-Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-require __DIR__.'/auth.php';
+Route::get('/recepcion', function () {
+    return view('recepcion.index');
+});
+Route::get('/despacho', function () {
+    return view('despacho.index');
+});
+Route::get('/trazabilidad', function () {
+    return view('trazabilidad.index');
+});
