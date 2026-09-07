@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Catálogo de Productos')
-@section('header', 'Gestión del Catálogo Maestro')
+@section('header', 'Gestión del Inventario')
 
 @section('content')
     <!-- Creacion y Importacion          -->
