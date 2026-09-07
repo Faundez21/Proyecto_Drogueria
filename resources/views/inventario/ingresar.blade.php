@@ -1,27 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-
-<body class="bg-gray-50">
-
-    <nav class="bg-white border-b border-gray-100 px-6 py-3 flex justify-between items-center w-full shadow-sm">
-        <div class="flex items-center gap-6 w-full max-w-3xl">
-            <button class="p-2 bg-slate-50 text-slate-500 rounded-lg hover:bg-slate-100 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
-                    </path>
-                </svg>
-            </button>
-            <a href="#" class="text-2xl font-extrabold text-slate-800 tracking-wider">DAS</a>
-        </div>
-    </nav>
-    <br>
+@extends('layouts.app')
+@section('content')
     <div class="w-full flex justify-center py-8 px-4">
 
         <div class="w-full max-w-4xl p-8 sm:p-12 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -82,6 +61,4 @@
             </div>
         </div>
     </div>
-</body>
-
-</html>
+@endsection

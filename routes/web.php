@@ -27,3 +27,19 @@ Route::get('/despacho', function () {
 Route::get('/trazabilidad', function () {
     return view('trazabilidad.index');
 });
+
+Route::get('/ingresar', function () {
+    return view('inventario.ingresar');
+});
+
+Route::get('/inventario_recepcion', function () {
+    return view('inventario.recepcion');
+});
+
+Route::get('/reporte', function () {
+    return view('inventario.reporte');
+});
+
+Route::get('/error', function () {
+    return view('error');
+});
