@@ -16,10 +16,10 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 1; 
+            z-index: 1;
         }
         .glass-panel {
-            background-color: #0f172a; 
+            background-color: #0f172a;
             border: 1px solid #1e293b;
         }
         /* Estilos para las etiquetas flotantes (Markers) */
@@ -41,7 +41,7 @@
         }
         .marker-green { background-color: #22c55e; color: white; }
         .marker-green::after { border-color: #22c55e transparent transparent transparent; }
-        
+
         .marker-blue { background-color: #3b82f6; color: white; }
         .marker-blue::after { border-color: #3b82f6 transparent transparent transparent; }
 
@@ -63,7 +63,7 @@
                 <button @click="changeView('3D')" :class="viewMode === '3D' ? 'bg-blue-500 text-white shadow' : 'text-gray-500 hover:text-gray-700'" class="px-5 py-1.5 text-sm font-semibold rounded-full transition">Vista 3D</button>
             </div>
         </div>
-        
+
         <!-- Botones de Zoom y Pantalla Completa (Funcionales) -->
         <div class="pointer-events-auto flex gap-2">
             <button @click="resetCamera()" title="Centrar Vista" class="w-10 h-10 bg-white rounded-lg border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:bg-gray-50 transition">
@@ -82,7 +82,7 @@
     </header>
 
     <div class="relative flex-1 flex overflow-hidden">
-        
+
         <!-- Sidebar -->
         <aside class="absolute top-32 left-6 w-64 glass-panel text-white rounded-xl p-5 shadow-2xl z-20 flex flex-col gap-4 pointer-events-auto">
             <div class="relative">
@@ -94,7 +94,7 @@
                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
             </div>
-            
+
             <!-- Buscador Funcional -->
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -102,7 +102,7 @@
                 </div>
                 <input type="text" x-model="searchQuery" @input="handleSearch" placeholder="Buscar ubicación... (Ej: A-01)" class="w-full bg-[#1e293b] border-none rounded-lg py-2.5 pl-9 pr-3 text-sm text-gray-300 focus:ring-2 focus:ring-blue-500 placeholder-gray-500 transition">
             </div>
-            
+
             <div class="flex flex-col gap-3 mt-2 text-sm font-medium text-gray-300">
                 <div class="flex items-center gap-3"><span class="w-3.5 h-3.5 rounded bg-[#22c55e]"></span> Disponible</div>
                 <div class="flex items-center gap-3"><span class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span> Ocupado</div>
@@ -116,7 +116,7 @@
         <div id="warehouse-3d-container"></div>
 
         <!-- Tooltip (Detalle de Ubicación) -->
-        <div x-show="tooltipVisible" 
+        <div x-show="tooltipVisible"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100"
@@ -125,7 +125,7 @@
              x-transition:leave-end="opacity-0 scale-95"
              style="display: none;"
              class="absolute top-24 right-96 w-72 glass-panel text-white rounded-xl p-5 shadow-2xl z-30 pointer-events-auto border border-gray-700">
-            
+
             <div class="border-b border-gray-700 pb-3 mb-3 relative flex justify-between items-center">
                 <span class="font-bold text-lg tracking-wide text-white" x-text="rackData.code"></span>
                 <button @click="tooltipVisible = false" class="text-gray-400 hover:text-white">
@@ -138,14 +138,14 @@
                 <p>Venc: <span x-text="rackData.venc"></span></p>
                 <p>Stock: <span x-text="rackData.stock"></span></p>
             </div>
-            
+
             <div class="mt-4 mb-4">
-                <span class="px-3 py-1 text-xs font-semibold rounded-md border inline-block" 
+                <span class="px-3 py-1 text-xs font-semibold rounded-md border inline-block"
                       :class="{
                           'bg-green-900/40 text-green-400 border-green-800': rackData.status === 'Disponible',
                           'bg-blue-900/40 text-blue-400 border-blue-800': rackData.status === 'Ocupado',
                           'bg-orange-900/40 text-orange-400 border-orange-800': rackData.status === 'Cuarentena'
-                      }" 
+                      }"
                       x-text="rackData.status"></span>
             </div>
             <button @click="verDetalle()" class="w-full py-2 bg-[#1e293b] hover:bg-slate-700 border border-gray-600 text-sm text-gray-200 font-medium rounded-lg transition shadow-inner">Ver detalle</button>
@@ -216,7 +216,7 @@
                         this.rackData = e.detail;
                         this.tooltipVisible = true;
                     });
-                    
+
                     // Ocultar tooltip al hacer clic en un área vacía
                     window.addEventListener('click-empty', () => {
                         this.tooltipVisible = false;
@@ -248,14 +248,14 @@
         // --- THREE.JS SETUP ---
         const container = document.getElementById('warehouse-3d-container');
         const labelsContainer = document.getElementById('labels-container');
-        
+
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color('#f8fafc'); 
+        scene.background = new THREE.Color('#f8fafc');
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
         const defaultCamPos = new THREE.Vector3(60, 55, 60);
         camera.position.copy(defaultCamPos);
-        
+
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
@@ -265,7 +265,7 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         const defaultTarget = new THREE.Vector3(0, -5, 0);
         controls.target.copy(defaultTarget);
-        controls.maxPolarAngle = Math.PI / 2 - 0.05; 
+        controls.maxPolarAngle = Math.PI / 2 - 0.05;
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
 
@@ -282,7 +282,7 @@
         // Estructura del Edificio
         const buildGroup = new THREE.Group();
         const floorMat = new THREE.MeshStandardMaterial({ color: '#e2e8f0' });
-        
+
         const floor1 = new THREE.Mesh(new THREE.BoxGeometry(40, 1, 30), floorMat);
         floor1.position.set(0, -0.5, 0); floor1.receiveShadow = true; buildGroup.add(floor1);
 
@@ -290,7 +290,7 @@
         floor2.position.set(-30, -0.5, 5); floor2.receiveShadow = true; buildGroup.add(floor2);
 
         const wallMat = new THREE.MeshPhysicalMaterial({ color: '#cbd5e1', transparent: true, opacity: 0.5, roughness: 0.2, side: THREE.DoubleSide });
-        const trimMat = new THREE.MeshStandardMaterial({ color: '#475569' }); 
+        const trimMat = new THREE.MeshStandardMaterial({ color: '#475569' });
 
         function createWall(w, h, d, x, y, z) {
             const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
@@ -314,10 +314,10 @@
         const racks = [];
         const markers = []; // Para sincronizar HTML con 3D
         const palleteGeo = new THREE.BoxGeometry(4, 3, 4);
-        
-        const matVerde = new THREE.MeshStandardMaterial({ color: '#4ade80', roughness: 0.7 }); 
-        const matAzul = new THREE.MeshStandardMaterial({ color: '#3b82f6', roughness: 0.7 });  
-        const matNaranja = new THREE.MeshStandardMaterial({ color: '#f97316', roughness: 0.7 }); 
+
+        const matVerde = new THREE.MeshStandardMaterial({ color: '#4ade80', roughness: 0.7 });
+        const matAzul = new THREE.MeshStandardMaterial({ color: '#3b82f6', roughness: 0.7 });
+        const matNaranja = new THREE.MeshStandardMaterial({ color: '#f97316', roughness: 0.7 });
 
         function createRackCluster(x, z, cols, rows, material, data) {
             const clusterGroup = new THREE.Group();
@@ -327,10 +327,10 @@
             for(let i=0; i<cols; i++) {
                 for(let j=0; j<rows; j++) {
                     const mesh = new THREE.Mesh(palleteGeo, material.clone());
-                    mesh.position.set(x + i*4.2, 1.5, z + j*4.2); 
+                    mesh.position.set(x + i*4.2, 1.5, z + j*4.2);
                     mesh.castShadow = true;
                     mesh.receiveShadow = true;
-                    
+
                     mesh.userData = data;
                     mesh.userData.originalEmissive = mesh.material.emissive.getHex();
                     racks.push(mesh);
@@ -345,13 +345,13 @@
             // Crear Marcador HTML Flotante para el grupo
             centerVec.divideScalar(count);
             centerVec.y += 3.5; // Altura sobre el bloque
-            
+
             const markerDiv = document.createElement('div');
             let bgClass = data.status === 'Disponible' ? 'marker-green' : (data.status === 'Cuarentena' ? 'marker-orange' : 'marker-blue');
             markerDiv.className = `rack-marker px-2 py-0.5 rounded text-xs font-bold shadow-md ${bgClass}`;
             markerDiv.textContent = data.code;
             labelsContainer.appendChild(markerDiv);
-            
+
             markers.push({ element: markerDiv, pos3D: centerVec });
         }
 
@@ -406,7 +406,7 @@
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-            
+
             const intersects = raycaster.intersectObjects(racks);
 
             if (intersects.length > 0) {
@@ -431,14 +431,14 @@
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-            
+
             const intersects = raycaster.intersectObjects(racks);
             if (intersects.length > 0) {
                 resetAllHighlights();
                 selectedObject = intersects[0].object;
                 highlightRack(selectedObject, false);
                 window.dispatchEvent(new CustomEvent('rack-selected', { detail: selectedObject.userData }));
-                
+
                 // Animar cámara suavemente hacia el objeto
                 controls.target.lerp(selectedObject.position, 0.5);
             } else {
@@ -452,7 +452,7 @@
             const query = e.detail.toLowerCase();
             resetAllHighlights();
             if(!query) return;
-            
+
             const found = racks.find(r => r.userData.code.toLowerCase().includes(query));
             if(found) {
                 selectedObject = found;
@@ -463,21 +463,21 @@
         });
 
         window.addEventListener('cam-zoom-in', () => { camera.position.lerp(controls.target, 0.2); });
-        window.addEventListener('cam-zoom-out', () => { 
+        window.addEventListener('cam-zoom-out', () => {
             let dir = new THREE.Vector3().subVectors(camera.position, controls.target).multiplyScalar(1.2);
-            camera.position.copy(controls.target).add(dir); 
+            camera.position.copy(controls.target).add(dir);
         });
-        window.addEventListener('cam-reset', () => { 
+        window.addEventListener('cam-reset', () => {
             camera.position.lerp(defaultCamPos, 1);
             controls.target.lerp(defaultTarget, 1);
         });
 
         window.addEventListener('update-camera-view', (e) => {
             if (e.detail === '2D') {
-                camera.position.set(0, 90, 0); 
+                camera.position.set(0, 90, 0);
                 controls.target.set(0, 0, 0);
             } else {
-                camera.position.copy(defaultCamPos); 
+                camera.position.copy(defaultCamPos);
                 controls.target.copy(defaultTarget);
             }
         });
@@ -485,20 +485,20 @@
         // Loop de Render y Sincronización de Marcadores
         function animate() {
             requestAnimationFrame(animate);
-            controls.update(); 
+            controls.update();
             renderer.render(scene, camera);
 
             // Actualizar posiciones de los marcadores HTML
             markers.forEach(marker => {
                 const vector = marker.pos3D.clone();
                 vector.project(camera);
-                
+
                 // Comprobar si el marcador está detrás de la cámara
                 if (vector.z > 1) {
                     marker.element.style.display = 'none';
                     return;
                 }
-                
+
                 marker.element.style.display = 'block';
                 const x = (vector.x * .5 + .5) * window.innerWidth;
                 const y = (vector.y * -.5 + .5) * window.innerHeight;
@@ -514,6 +514,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
->>>>>>> cristobal
+
 </body>
 </html>
