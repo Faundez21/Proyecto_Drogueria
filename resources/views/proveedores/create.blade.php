@@ -1,59 +1,66 @@
 @extends('layouts.app')
 
 @section('title', 'Nuevo Proveedor')
-@section('header', 'Proveedores')
+@section('header', 'Gestión de Proveedores')
 
 @section('content')
-    <!-- Botón Volver -->
-    <div class="mb-6">
-        <a href="{{ route('proveedores.index') }}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Volver al listado
-        </a>
+    <!-- Navegación / Breadcrumb -->
+    <div class="mb-4 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <a href="{{ route('proveedores.index') }}" class="hover:text-blue-600 transition-colors flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Directorio
+            </a>
+            <span class="text-slate-300">/</span>
+            <span class="text-slate-800">Nuevo Registro</span>
+        </div>
     </div>
 
-    <!-- Contenedor Principal del Formulario -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+    <!-- Contenedor Principal -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         
-        <!-- Cabecera del Formulario -->
-        <div class="px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
-            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2.5">
-                <div class="p-2 bg-blue-100 rounded-lg text-blue-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                </div>
-                Ficha de Nuevo Proveedor
-            </h2>
-            <p class="text-sm text-slate-500 mt-1 ml-11">Ingresa los datos fiscales, de contacto y bancarios del proveedor.</p>
+        <!-- Cabecera Compacta -->
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-bold text-slate-800">Ficha de Nuevo Proveedor</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Los campos marcados con (*) son obligatorios.</p>
+            </div>
         </div>
 
-        <form action="#" class="p-6 sm:p-8 space-y-10">
-            <!-- SECCIÓN 1: Datos de la Empresa -->
-            <div class="relative">
-                <div class="flex items-center gap-3 mb-5">
-                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm shadow-md shadow-blue-200">1</span>
-                    <h3 class="text-base font-bold text-slate-800 tracking-tight">Datos Fiscales y Empresa</h3>
+        <form action="#" method="POST" class="divide-y divide-slate-100">
+            @csrf
+
+            <!-- SECCIÓN 1: Perfil de la Empresa -->
+            <div class="p-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">1. Perfil de la Empresa</h3>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pl-0 sm:pl-11">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">RUT Proveedor *</label>
-                        <input type="text" placeholder="Ej: 76.123.456-7" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block p-2.5 transition-colors sm:text-sm">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- RUT -->
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">RUT Proveedor <span class="text-red-500">*</span></label>
+                        <input type="text" placeholder="Ej: 76.123.456-7" required class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block py-2 px-3 text-sm transition-colors">
                     </div>
 
+                    <!-- Razón Social -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Razón Social o Nombre *</label>
-                        <input type="text" placeholder="Nombre legal de la empresa" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block p-2.5 transition-colors sm:text-sm">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Razón Social o Nombre Legal <span class="text-red-500">*</span></label>
+                        <input type="text" placeholder="Nombre completo de la empresa" required class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block py-2 px-3 text-sm transition-colors">
                     </div>
 
+                    <!-- Giro -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Giro Comercial</label>
-                        <input type="text" placeholder="Ej: Venta al por mayor de productos farmacéuticos" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block p-2.5 transition-colors sm:text-sm">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Giro Comercial</label>
+                        <input type="text" placeholder="Ej: Venta de insumos médicos" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block py-2 px-3 text-sm transition-colors">
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Categoría Principal</label>
-                        <select class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block p-2.5 transition-colors sm:text-sm">
-                            <option value="" disabled selected>Seleccionar...</option>
+                    <!-- Categoría -->
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Categoría Principal <span class="text-red-500">*</span></label>
+                        <select required class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block py-2 px-3 text-sm transition-colors">
+                            <option value="" disabled selected>Seleccione...</option>
                             <option value="farmacos">Fármacos y Medicamentos</option>
                             <option value="insumos">Insumos Clínicos</option>
                             <option value="equipamiento">Equipamiento Médico</option>
@@ -63,67 +70,69 @@
                 </div>
             </div>
 
-            <hr class="border-slate-100">
-
             <!-- SECCIÓN 2: Contacto y Ubicación -->
-            <div class="relative">
-                <div class="flex items-center gap-3 mb-5">
-                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm shadow-md shadow-blue-200">2</span>
-                    <h3 class="text-base font-bold text-slate-800 tracking-tight">Información de Contacto</h3>
+            <div class="p-6 bg-slate-50/50">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">2. Contacto y Ubicación</h3>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pl-0 sm:pl-11">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Correo Electrónico *</label>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Correo -->
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Correo Electrónico <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
                             </div>
-                            <input type="email" placeholder="contacto@empresa.cl" class="w-full pl-10 bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block p-2.5 transition-colors sm:text-sm">
+                            <input type="email" placeholder="ventas@empresa.cl" required class="w-full pl-9 bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block py-2 pr-3 text-sm transition-colors">
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Teléfono Principal</label>
+                    <!-- Teléfono -->
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Teléfono Principal</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                             </div>
-                            <input type="text" placeholder="+56 9 1234 5678" class="w-full pl-10 bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block p-2.5 transition-colors sm:text-sm">
+                            <input type="text" placeholder="+56 9 1234 5678" class="w-full pl-9 bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block py-2 pr-3 text-sm transition-colors">
                         </div>
                     </div>
 
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Dirección Física</label>
-                        <input type="text" placeholder="Calle, número, oficina/depto" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block p-2.5 transition-colors sm:text-sm">
+                    <!-- Dirección -->
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Dirección Física</label>
+                        <input type="text" placeholder="Calle, número, comuna" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block py-2 px-3 text-sm transition-colors">
                     </div>
                 </div>
             </div>
 
-            <hr class="border-slate-100">
-
             <!-- SECCIÓN 3: Datos Bancarios -->
-            <div class="bg-slate-50/50 p-6 rounded-2xl border border-slate-200">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm shadow-md shadow-blue-200">3</span>
-                    <h3 class="text-base font-bold text-slate-800 tracking-tight">Datos Bancarios para Transferencias</h3>
+            <div class="p-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">3. Datos Bancarios</h3>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pl-0 sm:pl-11">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Banco</label>
-                        <select class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block p-2.5 transition-colors sm:text-sm">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Banco -->
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Institución Bancaria</label>
+                        <select class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block py-2 px-3 text-sm transition-colors">
                             <option value="" disabled selected>Seleccione banco...</option>
                             <option value="banco_estado">Banco Estado</option>
                             <option value="banco_chile">Banco de Chile</option>
                             <option value="banco_santander">Banco Santander</option>
-                            <option value="bci">BCI</option>
+                            <option value="bci">Banco BCI</option>
+                            <option value="itau">Banco Itaú</option>
                         </select>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tipo de Cuenta</label>
-                        <select class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block p-2.5 transition-colors sm:text-sm">
+                    <!-- Tipo Cuenta -->
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo de Cuenta</label>
+                        <select class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block py-2 px-3 text-sm transition-colors">
                             <option value="" disabled selected>Seleccione tipo...</option>
                             <option value="corriente">Cuenta Corriente</option>
                             <option value="vista">Cuenta Vista / RUT</option>
@@ -131,21 +140,22 @@
                         </select>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">N° de Cuenta</label>
-                        <input type="text" placeholder="Ej: 123456789" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block p-2.5 transition-colors sm:text-sm">
+                    <!-- N° Cuenta -->
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">N° de Cuenta</label>
+                        <input type="text" placeholder="Ej: 1234567890" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block py-2 px-3 text-sm transition-colors">
                     </div>
                 </div>
             </div>
 
-            <!-- Botones de Acción -->
-            <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-slate-200">
-                <a href="{{ route('proveedores.index') }}" class="px-6 py-3 bg-white border border-slate-300 text-slate-700 rounded-xl text-center text-sm font-bold hover:bg-slate-50 hover:text-slate-900 transition-all focus:ring-2 focus:ring-slate-200 order-2 sm:order-1">
+            <!-- Botones de Acción (Footer) -->
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3">
+                <a href="{{ route('proveedores.index') }}" class="w-full sm:w-auto px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-100 transition-colors text-center">
                     Cancelar
                 </a>
-                <button type="button" class="px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 flex items-center justify-center gap-2 transition-all focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 order-1 sm:order-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    Guardar Proveedor
+                <button type="submit" class="w-full sm:w-auto px-5 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 flex items-center justify-center gap-2 transition-colors shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Registrar Proveedor
                 </button>
             </div>
         </form>
