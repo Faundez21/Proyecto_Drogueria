@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Droguería DAS - @yield('title', 'Panel')</title>
     
-    <!-- FAVICON -->
+    <!-- favicon -->
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])

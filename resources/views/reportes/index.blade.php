@@ -4,7 +4,7 @@
 @section('header', 'Reportes, Filtros y Gestión de Registros')
 
 @section('content')
-    <!-- PANEL DE FILTROS AVANZADOS -->
+    <!-- Filtros de Búsqueda y Exportación -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6">
         <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
             <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
