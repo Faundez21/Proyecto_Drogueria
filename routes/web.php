@@ -48,7 +48,6 @@ Route::get('/proveedores/crear', function () {
     return view('proveedores.create');
 })->name('proveedores.create');
 
-
 Route::get('/inventario', function () {
         return view('inventario.index');
     })->name('inventario.index');
@@ -77,4 +76,5 @@ Route::resource('positions', PositionController::class);
 //6.Ruta de distribución
 
 Route::resource('distribution', DistributionController::class);
-
+// Ruta para cerrar sesión (ejemplo necesario para tu botón inferior)
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
