@@ -89,7 +89,7 @@
             </div>
             <!--Boton de reporte-->
             <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                <a href="{{ route('inventario.reporte') }}"
+                <a href="{{ route('reportes.index') }}"
                     class="flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm w-full sm:w-auto">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

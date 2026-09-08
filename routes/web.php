@@ -52,9 +52,9 @@ Route::get('/inventario', function () {
         return view('inventario.index');
     })->name('inventario.index');
 
-    Route::get('/reporte', function () {
-        return view('inventario.reporte');
-    })->name('inventario.reporte');
+    Route::get('/reportes', function () {
+        return view('reportes.index');
+    })->name('reportes.index');
 
 Route::get('/error', function () {
     return view('error');
