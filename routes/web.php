@@ -2,7 +2,15 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PasilloController;
+use App\Http\Controllers\LayoutController;
+use App\Http\Controllers\ShelfController;
+use App\Http\Controllers\LevelController;
+use App\Http\Controllers\PositionController;
+use App\Http\Controllers\DistributionController;
 
+
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // 1. Redirige la página principal exclusivamente al login
 Route::redirect('/', '/login');
 
@@ -41,12 +49,32 @@ Route::get('/proveedores/crear', function () {
 })->name('proveedores.create');
 
 Route::get('/inventario', function () {
-    return view('inventario.index');
-})->name('inventario.index');
+        return view('inventario.index');
+    })->name('inventario.index');
 
-Route::get('/reportes', function () {
-    return view('reportes.index');
-})->name('reportes.index');
+    Route::get('/reportes', function () {
+        return view('reportes.index');
+    })->name('reportes.index');
 
+Route::get('/error', function () {
+    return view('error');
+});
+
+
+
+//5. Rutas de mantenedores
+
+Route::resource('pasillos', PasilloController::class);
+
+
+Route::resource('shelves', ShelfController::class);
+
+Route::resource('levels', LevelController::class);
+
+Route::resource('positions', PositionController::class);
+
+//6.Ruta de distribución
+
+Route::resource('distribution', DistributionController::class);
 // Ruta para cerrar sesión (ejemplo necesario para tu botón inferior)
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
