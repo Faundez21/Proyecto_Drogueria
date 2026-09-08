@@ -7,6 +7,7 @@ use App\Http\Controllers\ShelfController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\DistributionController;
+use App\Http\Controllers\QuarantineController;
 
 // 1. Redirige la página principal exclusivamente al login
 Route::redirect('/', '/login');
@@ -72,3 +73,7 @@ Route::resource('positions', PositionController::class);
 //6.Ruta de distribución
 
 Route::resource('distribution', DistributionController::class);
+
+//7.Ruta de cuarentena
+
+Route::resource('quarantine', QuarantineController::class);

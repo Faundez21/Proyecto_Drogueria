@@ -93,7 +93,7 @@
                                 Editar
                             </button>
 
-                            <button class="text-red-600 hover:text-red-800 cursor-pointer">
+                             <button onclick="openDelete()" class="text-red-600 hover:text-red-800 mr-3 cursor-pointer">
                                 Eliminar
                             </button>
 
@@ -260,7 +260,37 @@
     </div>
 
 
-    <!-- Funciones con JS para abrir y cerrar los modales -->
+    <!--Modal para eliminar pasillos-->
+    <div id="deleteModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                Eliminar pasillo
+            </h2>
+
+            <p class="text-gray-700 mb-4">
+                ¿Estás seguro de que deseas eliminar este pasillo?
+            </p>
+
+            <div class="flex justify-end gap-3">
+
+                <button type="button" onclick="closeDelete()"
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg cursor-pointer">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg cursor-pointer">
+                    Eliminar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Funciones con JS para abrir y cerrar el modal -->
 
     <script>
         function openCreate() {
@@ -271,6 +301,7 @@
 
         }
 
+
         function closeCreate() {
 
             document
@@ -280,35 +311,33 @@
         }
 
         function openShow() {
-
             document
                 .getElementById('showModal')
                 .classList.remove('hidden');
-
         }
 
         function closeShow() {
-
             document
                 .getElementById('showModal')
                 .classList.add('hidden');
-
         }
 
         function openEdit() {
-
             document
                 .getElementById('editModal')
                 .classList.remove('hidden');
-
         }
 
         function closeEdit() {
-
             document
                 .getElementById('editModal')
                 .classList.add('hidden');
+        }
 
+        function openDelete() {
+            if (confirm('¿Estás seguro de que deseas eliminar este pasillo?')) {
+                alert('Pasillo eliminado');
+            }
         }
     </script>
 @endsection
