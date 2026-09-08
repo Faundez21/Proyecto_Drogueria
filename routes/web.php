@@ -79,8 +79,6 @@ Route::resource('positions', PositionController::class);
 Route::resource('distribution', DistributionController::class);
 // Ruta para cerrar sesión (ejemplo necesario para tu botón inferior)
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-<<<<<<< HEAD
-=======
 
 //5. Rutas de mantenedores
 
@@ -104,4 +102,4 @@ Route::resource('quarantine', QuarantineController::class);
 
 //8.Ruta de QR
 Route::resource ('qr', QRController::class);
->>>>>>> 838f8921d39831e69ddde98a4466df520d3a4fcb
+
