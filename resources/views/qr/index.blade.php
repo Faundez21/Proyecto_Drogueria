@@ -6,7 +6,6 @@
 
     <!-- Miga de pan -->
     <div class="flex items-center gap-2 text-gray-500 mb-4">
-        <a href="{{ route('dashboard') }}" class="hover:text-blue-900">
             Cuarentena
         </a>
     </div>
