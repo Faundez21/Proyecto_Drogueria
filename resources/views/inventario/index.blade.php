@@ -1,19 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<<<<<<< HEAD
-    <!-- Creacion y Importacion -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        
-        <!-- Importación Masiva -->
-        <div class="lg:col-span-1 space-y-6">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full">
-                <div class="px-6 py-4 border-b border-slate-200 bg-emerald-50/50">
-                    <h2 class="text-sm font-bold text-emerald-900 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                        Importación Masiva
-                    </h2>
-=======
     <div class="max-w-full sm:max-w-[95%] mx-auto p-4 sm:p-6 mt-2 sm:mt-4">
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
@@ -22,7 +9,6 @@
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Importar Carga Masiva</h2>
                     <p class="text-sm text-slate-500 mt-1 mb-6">Suba un archivo Excel (.xlsx o .csv) para actualizar el inventario completo.</p>
->>>>>>> origin/nicolas
                 </div>
 
                 <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg p-6 flex-grow flex flex-col justify-center items-center">
