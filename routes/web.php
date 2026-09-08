@@ -61,6 +61,9 @@ Route::get('/error', function () {
     return view('error');
 });
 
+Route::get('/users', function () {
+    return view('users.index');
+})->name('users.index');
 
 
 //5. Rutas de mantenedores
