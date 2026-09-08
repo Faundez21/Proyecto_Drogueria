@@ -1,128 +1,106 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-7xl mx-auto p-4 sm:p-6 mt-4">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <div>
-                <h1 class="text-2xl sm:text-3xl text-gray-800 font-semibold">Reportes</h1>
-            </div>
-            <!-- Ambos botones para exportar -->
-            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                <button
-                    class="flex justify-center items-center gap-2 bg-red-600 border border-transparent text-white px-4 py-2.5 sm:py-2 rounded-lg hover:bg-red-700 transition-colors font-medium text-sm shadow-sm w-full sm:w-auto">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                        </path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-6 4h6m-4-8h.01">
-                        </path>
-                    </svg>
-                    Exportar PDF
-                </button>
+    <div class="max-w-full sm:max-w-[95%] mx-auto p-4 sm:p-6 mt-2 sm:mt-4">
 
-                <button
-                    class="flex justify-center items-center gap-2 bg-emerald-600 border border-transparent text-white px-4 py-2.5 sm:py-2 rounded-lg hover:bg-emerald-700 transition-colors font-medium text-sm shadow-sm w-full sm:w-auto">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                        </path>
-                    </svg>
-                    Exportar Excel
-                </button>
-            </div>
-        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                        <!--importe-->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Importar Carga Masiva</h2>
+                    <p class="text-sm text-slate-500 mt-1 mb-6">Suba un archivo Excel (.xlsx o .csv) para actualizar el inventario completo.</p>
+                </div>
 
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-8">
-            <!-- Barra de busqueda -->
-            <div class="mb-5">
-                <label for="busqueda" class="block text-sm font-medium text-slate-700 mb-1">Búsqueda</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
+                <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg p-6 flex-grow flex flex-col justify-center items-center">
+                    <form action="/inventario/subir-excel" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
+                        @csrf
+                        <input type="file" id="excel" name="excel" class="hidden" accept=".xlsx, .xls, .csv">
+
+                        <label for="excel" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 px-4 py-2.5 rounded-lg cursor-pointer inline-flex items-center gap-2 text-sm font-medium transition-colors shadow-sm w-full sm:w-auto justify-center">
+                            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                            Seleccionar archivo
+                        </label>
+
+                        <button type="submit" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto">
+                            Subir Excel
+                        </button>
+                    </form>
+                </div>
+            </div>
+                    <!--ingreso manual-->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Ingresar Producto Individual</h2>
+                    <p class="text-sm text-slate-500 mt-1 mb-6">Registra un nuevo producto en el catálogo maestro del sistema.</p>
+                </div>
+
+                <form action="/inventario/guardar" method="POST">
+                    @csrf
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="sku" class="block text-xs font-medium text-slate-700 mb-1">ID</label>
+                            <input type="text" id="sku" name="sku" placeholder="Ej. COD-1005" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required />
+                        </div>
+
+                        <div>
+                            <label for="nombre" class="block text-xs font-medium text-slate-700 mb-1">Nombre del Producto</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Paracetamol" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required />
+                        </div>
+
+                        <div>
+                            <label for="categoria" class="block text-xs font-medium text-slate-700 mb-1">Categoría</label>
+                            <select id="categoria" name="categoria" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
+                                <option value="" disabled selected>Seleccionar...</option>
+                                <option value="farmacos">Fármacos</option>
+                                <option value="insumos">Insumos Clínicos</option>
+                                <option value="equipamiento">Equipamiento Médico</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="stock" class="block text-xs font-medium text-slate-700 mb-1">Stock Inicial</label>
+                            <input type="number" id="stock" name="stock" placeholder="0" min="0" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required />
+                        </div>
+
+                        <div>
+                            <label for="pasillo" class="block text-xs font-medium text-slate-700 mb-1">Pasillo</label>
+                            <input type="text" id="pasillo" name="pasillo" placeholder="Ej. Pasillo 1" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                        </div>
+
+                        <div>
+                            <label for="estante" class="block text-xs font-medium text-slate-700 mb-1">Estante</label>
+                            <input type="text" id="estante" name="estante" placeholder="Ej. Estante 3" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                        </div>
                     </div>
-                    <input type="text" id="busqueda"
-                        placeholder="Buscar por ID o Nombre de Producto..."
-                        class="pl-10 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                </div>
+
+                    <div class="flex justify-end mt-6 pt-4 border-t border-gray-100">
+                        <button type="submit" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto">
+                            Guardar Producto
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            <!-- div de los filtros -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-
-                <div>
-                    <label for="filtro_categoria" class="block text-xs font-medium text-slate-600 mb-1">Categoría</label>
-                    <select id="filtro_categoria"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 transition-all bg-white">
-                        <option value="">Todas las categorías</option>
-                        <option value="farmacos">Fármacos</option>
-                        <option value="insumos">Insumos</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="filtro_pasillo" class="block text-xs font-medium text-slate-600 mb-1">Pasillo</label>
-                    <select id="filtro_pasillo"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 transition-all bg-white">
-                        <option value="">Todos los pasillos</option>
-                        <option value="A">Pasillo A</option>
-                        <option value="B">Pasillo B</option>
-                        <option value="C">Pasillo C</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="filtro_estante" class="block text-xs font-medium text-slate-600 mb-1">Estante</label>
-                    <select id="filtro_estante"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 transition-all bg-white">
-                        <option value="">Todos los estantes</option>
-                        <option value="1">Estante 1</option>
-                        <option value="2">Estante 2</option>
-                        <option value="3">Estante 3</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="filtro_stock" class="block text-xs font-medium text-slate-600 mb-1">Nivel de Stock</label>
-                    <select id="filtro_stock"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 transition-all bg-white">
-                        <option value="">Cualquier cantidad</option>
-                        <option value="disponible">Disponible (Normal)</option>
-                        <option value="pocas">Pocas unidades (Crítico)</option>
-                        <option value="agotado">Agotado (0 unidades)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="filtro_cuarentena" class="block text-xs font-medium text-slate-600 mb-1">Estado / Cuarentena</label>
-                    <select id="filtro_cuarentena"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 transition-all bg-white">
-                        <option value="">Cualquier estado</option>
-                        <option value="no">Libre (No)</option>
-                        <option value="si">Retenido (Sí)</option>
-                    </select>
-                </div>
-                <div class="sm:col-span-2 lg:col-span-4 flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100 w-full">
-                    <button type="reset"
-                        class="px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium shadow-sm">
-                        Limpiar Filtros
-                    </button>
-                    <button type="button"
-                        class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition-colors font-medium text-sm flex items-center gap-2 shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                            </path>
-                        </svg>
-                        Aplicar Filtros
-                    </button>
-                </div>
-
+        </div>
+        <!--Parte del inventario-->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl text-gray-800 font-semibold">Inventario Maestro</h1>
+            </div>
+            <!--Boton de reporte-->
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <a href="{{ route('inventario.reporte') }}"
+                    class="flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm w-full sm:w-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                        </path>
+                    </svg>
+                    Reporte
+                </a>
             </div>
         </div>
-        <!-- Tabla (misma q la de inventario)-->
+        <!--Tabla inventario-->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto w-full">
                 <table class="min-w-[1100px] w-full text-left text-sm font-light text-gray-800 whitespace-nowrap">
@@ -145,7 +123,7 @@
                             <td class="px-4 py-3 font-medium text-gray-600">1001</td>
                             <td class="px-4 py-3 font-bold text-slate-800">PARACETAMOL 500MG</td>
                             <td class="px-4 py-3 text-gray-600">Fármacos</td>
-                            <td class="px-4 py-3 text-gray-600 font-medium">Pasillo A </td>
+                            <td class="px-4 py-3 text-gray-600 font-medium">Pasillo A   </td>
                             <td class="px-4 py-3 text-gray-600">Estante 1</td>
                             <td class="px-4 py-3 text-center text-gray-500 font-medium">No</td>
                             <td class="px-4 py-3">
@@ -295,6 +273,5 @@
                 </table>
             </div>
         </div>
-
     </div>
 @endsection

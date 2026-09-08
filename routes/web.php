@@ -40,5 +40,21 @@ Route::get('/proveedores/crear', function () {
     return view('proveedores.create');
 })->name('proveedores.create');
 
+
+Route::get('/inventario', function () {
+        return view('inventario.index');
+    })->name('inventario.index');
+
+    Route::get('/reporte', function () {
+        return view('inventario.reporte');
+    })->name('inventario.reporte');
+
+Route::get('/error', function () {
+    return view('error');
+});
+
 // Ruta para cerrar sesión (ejemplo necesario para tu botón inferior)
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::resource('pasillos', PasilloController::class);
+
+Route::resource('layout', LayoutController::class);
