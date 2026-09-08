@@ -16,10 +16,10 @@ class UserSeeder extends Seeder
 
         $user1 = User::updateOrCreate(
             [
-                'email' => 'admin@admin.cl',
+                'email' => 'pabloadmin@drogueriadas.com',
             ],
             [
-                'name' => 'Administrador',
+                'name' => 'Pablo Cáceres',
                 'password' => Hash::make('12345678'),
             ]
         );
