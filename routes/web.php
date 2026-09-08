@@ -9,6 +9,8 @@ use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\DistributionController;
 
+
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // 1. Redirige la página principal exclusivamente al login
 Route::redirect('/', '/login');
 
