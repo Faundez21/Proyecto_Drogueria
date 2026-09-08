@@ -13,17 +13,17 @@
 
     <!-- Contenedor Principal -->
     <div class="w-full max-w-md lg:max-w-7xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col lg:flex-row overflow-hidden min-h-[80vh] lg:min-h-[85vh]">
-        
+
         <!-- Vista movil (Solo Imagen) -->
-        <div class="block lg:hidden w-full h-40 sm:h-48 relative bg-cover bg-center" 
+        <div class="block lg:hidden w-full h-40 sm:h-48 relative bg-cover bg-center"
              style="background-image: url('{{ asset('images/bg-drogueria.jpg') }}');">
             <div class="absolute inset-0 bg-blue-900/10"></div>
         </div>
 
         <!-- Panel Izquierdo parte Desktop -->
-        <div class="hidden lg:flex w-1/2 relative bg-blue-900 flex-col justify-between p-12 text-white" 
+        <div class="hidden lg:flex w-1/2 relative bg-blue-900 flex-col justify-between p-12 text-white"
              style="background-image: url('{{ asset('images/bg-drogueria.jpg') }}'); background-size: cover; background-position: center;">
-            
+
             <div class="absolute inset-0 bg-gradient-to-r from-blue-950/95 via-blue-900/70 to-blue-900/20"></div>
 
             <div class="relative z-10 flex flex-col h-full">
@@ -122,7 +122,7 @@
 
         <!-- Panel Derecho del login -->
         <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 sm:p-10 lg:p-16 relative">
-            
+
             <div class="w-full max-w-md">
                 <!-- Logo solo visible en móviles (Ajustado para fondo blanco) -->
                 <div class="flex lg:hidden items-center justify-center gap-2 font-bold text-2xl mb-6">
@@ -141,7 +141,7 @@
                 <!-- Formulario -->
                 <form method="POST" action="{{ route('login') }}" class="space-y-4 sm:space-y-5">
                     @csrf
-                    
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
                         <div class="relative">
@@ -175,7 +175,7 @@
                     ¿No tienes una cuenta? <a href="#" class="font-medium text-blue-700 hover:text-blue-900">Contacta al administrador</a>
                 </p>
             </div>
-            
+
             <div class="mt-8 lg:absolute lg:bottom-8 w-full text-center">
                 <p class="text-[11px] sm:text-xs text-gray-400">&copy; {{ date('Y') }} Drogueria DAS. Todos los derechos reservados.</p>
             </div>
