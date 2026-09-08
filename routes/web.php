@@ -3,11 +3,12 @@
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasilloController;
-use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\ShelfController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\DistributionController;
+use App\Http\Controllers\QuarantineController;
+use App\Http\Controllers\QRController;
 
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -22,6 +23,8 @@ Route::post('/login', [LoginController::class, 'authenticate']);
 Route::get('/recuperar-password', function () {
     return "Página de recuperación de contraseña en construcción...";
 })->name('password.request');
+
+
 
 // 4. Rutas del Panel (Nombres asignados)
 Route::get('/dashboard', function () {
@@ -78,3 +81,26 @@ Route::resource('positions', PositionController::class);
 Route::resource('distribution', DistributionController::class);
 // Ruta para cerrar sesión (ejemplo necesario para tu botón inferior)
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+//5. Rutas de mantenedores
+
+Route::resource('pasillos', PasilloController::class);
+
+
+Route::resource('shelves', ShelfController::class);
+
+Route::resource('levels', LevelController::class);
+
+Route::resource('positions', PositionController::class);
+
+//6.Ruta de distribución
+
+Route::resource('distribution', DistributionController::class);
+
+//7.Ruta de cuarentena
+
+Route::resource('quarantine', QuarantineController::class);
+
+
+//8.Ruta de QR
+Route::resource ('qr', QRController::class);
