@@ -2,6 +2,12 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PasilloController;
+use App\Http\Controllers\LayoutController;
+use App\Http\Controllers\ShelfController;
+use App\Http\Controllers\LevelController;
+use App\Http\Controllers\PositionController;
+use App\Http\Controllers\DistributionController;
 
 // 1. Redirige la página principal exclusivamente al login
 Route::redirect('/', '/login');
@@ -53,8 +59,20 @@ Route::get('/error', function () {
     return view('error');
 });
 
-// Ruta para cerrar sesión (ejemplo necesario para tu botón inferior)
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+
+//5. Rutas de mantenedores
+
 Route::resource('pasillos', PasilloController::class);
 
-Route::resource('layout', LayoutController::class);
+
+Route::resource('shelves', ShelfController::class);
+
+Route::resource('levels', LevelController::class);
+
+Route::resource('positions', PositionController::class);
+
+//6.Ruta de distribución
+
+Route::resource('distribution', DistributionController::class);
+

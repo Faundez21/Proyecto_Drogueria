@@ -8,18 +8,39 @@ class PasilloController extends Controller
 {
 
     public function index()
-    {
-        //dirección del menú del mantenedor pasillo
+{
+    // datos temporales
 
-        return view('pasillos.index');
-    }
+    $pasillos = [
+        [
+            'id' => 1,
+            'nombre' => 'Pasillo A',
+            'descripcion' => 'Medicamentos generales',
+            'estado' => 'Disponible'
+        ],
+        [
+            'id' => 2,
+            'nombre' => 'Pasillo B',
+            'descripcion' => 'Medicamentos refrigerados',
+            'estado' => 'En uso'
+        ],
+        [
+            'id' => 3,
+            'nombre' => 'Pasillo C',
+            'descripcion' => 'Medicamentos en cuarentena',
+            'estado' => 'Cuarentena'
+        ],
+    ];
+
+    return view('maintainers.pasillos.index', compact('pasillos'));
+}
 
 
     public function create()
     {
         //dirección del menú de crear pasillo
 
-        return view('pasillos.create');
+        return view('maintainers.pasillos.create');
     }
 
 
@@ -53,13 +74,13 @@ class PasilloController extends Controller
 
     $pasillo = collect($pasillos)->firstWhere('id', $id);
 
-    return view('pasillos.show', compact('pasillo'));
+    return view('maintainers.pasillos.show', compact('pasillo'));
 }
 
 
     public function edit(string $id)
     {
-        return view('pasillos.edit');
+        return view('maintainers.pasillos.edit');
     }
 
     /**
