@@ -95,7 +95,7 @@
                                 Editar
                             </button>
 
-                             <button onclick="openDelete()" class="text-red-600 hover:text-red-800 mr-3 cursor-pointer">
+                            <button onclick="openDelete()" class="text-red-600 hover:text-red-800 mr-3 cursor-pointer">
                                 Eliminar
                             </button>
 
