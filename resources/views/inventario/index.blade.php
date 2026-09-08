@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('content')
+    @section('content')
     <div class="max-w-full sm:max-w-[95%] mx-auto p-4 sm:p-6 mt-2 sm:mt-4">
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
