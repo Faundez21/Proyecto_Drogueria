@@ -3,11 +3,12 @@
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasilloController;
-use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\ShelfController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\DistributionController;
+use App\Http\Controllers\QuarantineController;
+use App\Http\Controllers\QRController;
 
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -78,3 +79,29 @@ Route::resource('positions', PositionController::class);
 Route::resource('distribution', DistributionController::class);
 // Ruta para cerrar sesión (ejemplo necesario para tu botón inferior)
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+<<<<<<< HEAD
+=======
+
+//5. Rutas de mantenedores
+
+Route::resource('pasillos', PasilloController::class);
+
+
+Route::resource('shelves', ShelfController::class);
+
+Route::resource('levels', LevelController::class);
+
+Route::resource('positions', PositionController::class);
+
+//6.Ruta de distribución
+
+Route::resource('distribution', DistributionController::class);
+
+//7.Ruta de cuarentena
+
+Route::resource('quarantine', QuarantineController::class);
+
+
+//8.Ruta de QR
+Route::resource ('qr', QRController::class);
+>>>>>>> 838f8921d39831e69ddde98a4466df520d3a4fcb
