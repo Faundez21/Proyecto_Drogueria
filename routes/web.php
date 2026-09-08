@@ -26,8 +26,8 @@ Route::get('/recuperar-password', function () {
 
 // 4. Rutas del Panel (Nombres asignados)
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+    return view('dashboard.index');
+})->name('dashboard.index');
 
 Route::get('/recepcion', function () {
     return view('recepcion.index');
