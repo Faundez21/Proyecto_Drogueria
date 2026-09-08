@@ -8,6 +8,7 @@ use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\DistributionController;
 use App\Http\Controllers\QuarantineController;
+use App\Http\Controllers\QRController;
 
 // 1. Redirige la página principal exclusivamente al login
 Route::redirect('/', '/login');
@@ -77,3 +78,7 @@ Route::resource('distribution', DistributionController::class);
 //7.Ruta de cuarentena
 
 Route::resource('quarantine', QuarantineController::class);
+
+
+//8.Ruta de QR
+Route::resource ('qr', QRController::class);
