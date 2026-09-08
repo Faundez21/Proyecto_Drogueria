@@ -272,6 +272,19 @@
                     </tbody>
                 </table>
             </div>
+            <div class="px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-b-2xl">
+            <span class="text-sm text-slate-500">Mostrando del <span class="font-medium text-slate-900">1</span> al <span class="font-medium text-slate-900">10</span> de <span class="font-medium text-slate-900">142</span> proveedores</span>
+            <div class="flex items-center gap-1">
+                <button class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-400 cursor-not-allowed bg-slate-50">Anterior</button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-100">1</button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">2</button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">3</button>
+                <span class="px-1 text-slate-400">...</span>
+                <button class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">Siguiente</button>
+            </div>
+        </div>
+    </div>
+
         </div>
     </div>
 @endsection
