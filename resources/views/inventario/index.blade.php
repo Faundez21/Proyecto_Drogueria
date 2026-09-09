@@ -1,37 +1,68 @@
 @extends('layouts.app')
 
-    @section('content')
+@section('content')
     <div class="max-w-full sm:max-w-[95%] mx-auto p-4 sm:p-6 mt-2 sm:mt-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl text-gray-800 font-semibold">Inventario</h1>
+                <p class="text-gray-500 mt-1">
+                    Ingresos manuales o importaciones masivas y tabla del catálogo de productos
+                </p>
+            </div>
 
+        </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-                        <!--importe-->
+            <!--importe-->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Importar Carga Masiva</h2>
-                    <p class="text-sm text-slate-500 mt-1 mb-6">Suba un archivo Excel (.xlsx o .csv) para actualizar el inventario completo.</p>
+                    <p class="text-sm text-slate-500 mt-1 mb-5">Suba un archivo Excel (.xlsx o .csv) para actualizar el
+                        inventario completo.</p>
+
+                    <a href=""
+                        class="w-full mb-6 flex justify-center items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-colors font-medium text-sm shadow-sm">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        Descargar Plantilla
+                    </a>
                 </div>
 
-                <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg p-6 flex-grow flex flex-col justify-center items-center">
-                    <form action="/inventario/subir-excel" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
+
+                <div
+                    class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg p-6 flex-grow flex flex-col justify-center items-center">
+
+                    <form action="/inventario/subir-excel" method="POST" enctype="multipart/form-data"
+                        class="flex flex-col items-center gap-4 w-full">
                         @csrf
                         <input type="file" id="excel" name="excel" class="hidden" accept=".xlsx, .xls, .csv">
 
-                        <label for="excel" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 px-4 py-2.5 rounded-lg cursor-pointer inline-flex items-center gap-2 text-sm font-medium transition-colors shadow-sm w-full sm:w-auto justify-center">
-                            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                        <label for="excel"
+                            class="w-full sm:w-64 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 px-4 py-2.5 rounded-lg cursor-pointer inline-flex items-center gap-2 text-sm font-medium transition-colors shadow-sm justify-center mb-2">
+                            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
+                                </path>
+                            </svg>
                             Seleccionar archivo
                         </label>
 
-                        <button type="submit" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto">
-                            Subir Excel
+                        <button type="submit"
+                            class="w-full sm:w-64 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm">
+                            Procesar Importación
                         </button>
                     </form>
+
                 </div>
             </div>
-                    <!--ingreso manual-->
+            <!--ingreso manual-->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Ingresar Producto Individual</h2>
-                    <p class="text-sm text-slate-500 mt-1 mb-6">Registra un nuevo producto en el catálogo maestro del sistema.</p>
+                    <p class="text-sm text-slate-500 mt-1 mb-6">Registra un nuevo producto en el catálogo maestro del
+                        sistema.</p>
                 </div>
 
                 <form action="/inventario/guardar" method="POST">
@@ -39,17 +70,24 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="sku" class="block text-xs font-medium text-slate-700 mb-1">ID</label>
-                            <input type="text" id="sku" name="sku" placeholder="Ej. COD-1005" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required />
+                            <input type="text" id="sku" name="sku" placeholder="Ej. COD-1005"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                required />
                         </div>
 
                         <div>
-                            <label for="nombre" class="block text-xs font-medium text-slate-700 mb-1">Nombre del Producto</label>
-                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Paracetamol" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required />
+                            <label for="nombre" class="block text-xs font-medium text-slate-700 mb-1">Nombre del
+                                Producto</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Paracetamol"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                required />
                         </div>
 
                         <div>
                             <label for="categoria" class="block text-xs font-medium text-slate-700 mb-1">Categoría</label>
-                            <select id="categoria" name="categoria" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
+                            <select id="categoria" name="categoria"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                required>
                                 <option value="" disabled selected>Seleccionar...</option>
                                 <option value="farmacos">Fármacos</option>
                                 <option value="insumos">Insumos Clínicos</option>
@@ -58,23 +96,29 @@
                         </div>
 
                         <div>
-                            <label for="stock" class="block text-xs font-medium text-slate-700 mb-1">Stock Inicial</label>
-                            <input type="number" id="stock" name="stock" placeholder="0" min="0" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required />
+                            <label for="stock" class="block text-xs font-medium text-slate-700 mb-1">Stock
+                                Inicial</label>
+                            <input type="number" id="stock" name="stock" placeholder="0" min="0"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                required />
                         </div>
 
                         <div>
                             <label for="pasillo" class="block text-xs font-medium text-slate-700 mb-1">Pasillo</label>
-                            <input type="text" id="pasillo" name="pasillo" placeholder="Ej. Pasillo 1" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                            <input type="text" id="pasillo" name="pasillo" placeholder="Ej. Pasillo 1"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                         </div>
 
                         <div>
                             <label for="estante" class="block text-xs font-medium text-slate-700 mb-1">Estante</label>
-                            <input type="text" id="estante" name="estante" placeholder="Ej. Estante 3" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                            <input type="text" id="estante" name="estante" placeholder="Ej. Estante 3"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                         </div>
                     </div>
 
                     <div class="flex justify-end mt-6 pt-4 border-t border-gray-100">
-                        <button type="submit" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto">
+                        <button type="submit"
+                            class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto">
                             Guardar Producto
                         </button>
                     </div>
@@ -83,11 +127,15 @@
 
         </div>
         <!--Parte del inventario-->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div>
-                <h1 class="text-2xl sm:text-3xl text-gray-800 font-semibold">Inventario Maestro</h1>
+
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 mt-4">
+
+            <div class="w-full sm:w-auto">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 text-left">
+                    Catálogo Base de Productos
+                </h3>
             </div>
-            <!--Boton de reporte-->
+
             <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <a href="{{ route('reportes.index') }}"
                     class="flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm w-full sm:w-auto">
@@ -100,12 +148,15 @@
                 </a>
             </div>
         </div>
+
+
         <!--Tabla inventario-->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto w-full">
                 <table class="min-w-[1100px] w-full text-left text-sm font-light text-gray-800 whitespace-nowrap">
 
-                    <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                    <thead
+                        class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
                         <tr>
                             <th scope="col" class="px-4 py-4">ID</th>
                             <th scope="col" class="px-4 py-4">Producto</th>
@@ -123,7 +174,7 @@
                             <td class="px-4 py-3 font-medium text-gray-600">1001</td>
                             <td class="px-4 py-3 font-bold text-slate-800">PARACETAMOL 500MG</td>
                             <td class="px-4 py-3 text-gray-600">Fármacos</td>
-                            <td class="px-4 py-3 text-gray-600 font-medium">Pasillo A   </td>
+                            <td class="px-4 py-3 text-gray-600 font-medium">Pasillo A </td>
                             <td class="px-4 py-3 text-gray-600">Estante 1</td>
                             <td class="px-4 py-3 text-center text-gray-500 font-medium">No</td>
                             <td class="px-4 py-3">
@@ -132,7 +183,18 @@
                                     850 Unidades
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-center">
+                            <td class="px-4 py-3 text-center flex justify-center gap-1">
+                                <button
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    title="Ver Detalles">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
+                                    </svg>
+                                </button>
                                 <button
                                     class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                     title="Editar">
@@ -172,7 +234,18 @@
                                     15 Unidades
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-center">
+                            <td class="px-4 py-3 text-center flex justify-center gap-1">
+                                <button
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    title="Ver Detalles">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
+                                    </svg>
+                                </button>
                                 <button
                                     class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                     title="Editar">
@@ -207,7 +280,18 @@
                                     0 Unidades (Agotado)
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-center">
+                            <td class="px-4 py-3 text-center flex justify-center gap-1">
+                                <button
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    title="Ver Detalles">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
+                                    </svg>
+                                </button>
                                 <button
                                     class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                     title="Editar">
@@ -217,6 +301,7 @@
                                         </path>
                                     </svg>
                                 </button>
+                                <!-- Botón Desactivar -->
                                 <button
                                     class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                     title="Desactivar">
@@ -247,7 +332,18 @@
                                     320 Unidades
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-center">
+                            <td class="px-4 py-3 text-center flex justify-center gap-1">
+                                <button
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    title="Ver Detalles">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
+                                    </svg>
+                                </button>
                                 <button
                                     class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                     title="Editar">
@@ -272,19 +368,25 @@
                     </tbody>
                 </table>
             </div>
-            <div class="px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-b-2xl">
-            <span class="text-sm text-slate-500">Mostrando del <span class="font-medium text-slate-900">1</span> al <span class="font-medium text-slate-900">10</span> de <span class="font-medium text-slate-900">142</span> proveedores</span>
-            <div class="flex items-center gap-1">
-                <button class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-400 cursor-not-allowed bg-slate-50">Anterior</button>
-                <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-100">1</button>
-                <button class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">2</button>
-                <button class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">3</button>
-                <span class="px-1 text-slate-400">...</span>
-                <button class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">Siguiente</button>
+
+            <div
+                class="px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-b-2xl">
+                <span class="text-sm text-slate-500">Mostrando del <span class="font-medium text-slate-900">1</span> al
+                    <span class="font-medium text-slate-900">10</span> de <span
+                        class="font-medium text-slate-900">142</span> productos</span>
+                <div class="flex items-center gap-1">
+                    <button
+                        class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-400 cursor-not-allowed bg-slate-50">Anterior</button>
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-100">1</button>
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">2</button>
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">3</button>
+                    <span class="px-1 text-slate-400">...</span>
+                    <button
+                        class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">Siguiente</button>
+                </div>
             </div>
         </div>
-    </div>
-
-        </div>
-    </div>
-@endsection
+    @endsection
