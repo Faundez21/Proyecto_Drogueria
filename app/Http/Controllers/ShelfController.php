@@ -11,7 +11,7 @@ class ShelfController extends Controller
      */
     public function index()
     {
-            return view('maintainers.shelves.index');
+            return view('distribution.maintainers.shelves.index');
 
     }
 
