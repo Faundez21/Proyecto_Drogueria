@@ -6,7 +6,7 @@
 @section('content')
     <!-- Creacion y Importacion -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        
+
         <!-- Importación Masiva -->
         <div class="lg:col-span-1 space-y-6">
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full">
@@ -16,10 +16,10 @@
                         Importación Masiva
                     </h2>
                 </div>
-                
+
                 <div class="p-6">
                     <p class="text-sm text-slate-600 mb-4">Carga múltiples productos usando una plantilla Excel.</p>
-                    
+
                     <a href="#" class="mb-5 w-full flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
                         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         Descargar Plantilla
@@ -36,7 +36,7 @@
                                 <input id="file-upload" name="file-upload" type="file" class="sr-only" accept=".csv, .xlsx, .xls">
                             </div>
                             <p class="text-xs text-slate-500 mt-1">XLSX o CSV hasta 5MB</p>
-                            
+
                             <div id="file-name-display" class="hidden mt-3 inline-flex items-center gap-2 px-3 py-1 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 shadow-sm">
                                 <span id="file-name-text">archivo.xlsx</span>
                             </div>
@@ -109,11 +109,11 @@
     </div>
     <!-- Seccion 2: Listado de Catalogo -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        
+
         <!-- Cabecera y Filtros de la Tabla -->
         <div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
             <h2 class="text-lg font-bold text-slate-800">Catálogo Base de Productos</h2>
-            
+
             <div class="flex w-full md:w-auto gap-3">
                 <div class="relative flex-1 md:w-64">
                     <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -143,7 +143,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    
+
                     <!-- Producto 1 -->
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4 font-mono text-xs text-slate-500">PRD-001</td>
@@ -195,7 +195,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- Paginación -->
         <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between bg-white">
             <span class="text-sm text-slate-500">Mostrando 1 a 2 de 450 productos base</span>
