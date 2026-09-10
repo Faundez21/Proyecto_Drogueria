@@ -24,7 +24,8 @@ Route::get('/recuperar-password', function () {
     return "Página de recuperación de contraseña en construcción...";
 })->name('password.request');
 
-
+// middelware auth para proteger las rutas del panel
+Route::middleware('auth')->group(function () {
 
 // 4. Rutas del Panel (Nombres asignados)
 Route::get('/dashboard', function () {
@@ -104,3 +105,5 @@ Route::resource('quarantine', QuarantineController::class);
 
 //8.Ruta de QR
 Route::resource ('qr', QRController::class);
+
+});
