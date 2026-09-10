@@ -5,6 +5,9 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div>
                 <h1 class="text-2xl sm:text-3xl text-gray-800 font-semibold">Reportes</h1>
+                <p class="text-gray-500 mt-1">
+                    Visualización y exportación de datos del sistema.
+                </p>
             </div>
             <!-- Ambos botones para exportar -->
             <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
