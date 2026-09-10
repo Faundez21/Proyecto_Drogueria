@@ -19,11 +19,22 @@ class UserSeeder extends Seeder
                 'email' => 'pabloadmin@drogueriadas.com',
             ],
             [
-                'name' => 'Pablo Cáceres',
+                'name' => 'Pablo',
+                'last_name' => 'Cáceres',
                 'password' => Hash::make('12345678'),
             ]
         );
-
+$user2 = User::updateOrCreate(
+            [
+                'email' => 'usuario@drogueriadas.com',
+            ],
+            [
+                'name' => 'Juan',
+                'last_name' => 'Perez',
+                'password' => Hash::make('12345678'),
+            ]
+        );
         $user1->assignRole('Administrador');
+        $user2->assignRole('Usuario');
     }
 }
