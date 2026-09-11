@@ -32,7 +32,7 @@ class PasilloController extends Controller
         ],
     ];
 
-    return view('maintainers.pasillos.index', compact('pasillos'));
+    return view('distribution.maintainers.pasillos.index', compact('pasillos'));
 }
 
 
@@ -40,7 +40,7 @@ class PasilloController extends Controller
     {
         //dirección del menú de crear pasillo
 
-        return view('maintainers.pasillos.create');
+        return view('distribution.maintainers.pasillos.create');
     }
 
 
@@ -74,13 +74,13 @@ class PasilloController extends Controller
 
     $pasillo = collect($pasillos)->firstWhere('id', $id);
 
-    return view('maintainers.pasillos.show', compact('pasillo'));
+    return view('distribution.maintainers.pasillos.show', compact('pasillo'));
 }
 
 
     public function edit(string $id)
     {
-        return view('maintainers.pasillos.edit');
+        return view('distribution.maintainers.pasillos.edit');
     }
 
     /**
