@@ -11,7 +11,7 @@ class PositionController extends Controller
      */
     public function index()
     {
-      return view('maintainers.positions.index');
+      return view('distribution.maintainers.positions.index');
 
     }
 
