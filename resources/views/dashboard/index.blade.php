@@ -92,7 +92,6 @@
 
     <!-- 2. Sección Principal: Accesos, Trazabilidad y Cuarentena -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        
         <!-- Accesos Rápidos -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
             <h2 class="text-sm font-bold text-slate-800 mb-4">Accesos Rápidos</h2>
@@ -122,7 +121,6 @@
                 <h2 class="text-sm font-bold text-slate-800">Trazabilidad Reciente</h2>
                 <a href="#" class="text-xs text-blue-600 hover:underline">Ver historial</a>
             </div>
-            
             <div class="space-y-4">
                 <!-- Item Trazabilidad -->
                 <div class="flex gap-4">
@@ -165,7 +163,6 @@
 
     <!-- 3. Panel Inferior: Sistema QR y Lotes en Cuarentena -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
         <!-- Panel Sistema QR -->
         <div class="bg-[#0f172a] p-6 rounded-2xl shadow-md text-white flex flex-col sm:flex-row gap-6">
             <div class="flex-shrink-0">
@@ -210,7 +207,7 @@
                 <h2 class="text-sm font-bold text-slate-800">Lotes en Cuarentena</h2>
                 <a href="#" class="text-xs text-blue-600 hover:underline">Ver todos</a>
             </div>
-            
+
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600">
                     <thead class="text-xs uppercase text-slate-400 border-b border-slate-100">

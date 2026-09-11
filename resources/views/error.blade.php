@@ -7,7 +7,7 @@
     <title>¡¡Error!!</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-
+<link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
 <body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-lg p-8 sm:p-10 bg-white rounded-xl shadow-sm border border-gray-100 text-center">
@@ -25,9 +25,7 @@
         <h1 class="text-3xl font-bold text-gray-900 mb-3">Ha ocurrido un problema</h1>
 
         <p class="text-gray-500 mb-8 text-sm leading-relaxed">
-            No pudimos procesar tu solicitud en este momento. Por favor, verifica los datos e intenta nuevamente, o
-            contacta al administrador del sistema.
-        </p>
+            No pudimos procesar tu solicitud en este momento. Por favor, verifica los datos e intenta nuevamente.
 
 
         <div class="flex flex-col sm:flex-row justify-center gap-3">
