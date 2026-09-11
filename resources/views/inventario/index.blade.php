@@ -1,226 +1,392 @@
 @extends('layouts.app')
 
-@section('title', 'Catálogo de Productos')
-@section('header', 'Gestión del Inventario')
-
 @section('content')
-    <!-- Creacion y Importacion -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="max-w-full sm:max-w-[95%] mx-auto p-4 sm:p-6 mt-2 sm:mt-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl text-gray-800 font-semibold">Inventario</h1>
+                <p class="text-gray-500 mt-1">
+                    Ingresos manuales o importaciones masivas y tabla del catálogo de productos
+                </p>
+            </div>
 
-        <!-- Importación Masiva -->
-        <div class="lg:col-span-1 space-y-6">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full">
-                <div class="px-6 py-4 border-b border-slate-200 bg-emerald-50/50">
-                    <h2 class="text-sm font-bold text-emerald-900 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                        Importación Masiva
-                    </h2>
-                </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            <!--importe-->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Importar Carga Masiva</h2>
+                    <p class="text-sm text-slate-500 mt-1 mb-5">Suba un archivo Excel (.xlsx o .csv) para actualizar el
+                        inventario completo.</p>
 
-                <div class="p-6">
-                    <p class="text-sm text-slate-600 mb-4">Carga múltiples productos usando una plantilla Excel.</p>
-
-                    <a href="#" class="mb-5 w-full flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <a href=""
+                        class="w-full mb-6 flex justify-center items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-colors font-medium text-sm shadow-sm">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
                         Descargar Plantilla
                     </a>
+                </div>
 
-                    <form action="#" method="POST" enctype="multipart/form-data" class="space-y-4">
+
+                <div
+                    class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg p-6 flex-grow flex flex-col justify-center items-center">
+
+                    <form action="/inventario/subir-excel" method="POST" enctype="multipart/form-data"
+                        class="flex flex-col items-center gap-4 w-full">
                         @csrf
-                        <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-emerald-500 hover:bg-emerald-50 transition-colors cursor-pointer group" onclick="document.getElementById('file-upload').click()">
-                            <svg class="mx-auto h-10 w-10 text-slate-400 group-hover:text-emerald-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <input type="file" id="excel" name="excel" class="hidden" accept=".xlsx, .xls, .csv">
+
+                        <label for="excel"
+                            class="w-full sm:w-64 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 px-4 py-2.5 rounded-lg cursor-pointer inline-flex items-center gap-2 text-sm font-medium transition-colors shadow-sm justify-center mb-2">
+                            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
+                                </path>
                             </svg>
-                            <div class="mt-2 flex text-sm text-slate-600 justify-center">
-                                <span class="font-medium text-emerald-600 hover:text-emerald-500">Subir archivo</span>
-                                <input id="file-upload" name="file-upload" type="file" class="sr-only" accept=".csv, .xlsx, .xls">
-                            </div>
-                            <p class="text-xs text-slate-500 mt-1">XLSX o CSV hasta 5MB</p>
+                            Seleccionar archivo
+                        </label>
 
-                            <div id="file-name-display" class="hidden mt-3 inline-flex items-center gap-2 px-3 py-1 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 shadow-sm">
-                                <span id="file-name-text">archivo.xlsx</span>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors flex justify-center items-center gap-2">
+                        <button type="submit"
+                            class="w-full sm:w-64 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm">
                             Procesar Importación
                         </button>
                     </form>
+
                 </div>
             </div>
-        </div>
-
-        <!--  Columna Derecha:  Ingreso Manual -->
-        <div class="lg:col-span-2">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full">
-                <div class="px-6 py-4 border-b border-slate-200 bg-blue-50/50 flex justify-between items-center">
-                    <h2 class="text-sm font-bold text-blue-900 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Añadir Nuevo Producto
-                    </h2>
+            <!--ingreso manual-->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Ingresar Producto Individual</h2>
+                    <p class="text-sm text-slate-500 mt-1 mb-6">Registra un nuevo producto en el catálogo maestro del
+                        sistema.</p>
                 </div>
 
-                <form action="#" method="POST" class="p-6">
+                <form action="/inventario/guardar" method="POST">
                     @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del Producto <span class="text-red-500">*</span></label>
-                            <input type="text" name="nombre" required placeholder="Ej: Losartán 50mg" class="w-full border-slate-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="sku" class="block text-xs font-medium text-slate-700 mb-1">ID</label>
+                            <input type="text" id="sku" name="sku" placeholder="Ej. COD-1005"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                required />
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">SKU / Código</label>
-                            <input type="text" name="codigo" placeholder="Ej: PRD-001" class="w-full border-slate-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            <label for="nombre" class="block text-xs font-medium text-slate-700 mb-1">Nombre del
+                                Producto</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Paracetamol"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                required />
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Unidad <span class="text-red-500">*</span></label>
-                            <select name="unidad_medida" required class="w-full border-slate-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                <option value="Caja">Caja</option>
-                                <option value="Unidad">Unidad</option>
-                                <option value="Ampolla">Ampolla</option>
+                            <label for="categoria" class="block text-xs font-medium text-slate-700 mb-1">Categoría</label>
+                            <select id="categoria" name="categoria"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                required>
+                                <option value="" disabled selected>Seleccionar...</option>
+                                <option value="farmacos">Fármacos</option>
+                                <option value="insumos">Insumos Clínicos</option>
+                                <option value="equipamiento">Equipamiento Médico</option>
                             </select>
                         </div>
 
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Área / Programa <span class="text-red-500">*</span></label>
-                            <select name="tipo_producto" required class="w-full border-slate-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                <optgroup label="FÁRMACOS">
-                                    <option value="F-PALIATIVOS">CUIDADOS PALIATIVOS</option>
-                                    <option value="F-CARDIOVASCULAR">P.M. CARDIOVASCULAR</option>
-                                </optgroup>
-                                <optgroup label="INSUMOS">
-                                    <option value="I-URGENCIA">URGENCIA CIRUGIA</option>
-                                </optgroup>
-                                <optgroup label="EQUIPAMIENTO">
-                                    <option value="E-COMUNAL">EQUIPAMIENTO COMUNAL</option>
-                                </optgroup>
-                            </select>
+                        <div>
+                            <label for="stock" class="block text-xs font-medium text-slate-700 mb-1">Stock
+                                Inicial</label>
+                            <input type="number" id="stock" name="stock" placeholder="0" min="0"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                required />
+                        </div>
+
+                        <div>
+                            <label for="pasillo" class="block text-xs font-medium text-slate-700 mb-1">Pasillo</label>
+                            <input type="text" id="pasillo" name="pasillo" placeholder="Ej. Pasillo 1"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                        </div>
+
+                        <div>
+                            <label for="estante" class="block text-xs font-medium text-slate-700 mb-1">Estante</label>
+                            <input type="text" id="estante" name="estante" placeholder="Ej. Estante 3"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                         </div>
                     </div>
 
-                    <div class="flex justify-end gap-3 pt-5 mt-5 border-t border-slate-200">
-                        <button type="reset" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50">Limpiar</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Guardar Producto</button>
+                    <div class="flex justify-end mt-6 pt-4 border-t border-gray-100">
+                        <button type="submit"
+                            class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto">
+                            Guardar Producto
+                        </button>
                     </div>
                 </form>
             </div>
+
         </div>
-    </div>
-    <!-- Seccion 2: Listado de Catalogo -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <!--Parte del inventario-->
 
-        <!-- Cabecera y Filtros de la Tabla -->
-        <div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
-            <h2 class="text-lg font-bold text-slate-800">Catálogo Base de Productos</h2>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 mt-4">
 
-            <div class="flex w-full md:w-auto gap-3">
-                <div class="relative flex-1 md:w-64">
-                    <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" placeholder="Buscar por nombre o SKU..." class="pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm w-full focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <div class="w-full sm:w-auto">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 text-left">
+                    Catálogo Base de Productos
+                </h3>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <a href="{{ route('reportes.index') }}"
+                    class="flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm w-full sm:w-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                        </path>
+                    </svg>
+                    Reporte
+                </a>
+            </div>
+        </div>
+
+
+        <!--Tabla inventario-->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto w-full">
+                <table class="min-w-[1100px] w-full text-left text-sm font-light text-gray-800 whitespace-nowrap">
+
+                    <thead
+                        class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                        <tr>
+                            <th scope="col" class="px-4 py-4">ID</th>
+                            <th scope="col" class="px-4 py-4">Producto</th>
+                            <th scope="col" class="px-4 py-4">Categoría</th>
+                            <th scope="col" class="px-4 py-4">Pasillo</th>
+                            <th scope="col" class="px-4 py-4">Estante</th>
+                            <th scope="col" class="px-4 py-4 text-center">Cuarentena</th>
+                            <th scope="col" class="px-4 py-4">Stock Total</th>
+                            <th scope="col" class="px-4 py-4 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 font-medium text-gray-600">1001</td>
+                            <td class="px-4 py-3 font-bold text-slate-800">PARACETAMOL 500MG</td>
+                            <td class="px-4 py-3 text-gray-600">Fármacos</td>
+                            <td class="px-4 py-3 text-gray-600 font-medium">Pasillo A </td>
+                            <td class="px-4 py-3 text-gray-600">Estante 1</td>
+                            <td class="px-4 py-3 text-center text-gray-500 font-medium">No</td>
+                            <td class="px-4 py-3">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                    850 Unidades
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-center flex justify-center gap-1">
+                                <button
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    title="Ver Detalles">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Editar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Desactivar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr class="border-b border-neutral-200 bg-red-50/40 hover:bg-red-50 transition-colors">
+                            <td class="px-4 py-3 font-medium text-red-800">1042</td>
+                            <td class="px-4 py-3 font-bold text-red-900">ERITROMICINA 500 MG CM REC.</td>
+                            <td class="px-4 py-3 text-red-800">Fármacos</td>
+                            <td class="px-4 py-3 text-red-800 font-medium">Pasillo A</td>
+                            <td class="px-4 py-3 text-red-800">Estante 3</td>
+                            <td class="px-4 py-3 text-center text-red-800 font-medium">No</td>
+                            <td class="px-4 py-3">
+                                <span
+                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-300">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                        </path>
+                                    </svg>
+                                    15 Unidades
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-center flex justify-center gap-1">
+                                <button
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    title="Ver Detalles">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Editar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Desactivar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors opacity-75">
+                            <td class="px-4 py-3 font-medium text-gray-500">2055</td>
+                            <td class="px-4 py-3 font-bold text-gray-600">AGUJA 21 G X 1,5 DESECHABLE</td>
+                            <td class="px-4 py-3 text-gray-500">Insumos</td>
+                            <td class="px-4 py-3 text-gray-500 font-medium">Pasillo B</td>
+                            <td class="px-4 py-3 text-gray-500">Estante 2</td>
+                            <td class="px-4 py-3 text-center text-gray-500 font-medium">No</td>
+                            <td class="px-4 py-3">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-300">
+                                    0 Unidades (Agotado)
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-center flex justify-center gap-1">
+                                <button
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    title="Ver Detalles">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Editar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <!-- Botón Desactivar -->
+                                <button
+                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Desactivar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr class="border-b border-neutral-200 bg-orange-50 hover:bg-orange-100 transition-colors">
+                            <td class="px-4 py-3 font-medium text-orange-800">1088</td>
+                            <td class="px-4 py-3 font-bold text-orange-900">IBUPROFENO 400MG</td>
+                            <td class="px-4 py-3 text-orange-800">Fármacos</td>
+                            <td class="px-4 py-3 text-orange-800 font-medium">Pasillo C</td>
+                            <td class="px-4 py-3 text-orange-800">Estante 1</td>
+                            <td class="px-4 py-3 text-center">
+                                <span
+                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-orange-200 text-orange-800 border border-orange-300">
+                                    Sí
+                                </span>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-gray-800 border border-gray-300">
+                                    320 Unidades
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-center flex justify-center gap-1">
+                                <button
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    title="Ver Detalles">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Editar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Desactivar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div
+                class="px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-b-2xl">
+                <span class="text-sm text-slate-500">Mostrando del <span class="font-medium text-slate-900">1</span> al
+                    <span class="font-medium text-slate-900">10</span> de <span
+                        class="font-medium text-slate-900">142</span> productos</span>
+                <div class="flex items-center gap-1">
+                    <button
+                        class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-400 cursor-not-allowed bg-slate-50">Anterior</button>
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-100">1</button>
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">2</button>
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">3</button>
+                    <span class="px-1 text-slate-400">...</span>
+                    <button
+                        class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">Siguiente</button>
                 </div>
-                <select class="py-2 px-3 bg-white border border-slate-300 rounded-lg text-sm text-slate-600 focus:ring-2 focus:ring-blue-500">
-                    <option value="">Todas las Categorías</option>
-                    <option value="farmacos">Fármacos</option>
-                    <option value="insumos">Insumos</option>
-                    <option value="equipamiento">Equipamiento</option>
-                </select>
             </div>
         </div>
-
-        <!-- Tabla de Datos -->
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-600">
-                <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
-                    <tr>
-                        <th class="px-6 py-4">SKU / Cód.</th>
-                        <th class="px-6 py-4">Nombre del Producto</th>
-                        <th class="px-6 py-4">Programa / Área</th>
-                        <th class="px-6 py-4 text-center">Unidad</th>
-                        <th class="px-6 py-4 text-center">Stock Mín.</th>
-                        <th class="px-6 py-4 text-center">Estado</th>
-                        <th class="px-6 py-4 text-right">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-
-                    <!-- Producto 1 -->
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-4 font-mono text-xs text-slate-500">PRD-001</td>
-                        <td class="px-6 py-4 font-bold text-slate-800">Paracetamol 500mg</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">Fármaco - P.M. Artrosis</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">Caja</td>
-                        <td class="px-6 py-4 text-center">50</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Activo</span>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-2">
-                                <button class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors tooltip" title="Editar Producto">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                </button>
-                                <button class="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors tooltip" title="Desactivar">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Producto 2 -->
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-4 font-mono text-xs text-slate-500">INS-084</td>
-                        <td class="px-6 py-4 font-bold text-slate-800">Jeringa 5ml s/aguja</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex px-2 py-1 rounded text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">Insumo - Cirugía Menor</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">Unidad</td>
-                        <td class="px-6 py-4 text-center">100</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Activo</span>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-2">
-                                <button class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                </button>
-                                <button class="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Paginación -->
-        <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between bg-white">
-            <span class="text-sm text-slate-500">Mostrando 1 a 2 de 450 productos base</span>
-            <div class="flex gap-1">
-                <button class="px-3 py-1 border border-slate-200 rounded text-sm text-slate-400 cursor-not-allowed" disabled>Anterior</button>
-                <button class="px-3 py-1 border border-blue-500 rounded text-sm text-white bg-blue-600">1</button>
-                <button class="px-3 py-1 border border-slate-200 rounded text-sm text-slate-600 hover:bg-slate-50">2</button>
-                <button class="px-3 py-1 border border-slate-200 rounded text-sm text-slate-600 hover:bg-slate-50">Siguiente</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Script Drag & Drop UI (Importador) -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('file-upload');
-            const fileNameDisplay = document.getElementById('file-name-display');
-
-            fileInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    fileNameDisplay.innerHTML = `<span class="text-emerald-600 font-bold">✓</span> ${this.files[0].name}`;
-                    fileNameDisplay.classList.remove('hidden');
-                    fileNameDisplay.classList.add('inline-flex');
-                }
-            });
-        });
-    </script>
-@endsection
+    @endsection
