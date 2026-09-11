@@ -64,10 +64,11 @@ Route::get('/error', function () {
     return view('error');
 });
 
+Route::middleware(['auth', 'role:Administrador'])->group(function () {
 Route::get('/users', function () {
     return view('users.index');
 })->name('users.index');
-
+});
 
 //5. Rutas de mantenedores
 
