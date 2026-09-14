@@ -95,7 +95,4 @@ Route::resource('distribution', DistributionController::class);
 Route::resource('quarantine', QuarantineController::class);
 
 
-//8.Ruta de QR
-Route::resource ('qr', QRController::class);
-
 });

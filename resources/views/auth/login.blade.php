@@ -25,13 +25,13 @@
 
             <!-- Vista movil (Solo Imagen) -->
             <div class="block lg:hidden w-full h-40 sm:h-48 relative bg-cover bg-center"
-                style="background-image: url('{{ asset('images/bg-drogueria.jpg') }}');">
+                style="background-image: url('{{ asset('images/bg-drogueria.png') }}');">
                 <div class="absolute inset-0 bg-blue-900/10"></div>
             </div>
 
             <!-- Panel Izquierdo parte Desktop -->
             <div class="hidden lg:flex w-1/2 relative bg-blue-900 flex-col justify-between p-12 text-white"
-                style="background-image: url('{{ asset('images/bg-drogueria.jpg') }}'); background-size: cover; background-position: center;">
+                style="background-image: url('{{ asset('images/bg-drogueria.png') }}'); background-size: cover; background-position: center;">
 
                 <div class="absolute inset-0 bg-gradient-to-r from-blue-950/95 via-blue-900/70 to-blue-900/20"></div>
 
