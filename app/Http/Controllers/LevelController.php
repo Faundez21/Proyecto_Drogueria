@@ -11,7 +11,7 @@ class LevelController extends Controller
      */
     public function index()
     {
-        return view('distribution.maintainers.levels.index');
+        return view('distribution.maintainers.level.index');
 
     }
 

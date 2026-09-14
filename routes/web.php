@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PasilloController;
+use App\Http\Controllers\AisleController;
 use App\Http\Controllers\ShelfController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
@@ -69,17 +69,6 @@ Route::get('/users', function () {
 })->name('users.index');
 
 
-//5. Rutas de mantenedores
-
-Route::resource('pasillos', PasilloController::class);
-
-
-Route::resource('shelves', ShelfController::class);
-
-Route::resource('levels', LevelController::class);
-
-Route::resource('positions', PositionController::class);
-
 //6.Ruta de distribución
 
 Route::resource('distribution', DistributionController::class);
@@ -88,14 +77,14 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 //5. Rutas de mantenedores
 
-Route::resource('pasillos', PasilloController::class);
+Route::resource('aisle', AisleController::class);
 
 
-Route::resource('shelves', ShelfController::class);
+Route::resource('shelf', ShelfController::class);
 
-Route::resource('levels', LevelController::class);
+Route::resource('level', LevelController::class);
 
-Route::resource('positions', PositionController::class);
+Route::resource('position', PositionController::class);
 
 //6.Ruta de distribución
 
