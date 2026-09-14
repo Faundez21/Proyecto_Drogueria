@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\Shelf;
+use App\Models\Level;
 class LevelController extends Controller
 {
     /**
@@ -11,8 +12,11 @@ class LevelController extends Controller
      */
     public function index()
     {
-        return view('distribution.maintainers.level.index');
+        $levels = Level::with('shelf')->get();
 
+        $shelves = Shelf::all();
+
+        return view('distribution.maintainers.level.index', compact('levels', 'shelves'));
     }
 
     /**
@@ -28,7 +32,16 @@ class LevelController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'number' => 'required|integer',
+            'description' => 'nullable|string|max:255',
+            'shelf_id' => 'required|exists:shelves,id',
+        ]);
+
+        Level::create($request->all());
+
+
+        return redirect()->route('level.index')->with('success', 'Nivel creado exitosamente.');
     }
 
     /**
@@ -52,7 +65,19 @@ class LevelController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $level = Level::findOrFail($id);
+
+        $request->validate([
+            'number' => 'required|integer',
+            'description' => 'nullable|string|max:255',
+            'shelf_id' => 'required|exists:shelves,id',
+        ]);
+
+        $level->update($request->all());
+
+        return redirect()->route('level.index')->with('success', 'Nivel editado correctamente.');
+
+
     }
 
     /**
@@ -60,6 +85,8 @@ class LevelController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Level::destroy($id);
+
+        return redirect()->route('level.index')->with('success', 'Nivel eliminado correctamente');
     }
 }

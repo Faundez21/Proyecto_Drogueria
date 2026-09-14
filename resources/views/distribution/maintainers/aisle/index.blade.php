@@ -96,7 +96,8 @@
                                 <div class="flex justify-center gap-2">
 
                                     <!-- Ver -->
-                                    <button onclick="openShow()"
+                                    <button
+                                        onclick='openShow({{ $aisle->id }}, @json ($aisle->name), @json ($aisle->description))''
                                         class="p-1.5 text-slate-600 hover:bg-slate-100 rounded transition-colors"
                                         title="Ver pasillo">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,7 +109,8 @@
                                     </button>
 
                                     <!-- Editar -->
-                                    <button onclick="openEdit()"
+                                    <button
+                                        onclick='openEdit({{ $aisle->id }}, @json ($aisle->name), @json ($aisle->description))''
                                         class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                                         title="Editar pasillo">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,327 +135,332 @@
                                             </svg>
                                         </button>
                                     </form>
+
+
+
+
+                                </div>
+
+                            </td>
+
+                        </tr>
                     @endforeach
+                </tbody>
 
-
+            </table>
 
         </div>
 
-        </td>
 
-        </tr>
+        <!-- Modal para crear un nuevo pasillo -->
+        <div id="createModal"
+            class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
 
-        </tbody>
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
 
-        </table>
+                <!-- Encabezado -->
+                <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
 
-    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">
+                            Nuevo pasillo
+                        </h2>
 
+                        <p class="text-blue-100 text-sm mt-1">
+                            Registra un nuevo pasillo de la bodega.
+                        </p>
+                    </div>
 
-    <!-- Modal para crear un nuevo pasillo -->
-    <div id="createModal"
-        class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+                    <button type="button" onclick="closeCreate()"
+                        class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
 
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
 
-            <!-- Encabezado -->
-            <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
+                    </button>
 
-                <div>
-                    <h2 class="text-xl font-bold text-white">
-                        Nuevo pasillo
-                    </h2>
-
-                    <p class="text-blue-100 text-sm mt-1">
-                        Registra un nuevo pasillo de la bodega.
-                    </p>
                 </div>
 
-                <button type="button" onclick="closeCreate()"
-                    class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+                <!-- Formulario -->
+                <form action="{{ route('aisle.store') }}" method="POST">
 
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    @csrf
 
-                </button>
+                    <div class="px-6 py-6">
 
-            </div>
+                        <!-- Nombre -->
+                        <div class="mb-5">
 
-            <!-- Formulario -->
-            <form action="{{ route('aisle.store') }}" method="POST">
+                            <label for="name" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Nombre
+                            </label>
 
-                @csrf
-
-                <div class="px-6 py-6">
-
-                    <!-- Nombre -->
-                    <div class="mb-5">
-
-                        <label for="name" class="block text-sm font-semibold text-slate-700 mb-2">
-                            Nombre
-                        </label>
-
-                        <input type="text" name="name" id="name" placeholder="Ej: Pasillo A"
-                            class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
+                            <input type="text" name="name" id="name" placeholder="Ej: Pasillo A"
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
                         focus:outline-none focus:ring-2 focus:ring-blue-100
                         focus:border-blue-500 transition">
 
-                    </div>
+                        </div>
 
-                    <!-- Descripción -->
-                    <div>
+                        <!-- Descripción -->
+                        <div>
 
-                        <label for="description" class="block text-sm font-semibold text-slate-700 mb-2">
-                            Descripción
-                        </label>
+                            <label for="description" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Descripción
+                            </label>
 
-                        <textarea name="description" id="description" rows="4" placeholder="Descripción del pasillo..."
-                            class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
+                            <textarea name="description" id="description" rows="4" placeholder="Descripción del pasillo..."
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
                         focus:outline-none focus:ring-2 focus:ring-blue-100
                         focus:border-blue-500 transition resize-none"></textarea>
 
+                        </div>
+
                     </div>
 
-                </div>
+                    <!-- Botones -->
+                    <div class="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
 
-                <!-- Botones -->
-                <div class="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
-
-                    <button type="button" onclick="closeCreate()"
-                        class="px-4 py-2 text-sm font-medium text-slate-700
+                        <button type="button" onclick="closeCreate()"
+                            class="px-4 py-2 text-sm font-medium text-slate-700
                     bg-white border border-slate-300 rounded-lg
                     hover:bg-slate-100 transition-colors cursor-pointer">
-                        Cancelar
-                    </button>
+                            Cancelar
+                        </button>
 
-                    <button type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white
+                        <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-white
                     bg-blue-900 rounded-lg hover:bg-blue-800
                     transition-colors cursor-pointer">
-                        Guardar pasillo
+                            Guardar pasillo
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- Modal para ver un pasillo -->
+        <div id="showModal"
+            class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+
+                <!-- Encabezado -->
+                <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
+
+                    <div>
+                        <h2 class="text-xl font-bold text-white">
+                            Información del pasillo
+                        </h2>
+
+                        <p class="text-blue-100 text-sm mt-1">
+                            Detalles del pasillo seleccionado.
+                        </p>
+                    </div>
+
+                    <button type="button" onclick="closeShow()"
+                        class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+
                     </button>
 
                 </div>
 
-            </form>
+                <!-- Información -->
+                <div class="px-6 py-6 space-y-4">
 
-        </div>
-
-    </div>
-
-    <!-- Modal para ver un pasillo -->
-    <div id="showModal"
-        class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-
-            <!-- Encabezado -->
-            <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
-
-                <div>
-                    <h2 class="text-xl font-bold text-white">
-                        Información del pasillo
-                    </h2>
-
-                    <p class="text-blue-100 text-sm mt-1">
-                        Detalles del pasillo seleccionado.
-                    </p>
-                </div>
-
-                <button type="button" onclick="closeShow()"
-                    class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
-
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-
-                </button>
-
-            </div>
-
-            <!-- Información -->
-            <div class="px-6 py-6 space-y-4">
-
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">
-                        Nombre
-                    </p>
-
-                    <p class="text-slate-800 font-medium">
-                        Pasillo A
-                    </p>
-                </div>
-
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">
-                        Descripción
-                    </p>
-
-                    <p class="text-slate-700">
-                        Medicamentos generales
-                    </p>
-                </div>
-
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">
-                        Estanterías totales
-                    </p>
-
-                    <p class="text-slate-800 font-medium">
-                        6
-                    </p>
-                </div>
-
-            </div>
-
-            <!-- Botones -->
-            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200">
-
-                <button type="button" onclick="closeShow()"
-                    class="px-4 py-2 text-sm font-medium text-slate-700
-                bg-white border border-slate-300 rounded-lg
-                hover:bg-slate-100 transition-colors cursor-pointer">
-                    Cerrar
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-    <!-- Modal para editar un pasillo -->
-    <div id="editModal"
-        class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-
-            <!-- Encabezado -->
-            <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
-
-                <div>
-                    <h2 class="text-xl font-bold text-white">
-                        Editar pasillo
-                    </h2>
-
-                    <p class="text-blue-100 text-sm mt-1">
-                        Modifica la información del pasillo.
-                    </p>
-                </div>
-
-                <button type="button" onclick="closeEdit()"
-                    class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
-
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-
-                </button>
-
-            </div>
-
-            <!-- Formulario -->
-            <form>
-
-                <div class="px-6 py-6">
-
-                    <div class="mb-5">
-
-                        <label for="nombreEditar" class="block text-sm font-semibold text-slate-700 mb-2">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase mb-1">
                             Nombre
-                        </label>
+                        </p>
 
-                        <input type="text" name="nombre" id="nombreEditar" value="Pasillo A"
-                            class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition">
-
+                        <p id="showName" class="text-slate-800 font-medium">
+                        </p>
                     </div>
 
                     <div>
-
-                        <label for="descripcionEditar" class="block text-sm font-semibold text-slate-700 mb-2">
+                        <p class="text-xs font-semibold text-slate-500 uppercase mb-1">
                             Descripción
-                        </label>
+                        </p>
 
-                        <textarea name="descripcion" id="descripcionEditar" rows="4"
-                            class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition resize-none">Medicamentos generales</textarea>
+                        <p id="showDescription" class="text-slate-700">
+                        </p>
+                    </div>
 
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase mb-1">
+                            Estanterías totales
+                        </p>
+
+                        <p class="text-slate-800 font-medium">
+                            6
+                        </p>
                     </div>
 
                 </div>
 
                 <!-- Botones -->
-                <div class="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
+                <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200">
 
-                    <button type="button" onclick="closeEdit()"
+                    <button type="button" onclick="closeShow()"
                         class="px-4 py-2 text-sm font-medium text-slate-700
-                    bg-white border border-slate-300 rounded-lg
-                    hover:bg-slate-100 transition-colors cursor-pointer">
-                        Cancelar
-                    </button>
-
-                    <button type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white
-                    bg-blue-900 rounded-lg hover:bg-blue-800
-                    transition-colors cursor-pointer">
-                        Guardar cambios
+                bg-white border border-slate-300 rounded-lg
+                hover:bg-slate-100 transition-colors cursor-pointer">
+                        Cerrar
                     </button>
 
                 </div>
 
-            </form>
+            </div>
+
+        </div>
+        <!-- Modal para editar un pasillo -->
+        <div id="editModal"
+            class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+
+                <!-- Encabezado -->
+                <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
+
+                    <div>
+                        <h2 class="text-xl font-bold text-white">
+                            Editar pasillo
+                        </h2>
+
+                        <p class="text-blue-100 text-sm mt-1">
+                            Modifica la información del pasillo.
+                        </p>
+                    </div>
+
+                    <button type="button" onclick="closeEdit()"
+                        class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+
+                    </button>
+
+                </div>
+
+                <!-- Formulario -->
+                <form id="editForm" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="px-6 py-6">
+
+                        <div class="mb-5">
+
+                            <label for="editName" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Nombre
+                            </label>
+
+                            <input type="text" name="name" id="editName" value="Pasillo A"
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-blue-100
+                        focus:border-blue-500 transition">
+
+                        </div>
+
+                        <div>
+
+                            <label for="editDescription" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Descripción
+                            </label>
+
+                            <textarea name="description" id="editDescription" rows="4"
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-blue-100
+                        focus:border-blue-500 transition resize-none">Medicamentos generales</textarea>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
+
+                        <button type="button" onclick="closeEdit()"
+                            class="px-4 py-2 text-sm font-medium text-slate-700
+                    bg-white border border-slate-300 rounded-lg
+                    hover:bg-slate-100 transition-colors cursor-pointer">
+                            Cancelar
+                        </button>
+
+                        <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-white
+                    bg-blue-900 rounded-lg hover:bg-blue-800
+                    transition-colors cursor-pointer">
+                            Guardar cambios
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
 
         </div>
 
-    </div>
+        <!-- Funciones con JS para abrir y cerrar el modal -->
 
-    <!-- Funciones con JS para abrir y cerrar el modal -->
+        <script>
+            function openCreate() {
 
-    <script>
-        function openCreate() {
+                document
+                    .getElementById('createModal')
+                    .classList.remove('hidden');
 
-            document
-                .getElementById('createModal')
-                .classList.remove('hidden');
-
-        }
+            }
 
 
-        function closeCreate() {
+            function closeCreate() {
 
-            document
-                .getElementById('createModal')
-                .classList.add('hidden');
+                document
+                    .getElementById('createModal')
+                    .classList.add('hidden');
 
-        }
+            }
 
-        function openShow() {
-            document
-                .getElementById('showModal')
-                .classList.remove('hidden');
-        }
+            function openShow(id, name, description) {
+                document.getElementById('showModal').classList.remove('hidden');
 
-        function closeShow() {
-            document
-                .getElementById('showModal')
-                .classList.add('hidden');
-        }
+                document.getElementById('showName').textContent = name;
+                document.getElementById('showDescription').textContent = description || 'Sin descripción';
+            }
 
-        function openEdit() {
-            document
-                .getElementById('editModal')
-                .classList.remove('hidden');
-        }
+            function closeShow() {
+                document
+                    .getElementById('showModal')
+                    .classList.add('hidden');
+            }
 
-        function closeEdit() {
-            document
-                .getElementById('editModal')
-                .classList.add('hidden');
-        }
+            function openEdit(id, name, description) {
+                document.getElementById('editModal').classList.remove('hidden');
 
+                document.getElementById('editName').value = name;
+                document.getElementById('editDescription').value = description || '';
 
-    </script>
-@endsection
+                document.getElementById('editForm').action = '/aisle/' + id;
+            }
+
+            function closeEdit() {
+                document
+                    .getElementById('editModal')
+                    .classList.add('hidden');
+            }
+        </script>
+    @endsection

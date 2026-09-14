@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\Aisle;
+use App\Models\Shelf;
 class ShelfController extends Controller
 {
     /**
@@ -11,7 +12,12 @@ class ShelfController extends Controller
      */
     public function index()
     {
-            return view('distribution.maintainers.shelf.index');
+        $shelves = Shelf::with('aisle')->get();
+
+        // traer todos los pasillos para el select del formulario
+        $aisles = Aisle::all();
+
+        return view('distribution.maintainers.shelf.index', compact('shelves', 'aisles'));
 
     }
 
@@ -28,7 +34,15 @@ class ShelfController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'aisle_id' => 'required|exists:aisles,id',
+        ]);
+
+        Shelf::create($request->all());
+
+        return redirect()->route('shelf.index') ->with('success', 'Estantería creada exitosamente.');
     }
 
     /**
@@ -52,7 +66,18 @@ class ShelfController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $shelf = Shelf::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'aisle_id' => 'required|exists:aisles,id',
+        ]);
+
+        $shelf->update($request->all());
+
+        return redirect()->route('shelf.index') ->with('success', 'Estantería actualizada exitosamente.');
+
     }
 
     /**
@@ -60,6 +85,8 @@ class ShelfController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Shelf::destroy($id);
+
+        return redirect()->route('shelf.index') ->with('success','Estantería eliminada correctamente');
     }
 }

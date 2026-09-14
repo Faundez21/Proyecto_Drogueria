@@ -281,6 +281,9 @@
                                 </span>
                             </td>
                             <td class="px-4 py-3 text-center flex justify-center gap-1">
+
+
+                                <!--botón ver (QR)-->
                                 <button
                                     class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                                     title="Ver Detalles">
@@ -292,6 +295,7 @@
                                         </path>
                                     </svg>
                                 </button>
+
                                 <button
                                     class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                     title="Editar">
