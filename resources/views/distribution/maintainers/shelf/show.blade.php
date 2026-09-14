@@ -17,7 +17,7 @@
         <div class="mb-6">
 
             <a
-                href="{{ route('pasillos.index') }}"
+                href="{{ route('aisle.index') }}"
                 class="text-blue-600 hover:underline"
             >
                 ← Volver a Pasillos
@@ -36,7 +36,7 @@
             <div class="bg-blue-900 text-white px-6 py-4">
 
                 <h2 class="text-xl font-bold">
-                    {{ $pasillo['nombre'] }}
+                    {{ $aisle['nombre'] }}
                 </h2>
 
             </div>
@@ -54,7 +54,7 @@
                         </p>
 
                         <p class="text-lg font-semibold text-gray-800">
-                            {{ $pasillo['id'] }}
+                            {{ $aisle['id'] }}
                         </p>
 
                     </div>
@@ -68,7 +68,7 @@
                         </p>
 
                         <p class="text-lg font-semibold text-gray-800">
-                            {{ $pasillo['nombre'] }}
+                            {{ $aisle['nombre'] }}
                         </p>
 
                     </div>
@@ -82,7 +82,7 @@
                         </p>
 
                         <p class="text-gray-800 mt-1">
-                            {{ $pasillo['descripcion'] }}
+                            {{ $aisle['descripcion'] }}
                         </p>
 
                     </div>
@@ -95,14 +95,14 @@
                 <div class="flex justify-end gap-3 mt-8">
 
                     <a
-                        href="{{ route('pasillos.index') }}"
+                        href="{{ route('aisle.index') }}"
                         class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
                     >
                         Volver
                     </a>
 
                     <a
-                        href="{{ route('pasillos.edit', $pasillo['id']) }}"
+                        href="{{ route('aisle.edit', $pasillo['id']) }}"
                         class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
                     >
                         Editar
