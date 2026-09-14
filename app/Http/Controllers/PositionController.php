@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\Position;
+use App\Models\Level;
 class PositionController extends Controller
 {
     /**
@@ -11,8 +12,13 @@ class PositionController extends Controller
      */
     public function index()
     {
-      return view('distribution.maintainers.position.index');
+        $positions = Position::with('level')->get();
+        $levels = Level::all();
 
+        return view(
+            'distribution.maintainers.position.index',
+            compact('positions', 'levels')
+        );
     }
 
     /**
@@ -28,7 +34,15 @@ class PositionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'level_id' => 'required|exists:levels,id',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        Position::create($request->all());
+
+        return redirect()->route('position.index')->with('success', 'Posición creada exitosamente.');
     }
 
     /**
@@ -52,7 +66,20 @@ class PositionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $position = Position::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'level_id' => 'required|exists:levels,id',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $position->update($request->all());
+
+
+        return redirect()
+            ->route('position.index')
+            ->with('success', 'Posición actualizada exitosamente.');
     }
 
     /**
@@ -60,6 +87,10 @@ class PositionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Position::destroy($id);
+
+        return redirect()
+            ->route('position.index')
+            ->with('success', 'Posición eliminada exitosamente.');
     }
 }
