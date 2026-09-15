@@ -35,10 +35,11 @@
         .sidebar-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         .sidebar-scroll:hover::-webkit-scrollbar-thumb { background: #475569; }
 
-        #notifications-menu, #user-menu {
+        #notifications-menu, #user-menu, #search-modal {
             transition: opacity 0.15s ease-out, transform 0.15s ease-out;
         }
 
+        /* --- Animaciones del Sidebar --- */
         .flow-rail { position: relative; }
         .flow-rail::before {
             content: '';
@@ -48,16 +49,32 @@
             bottom: 4px;
             width: 1px;
             background: #334155;
+            transition: background-color 0.3s ease;
+        }
+
+        .flow-section:hover .flow-rail::before {
+            background: var(--accent);
         }
 
         .nav-row {
             position: relative;
-            transition: all 0.2s ease;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
             color: var(--sidebar-text);
         }
+        
+        .nav-row svg {
+            transition: transform 0.22s ease, color 0.22s ease;
+        }
+
         .nav-row:hover:not(.is-active) {
             background-color: var(--sidebar-hover);
             color: var(--sidebar-active-text);
+            transform: translateX(4px);
+        }
+
+        .nav-row:hover svg {
+            transform: scale(1.12);
+            color: var(--accent);
         }
         
         .nav-row.is-active {
@@ -65,6 +82,11 @@
             color: var(--accent);
             font-weight: 600;
         }
+
+        .nav-row.is-active svg {
+            color: var(--accent);
+        }
+
         .nav-row.is-active::before {
             content: '';
             position: absolute;
@@ -74,6 +96,26 @@
             width: 3px;
             background-color: var(--accent);
             border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 10px rgba(13, 148, 136, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .step-badge {
+            transition: all 0.25s ease;
+        }
+
+        .flow-section:hover .step-badge {
+            background-color: var(--accent);
+            color: #FFFFFF;
+            transform: scale(1.05);
+        }
+
+        .brand-logo-img {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .brand-container:hover .brand-logo-img {
+            transform: rotate(-6deg) scale(1.08);
         }
 
         @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -93,17 +135,17 @@
         class="fixed inset-y-0 left-0 w-[260px] flex flex-col z-50 transform -translate-x-full lg:translate-x-0 lg:static lg:shrink-0 transition-transform duration-300 ease-in-out"
         style="background-color: var(--sidebar-bg); box-shadow: 2px 0 8px rgba(0,0,0,0.15);">
 
-        <!-- Encabezado del sidebar -->
+        <!-- Encabezado del sidebar (Favicon sin fondo blanco) -->
         <div class="h-[75px] flex items-center px-5 shrink-0 relative border-b border-slate-800 bg-[#0F172A]">
-            <div class="flex items-center gap-3.5">
-                <div class="flex items-center justify-center w-10 h-10 bg-white rounded-xl shadow-sm p-1.5">
-                    <img src="{{ asset('images/favicon.svg') }}" alt="Logo DAS" class="w-full h-full object-contain">
+            <a href="{{ route('dashboard.index') }}" class="brand-container flex items-center gap-3.5 group">
+                <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-[#0F172A]">
+                    <img src="{{ asset('images/favicon.svg') }}" alt="Logo DAS" class="brand-logo-img w-full h-full object-contain">
                 </div>
                 <div class="flex flex-col justify-center mt-0.5">
-                    <span class="font-mono-das font-bold text-[19px] text-white tracking-widest leading-none">DAS</span>
+                    <span class="font-mono-das font-bold text-[19px] text-white tracking-widest leading-none group-hover:text-teal-400 transition-colors">DAS</span>
                     <span class="text-[10px] font-medium text-slate-400 tracking-[0.2em] uppercase mt-1.5 leading-none">Droguería</span>
                 </div>
-            </div>
+            </a>
             
             <button onclick="toggleSidebar()" class="absolute right-4 lg:hidden p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -123,9 +165,9 @@
             </div>
 
             <!-- Paso 1: Abastecimiento -->
-            <div>
+            <div class="flow-section">
                 <div class="flex items-center gap-2 mb-2 px-2">
-                    <span class="font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">01</span>
+                    <span class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">01</span>
                     <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Abastecimiento</p>
                 </div>
                 <div class="flow-rail pl-[27px] space-y-0.5">
@@ -143,9 +185,9 @@
             </div>
 
             <!-- Paso 2: Almacenamiento -->
-            <div>
+            <div class="flow-section">
                 <div class="flex items-center gap-2 mb-2 px-2">
-                    <span class="font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">02</span>
+                    <span class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">02</span>
                     <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Almacenamiento</p>
                 </div>
                 <div class="flow-rail pl-[27px] space-y-0.5">
@@ -169,9 +211,9 @@
             </div>
 
             <!-- Paso 3: Salida -->
-            <div>
+            <div class="flow-section">
                 <div class="flex items-center gap-2 mb-2 px-2">
-                    <span class="font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">03</span>
+                    <span class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">03</span>
                     <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Salida</p>
                 </div>
                 <div class="flow-rail pl-[27px] space-y-0.5">
@@ -189,9 +231,9 @@
             </div>
 
             <!-- Paso 4: Control -->
-            <div>
+            <div class="flow-section">
                 <div class="flex items-center gap-2 mb-2 px-2">
-                    <span class="font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">04</span>
+                    <span class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">04</span>
                     <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Control</p>
                 </div>
                 <div class="flow-rail pl-[27px] space-y-0.5">
@@ -239,15 +281,17 @@
                 </button>
             </div>
 
+            <!-- Buscador Interactivo (Ctrl + K) -->
             <div class="flex-1 max-w-2xl mx-4">
-                <div class="hidden sm:flex items-center justify-between w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 shadow-sm">
+                <div onclick="openSearchModal()" 
+                    class="hidden sm:flex items-center justify-between w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white hover:border-teal-500/50 hover:shadow-md transition-all duration-200 text-slate-500 cursor-pointer group">
                     <div class="flex items-center gap-2.5">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <span class="text-[13px]">Buscar en inventario, lotes o reportes...</span>
+                        <svg class="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <span class="text-[13px] group-hover:text-slate-700 transition-colors">Buscar en inventario, lotes o reportes...</span>
                     </div>
                     <div class="flex items-center gap-1">
-                        <kbd class="font-mono-das text-[10px] px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-400">Ctrl</kbd>
-                        <kbd class="font-mono-das text-[10px] px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-400">K</kbd>
+                        <kbd class="font-mono-das text-[10px] px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-400 group-hover:border-slate-400 transition-colors">Ctrl</kbd>
+                        <kbd class="font-mono-das text-[10px] px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-400 group-hover:border-slate-400 transition-colors">K</kbd>
                     </div>
                 </div>
             </div>
@@ -338,10 +382,6 @@
             <div class="max-w-[1600px] mx-auto space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 class="text-[22px] font-semibold tracking-tight text-slate-800">@yield('title', 'Dashboard')</h1>
-                        <p class="text-[13px] mt-1 text-slate-500">@yield('subtitle', 'Gestiona y monitorea los procesos de la droguería.')</p>
-                    </div>
-                    <div>
                         @yield('actions')
                     </div>
                 </div>
@@ -353,7 +393,50 @@
         </main>
     </div>
 
+    <!-- Modal de Búsqueda Global (Comandos Ctrl + K) -->
+    <div id="search-modal" class="fixed inset-0 z-50 hidden flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-200" onclick="if(event.target === this) closeSearchModal()">
+        <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden transform scale-95 transition-transform duration-200" id="search-modal-card">
+            <div class="flex items-center px-4 border-b border-slate-100 bg-slate-50/50">
+                <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="global-search-input" placeholder="Escribe para buscar productos, lotes, proveedores..." class="w-full px-3 py-4 text-[14px] bg-transparent border-0 focus:outline-none text-slate-800 placeholder-slate-400 font-medium">
+                <kbd onclick="closeSearchModal()" class="cursor-pointer font-mono-das text-[10px] px-2 py-1 rounded border border-slate-200 bg-white text-slate-400 hover:bg-slate-100 transition-colors">ESC</kbd>
+            </div>
+            <div class="p-2 max-h-[360px] overflow-y-auto space-y-1 sidebar-scroll">
+                <div class="px-3 py-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono-das">Accesos Rápidos</div>
+                
+                <a href="{{ route('inventario.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 group transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="p-1.5 rounded-md bg-slate-100 group-hover:bg-teal-100 text-slate-500 group-hover:text-teal-700 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></span>
+                        <span class="text-[13px] font-medium">Buscar en Inventario</span>
+                    </div>
+                    <span class="text-[11px] font-mono-das text-slate-400">Ir a página</span>
+                </a>
+
+                <a href="{{ route('proveedores.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 group transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="p-1.5 rounded-md bg-slate-100 group-hover:bg-teal-100 text-slate-500 group-hover:text-teal-700 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></span>
+                        <span class="text-[13px] font-medium">Gestión de Proveedores</span>
+                    </div>
+                    <span class="text-[11px] font-mono-das text-slate-400">Ir a página</span>
+                </a>
+
+                <a href="{{ route('quarantine.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-amber-50 text-slate-700 hover:text-amber-900 group transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="p-1.5 rounded-md bg-slate-100 group-hover:bg-amber-100 text-slate-500 group-hover:text-amber-700 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></span>
+                        <span class="text-[13px] font-medium">Revisar Cuarentena (3)</span>
+                    </div>
+                    <span class="text-[11px] font-mono-das text-amber-600 font-semibold">Alerta</span>
+                </a>
+            </div>
+            <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <span>Navega con la consola de búsqueda</span>
+                <span class="font-mono-das">Droguería DAS</span>
+            </div>
+        </div>
+    </div>
+
     <script>
+        /* --- Control del Sidebar --- */
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -361,6 +444,7 @@
             overlay.classList.toggle('hidden');
         }
 
+        /* --- Control de Menús Desplegables --- */
         function toggleMenu(menuId) {
             const menu = document.getElementById(menuId);
             const otherMenuId = menuId === 'notifications-menu' ? 'user-menu' : 'notifications-menu';
@@ -392,6 +476,52 @@
         function toggleNotifications() { toggleMenu('notifications-menu'); }
         function toggleUserMenu() { toggleMenu('user-menu'); }
 
+        /* --- Búsqueda Ctrl + K --- */
+        function openSearchModal() {
+            const modal = document.getElementById('search-modal');
+            const card = document.getElementById('search-modal-card');
+            const input = document.getElementById('global-search-input');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+                card.classList.add('scale-100');
+                input.focus();
+            }, 10);
+        }
+
+        function closeSearchModal() {
+            const modal = document.getElementById('search-modal');
+            const card = document.getElementById('search-modal-card');
+            
+            modal.classList.add('opacity-0');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 150);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                const modal = document.getElementById('search-modal');
+                if (modal.classList.contains('hidden')) {
+                    openSearchModal();
+                } else {
+                    closeSearchModal();
+                }
+            }
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('search-modal');
+                if (!modal.classList.contains('hidden')) {
+                    closeSearchModal();
+                }
+            }
+        });
+
+        /* --- Cierre por clic fuera del contenedor --- */
         document.addEventListener('click', (event) => {
             ['notifications', 'user'].forEach(type => {
                 const container = document.getElementById(`${type}-menu-container`);
@@ -408,6 +538,7 @@
             });
         });
 
+        /* --- Reloj en tiempo real --- */
         function updateClock() {
             const clockElement = document.getElementById('live-clock');
             if (clockElement) {
