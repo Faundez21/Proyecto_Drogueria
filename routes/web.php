@@ -9,7 +9,7 @@ use App\Http\Controllers\PositionController;
 use App\Http\Controllers\DistributionController;
 use App\Http\Controllers\QuarantineController;
 use App\Http\Controllers\QRController;
-use App\Http\Controllers\ProviderController; // <-- Importación del nuevo controlador
+use App\Http\Controllers\ProviderController; 
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // 1. Redirige la página principal exclusivamente al login
@@ -32,9 +32,9 @@ Route::middleware('auth')->group(function () {
         return view('dashboard.index');
     })->name('dashboard.index');
 
-    Route::get('/recepcion', function () {
-        return view('recepcion.index');
-    })->name('recepcion.index');
+    Route::get('/reception', function () {
+        return view('reception.index');
+    })->name('reception.index');
 
     Route::get('/despacho', function () {
         return view('despacho.index');
@@ -70,7 +70,7 @@ Route::middleware('auth')->group(function () {
     //6.Ruta de distribución
     Route::resource('distribution', DistributionController::class);
     
-    // Ruta para cerrar sesión (ejemplo necesario para tu botón inferior)
+    // Ruta para cerrar sesión 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     //5. Rutas de mantenedores
@@ -82,7 +82,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('position', PositionController::class);
 
-    //6.Ruta de distribución (Estaba repetida en tu código original, la mantengo tal cual)
+    //6.Ruta de distribución 
     Route::resource('distribution', DistributionController::class);
 
     //7.Ruta de cuarentena
