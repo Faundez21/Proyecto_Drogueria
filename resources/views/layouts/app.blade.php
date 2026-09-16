@@ -171,8 +171,8 @@
                     <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Abastecimiento</p>
                 </div>
                 <div class="flow-rail pl-[27px] space-y-0.5">
-                    <a href="{{ route('proveedores.index') }}"
-                        class="nav-row {{ request()->routeIs('proveedores.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                    <a href="{{ route('providers.index') }}"
+                        class="nav-row {{ request()->routeIs('providers.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                         Proveedores
                     </a>
@@ -412,7 +412,7 @@
                     <span class="text-[11px] font-mono-das text-slate-400">Ir a página</span>
                 </a>
 
-                <a href="{{ route('proveedores.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 group transition-colors">
+                <a href="{{ route('providers.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 group transition-colors">
                     <div class="flex items-center gap-3">
                         <span class="p-1.5 rounded-md bg-slate-100 group-hover:bg-teal-100 text-slate-500 group-hover:text-teal-700 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></span>
                         <span class="text-[13px] font-medium">Gestión de Proveedores</span>
