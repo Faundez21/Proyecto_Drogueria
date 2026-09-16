@@ -44,17 +44,12 @@ Route::middleware('auth')->group(function () {
         return view('trazabilidad.index');
     })->name('trazabilidad.index');
 
-// --- RUTAS DE PROVEEDORES ---
+// 5.Rutas de Proveedores
     Route::get('/proveedores', [ProviderController::class, 'index'])->name('providers.index');
     Route::get('/proveedores/crear', [ProviderController::class, 'create'])->name('providers.create');
     Route::post('/proveedores', [ProviderController::class, 'store'])->name('providers.store');
     Route::put('/proveedores/{provider}', [ProviderController::class, 'update'])->name('providers.update');
     Route::patch('/proveedores/{provider}/toggle-status', [ProviderController::class, 'toggleStatus'])->name('providers.toggle-status');
-    // Dejo la ruta de crear por si la llegas a necesitar en otra parte, aunque ahora funcione con modales
-    Route::get('/providers/crear', function () {
-        return view('providers.create');
-    })->name('providers.create');
-    // -----------------------------------
 
     Route::get('/inventario', function () {
         return view('inventario.index');
