@@ -8,13 +8,14 @@
                 <p class="text-sm text-slate-500 mt-1">Administra los accesos, roles y atiende las solicitudes del sistema.
                 </p>
             </div>
-            <a href="{{ route('users.create') }}"
+            <!-- Corregido el error tipográfico "<<" -->
+            <button type="button" onclick="openCreate()"
                 class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-all shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
                 Nuevo Usuario
-            </a>
+            </button>
         </div>
 
         <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl mb-8 shadow-sm">
@@ -104,18 +105,18 @@
 
                                         @if ($user->id === auth()->id())
                                             <button class="p-2 text-slate-300 cursor-not-allowed rounded-lg"
-                                                title="No puedes bloquear tu propia cuenta" disabled>
+                                                title="No puedes desactivar tu propia cuenta" disabled>
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                                                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.36">
                                                     </path>
                                                 </svg>
                                             </button>
                                         @else
                                             <button
                                                 class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Bloquear">
+                                                title="Desactivar">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -135,4 +136,77 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL (Añadido 'hidden', clases de posición fija y fondo oscuro) -->
+    <div id="CreateModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-8 w-full max-w-4xl">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-800">Crear Nuevo Usuario</h1>
+                    <p class="text-sm text-slate-500 mt-1">Completa los datos para registrar a un nuevo miembro del equipo.
+                    </p>
+                </div>
+            </div>
+            <form action="#" method="POST">
+                @csrf
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
+                        <input type="text" id="name"
+                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            placeholder="Ej. Juan">
+                    </div>
+
+                    <div>
+                        <label for="last_name" class="block text-sm font-medium text-slate-700 mb-1">Apellido</label>
+                        <input type="text" id="last_name"
+                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            placeholder="Ej. Pérez">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Correo
+                            Electrónico</label>
+                        <input type="email" id="email"
+                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            placeholder="ejemplo@drogueriadas.com">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Contraseña
+                            temporal</label>
+                        <input type="password" id="password"
+                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end gap-3 border-t border-slate-100 pt-6">
+                    <!-- Cambiado el enlace por un botón que ejecute closeCreate() -->
+                    <button type="button" onclick="closeCreate()"
+                        class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Guardar Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openCreate() {
+            document.getElementById('CreateModal').classList.remove('hidden');
+        }
+
+        function closeCreate() {
+            document.getElementById('CreateModal').classList.add('hidden');
+        }
+    </script>
 @endsection
