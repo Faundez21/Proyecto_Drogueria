@@ -13,6 +13,19 @@
             <span class="text-gray-800 font-medium">
                 Niveles
             </span>
+
+            @role('Administrador')
+                <div class="flex gap-2 w-full sm:w-auto ml-auto">
+                    <button type="button" onclick="openHistory()"
+                        class="w-full sm:w-auto bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors shadow-sm">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Ver Historial
+                    </button>
+                </div>
+            @endrole
         </div>
         <!-- Encabezado -->
 
@@ -282,9 +295,60 @@
         </div>
 
     </div>
+    <!-- Modal de Historial -->
+    <div id="HistoryModal"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 w-full max-w-4xl overflow-hidden">
 
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Historial de Niveles</h2>
+                    <p class="text-sm text-slate-500 mt-0.5">Registro de auditoría de creación y modificaciones de niveles.
+                    </p>
+                </div>
+                <button type="button" onclick="closeHistory()"
+                    class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
 
-    <!--Modal para eliminar pasillos-->
+            <div class="overflow-x-auto max-h-96 border border-slate-200 rounded-xl">
+                <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b border-slate-200 sticky top-0">
+                        <tr>
+                            <th class="px-4 py-3 font-semibold">Fecha / Hora</th>
+                            <th class="px-4 py-3 font-semibold">Acción</th>
+                            <th class="px-4 py-3 font-semibold">Detalle del Nivel</th>
+                            <th class="px-4 py-3 font-semibold">Usuario Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-4 py-3 text-slate-500">16/09/2026 - 11:15</td>
+                            <td class="px-4 py-3">
+                                <span
+                                    class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold">Creación</span>
+                            </td>
+                            <td class="px-4 py-3 font-medium text-slate-800">Nivel 1</td>
+                            <td class="px-4 py-3 text-slate-600 font-medium">Juan Pérez</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-end pt-6 border-t border-slate-100">
+                <button type="button" onclick="closeHistory()"
+                    class="px-5 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-colors text-sm font-medium shadow-sm">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <div id="deleteModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
 
         <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
@@ -362,6 +426,14 @@
             if (confirm('¿Estás seguro de que deseas eliminar este pasillo?')) {
                 alert('Pasillo eliminado');
             }
+        }
+
+        function openHistory() {
+            document.getElementById('HistoryModal').classList.remove('hidden');
+        }
+
+        function closeHistory() {
+            document.getElementById('HistoryModal').classList.add('hidden');
         }
     </script>
 @endsection
