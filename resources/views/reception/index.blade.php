@@ -31,10 +31,6 @@
                     <h2 class="text-[15px] font-bold text-slate-800">Registro de Ingreso de Mercadería</h2>
                     <p class="text-[12px] text-slate-500 mt-0.5">Complete los datos del documento, proveedor y productos a recepcionar.</p>
                 </div>
-                <div class="flex items-center gap-2 bg-teal-50 border border-teal-200 px-3 py-1.5 rounded-lg shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-teal-600 animate-pulse"></span>
-                    <span class="text-[11.5px] font-mono-das font-bold text-teal-800 tracking-wide">CORRELATIVO: #REC-{{ date('Ymd-His') }}</span>
-                </div>
             </div>
 
             <form action="#" method="POST" class="divide-y divide-slate-100">
