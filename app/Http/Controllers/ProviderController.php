@@ -82,6 +82,11 @@ class ProviderController extends Controller
             'category'       => 'required|string',
             'email'          => 'required|email|max:255',
             'phone'          => 'nullable|string|max:20',
+            'business_line'  => 'nullable|string|max:255',
+            'address'        => 'nullable|string|max:255',
+            'bank_name'      => 'nullable|string|max:255',
+            'account_type'   => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
         ]);
 
         Provider::create($validated);
@@ -91,11 +96,16 @@ class ProviderController extends Controller
     public function update(Request $request, Provider $provider)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'rut' => 'required|string|max:20|unique:providers,rut,' . $provider->id,
-            'email' => 'required|email|max:255',
-            'category' => 'required|string',
-            'phone' => 'nullable|string|max:20',
+            'name'           => 'required|string|max:255',
+            'rut'            => 'required|string|max:20|unique:providers,rut,' . $provider->id,
+            'email'          => 'required|email|max:255',
+            'category'       => 'required|string',
+            'phone'          => 'nullable|string|max:20',
+            'business_line'  => 'nullable|string|max:255',
+            'address'        => 'nullable|string|max:255',
+            'bank_name'      => 'nullable|string|max:255',
+            'account_type'   => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
         ]);
 
         $provider->update($validated);
@@ -107,5 +117,5 @@ class ProviderController extends Controller
         $provider->status = $provider->status === 'activo' ? 'inactivo' : 'activo';
         $provider->save();
         return response()->json(['success' => true, 'new_status' => $provider->status]);
-    }
+    } 
 }
