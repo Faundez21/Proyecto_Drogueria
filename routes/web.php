@@ -10,6 +10,7 @@ use App\Http\Controllers\DistributionController;
 use App\Http\Controllers\QuarantineController;
 use App\Http\Controllers\QRController;
 use App\Http\Controllers\ProviderController; 
+use App\Http\Controllers\ReceptionController;
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // 1. Redirige la página principal exclusivamente al login
@@ -50,6 +51,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/proveedores', [ProviderController::class, 'store'])->name('providers.store');
     Route::put('/proveedores/{provider}', [ProviderController::class, 'update'])->name('providers.update');
     Route::patch('/proveedores/{provider}/toggle-status', [ProviderController::class, 'toggleStatus'])->name('providers.toggle-status');
+
+
+Route::prefix('reception')->name('reception.')->group(function () {
+    Route::get('/', [ReceptionController::class, 'index'])->name('index');
+    Route::post('/guardar', [ReceptionController::class, 'store'])->name('store');
+    Route::get('/{reception}/pdf', [ReceptionController::class, 'downloadPdf'])->name('pdf');
+});
+
 
     Route::get('/inventario', function () {
         return view('inventario.index');
