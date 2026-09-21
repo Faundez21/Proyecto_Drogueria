@@ -1,100 +1,80 @@
 <?php
-
-use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
+
+//  Controladores de Autenticación 
+use App\Http\Controllers\Auth\LoginController;
+
+//  Controladores de Módulos y Operaciones 
+use App\Http\Controllers\ReceptionController;
+use App\Http\Controllers\DistributionController;
+use App\Http\Controllers\QuarantineController;
+use App\Http\Controllers\ProviderController;
+
+//  Controladores de Estructura de Almacén (Mantenedores)  
 use App\Http\Controllers\AisleController;
 use App\Http\Controllers\ShelfController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
-use App\Http\Controllers\DistributionController;
-use App\Http\Controllers\QuarantineController;
-use App\Http\Controllers\QRController;
-use App\Http\Controllers\ProviderController; 
-use App\Http\Controllers\ReceptionController;
+use App\Http\Controllers\QRController; 
 
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-// 1. Redirige la página principal exclusivamente al login
+// Rutas Públicas Estas rutas son accesibles sin necesidad de iniciar sesión.
+
+
+// 1. Redirección principal al login
 Route::redirect('/', '/login');
 
-// 2. Rutas del Login
+// 2. Rutas de Login
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 
-// 3. Ruta de recuperación
+// 3. Ruta de recuperación de contraseña
 Route::get('/recuperar-password', function () {
     return "Página de recuperación de contraseña en construcción...";
 })->name('password.request');
 
-// middelware auth para proteger las rutas del panel
+/*
+ Rutas Privadas (Protegidas)
+ Todas estas rutas requieren que el usuario esté autenticado (middleware auth).
+*/
+
 Route::middleware('auth')->group(function () {
 
-    // 4. Rutas del Panel (Nombres asignados)
-    Route::get('/dashboard', function () {
-        return view('dashboard.index');
-    })->name('dashboard.index');
-
-    Route::get('/reception', function () {
-        return view('reception.index');
-    })->name('reception.index');
-
-    Route::get('/despacho', function () {
-        return view('despacho.index');
-    })->name('despacho.index');
-
-    Route::get('/trazabilidad', function () {
-        return view('trazabilidad.index');
-    })->name('trazabilidad.index');
-
-// 5.Rutas de Proveedores
-    Route::get('/proveedores', [ProviderController::class, 'index'])->name('providers.index');
-    Route::get('/proveedores/crear', [ProviderController::class, 'create'])->name('providers.create');
-    Route::post('/proveedores', [ProviderController::class, 'store'])->name('providers.store');
-    Route::put('/proveedores/{provider}', [ProviderController::class, 'update'])->name('providers.update');
-    Route::patch('/proveedores/{provider}/toggle-status', [ProviderController::class, 'toggleStatus'])->name('providers.toggle-status');
-
-
-Route::prefix('reception')->name('reception.')->group(function () {
-    Route::get('/', [ReceptionController::class, 'index'])->name('index');
-    Route::post('/guardar', [ReceptionController::class, 'store'])->name('store');
-    Route::get('/{reception}/pdf', [ReceptionController::class, 'downloadPdf'])->name('pdf');
-});
-
-
-    Route::get('/inventario', function () {
-        return view('inventario.index');
-    })->name('inventario.index');
-
-    Route::get('/reportes', function () {
-        return view('reportes.index');
-    })->name('reportes.index');
-
-    Route::get('/error', function () {
-        return view('error');
-    });
-
-    Route::get('/users', function () {
-        return view('users.index');
-    })->name('users.index');
-
-    //6.Ruta de distribución
-    Route::resource('distribution', DistributionController::class);
-    
-    // Ruta para cerrar sesión 
+    // 4. Cierre de sesión (Movido dentro del middleware para mayor seguridad)
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    //5. Rutas de mantenedores
+    // 5. Vistas Generales y Dashboards
+    Route::get('/dashboard', function () { return view('dashboard.index'); })->name('dashboard.index');
+    Route::get('/despacho', function () { return view('despacho.index'); })->name('despacho.index');
+    Route::get('/trazabilidad', function () { return view('trazabilidad.index'); })->name('trazabilidad.index');
+    Route::get('/inventario', function () { return view('inventario.index'); })->name('inventario.index');
+    Route::get('/reportes', function () { return view('reportes.index'); })->name('reportes.index');
+    Route::get('/users', function () { return view('users.index'); })->name('users.index');
+    Route::get('/error', function () { return view('error'); })->name('error');
+
+    // 6. Módulo de Recepción 
+    Route::prefix('reception')->name('reception.')->group(function () {
+        Route::get('/', [ReceptionController::class, 'index'])->name('index');
+        Route::post('/guardar', [ReceptionController::class, 'store'])->name('store');
+        Route::get('/{reception}/pdf', [ReceptionController::class, 'downloadPdf'])->name('pdf');
+    });
+
+    // 7. Módulo de Proveedores 
+    Route::prefix('proveedores')->name('providers.')->group(function () {
+        Route::get('/', [ProviderController::class, 'index'])->name('index');
+        Route::get('/crear', [ProviderController::class, 'create'])->name('create');
+        Route::post('/', [ProviderController::class, 'store'])->name('store');
+        Route::put('/{provider}', [ProviderController::class, 'update'])->name('update');
+        Route::patch('/{provider}/toggle-status', [ProviderController::class, 'toggleStatus'])->name('toggle-status');
+    });
+
+    // 8. Mantenedores de Estructura Física 
     Route::resource('aisle', AisleController::class);
-
     Route::resource('shelf', ShelfController::class);
-
     Route::resource('level', LevelController::class);
-
     Route::resource('position', PositionController::class);
 
-    //6.Ruta de distribución 
+    // 9. Operaciones Logísticas Especiales
     Route::resource('distribution', DistributionController::class);
-
-    //7.Ruta de cuarentena
     Route::resource('quarantine', QuarantineController::class);
 
 });
