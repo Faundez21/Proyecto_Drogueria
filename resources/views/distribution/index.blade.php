@@ -44,10 +44,10 @@
         /* Colores exactos */
         .marker-green { background-color: #22c55e; color: white; }
         .marker-green::after { border-color: #22c55e transparent transparent transparent; }
-        
+
         .marker-blue { background-color: #3b82f6; color: white; }
         .marker-blue::after { border-color: #3b82f6 transparent transparent transparent; }
-        
+
         .marker-orange { background-color: #f97316; color: white; }
         .marker-orange::after { border-color: #f97316 transparent transparent transparent; }
 
@@ -67,7 +67,7 @@
             </a>
         </div>
     </div>
-    
+
     <div class="max-w-7xl mx-auto p-4 sm:p-6">
         <!-- Encabezado Principal -->
         <div class="mb-6">
@@ -79,21 +79,21 @@
         <div class="mb-8">
             <h2 class="text-lg sm:text-xl font-bold text-gray-800">Mantenedores</h2>
             <p class="text-gray-500 mt-1 mb-4 text-sm sm:text-base">Acceder a los mantenedores de la distribución física de la droguería</p>
-            
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <a href="{{ route('pasillos.index') }}" class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
+                <a href="{{ route('aisle.index') }}" class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
                     <h3 class="text-base sm:text-lg font-bold text-gray-800">Pasillos</h3>
                     <p class="text-gray-500 text-sm mt-1">Administración de pasillos</p>
                 </a>
-                <a href="{{ route('shelves.index') }}" class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
+                <a href="{{ route('shelf.index') }}" class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
                     <h3 class="text-base sm:text-lg font-bold text-gray-800">Estanterías</h3>
                     <p class="text-gray-500 text-sm mt-1">Administración de estanterías</p>
                 </a>
-                <a href="{{ route('levels.index') }}" class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
+                <a href="{{ route('level.index') }}" class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
                     <h3 class="text-base sm:text-lg font-bold text-gray-800">Niveles</h3>
                     <p class="text-gray-500 text-sm mt-1">Administración de niveles</p>
                 </a>
-                <a href="{{ route('positions.index') }}" class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
+                <a href="{{ route('position.index') }}" class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
                     <h3 class="text-base sm:text-lg font-bold text-gray-800">Posiciones</h3>
                     <p class="text-gray-500 text-sm mt-1">Administración de posiciones</p>
                 </a>
@@ -106,10 +106,10 @@
 
             <!-- Contenedor Wrapper para Three.js y Alpine.js -->
             <div id="warehouse-wrapper" x-data="warehouseApp()" class="h-[500px] sm:h-[600px] lg:h-[750px] rounded-xl overflow-hidden border border-gray-300 bg-[#eef2f6] select-none">
-                
+
                 <!-- Capa HTML para etiquetas (Markers) -->
                 <div id="labels-container" class="absolute top-0 left-0 w-full h-full pointer-events-none z-10 overflow-hidden"></div>
-                
+
                 <!-- Capa WebGL 3D -->
                 <div id="warehouse-3d-container"></div>
 
@@ -148,7 +148,7 @@
                         </span>
                         <svg :class="{'rotate-180': !sidebarOpen}" class="w-4 h-4 text-gray-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                     </div>
-                    
+
                     <!-- Contenido interior del Sidebar -->
                     <div x-show="sidebarOpen" x-transition class="p-3 sm:p-4 pt-0 border-t border-slate-700/50 mt-1 flex flex-col gap-3">
                         <div class="relative">
@@ -249,7 +249,7 @@
                 searchQuery: '',
                 init() {
                     this.initThreeJS();
-                    
+
                     window.addEventListener('rack-selected', (e) => {
                         this.rackData = e.detail;
                         this.tooltipVisible = true;
@@ -290,7 +290,7 @@
                     scene.background = new THREE.Color('#f8fafc');
 
                     const camera = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 1, 1000);
-                    const defaultCamPos = new THREE.Vector3(70, 75, 80); 
+                    const defaultCamPos = new THREE.Vector3(70, 75, 80);
                     camera.position.copy(defaultCamPos);
 
                     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
@@ -318,17 +318,17 @@
 
                     // --- ESTRUCTURA BASE (BORDES Y SUELO DE LA BODEGA) ---
                     const buildGroup = new THREE.Group();
-                    
+
                     // Suelo unificado (80x50)
                     const floorMat = new THREE.MeshStandardMaterial({ color: '#cbd5e1', roughness: 0.8 });
                     const floor = new THREE.Mesh(new THREE.BoxGeometry(80, 1, 50), floorMat);
-                    floor.position.set(0, -0.5, 0); 
-                    floor.receiveShadow = true; 
+                    floor.position.set(0, -0.5, 0);
+                    floor.receiveShadow = true;
                     buildGroup.add(floor);
 
                     // Materiales para las paredes (Cristal semi-transparente + Zócalo sólido)
-                    const wallMat = new THREE.MeshPhysicalMaterial({ 
-                        color: '#94a3b8', transparent: true, opacity: 0.25, roughness: 0.1, side: THREE.DoubleSide 
+                    const wallMat = new THREE.MeshPhysicalMaterial({
+                        color: '#94a3b8', transparent: true, opacity: 0.25, roughness: 0.1, side: THREE.DoubleSide
                     });
                     const wallSolidMat = new THREE.MeshStandardMaterial({ color: '#64748b' });
 
@@ -337,7 +337,7 @@
                         const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
                         wall.position.set(x, y + 1, z); // Subir un poco para dar espacio al zócalo
                         buildGroup.add(wall);
-                        
+
                         // Zócalo inferior (base sólida de la pared)
                         const baseHeight = 1.5;
                         const base = new THREE.Mesh(new THREE.BoxGeometry(w, baseHeight, d), wallSolidMat);
@@ -410,7 +410,7 @@
                     createRackCluster(-25, -15, 4, 2, matVerde, { code: 'A-01', status: 'Disponible', product: 'Ibuprofeno 400mg', stock: '1,200', lot: 'LOT-555', venc: '12/10/2025' });
                     createRackCluster(-5, -15, 2, 3, matAzul, { code: 'B-01', status: 'Ocupado', product: 'Paracetamol', stock: '850', lot: 'LOT-123', venc: '30/06/2026' });
                     createRackCluster(15, -15, 2, 3, matNaranja, { code: 'C-01', status: 'Cuarentena', product: 'Aspirina Vencida', stock: '0', lot: 'ERR-99', venc: 'VENCIDO' });
-                    
+
                     createRackCluster(-25, 5, 2, 2, matMorado, { code: 'D-01', status: 'Reservado', product: 'Amoxicilina 500mg', stock: '400 (Req. #144)', lot: 'LOT-881', venc: '14/02/2027' });
                     createRackCluster(-10, 5, 4, 2, matAzul, { code: 'D-02', status: 'Ocupado', product: 'Loratadina', stock: '2,000', lot: 'LOT-101', venc: '10/05/2026' });
                     createRackCluster(15, 5, 3, 2, matGris, { code: 'E-01', status: 'Mantenimiento', product: 'Vacio', stock: '0', lot: 'N/A', venc: 'N/A' });
@@ -446,7 +446,7 @@
                             wrapper.style.cursor = 'default';
                             return;
                         }
-                        
+
                         getMousePos(event);
                         raycaster.setFromCamera(mouse, camera);
                         const intersects = raycaster.intersectObjects(racks);
@@ -468,11 +468,11 @@
                     // Clic logic
                     wrapper.addEventListener('click', (event) => {
                         if (event.target.closest('header') || event.target.closest('aside') || event.target.closest('.z-30') || event.target.closest('.bottom-6')) return;
-                        
+
                         getMousePos(event);
                         raycaster.setFromCamera(mouse, camera);
                         const intersects = raycaster.intersectObjects(racks);
-                        
+
                         if (intersects.length > 0) {
                             resetAllHighlights();
                             selectedObject = intersects[0].object;
@@ -508,10 +508,10 @@
                         camera.position.lerp(defaultCamPos, 0.1);
                         controls.target.lerp(defaultTarget, 0.1);
                     });
-                    
+
                     window.addEventListener('update-camera-view', (e) => {
                         if (e.detail === '2D') {
-                            camera.position.set(0, 110, 0); 
+                            camera.position.set(0, 110, 0);
                             controls.target.set(0, 0, 0);
                         } else {
                             camera.position.copy(defaultCamPos);
@@ -529,12 +529,12 @@
                         markers.forEach(marker => {
                             const vector = marker.pos3D.clone();
                             vector.project(camera);
-                            
+
                             if (vector.z > 1) {
                                 marker.element.style.display = 'none';
                                 return;
                             }
-                            
+
                             marker.element.style.display = 'block';
                             const x = (vector.x * 0.5 + 0.5) * wrapper.clientWidth;
                             const y = (vector.y * -0.5 + 0.5) * wrapper.clientHeight;
