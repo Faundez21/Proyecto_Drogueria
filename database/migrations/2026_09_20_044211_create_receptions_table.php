@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        // 1. CREAMOS LA TABLA PRODUCTOS PRIMERO (La solución infalible)
+        // tabla de productos
         if (!Schema::hasTable('products')) {
             Schema::create('products', function (Blueprint $table) {
                 $table->id();
@@ -17,7 +17,7 @@ return new class extends Migration
             });
         }
 
-        // 2. CREAMOS LA TABLA PRINCIPAL DE RECEPCIONES
+        //  tabla de recepciones
         if (!Schema::hasTable('receptions')) {
             Schema::create('receptions', function (Blueprint $table) {
                 $table->id();
@@ -38,13 +38,13 @@ return new class extends Migration
             });
         }
 
-        // 3. CREAMOS LA TABLA HIJA DE LOS PRODUCTOS (Ahora no fallará porque products ya existe)
+        // tabla de productos
         if (!Schema::hasTable('reception_items')) {
             Schema::create('reception_items', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('reception_id')->constrained('receptions')->onDelete('cascade');
                 
-                // Esta es la línea que fallaba. Ya no fallará.
+      
                 $table->foreignId('product_id')->constrained('products')->onDelete('restrict');
                 
                 $table->string('tipo_producto');
@@ -63,7 +63,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('reception_items');
         Schema::dropIfExists('receptions');
-        // Dejamos products intacto en el rollback por si otras tablas lo usan a futuro
-        // Schema::dropIfExists('products'); 
     }
 };
