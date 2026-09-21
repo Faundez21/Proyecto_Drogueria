@@ -1,18 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-full sm:max-w-[95%] mx-auto p-4 sm:p-6 mt-2 sm:mt-4">
+    <div class="w-full p-4 sm:p-6 space-y-6">
 
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <!-- Encabezado -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h1 class="text-2xl sm:text-3xl text-gray-800 font-semibold">Inventario</h1>
+                <h1 class="text-3xl font-bold text-gray-800">Inventario</h1>
                 <p class="text-gray-500 mt-1">
                     Ingresos manuales o importaciones masivas y tabla del catálogo de productos
                 </p>
             </div>
             <div class="flex gap-2 w-full sm:w-auto">
                 <button type="button" onclick="openHistory()"
-                    class="w-full sm:w-auto bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors shadow-sm">
+                    class="w-full sm:w-auto bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer">
                     <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -21,7 +22,6 @@
                 </button>
             </div>
         </div>
-
 
         <!-- Modal de Historial -->
         <div id="HistoryModal"
@@ -36,7 +36,7 @@
                     </div>
                     @role('Administrador')
                         <button type="button" onclick="closeHistory()"
-                            class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors">
+                            class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                                 </path>
@@ -76,20 +76,19 @@
                 <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100">
                     <span class="text-xs text-slate-400">Mostrando registros recientes de auditoría</span>
                     <button type="button" onclick="closeHistory()"
-                        class="px-5 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-colors text-sm font-medium shadow-sm">
+                        class="px-5 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-colors text-sm font-medium shadow-sm cursor-pointer">
                         Cerrar
                     </button>
                 </div>
 
             </div>
         </div>
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
 
-
+        <!-- Botones de Acción -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-
                 <button type="button" onclick="openImport()"
-                    class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto">
+                    class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
@@ -98,7 +97,7 @@
                 </button>
 
                 <button type="button" onclick="openDeposit()"
-                    class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto">
+                    class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
@@ -108,7 +107,7 @@
         </div>
 
         <!-- Tabla inventario -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-slate-200 flex flex-col lg:flex-row justify-between items-center gap-4">
                 <h3 class="text-lg sm:text-xl font-bold text-slate-800 text-left">
                     Catálogo Base de Productos
@@ -159,7 +158,7 @@
                             </td>
                             <td class="px-4 py-3 text-center flex justify-center gap-1">
                                 <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
                                     title="Ver Detalles">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -170,7 +169,7 @@
                                     </svg>
                                 </button>
                                 <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                                     title="Editar">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -179,7 +178,7 @@
                                     </svg>
                                 </button>
                                 <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                                     title="Eliminar">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -210,7 +209,7 @@
                             </td>
                             <td class="px-4 py-3 text-center flex justify-center gap-1">
                                 <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
                                     title="Ver Detalles">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -221,7 +220,7 @@
                                     </svg>
                                 </button>
                                 <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                                     title="Editar">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -230,7 +229,7 @@
                                     </svg>
                                 </button>
                                 <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                                     title="Eliminar">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -256,7 +255,7 @@
                             </td>
                             <td class="px-4 py-3 text-center flex justify-center gap-1">
                                 <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
                                     title="Ver Detalles">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -267,7 +266,7 @@
                                     </svg>
                                 </button>
                                 <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                                     title="Editar">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -276,7 +275,7 @@
                                     </svg>
                                 </button>
                                 <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                                     title="Eliminar">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -287,7 +286,7 @@
                             </td>
                         </tr>
 
-                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors"">
+                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors">
                             <td class="px-4 py-3 font-medium text-gray-600">1088</td>
                             <td class="px-4 py-3 font-medium text-gray-600">IBUPROFENO 400MG</td>
                             <td class="px-4 py-3 text-gray-600">Fármacos</td>
@@ -307,7 +306,7 @@
                             </td>
                             <td class="px-4 py-3 text-center flex justify-center gap-1">
                                 <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
                                     title="Ver Detalles">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -318,7 +317,7 @@
                                     </svg>
                                 </button>
                                 <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                                     title="Editar">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -327,7 +326,7 @@
                                     </svg>
                                 </button>
                                 <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                                     title="Eliminar">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -364,26 +363,18 @@
         </div>
     </div>
 
-
-
-
-
-
-
-
-    <!--importe-->
+    <!-- Modal Importar -->
     <div id="importModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
+        <div
+            class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between w-full max-w-md">
             <div>
                 <h2 class="text-xl font-bold text-slate-800">Importar Carga Masiva</h2>
                 <p class="text-sm text-slate-500 mt-1 mb-5">Suba un archivo Excel (.xlsx o .csv) para actualizar el
                     inventario completo.</p>
 
                 <a href=""
-                    class="w-full mb-6 flex justify-center items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-colors font-medium text-sm shadow-sm">
+                    class="w-full mb-6 flex justify-center items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-colors font-medium text-sm shadow-sm cursor-pointer">
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
@@ -392,7 +383,6 @@
                     Descargar Plantilla
                 </a>
             </div>
-
 
             <div
                 class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg p-6 flex-grow flex flex-col justify-center items-center">
@@ -413,19 +403,22 @@
                     </label>
 
                     <button type="submit"
-                        class="w-full sm:w-64 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm">
+                        class="w-full sm:w-64 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm cursor-pointer">
                         Procesar Importación
                     </button>
                 </form>
-
+            </div>
+            <div class="flex justify-end mt-4">
+                <button type="button" onclick="closeImport()"
+                    class="px-5 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors text-sm font-medium shadow-sm cursor-pointer">Cerrar</button>
             </div>
         </div>
     </div>
 
-    <!--ingreso manual-->
+    <!-- Modal Ingreso Manual -->
     <div id="DepositModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 w-full max-w-lg">
             <div>
                 <h2 class="text-xl font-bold text-slate-800">Ingresar Producto Individual</h2>
                 <p class="text-sm text-slate-500 mt-1 mb-6">Registra un nuevo producto en el catálogo maestro del
@@ -485,11 +478,11 @@
 
                 <div class="flex flex-col sm:flex-row justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
                     <button type="button" onclick="closeDeposit()"
-                        class="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto">
+                        class="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto cursor-pointer">
                         Cancelar
                     </button>
                     <button type="submit"
-                        class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto">
+                        class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto cursor-pointer">
                         Guardar Producto
                     </button>
                 </div>
@@ -497,6 +490,7 @@
         </div>
     </div>
 
+    <!-- Script -->
     <script>
         function openHistory() {
             document.getElementById('HistoryModal').classList.remove('hidden');
@@ -507,23 +501,19 @@
         }
 
         function openImport() {
-            document.getElementById('importModal')
-                .classList.remove('hidden');
+            document.getElementById('importModal').classList.remove('hidden');
         }
 
         function closeImport() {
-            document.getElementById('importModal')
-                .classList.add('hidden');
+            document.getElementById('importModal').classList.add('hidden');
         }
 
         function openDeposit() {
-            document.getElementById('DepositModal')
-                .classList.remove('hidden');
+            document.getElementById('DepositModal').classList.remove('hidden');
         }
 
         function closeDeposit() {
-            document.getElementById('DepositModal')
-                .classList.add('hidden');
+            document.getElementById('DepositModal').classList.add('hidden');
         }
     </script>
 @endsection

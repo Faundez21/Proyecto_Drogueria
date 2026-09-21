@@ -8,7 +8,6 @@
                 <p class="text-sm text-slate-500 mt-1">Administra los accesos, roles y atiende las solicitudes del sistema.
                 </p>
             </div>
-            <!-- Corregido el error tipográfico "<<" -->
             <button type="button" onclick="openCreate()"
                 class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-all shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,7 +136,6 @@
         </div>
     </div>
 
-    <!-- MODAL (Añadido 'hidden', clases de posición fija y fondo oscuro) -->
     <div id="CreateModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-8 w-full max-w-4xl">
             <div class="flex justify-between items-center mb-8">
@@ -183,7 +181,6 @@
                 </div>
 
                 <div class="mt-8 flex justify-end gap-3 border-t border-slate-100 pt-6">
-                    <!-- Cambiado el enlace por un botón que ejecute closeCreate() -->
                     <button type="button" onclick="closeCreate()"
                         class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded-lg transition-colors">
                         Cancelar
