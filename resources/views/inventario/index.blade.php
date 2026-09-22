@@ -6,7 +6,7 @@
 @section('content')
     <div class="w-full p-4 sm:p-6 space-y-6">
 
-        <!-- ENCABEZADO Y ACCIONES PRINCIPALES -->
+        <!-- encabezado acciones principales -->
         <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-5">
             <div>
                 <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 mb-1.5">
@@ -35,7 +35,7 @@
             </div>
         </div>
 
-        <!-- CONTENEDOR PRINCIPAL: TABLA DE INVENTARIO -->
+       <!-- Contenedor principal tabla inventario -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
 
             <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/50">
@@ -267,11 +267,6 @@
                 @endif
             </div>
         </div>
-
-        <!-- ========================================== -->
-        <!-- ZONA DE MODALES GENERALES (DISEÑO LIMPIO)  -->
-        <!-- ========================================== -->
-
         <!-- 1. MODAL: Historial de Movimientos -->
         <div id="HistoryModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-5xl flex flex-col overflow-hidden">
@@ -553,10 +548,6 @@
                 </form>
             </div>
         </div>
-
-        <!-- ========================================== -->
-        <!-- SCRIPTS JS CORREGIDOS Y ASEGURADOS         -->
-        <!-- ========================================== -->
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
