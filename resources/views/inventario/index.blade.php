@@ -209,6 +209,7 @@
                                                 <tr>
                                                     <th class="px-4 py-2.5">N° Correlativo</th>
                                                     <th class="px-4 py-2.5">Lote / Vencimiento</th>
+                                                    <th class="px-4 py-2.5">Origen Mercadería</th>
                                                     <th class="px-4 py-2.5">Proveedor / Documento</th>
                                                     <th class="px-4 py-2.5">Ubicación</th>
                                                     <th class="px-4 py-2.5 text-right">Valor Neto Unit.</th>
@@ -227,6 +228,11 @@
                                                         <td class="px-4 py-2.5 font-medium">
                                                             <span class="text-slate-800 font-bold">Lote: {{ $loteObj->lote ?? 'S/L' }}</span> <br>
                                                             <span class="text-slate-400">Vence: {{ $loteObj->fecha_vencimiento ?? 'N/A' }}</span>
+                                                        </td>
+                                                        <td class="px-4 py-2.5">
+                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                                                                {{ $loteObj->origen_mercaderia ?? 'Sin Origen' }}
+                                                            </span>
                                                         </td>
                                                         <td class="px-4 py-2.5">
                                                             <span class="font-semibold text-slate-800">{{ $loteObj->razon_social ?? 'S/N' }}</span> <br>
@@ -363,9 +369,18 @@
                     </div>
 
                     <div>
-                        <label for="origen_mercaderia" class="block text-xs font-medium text-slate-700 mb-1">Origen Mercadería</label>
-                        <input type="text" id="origen_mercaderia" name="origen_mercaderia" placeholder="Ej. Cenabast / Importación" required
-                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                        <label for="origen_mercaderia" class="block text-xs font-medium text-slate-700 mb-1">Origen de la Mercadería *</label>
+                        <select id="origen_mercaderia" name="origen_mercaderia" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            <option value="" disabled selected>Seleccione origen...</option>
+                            <option value="CENABAST">CENABAST</option>
+                            <option value="COMPRA DIRECTA DAS">COMPRA DIRECTA DAS</option>
+                            <option value="SERVICIO DE SALUD TALCAHUANO">SERVICIO DE SALUD TALCAHUANO</option>
+                            <option value="Traspaso">Traspaso</option>
+                            <option value="Donación">Donación</option>
+                            <option value="Préstamo">Préstamo</option>
+                            <option value="Canje">Canje</option>
+                        </select>
                     </div>
 
                     <div>

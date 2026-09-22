@@ -19,11 +19,11 @@ return new class extends Migration
             $table->string('orden_compra')->nullable();
             $table->string('origen_mercaderia');
 
-            //  Datos del Proveedor
+            // Datos del Proveedor
             $table->string('rut_proveedor');
             $table->string('razon_social');
 
-            //Detalle del Producto
+            // Detalle del Producto
             $table->string('producto');
             $table->string('categoria');
             $table->string('lote')->nullable();
@@ -31,6 +31,10 @@ return new class extends Migration
             $table->integer('cantidad');
             $table->decimal('valor_neto_unitario', 15, 2)->default(0);
 
+            // Estado del Lote (Disponible, Cuarentena, Merma)
+            $table->string('estado')->default('Disponible');
+
+            // Ubicación física
             $table->string('pasillo')->nullable();
             $table->string('estante')->nullable();
 
