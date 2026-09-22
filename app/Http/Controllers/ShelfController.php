@@ -42,7 +42,7 @@ class ShelfController extends Controller
 
         Shelf::create($request->all());
 
-        return redirect()->route('shelf.index') ->with('success', 'Estantería creada exitosamente.');
+        return redirect()->route('shelf.index')->with('success', 'Estantería creada exitosamente.');
     }
 
     /**
@@ -76,7 +76,7 @@ class ShelfController extends Controller
 
         $shelf->update($request->all());
 
-        return redirect()->route('shelf.index') ->with('success', 'Estantería actualizada exitosamente.');
+        return redirect()->route('shelf.index')->with('success', 'Estantería actualizada exitosamente.');
 
     }
 
@@ -87,6 +87,23 @@ class ShelfController extends Controller
     {
         Shelf::destroy($id);
 
-        return redirect()->route('shelf.index') ->with('success','Estantería eliminada correctamente');
+        return redirect()->route('shelf.index')->with('success', 'Estantería eliminada correctamente');
+    }
+    public function updatePosition(Request $request, $id)
+    {
+        // Validamos que vengan coordenadas
+        $request->validate([
+            'pos_x' => 'required|numeric',
+            'pos_z' => 'required|numeric',
+        ]);
+
+        // Buscamos la estantería y le actualizamos sus coordenadas
+        $shelf = Shelf::findOrFail($id);
+        $shelf->update([
+            'pos_x' => $request->pos_x,
+            'pos_z' => $request->pos_z
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Posición actualizada correctamente']);
     }
 }

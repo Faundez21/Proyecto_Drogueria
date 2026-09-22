@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="w-full max-w-[1400px] mx-auto p-4 sm:p-6">
+    <div class="w-full">
         <!-- miga de pan -->
         <div class="flex items-center gap-2 text-gray-500 mb-4">
             <a href="{{ route('distribution.index') }}" class="hover:text-blue-900">

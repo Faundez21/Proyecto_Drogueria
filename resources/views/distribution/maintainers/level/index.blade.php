@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="w-full max-w-[1400px] mx-auto p-4 sm:p-6">
+    <div class="w-full">
 
         <!-- miga de pan -->
 

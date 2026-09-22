@@ -284,7 +284,7 @@
 
 
                                 <!--botón ver (QR)-->
-                                <button
+                                <button onclick="openQRModal()"
                                     class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                                     title="Ver Detalles">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -393,4 +393,230 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal QR -->
+        <div id="qrModal" class="hidden fixed inset-0 z-50 bg-black/50 items-center justify-center p-4">
+
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+
+                <!-- Encabezado -->
+                <div class="bg-blue-900 border-b border-blue-100 px-6 py-4 flex items-center justify-between">
+
+                    <div>
+                        <h2 class="text-xl text-white font-bold text-gray-800">
+                            Código QR del lote
+                        </h2>
+
+                        <p class="text-sm text-white mt-1">
+                            Información del producto
+                        </p>
+                    </div>
+
+                    <button type="button" onclick="closeQRModal()"
+                        class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Cerrar">
+
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12">
+                            </path>
+                        </svg>
+
+                    </button>
+
+                </div>
+
+
+                <!-- Contenido -->
+                <div class="p-6">
+
+                    <!-- QR -->
+                    <div class="flex justify-center mb-6">
+
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+
+                            <div id="qrcode" class="w-48 h-48 flex items-center justify-center">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Información del producto -->
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+
+                        <div class="bg-slate-50 px-4 py-3 border-b border-gray-200">
+
+                            <h3 class="text-sm font-semibold text-slate-700">
+                                Información del lote
+                            </h3>
+
+                        </div>
+
+
+                        <div class="divide-y divide-gray-100">
+
+                            <!-- ID -->
+                            <div class="flex justify-between gap-4 px-4 py-3">
+
+                                <span class="text-sm text-gray-500">
+                                    ID
+                                </span>
+
+                                <span id="qrId" class="text-sm font-medium text-gray-800">
+                                    2055
+                                </span>
+
+                            </div>
+
+
+                            <!-- Producto -->
+                            <div class="flex justify-between gap-4 px-4 py-3">
+
+                                <span class="text-sm text-gray-500">
+                                    Producto
+                                </span>
+
+                                <span id="qrProducto" class="text-sm font-medium text-gray-800 text-right">
+                                    AGUJA 21 G X 1,5 DESECHABLE
+                                </span>
+
+                            </div>
+
+
+                            <!-- Lote -->
+                            <div class="flex justify-between gap-4 px-4 py-3">
+
+                                <span class="text-sm text-gray-500">
+                                    Lote
+                                </span>
+
+                                <span id="qrLote" class="text-sm font-medium text-gray-800">
+                                    L-2026-001
+                                </span>
+
+                            </div>
+
+
+                            <!-- Vencimiento -->
+                            <div class="flex justify-between gap-4 px-4 py-3">
+
+                                <span class="text-sm text-gray-500">
+                                    Vencimiento
+                                </span>
+
+                                <span id="qrVencimiento" class="text-sm font-medium text-gray-800">
+                                    12/2027
+                                </span>
+
+                            </div>
+
+
+                            <!-- Stock -->
+                            <div class="flex justify-between gap-4 px-4 py-3">
+
+                                <span class="text-sm text-gray-500">
+                                    Stock disponible
+                                </span>
+
+                                <span id="qrStock" class="text-sm font-medium text-emerald-600">
+                                    850 Unidades
+                                </span>
+
+                            </div>
+
+
+                            <!-- Proveedor -->
+                            <div class="flex justify-between gap-4 px-4 py-3">
+
+                                <span class="text-sm text-gray-500">
+                                    Proveedor
+                                </span>
+
+                                <span id="qrUbicacion" class="text-sm font-medium text-gray-800 text-right">
+                                    Laboratorios Andinos S.A
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Footer -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-gray-200 flex justify-end">
+
+                    <button type="button" onclick="closeQRModal()"
+                        class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors">
+
+                        Cerrar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Librería para generar QR -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+
+        <script>
+            function openQRModal() {
+
+                const modal = document.getElementById('qrModal');
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+
+
+                // Limpiar QR anterior
+                const qrContainer = document.getElementById('qrcode');
+
+                qrContainer.innerHTML = '';
+
+
+                // Datos del lote
+                const id = document.getElementById('qrId').textContent.trim();
+
+
+                // Generar QR
+                new QRCode(qrContainer, {
+                    text: 'LOTE-' + id,
+                    width: 192,
+                    height: 192,
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+            }
+
+
+            function closeQRModal() {
+
+                const modal = document.getElementById('qrModal');
+
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+
+            }
+        </script>
     @endsection
+
+    <script>
+        function openQRModal() {
+            document.getElementById('qrModal').classList.remove('hidden');
+            document.getElementById('qrModal').classList.add('flex');
+        }
+
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.add('hidden');
+            document.getElementById('qrModal').classList.remove('flex');
+        }
+    </script>
