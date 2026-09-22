@@ -8,7 +8,7 @@
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">Inventario</h1>
                 <p class="text-gray-500 mt-1">
-                    Ingresos manuales o importaciones masivas y tabla del catálogo de productos
+                    Control de productos y detalle de lotes
                 </p>
             </div>
             <div class="flex gap-2 w-full sm:w-auto">
@@ -27,60 +27,61 @@
         <div id="HistoryModal"
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 w-full max-w-4xl overflow-hidden">
-
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
                     <div>
-                        <h2 class="text-xl font-bold text-slate-800">Historial de Movimientos del Inventario</h2>
-                        <p class="text-sm text-slate-500 mt-0.5">Registro de auditoría de entradas, salidas e importaciones
-                            masivas.</p>
+                        <h2 class="text-xl font-bold text-slate-800">Historial de Movimientos de Inventario</h2>
+                        <p class="text-sm text-slate-500 mt-0.5">Registro de auditoría de recepciones e importaciones.</p>
                     </div>
-                    @role('Administrador')
-                        <button type="button" onclick="closeHistory()"
-                            class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                                </path>
-                            </svg>
-                        </button>
-                    @endrole
+                    <button type="button" onclick="closeHistory()"
+                        class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
 
                 <div class="overflow-x-auto max-h-96 border border-slate-200 rounded-xl">
                     <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
                         <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b border-slate-200 sticky top-0">
                             <tr>
-                                <th class="px-4 py-3 font-semibold">Fecha / Hora</th>
-                                <th class="px-4 py-3 font-semibold">Acción</th>
-                                <th class="px-4 py-3 font-semibold">Descripción / Detalle</th>
+                                <th class="px-4 py-3 font-semibold">Fecha Recepción</th>
+                                <th class="px-4 py-3 font-semibold">Documento / Correlativo</th>
+                                <th class="px-4 py-3 font-semibold">Proveedor</th>
+                                <th class="px-4 py-3 font-semibold">Producto</th>
                                 <th class="px-4 py-3 font-semibold text-center">Cantidad</th>
-                                <th class="px-4 py-3 font-semibold">Usuario</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            <tr class="hover:bg-slate-50/50 transition-colors">
-                                <td class="px-4 py-3 text-slate-500">11/09/2026 - 09:50</td>
-                                <td class="px-4 py-3">
-                                    <span
-                                        class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold">Importación</span>
-                                </td>
-                                <td class="px-4 py-3 font-medium text-slate-800">Carga Masiva (Excel)</td>
-                                <td class="px-4 py-3 text-center font-bold text-emerald-600">+142 ítems</td>
-                                <td class="px-4 py-3 text-slate-600 font-medium">
-                                    Juan Pérez
-                                </td>
-                            </tr>
+                            @forelse($inventories ?? [] as $item)
+                                @php $itemObj = is_object($item) ? $item : (object) $item; @endphp
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="px-4 py-3 text-slate-500">{{ $itemObj->fecha_recepcion ?? '' }}</td>
+                                    <td class="px-4 py-3 font-medium text-slate-800">
+                                        {{ $itemObj->tipo_documento ?? '' }} #{{ $itemObj->numero_documento ?? '' }}
+                                        @if(!empty($itemObj->correlativo_interno))
+                                            <span class="text-xs text-slate-400 block">Corr: {{ $itemObj->correlativo_interno }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3 text-slate-600">{{ $itemObj->razon_social ?? '' }}</td>
+                                    <td class="px-4 py-3 font-semibold text-slate-800">{{ $itemObj->producto ?? '' }}</td>
+                                    <td class="px-4 py-3 text-center font-bold text-emerald-600">+{{ $itemObj->cantidad ?? 0 }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-4 py-6 text-center text-slate-400">No hay movimientos registrados.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
 
                 <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100">
-                    <span class="text-xs text-slate-400">Mostrando registros recientes de auditoría</span>
+                    <span class="text-xs text-slate-400">Mostrando registros recientes</span>
                     <button type="button" onclick="closeHistory()"
                         class="px-5 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-colors text-sm font-medium shadow-sm cursor-pointer">
                         Cerrar
                     </button>
                 </div>
-
             </div>
         </div>
 
@@ -106,259 +107,163 @@
             </div>
         </div>
 
-        <!-- Tabla inventario -->
+        <!-- Tabla Inventario Agrupada -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-slate-200 flex flex-col lg:flex-row justify-between items-center gap-4">
                 <h3 class="text-lg sm:text-xl font-bold text-slate-800 text-left">
-                    Catálogo Base de Productos
+                    Catálogo
                 </h3>
 
                 <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                    <div class="relative w-full sm:w-80">
+                    <form method="GET" action="{{ route('inventario.index') }}" class="relative w-full sm:w-80">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </div>
-                        <input type="text" placeholder="Buscar producto..."
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar por producto, lote o proveedor..."
                             class="block w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors text-slate-700">
-                    </div>
+                    </form>
                 </div>
             </div>
 
             <div class="overflow-x-auto w-full">
-                <table class="min-w-[1100px] w-full text-left text-sm font-light text-gray-800 whitespace-nowrap">
+                @php
+                    // Convertimos a colección en caso de ser un paginador o array y agrupamos
+                    $invCollection = collect(isset($inventories) && method_exists($inventories, 'items') ? $inventories->items() : ($inventories ?? []));
+                    $groupedInventories = $invCollection->groupBy('producto');
+                @endphp
+
+                <table class="min-w-[1000px] w-full text-left text-sm font-light text-gray-800 whitespace-nowrap">
                     <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
                         <tr>
-                            <th scope="col" class="px-4 py-4">ID</th>
+                            <th scope="col" class="px-4 py-4 w-12 text-center"></th>
                             <th scope="col" class="px-4 py-4">Producto</th>
                             <th scope="col" class="px-4 py-4">Categoría</th>
-                            <th scope="col" class="px-4 py-4">Pasillo</th>
-                            <th scope="col" class="px-4 py-4">Estante</th>
-                            <th scope="col" class="px-4 py-4 text-center">Estado</th>
-                            <th scope="col" class="px-4 py-4">Stock Total</th>
+                            <th scope="col" class="px-4 py-4 text-center">N° de Lotes Activos</th>
+                            <th scope="col" class="px-4 py-4 text-center">Stock Total Acumulado</th>
                             <th scope="col" class="px-4 py-4 text-center">Acciones</th>
                         </tr>
                     </thead>
 
-                    <tbody>
-                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors">
-                            <td class="px-4 py-3 font-medium text-gray-600">1001</td>
-                            <td class="px-4 py-3 font-bold text-slate-800">PARACETAMOL 500MG</td>
-                            <td class="px-4 py-3 text-gray-600">Fármacos</td>
-                            <td class="px-4 py-3 text-gray-600 font-medium">Pasillo A </td>
-                            <td class="px-4 py-3 text-gray-600">Estante 1</td>
-                            <td class="px-4 py-3 text-center text-gray-500 font-medium">En espera</td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-gray-800 border border-gray-300">
-                                    850 Unidades
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-                                <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Eliminar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
+                    <tbody class="divide-y divide-slate-200">
+                        @forelse($groupedInventories as $nombreProducto => $lotes)
+                            @php
+                                $stockTotalProducto = $lotes->sum('cantidad');
+                                $groupKey = Str::slug($nombreProducto ?: 'producto-sin-nombre');
+                                $primerLote = is_object($lotes->first()) ? $lotes->first() : (object) ($lotes->first() ?? []);
+                            @endphp
 
-                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors">
-                            <td class="px-4 py-3 font-medium text-gray-600">1042</td>
-                            <td class="px-4 py-3 font-bold text-slate-800">ERITROMICINA 500 MG CM REC.</td>
-                            <td class="px-4 py-3 text-gray-600">Fármacos</td>
-                            <td class="px-4 py-3 text-gray-600 font-medium">Pasillo A</td>
-                            <td class="px-4 py-3 text-gray-600">Estante 3</td>
-                            <td class="px-4 py-3 text-center text-gray-500 font-medium">En stock</td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-300">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                        </path>
-                                    </svg>
-                                    15 Unidades
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-                                <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Eliminar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
+                            <!-- Fila Principal del Producto -->
+                            <tr class="bg-white hover:bg-slate-50/80 transition-colors cursor-pointer select-none" onclick="toggleLotes('{{ $groupKey }}')">
+                                <td class="px-4 py-3 text-center">
+                                    <button type="button" class="text-slate-400 hover:text-blue-600 transition-transform duration-200" id="icon-{{ $groupKey }}">
+                                        <svg class="w-5 h-5 transform transition-transform" id="arrow-{{ $groupKey }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                </td>
+                                <td class="px-4 py-3 font-bold text-slate-800 text-base">
+                                    {{ $nombreProducto ?: 'Sin Nombre' }}
+                                </td>
+                                <td class="px-4 py-3 text-slate-600 font-medium">
+                                    {{ $primerLote->categoria ?? 'General' }}
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                        {{ $lotes->count() }} lote(s)
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    @if($stockTotalProducto > 10)
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            {{ number_format($stockTotalProducto, 0, ',', '.') }} Unidades
+                                        </span>
+                                    @elseif($stockTotalProducto > 0)
+                                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                            {{ number_format($stockTotalProducto, 0, ',', '.') }} Unidades (Stock Bajo)
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200">
+                                            0 Unidades (Agotado)
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
+                                    <button onclick="toggleLotes('{{ $groupKey }}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition-colors">
+                                        Ver Lotes
+                                    </button>
+                                </td>
+                            </tr>
 
-                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors opacity-75">
-                            <td class="px-4 py-3 font-medium text-gray-500">2055</td>
-                            <td class="px-4 py-3 font-bold text-gray-600">AGUJA 21 G X 1,5 DESECHABLE</td>
-                            <td class="px-4 py-3 text-gray-500">Insumos</td>
-                            <td class="px-4 py-3 text-gray-500 font-medium">Pasillo B</td>
-                            <td class="px-4 py-3 text-gray-500">Estante 2</td>
-                            <td class="px-4 py-3 text-center text-gray-500 font-medium">En stock</td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-300">
-                                    0 Unidades (Agotado)
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-                                <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Eliminar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors">
-                            <td class="px-4 py-3 font-medium text-gray-600">1088</td>
-                            <td class="px-4 py-3 font-medium text-gray-600">IBUPROFENO 400MG</td>
-                            <td class="px-4 py-3 text-gray-600">Fármacos</td>
-                            <td class="px-4 py-3 text-gray-600 font-medium">Pasillo C</td>
-                            <td class="px-4 py-3 text-gray-600">Estante 1</td>
-                            <td class="px-4 py-3 text-center">
-                                <span
-                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-orange-200 text-orange-800 border border-orange-300">
-                                    En Cuarentena
-                                </span>
-                            </td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-gray-800 border border-gray-300">
-                                    320 Unidades
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-                                <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                                    title="Eliminar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
+                            <!-- Subtabla Desplegable de Lotes -->
+                            <tr id="lotes-{{ $groupKey }}" class="hidden bg-slate-50/60 border-t border-b border-slate-200/80">
+                                <td colspan="6" class="p-4 pl-12">
+                                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                        <div class="px-4 py-2.5 bg-slate-100/70 border-b border-slate-200 flex justify-between items-center">
+                                            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Desglose de Lotes / Recepciones de {{ $nombreProducto }}</span>
+                                        </div>
+                                        <table class="w-full text-left text-xs whitespace-nowrap">
+                                            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-200">
+                                                <tr>
+                                                    <th class="px-4 py-2.5">N° Correlativo</th>
+                                                    <th class="px-4 py-2.5">Lote / Vencimiento</th>
+                                                    <th class="px-4 py-2.5">Proveedor / Documento</th>
+                                                    <th class="px-4 py-2.5">Ubicación</th>
+                                                    <th class="px-4 py-2.5 text-right">Valor Neto Unit.</th>
+                                                    <th class="px-4 py-2.5 text-center">Stock del Lote</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-100 text-slate-700">
+                                                @foreach($lotes as $lote)
+                                                    @php
+                                                        $loteObj = is_object($lote) ? $lote : (object) $lote;
+                                                    @endphp
+                                                    <tr class="hover:bg-slate-50/80 transition-colors">
+                                                        <td class="px-4 py-2.5 font-bold text-teal-700">
+                                                            #{{ $loteObj->correlativo_interno ?? 'N/A' }}
+                                                        </td>
+                                                        <td class="px-4 py-2.5 font-medium">
+                                                            <span class="text-slate-800 font-bold">Lote: {{ $loteObj->lote ?? 'S/L' }}</span> <br>
+                                                            <span class="text-slate-400">Vence: {{ $loteObj->fecha_vencimiento ?? 'N/A' }}</span>
+                                                        </td>
+                                                        <td class="px-4 py-2.5">
+                                                            <span class="font-semibold text-slate-800">{{ $loteObj->razon_social ?? 'S/N' }}</span> <br>
+                                                            <span class="text-slate-400">{{ $loteObj->tipo_documento ?? '' }}: {{ $loteObj->numero_documento ?? '' }}</span>
+                                                        </td>
+                                                        <td class="px-4 py-2.5 text-slate-500">
+                                                            {{ $loteObj->pasillo ?? 'Sin pasillo' }} / {{ $loteObj->estante ?? 'Sin estante' }}
+                                                        </td>
+                                                        <td class="px-4 py-2.5 text-right font-semibold text-slate-800">
+                                                            ${{ number_format($loteObj->valor_neto_unitario ?? 0, 0, ',', '.') }}
+                                                        </td>
+                                                        <td class="px-4 py-2.5 text-center">
+                                                            <span class="font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
+                                                                {{ number_format($loteObj->cantidad ?? 0, 0, ',', '.') }} Unid.
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-4 py-6 text-center text-slate-400">No hay registros de productos en el inventario.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <div
-                class="px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white">
-                <span class="text-sm text-slate-500">Mostrando del <span class="font-medium text-slate-900">1</span> al
-                    <span class="font-medium text-slate-900">10</span> de <span
-                        class="font-medium text-slate-900">142</span>
-                    productos</span>
-                <div class="flex items-center gap-1">
-                    <button
-                        class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-400 cursor-not-allowed bg-slate-50">Anterior</button>
-                    <button
-                        class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-100">1</button>
-                    <button
-                        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">2</button>
-                    <button
-                        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">3</button>
-                    <span class="px-1 text-slate-400">...</span>
-                    <button
-                        class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">Siguiente</button>
-                </div>
+            <!-- Paginación -->
+            <div class="px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white">
+                @if(isset($inventories) && method_exists($inventories, 'links'))
+                    {{ $inventories->links() }}
+                @endif
             </div>
         </div>
     </div>
@@ -366,14 +271,12 @@
     <!-- Modal Importar -->
     <div id="importModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div
-            class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between w-full max-w-md">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between w-full max-w-md">
             <div>
                 <h2 class="text-xl font-bold text-slate-800">Importar Carga Masiva</h2>
-                <p class="text-sm text-slate-500 mt-1 mb-5">Suba un archivo Excel (.xlsx o .csv) para actualizar el
-                    inventario completo.</p>
+                <p class="text-sm text-slate-500 mt-1 mb-5">Suba un archivo Excel (.xlsx o .csv) para registrar recepciones masivas.</p>
 
-                <a href=""
+                <a href="#"
                     class="w-full mb-6 flex justify-center items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-colors font-medium text-sm shadow-sm cursor-pointer">
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -384,11 +287,8 @@
                 </a>
             </div>
 
-            <div
-                class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg p-6 flex-grow flex flex-col justify-center items-center">
-
-                <form action="/inventario/subir-excel" method="POST" enctype="multipart/form-data"
-                    class="flex flex-col items-center gap-4 w-full">
+            <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg p-6 flex-grow flex flex-col justify-center items-center">
+                <form action="{{ route('inventario.import') }}" method="POST" enctype="multipart/form-data" class="flex flex-col items-center gap-4 w-full">
                     @csrf
                     <input type="file" id="excel" name="excel" class="hidden" accept=".xlsx, .xls, .csv">
 
@@ -418,60 +318,106 @@
     <!-- Modal Ingreso Manual -->
     <div id="DepositModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 w-full max-w-lg">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div>
-                <h2 class="text-xl font-bold text-slate-800">Ingresar Producto Individual</h2>
-                <p class="text-sm text-slate-500 mt-1 mb-6">Registra un nuevo producto en el catálogo maestro del
-                    sistema.</p>
+                <h2 class="text-xl font-bold text-slate-800">Ingresar Producto / Recepción Manual</h2>
+                <p class="text-sm text-slate-500 mt-1 mb-6">Registra un nuevo producto con su correspondiente documento de origen.</p>
             </div>
 
-            <form action="/inventario/guardar" method="POST">
+            <form action="{{ route('inventario.store') }}" method="POST">
                 @csrf
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="id" class="block text-xs font-medium text-slate-700 mb-1">ID</label>
-                        <input type="text" id="id" name="id" placeholder="Ej. COD-1005"
-                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                            required />
-                    </div>
-
-                    <div>
-                        <label for="nombre" class="block text-xs font-medium text-slate-700 mb-1">Nombre del
-                            Producto</label>
-                        <input type="text" id="nombre" name="nombre" placeholder="Ej. Paracetamol"
-                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                            required />
-                    </div>
-
-                    <div>
-                        <label for="categoria" class="block text-xs font-medium text-slate-700 mb-1">Categoría</label>
-                        <select id="categoria" name="categoria"
-                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                            required>
-                            <option value="" disabled selected>Seleccionar...</option>
-                            <option value="farmacos">Fármacos</option>
-                            <option value="insumos">Insumos Clínicos</option>
-                            <option value="equipamiento">Equipamiento Médico</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="stock" class="block text-xs font-medium text-slate-700 mb-1">Stock
-                            Inicial</label>
-                        <input type="number" id="stock" name="stock" placeholder="0" min="0"
-                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                            required />
-                    </div>
-
-                    <div>
-                        <label for="pasillo" class="block text-xs font-medium text-slate-700 mb-1">Pasillo</label>
-                        <input type="text" id="pasillo" name="pasillo" placeholder="Ej. Pasillo 1"
+                        <label for="correlativo_interno" class="block text-xs font-medium text-slate-700 mb-1">N° Correlativo Interno</label>
+                        <input type="number" id="correlativo_interno" name="correlativo_interno" placeholder="Ej. 1001"
                             class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div>
 
                     <div>
-                        <label for="estante" class="block text-xs font-medium text-slate-700 mb-1">Estante</label>
-                        <input type="text" id="estante" name="estante" placeholder="Ej. Estante 3"
+                        <label for="fecha_recepcion" class="block text-xs font-medium text-slate-700 mb-1">Fecha Recepción</label>
+                        <input type="date" id="fecha_recepcion" name="fecha_recepcion" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="tipo_documento" class="block text-xs font-medium text-slate-700 mb-1">Tipo Documento</label>
+                        <select id="tipo_documento" name="tipo_documento" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            <option value="" disabled selected>Seleccione...</option>
+                            <option value="Factura">Factura</option>
+                            <option value="Guía de Despacho">Guía de Despacho</option>
+                            <option value="Orden de Compra">Orden de Compra</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="numero_documento" class="block text-xs font-medium text-slate-700 mb-1">N° del Documento</label>
+                        <input type="text" id="numero_documento" name="numero_documento" placeholder="Ej. F-9842" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="orden_compra" class="block text-xs font-medium text-slate-700 mb-1">Orden de Compra / Ref.</label>
+                        <input type="text" id="orden_compra" name="orden_compra" placeholder="Ej. OC-4512"
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="origen_mercaderia" class="block text-xs font-medium text-slate-700 mb-1">Origen Mercadería</label>
+                        <input type="text" id="origen_mercaderia" name="origen_mercaderia" placeholder="Ej. Cenabast / Importación" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="rut_proveedor" class="block text-xs font-medium text-slate-700 mb-1">RUT Proveedor</label>
+                        <input type="text" id="rut_proveedor" name="rut_proveedor" placeholder="Ej. 76.123.456-7" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="razon_social" class="block text-xs font-medium text-slate-700 mb-1">Razón Social / Proveedor</label>
+                        <input type="text" id="razon_social" name="razon_social" placeholder="Ej. Droguería Central SpA" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="producto" class="block text-xs font-medium text-slate-700 mb-1">Producto</label>
+                        <input type="text" id="producto" name="producto" placeholder="Ej. PARACETAMOL 500MG" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="categoria" class="block text-xs font-medium text-slate-700 mb-1">Categoría</label>
+                        <select id="categoria" name="categoria" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            <option value="" disabled selected>Seleccionar...</option>
+                            <option value="Fármacos">Fármacos</option>
+                            <option value="Insumos Clínicos">Insumos Clínicos</option>
+                            <option value="Equipamiento Médico">Equipamiento Médico</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="lote" class="block text-xs font-medium text-slate-700 mb-1">Lote</label>
+                        <input type="text" id="lote" name="lote" placeholder="Ej. L-4893"
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="fecha_vencimiento" class="block text-xs font-medium text-slate-700 mb-1">F. Vencimiento</label>
+                        <input type="date" id="fecha_vencimiento" name="fecha_vencimiento"
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="cantidad" class="block text-xs font-medium text-slate-700 mb-1">Cantidad</label>
+                        <input type="number" id="cantidad" name="cantidad" placeholder="0" min="1" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="valor_neto_unitario" class="block text-xs font-medium text-slate-700 mb-1">Valor Neto Unit. ($)</label>
+                        <input type="number" step="0.01" id="valor_neto_unitario" name="valor_neto_unitario" placeholder="0.00" required
                             class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div>
                 </div>
@@ -483,37 +429,35 @@
                     </button>
                     <button type="submit"
                         class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto cursor-pointer">
-                        Guardar Producto
+                        Guardar Registro
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Script -->
+    <!-- Script de Modales y Desplegables -->
     <script>
-        function openHistory() {
-            document.getElementById('HistoryModal').classList.remove('hidden');
+        function toggleLotes(key) {
+            const row = document.getElementById('lotes-' + key);
+            const arrow = document.getElementById('arrow-' + key);
+
+            if (row) {
+                if (row.classList.contains('hidden')) {
+                    row.classList.remove('hidden');
+                    if(arrow) arrow.classList.add('rotate-180');
+                } else {
+                    row.classList.add('hidden');
+                    if(arrow) arrow.classList.remove('rotate-180');
+                }
+            }
         }
 
-        function closeHistory() {
-            document.getElementById('HistoryModal').classList.add('hidden');
-        }
-
-        function openImport() {
-            document.getElementById('importModal').classList.remove('hidden');
-        }
-
-        function closeImport() {
-            document.getElementById('importModal').classList.add('hidden');
-        }
-
-        function openDeposit() {
-            document.getElementById('DepositModal').classList.remove('hidden');
-        }
-
-        function closeDeposit() {
-            document.getElementById('DepositModal').classList.add('hidden');
-        }
+        function openHistory() { document.getElementById('HistoryModal').classList.remove('hidden'); }
+        function closeHistory() { document.getElementById('HistoryModal').classList.add('hidden'); }
+        function openImport() { document.getElementById('importModal').classList.remove('hidden'); }
+        function closeImport() { document.getElementById('importModal').classList.add('hidden'); }
+        function openDeposit() { document.getElementById('DepositModal').classList.remove('hidden'); }
+        function closeDeposit() { document.getElementById('DepositModal').classList.add('hidden'); }
     </script>
 @endsection

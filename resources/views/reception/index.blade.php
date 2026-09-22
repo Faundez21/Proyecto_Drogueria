@@ -37,7 +37,7 @@
             <!-- Formulario Principal -->
             <form action="{{ route('reception.store') }}" method="POST" class="divide-y divide-slate-100" id="receptionForm">
                 @csrf
-                
+
                 <!-- SECCIÓN 1: Documento -->
                 <div class="p-6">
                     <div class="flex items-center gap-2 mb-4">
@@ -191,7 +191,7 @@
                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                         <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">4. Firmas Digitales</h3>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Firma Proveedor -->
                         <div class="flex flex-col items-center">
@@ -363,7 +363,7 @@
 
             // 2. Lógica Dinámica de Productos y Totales
             const container = document.getElementById('productos_container');
-            
+
             function calcularTotalGeneral() {
                 let totalNeto = 0;
                 document.querySelectorAll('.producto-item').forEach(item => {
@@ -371,7 +371,7 @@
                     const price = parseFloat(item.querySelector('.calc-price').value) || 0;
                     totalNeto += (qty * price);
                 });
-                
+
                 const inputFinal = document.getElementById('valor_final_iva');
                 if(totalNeto > 0) {
                     inputFinal.value = new Intl.NumberFormat('es-CL').format(Math.round(totalNeto * 1.19));
@@ -419,7 +419,7 @@
                 signatureProv.clear();
                 signatureRec.clear();
                 document.getElementById('valor_final_iva').value = '';
-                
+
                 // Borra los productos extra y deja solo el primero
                 const items = container.querySelectorAll('.producto-item');
                 for(let i = 1; i < items.length; i++) {
@@ -446,11 +446,11 @@
             document.getElementById('m_orden').innerText = data.orden_compra || 'N/A';
             document.getElementById('m_proveedor').innerText = providerName;
             document.getElementById('m_rut_proveedor').innerText = providerRut;
-            
+
             // Llenar tabla de items
             const tbody = document.getElementById('m_items_table');
             tbody.innerHTML = '';
-            
+
             data.items.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -463,16 +463,16 @@
             });
 
             document.getElementById('m_total').innerText = '$' + parseFloat(data.valor_total_recepcion).toLocaleString('es-CL');
-            
+
             // Firmas
             const imgProv = document.getElementById('m_img_proveedor');
             const noFirmaProv = document.getElementById('m_no_firma_proveedor');
-            if(data.firma_proveedor) { imgProv.src = data.firma_proveedor; imgProv.classList.remove('hidden'); noFirmaProv.classList.add('hidden'); } 
+            if(data.firma_proveedor) { imgProv.src = data.firma_proveedor; imgProv.classList.remove('hidden'); noFirmaProv.classList.add('hidden'); }
             else { imgProv.classList.add('hidden'); noFirmaProv.classList.remove('hidden'); }
 
             const imgRec = document.getElementById('m_img_receptor');
             const noFirmaRec = document.getElementById('m_no_firma_receptor');
-            if(data.firma_receptor) { imgRec.src = data.firma_receptor; imgRec.classList.remove('hidden'); noFirmaRec.classList.add('hidden'); } 
+            if(data.firma_receptor) { imgRec.src = data.firma_receptor; imgRec.classList.remove('hidden'); noFirmaRec.classList.add('hidden'); }
             else { imgRec.classList.add('hidden'); noFirmaRec.classList.remove('hidden'); }
 
             document.getElementById('m_btn_pdf').href = pdfUrl;
