@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     })->name('inventario.index');
 
     Route::get('/inventario', [InventoryController::class, 'index'])->name('inventario.index');
+    Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])->name('inventario.update');
     Route::post('/inventario/guardar', [InventoryController::class, 'store'])->name('inventario.store');
     Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])->name('inventario.import');
     Route::get('/reportes', function () {
