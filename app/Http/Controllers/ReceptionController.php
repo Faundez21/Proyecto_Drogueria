@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventory;
 use App\Models\Reception;
 use App\Models\ReceptionItem;
 use App\Models\Provider;
@@ -15,11 +16,10 @@ class ReceptionController extends Controller
     {
         $providers = Provider::all();
         // Carga los productos reales de tu tabla de inventario
-        $products = Product::all(); 
-        
+        $products = Product::all();
         // Traemos las recepciones con su proveedor y con los items (que a su vez traen el producto)
         $receptions = Reception::with(['provider', 'items.product'])->orderBy('created_at', 'desc')->get();
-        
+
         $nextCorrelativo = Reception::max('correlativo') + 1;
 
         return view('reception.index', compact('providers', 'receptions', 'products', 'nextCorrelativo'));
@@ -33,12 +33,16 @@ class ReceptionController extends Controller
             'numero_documento' => 'required|string',
             'origen' => 'required|string',
             'provider_id' => 'required|exists:providers,id',
-            // Validamos que venga al menos un producto (los campos ahora son arrays)
             'product_id' => 'required|array|min:1',
             'product_id.*' => 'required|integer',
             'cantidad_unitaria' => 'required|array|min:1',
             'cantidad_unitaria.*' => 'required|integer|min:1',
         ]);
+
+        // OBTENER INFORMACIÓN DEL PROVEEDOR
+        $provider = Provider::findOrFail($request->provider_id);
+        $rutProveedor = $provider->rut ?? 'S/R';
+        $nombreProveedor = $provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor';
 
         // 1. Guardar la Cabecera de la Recepción
         $correlativo_autogenerado = Reception::max('correlativo') + 1;
@@ -51,7 +55,7 @@ class ReceptionController extends Controller
             'orden_compra' => $request->orden_compra,
             'origen' => $request->origen,
             'provider_id' => $request->provider_id,
-            'valor_total_recepcion' => 0, // Lo actualizaremos después del loop
+            'valor_total_recepcion' => 0,
             'firma_proveedor' => $request->firma_proveedor,
             'firma_receptor' => $request->firma_receptor,
         ]);
@@ -60,21 +64,44 @@ class ReceptionController extends Controller
 
         // 2. Guardar cada Producto asociado (Bucle dinámico)
         foreach ($request->product_id as $index => $prod_id) {
+            // OBTENER INFORMACIÓN DEL PRODUCTO
+            $product = Product::find($prod_id);
+            $nombreProducto = $product ? $product->nombre : 'Producto #' . $prod_id;
+
             $cantidad = $request->cantidad_unitaria[$index];
             $valor_u = $request->valor_unitario[$index] ?? 0;
             $subtotal_item = $cantidad * $valor_u;
-            
+
             $total_neto_recepcion += $subtotal_item;
 
+            // Guardar en reception_items
             ReceptionItem::create([
                 'reception_id' => $reception->id,
                 'product_id' => $prod_id,
-                'tipo_producto' => $request->tipo_producto[$index],
-                'lote' => $request->lote[$index],
-                'fecha_vencimiento' => $request->fecha_vencimiento[$index],
+                'tipo_producto' => $request->tipo_producto[$index] ?? null,
+                'lote' => $request->lote[$index] ?? null,
+                'fecha_vencimiento' => $request->fecha_vencimiento[$index] ?? null,
                 'cantidad' => $cantidad,
                 'valor_unitario' => $valor_u,
-                'valor_total_item' => $subtotal_item * 1.19, // C/IVA
+                'valor_total_item' => $subtotal_item * 1.19,
+            ]);
+
+            // Guardar el movimiento en la tabla inventories
+            Inventory::create([
+                'correlativo_interno' => $correlativo_autogenerado,
+                'fecha_recepcion' => $request->fecha_recepcion,
+                'tipo_documento' => $request->tipo_documento,
+                'numero_documento' => $request->numero_documento,
+                'orden_compra' => $request->orden_compra,
+                'origen_mercaderia' => $request->origen,
+                'rut_proveedor' => $rutProveedor,
+                'razon_social' => $nombreProveedor,
+                'producto' => $nombreProducto,
+                'categoria' => $request->tipo_producto[$index] ?? 'General',
+                'lote' => $request->lote[$index] ?? null,
+                'fecha_vencimiento' => $request->fecha_vencimiento[$index] ?? null,
+                'cantidad' => $cantidad,
+                'valor_neto_unitario' => $valor_u,
             ]);
         }
 
@@ -85,7 +112,7 @@ class ReceptionController extends Controller
             return redirect()->route('reception.pdf', $reception->id);
         }
 
-        return redirect()->route('reception.index')->with('success', 'Recepción guardada exitosamente. N°: ' . $correlativo_autogenerado);
+        return redirect()->route('reception.index')->with('success', 'Recepción e Ingreso a Inventario guardados exitosamente. N°: ' . $correlativo_autogenerado);
     }
 
     public function downloadPdf(Reception $reception)

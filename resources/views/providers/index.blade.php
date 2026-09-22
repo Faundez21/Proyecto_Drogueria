@@ -133,7 +133,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="mt-5 flex items-center justify-end gap-3 border-t border-slate-200/60 pt-4">
                     <a href="{{ route('providers.index') }}" class="px-4 py-2 rounded-lg text-[12.5px] font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors">
                         Limpiar Filtros
@@ -159,20 +159,20 @@
                     <tbody class="divide-y divide-slate-100 text-[13px]">
                         @forelse ($providers ?? [] as $provider)
                         <!-- IMPORTANTE: Todos los campos añadidos a los data-attributes -->
-                        <tr class="provider-row hover:bg-slate-50 transition-colors group" 
+                        <tr class="provider-row hover:bg-slate-50 transition-colors group"
                             data-id="{{ $provider->id }}"
-                            data-name="{{ $provider->name }}" 
-                            data-rut="{{ $provider->rut }}" 
-                            data-business-line="{{ $provider->business_line }}" 
-                            data-email="{{ $provider->email }}" 
-                            data-phone="{{ $provider->phone }}" 
-                            data-address="{{ $provider->address }}" 
-                            data-category="{{ $provider->category }}" 
-                            data-bank-name="{{ $provider->bank_name }}" 
-                            data-account-type="{{ $provider->account_type }}" 
-                            data-account-number="{{ $provider->account_number }}" 
+                            data-name="{{ $provider->name }}"
+                            data-rut="{{ $provider->rut }}"
+                            data-business-line="{{ $provider->business_line }}"
+                            data-email="{{ $provider->email }}"
+                            data-phone="{{ $provider->phone }}"
+                            data-address="{{ $provider->address }}"
+                            data-category="{{ $provider->category }}"
+                            data-bank-name="{{ $provider->bank_name }}"
+                            data-account-type="{{ $provider->account_type }}"
+                            data-account-number="{{ $provider->account_number }}"
                             data-status="{{ $provider->status }}">
-                            
+
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-xl flex items-center justify-center font-mono-das font-bold text-[13px] {{ $provider->status == 'activo' ? 'text-teal-700 bg-teal-50' : 'text-slate-500 bg-slate-100' }} shrink-0 border border-slate-200/60">
@@ -206,7 +206,7 @@
                                 </span>
                                 @endif
                             </td>
-                            
+
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                                     <button type="button" class="js-view-detail p-2 text-teal-600 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors border border-transparent hover:border-teal-200" title="Ver Ficha">
@@ -308,9 +308,9 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            
+
             <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-                
+
                 <!-- Sección: Información Comercial -->
                 <div>
                     <h4 class="text-[13px] font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">Información Comercial y Contacto</h4>
@@ -377,7 +377,7 @@
     <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity" data-close="modal-edit"></div>
         <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 max-h-[95vh] flex flex-col bg-white shadow-2xl border border-slate-200" id="modal-edit-panel">
-            
+
             <div class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white shrink-0">
                 <div>
                     <h3 id="modal-edit-title" class="text-[18px] font-bold text-slate-800">Proveedor</h3>
@@ -392,11 +392,11 @@
 
             <form class="p-6 space-y-6 overflow-y-auto">
                 <input type="hidden" id="provider-id" value="">
-                
+
                 <!-- SECCIÓN 1: DATOS GENERALES -->
                 <div>
                     <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Datos Generales</h4>
-                    
+
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="sm:col-span-2">
@@ -408,7 +408,7 @@
                                 <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">RUT <span class="text-red-500">*</span></label>
                                 <input type="text" id="provider-rut" required placeholder="76.543.210-K" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
                             </div>
-                            
+
                             <div>
                                 <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría <span class="text-red-500">*</span></label>
                                 <select id="provider-category" required class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
@@ -419,7 +419,7 @@
                                     <option value="Dispositivos médicos">Dispositivos médicos</option>
                                 </select>
                             </div>
-                            
+
                             <div class="sm:col-span-2">
                                 <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Giro Comercial</label>
                                 <input type="text" id="provider-business-line" placeholder="Ej: Venta al por mayor de productos farmacéuticos" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
@@ -431,7 +431,7 @@
                 <!-- SECCIÓN 2: CONTACTO Y DIRECCIÓN -->
                 <div>
                     <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Contacto y Ubicación</h4>
-                    
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Correo Electrónico <span class="text-red-500">*</span></label>
@@ -451,7 +451,7 @@
                 <!-- SECCIÓN 3: DATOS BANCARIOS -->
                 <div>
                     <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Datos Bancarios</h4>
-                    
+
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Banco</label>
@@ -592,14 +592,14 @@
                     if (!row) return;
                     selectedRow = row;
                     const p = getProviderFromRow(row);
-                    
+
                     document.getElementById('detail-name').textContent = p.name;
                     document.getElementById('detail-rut').textContent = `RUT: ${p.rut}`;
                     document.getElementById('detail-email').textContent = p.email || 'No registrado';
                     document.getElementById('detail-phone').textContent = p.phone || 'No registrado';
                     document.getElementById('detail-category').textContent = p.category;
                     document.getElementById('detail-initials').textContent = p.name.substring(0,2).toUpperCase();
-                    
+
                     // Nuevos campos en el detalle
                     document.getElementById('detail-business-line').textContent = p.business_line || 'No registrado';
                     document.getElementById('detail-address').textContent = p.address || 'No registrada';
@@ -609,8 +609,8 @@
 
                     const statusBadge = document.getElementById('detail-status');
                     statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${p.status === 'activo' ? 'bg-emerald-500' : 'bg-slate-400'}"></span> ${p.status === 'activo' ? 'Activo' : 'Inactivo'}`;
-                    statusBadge.className = p.status === 'activo' 
-                        ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-0.5' 
+                    statusBadge.className = p.status === 'activo'
+                        ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-0.5'
                         : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-slate-100 text-slate-600 border border-slate-200 mt-0.5';
 
                     openModal('modal-detail');
@@ -620,56 +620,56 @@
             // --- 2. Formulario de Guardado ---
             function openEditForm(row = null) {
                 document.getElementById('form-errors').classList.add('hidden');
-                
-                if (row) { 
+
+                if (row) {
                     const p = getProviderFromRow(row);
                     document.getElementById('modal-edit-title').textContent = 'Editar Proveedor';
                     document.getElementById('provider-id').value = p.id;
-                    
+
                     document.getElementById('provider-name').value = p.name;
                     document.getElementById('provider-rut').value = p.rut;
                     document.getElementById('provider-category').value = p.category;
                     document.getElementById('provider-business-line').value = p.business_line;
-                    
+
                     document.getElementById('provider-email').value = p.email;
-                    document.getElementById('provider-phone').value = p.phone || '+56 '; 
+                    document.getElementById('provider-phone').value = p.phone || '+56 ';
                     document.getElementById('provider-address').value = p.address;
-                    
+
                     document.getElementById('provider-bank-name').value = p.bank_name;
                     document.getElementById('provider-account-type').value = p.account_type;
                     document.getElementById('provider-account-number').value = p.account_number;
 
                     document.querySelector(`input[name="edit-status"][value="${p.status}"]`).checked = true;
-                    document.getElementById('status-container').classList.remove('hidden'); 
-                } else { 
+                    document.getElementById('status-container').classList.remove('hidden');
+                } else {
                     document.getElementById('modal-edit-title').textContent = 'Registrar Proveedor';
                     document.getElementById('provider-id').value = '';
-                    
+
                     document.getElementById('provider-name').value = '';
                     document.getElementById('provider-rut').value = '';
                     document.getElementById('provider-category').value = '';
                     document.getElementById('provider-business-line').value = '';
-                    
+
                     document.getElementById('provider-email').value = '';
-                    document.getElementById('provider-phone').value = '+56 '; 
+                    document.getElementById('provider-phone').value = '+56 ';
                     document.getElementById('provider-address').value = '';
-                    
+
                     document.getElementById('provider-bank-name').value = '';
                     document.getElementById('provider-account-type').value = '';
                     document.getElementById('provider-account-number').value = '';
 
                     document.querySelector('input[name="edit-status"][value="activo"]').checked = true;
-                    document.getElementById('status-container').classList.add('hidden'); 
+                    document.getElementById('status-container').classList.add('hidden');
                 }
                 openModal('modal-edit');
             }
 
             document.getElementById('btn-new-provider').addEventListener('click', () => openEditForm());
-            
+
             document.querySelectorAll('.js-edit-provider').forEach(btn => {
                 btn.addEventListener('click', (e) => openEditForm(e.target.closest('.provider-row')));
             });
-            
+
             document.getElementById('modal-detail-edit-btn').addEventListener('click', () => {
                 closeModal('modal-detail');
                 setTimeout(() => openEditForm(selectedRow), 200);
@@ -706,7 +706,7 @@
                 const url = id ? `/proveedores/${id}` : '/proveedores';
                 const method = id ? 'PUT' : 'POST';
                 const btn = document.getElementById('modal-edit-action');
-                
+
                 btn.disabled = true;
                 btn.textContent = 'Guardando...';
 
@@ -716,9 +716,9 @@
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
                         body: JSON.stringify(data)
                     });
-                    
+
                     if (response.ok) {
-                        window.location.reload(); 
+                        window.location.reload();
                     } else {
                         const result = await response.json();
                         const err = document.getElementById('form-errors');
@@ -743,13 +743,13 @@
                     const isActivo = p.status === 'activo';
 
                     document.getElementById('confirm-message').innerHTML = `¿Estás seguro que deseas <b>${isActivo ? 'desactivar' : 'reactivar'}</b> a <br>${p.name}?`;
-                    
+
                     const actionBtn = document.getElementById('modal-confirm-action');
                     actionBtn.textContent = isActivo ? 'Sí, Desactivar' : 'Sí, Reactivar';
-                    actionBtn.className = isActivo 
+                    actionBtn.className = isActivo
                         ? 'flex-1 px-4 py-2.5 rounded-xl text-[13px] font-bold text-white shadow-md bg-rose-600 hover:bg-rose-700 transition-all'
                         : 'flex-1 px-4 py-2.5 rounded-xl text-[13px] font-bold text-white shadow-md bg-teal-600 hover:bg-teal-700 transition-all';
-                    
+
                     const iconContainer = document.getElementById('confirm-icon-container');
                     iconContainer.className = isActivo
                         ? 'w-16 h-16 rounded-full flex items-center justify-center mb-5 mx-auto bg-rose-50 text-rose-600 shadow-inner'
@@ -763,7 +763,7 @@
                 if (!selectedRow) return;
                 const id = selectedRow.dataset.id;
                 const btn = document.getElementById('modal-confirm-action');
-                
+
                 btn.disabled = true;
                 btn.textContent = 'Procesando...';
 
