@@ -98,4 +98,7 @@ Route::resource('quarantine', QuarantineController::class);
 //8.Ruta de QR
 Route::resource ('qr', QRController::class);
 
+//9.ruta para mover posiciones 3d
+Route::post('/shelf/{id}/update-position', [App\Http\Controllers\ShelfController::class, 'updatePosition'])->name('shelf.updatePosition');
+
 });
