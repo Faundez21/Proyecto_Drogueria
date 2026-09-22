@@ -12,10 +12,10 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleSeeder::class);
         $this->call(UserSeeder::class);
         $this->call(ProviderSeeder::class);
-        
+
         // 2. Luego se crean los productos
         $this->call(ProductSeeder::class);
-        
+
         // 3. Finalmente la recepción (que depende de proveedor y producto)
         $this->call(ReceptionSeeder::class);
     }
