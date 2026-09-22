@@ -15,8 +15,8 @@ class InventoryController extends Controller
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where('producto', 'LIKE', "%{$search}%")
-                  ->orWhere('lote', 'LIKE', "%{$search}%")
-                  ->orWhere('razon_social', 'LIKE', "%{$search}%");
+                ->orWhere('lote', 'LIKE', "%{$search}%")
+                ->orWhere('razon_social', 'LIKE', "%{$search}%");
         }
 
         $inventories = $query->latest()->paginate(10);
@@ -28,18 +28,18 @@ class InventoryController extends Controller
     {
         $validated = $request->validate([
             'correlativo_interno' => 'nullable|integer',
-            'fecha_recepcion'     => 'required|date',
-            'tipo_documento'      => 'required|string',
-            'numero_documento'    => 'required|string',
-            'orden_compra'        => 'nullable|string',
-            'origen_mercaderia'   => 'required|string',
-            'rut_proveedor'       => 'required|string',
-            'razon_social'        => 'required|string',
-            'producto'            => 'required|string',
-            'categoria'           => 'required|string',
-            'lote'                => 'nullable|string',
-            'fecha_vencimiento'   => 'nullable|date',
-            'cantidad'            => 'required|integer|min:1',
+            'fecha_recepcion' => 'required|date',
+            'tipo_documento' => 'required|string',
+            'numero_documento' => 'required|string',
+            'orden_compra' => 'nullable|string',
+            'origen_mercaderia' => 'required|string',
+            'rut_proveedor' => 'required|string',
+            'razon_social' => 'required|string',
+            'producto' => 'required|string',
+            'categoria' => 'required|string',
+            'lote' => 'nullable|string',
+            'fecha_vencimiento' => 'nullable|date',
+            'cantidad' => 'required|integer|min:1',
             'valor_neto_unitario' => 'required|numeric|min:0',
         ]);
 
@@ -56,5 +56,19 @@ class InventoryController extends Controller
         ]);
 
         return redirect()->route('inventario.index')->with('success', 'Archivo recibido correctamente.');
+    }
+
+    public function update(Request $request, Inventory $inventory)
+    {
+        $request->validate([
+            'estado' => 'required|in:Disponible,Cuarentena,Merma',
+        ]);
+
+        $inventory->update([
+            'estado' => $request->estado,
+        ]);
+
+        return redirect()->route('inventario.index')
+            ->with('success', 'El estado del lote fue actualizado correctamente.');
     }
 }

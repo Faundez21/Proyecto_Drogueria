@@ -16,7 +16,7 @@
                     class="w-full sm:w-auto bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer">
                     <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 0 0118 0z"></path>
                     </svg>
                     Ver Historial
                 </button>
@@ -26,7 +26,7 @@
         <!-- Modal de Historial -->
         <div id="HistoryModal"
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 w-full max-w-4xl overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 w-full max-w-5xl overflow-hidden">
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
                     <div>
                         <h2 class="text-xl font-bold text-slate-800">Historial de Movimientos de Inventario</h2>
@@ -48,6 +48,7 @@
                                 <th class="px-4 py-3 font-semibold">Documento / Correlativo</th>
                                 <th class="px-4 py-3 font-semibold">Proveedor</th>
                                 <th class="px-4 py-3 font-semibold">Producto</th>
+                                <th class="px-4 py-3 font-semibold text-center">Estado</th>
                                 <th class="px-4 py-3 font-semibold text-center">Cantidad</th>
                             </tr>
                         </thead>
@@ -64,11 +65,21 @@
                                     </td>
                                     <td class="px-4 py-3 text-slate-600">{{ $itemObj->razon_social ?? '' }}</td>
                                     <td class="px-4 py-3 font-semibold text-slate-800">{{ $itemObj->producto ?? '' }}</td>
+                                    <td class="px-4 py-3 text-center">
+                                        @php $estadoHist = strtolower($itemObj->estado ?? 'disponible'); @endphp
+                                        @if($estadoHist == 'cuarentena' || $estadoHist == 'en cuarentena')
+                                            <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-amber-500 text-white shadow-sm">Cuarentena</span>
+                                        @elseif($estadoHist == 'merma' || $estadoHist == 'en merma')
+                                            <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-red-600 text-white shadow-sm">Merma</span>
+                                        @else
+                                            <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-600 text-white shadow-sm">Disponible</span>
+                                        @endif
+                                    </td>
                                     <td class="px-4 py-3 text-center font-bold text-emerald-600">+{{ $itemObj->cantidad ?? 0 }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-4 py-6 text-center text-slate-400">No hay movimientos registrados.</td>
+                                    <td colspan="6" class="px-4 py-6 text-center text-slate-400">No hay movimientos registrados.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -130,7 +141,6 @@
 
             <div class="overflow-x-auto w-full">
                 @php
-                    // Convertimos a colección en caso de ser un paginador o array y agrupamos
                     $invCollection = collect(isset($inventories) && method_exists($inventories, 'items') ? $inventories->items() : ($inventories ?? []));
                     $groupedInventories = $invCollection->groupBy('producto');
                 @endphp
@@ -143,7 +153,6 @@
                             <th scope="col" class="px-4 py-4">Categoría</th>
                             <th scope="col" class="px-4 py-4 text-center">N° de Lotes Activos</th>
                             <th scope="col" class="px-4 py-4 text-center">Stock Total Acumulado</th>
-                            <th scope="col" class="px-4 py-4 text-center">Acciones</th>
                         </tr>
                     </thead>
 
@@ -185,21 +194,16 @@
                                             {{ number_format($stockTotalProducto, 0, ',', '.') }} Unidades (Stock Bajo)
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-600 text-white border border-red-700 shadow-sm">
                                             0 Unidades (Agotado)
                                         </span>
                                     @endif
-                                </td>
-                                <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
-                                    <button onclick="toggleLotes('{{ $groupKey }}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition-colors">
-                                        Ver Lotes
-                                    </button>
                                 </td>
                             </tr>
 
                             <!-- Subtabla Desplegable de Lotes -->
                             <tr id="lotes-{{ $groupKey }}" class="hidden bg-slate-50/60 border-t border-b border-slate-200/80">
-                                <td colspan="6" class="p-4 pl-12">
+                                <td colspan="5" class="p-4 pl-12">
                                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                                         <div class="px-4 py-2.5 bg-slate-100/70 border-b border-slate-200 flex justify-between items-center">
                                             <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Desglose de Lotes / Recepciones de {{ $nombreProducto }}</span>
@@ -212,14 +216,34 @@
                                                     <th class="px-4 py-2.5">Origen Mercadería</th>
                                                     <th class="px-4 py-2.5">Proveedor / Documento</th>
                                                     <th class="px-4 py-2.5">Ubicación</th>
+                                                    <th class="px-4 py-2.5 text-center">Estado</th>
                                                     <th class="px-4 py-2.5 text-right">Valor Neto Unit.</th>
                                                     <th class="px-4 py-2.5 text-center">Stock del Lote</th>
+                                                    <th class="px-4 py-2.5 text-center">Acciones</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="divide-y divide-slate-100 text-slate-700">
                                                 @foreach($lotes as $lote)
                                                     @php
                                                         $loteObj = is_object($lote) ? $lote : (object) $lote;
+                                                        $estadoVal = strtolower($loteObj->estado ?? 'disponible');
+
+                                                        $badgeVencimientoClass = 'bg-slate-100 text-slate-700 border-slate-200';
+                                                        $textoVencimiento = $loteObj->fecha_vencimiento ?? 'N/A';
+
+                                                        if (!empty($loteObj->fecha_vencimiento)) {
+                                                            $fechaVenc = \Carbon\Carbon::parse($loteObj->fecha_vencimiento);
+                                                            $hoy = \Carbon\Carbon::now();
+                                                            $mesesRestantes = $hoy->diffInMonths($fechaVenc, false);
+
+                                                            if ($mesesRestantes > 6) {
+                                                                $badgeVencimientoClass = 'bg-emerald-100 text-emerald-800 border-emerald-300 font-semibold';
+                                                            } elseif ($mesesRestantes >= 3 && $mesesRestantes <= 6) {
+                                                                $badgeVencimientoClass = 'bg-amber-100 text-amber-800 border-amber-300 font-semibold';
+                                                            } else {
+                                                                $badgeVencimientoClass = 'bg-red-600 text-white font-bold border-red-700 shadow-sm';
+                                                            }
+                                                        }
                                                     @endphp
                                                     <tr class="hover:bg-slate-50/80 transition-colors">
                                                         <td class="px-4 py-2.5 font-bold text-teal-700">
@@ -227,11 +251,13 @@
                                                         </td>
                                                         <td class="px-4 py-2.5 font-medium">
                                                             <span class="text-slate-800 font-bold">Lote: {{ $loteObj->lote ?? 'S/L' }}</span> <br>
-                                                            <span class="text-slate-400">Vence: {{ $loteObj->fecha_vencimiento ?? 'N/A' }}</span>
+                                                            <span class="inline-block mt-1 px-2.5 py-0.5 rounded text-[11px] border {{ $badgeVencimientoClass }}">
+                                                                Vence: {{ $textoVencimiento }}
+                                                            </span>
                                                         </td>
                                                         <td class="px-4 py-2.5">
                                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                                                                {{ $loteObj->origen_mercaderia ?? 'Sin Origen' }}
+                                                                {{ $loteObj->origen_mercaderia ?? $loteObj->origen ?? 'Sin Origen' }}
                                                             </span>
                                                         </td>
                                                         <td class="px-4 py-2.5">
@@ -241,6 +267,22 @@
                                                         <td class="px-4 py-2.5 text-slate-500">
                                                             {{ $loteObj->pasillo ?? 'Sin pasillo' }} / {{ $loteObj->estante ?? 'Sin estante' }}
                                                         </td>
+                                                        <!-- Estado del Lote -->
+                                                        <td class="px-4 py-2.5 text-center">
+                                                            @if($estadoVal == 'cuarentena' || $estadoVal == 'en cuarentena')
+                                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold bg-amber-500 text-white shadow-sm">
+                                                                    Cuarentena
+                                                                </span>
+                                                            @elseif($estadoVal == 'merma' || $estadoVal == 'en merma')
+                                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold bg-red-600 text-white shadow-sm">
+                                                                    Merma
+                                                                </span>
+                                                            @else
+                                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-600 text-white shadow-sm">
+                                                                    Disponible
+                                                                </span>
+                                                            @endif
+                                                        </td>
                                                         <td class="px-4 py-2.5 text-right font-semibold text-slate-800">
                                                             ${{ number_format($loteObj->valor_neto_unitario ?? 0, 0, ',', '.') }}
                                                         </td>
@@ -248,6 +290,17 @@
                                                             <span class="font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
                                                                 {{ number_format($loteObj->cantidad ?? 0, 0, ',', '.') }} Unid.
                                                             </span>
+                                                        </td>
+                                                        <!-- Acciones de Lote -->
+                                                        <td class="px-4 py-2.5 text-center" onclick="event.stopPropagation()">
+                                                            <button type="button"
+                                                                onclick="openEditLote('{{ $loteObj->id }}', '{{ $loteObj->lote ?? 'S/L' }}', '{{ $nombreProducto }}', '{{ $loteObj->estado ?? 'Disponible' }}')"
+                                                                class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold transition-colors shadow-sm cursor-pointer inline-flex items-center gap-1">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                                </svg>
+                                                                Editar
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -258,7 +311,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-4 py-6 text-center text-slate-400">No hay registros de productos en el inventario.</td>
+                                <td colspan="5" class="px-4 py-6 text-center text-slate-400">No hay registros de productos en el inventario.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -271,6 +324,59 @@
                     {{ $inventories->links() }}
                 @endif
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Estado de Lote (Cuarentena / Merma / Disponible) -->
+    <div id="editLoteModal"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 w-full max-w-md">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
+                <h2 class="text-lg font-bold text-slate-800">Cambiar Estado del Lote</h2>
+                <button type="button" onclick="closeEditLote()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="editLoteForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+
+                <div class="space-y-4">
+                    <div>
+                        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Producto</span>
+                        <p id="modal_producto_nombre" class="text-sm font-bold text-slate-800"></p>
+                    </div>
+
+                    <div>
+                        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Lote</span>
+                        <p id="modal_lote_nombre" class="text-sm font-bold text-slate-700"></p>
+                    </div>
+
+                    <div>
+                        <label for="modal_estado" class="block text-xs font-bold text-slate-700 mb-1">Estado de Disponibilidad *</label>
+                        <select id="modal_estado" name="estado" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            <option value="Disponible">Disponible (En Stock Normal)</option>
+                            <option value="Cuarentena">En Cuarentena (Bloqueado temporalmente)</option>
+                            <option value="Merma">En Merma (Dañado / Vencido)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeEditLote()"
+                        class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+                        Actualizar Estado
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -413,6 +519,16 @@
                     </div>
 
                     <div>
+                        <label for="estado" class="block text-xs font-medium text-slate-700 mb-1">Estado del Lote *</label>
+                        <select id="estado" name="estado" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            <option value="Disponible" selected>Disponible</option>
+                            <option value="Cuarentena">En Cuarentena</option>
+                            <option value="Merma">En Merma (Vencido / Dañado)</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label for="lote" class="block text-xs font-medium text-slate-700 mb-1">Lote</label>
                         <input type="text" id="lote" name="lote" placeholder="Ej. L-4893"
                             class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
@@ -439,7 +555,7 @@
 
                 <div class="flex flex-col sm:flex-row justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
                     <button type="button" onclick="closeDeposit()"
-                        class="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto cursor-pointer">
+                        class="px-5 py-2.5 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto cursor-pointer">
                         Cancelar
                     </button>
                     <button type="submit"
@@ -466,6 +582,18 @@
                     if(arrow) arrow.classList.remove('rotate-180');
                 }
             }
+        }
+
+        function openEditLote(id, lote, producto, estado) {
+            document.getElementById('editLoteForm').action = "/inventario/" + id;
+            document.getElementById('modal_producto_nombre').textContent = producto;
+            document.getElementById('modal_lote_nombre').textContent = lote;
+            document.getElementById('modal_estado').value = estado;
+            document.getElementById('editLoteModal').classList.remove('hidden');
+        }
+
+        function closeEditLote() {
+            document.getElementById('editLoteModal').classList.add('hidden');
         }
 
         function openHistory() { document.getElementById('HistoryModal').classList.remove('hidden'); }
