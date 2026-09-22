@@ -1,24 +1,22 @@
 <?php
-use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\AisleController;
 //  Controladores de Autenticación
 use App\Http\Controllers\Auth\LoginController;
-
 //  Controladores de Módulos y Operaciones
-use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\DistributionController;
-use App\Http\Controllers\QuarantineController;
-use App\Http\Controllers\ProviderController;
-
-//  Controladores de Estructura de Almacén (Mantenedores)
-use App\Http\Controllers\AisleController;
-use App\Http\Controllers\ShelfController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
-use App\Http\Controllers\QRController;
+use App\Http\Controllers\ProviderController;
+use App\Http\Controllers\QuarantineController;
+//  Controladores de Estructura de Almacén (Mantenedores)
+use App\Http\Controllers\ReceptionController;
+use App\Http\Controllers\ShelfController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 // Rutas Públicas Estas rutas son accesibles sin necesidad de iniciar sesión.
-
 
 // 1. Redirección principal al login
 Route::redirect('/', '/login');
@@ -43,13 +41,29 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // 5. Vistas Generales y Dashboards
-    Route::get('/dashboard', function () { return view('dashboard.index'); })->name('dashboard.index');
-    Route::get('/despacho', function () { return view('despacho.index'); })->name('despacho.index');
-    Route::get('/trazabilidad', function () { return view('trazabilidad.index'); })->name('trazabilidad.index');
-    Route::get('/inventario', function () { return view('inventario.index'); })->name('inventario.index');
-    Route::get('/reportes', function () { return view('reportes.index'); })->name('reportes.index');
-    Route::get('/users', function () { return view('users.index'); })->name('users.index');
-    Route::get('/error', function () { return view('error'); })->name('error');
+    Route::get('/dashboard', function () {
+        return view('dashboard.index');
+    })->name('dashboard.index');
+    Route::get('/despacho', function () {
+        return view('despacho.index');
+    })->name('despacho.index');
+    Route::get('/trazabilidad', function () {
+        return view('trazabilidad.index');
+    })->name('trazabilidad.index');
+    Route::get('/inventario', function () {
+        return view('inventario.index');
+    })->name('inventario.index');
+
+    Route::get('/inventario', [InventoryController::class, 'index'])->name('inventario.index');
+    Route::post('/inventario/guardar', [InventoryController::class, 'store'])->name('inventario.store');
+    Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])->name('inventario.import');
+    Route::get('/reportes', function () {
+        return view('reportes.index');
+    })->name('reportes.index');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/error', function () {
+        return view('error');
+    })->name('error');
 
     // 6. Módulo de Recepción
     Route::prefix('reception')->name('reception.')->group(function () {
