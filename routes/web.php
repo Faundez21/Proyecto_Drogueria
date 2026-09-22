@@ -10,6 +10,8 @@ use App\Http\Controllers\QuarantineController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\QRController;
+use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\TraceabilityController;
 
 //  Controladores de Estructura de Almacén (Mantenedores)
 use App\Http\Controllers\AisleController;
@@ -51,13 +53,14 @@ Route::middleware('auth')->group(function () {
         return view('dashboard.index');
     })->name('dashboard.index');
 
-    Route::get('/despacho', function () {
-        return view('despacho.index');
-    })->name('despacho.index');
+    Route::get('/despacho', [DispatchController::class, 'index'])->name('despacho.index');
+    Route::post('/despacho', [DispatchController::class, 'store'])->name('despacho.store');
+    Route::get('/despacho/{id}/pdf', [DispatchController::class, 'pdf'])->name('despacho.pdf'); 
 
-    Route::get('/trazabilidad', function () {
-        return view('trazabilidad.index');
-    })->name('trazabilidad.index');
+    Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
+    Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
+
+
 
     Route::get('/reportes', function () {
         return view('reportes.index');
