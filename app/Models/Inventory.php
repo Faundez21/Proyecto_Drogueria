@@ -20,6 +20,7 @@ class Inventory extends Model
         'razon_social',
         'producto',
         'categoria',
+        'estado',
         'lote',
         'fecha_vencimiento',
         'cantidad',
