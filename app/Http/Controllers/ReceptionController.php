@@ -41,7 +41,7 @@ class ReceptionController extends Controller
             'cantidad_unitaria.*' => 'required|integer|min:1',
         ]);
 
-        // OBTENER INFORMACIÓN DEL PROVEEDOR
+        // obtiene información del proveedor para registrar en inventario y trazabilidad
         $provider = Provider::findOrFail($request->provider_id);
         $rutProveedor = $provider->rut ?? 'S/R';
         $nombreProveedor = $provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor';
@@ -70,7 +70,7 @@ class ReceptionController extends Controller
 
             // 2. Guardar cada Producto asociado (Bucle dinámico)
             foreach ($request->product_id as $index => $prod_id) {
-                // OBTENER INFORMACIÓN DEL PRODUCTO
+                // obtener el nombre del producto para inventario y trazabilidad
                 $product = Product::find($prod_id);
                 $nombreProducto = $product ? $product->nombre : 'Producto #' . $prod_id;
 
@@ -131,7 +131,7 @@ class ReceptionController extends Controller
                     ]);
                 }
 
-                // --- NUEVO: REGISTRAR EN LA TABLA DE TRAZABILIDAD ---
+                // tabla trazabilidad (stock_movements) para cada producto recibido
                 StockMovement::create([
                     'producto' => $nombreProducto,
                     'lote' => $loteRecibido,
