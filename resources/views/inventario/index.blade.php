@@ -56,7 +56,9 @@
                             @forelse($inventories ?? [] as $item)
                                 @php $itemObj = is_object($item) ? $item : (object) $item; @endphp
                                 <tr class="hover:bg-slate-50/50 transition-colors">
-                                    <td class="px-4 py-3 text-slate-500">{{ $itemObj->fecha_recepcion ?? '' }}</td>
+                                    <td class="px-4 py-3 text-slate-500">
+                                        {{ !empty($itemObj->fecha_recepcion) ? \Carbon\Carbon::parse($itemObj->fecha_recepcion)->format('d-m-Y') : 'N/A' }}
+                                    </td>
                                     <td class="px-4 py-3 font-medium text-slate-800">
                                         {{ $itemObj->tipo_documento ?? '' }} #{{ $itemObj->numero_documento ?? '' }}
                                         @if(!empty($itemObj->correlativo_interno))
@@ -229,7 +231,9 @@
                                                         $estadoVal = strtolower($loteObj->estado ?? 'disponible');
 
                                                         $badgeVencimientoClass = 'bg-slate-100 text-slate-700 border-slate-200';
-                                                        $textoVencimiento = $loteObj->fecha_vencimiento ?? 'N/A';
+                                                        $textoVencimiento = !empty($loteObj->fecha_vencimiento)
+                                                            ? \Carbon\Carbon::parse($loteObj->fecha_vencimiento)->format('d-m-Y')
+                                                            : 'N/A';
 
                                                         if (!empty($loteObj->fecha_vencimiento)) {
                                                             $fechaVenc = \Carbon\Carbon::parse($loteObj->fecha_vencimiento);
@@ -327,7 +331,7 @@
         </div>
     </div>
 
-    <!-- Modal Editar Estado de Lote (Cuarentena / Merma / Disponible) -->
+    <!-- Modal Editar Estado de Lote -->
     <div id="editLoteModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 w-full max-w-md">
@@ -555,7 +559,7 @@
 
                 <div class="flex flex-col sm:flex-row justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
                     <button type="button" onclick="closeDeposit()"
-                        class="px-5 py-2.5 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium shadow-sm w-full sm:w-auto cursor-pointer">
+                        class="px-5 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors text-sm font-medium shadow-sm cursor-pointer">
                         Cancelar
                     </button>
                     <button type="submit"
