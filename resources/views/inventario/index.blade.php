@@ -155,158 +155,6 @@
                                 $primerLote = is_object($lotes->first()) ? $lotes->first() : (object) ($lotes->first() ?? []);
                             @endphp
 
-                        <tr class="border-b border-neutral-200 bg-red-50/40 hover:bg-red-50 transition-colors">
-                            <td class="px-4 py-3 font-medium text-red-800">1042</td>
-                            <td class="px-4 py-3 font-bold text-red-900">ERITROMICINA 500 MG CM REC.</td>
-                            <td class="px-4 py-3 text-red-800">Fármacos</td>
-                            <td class="px-4 py-3 text-red-800 font-medium">Pasillo A</td>
-                            <td class="px-4 py-3 text-red-800">Estante 3</td>
-                            <td class="px-4 py-3 text-center text-red-800 font-medium">No</td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-300">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                        </path>
-                                    </svg>
-                                    15 Unidades
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-                                <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                    title="Desactivar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors opacity-75">
-                            <td class="px-4 py-3 font-medium text-gray-500">2055</td>
-                            <td class="px-4 py-3 font-bold text-gray-600">AGUJA 21 G X 1,5 DESECHABLE</td>
-                            <td class="px-4 py-3 text-gray-500">Insumos</td>
-                            <td class="px-4 py-3 text-gray-500 font-medium">Pasillo B</td>
-                            <td class="px-4 py-3 text-gray-500">Estante 2</td>
-                            <td class="px-4 py-3 text-center text-gray-500 font-medium">No</td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-300">
-                                    0 Unidades (Agotado)
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-
-
-                                <!--botón ver (QR)-->
-                                <button onclick="openQRModal()"
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <!-- Botón Desactivar -->
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                    title="Desactivar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="border-b border-neutral-200 bg-orange-50 hover:bg-orange-100 transition-colors">
-                            <td class="px-4 py-3 font-medium text-orange-800">1088</td>
-                            <td class="px-4 py-3 font-bold text-orange-900">IBUPROFENO 400MG</td>
-                            <td class="px-4 py-3 text-orange-800">Fármacos</td>
-                            <td class="px-4 py-3 text-orange-800 font-medium">Pasillo C</td>
-                            <td class="px-4 py-3 text-orange-800">Estante 1</td>
-                            <td class="px-4 py-3 text-center">
-                                <span
-                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-orange-200 text-orange-800 border border-orange-300">
-                                    Sí
-                                </span>
-                            </td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-gray-800 border border-gray-300">
-                                    320 Unidades
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-                                <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                    title="Desactivar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
                             <!-- Fila Principal del Producto -->
                             <tr class="bg-white hover:bg-slate-50/80 transition-colors cursor-pointer select-none" onclick="toggleLotes('{{ $groupKey }}')">
                                 <td class="px-4 py-3 text-center">
@@ -365,6 +213,7 @@
                                                     <th class="px-4 py-2.5">Ubicación</th>
                                                     <th class="px-4 py-2.5 text-right">Valor Neto Unit.</th>
                                                     <th class="px-4 py-2.5 text-center">Stock del Lote</th>
+                                                    <th class="px-4 py-2.5 text-center">Acciones</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="divide-y divide-slate-100 text-slate-700">
@@ -395,6 +244,22 @@
                                                                 {{ number_format($loteObj->cantidad ?? 0, 0, ',', '.') }} Unid.
                                                             </span>
                                                         </td>
+                                                        <td class="px-4 py-2.5 text-center">
+                                                            <button onclick="openQRModal(this)"
+                                                                data-id="{{ $loteObj->correlativo_interno ?? 'N/A' }}"
+                                                                data-producto="{{ $nombreProducto }}"
+                                                                data-lote="{{ $loteObj->lote ?? 'S/L' }}"
+                                                                data-vencimiento="{{ $loteObj->fecha_vencimiento ?? 'N/A' }}"
+                                                                data-stock="{{ $loteObj->cantidad ?? 0 }}"
+                                                                data-proveedor="{{ $loteObj->razon_social ?? 'S/N' }}"
+                                                                class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                                                title="Ver QR Lote">
+                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                                </svg>
+                                                            </button>
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -419,221 +284,154 @@
             </div>
         </div>
 
-
         <!-- Modal QR -->
         <div id="qrModal" class="hidden fixed inset-0 z-50 bg-black/50 items-center justify-center p-4">
-
             <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-
                 <!-- Encabezado -->
                 <div class="bg-blue-900 border-b border-blue-100 px-6 py-4 flex items-center justify-between">
-
                     <div>
                         <h2 class="text-xl text-white font-bold text-gray-800">
                             Código QR del lote
                         </h2>
-
                         <p class="text-sm text-white mt-1">
                             Información del producto
                         </p>
                     </div>
-
                     <button type="button" onclick="closeQRModal()"
                         class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                         title="Cerrar">
-
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12">
                             </path>
                         </svg>
-
                     </button>
-
                 </div>
-
 
                 <!-- Contenido -->
                 <div class="p-6">
-
                     <!-- QR -->
                     <div class="flex justify-center mb-6">
-
                         <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-
                             <div id="qrcode" class="w-48 h-48 flex items-center justify-center">
                             </div>
-
                         </div>
-
                     </div>
-
 
                     <!-- Información del producto -->
                     <div class="border border-gray-200 rounded-lg overflow-hidden">
-
                         <div class="bg-slate-50 px-4 py-3 border-b border-gray-200">
-
                             <h3 class="text-sm font-semibold text-slate-700">
                                 Información del lote
                             </h3>
-
                         </div>
 
-
                         <div class="divide-y divide-gray-100">
-
                             <!-- ID -->
                             <div class="flex justify-between gap-4 px-4 py-3">
-
                                 <span class="text-sm text-gray-500">
                                     ID
                                 </span>
-
-                                <span id="qrId" class="text-sm font-medium text-gray-800">
-                                    2055
-                                </span>
-
+                                <span id="qrId" class="text-sm font-medium text-gray-800"></span>
                             </div>
-
 
                             <!-- Producto -->
                             <div class="flex justify-between gap-4 px-4 py-3">
-
                                 <span class="text-sm text-gray-500">
                                     Producto
                                 </span>
-
-                                <span id="qrProducto" class="text-sm font-medium text-gray-800 text-right">
-                                    AGUJA 21 G X 1,5 DESECHABLE
-                                </span>
-
+                                <span id="qrProducto" class="text-sm font-medium text-gray-800 text-right"></span>
                             </div>
-
 
                             <!-- Lote -->
                             <div class="flex justify-between gap-4 px-4 py-3">
-
                                 <span class="text-sm text-gray-500">
                                     Lote
                                 </span>
-
-                                <span id="qrLote" class="text-sm font-medium text-gray-800">
-                                    L-2026-001
-                                </span>
-
+                                <span id="qrLote" class="text-sm font-medium text-gray-800"></span>
                             </div>
-
 
                             <!-- Vencimiento -->
                             <div class="flex justify-between gap-4 px-4 py-3">
-
                                 <span class="text-sm text-gray-500">
                                     Vencimiento
                                 </span>
-
-                                <span id="qrVencimiento" class="text-sm font-medium text-gray-800">
-                                    12/2027
-                                </span>
-
+                                <span id="qrVencimiento" class="text-sm font-medium text-gray-800"></span>
                             </div>
-
 
                             <!-- Stock -->
                             <div class="flex justify-between gap-4 px-4 py-3">
-
                                 <span class="text-sm text-gray-500">
                                     Stock disponible
                                 </span>
-
-                                <span id="qrStock" class="text-sm font-medium text-emerald-600">
-                                    850 Unidades
-                                </span>
-
+                                <span id="qrStock" class="text-sm font-medium text-emerald-600"></span>
                             </div>
-
 
                             <!-- Proveedor -->
                             <div class="flex justify-between gap-4 px-4 py-3">
-
                                 <span class="text-sm text-gray-500">
                                     Proveedor
                                 </span>
-
-                                <span id="qrUbicacion" class="text-sm font-medium text-gray-800 text-right">
-                                    Laboratorios Andinos S.A
-                                </span>
-
+                                <span id="qrUbicacion" class="text-sm font-medium text-gray-800 text-right"></span>
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
-
 
                 <!-- Footer -->
                 <div class="px-6 py-4 bg-slate-50 border-t border-gray-200 flex justify-end">
-
                     <button type="button" onclick="closeQRModal()"
                         class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors">
-
                         Cerrar
-
                     </button>
-
                 </div>
-
             </div>
-
         </div>
-
 
         <!-- Librería para generar QR -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-
         <script>
-            function openQRModal() {
-
+            function openQRModal(btn) {
                 const modal = document.getElementById('qrModal');
-
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
 
+                // Extraemos la información del botón que fue presionado
+                const id = btn.getAttribute('data-id');
+                const producto = btn.getAttribute('data-producto');
+                const lote = btn.getAttribute('data-lote');
+                const vencimiento = btn.getAttribute('data-vencimiento');
+                const stock = btn.getAttribute('data-stock');
+                const proveedor = btn.getAttribute('data-proveedor');
+
+                // Llenamos el modal con la información capturada
+                document.getElementById('qrId').textContent = id;
+                document.getElementById('qrProducto').textContent = producto;
+                document.getElementById('qrLote').textContent = lote;
+                document.getElementById('qrVencimiento').textContent = vencimiento;
+                document.getElementById('qrStock').textContent = stock + ' Unidades';
+                document.getElementById('qrUbicacion').textContent = proveedor;
 
                 // Limpiar QR anterior
                 const qrContainer = document.getElementById('qrcode');
-
                 qrContainer.innerHTML = '';
 
-
-                // Datos del lote
-                const id = document.getElementById('qrId').textContent.trim();
-
-
-                // Generar QR
+                // Generar QR nuevo con el ID/Correlativo
                 new QRCode(qrContainer, {
                     text: 'LOTE-' + id,
                     width: 192,
                     height: 192,
                     correctLevel: QRCode.CorrectLevel.H
                 });
-
             }
-
 
             function closeQRModal() {
-
                 const modal = document.getElementById('qrModal');
-
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
-
             }
         </script>
-
     </div>
 
     <!-- Modal Importar -->
