@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class TraceabilityController extends Controller
 {
-    // Función central blindada con DB::table (Sin usar relaciones de Eloquent)
+    // Función central con DB
     private function getAllMovements()
     {
         $movements = collect();
@@ -84,7 +84,7 @@ class TraceabilityController extends Controller
     {
         $movements = $this->getAllMovements();
 
-        // FILTROS AVANZADOS
+        // filtros dinámicos
         if ($request->filled('search')) {
             $search = mb_strtolower($request->search, 'UTF-8');
             $movements = $movements->filter(function($item) use ($search) {
@@ -109,12 +109,12 @@ class TraceabilityController extends Controller
             });
         }
 
-        // EXPORTAR A EXCEL (CSV)
+        // exportar excel
         if ($request->has('export') && $request->export == 'csv') {
             return $this->exportCsv($movements);
         }
 
-        // PAGINACIÓN NATIVA
+        // paginación manual de la colección
         $perPage = 15;
         $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage();
         $currentItems = $movements->slice(($currentPage - 1) * $perPage, $perPage)->all();
