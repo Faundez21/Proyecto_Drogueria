@@ -20,7 +20,6 @@ class AisleController extends Controller
     {
         //dirección del menú de crear pasillo
 
-        return view('distribution.maintainers.aisle.create');
     }
 
 
@@ -30,7 +29,10 @@ class AisleController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
         ]);
-        Aisle::create($request->all());
+        Aisle::create([
+            'name' => $request->name,
+            'description' => $request->description,
+        ]);
         return redirect()->route('aisle.index')->with('success', 'Pasillo creado exitosamente.');
     }
 
@@ -39,27 +41,7 @@ class AisleController extends Controller
      */
     public function show($id)
     {
-        $aisles = [
-            [
-                'id' => 1,
-                'nombre' => 'Pasillo A',
-                'descripcion' => 'Medicamentos generales'
-            ],
-            [
-                'id' => 2,
-                'nombre' => 'Pasillo B',
-                'descripcion' => 'Medicamentos refrigerados'
-            ],
-            [
-                'id' => 3,
-                'nombre' => 'Pasillo C',
-                'descripcion' => 'Medicamentos en cuarentena'
-            ],
-        ];
 
-        $aisle = collect($aisles)->firstWhere('id', $id);
-
-        return view('distribution.maintainers.aisle.show', compact('aisle'));
     }
 
 
@@ -73,7 +55,21 @@ class AisleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $aisle = Aisle::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $aisle->update([
+            'name' => $request->name,
+            'description' => $request->description,
+        ]);
+
+        return redirect()
+            ->route('aisle.index')
+            ->with('success', 'Pasillo actualizado exitosamente.');
     }
 
     /**
