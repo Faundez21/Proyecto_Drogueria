@@ -358,9 +358,9 @@
         <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             <div class="max-w-[1600px] mx-auto space-y-6">
                 
-                <!-- ============================================================== -->
+                
                 <!-- ENCABEZADO DINÁMICO DE PÁGINA (Resuelve el problema de los botones) -->
-                <!-- ============================================================== -->
+                
                 @if(View::hasSection('title') || View::hasSection('actions'))
                 <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-5">
                     <div>
@@ -379,7 +379,7 @@
                     @endif
                 </div>
                 @endif
-                <!-- ============================================================== -->
+                
 
                 <div class="w-full">
                     @yield('content')
@@ -388,9 +388,8 @@
         </main>
     </div>
 
-    <!-- ============================================================== -->
     <!-- MODAL DE BÚSQUEDA GLOBAL "NIVEL INSANO" (Navegación por Teclado) -->
-    <!-- ============================================================== -->
+
     <div id="search-modal" class="fixed inset-0 z-50 hidden flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-200" onclick="if(event.target === this) closeSearchModal()">
         <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden transform scale-95 transition-transform duration-200 flex flex-col max-h-[80vh]" id="search-modal-card">
             
