@@ -105,7 +105,7 @@
                 
                 <div class="mt-4 flex justify-end gap-3">
                     <?php if(request()->hasAny(['search', 'tipo_movimiento', 'fecha_desde', 'fecha_hasta'])): ?>
-                        <a href="{{ route('trazabilidad.index') }}" class="py-2 px-4 bg-slate-100 text-slate-600 border border-slate-300 rounded-xl text-[13px] font-bold hover:bg-slate-200 transition-colors">Limpiar</a>
+                        <a href="{{ route('traceability.index') }}" class="py-2 px-4 bg-slate-100 text-slate-600 border border-slate-300 rounded-xl text-[13px] font-bold hover:bg-slate-200 transition-colors">Limpiar</a>
                     <?php endif; ?>
                     <button type="submit" class="py-2 px-5 bg-slate-800 text-white rounded-xl text-[13px] font-bold hover:bg-slate-900 transition-colors shadow-sm cursor-pointer">
                         Aplicar Filtros
