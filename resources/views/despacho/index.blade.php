@@ -1,10 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Despacho')
-@section('header', 'Despacho de Pedidos')
-
 @section('content')
-    <!-- Notificaciones -->
+    <!-- SECCIÓN DE NOTIFICACIONES (ALERTAS) -->
     @if(session('error'))
         <div class="mx-4 sm:mx-6 mt-4 bg-rose-50 border-l-4 border-rose-500 p-4 rounded-xl shadow-sm flex items-center gap-3">
             <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -18,27 +15,39 @@
         </div>
     @endif
 
+    <!-- CONTENEDOR PRINCIPAL-->
     <div class="w-full p-4 sm:p-6 space-y-6">
 
-        <div class="flex flex-col gap-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500">
-                    <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-400 font-semibold">03</span>
-                    <span>Salida</span>
-                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    <span class="font-medium text-slate-800">Despacho</span>
+        <!-- ENCABEZADO DE PÁGINA (ESTILO IMAGEN) -->
+        <div class="w-full pb-4">
+            <!-- Título y Botón Superior -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <div>
+                    <h1 class="text-[22px] font-extrabold text-slate-800 tracking-tight">Despacho</h1>
+                    <p class="text-[13px] text-slate-500 mt-1">Directorio y gestión de guías de despacho emitidas.</p>
                 </div>
-
-                <button type="button" onclick="openBandeja()" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto cursor-pointer">
+                
+                <button type="button" onclick="openBandeja()" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                     Bandeja de Despachos e Historial
                 </button>
             </div>
+            
+            <!-- Línea separadora -->
+            <hr class="border-slate-200 mb-4">
+            
+            <!-- Breadcrumb (Migas de pan) -->
+            <div class="flex items-center gap-2 text-[13px] text-slate-400">
+                <span class="font-semibold text-slate-400">03</span>
+                <span class="text-slate-400">Salida</span>
+                <svg class="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                <span class="font-medium text-slate-800">Despacho</span>
+            </div>
         </div>
 
-        <!-- KPIs SUPERIORES -->
+        <!-- KPIs (INDICADORES DE RENDIMIENTO) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Despachos Hoy</p>
                     <h3 class="text-2xl font-black text-slate-800 mt-1">{{ collect($dispatches)->where('fecha_despacho', date('Y-m-d'))->count() }}</h3>
@@ -47,7 +56,7 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </div>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Histórico Total</p>
                     <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ collect($dispatches)->count() }}</h3>
@@ -58,7 +67,7 @@
             </div>
         </div>
 
-        <!-- Form despacho  -->
+        <!-- FORMULARIO DE EMISIÓN DE GUÍA DE DESPACHO -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
             
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
@@ -71,7 +80,7 @@
             <form action="{{ route('despacho.store') }}" method="POST" id="despachoForm">
                 @csrf
                 
-                <!-- DATOS DEL REMITENTE -->
+                <!-- SECCIÓN: DATOS DEL REMITENTE Y CORRELATIVO -->
                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
                     <div>
                         <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Datos del Remitente</h4>
@@ -87,23 +96,24 @@
 
                     <div class="flex flex-col justify-center items-end">
                         <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 w-full md:w-auto text-left md:text-right">N° Correlativo Automático</h4>
+                        <!-- Input Solo Lectura -->
                         <input type="text" name="correlativo_despacho" value="{{ $correlativo }}" readonly class="w-full md:w-48 bg-slate-100 border border-slate-300 text-slate-800 text-lg font-mono font-extrabold rounded-xl text-center py-2 focus:outline-none cursor-default shadow-inner">
                     </div>
                 </div>
 
-                <!-- DESTINO Y LOGÍSTICA -->
+                <!-- SECCIÓN: DESTINO Y LOGÍSTICA -->
                 <div class="p-6 bg-white border-b border-slate-100">
                     <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide mb-4">1. Destino y Logística</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
                         <div class="md:col-span-1">
                             <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Fecha Salida <span class="text-rose-500">*</span></label>
-                            <input type="date" name="fecha_despacho" value="{{ date('Y-m-d') }}" required class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2.5 px-3 text-[13px] shadow-sm transition-all outline-none">
+                            <input type="date" name="fecha_despacho" value="{{ date('Y-m-d') }}" required class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
                         </div>
 
                         <div class="md:col-span-1">
                             <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Liberación <span class="text-rose-500">*</span></label>
-                            <select name="estado_liberacion" required class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2.5 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                            <select name="estado_liberacion" required class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                                 <option value="Liberada">Liberada / Aprobada</option>
                                 <option value="Pendiente">Pendiente de V°B°</option>
                             </select>
@@ -111,35 +121,48 @@
 
                         <div class="md:col-span-2">
                             <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino <span class="text-rose-500">*</span></label>
-                            <select name="establecimiento_destino" required class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2.5 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
-                                <option value="" disabled selected>Seleccione el CESFAM o CECOSF...</option>
-                                <option value="CESFAM Paulina Avendaño">CESFAM Paulina Avendaño</option>
-                                <option value="CESFAM San Vicente">CESFAM San Vicente</option>
-                                <option value="CESFAM Leocán Portus">CESFAM Leocán Portus</option>
-                                <option value="CECOSF 8 de Mayo">CECOSF 8 de Mayo</option>
-                                <option value="CECOSF Los Lobos">CECOSF Los Lobos</option>
+                            <!-- El onchange dispara la función JS que completa la dirección de manera automática y no editable -->
+                            <select name="establecimiento_destino" id="establecimiento_destino" onchange="actualizarDireccion()" required class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                                <option value="" disabled selected>Seleccione el Establecimiento...</option>
+                                <option value="CESFAM LOS CERROS" data-direccion="Calle El Galgo, esquina Calle Coliumo, Villa Badarán, Talcahuano">CESFAM LOS CERROS</option>
+                                <option value="CECOSF CENTINELA" data-direccion="Calle Punta Peñablanca 1301, población Centinela, Talcahuano">CECOSF CENTINELA</option>
+                                <option value="CECOSF LOS LOBOS - LA GLORIA" data-direccion="Calle Los Lobos 1960, población Los Lobos, Talcahuano">CECOSF LOS LOBOS - LA GLORIA</option>
+                                <option value="POSTA TUMBE" data-direccion="Maryland s/n, Caleta Tumbes, Talcahuano">POSTA TUMBE</option>
+                                <option value="CESFAM PAULINA AVENDAÑO" data-direccion="Calle Carlos Dittborn 4100, Villa San Martín, Talcahuano">CESFAM PAULINA AVENDAÑO</option>
+                                <option value="CESFAM SAN VICENTE" data-direccion="Calle Brasil 360, San Vicente, Talcahuano">CESFAM SAN VICENTE</option>
+                                <option value="CECOSF LIBERTAD GAETE" data-direccion="Calle Isla San Ambrosio 509, población Libertad, Talcahuano">CECOSF LIBERTAD GAETE</option>
+                                <option value="CECOSF 8 DE MAYO" data-direccion="Calle Aysén 7370, población Diego Portales, Talcahuano">CECOSF 8 DE MAYO</option>
+                                <option value="CECOSF ESMERALDA" data-direccion="Calle San Miguel 546, Población Patricio Lynch, Talcahuano">CECOSF ESMERALDA</option>
+                                <option value="CESFAM LEOCAN PORTUS" data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM LEOCAN PORTUS</option>
+                                <option value="SAR SAN VICENTE" data-direccion="Juan de la Cruz Tapia s/n, Talcahuano">SAR SAN VICENTE</option>
+                                <option value="SAR LOS CERROS" data-direccion="Calle Coliumo S/N Nueva los Lobos, Talcahuano">SAR LOS CERROS</option>
+                                <option value="UAPO" data-direccion="Calle Blanco Encalada 1142, Talcahuano">UAPO</option>
+                                <option value="Dental - CESFAM SAN VICENTE" data-direccion="Brasil 360, Talcahuano">Dental - CESFAM SAN VICENTE</option>
+                                <option value="Laboratorio - CESFAM SAN VICENTE" data-direccion="Brasil 360, Talcahuano">Laboratorio - CESFAM SAN VICENTE</option>
                             </select>
                         </div>
 
                         <div class="md:col-span-2">
                             <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Dirección Destino</label>
-                            <input type="text" name="direccion_destino" placeholder="Automático o ingresar manual..." class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2.5 px-3 text-[13px] shadow-sm transition-all outline-none">
+                            <!-- Input readonly, se autocompleta basado en el establecimiento -->
+                            <input type="text" name="direccion_destino" id="direccion_destino" readonly placeholder="Se autocompletará al seleccionar destino..." class="w-full bg-slate-50 border border-slate-300 text-slate-500 font-medium rounded-xl focus:outline-none block py-2 px-3 text-[13px] shadow-inner cursor-not-allowed transition-all">
                         </div>
 
                         <div class="md:col-span-2">
                             <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Condiciones Transporte</label>
-                            <input type="text" name="condiciones_transporte" placeholder="Ej: Cadena de Frío (2° a 8°C)" class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2.5 px-3 text-[13px] shadow-sm transition-all outline-none">
+                            <input type="text" name="condiciones_transporte" placeholder="Ej: Cadena de Frío (2° a 8°C)" class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
                         </div>
                     </div>
                 </div>
 
-                <!-- DETALLE DE PRODUCTOS -->
+                <!-- SECCIÓN: DETALLE DE PRODUCTOS -->
                 <div class="p-6 bg-slate-50/30">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                         <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide">2. Detalle de Extracción (Lotes en Stock)</h3>
                         
+                        <!-- Botones de Acción de Tabla -->
                         <div class="flex items-center gap-3">
-                            <button type="button" onclick="openScanner()" class="px-4 py-2 bg-teal-600 text-white rounded-lg text-[12px] font-bold hover:bg-teal-700 transition-all flex items-center gap-2 shadow-sm cursor-pointer">
+                            <button type="button" onclick="openScanner()" class="px-4 py-2 bg-[#0f968c] text-white rounded-lg text-[12px] font-bold hover:bg-teal-700 transition-all flex items-center gap-2 shadow-sm cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h2m4 0h2m4 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-4 0h-2m-4 0H5a2 2 0 01-2-2v-2m4-10h2v2H7V7zm8 0h2v2h-2V7zM7 15h2v2H7v-2zm8-2h2v4h-2v-4zm-4-2h2v2h-2v-2z"></path></svg>
                                 Escanear Etiqueta QR
                             </button>
@@ -150,6 +173,7 @@
                         </div>
                     </div>
 
+                    <!-- Tabla de Extracción -->
                     <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white">
                         <table class="w-full text-left text-[13px] whitespace-nowrap" id="productsTable">
                             <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-extrabold text-[10px]">
@@ -162,13 +186,14 @@
                                     <th class="px-4 py-3.5 w-[5%] text-center"></th>
                                 </tr>
                             </thead>
+                            <!-- Aquí se insertan dinámicamente las filas con Javascript -->
                             <tbody class="divide-y divide-slate-100" id="productsBody">
-                                <!-- Filas JS -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
+                <!-- FOOTER DEL FORMULARIO -->
                 <div class="px-6 py-5 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3 rounded-b-2xl">
                     <button type="button" onclick="window.location.reload()" class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 transition-colors text-center shadow-sm cursor-pointer">
                         Limpiar Formulario
@@ -182,8 +207,6 @@
         </div>
     </div>
 
-
-    <!-- TEMPLATE OCULTO PARA NUEVAS FILAS -->
     <template id="rowTemplate">
         <tr class="bg-white hover:bg-slate-50/80 transition-colors group">
             <td class="px-3 py-2 border-r border-slate-100">
@@ -214,6 +237,7 @@
                 </select>
             </td>
             <td class="px-3 py-2 border-r border-slate-100 relative pb-6">
+                <!-- Validación JS max="stock" previene ingresos incorrectos -->
                 <input type="number" name="cantidades[]" placeholder="0" min="1" oninput="validarStock(this)" required class="w-full bg-white border border-slate-300 focus:border-teal-500 rounded-lg px-2.5 py-2 text-[14px] font-black text-center text-slate-800 outline-none shadow-sm transition-colors">
                 <div class="stock-container absolute bottom-1 left-0 w-full text-center text-[10px] font-extrabold text-blue-600 hidden">Máx: <span class="stock-max-badge">0</span></div>
             </td>
@@ -357,14 +381,34 @@
         </div>
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- LIBRERÍAS Y SCRIPTS -->
     <script src="https://unpkg.com/html5-qrcode"></script>
 
     <script>
-        // Modal Bandeja Histórica
+        // --- 1. LÓGICA DE AUTOCOMPLETADO DE DIRECCIÓN ---
+        /**
+         * Extrae el atributo 'data-direccion' del CESFAM seleccionado
+         * y lo inserta en el campo de texto (readonly).
+         */
+        function actualizarDireccion() {
+            const select = document.getElementById('establecimiento_destino');
+            const input = document.getElementById('direccion_destino');
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (selectedOption && selectedOption.dataset.direccion) {
+                input.value = selectedOption.dataset.direccion;
+            } else {
+                input.value = '';
+            }
+        }
+
+        // --- 2. LÓGICA DE BANDEJA HISTÓRICA (MODAL) ---
         function openBandeja() { document.getElementById('BandejaModal').classList.remove('hidden'); }
         function closeBandeja() { document.getElementById('BandejaModal').classList.add('hidden'); }
 
+        /**
+         * Despliega la tabla hija con los artículos correspondientes al despacho clickeado
+         */
         function toggleItems(key) {
             const row = document.getElementById('items-' + key);
             const arrow = document.getElementById('arrow-' + key);
@@ -388,14 +432,15 @@
             }
         }
 
-        // --- LÓGICA DE TABLA ---
+        // --- 3. LÓGICA DE TABLA DE EXTRACCIÓN Y STOCK ---
         const tbody = document.getElementById('productsBody');
 
-        // Renderizar la primera fila usando el Template al cargar
+        // Renderizar la primera fila en blanco al inicializar
         document.addEventListener("DOMContentLoaded", () => { 
             addRow(); 
         });
 
+        // Clona el <template> de HTML y lo inyecta en la tabla
         function addNewRowFromTemplate() {
             const template = document.getElementById('rowTemplate');
             const clone = template.content.cloneNode(true);
@@ -403,6 +448,7 @@
             return tbody.lastElementChild;
         }
 
+        // Añade una fila nueva, puede recibir objeto pre-cargado si viene del escáner
         function addRow(data = null) {
             let tr = addNewRowFromTemplate();
             if (data) {
@@ -418,6 +464,11 @@
             return tr;
         }
 
+        /**
+         * Función disparada al elegir un producto en el select.
+         * Autocompleta Lote, Fecha de Vencimiento, indica FEFO y 
+         * limita el input number a no pasarse del stock máximo.
+         */
         function llenarDatosFila(selectElement) {
             let option = selectElement.options[selectElement.selectedIndex];
             if (!option || option.disabled) return; 
@@ -435,11 +486,11 @@
             venceInput.value = option.getAttribute('data-vence');
             
             let stock = parseInt(option.getAttribute('data-stock'));
-            cantInput.setAttribute('max', stock);
+            cantInput.setAttribute('max', stock); 
             stockBadge.textContent = stock;
             stockContainer.classList.remove('hidden');
             
-            // Lógica FEFO
+            // Evaluamos FEFO para colocar Badge si faltan menos de 6 meses
             fefoContainer.innerHTML = '';
             venceInput.classList.remove('text-rose-700', 'font-extrabold', 'bg-rose-50');
             
@@ -459,6 +510,7 @@
             cantInput.focus();
         }
 
+        // Remueve la fila seleccionada. Si es la última, sólo limpia sus valores.
         function removeRow(button) {
             const tr = button.closest('tr');
             if (tbody.children.length > 1) {
@@ -474,6 +526,10 @@
             }
         }
 
+        /**
+         * Verifica el valor digitado contra el "max" (Stock disponible).
+         * Si sobrepasa, regresa al máximo de stock y pinta de rojo para alertar visualmente.
+         */
         function validarStock(input) {
             let maxVal = parseInt(input.getAttribute('max'));
             let currentVal = parseInt(input.value);
@@ -489,11 +545,11 @@
             }
         }
 
-        // --- Lógica Escáner QR ---
+        // --- 4. LÓGICA DE ESCÁNER QR ---
         let html5QrcodeScanner = null;
 
         function openScanner() {
-            // Verificar si estamos en entorno seguro o localhost
+            // El API de HTML5-QRCode requiere contexto seguro o ser local
             if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
                 alert("Advertencia: Para usar la cámara necesitas acceder mediante 'localhost', '127.0.0.1' o una conexión segura HTTPS.");
             }
@@ -504,13 +560,18 @@
         }
 
         function closeScanner() {
-            if(html5QrcodeScanner) { html5QrcodeScanner.clear().catch(e => console.error(e)); html5QrcodeScanner = null; }
+            if(html5QrcodeScanner) { 
+                html5QrcodeScanner.clear().catch(e => console.error(e)); 
+                html5QrcodeScanner = null; 
+            }
             document.getElementById('scannerModal').classList.add('hidden');
         }
 
+        // Lectura exitosa del código QR
         function onScanSuccess(decodedText) {
             closeScanner();
             
+            // Decodifica la trama que debe venir formateada en pares key:value separados por pipe (|)
             let parsedData = {};
             let chunks = decodedText.split('|');
             chunks.forEach(chunk => {
@@ -530,6 +591,7 @@
                 stock: parseInt(parsedData.STOCK)
             };
 
+            // Busca una fila vacía en la tabla o crea una nueva si todas están en uso
             let emptySelect = Array.from(tbody.querySelectorAll('select[name="productos[]"]')).find(sel => sel.value === '');
             let tr;
             
@@ -541,6 +603,7 @@
 
             let select = tr.querySelector('select[name="productos[]"]');
             let options = Array.from(select.options);
+            // Empata por Producto Y Lote en base al select
             let targetOption = options.find(opt => opt.value === rowData.producto && opt.getAttribute('data-lote') === rowData.lote);
             
             if (targetOption) {
@@ -553,6 +616,8 @@
             }
         }
 
-        function onScanFailure(error) {}
+        function onScanFailure(error) {
+            // Ignoramos en silencio fallas parciales (ej. falta de enfoque o luz)
+        }
     </script>
 @endsection
