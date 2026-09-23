@@ -211,9 +211,7 @@
         </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- MODAL DUAL: FICHA CLÍNICA DE RECEPCIÓN Y LÍNEA DE TIEMPO-->
-    <!-- ======================================================= -->
+    <!-- FICHA CLÍNICA DE RECEPCIÓN Y LÍNEA DE TIEMPO-->
     <div id="modal-lot-details" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all">
         <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeLotDetails()"></div>
         <div class="relative w-full max-w-5xl rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
