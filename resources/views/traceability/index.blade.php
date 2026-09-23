@@ -1,0 +1,305 @@
+@extends('layouts.app')
+
+@section('title', 'Trazabilidad')
+@section('subtitle', 'Seguimiento detallado de lotes, movimientos y ciclo de vida de productos.')
+
+@section('content')
+    <div class="w-full p-4 sm:p-6 space-y-6">
+
+        <!-- cabecera -->
+        <div class="flex flex-col gap-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                
+                <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500">
+                    <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-400 font-semibold tracking-wider">04</span>
+                    <span>Control</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    <span class="font-bold text-slate-800">Trazabilidad de Lotes</span>
+                </div>
+
+                <button type="submit" form="filterForm" name="export" value="csv" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Exportar Reporte Excel
+                </button>
+            </div>
+        </div>
+
+      
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Movimientos Trazados</p>
+                        <p class="font-mono text-[28px] font-black text-slate-800 mt-1">{{ number_format($totalMovimientos ?? 0, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-teal-50 text-teal-600 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Lotes en Bodega Activos</p>
+                        <p class="font-mono text-[28px] font-black text-slate-800 mt-1">{{ number_format($lotesActivos ?? 0, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm sm:col-span-2 lg:col-span-1">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Alertas Clínicas (FEFO)</p>
+                        <p class="font-mono text-[28px] font-black {{ ($alertas ?? 0) > 0 ? 'text-amber-600' : 'text-slate-800' }} mt-1">{{ $alertas ?? 0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-amber-50 text-amber-600 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR PRINCIPAL: TABLA DE MOVIMIENTOS -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+
+            <!-- Barra de busquedas mas filtros -->
+            <form method="GET" action="{{ route('traceability.index') }}" id="filterForm" class="p-5 border-b border-slate-200 bg-slate-50/50">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                    
+                    <div class="lg:col-span-2 relative">
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Búsqueda Libre</label>
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 pt-5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar Lote, Producto o Doc..."
+                            class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-[13px] font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Movimiento</label>
+                        <select name="tipo_movimiento" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
+                            <option value="">Todos</option>
+                            <option value="Recepción" {{ request('tipo_movimiento') == 'Recepción' ? 'selected' : '' }}>Recepción</option>
+                            <option value="Despacho" {{ request('tipo_movimiento') == 'Despacho' ? 'selected' : '' }}>Despacho</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Desde</label>
+                        <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Hasta</label>
+                        <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm">
+                    </div>
+                    
+                </div>
+                
+                <div class="mt-4 flex justify-end gap-3">
+                    <?php if(request()->hasAny(['search', 'tipo_movimiento', 'fecha_desde', 'fecha_hasta'])): ?>
+                        <a href="{{ route('traceability.index') }}" class="py-2 px-4 bg-slate-100 text-slate-600 border border-slate-300 rounded-xl text-[13px] font-bold hover:bg-slate-200 transition-colors">Limpiar</a>
+                    <?php endif; ?>
+                    <button type="submit" class="py-2 px-5 bg-slate-800 text-white rounded-xl text-[13px] font-bold hover:bg-slate-900 transition-colors shadow-sm cursor-pointer">
+                        Aplicar Filtros
+                    </button>
+                </div>
+            </form>
+
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse min-w-[900px]">
+                    <thead>
+                        <tr class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 bg-slate-50 border-b border-slate-200">
+                            <th class="px-6 py-4 whitespace-nowrap">Lote / Producto</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Tipo Movimiento</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Origen / Destino</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Fecha / Hora</th>
+                            <th class="px-6 py-4 text-center whitespace-nowrap">Estado Lote</th>
+                            <th class="px-6 py-4 text-right whitespace-nowrap">Trazabilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-[13px]">
+                        
+                        <?php if(count($movements) > 0): ?>
+                            <?php foreach($movements as$mov): ?>
+                                <?php
+                                    $badgeBg = 'bg-slate-50'; $badgeText = 'text-slate-700';$badgeBorder = 'border-slate-200';
+                                    if($mov->tipo_movimiento == 'Recepción') {
+                                        $badgeBg = 'bg-emerald-50'; $badgeText = 'text-emerald-700';$badgeBorder = 'border-emerald-200';
+                                    } elseif($mov->tipo_movimiento == 'Despacho') {$badgeBg = 'bg-blue-50'; $badgeText = 'text-blue-700';$badgeBorder = 'border-blue-200';
+                                    }
+                                ?>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-mono font-bold text-[11px] text-teal-700 bg-teal-50 shrink-0 border border-teal-100">
+                                                {{ Str::limit($mov->lote, 4, '') }}
+                                            </div>
+                                            <div class="min-w-0">
+                                                <p class="font-extrabold text-[14px] text-slate-800 truncate">{{ $mov->producto }}</p>
+                                                <p class="font-mono text-[11px] font-semibold text-slate-500 mt-0.5">Lote: {{ $mov->lote }} · Vence: {{ $mov->fecha_vencimiento ? \Carbon\Carbon::parse($mov->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wide {{ $badgeBg }} {{ $badgeText }} {{$badgeBorder }} border whitespace-nowrap">
+                                            {{ $mov->tipo_movimiento }} ({{$mov->cantidad > 0 ? '+'.$mov->cantidad :$mov->cantidad }})
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-col">
+                                            <span class="text-slate-800 font-bold text-[13px]">{{ $mov->origen_destino }}</span>
+                                            <span class="text-[11px] font-medium text-slate-500">{{ $mov->documento_respaldo }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono text-[12px] font-semibold text-slate-600">
+                                        {{ \Carbon\Carbon::parse($mov->fecha_hora)->format('d/m/Y - H:i') }}
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <?php if(strtolower($mov->estado_lote) == 'cuarentena'): ?>
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Cuarentena
+                                            </span>
+                                        <?php elseif(strtolower($mov->estado_lote) == 'merma'): ?>
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-rose-100 text-rose-800 border border-rose-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Merma
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Vigente
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button type="button" onclick="openTimeline('{{ $mov->lote }}', '{{ addslashes($mov->producto) }}')" class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 rounded-lg text-[12px] font-bold transition-colors cursor-pointer shadow-sm">
+                                            <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                                            Línea de Tiempo
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="6" class="px-6 py-16 text-center">
+                                    <div class="flex flex-col items-center justify-center text-slate-400">
+                                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
+                                            <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        </div>
+                                        <p class="text-[15px] font-bold text-slate-600">Sin movimientos trazados</p>
+                                        <p class="text-[13px] text-slate-500 mt-1 max-w-sm">No existen recepciones ni despachos registrados que coincidan con la búsqueda actual.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="px-6 py-4 border-t border-slate-200 bg-white">
+                {{ $movements->links() }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal con linea de tiempo para trazabilidad -->
+    <div id="modal-lineage" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all">
+        <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-md" onclick="closeTimeline()"></div>
+        <div class="relative w-full max-w-lg rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
+
+            <div class="flex items-start justify-between p-6 bg-gradient-to-r from-slate-800 to-slate-900 shrink-0">
+                <div>
+                    <h3 class="text-[16px] font-bold text-white tracking-wide">Línea de Trazabilidad del Lote</h3>
+                    <p class="font-mono text-[12px] font-semibold text-teal-300 mt-1" id="timeline-subtitle">Cargando...</p>
+                </div>
+                <button type="button" onclick="closeTimeline()" class="p-2 rounded-xl text-slate-400 hover:text-white bg-white/10 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-8 space-y-6 overflow-y-auto bg-slate-50/50" id="timeline-container">
+                <div class="text-center text-slate-500 text-sm font-medium py-10">Consultando movimientos...</div>
+            </div>
+
+            <div class="flex justify-end p-5 border-t border-slate-200 bg-white shrink-0">
+                <button type="button" onclick="closeTimeline()" class="px-5 py-2.5 rounded-xl text-[13px] font-bold text-slate-700 bg-slate-100 border border-slate-300 hover:bg-slate-200 transition-colors shadow-sm cursor-pointer">
+                    Cerrar Trazabilidad
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTimeline(lote, producto) {
+            document.getElementById('modal-lineage').classList.remove('hidden');
+            document.getElementById('timeline-subtitle').textContent = `Lote: ${lote} · ${producto}`;
+            
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = `<div class="text-center text-slate-500 text-sm font-medium py-10">
+                <svg class="animate-spin h-6 w-6 text-teal-600 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Consultando historial seguro...
+            </div>`;
+
+            // SOLUCIÓN AL 404: 
+            // Usamos una ruta relativa absoluta que detecta automáticamente si estás en /traceability o /trazabilidad
+            const currentPath = window.location.pathname.replace(/\/$/, '');
+            const fetchUrl = `${currentPath}/timeline?lote=${encodeURIComponent(lote)}`;
+
+            fetch(fetchUrl)
+                .then(async response => {
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        throw new Error(errText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if(!data || data.length === 0) {
+                        container.innerHTML = '<div class="text-center text-slate-500 py-10 font-medium">No hay registros de trazabilidad para este lote.</div>';
+                        return;
+                    }
+
+                    let html = '<div class="relative pl-6 border-l-2 border-teal-500 space-y-7">';
+                    
+                    data.forEach((mov) => {
+                        let badgeBg = mov.tipo === 'Recepción' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200';
+                        
+                        html += `
+                        <div class="relative">
+                            <div class="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-teal-600 border-2 border-white ring-4 ring-teal-50"></div>
+                            <div>
+                                <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${badgeBg} mb-1.5 border">
+                                    ${mov.tipo} (${mov.cantidad > 0 ? '+'+mov.cantidad : mov.cantidad})
+                                </span>
+                                <h4 class="text-[14px] font-black text-slate-800 leading-tight">${mov.origen_destino}</h4>
+                                <p class="text-[12px] font-medium text-slate-500 mt-1">Doc. Respaldo: <span class="text-slate-700">${mov.documento}</span></p>
+                                <p class="font-mono text-[11px] font-bold text-slate-400 mt-1.5">${mov.fecha}</p>
+                            </div>
+                        </div>`;
+                    });
+
+                    html += '</div>';
+                    container.innerHTML = html;
+                })
+                .catch(err => {
+                    console.error("🔥 ERROR DE LARAVEL:", err);
+                    container.innerHTML = `
+                        <div class="text-center text-rose-600 py-10">
+                            <svg class="w-10 h-10 mx-auto text-rose-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <p class="font-bold text-[14px]">Error de Conexión o Servidor.</p>
+                            <p class="text-[11px] text-slate-500 mt-2 font-medium">Laravel está bloqueando la ruta o hay un error en el Controlador.</p>
+                            <p class="text-[10px] text-rose-400 mt-1 font-bold">La ruta intentada fue: ${fetchUrl}</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function closeTimeline() {
+            document.getElementById('modal-lineage').classList.add('hidden');
+        }
+    </script>
+@endsection

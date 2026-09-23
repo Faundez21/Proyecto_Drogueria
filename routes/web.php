@@ -1,104 +1,156 @@
 <?php
 
+//  Controladores de Autenticación
 use App\Http\Controllers\Auth\LoginController;
-use Illuminate\Support\Facades\Route;
+
+//  Controladores de Módulos y Operaciones
+use App\Http\Controllers\ReceptionController;
+use App\Http\Controllers\DistributionController;
+use App\Http\Controllers\QuarantineController;
+use App\Http\Controllers\ProviderController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\QRController;
+use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\TraceabilityController;
+
+//  Controladores de Estructura de Almacén (Mantenedores)
 use App\Http\Controllers\AisleController;
 use App\Http\Controllers\ShelfController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
-use App\Http\Controllers\DistributionController;
-use App\Http\Controllers\QuarantineController;
-use App\Http\Controllers\QRController;
 
+//  Controladores de Usuarios
+use App\Http\Controllers\UserController;
 
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-// 1. Redirige la página principal exclusivamente al login
+use Illuminate\Support\Facades\Route;
+
+// Rutas Públicas Estas rutas son accesibles sin necesidad de iniciar sesión.
+
+// 1. Redirección principal al login
 Route::redirect('/', '/login');
 
-// 2. Rutas del Login
+// 2. Rutas de Login
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 
-// 3. Ruta de recuperación
+// 3. Ruta de recuperación de contraseña
 Route::get('/recuperar-password', function () {
-    return "Página de recuperación de contraseña en construcción...";
+    return view('auth.forgot-password');
 })->name('password.request');
 
-// middelware auth para proteger las rutas del panel
+/*
+ Rutas Privadas (Protegidas)
+ Todas estas rutas requieren que el usuario esté autenticado (middleware auth).
+*/
+
 Route::middleware('auth')->group(function () {
 
-// 4. Rutas del Panel (Nombres asignados)
-Route::get('/dashboard', function () {
-    return view('dashboard.index');
-})->name('dashboard.index');
+    // 4. Cierre de sesión (Movido dentro del middleware para mayor seguridad)
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/recepcion', function () {
-    return view('recepcion.index');
-})->name('recepcion.index');
+    // 5. Vistas Generales y Dashboards
+    Route::get('/dashboard', function () {
+        return view('dashboard.index');
+    })->name('dashboard.index');
 
-Route::get('/despacho', function () {
-    return view('despacho.index');
-})->name('despacho.index');
+    Route::get('/despacho', [DispatchController::class, 'index'])->name('despacho.index');
+    Route::post('/despacho', [DispatchController::class, 'store'])->name('despacho.store');
+    Route::get('/despacho/{id}/pdf', [DispatchController::class, 'pdf'])->name('despacho.pdf'); 
 
-Route::get('/trazabilidad', function () {
-    return view('trazabilidad.index');
-})->name('trazabilidad.index');
+    Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
+    Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
 
-Route::get('/proveedores', function () {
-    return view('proveedores.index');
-})->name('proveedores.index');
 
-Route::get('/proveedores/crear', function () {
-    return view('proveedores.create');
-})->name('proveedores.create');
-
-Route::get('/inventario', function () {
-        return view('inventario.index');
-    })->name('inventario.index');
 
     Route::get('/reportes', function () {
         return view('reportes.index');
     })->name('reportes.index');
 
-Route::get('/error', function () {
-    return view('error');
-});
+    Route::get('/error', function () {
+        return view('error');
+    })->name('error');
 
-Route::get('/users', function () {
-    return view('users.index');
-})->name('users.index');
-
-
-//6.Ruta de distribución
-
-Route::resource('distribution', DistributionController::class);
-// Ruta para cerrar sesión (ejemplo necesario para tu botón inferior)
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
-//5. Rutas de mantenedores
-
-Route::resource('aisle', AisleController::class);
+    // Usuarios
+    Route::get('/users', [UserController::class, 'index'])
+        ->name('users.index');
 
 
-Route::resource('shelf', ShelfController::class);
+    // Inventario
+    Route::get('/inventario', [InventoryController::class, 'index'])
+        ->name('inventario.index');
 
-Route::resource('level', LevelController::class);
+    Route::post('/inventario/guardar', [InventoryController::class, 'store'])
+        ->name('inventario.store');
 
-Route::resource('position', PositionController::class);
-
-//6.Ruta de distribución
-
-Route::resource('distribution', DistributionController::class);
-
-//7.Ruta de cuarentena
-
-Route::resource('quarantine', QuarantineController::class);
+    Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])
+        ->name('inventario.import');
 
 
-//8.Ruta de QR
-Route::resource ('qr', QRController::class);
+    // 6. Módulo de Recepción
+    Route::prefix('reception')->name('reception.')->group(function () {
 
-//9.ruta para mover posiciones 3d
-Route::post('/shelf/{id}/update-position', [App\Http\Controllers\ShelfController::class, 'updatePosition'])->name('shelf.updatePosition');
+        Route::get('/', [ReceptionController::class, 'index'])
+            ->name('index');
+
+        Route::post('/guardar', [ReceptionController::class, 'store'])
+            ->name('store');
+
+        Route::get('/{reception}/pdf', [ReceptionController::class, 'downloadPdf'])
+            ->name('pdf');
+    });
+
+
+    // 7. Módulo de Proveedores
+    Route::prefix('proveedores')->name('providers.')->group(function () {
+
+        Route::get('/', [ProviderController::class, 'index'])
+            ->name('index');
+
+        Route::get('/crear', [ProviderController::class, 'create'])
+            ->name('create');
+
+        Route::post('/', [ProviderController::class, 'store'])
+            ->name('store');
+
+        Route::put('/{provider}', [ProviderController::class, 'update'])
+            ->name('update');
+
+        Route::patch('/{provider}/toggle-status', [ProviderController::class, 'toggleStatus'])
+            ->name('toggle-status');
+    });
+
+
+    // 5. Rutas de mantenedores
+
+    Route::resource('aisle', AisleController::class);
+
+    Route::resource('shelf', ShelfController::class);
+
+    Route::resource('level', LevelController::class);
+
+    Route::resource('position', PositionController::class);
+
+
+    // 6. Ruta de distribución
+
+    Route::resource('distribution', DistributionController::class);
+
+
+    // 7. Ruta de cuarentena
+
+    Route::resource('quarantine', QuarantineController::class);
+
+
+    // 8. Ruta de QR
+
+    Route::resource('qr', QRController::class);
+
+
+    // 9. ruta para mover posiciones 3d
+
+    Route::post(
+        '/shelf/{id}/update-position',
+        [ShelfController::class, 'updatePosition']
+    )->name('shelf.updatePosition');
 
 });
