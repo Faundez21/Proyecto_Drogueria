@@ -10,18 +10,16 @@ use Illuminate\Support\Facades\DB;
 
 class TraceabilityController extends Controller
 {
-    // Función central con DB
     private function getAllMovements()
     {
         $movements = collect();
 
-        // 1. Extraer Recepciones Históricas
+        // 1. Extraer Recepciones
         try {
             $receptions = DB::table('receptions')->get();
             foreach ($receptions as $rec) {
                 $items = DB::table('reception_items')->where('reception_id', $rec->id)->get();
                 
-                // Buscar nombre del proveedor
                 $providerName = 'Proveedor Externo';
                 if (!empty($rec->provider_id)) {
                     $prov = DB::table('providers')->where('id', $rec->provider_id)->first();
@@ -31,7 +29,6 @@ class TraceabilityController extends Controller
                 }
 
                 foreach ($items as $item) {
-                    // Buscar nombre del producto
                     $productName = 'Producto ID: ' . ($item->product_id ?? 'Desconocido');
                     if (!empty($item->product_id)) {
                         $prod = DB::table('products')->where('id', $item->product_id)->first();
@@ -55,7 +52,7 @@ class TraceabilityController extends Controller
             }
         } catch (\Exception $e) {}
 
-        // 2. Extraer Despachos Históricos
+        // 2. Extraer Despachos
         try {
             $dispatches = DB::table('dispatches')->get();
             foreach ($dispatches as $disp) {
@@ -66,7 +63,7 @@ class TraceabilityController extends Controller
                         'lote' => $item->lote ?? 'S/L',
                         'fecha_vencimiento' => $item->fecha_vencimiento ?? null,
                         'tipo_movimiento' => 'Despacho',
-                        'cantidad' => -abs($item->cantidad ?? 0), // Salida siempre en negativo
+                        'cantidad' => -abs($item->cantidad ?? 0),
                         'fecha_hora' => $disp->created_at ?? $disp->fecha_despacho ?? now(),
                         'origen_destino' => 'Hacia: ' . ($disp->establecimiento_destino ?? 'Destino Desconocido'),
                         'documento_respaldo' => 'Guía N° ' . ($disp->correlativo ?? 'S/N'),
@@ -76,7 +73,6 @@ class TraceabilityController extends Controller
             }
         } catch (\Exception $e) {}
 
-        // Devolvemos todo unificado y ordenado
         return $movements->sortByDesc('fecha_hora')->values();
     }
 
@@ -84,7 +80,7 @@ class TraceabilityController extends Controller
     {
         $movements = $this->getAllMovements();
 
-        // filtros dinámicos
+        // FILTROS
         if ($request->filled('search')) {
             $search = mb_strtolower($request->search, 'UTF-8');
             $movements = $movements->filter(function($item) use ($search) {
@@ -109,12 +105,11 @@ class TraceabilityController extends Controller
             });
         }
 
-        // exportar excel
-        if ($request->has('export') && $request->export == 'csv') {
-            return $this->exportCsv($movements);
+        // EXPORTACIÓN A EXCEL CON ESTILOS VISUALES
+        if ($request->has('export') && $request->export == 'excel') {
+            return $this->exportExcelStyled($movements);
         }
 
-        // paginación manual de la colección
         $perPage = 15;
         $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage();
         $currentItems = $movements->slice(($currentPage - 1) * $perPage, $perPage)->all();
@@ -123,7 +118,6 @@ class TraceabilityController extends Controller
             'query' => $request->query()
         ]);
 
-        // KPIs DINÁMICOS
         $totalMovimientos = $movements->filter(function($item) {
             return Carbon::parse($item->fecha_hora)->month == date('m');
         })->count();
@@ -141,7 +135,6 @@ class TraceabilityController extends Controller
         ]);
     }
 
-    // Endpoint Seguro para el Modal
     public function getTimeline(Request $request)
     {
         try {
@@ -151,6 +144,7 @@ class TraceabilityController extends Controller
                 return response()->json([]);
             }
 
+            // 1. Línea de tiempo
             $timeline = $this->getAllMovements()
                 ->where('lote', $lote)
                 ->sortBy('fecha_hora') 
@@ -164,48 +158,80 @@ class TraceabilityController extends Controller
                     ];
                 })->values();
 
-            return response()->json($timeline);
+            // 2. Ficha Completa desde Inventory (Datos de Recepción Original)
+            $inventory = Inventory::where('lote', $lote)->first();
+            $details = null;
+            
+            if ($inventory) {
+                $details = [
+                    'producto' => $inventory->producto ?? 'S/N',
+                    'categoria' => $inventory->categoria ?? 'General',
+                    'proveedor' => $inventory->razon_social ?? 'S/R',
+                    'rut_proveedor' => $inventory->rut_proveedor ?? 'S/R',
+                    'documento' => ($inventory->tipo_documento ?? 'Documento') . ' N° ' . ($inventory->numero_documento ?? 'S/N'),
+                    'orden_compra' => $inventory->orden_compra ?? 'S/OC',
+                    'fecha_recepcion' => $inventory->fecha_recepcion ? Carbon::parse($inventory->fecha_recepcion)->format('d/m/Y') : 'S/R',
+                    'valor_unitario' => '$' . number_format($inventory->valor_neto_unitario ?? 0, 0, ',', '.'),
+                    'estado_actual' => $inventory->estado ?? 'Vigente',
+                    'stock_actual' => $inventory->cantidad ?? 0,
+                    'ubicacion' => 'Pasillo ' . ($inventory->pasillo ?? 'N/A') . ' - Estante ' . ($inventory->estante ?? 'N/A'),
+                ];
+            }
+
+            return response()->json([
+                'timeline' => $timeline,
+                'details' => $details
+            ]);
+
         } catch (\Exception $e) {
-            // Devolvemos el error real para verlo en JS
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
-    // Generador de Excel / CSV
-    private function exportCsv($movements)
+    // EXPORTACIÓN EXCEL NATIVA (Soporta colores y negritas sin librerías extras)
+    private function exportExcelStyled($movements)
     {
-        $filename = "Kardex_Lotes_" . date('Y-m-d_H-i-s') . ".csv";
+        $filename = "Reporte_Trazabilidad_Lotes_" . date('Y-m-d_H-i') . ".xls";
         
-        $headers = [
-            "Content-type"        => "text/csv; charset=UTF-8",
-            "Content-Disposition" => "attachment; filename=$filename",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
+        $html = '<meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">';
+        $html .= '<table border="1" style="font-family: Arial, sans-serif; border-collapse: collapse;">';
+        
+        // Cabeceras del Excel con colores corporativos
+        $html .= '<thead>';
+        $html .= '<tr style="background-color: #0f172a; color: #ffffff; text-align: center; height: 30px;">';
+        $html .= '<th>FECHA Y HORA</th>';
+        $html .= '<th>PRODUCTO</th>';
+        $html .= '<th>LOTE</th>';
+        $html .= '<th>VENCIMIENTO</th>';
+        $html .= '<th>TIPO MOVIMIENTO</th>';
+        $html .= '<th>CANTIDAD</th>';
+        $html .= '<th>ORIGEN / DESTINO</th>';
+        $html .= '<th>DOCUMENTO RESPALDO</th>';
+        $html .= '</tr>';
+        $html .= '</thead>';
+        
+        $html .= '<tbody>';
+        foreach ($movements as $mov) {
+            $colorMovimiento = $mov->tipo_movimiento == 'Recepción' ? 'color: #047857; font-weight: bold;' : 'color: #1d4ed8; font-weight: bold;';
+            $fechaVence = $mov->fecha_vencimiento ? Carbon::parse($mov->fecha_vencimiento)->format('d/m/Y') : 'N/A';
+            
+            $html .= '<tr style="text-align: center;">';
+            $html .= '<td>' . Carbon::parse($mov->fecha_hora)->format('d/m/Y H:i') . '</td>';
+            $html .= '<td style="text-align: left; font-weight: bold;">' . $mov->producto . '</td>';
+            $html .= '<td style="mso-number-format:\'@\';">' . $mov->lote . '</td>';
+            $html .= '<td>' . $fechaVence . '</td>';
+            $html .= '<td style="' . $colorMovimiento . '">' . $mov->tipo_movimiento . '</td>';
+            $html .= '<td style="font-weight: bold;">' . $mov->cantidad . '</td>';
+            $html .= '<td style="text-align: left;">' . $mov->origen_destino . '</td>';
+            $html .= '<td>' . $mov->documento_respaldo . '</td>';
+            $html .= '</tr>';
+        }
+        $html .= '</tbody></table>';
 
-        $columns = ['Fecha y Hora', 'Producto', 'Lote', 'Vencimiento', 'Movimiento', 'Cantidad', 'Origen / Destino', 'Documento Respaldo'];
-
-        $callback = function() use($movements, $columns) {
-            $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
-            fputcsv($file, $columns, ';');
-
-            foreach ($movements as $mov) {
-                fputcsv($file, [
-                    Carbon::parse($mov->fecha_hora)->format('d/m/Y H:i'),
-                    $mov->producto,
-                    $mov->lote,
-                    $mov->fecha_vencimiento ? Carbon::parse($mov->fecha_vencimiento)->format('d/m/Y') : 'N/A',
-                    $mov->tipo_movimiento,
-                    $mov->cantidad,
-                    $mov->origen_destino,
-                    $mov->documento_respaldo
-                ], ';');
-            }
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return response($html)
+            ->header('Content-Type', 'application/vnd.ms-excel; charset=UTF-8')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 }
