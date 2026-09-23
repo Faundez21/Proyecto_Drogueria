@@ -233,9 +233,11 @@
         </tr>
     </template>
 
-    <!-- ventana modal para el historial de despachos emitidos -->
+    <!-- ventana modal para el historial de despachos emitidos con buscador y multiples filtros -->
     <div id="BandejaModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl flex flex-col overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
+            
+            <!-- cabecera de modal historico -->
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-bold text-white tracking-wide">Bandeja Historica de Despachos</h2>
@@ -246,7 +248,67 @@
                 </button>
             </div>
 
-            <div class="overflow-x-auto max-h-[65vh] bg-slate-50">
+            <!-- cuadricula de filtros dinamicos -->
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-col gap-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros de Busqueda</span>
+                    <button type="button" onclick="limpiarFiltrosBandeja()" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 transition-colors">Limpiar Filtros</button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- filtro correlativo con sugerencias dinamicas -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Correlativo GD</label>
+                        <input type="text" id="filtroCorrelativo" list="sugerencias-correlativos" oninput="filtrarBandeja()" placeholder="Ej: 12345" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                        <datalist id="sugerencias-correlativos">
+                            @foreach($dispatches as $despacho)
+                                <option value="{{ $despacho->correlativo }}">
+                            @endforeach
+                        </datalist>
+                    </div>
+                    
+                    <!-- filtro fecha -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Fecha Emision</label>
+                        <input type="date" id="filtroFecha" oninput="filtrarBandeja()" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                    </div>
+
+                    <!-- filtro destino con sugerencias -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Destino</label>
+                        <input type="text" id="filtroDestino" list="sugerencias-destinos" oninput="filtrarBandeja()" placeholder="Ej: CESFAM Los Cerros" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                        <datalist id="sugerencias-destinos">
+                            <option value="CESFAM LOS CERROS">
+                            <option value="CECOSF CENTINELA">
+                            <option value="CECOSF LOS LOBOS - LA GLORIA">
+                            <option value="POSTA TUMBE">
+                            <option value="CESFAM PAULINA AVENDAÑO">
+                            <option value="CESFAM SAN VICENTE">
+                            <option value="CECOSF LIBERTAD GAETE">
+                            <option value="CECOSF 8 DE MAYO">
+                            <option value="CECOSF ESMERALDA">
+                            <option value="CESFAM LEOCAN PORTUS">
+                            <option value="SAR SAN VICENTE">
+                            <option value="SAR LOS CERROS">
+                            <option value="UAPO">
+                            <option value="Dental - CESFAM SAN VICENTE">
+                            <option value="Laboratorio - CESFAM SAN VICENTE">
+                        </datalist>
+                    </div>
+
+                    <!-- filtro estado -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estado</label>
+                        <select id="filtroEstadoBandeja" onchange="filtrarBandeja()" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            <option value="">Todos los estados</option>
+                            <option value="aprobada">Aprobada</option>
+                            <option value="pendiente">Pendiente</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-[60vh] bg-white">
                 <table class="w-full text-left text-[13px] whitespace-nowrap">
                     <thead class="bg-white text-slate-500 uppercase text-[11px] font-extrabold border-b border-slate-200 sticky top-0 shadow-sm z-10">
                         <tr>
@@ -261,7 +323,8 @@
                     <tbody class="divide-y divide-slate-100">
                         @forelse($dispatches as $despacho)
                             @php $dKey = 'desp_' . $despacho->id; @endphp
-                            <tr class="bg-white hover:bg-slate-50 transition-colors cursor-pointer group" onclick="toggleItems('{{ $dKey }}')">
+                            <!-- clases identificadoras para el filtrado -->
+                            <tr class="bg-white hover:bg-slate-50 transition-colors cursor-pointer group fila-despacho" data-key="{{ $dKey }}" onclick="toggleItems('{{ $dKey }}')">
                                 <td class="px-6 py-4 text-center">
                                     <button type="button" class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200" id="icon-{{ $dKey }}">
                                         <svg class="w-4 h-4 transform transition-transform duration-300" id="arrow-{{ $dKey }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -278,9 +341,9 @@
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     @if($despacho->estado_liberacion === 'Liberada' || $despacho->estado_liberacion === 'liberada')
-                                        <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">Aprobada</span>
+                                        <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase badge-estado">Aprobada</span>
                                     @else
-                                        <span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">{{ $despacho->estado_liberacion }}</span>
+                                        <span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase badge-estado">{{ $despacho->estado_liberacion }}</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center" onclick="event.stopPropagation();">
@@ -290,6 +353,7 @@
                                     </a>
                                 </td>
                             </tr>
+                            <!-- detalle de articulos oculto -->
                             <tr id="items-{{ $dKey }}" class="hidden bg-slate-100/50 shadow-inner">
                                 <td colspan="6" class="p-0 border-b border-slate-300">
                                     <div class="py-4 pr-6 pl-14">
@@ -385,6 +449,64 @@
         // funciones para mostrar u ocultar la bandeja de historial
         function openBandeja() { document.getElementById('BandejaModal').classList.remove('hidden'); }
         function closeBandeja() { document.getElementById('BandejaModal').classList.add('hidden'); }
+
+        // limpia todos los campos de busqueda del historial y refresca la tabla
+        function limpiarFiltrosBandeja() {
+            document.getElementById('filtroCorrelativo').value = '';
+            document.getElementById('filtroFecha').value = '';
+            document.getElementById('filtroDestino').value = '';
+            document.getElementById('filtroEstadoBandeja').value = '';
+            filtrarBandeja();
+        }
+
+        // buscador interno dinamico multi-criterio para la tabla de historial
+        function filtrarBandeja() {
+            let inputCorrelativo = document.getElementById('filtroCorrelativo').value.toLowerCase();
+            let inputFecha = document.getElementById('filtroFecha').value;
+            let inputDestino = document.getElementById('filtroDestino').value.toLowerCase();
+            let selectEstado = document.getElementById('filtroEstadoBandeja').value.toLowerCase();
+            
+            let fechaFormateada = "";
+            if (inputFecha) {
+                let partes = inputFecha.split('-');
+                if (partes.length === 3) {
+                    fechaFormateada = partes[2] + '-' + partes[1] + '-' + partes[0];
+                }
+            }
+
+            let filas = document.querySelectorAll('.fila-despacho');
+
+            filas.forEach(fila => {
+                let correlativoText = fila.children[1].textContent.toLowerCase();
+                let fechaText = fila.children[2].textContent.trim();
+                let destinoText = fila.children[3].textContent.toLowerCase();
+                let estadoText = fila.children[4].textContent.toLowerCase();
+                
+                let coincideCorrelativo = correlativoText.includes(inputCorrelativo);
+                let coincideFecha = fechaFormateada === "" || fechaText.includes(fechaFormateada);
+                let coincideDestino = destinoText.includes(inputDestino);
+                let coincideEstado = selectEstado === "" || estadoText.includes(selectEstado);
+
+                let key = fila.getAttribute('data-key');
+                let filaHija = document.getElementById('items-' + key);
+
+                if (coincideCorrelativo && coincideFecha && coincideDestino && coincideEstado) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                    if (filaHija) {
+                        filaHija.classList.add('hidden');
+                        let arrow = document.getElementById('arrow-' + key);
+                        let iconContainer = document.getElementById('icon-' + key);
+                        if(arrow) arrow.classList.remove('rotate-90');
+                        if(iconContainer) {
+                            iconContainer.classList.add('bg-slate-100', 'text-slate-400');
+                            iconContainer.classList.remove('bg-blue-600', 'text-white', 'shadow-md', 'border-blue-600');
+                        }
+                    }
+                }
+            });
+        }
 
         // despliegue de detalles y productos de una guia de despacho en particular
         function toggleItems(key) {
