@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Inventario y Stock')
-@section('subtitle', 'Control físico de medicamentos e insumos en bodega.')
 
 @section('content')
     <div class="w-full p-4 sm:p-6 space-y-6">
