@@ -13,8 +13,8 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\QRController;
 use App\Http\Controllers\DispatchController;
 use App\Http\Controllers\TraceabilityController;
-    use App\Http\Controllers\GlobalSearchController;
-    
+use App\Http\Controllers\GlobalSearchController;
+
 //  Controladores de Estructura de Almacén (Mantenedores)
 use App\Http\Controllers\AisleController;
 use App\Http\Controllers\ShelfController;
@@ -54,14 +54,14 @@ Route::middleware('auth')->group(function () {
 
 
 
-// Rutas para la Barra de Búsqueda Global y Notificaciones
+    // Rutas para la Barra de Búsqueda Global y Notificaciones
     Route::get('/api/global-search', [GlobalSearchController::class, 'search'])->name('global.search');
     Route::get('/api/notifications', [GlobalSearchController::class, 'notifications'])->name('global.notifications');
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::get('/despacho', [DispatchController::class, 'index'])->name('despacho.index');
     Route::post('/despacho', [DispatchController::class, 'store'])->name('despacho.store');
-    Route::get('/despacho/{id}/pdf', [DispatchController::class, 'pdf'])->name('despacho.pdf'); 
+    Route::get('/despacho/{id}/pdf', [DispatchController::class, 'pdf'])->name('despacho.pdf');
 
     Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
     Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
@@ -90,6 +90,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])
         ->name('inventario.import');
+        
+    Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])
+        ->name('inventario.update');
 
 
     // 6. Módulo de Recepción

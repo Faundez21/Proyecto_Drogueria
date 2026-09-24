@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Inventory;
 
 class QuarantineController extends Controller
 {
@@ -11,7 +12,11 @@ class QuarantineController extends Controller
      */
     public function index()
     {
-        return view("quarantine.index");
+        $inventories = Inventory::where('estado', 'Cuarentena')
+            ->latest()
+            ->get();
+
+        return view('quarantine.index', compact('inventories'));
     }
 
     /**
