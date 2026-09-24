@@ -182,9 +182,8 @@
         </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- TEMPLATE OCULTO PARA NUEVAS FILAS (Garantiza Funcionar) -->
-    <!-- ======================================================= -->
+
+    <!-- TEMPLATE OCULTO PARA NUEVAS FILAS -->
     <template id="rowTemplate">
         <tr class="bg-white hover:bg-slate-50/80 transition-colors group">
             <td class="px-3 py-2 border-r border-slate-100">

@@ -6,7 +6,7 @@
 @section('content')
     <div class="w-full p-4 sm:p-6 space-y-6">
 
-        <!-- cabecera -->
+        <!-- CABECERA Y ACCIONES SUPERIORES -->
         <div class="flex flex-col gap-3">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 
@@ -17,14 +17,17 @@
                     <span class="font-bold text-slate-800">Trazabilidad de Lotes</span>
                 </div>
 
-                <button type="submit" form="filterForm" name="export" value="csv" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto cursor-pointer">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Exportar Reporte Excel
+                <!-- Botón Exportar (Apunta al nuevo método Excel Visual) -->
+                <button type="submit" form="filterForm" name="export" value="excel" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-600 hover:text-white shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1.5 13.9l-2.4-3.4 2.3-3.3h1.8l-1.4 2.2 1.5 2.3h-1.8zM9.5 15.9l1.4-2.2-1.3-2.1h1.8l.5.9.6-.9h1.7l-2.2 3.2 2.4 3.5h-1.8l-1.5-2.4-1.5 2.4H9.5z" />
+                    </svg>
+                    Exportar Reporte Excel Visual
                 </button>
             </div>
         </div>
 
-      
+        <!-- TARJETAS KPIs -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
                 <div class="flex items-start justify-between">
@@ -66,7 +69,7 @@
         <!-- CONTENEDOR PRINCIPAL: TABLA DE MOVIMIENTOS -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
 
-            <!-- Barra de busquedas mas filtros -->
+            <!-- BARRA DE BÚSQUEDA Y FILTROS -->
             <form method="GET" action="{{ route('traceability.index') }}" id="filterForm" class="p-5 border-b border-slate-200 bg-slate-50/50">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                     
@@ -110,6 +113,7 @@
                 </div>
             </form>
 
+            <!-- Tabla responsive -->
             <div class="overflow-x-auto w-full">
                 <table class="w-full text-left border-collapse min-w-[900px]">
                     <thead>
@@ -119,7 +123,7 @@
                             <th class="px-6 py-4 whitespace-nowrap">Origen / Destino</th>
                             <th class="px-6 py-4 whitespace-nowrap">Fecha / Hora</th>
                             <th class="px-6 py-4 text-center whitespace-nowrap">Estado Lote</th>
-                            <th class="px-6 py-4 text-right whitespace-nowrap">Trazabilidad</th>
+                            <th class="px-6 py-4 text-right whitespace-nowrap">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-[13px]">
@@ -175,9 +179,10 @@
                                         <?php endif; ?>
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <button type="button" onclick="openTimeline('{{ $mov->lote }}', '{{ addslashes($mov->producto) }}')" class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 rounded-lg text-[12px] font-bold transition-colors cursor-pointer shadow-sm">
-                                            <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                                            Línea de Tiempo
+                                        <!-- BOTÓN FICHA MAESTRA MEJORADO -->
+                                        <button type="button" onclick="openLotDetails('{{ $mov->lote }}', '{{ addslashes($mov->producto) }}')" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-teal-700 text-white rounded-xl text-[12px] font-bold transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer shadow-sm">
+                                            <svg class="w-4 h-4 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                            Ver Ficha Maestra
                                         </button>
                                     </td>
                                 </tr>
@@ -206,46 +211,75 @@
         </div>
     </div>
 
-    <!-- Modal con linea de tiempo para trazabilidad -->
-    <div id="modal-lineage" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all">
-        <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-md" onclick="closeTimeline()"></div>
-        <div class="relative w-full max-w-lg rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
+    <!-- FICHA CLÍNICA DE RECEPCIÓN Y LÍNEA DE TIEMPO-->
+    <div id="modal-lot-details" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all">
+        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeLotDetails()"></div>
+        <div class="relative w-full max-w-5xl rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
 
-            <div class="flex items-start justify-between p-6 bg-gradient-to-r from-slate-800 to-slate-900 shrink-0">
-                <div>
-                    <h3 class="text-[16px] font-bold text-white tracking-wide">Línea de Trazabilidad del Lote</h3>
-                    <p class="font-mono text-[12px] font-semibold text-teal-300 mt-1" id="timeline-subtitle">Cargando...</p>
+            <!-- CABECERA DEL MODAL -->
+            <div class="flex items-center justify-between p-6 bg-slate-800 shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-slate-700 border border-slate-600 flex items-center justify-center text-teal-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-[18px] font-black text-white tracking-wide">Ficha Maestra de Trazabilidad</h3>
+                        <p class="font-mono text-[13px] font-semibold text-slate-400 mt-0.5" id="modal-subtitle">Cargando...</p>
+                    </div>
                 </div>
-                <button type="button" onclick="closeTimeline()" class="p-2 rounded-xl text-slate-400 hover:text-white bg-white/10 transition-colors cursor-pointer">
+                <button type="button" onclick="closeLotDetails()" class="p-2.5 rounded-xl text-slate-400 hover:text-white bg-slate-700 hover:bg-rose-600 transition-colors cursor-pointer shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
-            <div class="p-8 space-y-6 overflow-y-auto bg-slate-50/50" id="timeline-container">
-                <div class="text-center text-slate-500 text-sm font-medium py-10">Consultando movimientos...</div>
+            <!-- CUERPO DUAL DEL MODAL -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 overflow-y-auto bg-white h-full">
+                
+                <!-- COLUMNA IZQUIERDA: Detalles de Recepción Original -->
+                <div class="p-6 lg:p-8 border-b lg:border-b-0 lg:border-r border-slate-200 bg-slate-50/50">
+                    <h4 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-widest mb-5 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Datos Comerciales de Ingreso
+                    </h4>
+                    <div id="lot-details-container" class="space-y-4">
+                        <div class="text-center text-slate-400 py-10 text-sm">Cargando datos...</div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: Línea de Tiempo de Kardex -->
+                <div class="p-6 lg:p-8 bg-white">
+                    <h4 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-widest mb-5 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Línea de Vida Física (Kardex)
+                    </h4>
+                    <div id="timeline-container" class="space-y-6">
+                        <div class="text-center text-slate-400 py-10 text-sm">Construyendo línea de tiempo...</div>
+                    </div>
+                </div>
+
             </div>
 
+            <!-- FOOTER -->
             <div class="flex justify-end p-5 border-t border-slate-200 bg-white shrink-0">
-                <button type="button" onclick="closeTimeline()" class="px-5 py-2.5 rounded-xl text-[13px] font-bold text-slate-700 bg-slate-100 border border-slate-300 hover:bg-slate-200 transition-colors shadow-sm cursor-pointer">
-                    Cerrar Trazabilidad
+                <button type="button" onclick="closeLotDetails()" class="px-6 py-2.5 rounded-xl text-[13px] font-bold text-slate-700 bg-slate-100 border border-slate-300 hover:bg-slate-200 transition-colors shadow-sm cursor-pointer">
+                    Cerrar Ficha
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- SCRIPT AJAX PARA LA FICHA DUAL -->
     <script>
-        function openTimeline(lote, producto) {
-            document.getElementById('modal-lineage').classList.remove('hidden');
-            document.getElementById('timeline-subtitle').textContent = `Lote: ${lote} · ${producto}`;
+        function openLotDetails(lote, producto) {
+            document.getElementById('modal-lot-details').classList.remove('hidden');
+            document.getElementById('modal-subtitle').textContent = `Lote ID: ${lote} · ${producto}`;
             
-            const container = document.getElementById('timeline-container');
-            container.innerHTML = `<div class="text-center text-slate-500 text-sm font-medium py-10">
-                <svg class="animate-spin h-6 w-6 text-teal-600 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Consultando historial seguro...
-            </div>`;
+            const timelineContainer = document.getElementById('timeline-container');
+            const detailsContainer = document.getElementById('lot-details-container');
+            
+            timelineContainer.innerHTML = `<div class="text-center text-slate-500 py-10"><svg class="animate-spin h-6 w-6 text-teal-600 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Cargando historia...</div>`;
+            detailsContainer.innerHTML = `<div class="text-center text-slate-500 py-10">Consultando base de datos...</div>`;
 
-            // SOLUCIÓN AL 404: 
-            // Usamos una ruta relativa absoluta que detecta automáticamente si estás en /traceability o /trazabilidad
             const currentPath = window.location.pathname.replace(/\/$/, '');
             const fetchUrl = `${currentPath}/timeline?lote=${encodeURIComponent(lote)}`;
 
@@ -258,48 +292,86 @@
                     return response.json();
                 })
                 .then(data => {
-                    if(!data || data.length === 0) {
-                        container.innerHTML = '<div class="text-center text-slate-500 py-10 font-medium">No hay registros de trazabilidad para este lote.</div>';
+                    // 1. DIBUJAR LOS DETALLES DEL LOTE (Izquierda)
+                    if(data.details) {
+                        detailsContainer.innerHTML = `
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                                <div>
+                                    <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Proveedor Origen</p>
+                                    <p class="text-[15px] font-black text-slate-800 mt-0.5">${data.details.proveedor}</p>
+                                    <p class="text-[11px] font-bold text-slate-500 font-mono mt-0.5">RUT: ${data.details.rut_proveedor}</p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                        <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Doc. Recepción</p>
+                                        <p class="text-[12px] font-bold text-slate-800 mt-0.5">${data.details.documento}</p>
+                                    </div>
+                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                        <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Orden de Compra</p>
+                                        <p class="text-[12px] font-bold text-slate-800 mt-0.5 font-mono">${data.details.orden_compra}</p>
+                                    </div>
+                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                        <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Fecha Ingreso</p>
+                                        <p class="text-[12px] font-bold text-slate-800 mt-0.5">${data.details.fecha_recepcion}</p>
+                                    </div>
+                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                        <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Valor Neto Unidad</p>
+                                        <p class="text-[14px] font-black text-emerald-600 mt-0.5">${data.details.valor_unitario}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800 p-5 rounded-2xl shadow-inner flex items-center justify-between border border-slate-700">
+                                <div>
+                                    <p class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Stock Físico Restante</p>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Ubicación: ${data.details.ubicacion}</p>
+                                </div>
+                                <p class="text-[24px] font-black text-white font-mono">${data.details.stock_actual} <span class="text-[12px] text-teal-400">UNID.</span></p>
+                            </div>
+                        `;
+                    } else {
+                        detailsContainer.innerHTML = `<div class="bg-white p-6 rounded-2xl border border-slate-200 text-center text-slate-500 text-[13px] font-medium shadow-sm">No se encontró la ficha de ingreso original para este lote. Es posible que haya sido un ingreso manual antiguo.</div>`;
+                    }
+
+                    // 2. DIBUJAR LÍNEA DE TIEMPO (Derecha)
+                    if(!data.timeline || data.timeline.length === 0) {
+                        timelineContainer.innerHTML = '<div class="text-center text-slate-500 py-10 font-medium">No hay registros de trazabilidad.</div>';
                         return;
                     }
 
-                    let html = '<div class="relative pl-6 border-l-2 border-teal-500 space-y-7">';
+                    let html = '<div class="relative pl-6 border-l-2 border-slate-200 space-y-7">';
                     
-                    data.forEach((mov) => {
+                    data.timeline.forEach((mov) => {
                         let badgeBg = mov.tipo === 'Recepción' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200';
+                        let dotColor = mov.tipo === 'Recepción' ? 'bg-emerald-500 ring-emerald-50' : 'bg-blue-500 ring-blue-50';
                         
                         html += `
                         <div class="relative">
-                            <div class="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-teal-600 border-2 border-white ring-4 ring-teal-50"></div>
-                            <div>
-                                <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${badgeBg} mb-1.5 border">
-                                    ${mov.tipo} (${mov.cantidad > 0 ? '+'+mov.cantidad : mov.cantidad})
-                                </span>
-                                <h4 class="text-[14px] font-black text-slate-800 leading-tight">${mov.origen_destino}</h4>
-                                <p class="text-[12px] font-medium text-slate-500 mt-1">Doc. Respaldo: <span class="text-slate-700">${mov.documento}</span></p>
-                                <p class="font-mono text-[11px] font-bold text-slate-400 mt-1.5">${mov.fecha}</p>
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full ${dotColor} border-2 border-white ring-4"></div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${badgeBg} border">
+                                        ${mov.tipo} (${mov.cantidad > 0 ? '+'+mov.cantidad : mov.cantidad})
+                                    </span>
+                                    <p class="font-mono text-[11px] font-bold text-slate-400">${mov.fecha}</p>
+                                </div>
+                                <h4 class="text-[13px] font-black text-slate-800 leading-tight">${mov.origen_destino}</h4>
+                                <p class="text-[11.5px] font-medium text-slate-500 mt-1">Ref: <span class="text-slate-700 font-bold">${mov.documento}</span></p>
                             </div>
                         </div>`;
                     });
 
                     html += '</div>';
-                    container.innerHTML = html;
+                    timelineContainer.innerHTML = html;
                 })
                 .catch(err => {
                     console.error("🔥 ERROR DE LARAVEL:", err);
-                    container.innerHTML = `
-                        <div class="text-center text-rose-600 py-10">
-                            <svg class="w-10 h-10 mx-auto text-rose-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                            <p class="font-bold text-[14px]">Error de Conexión o Servidor.</p>
-                            <p class="text-[11px] text-slate-500 mt-2 font-medium">Laravel está bloqueando la ruta o hay un error en el Controlador.</p>
-                            <p class="text-[10px] text-rose-400 mt-1 font-bold">La ruta intentada fue: ${fetchUrl}</p>
-                        </div>
-                    `;
+                    timelineContainer.innerHTML = `<div class="text-center text-rose-600 py-5"><p class="font-bold">Error de Conexión</p><p class="text-xs text-slate-500">Revisa la consola para más detalles.</p></div>`;
+                    detailsContainer.innerHTML = `<div class="text-center text-rose-600 py-5"><p class="font-bold">No se pudieron cargar los datos</p></div>`;
                 });
         }
 
-        function closeTimeline() {
-            document.getElementById('modal-lineage').classList.add('hidden');
+        function closeLotDetails() {
+            document.getElementById('modal-lot-details').classList.add('hidden');
         }
     </script>
 @endsection

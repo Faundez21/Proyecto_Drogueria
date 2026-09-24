@@ -4,6 +4,7 @@
 use App\Http\Controllers\Auth\LoginController;
 
 //  Controladores de Módulos y Operaciones
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\DistributionController;
 use App\Http\Controllers\QuarantineController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\QRController;
 use App\Http\Controllers\DispatchController;
 use App\Http\Controllers\TraceabilityController;
+use App\Http\Controllers\GlobalSearchController;
 
 //  Controladores de Estructura de Almacén (Mantenedores)
 use App\Http\Controllers\AisleController;
@@ -49,13 +51,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // 5. Vistas Generales y Dashboards
-    Route::get('/dashboard', function () {
-        return view('dashboard.index');
-    })->name('dashboard.index');
+
+
+
+    // Rutas para la Barra de Búsqueda Global y Notificaciones
+    Route::get('/api/global-search', [GlobalSearchController::class, 'search'])->name('global.search');
+    Route::get('/api/notifications', [GlobalSearchController::class, 'notifications'])->name('global.notifications');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::get('/despacho', [DispatchController::class, 'index'])->name('despacho.index');
     Route::post('/despacho', [DispatchController::class, 'store'])->name('despacho.store');
-    Route::get('/despacho/{id}/pdf', [DispatchController::class, 'pdf'])->name('despacho.pdf'); 
+    Route::get('/despacho/{id}/pdf', [DispatchController::class, 'pdf'])->name('despacho.pdf');
 
     Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
     Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
@@ -84,6 +90,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])
         ->name('inventario.import');
+        
+    Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])
+        ->name('inventario.update');
 
 
     // 6. Módulo de Recepción
