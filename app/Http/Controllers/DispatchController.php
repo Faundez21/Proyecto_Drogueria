@@ -38,17 +38,27 @@ class DispatchController extends Controller
             return redirect()->back()->with('error', 'Debe agregar al menos un producto al despacho.');
         }
 
+        // Determinar el destino final dependiendo de la clasificación
+        $destino = $request->establecimiento_destino;
+        if ($request->clasificacion === 'Externo') {
+            // Se concatena el tipo (Ej: "Préstamo - Hospital Las Higueras")
+            $destino = $request->tipo_externo_despacho . ' - ' . $request->establecimiento_destino;
+        }
+
         // Iniciamos transacción para proteger los datos
         DB::beginTransaction();
         try {
-            // 1. Guardar Cabecera del Despacho
+            // 1. Guardar Cabecera del Despacho con los nuevos campos
             $dispatch = Dispatch::create([
                 'correlativo' => $request->correlativo_despacho,
                 'fecha_despacho' => $request->fecha_despacho,
+                'clasificacion' => $request->clasificacion,
                 'estado_liberacion' => $request->estado_liberacion,
-                'establecimiento_destino' => $request->establecimiento_destino,
+                'establecimiento_destino' => $destino,
                 'direccion_destino' => $request->direccion_destino,
                 'condiciones_transporte' => $request->condiciones_transporte,
+                'firma_despacha' => $request->firma_despacha,
+                'firma_recibe' => $request->firma_recibe,
             ]);
 
             // 2. Procesar cada producto, descontar inventario y trazar movimiento
@@ -85,7 +95,7 @@ class DispatchController extends Controller
                     // REBAJAMOS EL STOCK FÍSICO
                     $inventory->decrement('cantidad', $cantidadSolicitada);
 
-                    // --- NUEVO: REGISTRAR EN LA TABLA DE TRAZABILIDAD ---
+                    // REGISTRAR EN LA TABLA DE TRAZABILIDAD
                     StockMovement::create([
                         'producto' => $nombreProducto,
                         'lote' => $lote,
@@ -93,7 +103,7 @@ class DispatchController extends Controller
                         'tipo_movimiento' => 'Despacho',
                         'cantidad' => -$cantidadSolicitada, // En negativo porque sale de bodega
                         'fecha_hora' => now(),
-                        'origen_destino' => 'Hacia: ' . $request->establecimiento_destino,
+                        'origen_destino' => 'Hacia: ' . $destino,
                         'documento_respaldo' => 'Guía N° ' . $request->correlativo_despacho,
                         'estado_lote' => $inventory->estado ?? 'Vigente'
                     ]);

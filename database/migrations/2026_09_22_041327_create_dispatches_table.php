@@ -13,10 +13,13 @@ return new class extends Migration
             $table->id();
             $table->string('correlativo')->unique(); // Ej: GD-2026-0001
             $table->date('fecha_despacho');
+            $table->string('clasificacion')->default('Interno'); // NUEVO: Interno o Externo
             $table->string('estado_liberacion');
             $table->string('establecimiento_destino');
             $table->string('direccion_destino')->nullable();
             $table->string('condiciones_transporte')->nullable();
+            $table->longText('firma_despacha')->nullable(); // NUEVO: Firma base64
+            $table->longText('firma_recibe')->nullable(); // NUEVO: Firma base64
             $table->timestamps();
         });
 
