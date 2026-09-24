@@ -10,13 +10,19 @@ class InventoryController extends Controller
     // Mostrar el listado del inventario
     public function index(Request $request)
     {
-        $query = Inventory::query();
+        $query = Inventory::where(function ($q) {
+            $q->where('estado', '!=', 'Cuarentena')
+                ->orWhereNull('estado');
+        });
 
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where('producto', 'LIKE', "%{$search}%")
-                ->orWhere('lote', 'LIKE', "%{$search}%")
-                ->orWhere('razon_social', 'LIKE', "%{$search}%");
+
+            $query->where(function ($q) use ($search) {
+                $q->where('producto', 'LIKE', "%{$search}%")
+                    ->orWhere('lote', 'LIKE', "%{$search}%")
+                    ->orWhere('razon_social', 'LIKE', "%{$search}%");
+            });
         }
 
         $inventories = $query->latest()->paginate(10);
@@ -42,6 +48,8 @@ class InventoryController extends Controller
             'cantidad' => 'required|integer|min:1',
             'valor_neto_unitario' => 'required|numeric|min:0',
         ]);
+
+        $validated['estado'] = 'Disponible';
 
         Inventory::create($validated);
 
