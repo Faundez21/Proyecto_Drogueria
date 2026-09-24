@@ -64,7 +64,7 @@
             </div>
             <div>
                 <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Registro de Despacho</h2>
-                <p class="text-[12px] text-slate-500 mt-0.5">Complete los datos del documento, cliente y productos a despachar.</p>
+                <p class="text-[12px] text-slate-500 mt-0.5">Complete los datos del documento, cliente, productos a despachar y firmas.</p>
             </div>
         </div>
 
@@ -91,11 +91,22 @@
                 </div>
             </div>
 
-            <!-- seccion de destino y logistica -->
+            <!-- seccion de destino y logistica con clasificacion -->
             <div class="p-6 bg-white border-b border-slate-100">
-                <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide mb-4">1. Destino y Logistica</h3>
+                <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide mb-4">1. Tipo, Destino y Logistica</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                    
+                    <!-- clasificacion interno/externo -->
+                    <div class="md:col-span-2">
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Clasificacion del Despacho <span class="text-rose-500">*</span></label>
+                        <select name="clasificacion" id="clasificacion_select" onchange="toggleClasificacion()" required class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                            <option value="" disabled selected>Seleccione la clasificacion...</option>
+                            <option value="Interno">Interno (Nivel Comunal / CESFAM)</option>
+                            <option value="Externo">Externo (Traspasos, Prestamos, Donaciones, etc.)</option>
+                        </select>
+                    </div>
+
                     <div class="md:col-span-1">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Fecha Salida <span class="text-rose-500">*</span></label>
                         <input type="date" name="fecha_despacho" value="{{ date('Y-m-d') }}" required class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
@@ -109,9 +120,10 @@
                         </select>
                     </div>
 
-                    <div class="md:col-span-2">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino <span class="text-rose-500">*</span></label>
-                        <select name="establecimiento_destino" id="establecimiento_destino" onchange="actualizarDireccion()" required class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                    <!-- div dinamico para destino interno -->
+                    <div id="div_interno" class="md:col-span-2 hidden">
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Interno) <span class="text-rose-500">*</span></label>
+                        <select id="establecimiento_interno" onchange="actualizarDireccionInterna()" class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                             <option value="" disabled selected>Seleccione el Establecimiento...</option>
                             <option value="CESFAM LOS CERROS" data-direccion="Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano">CESFAM LOS CERROS</option>
                             <option value="CECOSF CENTINELA" data-direccion="Calle Punta Peñablanca 1301, poblacion Centinela, Talcahuano">CECOSF CENTINELA</option>
@@ -131,20 +143,37 @@
                         </select>
                     </div>
 
-                    <div class="md:col-span-2">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Direccion Destino</label>
-                        <input type="text" name="direccion_destino" id="direccion_destino" readonly placeholder="Se autocompletara al seleccionar destino..." class="w-full bg-slate-50 border border-slate-300 text-slate-500 font-medium rounded-xl focus:outline-none block py-2 px-3 text-[13px] shadow-inner cursor-not-allowed transition-all">
+                    <!-- div dinamico para destino externo -->
+                    <div id="div_externo" class="md:col-span-2 hidden">
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo y Destino Externo <span class="text-rose-500">*</span></label>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <select id="tipo_externo" class="w-full sm:w-2/5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                                <option value="" disabled selected>Tipo...</option>
+                                <option value="Traspaso">Traspaso</option>
+                                <option value="Prestamo">Prestamo</option>
+                                <option value="Donacion">Donacion</option>
+                                <option value="Devolucion">Devolucion a Proveedor</option>
+                                <option value="Merma">Merma / Destruccion</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                            <input type="text" id="establecimiento_externo" placeholder="Nombre institucion/destino..." class="w-full sm:w-3/5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
+                        </div>
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Condiciones Transporte</label>
-                        <input type="text" name="condiciones_transporte" placeholder="Ej: Cadena de Frio (2° a 8°C)" class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Direccion Destino</label>
+                        <input type="text" name="direccion_destino" id="direccion_destino" placeholder="Esperando clasificacion..." readonly class="w-full bg-slate-50 border border-slate-300 text-slate-500 font-medium rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-inner transition-all">
+                    </div>
+
+                    <div class="md:col-span-4">
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Condiciones Transporte y Observaciones</label>
+                        <input type="text" name="condiciones_transporte" placeholder="Ej: Cadena de Frio (2° a 8°C). Referencia solicitud interna #342." class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
                     </div>
                 </div>
             </div>
 
             <!-- seccion de tabla de productos y stock -->
-            <div class="p-6 bg-slate-50/30">
+            <div class="p-6 bg-slate-50/30 border-b border-slate-100">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide">2. Detalle de Extraccion (Lotes en Stock)</h3>
                     
@@ -178,9 +207,39 @@
                 </div>
             </div>
 
+            <!-- seccion de firmas digitales -->
+            <div class="p-6 bg-slate-50/60">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                    <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">3. Firmas de Respaldo</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- firma despacha (bodega central) -->
+                    <div class="flex flex-col items-center">
+                        <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma Quien Despacha (Bodega/DAS)</p>
+                        <input type="hidden" name="firma_despacha" id="firma_despacha_input">
+                        <div class="border-2 border-dashed border-slate-300 rounded-lg bg-white overflow-hidden shadow-sm w-full max-w-[400px]">
+                            <canvas id="pad_despacha" width="400" height="150" class="cursor-crosshair touch-none w-full"></canvas>
+                        </div>
+                        <button type="button" onclick="signatureDespacha.clear()" class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500 transition-colors">Limpiar Firma de Despacho</button>
+                    </div>
+
+                    <!-- firma solicita/recibe (establecimiento) -->
+                    <div class="flex flex-col items-center">
+                        <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma Quien Solicita / Recibe (Establecimiento)</p>
+                        <input type="hidden" name="firma_recibe" id="firma_recibe_input">
+                        <div class="border-2 border-dashed border-teal-300 rounded-lg bg-white overflow-hidden shadow-sm w-full max-w-[400px]">
+                            <canvas id="pad_recibe" width="400" height="150" class="cursor-crosshair touch-none w-full"></canvas>
+                        </div>
+                        <button type="button" onclick="signatureRecibe.clear()" class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500 transition-colors">Limpiar Firma de Recepcion</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- botones inferiores del formulario -->
             <div class="px-6 py-5 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3 rounded-b-2xl">
-                <button type="button" onclick="window.location.reload()" class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 transition-colors text-center shadow-sm cursor-pointer">
+                <button type="button" id="btn_limpiar_form" class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 transition-colors text-center shadow-sm cursor-pointer">
                     Limpiar Formulario
                 </button>
                 <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-slate-800 text-white rounded-xl text-[13px] font-bold hover:bg-slate-900 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
@@ -255,11 +314,11 @@
                     <button type="button" onclick="limpiarFiltrosBandeja()" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 transition-colors">Limpiar Filtros</button>
                 </div>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <!-- filtro correlativo con sugerencias dinamicas -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                    <!-- filtro correlativo -->
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Correlativo GD</label>
-                        <input type="text" id="filtroCorrelativo" list="sugerencias-correlativos" oninput="filtrarBandeja()" placeholder="Ej: 12345" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Correlativo</label>
+                        <input type="text" id="filtroCorrelativo" list="sugerencias-correlativos" oninput="filtrarBandeja()" placeholder="Ej: 123" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
                         <datalist id="sugerencias-correlativos">
                             @foreach($dispatches as $despacho)
                                 <option value="{{ $despacho->correlativo }}">
@@ -273,10 +332,20 @@
                         <input type="date" id="filtroFecha" oninput="filtrarBandeja()" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
                     </div>
 
-                    <!-- filtro destino con sugerencias -->
+                    <!-- filtro clasificacion -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Clasificacion</label>
+                        <select id="filtroClasificacion" onchange="filtrarBandeja()" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            <option value="">Todas</option>
+                            <option value="interno">Interno</option>
+                            <option value="externo">Externo</option>
+                        </select>
+                    </div>
+
+                    <!-- filtro destino -->
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Destino</label>
-                        <input type="text" id="filtroDestino" list="sugerencias-destinos" oninput="filtrarBandeja()" placeholder="Ej: CESFAM Los Cerros" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                        <input type="text" id="filtroDestino" list="sugerencias-destinos" oninput="filtrarBandeja()" placeholder="Ej: CESFAM" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
                         <datalist id="sugerencias-destinos">
                             <option value="CESFAM LOS CERROS">
                             <option value="CECOSF CENTINELA">
@@ -315,6 +384,7 @@
                             <th class="px-6 py-4 w-12">Detalle</th>
                             <th class="px-6 py-4">Correlativo GD</th>
                             <th class="px-6 py-4">Fecha Emision</th>
+                            <th class="px-6 py-4">Clasificacion</th>
                             <th class="px-6 py-4">Destino</th>
                             <th class="px-6 py-4 text-center">Estado</th>
                             <th class="px-6 py-4 text-center">Documento</th>
@@ -336,11 +406,19 @@
                                 <td class="px-6 py-4 font-medium text-slate-600">
                                     {{ \Carbon\Carbon::parse($despacho->fecha_despacho)->format('d-m-Y') }}
                                 </td>
+                                <td class="px-6 py-4 font-bold text-slate-600">
+                                    <!-- badge de clasificacion -->
+                                    @if(strtolower($despacho->clasificacion) == 'interno')
+                                        <span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Interno</span>
+                                    @else
+                                        <span class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Externo' }}</span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 font-bold text-slate-800">
                                     {{ $despacho->establecimiento_destino }}
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    @if($despacho->estado_liberacion === 'Liberada' || $despacho->estado_liberacion === 'liberada')
+                                    @if(strtolower($despacho->estado_liberacion) === 'liberada')
                                         <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase badge-estado">Aprobada</span>
                                     @else
                                         <span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase badge-estado">{{ $despacho->estado_liberacion }}</span>
@@ -353,11 +431,13 @@
                                     </a>
                                 </td>
                             </tr>
-                            <!-- detalle de articulos oculto -->
+                            <!-- detalle de articulos y firmas oculto -->
                             <tr id="items-{{ $dKey }}" class="hidden bg-slate-100/50 shadow-inner">
-                                <td colspan="6" class="p-0 border-b border-slate-300">
+                                <td colspan="7" class="p-0 border-b border-slate-300">
                                     <div class="py-4 pr-6 pl-14">
-                                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                        
+                                        <!-- tabla de productos rebajados -->
+                                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-4">
                                             <div class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
                                                 <span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                                                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
@@ -385,11 +465,32 @@
                                                 </tbody>
                                             </table>
                                         </div>
+
+                                        <!-- visualizacion de firmas en el historial -->
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="bg-white p-3 rounded-lg border border-slate-200 text-center">
+                                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Firma Quien Despacha</p>
+                                                @if(isset($despacho->firma_despacha) && $despacho->firma_despacha)
+                                                    <img src="{{ $despacho->firma_despacha }}" class="mx-auto max-h-16" alt="Firma Despacho">
+                                                @else
+                                                    <p class="text-xs text-slate-400 italic py-2">No registrada</p>
+                                                @endif
+                                            </div>
+                                            <div class="bg-white p-3 rounded-lg border border-slate-200 text-center">
+                                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Firma Quien Solicita/Recibe</p>
+                                                @if(isset($despacho->firma_recibe) && $despacho->firma_recibe)
+                                                    <img src="{{ $despacho->firma_recibe }}" class="mx-auto max-h-16" alt="Firma Recepcion">
+                                                @else
+                                                    <p class="text-xs text-slate-400 italic py-2">No registrada</p>
+                                                @endif
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="px-6 py-12 text-center text-slate-400 font-medium">No hay guias de despacho emitidas en la plataforma.</td></tr>
+                            <tr><td colspan="7" class="px-6 py-12 text-center text-slate-400 font-medium">No hay guias de despacho emitidas en la plataforma.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -431,11 +532,106 @@
 
     <!-- librerias externas -->
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 
     <script>
+        // instancias de firmas para que sean globales en la vista
+        let signatureDespacha = null;
+        let signatureRecibe = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // inicializar pads de firmas si existen
+            const padDespachaElem = document.getElementById('pad_despacha');
+            const padRecibeElem = document.getElementById('pad_recibe');
+            const padOptions = { penColor: 'rgb(15, 23, 42)', backgroundColor: 'rgba(255, 255, 255, 1)' };
+
+            if(padDespachaElem) signatureDespacha = new SignaturePad(padDespachaElem, padOptions);
+            if(padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
+
+            // asignacion de firmas a los inputs ocultos antes del submit
+            const form = document.getElementById('despachoForm');
+            if(form) {
+                form.addEventListener('submit', function() {
+                    if (signatureDespacha && !signatureDespacha.isEmpty()) {
+                        document.getElementById('firma_despacha_input').value = signatureDespacha.toDataURL('image/png');
+                    }
+                    if (signatureRecibe && !signatureRecibe.isEmpty()) {
+                        document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL('image/png');
+                    }
+                });
+            }
+
+            // logica de boton limpiar form general
+            const btnLimpiar = document.getElementById('btn_limpiar_form');
+            if(btnLimpiar) {
+                btnLimpiar.addEventListener('click', function() {
+                    if(signatureDespacha) signatureDespacha.clear();
+                    if(signatureRecibe) signatureRecibe.clear();
+                    // eliminar filas extra de productos
+                    const items = document.querySelectorAll('.producto-item');
+                    for(let i = 1; i < items.length; i++) {
+                        items[i].remove();
+                    }
+                    // dejar que window.location.reload o el reset natural actuen
+                    window.location.reload();
+                });
+            }
+        });
+
+        // funcion para alternar visualmente la logica de clasificacion interno/externo
+        function toggleClasificacion() {
+            const val = document.getElementById('clasificacion_select').value;
+            const divInt = document.getElementById('div_interno');
+            const divExt = document.getElementById('div_externo');
+            
+            const selInt = document.getElementById('establecimiento_interno');
+            const selExtTipo = document.getElementById('tipo_externo');
+            const inpExtDest = document.getElementById('establecimiento_externo');
+            const inpDir = document.getElementById('direccion_destino');
+
+            if (val === 'Interno') {
+                divInt.classList.remove('hidden');
+                divExt.classList.add('hidden');
+                
+                selInt.setAttribute('name', 'establecimiento_destino');
+                selInt.setAttribute('required', 'true');
+                
+                selExtTipo.removeAttribute('name');
+                selExtTipo.removeAttribute('required');
+                inpExtDest.removeAttribute('name');
+                inpExtDest.removeAttribute('required');
+
+                inpDir.readOnly = true;
+                inpDir.classList.add('bg-slate-50', 'cursor-not-allowed');
+                inpDir.classList.remove('bg-white');
+                inpDir.placeholder = "Se autocompletara al seleccionar destino...";
+                
+                actualizarDireccionInterna();
+            } else if (val === 'Externo') {
+                divInt.classList.add('hidden');
+                divExt.classList.remove('hidden');
+
+                selInt.removeAttribute('name');
+                selInt.removeAttribute('required');
+
+                selExtTipo.setAttribute('name', 'tipo_externo_despacho');
+                selExtTipo.setAttribute('required', 'true');
+                inpExtDest.setAttribute('name', 'establecimiento_destino');
+                inpExtDest.setAttribute('required', 'true');
+
+                inpDir.readOnly = false;
+                inpDir.classList.remove('bg-slate-50', 'cursor-not-allowed');
+                inpDir.classList.add('bg-white');
+                inpDir.value = '';
+                inpDir.placeholder = 'Ingrese la direccion manualmente...';
+            }
+        }
+
         // funcion para buscar la direccion del cesfam elegido y rellenar el input readonly
-        function actualizarDireccion() {
-            const select = document.getElementById('establecimiento_destino');
+        function actualizarDireccionInterna() {
+            if(document.getElementById('clasificacion_select').value !== 'Interno') return;
+            
+            const select = document.getElementById('establecimiento_interno');
             const input = document.getElementById('direccion_destino');
             const selectedOption = select.options[select.selectedIndex];
             
@@ -454,6 +650,7 @@
         function limpiarFiltrosBandeja() {
             document.getElementById('filtroCorrelativo').value = '';
             document.getElementById('filtroFecha').value = '';
+            document.getElementById('filtroClasificacion').value = '';
             document.getElementById('filtroDestino').value = '';
             document.getElementById('filtroEstadoBandeja').value = '';
             filtrarBandeja();
@@ -463,6 +660,7 @@
         function filtrarBandeja() {
             let inputCorrelativo = document.getElementById('filtroCorrelativo').value.toLowerCase();
             let inputFecha = document.getElementById('filtroFecha').value;
+            let selectClasificacion = document.getElementById('filtroClasificacion').value.toLowerCase();
             let inputDestino = document.getElementById('filtroDestino').value.toLowerCase();
             let selectEstado = document.getElementById('filtroEstadoBandeja').value.toLowerCase();
             
@@ -479,18 +677,20 @@
             filas.forEach(fila => {
                 let correlativoText = fila.children[1].textContent.toLowerCase();
                 let fechaText = fila.children[2].textContent.trim();
-                let destinoText = fila.children[3].textContent.toLowerCase();
-                let estadoText = fila.children[4].textContent.toLowerCase();
+                let clasificacionText = fila.children[3].textContent.toLowerCase();
+                let destinoText = fila.children[4].textContent.toLowerCase();
+                let estadoText = fila.children[5].textContent.toLowerCase();
                 
                 let coincideCorrelativo = correlativoText.includes(inputCorrelativo);
                 let coincideFecha = fechaFormateada === "" || fechaText.includes(fechaFormateada);
+                let coincideClasificacion = selectClasificacion === "" || clasificacionText.includes(selectClasificacion);
                 let coincideDestino = destinoText.includes(inputDestino);
                 let coincideEstado = selectEstado === "" || estadoText.includes(selectEstado);
 
                 let key = fila.getAttribute('data-key');
                 let filaHija = document.getElementById('items-' + key);
 
-                if (coincideCorrelativo && coincideFecha && coincideDestino && coincideEstado) {
+                if (coincideCorrelativo && coincideFecha && coincideClasificacion && coincideDestino && coincideEstado) {
                     fila.style.display = '';
                 } else {
                     fila.style.display = 'none';
