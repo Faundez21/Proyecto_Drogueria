@@ -11,7 +11,6 @@ class QRController extends Controller
      */
     public function index()
     {
-        return view("qr.index");
     }
 
     /**
