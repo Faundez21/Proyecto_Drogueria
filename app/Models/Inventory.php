@@ -21,6 +21,7 @@ class Inventory extends Model
         'producto',
         'categoria',
         'estado',
+        'motivo',
         'lote',
         'fecha_vencimiento',
         'cantidad',
