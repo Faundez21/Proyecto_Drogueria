@@ -1,93 +1,65 @@
 @extends('layouts.app')
+
 @section('title', 'Inventario de Droguería')
 @section('subtitle', 'Gestión centralizada de productos, lotes y ubicaciones físicas.')
 
-
-@section('content')
-    <div class="w-full p-4 sm:p-6 space-y-6">
-
-        <!-- encabezado acciones principales -->
-        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-5">
-            <div>
-                <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 mb-1.5">
-                    <span class="font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-semibold">02</span>
-                    <span>Bodega</span>
-                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    <span class="font-bold text-teal-700">Catálogo Maestro</span>
-                </div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Inventario de Droguería</h1>
-                <p class="text-slate-500 text-sm mt-1">Gestión centralizada de productos, lotes y ubicaciones físicas.</p>
-            </div>
-
-            <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
-                <button type="button" onclick="openMerma()"
-                    class="flex-1 sm:flex-none px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-[13px] font-bold hover:bg-rose-100 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                    <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                        </path>
-                    </svg>
-                    Ver Mermas
-                </button>
-                <button type="button" onclick="openHistory()"
-                    class="flex-1 sm:flex-none px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 hover:text-teal-700 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Ver Historial
-                </button>
-                <button type="button" onclick="openImport()"
-                    class="flex-1 sm:flex-none px-5 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-all text-[13px] font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                    <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                    </svg>
-                    Carga Masiva
-                </button>
-                <button type="button" onclick="openDeposit()"
-                    class="flex-1 sm:flex-none px-5 py-2.5 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all text-[13px] font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                    <svg class="w-4 h-4 text-teal-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Ingreso Manual
-                </button>
-            </div>
-        </div>
+@section('actions')
+    <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+        <button type="button" onclick="openMerma()"
+            class="flex-1 sm:flex-none px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-[13px] font-bold hover:bg-rose-100 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                </path>
+            </svg>
+            Ver Mermas
+        </button>
+        <button type="button" onclick="openHistory()"
+            class="flex-1 sm:flex-none px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 hover:text-teal-700 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Ver Historial
+        </button>
+        <button type="button" onclick="openImport()"
+            class="flex-1 sm:flex-none px-5 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-all text-[13px] font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+            </svg>
+            Carga Masiva
+        </button>
+        <button type="button" onclick="openDeposit()"
+            class="flex-1 sm:flex-none px-5 py-2.5 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all text-[13px] font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+            <svg class="w-4 h-4 text-teal-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Ingreso Manual
+        </button>
+    </div>
 @endsection
 
 @section('content')
-<br>
-    <!-- migas de pan -->
-    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
-        <span class="text-slate-400 font-semibold">02</span>
-        <span>Almacenamiento</span>
-        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        <span class="font-semibold text-slate-800">Inventario</span>
-    </div>
+    <div class="w-full space-y-6">
 
+        <!-- Migas de pan -->
+        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
+            <span class="text-slate-400 font-semibold">02</span>
+            <span>Almacenamiento</span>
+            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            <span class="font-semibold text-slate-800">Inventario</span>
+        </div>
 
         <!-- Contenedor Principal Tabla Inventario -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
 
-            <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/50">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-white border border-teal-100 shadow-sm flex items-center justify-center">
-                        <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-bold text-slate-800">Directorio de Productos</h3>
-                        <p class="text-[11px] text-slate-500 font-medium">Agrupados por categoría y stock total</p>
-                    </div>
-                </div>
-
-            <!--  Filtros Avanzados -->
+            <!-- Filtros Avanzados -->
             <div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col gap-4">
                 <form id="filtersForm" method="GET" action="{{ Route::has('inventario.index') ? route('inventario.index') : '#' }}">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-xl bg-white border border-teal-100 shadow-sm flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-xl bg-white border border-teal-100 shadow-sm flex items-center justify-center">
                                 <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
@@ -228,9 +200,13 @@
                         : [];
                     $invCollection = collect($invRaw);
 
-                    // Agrupación blindada contra nulos
-                    $groupedInventories = $invCollection->groupBy(function($item) {
-                        $prod = is_object($item) ? ($item->product ?? null) : null;
+                    $mainInventories = $invCollection->reject(function ($item) {
+                        $itemObj = is_object($item) ? $item : (object) $item;
+                        return str_contains(strtolower($itemObj->estado ?? ''), 'merma');
+                    });
+
+                    $groupedInventories = $mainInventories->groupBy(function ($item) {
+                        $prod = is_object($item) ? $item->product ?? null : null;
                         if ($prod && isset($prod->nombre)) {
                             return $prod->nombre;
                         }
@@ -242,8 +218,7 @@
                 @endphp
 
                 <table class="w-full text-left text-sm whitespace-nowrap">
-                    <thead
-                        class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-extrabold">
+                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-extrabold">
                         <tr>
                             <th scope="col" class="px-6 py-4 w-14 text-center">Detalle</th>
                             <th scope="col" class="px-6 py-4">Producto Principal</th>
@@ -258,18 +233,13 @@
                             <tr>
                                 <td colspan="5" class="px-6 py-16 text-center">
                                     <div class="flex flex-col items-center justify-center text-slate-400">
-                                        <div
-                                            class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
-                                            <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4">
-                                                </path>
+                                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
+                                            <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                                             </svg>
                                         </div>
                                         <p class="text-[15px] font-bold text-slate-600">Bodega sin productos activos</p>
-                                        <p class="text-[13px] text-slate-500 mt-1 max-w-sm">No existen medicamentos o
-                                            insumos disponibles en el directorio actual.</p>
+                                        <p class="text-[13px] text-slate-500 mt-1 max-w-sm">No existen medicamentos o insumos disponibles en el directorio actual.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -291,49 +261,39 @@
                                     class="product-master-row bg-white hover:bg-slate-50/80 transition-colors cursor-pointer group"
                                     onclick="toggleLotes('{{ $groupKey }}')">
                                     <td class="px-6 py-4 text-center relative">
-                                        <div
-                                            class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors">
-                                        </div>
+                                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors"></div>
                                         <button type="button"
                                             class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-teal-100 group-hover:text-teal-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200 group-hover:border-teal-200"
                                             id="icon-{{ $groupKey }}">
                                             <svg class="w-4 h-4 transform transition-transform duration-300"
-                                                id="arrow-{{ $groupKey }}" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 9l-7 7-7-7"></path>
+                                                id="arrow-{{ $groupKey }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                             </svg>
                                         </button>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span
-                                            class="font-extrabold text-slate-800 text-[14px]">{{ $nombreProducto }}</span>
+                                        <span class="font-extrabold text-slate-800 text-[14px]">{{ $nombreProducto }}</span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span
-                                            class="px-2.5 py-1 rounded bg-slate-100 text-slate-600 text-[11px] font-bold border border-slate-200">{{ $categoriaLote }}</span>
+                                        <span class="px-2.5 py-1 rounded bg-slate-100 text-slate-600 text-[11px] font-bold border border-slate-200">{{ $categoriaLote }}</span>
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <span
-                                            class="font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{{ $lotes->count() }}</span>
+                                        <span class="font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{{ $lotes->count() }}</span>
                                         <span class="text-slate-400 text-[11px] font-semibold uppercase">Lote(s)</span>
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         @if ($stockTotalProducto > 10)
-                                            <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                                 {{ number_format($stockTotalProducto, 0, ',', '.') }} Unidades
                                             </span>
                                         @elseif($stockTotalProducto > 0)
-                                            <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                                 {{ number_format($stockTotalProducto, 0, ',', '.') }} Unid. (Bajo)
                                             </span>
                                         @else
-                                            <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-rose-50 text-rose-700 border border-rose-200 shadow-sm">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-rose-50 text-rose-700 border border-rose-200 shadow-sm">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                                 0 Unidades (Agotado)
                                             </span>
@@ -344,26 +304,18 @@
                                 <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-100/50 shadow-inner">
                                     <td colspan="5" class="p-0 border-b border-slate-300">
                                         <div class="py-4 pr-6 pl-14">
-                                            <div
-                                                class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                                                <div
-                                                    class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
-                                                    <span
-                                                        class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                                                            </path>
+                                            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                                <div class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
+                                                    <span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                                         </svg>
                                                         Desglose Físico de Lotes
                                                     </span>
                                                 </div>
                                                 <div class="overflow-x-auto">
                                                     <table class="w-full text-left text-xs whitespace-nowrap">
-                                                        <thead
-                                                            class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 text-[10px] tracking-wider">
+                                                        <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 text-[10px] tracking-wider">
                                                             <tr>
                                                                 <th class="px-4 py-3">Lote / Vencimiento</th>
                                                                 <th class="px-4 py-3">Ubicación (Pasillo/Estante)</th>
@@ -375,9 +327,7 @@
                                                         <tbody class="divide-y divide-slate-100 text-slate-700">
                                                             @foreach ($lotes as $loteObj)
                                                                 @php
-                                                                    $loteData = is_object($loteObj)
-                                                                        ? $loteObj
-                                                                        : (object) $loteObj;
+                                                                    $loteData = is_object($loteObj) ? $loteObj : (object) $loteObj;
                                                                     $badgeVencimientoClass = 'text-slate-500';
                                                                     $fechaVencRaw = $loteData->fecha_vencimiento ?? null;
                                                                     $textoVencimiento = 'N/A';
@@ -419,57 +369,42 @@
                                                                     data-pasillo="{{ strtolower(trim($pasilloVal)) }}"
                                                                     data-estante="{{ strtolower(trim($estanteVal)) }}">
                                                                     <td class="px-4 py-3">
-                                                                        <span
-                                                                            class="font-mono font-extrabold text-slate-800 text-[13px]">{{ $loteCodigo }}</span><br>
-                                                                        <span
-                                                                            class="text-[10px] uppercase font-semibold {{ $badgeVencimientoClass }}">Vence:
-                                                                            {{ $textoVencimiento }}</span>
+                                                                        <span class="font-mono font-extrabold text-slate-800 text-[13px]">{{ $loteCodigo }}</span><br>
+                                                                        <span class="text-[10px] uppercase font-semibold {{ $badgeVencimientoClass }}">Vence: {{ $textoVencimiento }}</span>
                                                                     </td>
                                                                     <td class="px-4 py-3">
                                                                         <div class="flex items-center gap-1.5 text-[11px]">
-                                                                            <span
-                                                                                class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span
-                                                                                    class="text-slate-400">P:</span> <b
-                                                                                    class="text-slate-800">{{ $pasilloVal }}</b></span>
-                                                                            <span
-                                                                                class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span
-                                                                                    class="text-slate-400">E:</span> <b
-                                                                                    class="text-slate-800">{{ $estanteVal }}</b></span>
+                                                                            <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">P:</span> <b class="text-slate-800">{{ $pasilloVal }}</b></span>
+                                                                            <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">E:</span> <b class="text-slate-800">{{ $estanteVal }}</b></span>
                                                                         </div>
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
                                                                         @if ($isCuarentena)
-                                                                            <span
-                                                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+                                                                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
                                                                                 CUARENTENA
                                                                             </span>
                                                                         @elseif($stockLote <= 0)
-                                                                            <span
-                                                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-slate-100 text-slate-600 border border-slate-200">
+                                                                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-slate-100 text-slate-600 border border-slate-200">
                                                                                 AGOTADO
                                                                             </span>
                                                                         @else
-                                                                            <span
-                                                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                                                                 DISPONIBLE
                                                                             </span>
                                                                         @endif
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
-                                                                        <span
-                                                                            class="font-extrabold text-slate-800 text-[14px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
+                                                                        <span class="font-extrabold text-slate-800 text-[14px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center flex justify-center gap-2">
-                                                                        <!-- Botón QR con parámetros sanitizados usando addslashes en Blade -->
                                                                         <button type="button"
-                                                                            onclick="openQRModal('{{ addslashes($loteId) }}', '{{ addslashes($nombreProducto) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($textoVencimiento) }}', '{{ $stockLote }}', 'Droguería DAS')"
+                                                                            onclick="openQRModal('{{ e($loteId) }}', '{{ e($nombreProducto) }}', '{{ e($loteCodigo) }}', '{{ e($textoVencimiento) }}', '{{ $stockLote }}', 'Droguería DAS')"
                                                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Generar Etiqueta QR">
                                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                                                         </button>
 
-                                                                        <!-- Botón Editar con parámetros sanitizados -->
                                                                         <button type="button"
-                                                                            onclick="openEditLote('{{ addslashes($loteId) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($nombreProducto) }}', '{{ $estadoActualStr }}')"
+                                                                            onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}')"
                                                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Cambiar Estado">
                                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                                         </button>
@@ -499,27 +434,23 @@
         <!-- Modal: Historial de Movimientos -->
         <div id="HistoryModal"
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div
-                class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <div>
                         <h2 class="text-lg font-bold text-white tracking-wide">Historial de Movimientos de Inventario</h2>
-                        <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro de auditoría de recepciones e
-                            importaciones.</p>
+                        <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro de auditoría de recepciones e importaciones.</p>
                     </div>
                     <button type="button" onclick="closeHistory()"
                         class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
 
                 <div class="overflow-x-auto max-h-[60vh] bg-slate-50">
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
-                        <thead
-                            class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm">
+                        <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm">
                             <tr>
                                 <th class="px-6 py-4">Fecha</th>
                                 <th class="px-6 py-4">Doc / Correlativo</th>
@@ -537,6 +468,7 @@
                                     $itemObj = is_object($item) ? $item : (object) $item;
                                     $prodNombre = is_object($itemObj->product ?? null) ? ($itemObj->product->nombre ?? 'Producto') : ($itemObj->producto ?? 'Producto');
                                     $cant = $itemObj->stock_total ?? $itemObj->cantidad ?? 0;
+                                    $loteCodigo = $itemObj->lote ?? (is_object($itemObj->loteRef ?? null) ? $itemObj->loteRef->lote ?? null : null) ?? 'S/L';
                                 @endphp
                                 <tr class="hover:bg-slate-100/70 transition-colors">
                                     <td class="px-6 py-3.5 text-slate-500 font-medium">
@@ -545,38 +477,32 @@
                                     <td class="px-6 py-3.5 font-semibold text-slate-800">
                                         {{ $itemObj->tipo_documento ?? 'Doc' }} #{{ $itemObj->numero_documento ?? '000' }}
                                     </td>
-                                    <td class="px-6 py-3.5 text-slate-600">{{ $itemObj->razon_social ?? 'Proveedor' }}
-                                    </td>
+                                    <td class="px-6 py-3.5 text-slate-600">{{ $itemObj->razon_social ?? 'Proveedor' }}</td>
                                     <td class="px-6 py-3.5 font-bold text-slate-800">{{ $prodNombre }}</td>
                                     <td class="px-6 py-3.5 text-center">
                                         <span class="px-2.5 py-1 rounded bg-slate-200 text-slate-800 font-mono font-extrabold text-[12px] border border-slate-300">
                                             {{ $loteCodigo }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-3.5 text-center"><span
-                                            class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Completado</span>
+                                    <td class="px-6 py-3.5 text-center">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Completado</span>
                                     </td>
-                                    <td class="px-6 py-3.5 text-center font-extrabold text-emerald-600">
-                                        +{{ $cant }}</td>
+                                    <td class="px-6 py-3.5 text-center font-extrabold text-emerald-600">+{{ $cant }}</td>
                                     <td class="px-6 py-3.5 text-center">
                                         <button type="button"
                                             onclick="filterTableByLote('{{ e($prodNombre) }}', '{{ e($loteCodigo) }}')"
                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center justify-center"
                                             title="Ver este lote específico">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                             </svg>
                                         </button>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="px-6 py-12 text-center text-slate-400 font-medium">No hay
-                                        movimientos registrados recientes.</td>
+                                    <td colspan="8" class="px-6 py-12 text-center text-slate-400 font-medium">No hay movimientos registrados recientes.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -585,38 +511,34 @@
 
                 <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end">
                     <button type="button" onclick="closeHistory()"
-                        class="px-6 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cerrar
-                        Historial</button>
+                        class="px-6 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
+                        Cerrar Historial
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- modal Importar Carga Masiva -->
+        <!-- Modal: Importar Carga Masiva -->
         <div id="importModal"
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div
-                class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 flex flex-col w-full max-w-md overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 flex flex-col w-full max-w-md overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <h2 class="text-lg font-bold text-white tracking-wide">Importar Carga Masiva</h2>
                     <button type="button" onclick="closeImport()"
                         class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
 
                 <div class="p-6 bg-slate-50">
-                    <p class="text-[13px] text-slate-600 mb-5 text-center leading-relaxed">Descargue la plantilla oficial,
-                        complete los datos de los productos y suba el archivo Excel (.xlsx o .csv) para registrar el
-                        inventario masivamente.</p>
+                    <p class="text-[13px] text-slate-600 mb-5 text-center leading-relaxed">Descargue la plantilla oficial, complete los datos de los productos y suba el archivo Excel (.xlsx o .csv) para registrar el inventario masivamente.</p>
 
                     <a href="{{ Route::has('inventario.template') ? route('inventario.template') : '#' }}"
                         class="w-full mb-6 flex justify-center items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-100 hover:text-teal-700 transition-all font-bold text-[13px] shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                         </svg>
                         Descargar Plantilla Oficial
                     </a>
@@ -624,12 +546,9 @@
                     <form action="{{ Route::has('inventario.import') ? route('inventario.import') : '#' }}" method="POST" enctype="multipart/form-data"
                         class="bg-white border border-dashed border-slate-300 hover:border-teal-400 transition-colors rounded-xl p-6 flex flex-col items-center gap-4 text-center shadow-sm">
                         @csrf
-                        <div
-                            class="w-12 h-12 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-teal-600 mb-1">
+                        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-teal-600 mb-1">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                         </div>
                         <input type="file" id="excel" name="excel" class="hidden" accept=".xlsx, .xls, .csv" onchange="updateFileName(this)">
@@ -647,11 +566,10 @@
             </div>
         </div>
 
-        <!-- modal Ingreso Manual -->
+        <!-- Modal: Ingreso Manual -->
         <div id="DepositModal"
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div
-                class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <div>
                         <h2 class="text-lg font-bold text-white tracking-wide">Ingreso Directo de Producto</h2>
@@ -660,8 +578,7 @@
                     <button type="button" onclick="closeDeposit()"
                         class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
@@ -670,7 +587,6 @@
                     <form action="{{ Route::has('inventario.store') ? route('inventario.store') : '#' }}" method="POST" id="manualDepositForm">
                         @csrf
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-
                             <div class="sm:col-span-2">
                                 <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-2">
                                     <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">1. Datos del Documento</h4>
@@ -762,26 +678,22 @@
                 <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
                     <button type="button" onclick="closeDeposit()"
                         class="px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar</button>
-                    <button type="button" onclick="submitDepositForm()"
-                        class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm text-[13px] font-bold cursor-pointer">Confirmar
-                        Ingreso</button>
+                    <button type="button" onclick="document.getElementById('manualDepositForm').submit()"
+                        class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm text-[13px] font-bold cursor-pointer">Confirmar Ingreso</button>
                 </div>
             </div>
         </div>
 
-        <!-- modal: Etiqueta QR -->
+        <!-- Modal: Etiqueta QR -->
         <div id="qrModal"
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="relative w-full max-w-sm flex flex-col items-center">
-
-                <!-- Etiqueta Simulada (Fondo Blanco) -->
                 <div class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
 
                     <div class="w-full flex flex-col items-center mb-4 z-10 border-b-2 border-black pb-3">
                         <h2 class="text-[17px] text-black font-black tracking-widest uppercase">DROGUERÍA DAS</h2>
-                        <span class="text-[11px] text-black font-bold font-mono tracking-widest uppercase mt-0.5">Control
-                            de Trazabilidad</span>
+                        <span class="text-[11px] text-black font-bold font-mono tracking-widest uppercase mt-0.5">Control de Trazabilidad</span>
                     </div>
 
                     <div class="bg-white p-2 mb-4 z-10 flex justify-center w-full">
@@ -790,8 +702,7 @@
 
                     <div class="w-full z-10 space-y-2.5 px-2">
                         <div class="text-center mb-4">
-                            <span id="qrProducto"
-                                class="text-[14px] font-black text-black block leading-tight uppercase">PRODUCTO</span>
+                            <span id="qrProducto" class="text-[14px] font-black text-black block leading-tight uppercase">PRODUCTO</span>
                         </div>
 
                         <div class="grid grid-cols-2 gap-2 text-[12px] font-mono border-t border-b border-black py-2.5">
@@ -808,8 +719,7 @@
                         <div class="flex justify-between items-end pt-1.5">
                             <div class="flex flex-col max-w-[60%]">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Origen / Bodega</span>
-                                <span id="qrProveedor"
-                                    class="font-bold text-black text-[12px] truncate uppercase">INTERNO</span>
+                                <span id="qrProveedor" class="font-bold text-black text-[12px] truncate uppercase">INTERNO</span>
                             </div>
                             <div class="flex flex-col text-right">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Stock Físico</span>
@@ -827,9 +737,7 @@
                     <button type="button" onclick="window.print()"
                         class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
-                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                         </svg>
                         Imprimir Etiqueta
                     </button>
@@ -837,17 +745,16 @@
             </div>
         </div>
 
+        <!-- Modal: Editar Lote -->
         <div id="editLoteModal"
             class="hidden fixed inset-0 z-[60] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div
-                class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md flex flex-col overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <h2 class="text-[16px] font-bold text-white tracking-wide">Actualizar Estado de Lote</h2>
                     <button type="button" onclick="closeEditLote()"
                         class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
@@ -857,19 +764,15 @@
                     @method('PUT')
                     <div class="p-6 space-y-4">
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <span
-                                class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Modificando
-                                Lote de:</span>
-                            <p id="modal_producto_nombre"
-                                class="text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Modificando Lote de:</span>
+                            <p id="modal_producto_nombre" class="text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
                             <div class="mt-2 inline-block bg-white border border-slate-300 px-3 py-1 rounded-lg shadow-sm">
                                 <p id="modal_lote_nombre" class="text-[13px] font-mono font-bold text-slate-700"></p>
                             </div>
                         </div>
 
                         <div>
-                            <label for="modal_estado" class="block text-[13px] font-bold text-slate-700 mb-2">Seleccione
-                                Nuevo Estado Físico *</label>
+                            <label for="modal_estado" class="block text-[13px] font-bold text-slate-700 mb-2">Seleccione Nuevo Estado Físico *</label>
                             <select id="modal_estado" name="estado" onchange="toggleMotivoField(this.value)" required
                                 class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 font-semibold text-slate-700 shadow-sm cursor-pointer transition-colors">
                                 <option value="Disponible">🟢 Disponible (Liberado para entrega)</option>
@@ -892,47 +795,39 @@
                         <button type="button" onclick="closeEditLote()"
                             class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 text-[13px] font-bold transition-colors shadow-sm cursor-pointer">Cancelar</button>
                         <button type="submit"
-                            class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[13px] font-bold transition-all shadow-sm cursor-pointer">Confirmar
-                            Cambio</button>
+                            class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[13px] font-bold transition-all shadow-sm cursor-pointer">Confirmar Cambio</button>
                     </div>
                 </form>
             </div>
         </div>
 
+        <!-- Modal: Ver Mermas -->
         <div id="mermaModal"
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div
-                class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-5xl flex flex-col overflow-hidden">
-
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-5xl flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-rose-800 flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                        <div
-                            class="w-9 h-9 rounded-xl bg-rose-700 border border-rose-600 flex items-center justify-center text-white">
+                        <div class="w-9 h-9 rounded-xl bg-rose-700 border border-rose-600 flex items-center justify-center text-white">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
                         </div>
                         <div>
                             <h2 class="text-lg font-bold text-white tracking-wide">Registro de Productos Mermados</h2>
-                            <p class="text-[12px] text-rose-200 mt-0.5 font-medium">Listado exclusivo de medicamentos e
-                                insumos marcados con estado Merma.</p>
+                            <p class="text-[12px] text-rose-200 mt-0.5 font-medium">Listado exclusivo de medicamentos e insumos marcados con estado Merma.</p>
                         </div>
                     </div>
                     <button type="button" onclick="closeMerma()"
                         class="text-rose-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
 
                 <div class="overflow-x-auto max-h-[60vh] bg-slate-50">
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
-                        <thead
-                            class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm">
+                        <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm">
                             <tr>
                                 <th class="px-6 py-4">Producto</th>
                                 <th class="px-6 py-4">Lote / Serie</th>
@@ -963,7 +858,6 @@
                                         ? \Carbon\Carbon::parse($mObj->fecha_vencimiento)->format('d/m/Y')
                                         : 'N/A';
 
-                                    // Búsqueda prioritaria del motivo en la base de datos
                                     $mMotivo = $mObj->motivo ?? ($mObj->observacion ?? ($mObj->descripcion ?? null));
                                     if (empty($mMotivo)) {
                                         $mMotivo = 'Sin motivo especificado';
@@ -988,15 +882,12 @@
                                         {{ number_format($mStock, 0, ',', '.') }} Unid.
                                     </td>
                                     <td class="px-6 py-3.5 text-center">
-                                        <!-- Botón Solo Icono para Editar / Recuperar Lote -->
                                         <button type="button"
                                             onclick="openEditLote('{{ e($mLoteId) }}', '{{ e($mLoteCodigo) }}', '{{ e($mNombre) }}', 'Merma', '{{ e($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}')"
                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center justify-center"
                                             title="Cambiar Estado">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                             </svg>
                                         </button>
                                     </td>
@@ -1005,10 +896,8 @@
                                 <tr>
                                     <td colspan="7" class="px-6 py-12 text-center text-slate-400 font-medium">
                                         <div class="flex flex-col items-center justify-center">
-                                            <svg class="w-10 h-10 text-slate-300 mb-2" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <svg class="w-10 h-10 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                             <span>No hay productos marcados en estado de merma actualmente.</span>
                                         </div>
@@ -1020,8 +909,7 @@
                 </div>
 
                 <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-between items-center">
-                    <span class="text-xs text-slate-500 font-medium">Total de lotes mermados:
-                        <b>{{ $mermas->count() }}</b></span>
+                    <span class="text-xs text-slate-500 font-medium">Total de lotes mermados: <b>{{ $mermas->count() }}</b></span>
                     <button type="button" onclick="closeMerma()"
                         class="px-6 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
                         Cerrar
@@ -1030,287 +918,284 @@
             </div>
         </div>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    </div>
 
-        <script>
-            // Helper para normalizar cadenas
-            function normalizeText(text) {
-                return (text || '')
-                    .toString()
-                    .normalize("NFD")
-                    .replace(/[\u0300-\u036f]/g, "")
-                    .trim()
-                    .toLowerCase();
-            }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-            function filterTableByLocation() {
-                const pasilloVal = normalizeText(document.getElementById('pasilloSelect').value);
-                const estanteVal = normalizeText(document.getElementById('estanteSelect').value);
+    <script>
+        function normalizeText(text) {
+            return (text || '')
+                .toString()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim()
+                .toLowerCase();
+        }
 
-                const masterRows = document.querySelectorAll('.product-master-row');
+        function filterTableByLocation() {
+            const pasilloVal = normalizeText(document.getElementById('pasilloSelect').value);
+            const estanteVal = normalizeText(document.getElementById('estanteSelect').value);
+            const masterRows = document.querySelectorAll('.product-master-row');
 
-                masterRows.forEach(row => {
-                    const groupKey = row.id.replace('product-row-', '');
-                    const lotesSubrow = document.getElementById('lotes-' + groupKey);
+            masterRows.forEach(row => {
+                const groupKey = row.id.replace('product-row-', '');
+                const lotesSubrow = document.getElementById('lotes-' + groupKey);
 
-                    if (!lotesSubrow) return;
+                if (!lotesSubrow) return;
 
-                    const loteRows = lotesSubrow.querySelectorAll('.lote-item-row');
-                    let visiblesCount = 0;
+                const loteRows = lotesSubrow.querySelectorAll('.lote-item-row');
+                let visiblesCount = 0;
 
-                    loteRows.forEach(loteRow => {
-                        const lotePasillo = normalizeText(loteRow.getAttribute('data-pasillo'));
-                        const loteEstante = normalizeText(loteRow.getAttribute('data-estante'));
-
-                        const matchPasillo = !pasilloVal || lotePasillo === pasilloVal || lotePasillo.includes(pasilloVal);
-                        const matchEstante = !estanteVal || loteEstante === estanteVal || loteEstante.includes(estanteVal);
-
-                        if (matchPasillo && matchEstante) {
-                            loteRow.classList.remove('hidden');
-                            visiblesCount++;
-                        } else {
-                            loteRow.classList.add('hidden');
-                        }
-                    });
-
-                    if (visiblesCount > 0) {
-                        row.classList.remove('hidden');
-                        if (pasilloVal || estanteVal) {
-                            lotesSubrow.classList.remove('hidden');
-                            const arrow = document.getElementById('arrow-' + groupKey);
-                            const iconContainer = document.getElementById('icon-' + groupKey);
-                            if (arrow) arrow.classList.add('rotate-90');
-                            if (iconContainer) {
-                                iconContainer.classList.remove('bg-slate-100', 'text-slate-400', 'border-slate-200');
-                                iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
-                            }
-                        }
-                    } else {
-                        row.classList.add('hidden');
-                        lotesSubrow.classList.add('hidden');
-                    }
-                });
-
-                const alertBanner = document.getElementById('activeFilterAlert');
-                const filteredText = document.getElementById('filteredProductName');
-
-                if (pasilloVal || estanteVal) {
-                    let textoAlert = [];
-                    if (pasilloVal) textoAlert.push(`Pasillo: ${document.getElementById('pasilloSelect').value}`);
-                    if (estanteVal) textoAlert.push(`Estante: ${document.getElementById('estanteSelect').value}`);
-
-                    if (filteredText) filteredText.textContent = textoAlert.join(' | ');
-                    if (alertBanner) alertBanner.classList.remove('hidden');
-                } else {
-                    if (alertBanner) alertBanner.classList.add('hidden');
-                }
-            }
-
-            // Función principal para filtrar la tabla por producto y lote desde el Historial
-            function filterTableByLote(nombreProducto, codigoLote) {
-                closeHistory();
-
-                const nombreNorm = normalizeText(nombreProducto);
-                const loteNorm = normalizeText(codigoLote);
-
-                const rows = document.querySelectorAll('.product-master-row');
-
-                rows.forEach(row => {
-                    const rowProdName = normalizeText(row.getAttribute('data-product-name'));
-                    const groupKey = row.id.replace('product-row-', '');
-                    const lotesSubrow = document.getElementById('lotes-' + groupKey);
-
-                    const esMismoProducto = rowProdName.includes(nombreNorm) || nombreNorm.includes(rowProdName);
-
-                    if (esMismoProducto) {
-                        row.classList.remove('hidden');
-
-                        if (lotesSubrow) {
-                            lotesSubrow.classList.remove('hidden');
-
-                            const arrow = document.getElementById('arrow-' + groupKey);
-                            const iconContainer = document.getElementById('icon-' + groupKey);
-                            if (arrow) arrow.classList.add('rotate-90');
-                            if (iconContainer) {
-                                iconContainer.classList.remove('bg-slate-100', 'text-slate-400', 'border-slate-200');
-                                iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
-                            }
-
-                            const loteRows = lotesSubrow.querySelectorAll('.lote-item-row');
-                            loteRows.forEach(loteRow => {
-                                const rowLoteCode = normalizeText(loteRow.getAttribute('data-lote-code'));
-
-                                if (loteNorm !== 's/l' && (rowLoteCode.includes(loteNorm) || loteNorm.includes(rowLoteCode))) {
-                                    loteRow.classList.remove('hidden');
-                                    loteRow.classList.add('bg-teal-50/80');
-                                } else if (loteNorm === 's/l') {
-                                    loteRow.classList.remove('hidden');
-                                } else {
-                                    loteRow.classList.add('hidden');
-                                }
-                            });
-                        }
-                    } else {
-                        row.classList.add('hidden');
-                        if (lotesSubrow) {
-                            lotesSubrow.classList.add('hidden');
-                        }
-                    }
-                });
-
-                const alertBanner = document.getElementById('activeFilterAlert');
-                const filteredText = document.getElementById('filteredProductName');
-                const searchInput = document.getElementById('searchInput');
-
-                if (searchInput) {
-                    searchInput.value = codigoLote !== 'S/L' ? codigoLote : nombreProducto;
-                }
-
-                if (alertBanner && filteredText) {
-                    filteredText.textContent = `${nombreProducto} (Lote: ${codigoLote})`;
-                    alertBanner.classList.remove('hidden');
-                }
-            }
-
-            function clearClientFilter() {
-                const masterRows = document.querySelectorAll('.product-master-row');
-                masterRows.forEach(row => row.classList.remove('hidden'));
-
-                const loteRows = document.querySelectorAll('.lote-item-row');
                 loteRows.forEach(loteRow => {
-                    loteRow.classList.remove('hidden', 'bg-teal-50/80');
+                    const lotePasillo = normalizeText(loteRow.getAttribute('data-pasillo'));
+                    const loteEstante = normalizeText(loteRow.getAttribute('data-estante'));
+
+                    const matchPasillo = !pasilloVal || lotePasillo === pasilloVal || lotePasillo.includes(pasilloVal);
+                    const matchEstante = !estanteVal || loteEstante === estanteVal || loteEstante.includes(estanteVal);
+
+                    if (matchPasillo && matchEstante) {
+                        loteRow.classList.remove('hidden');
+                        visiblesCount++;
+                    } else {
+                        loteRow.classList.add('hidden');
+                    }
                 });
 
-                const pasilloSel = document.getElementById('pasilloSelect');
-                const estanteSel = document.getElementById('estanteSelect');
-                if (pasilloSel) pasilloSel.value = '';
-                if (estanteSel) estanteSel.value = '';
-
-                const alertBanner = document.getElementById('activeFilterAlert');
-                if (alertBanner) alertBanner.classList.add('hidden');
-
-                const searchInput = document.getElementById('searchInput');
-                if (searchInput) searchInput.value = '';
-            }
-
-            function toggleFiltersPanel() {
-                const panel = document.getElementById('filtersPanel');
-                if (panel) {
-                    panel.classList.toggle('hidden');
-                }
-            }
-
-            function toggleLotes(key) {
-                const row = document.getElementById('lotes-' + key);
-                const arrow = document.getElementById('arrow-' + key);
-                const iconContainer = document.getElementById('icon-' + key);
-
-                if (row) {
-                    if (row.classList.contains('hidden')) {
-                        row.classList.remove('hidden');
+                if (visiblesCount > 0) {
+                    row.classList.remove('hidden');
+                    if (pasilloVal || estanteVal) {
+                        lotesSubrow.classList.remove('hidden');
+                        const arrow = document.getElementById('arrow-' + groupKey);
+                        const iconContainer = document.getElementById('icon-' + groupKey);
                         if (arrow) arrow.classList.add('rotate-90');
                         if (iconContainer) {
                             iconContainer.classList.remove('bg-slate-100', 'text-slate-400', 'border-slate-200');
                             iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
                         }
-                    } else {
-                        row.classList.add('hidden');
-                        if (arrow) arrow.classList.remove('rotate-90');
-                        if (iconContainer) {
-                            iconContainer.classList.remove('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
-                            iconContainer.classList.add('bg-slate-100', 'text-slate-400', 'border-slate-200');
-                        }
                     }
-                }
-            }
-
-            function openEditLote(id, lote, producto, estado, motivo = '') {
-                const form = document.getElementById('editLoteForm');
-                if (form) {
-                    form.action = "/inventario/" + id;
-                }
-
-                document.getElementById('modal_producto_nombre').textContent = producto;
-                document.getElementById('modal_lote_nombre').textContent = "LOTE: " + lote;
-
-                let estadoSelect = document.getElementById('modal_estado');
-                let estadoFormat = (estado || '').toLowerCase();
-                let selectedVal = 'Disponible';
-
-                if (estadoFormat.includes('cuarentena')) selectedVal = 'Cuarentena';
-                else if (estadoFormat.includes('merma')) selectedVal = 'Merma';
-
-                estadoSelect.value = selectedVal;
-
-                let motivoInput = document.getElementById('modal_motivo');
-                if (motivoInput) {
-                    motivoInput.value = motivo;
-                }
-
-                toggleMotivoField(selectedVal);
-
-                document.getElementById('editLoteModal').classList.remove('hidden');
-            }
-
-            function closeEditLote() {
-                document.getElementById('editLoteModal').classList.add('hidden');
-            }
-
-            function toggleMotivoField(estado) {
-                const motivoContainer = document.getElementById('motivoContainer');
-                const motivoInput = document.getElementById('modal_motivo');
-
-                if (estado === 'Cuarentena' || estado === 'Merma') {
-                    motivoContainer.classList.remove('hidden');
-                    motivoInput.setAttribute('required', 'required');
                 } else {
-                    motivoContainer.classList.add('hidden');
-                    motivoInput.removeAttribute('required');
+                    row.classList.add('hidden');
+                    lotesSubrow.classList.add('hidden');
+                }
+            });
+
+            const alertBanner = document.getElementById('activeFilterAlert');
+            const filteredText = document.getElementById('filteredProductName');
+
+            if (pasilloVal || estanteVal) {
+                let textoAlert = [];
+                if (pasilloVal) textoAlert.push(`Pasillo: ${document.getElementById('pasilloSelect').value}`);
+                if (estanteVal) textoAlert.push(`Estante: ${document.getElementById('estanteSelect').value}`);
+
+                if (filteredText) filteredText.textContent = textoAlert.join(' | ');
+                if (alertBanner) alertBanner.classList.remove('hidden');
+            } else {
+                if (alertBanner) alertBanner.classList.add('hidden');
+            }
+        }
+
+        function filterTableByLote(nombreProducto, codigoLote) {
+            closeHistory();
+
+            const nombreNorm = normalizeText(nombreProducto);
+            const loteNorm = normalizeText(codigoLote);
+            const rows = document.querySelectorAll('.product-master-row');
+
+            rows.forEach(row => {
+                const rowProdName = normalizeText(row.getAttribute('data-product-name'));
+                const groupKey = row.id.replace('product-row-', '');
+                const lotesSubrow = document.getElementById('lotes-' + groupKey);
+                const esMismoProducto = rowProdName.includes(nombreNorm) || nombreNorm.includes(rowProdName);
+
+                if (esMismoProducto) {
+                    row.classList.remove('hidden');
+
+                    if (lotesSubrow) {
+                        lotesSubrow.classList.remove('hidden');
+
+                        const arrow = document.getElementById('arrow-' + groupKey);
+                        const iconContainer = document.getElementById('icon-' + groupKey);
+                        if (arrow) arrow.classList.add('rotate-90');
+                        if (iconContainer) {
+                            iconContainer.classList.remove('bg-slate-100', 'text-slate-400', 'border-slate-200');
+                            iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
+                        }
+
+                        const loteRows = lotesSubrow.querySelectorAll('.lote-item-row');
+                        loteRows.forEach(loteRow => {
+                            const rowLoteCode = normalizeText(loteRow.getAttribute('data-lote-code'));
+
+                            if (loteNorm !== 's/l' && (rowLoteCode.includes(loteNorm) || loteNorm.includes(rowLoteCode))) {
+                                loteRow.classList.remove('hidden');
+                                loteRow.classList.add('bg-teal-50/80');
+                            } else if (loteNorm === 's/l') {
+                                loteRow.classList.remove('hidden');
+                            } else {
+                                loteRow.classList.add('hidden');
+                            }
+                        });
+                    }
+                } else {
+                    row.classList.add('hidden');
+                    if (lotesSubrow) {
+                        lotesSubrow.classList.add('hidden');
+                    }
+                }
+            });
+
+            const alertBanner = document.getElementById('activeFilterAlert');
+            const filteredText = document.getElementById('filteredProductName');
+            const searchInput = document.getElementById('searchInput');
+
+            if (searchInput) {
+                searchInput.value = codigoLote !== 'S/L' ? codigoLote : nombreProducto;
+            }
+
+            if (alertBanner && filteredText) {
+                filteredText.textContent = `${nombreProducto} (Lote: ${codigoLote})`;
+                alertBanner.classList.remove('hidden');
+            }
+        }
+
+        function clearClientFilter() {
+            const masterRows = document.querySelectorAll('.product-master-row');
+            masterRows.forEach(row => row.classList.remove('hidden'));
+
+            const loteRows = document.querySelectorAll('.lote-item-row');
+            loteRows.forEach(loteRow => {
+                loteRow.classList.remove('hidden', 'bg-teal-50/80');
+            });
+
+            const pasilloSel = document.getElementById('pasilloSelect');
+            const estanteSel = document.getElementById('estanteSelect');
+            if (pasilloSel) pasilloSel.value = '';
+            if (estanteSel) estanteSel.value = '';
+
+            const alertBanner = document.getElementById('activeFilterAlert');
+            if (alertBanner) alertBanner.classList.add('hidden');
+
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+        }
+
+        function toggleFiltersPanel() {
+            const panel = document.getElementById('filtersPanel');
+            if (panel) {
+                panel.classList.toggle('hidden');
+            }
+        }
+
+        function toggleLotes(key) {
+            const row = document.getElementById('lotes-' + key);
+            const arrow = document.getElementById('arrow-' + key);
+            const iconContainer = document.getElementById('icon-' + key);
+
+            if (row) {
+                if (row.classList.contains('hidden')) {
+                    row.classList.remove('hidden');
+                    if (arrow) arrow.classList.add('rotate-90');
+                    if (iconContainer) {
+                        iconContainer.classList.remove('bg-slate-100', 'text-slate-400', 'border-slate-200');
+                        iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
+                    }
+                } else {
+                    row.classList.add('hidden');
+                    if (arrow) arrow.classList.remove('rotate-90');
+                    if (iconContainer) {
+                        iconContainer.classList.remove('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
+                        iconContainer.classList.add('bg-slate-100', 'text-slate-400', 'border-slate-200');
+                    }
                 }
             }
+        }
 
-            function openQRModal(id, producto, lote, vencimiento, stock, proveedor) {
-                const modal = document.getElementById('qrModal');
-                modal.classList.remove('hidden');
-
-                document.getElementById('qrProducto').textContent = producto;
-                document.getElementById('qrLote').textContent = lote;
-                document.getElementById('qrVencimiento').textContent = vencimiento;
-                document.getElementById('qrStock').textContent = stock + " UNID.";
-                document.getElementById('qrProveedor').textContent = proveedor;
-
-                const qrContainer = document.getElementById('qrcode');
-                qrContainer.innerHTML = '';
-
-                setTimeout(function() {
-                    try {
-                        new QRCode(qrContainer, {
-                            text: 'LOTE:' + lote + '|PROD:' + producto + '|VENCE:' + vencimiento + '|STOCK:' + stock,
-                            width: 140,
-                            height: 140,
-                            colorDark: "#0f172a",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.M
-                        });
-                    } catch (error) {
-                        console.error("Error al generar código QR:", error);
-                    }
-                }, 150);
+        function openEditLote(id, lote, producto, estado, motivo = '') {
+            const form = document.getElementById('editLoteForm');
+            if (form) {
+                form.action = "/inventario/" + id;
             }
 
-            function closeQRModal() {
-                document.getElementById('qrModal').classList.add('hidden');
+            document.getElementById('modal_producto_nombre').textContent = producto;
+            document.getElementById('modal_lote_nombre').textContent = "LOTE: " + lote;
+
+            let estadoSelect = document.getElementById('modal_estado');
+            let estadoFormat = (estado || '').toLowerCase();
+            let selectedVal = 'Disponible';
+
+            if (estadoFormat.includes('cuarentena')) selectedVal = 'Cuarentena';
+            else if (estadoFormat.includes('merma')) selectedVal = 'Merma';
+
+            estadoSelect.value = selectedVal;
+
+            let motivoInput = document.getElementById('modal_motivo');
+            if (motivoInput) {
+                motivoInput.value = motivo;
             }
 
-            // Modales Generales Secundarios
-            function openHistory() { document.getElementById('HistoryModal').classList.remove('hidden'); }
-            function closeHistory() { document.getElementById('HistoryModal').classList.add('hidden'); }
+            toggleMotivoField(selectedVal);
+            document.getElementById('editLoteModal').classList.remove('hidden');
+        }
 
-            function openImport() { document.getElementById('importModal').classList.remove('hidden'); }
-            function closeImport() { document.getElementById('importModal').classList.add('hidden'); }
+        function closeEditLote() {
+            document.getElementById('editLoteModal').classList.add('hidden');
+        }
 
-            function openDeposit() { document.getElementById('DepositModal').classList.remove('hidden'); }
-            function closeDeposit() { document.getElementById('DepositModal').classList.add('hidden'); }
-        </script>
-    </div>
+        function toggleMotivoField(estado) {
+            const motivoContainer = document.getElementById('motivoContainer');
+            const motivoInput = document.getElementById('modal_motivo');
+
+            if (estado === 'Cuarentena' || estado === 'Merma') {
+                motivoContainer.classList.remove('hidden');
+                motivoInput.setAttribute('required', 'required');
+            } else {
+                motivoContainer.classList.add('hidden');
+                motivoInput.removeAttribute('required');
+            }
+        }
+
+        function openQRModal(id, producto, lote, vencimiento, stock, proveedor) {
+            const modal = document.getElementById('qrModal');
+            modal.classList.remove('hidden');
+
+            document.getElementById('qrProducto').textContent = producto;
+            document.getElementById('qrLote').textContent = lote;
+            document.getElementById('qrVencimiento').textContent = vencimiento;
+            document.getElementById('qrStock').textContent = stock + " UNID.";
+            document.getElementById('qrProveedor').textContent = proveedor;
+
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+
+            setTimeout(function() {
+                try {
+                    new QRCode(qrContainer, {
+                        text: 'LOTE:' + lote + '|PROD:' + producto + '|VENCE:' + vencimiento + '|STOCK:' + stock,
+                        width: 140,
+                        height: 140,
+                        colorDark: "#0f172a",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                } catch (error) {
+                    console.error("Error al generar código QR:", error);
+                }
+            }, 150);
+        }
+
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.add('hidden');
+        }
+
+        function openHistory() { document.getElementById('HistoryModal').classList.remove('hidden'); }
+        function closeHistory() { document.getElementById('HistoryModal').classList.add('hidden'); }
+
+        function openImport() { document.getElementById('importModal').classList.remove('hidden'); }
+        function closeImport() { document.getElementById('importModal').classList.add('hidden'); }
+
+        function openDeposit() { document.getElementById('DepositModal').classList.remove('hidden'); }
+        function closeDeposit() { document.getElementById('DepositModal').classList.add('hidden'); }
+
+        function openMerma() { document.getElementById('mermaModal').classList.remove('hidden'); }
+        function closeMerma() { document.getElementById('mermaModal').classList.add('hidden'); }
+    </script>
 @endsection
