@@ -33,6 +33,7 @@ return new class extends Migration
 
             // Estado del Lote (Disponible, Cuarentena, Merma)
             $table->string('estado')->default('Disponible');
+            $table->text('motivo')->nullable();
 
             // Ubicación física
             $table->string('pasillo')->nullable();

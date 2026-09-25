@@ -60,7 +60,7 @@
 
         <!-- Form despacho  -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-            
+
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
                 <div class="w-8 h-8 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -70,7 +70,7 @@
 
             <form action="{{ route('despacho.store') }}" method="POST" id="despachoForm">
                 @csrf
-                
+
                 <!-- DATOS DEL REMITENTE -->
                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
                     <div>
@@ -137,7 +137,7 @@
                 <div class="p-6 bg-slate-50/30">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                         <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide">2. Detalle de Extracción (Lotes en Stock)</h3>
-                        
+
                         <div class="flex items-center gap-3">
                             <button type="button" onclick="openScanner()" class="px-4 py-2 bg-teal-600 text-white rounded-lg text-[12px] font-bold hover:bg-teal-700 transition-all flex items-center gap-2 shadow-sm cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h2m4 0h2m4 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-4 0h-2m-4 0H5a2 2 0 01-2-2v-2m4-10h2v2H7V7zm8 0h2v2h-2V7zM7 15h2v2H7v-2zm8-2h2v4h-2v-4zm-4-2h2v2h-2v-2z"></path></svg>
@@ -191,9 +191,9 @@
                 <select name="productos[]" required onchange="llenarDatosFila(this)" class="w-full bg-white border border-slate-300 focus:border-teal-500 rounded-lg px-2.5 py-2 text-[12px] font-bold text-slate-800 outline-none shadow-sm cursor-pointer transition-colors">
                     <option value="" disabled selected>Seleccione producto del inventario...</option>
                     @foreach($inventarioDisponible as $inv)
-                        <option value="{{ $inv->producto }}" 
-                                data-lote="{{ $inv->lote ?? 'S/L' }}" 
-                                data-vence="{{ $inv->fecha_vencimiento ?? '' }}" 
+                        <option value="{{ $inv->producto }}"
+                                data-lote="{{ $inv->lote ?? 'S/L' }}"
+                                data-vence="{{ $inv->fecha_vencimiento ?? '' }}"
                                 data-stock="{{ $inv->cantidad ?? 0 }}">
                             {{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})
                         </option>
@@ -342,7 +342,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            
+
             <div class="p-6 bg-slate-50 flex flex-col items-center">
                 <div class="bg-white border-[3px] border-slate-200 border-dashed rounded-2xl p-2 w-full max-w-sm flex flex-col items-center">
                     <div id="reader" class="w-full rounded-xl overflow-hidden shadow-inner bg-black"></div>
@@ -393,8 +393,8 @@
         const tbody = document.getElementById('productsBody');
 
         // Renderizar la primera fila usando el Template al cargar
-        document.addEventListener("DOMContentLoaded", () => { 
-            addRow(); 
+        document.addEventListener("DOMContentLoaded", () => {
+            addRow();
         });
 
         function addNewRowFromTemplate() {
@@ -410,7 +410,7 @@
                 let select = tr.querySelector('select[name="productos[]"]');
                 let options = Array.from(select.options);
                 let targetOption = options.find(opt => opt.value === data.producto && opt.getAttribute('data-lote') === data.lote);
-                
+
                 if (targetOption) {
                     select.value = targetOption.value;
                     llenarDatosFila(select);
@@ -421,42 +421,42 @@
 
         function llenarDatosFila(selectElement) {
             let option = selectElement.options[selectElement.selectedIndex];
-            if (!option || option.disabled) return; 
+            if (!option || option.disabled) return;
 
             let tr = selectElement.closest('tr');
             let loteInput = tr.querySelector('input[name="lotes[]"]');
             let venceInput = tr.querySelector('input[name="vencimientos[]"]');
             let cantInput = tr.querySelector('input[name="cantidades[]"]');
-            
+
             let stockBadge = tr.querySelector('.stock-max-badge');
             let stockContainer = tr.querySelector('.stock-container');
             let fefoContainer = tr.querySelector('.fefo-container');
 
             loteInput.value = option.getAttribute('data-lote');
             venceInput.value = option.getAttribute('data-vence');
-            
+
             let stock = parseInt(option.getAttribute('data-stock'));
             cantInput.setAttribute('max', stock);
             stockBadge.textContent = stock;
             stockContainer.classList.remove('hidden');
-            
+
             // Lógica FEFO
             fefoContainer.innerHTML = '';
             venceInput.classList.remove('text-rose-700', 'font-extrabold', 'bg-rose-50');
-            
+
             if(venceInput.value) {
                 try {
                     let fVence = new Date(venceInput.value);
                     let hoy = new Date();
                     let mesesRestantes = (fVence.getFullYear() - hoy.getFullYear()) * 12 + (fVence.getMonth() - hoy.getMonth());
-                    
+
                     if(mesesRestantes <= 6) {
                         venceInput.classList.add('text-rose-700', 'font-extrabold', 'bg-rose-50');
                         fefoContainer.innerHTML = '<span class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] bg-rose-500 text-white font-bold px-1.5 py-0.5 rounded shadow-sm">PRONTO A VENCER</span>';
                     }
                 } catch(e) {}
             }
-            
+
             cantInput.focus();
         }
 
@@ -478,10 +478,10 @@
         function validarStock(input) {
             let maxVal = parseInt(input.getAttribute('max'));
             let currentVal = parseInt(input.value);
-            
+
             if(!isNaN(maxVal) && !isNaN(currentVal)) {
                 if(currentVal > maxVal) {
-                    input.value = maxVal; 
+                    input.value = maxVal;
                     input.classList.add('border-rose-500', 'bg-rose-50', 'text-rose-700', 'ring-2', 'ring-rose-500/20');
                     setTimeout(() => {
                         input.classList.remove('border-rose-500', 'bg-rose-50', 'text-rose-700', 'ring-2', 'ring-rose-500/20');
@@ -511,7 +511,7 @@
 
         function onScanSuccess(decodedText) {
             closeScanner();
-            
+
             let parsedData = {};
             let chunks = decodedText.split('|');
             chunks.forEach(chunk => {
@@ -533,7 +533,7 @@
 
             let emptySelect = Array.from(tbody.querySelectorAll('select[name="productos[]"]')).find(sel => sel.value === '');
             let tr;
-            
+
             if(emptySelect) {
                 tr = emptySelect.closest('tr');
             } else {
@@ -543,14 +543,14 @@
             let select = tr.querySelector('select[name="productos[]"]');
             let options = Array.from(select.options);
             let targetOption = options.find(opt => opt.value === rowData.producto && opt.getAttribute('data-lote') === rowData.lote);
-            
+
             if (targetOption) {
                 select.value = targetOption.value;
                 llenarDatosFila(select);
                 tr.querySelector('input[name="cantidades[]"]').focus();
             } else {
                 alert("El producto o lote escaneado ya no tiene stock disponible en la bodega.");
-                if (!emptySelect && tbody.children.length > 1) tr.remove(); 
+                if (!emptySelect && tbody.children.length > 1) tr.remove();
             }
         }
 

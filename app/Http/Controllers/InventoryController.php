@@ -67,6 +67,8 @@ class InventoryController extends Controller
         $inventory->update([
             'estado' => $request->estado,
         ]);
+        $inventory->motivo = $request->input('motivo');
+        $inventory->save();
 
         return redirect()->route('inventario.index')
             ->with('success', 'El estado del lote fue actualizado correctamente.');
