@@ -2,7 +2,23 @@
 @section('title', 'Inventario de Droguería')
 @section('subtitle', 'Gestión centralizada de productos, lotes y ubicaciones físicas.')
 
-@section('actions')
+
+@section('content')
+    <div class="w-full p-4 sm:p-6 space-y-6">
+
+        <!-- encabezado acciones principales -->
+        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-5">
+            <div>
+                <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 mb-1.5">
+                    <span class="font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-semibold">02</span>
+                    <span>Bodega</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    <span class="font-bold text-teal-700">Catálogo Maestro</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Inventario de Droguería</h1>
+                <p class="text-slate-500 text-sm mt-1">Gestión centralizada de productos, lotes y ubicaciones físicas.</p>
+            </div>
+
             <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
                 <button type="button" onclick="openMerma()"
                     class="flex-1 sm:flex-none px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-[13px] font-bold hover:bg-rose-100 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
@@ -53,6 +69,17 @@
 
         <!-- Contenedor Principal Tabla Inventario -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+
+            <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white border border-teal-100 shadow-sm flex items-center justify-center">
+                        <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800">Directorio de Productos</h3>
+                        <p class="text-[11px] text-slate-500 font-medium">Agrupados por categoría y stock total</p>
+                    </div>
+                </div>
 
             <!--  Filtros Avanzados -->
             <div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col gap-4">
@@ -201,13 +228,9 @@
                         : [];
                     $invCollection = collect($invRaw);
 
-                    $mainInventories = $invCollection->reject(function ($item) {
-                        $itemObj = is_object($item) ? $item : (object) $item;
-                        return str_contains(strtolower($itemObj->estado ?? ''), 'merma');
-                    });
-
-                    $groupedInventories = $mainInventories->groupBy(function ($item) {
-                        $prod = is_object($item) ? $item->product ?? null : null;
+                    // Agrupación blindada contra nulos
+                    $groupedInventories = $invCollection->groupBy(function($item) {
+                        $prod = is_object($item) ? ($item->product ?? null) : null;
                         if ($prod && isset($prod->nombre)) {
                             return $prod->nombre;
                         }
@@ -436,35 +459,19 @@
                                                                         <span
                                                                             class="font-extrabold text-slate-800 text-[14px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
                                                                     </td>
-                                                                    <td
-                                                                        class="px-4 py-3 text-center flex justify-center gap-2">
-                                                                        <!-- Botón QR -->
+                                                                    <td class="px-4 py-3 text-center flex justify-center gap-2">
+                                                                        <!-- Botón QR con parámetros sanitizados usando addslashes en Blade -->
                                                                         <button type="button"
-                                                                            onclick="openQRModal('{{ e($loteId) }}', '{{ e($nombreProducto) }}', '{{ e($loteCodigo) }}', '{{ e($textoVencimiento) }}', '{{ $stockLote }}', 'Droguería DAS')"
-                                                                            class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer"
-                                                                            title="Generar Etiqueta QR">
-                                                                            <svg class="w-4 h-4" fill="none"
-                                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                                <path stroke-linecap="round"
-                                                                                    stroke-linejoin="round"
-                                                                                    stroke-width="2"
-                                                                                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z">
-                                                                                </path>
-                                                                            </svg>
+                                                                            onclick="openQRModal('{{ addslashes($loteId) }}', '{{ addslashes($nombreProducto) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($textoVencimiento) }}', '{{ $stockLote }}', 'Droguería DAS')"
+                                                                            class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Generar Etiqueta QR">
+                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                                                         </button>
 
+                                                                        <!-- Botón Editar con parámetros sanitizados -->
                                                                         <button type="button"
-                                                                            onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}')"
-                                                                            class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer"
-                                                                            title="Cambiar Estado">
-                                                                            <svg class="w-4 h-4" fill="none"
-                                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                                <path stroke-linecap="round"
-                                                                                    stroke-linejoin="round"
-                                                                                    stroke-width="2"
-                                                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                                                                </path>
-                                                                            </svg>
+                                                                            onclick="openEditLote('{{ addslashes($loteId) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($nombreProducto) }}', '{{ $estadoActualStr }}')"
+                                                                            class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Cambiar Estado">
+                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                                         </button>
                                                                     </td>
                                                                 </tr>
@@ -528,13 +535,8 @@
                             @forelse($inventories ?? [] as $item)
                                 @php
                                     $itemObj = is_object($item) ? $item : (object) $item;
-                                    $prodNombre = is_object($itemObj->product ?? null)
-                                        ? $itemObj->product->nombre ?? 'Producto'
-                                        : $itemObj->producto ?? 'Producto';
-                                    $cant = $itemObj->stock_total ?? ($itemObj->cantidad ?? 0);
-                                    $loteCodigo = $itemObj->lote
-                                        ?? (is_object($itemObj->loteRef ?? null) ? $itemObj->loteRef->lote ?? null : null)
-                                        ?? 'S/L';
+                                    $prodNombre = is_object($itemObj->product ?? null) ? ($itemObj->product->nombre ?? 'Producto') : ($itemObj->producto ?? 'Producto');
+                                    $cant = $itemObj->stock_total ?? $itemObj->cantidad ?? 0;
                                 @endphp
                                 <tr class="hover:bg-slate-100/70 transition-colors">
                                     <td class="px-6 py-3.5 text-slate-500 font-medium">
@@ -637,8 +639,7 @@
                         </label>
                         <span class="text-[11px] text-slate-400 font-medium">Formatos soportados: .xlsx, .csv</span>
 
-                        <button type="submit"
-                            class="w-full px-4 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all text-[13px] font-bold shadow-sm mt-3 cursor-pointer">
+                        <button type="submit" class="w-full px-4 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all text-[13px] font-bold shadow-sm mt-3 cursor-pointer">
                             Procesar e Importar
                         </button>
                     </form>
@@ -773,10 +774,9 @@
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="relative w-full max-w-sm flex flex-col items-center">
 
-                <div
-                    class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
-                    <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none">
-                    </div>
+                <!-- Etiqueta Simulada (Fondo Blanco) -->
+                <div class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
+                    <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
 
                     <div class="w-full flex flex-col items-center mb-4 z-10 border-b-2 border-black pb-3">
                         <h2 class="text-[17px] text-black font-black tracking-widest uppercase">DROGUERÍA DAS</h2>
@@ -1295,62 +1295,22 @@
                     } catch (error) {
                         console.error("Error al generar código QR:", error);
                     }
-                }, 100);
+                }, 150);
             }
 
             function closeQRModal() {
                 document.getElementById('qrModal').classList.add('hidden');
             }
 
-            function openHistory() {
-                document.getElementById('HistoryModal').classList.remove('hidden');
-            }
+            // Modales Generales Secundarios
+            function openHistory() { document.getElementById('HistoryModal').classList.remove('hidden'); }
+            function closeHistory() { document.getElementById('HistoryModal').classList.add('hidden'); }
 
-            function closeHistory() {
-                document.getElementById('HistoryModal').classList.add('hidden');
-            }
+            function openImport() { document.getElementById('importModal').classList.remove('hidden'); }
+            function closeImport() { document.getElementById('importModal').classList.add('hidden'); }
 
-            function openImport() {
-                document.getElementById('importModal').classList.remove('hidden');
-            }
-
-            function closeImport() {
-                document.getElementById('importModal').classList.add('hidden');
-            }
-
-            function openDeposit() {
-                document.getElementById('DepositModal').classList.remove('hidden');
-            }
-
-            function closeDeposit() {
-                document.getElementById('DepositModal').classList.add('hidden');
-            }
-
-            function openMerma() {
-                document.getElementById('mermaModal').classList.remove('hidden');
-            }
-
-            function closeMerma() {
-                document.getElementById('mermaModal').classList.add('hidden');
-            }
-
-            function updateFileName(input) {
-                const label = document.getElementById('fileNameLabel');
-                if (input.files && input.files[0]) {
-                    label.textContent = input.files[0].name;
-                } else {
-                    label.textContent = 'Explorar Archivos';
-                }
-            }
-
-            function submitDepositForm() {
-                const form = document.getElementById('manualDepositForm');
-                if (form.checkValidity()) {
-                    form.submit();
-                } else {
-                    form.reportValidity();
-                }
-            }
+            function openDeposit() { document.getElementById('DepositModal').classList.remove('hidden'); }
+            function closeDeposit() { document.getElementById('DepositModal').classList.add('hidden'); }
         </script>
     </div>
 @endsection
