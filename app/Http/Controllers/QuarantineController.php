@@ -10,11 +10,21 @@ class QuarantineController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $inventories = Inventory::where('estado', 'Cuarentena')
-            ->latest()
-            ->get();
+        $query = Inventory::where('estado', 'Cuarentena');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            $query->where(function ($q) use ($search) {
+                $q->where('producto', 'LIKE', "%{$search}%")
+                    ->orWhere('lote', 'LIKE', "%{$search}%")
+                    ->orWhere('categoria', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $inventories = $query->latest()->paginate(10);
 
         return view('quarantine.index', compact('inventories'));
     }
