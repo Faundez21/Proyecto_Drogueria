@@ -12,7 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ControlledDispatchController extends Controller
 {
-    // lista estricta de medicamentos controlados permitidos
+    // lista estricta de medicamentos controlados permitidos para este modulo
     private $controlados = [
         'Alprazolam 0.5 mg comprimidos',
         'Buprenorfina 35 mcg/h parche',
@@ -35,15 +35,13 @@ class ControlledDispatchController extends Controller
 
     public function index()
     {
-        // generar correlativo automatico para controlados (gdc)
         $lastDispatch = ControlledDispatch::orderBy('id', 'desc')->first();
         $nextId = $lastDispatch ? $lastDispatch->id + 1 : 1;
         $correlativo = 'GDC-' . date('Y') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
 
-        // traer el historial de despachos controlados
         $dispatches = ControlledDispatch::with('items')->orderBy('created_at', 'desc')->get();
 
-        // traer inventario disponible filtrando solo por la lista de controlados
+        // traemos el inventario disponible INCLUYENDO EXCLUSIVAMENTE (whereIn) la lista
         $inventarioDisponible = Inventory::whereIn('producto', $this->controlados)
             ->where('cantidad', '>', 0)
             ->orderBy('fecha_vencimiento', 'asc')
@@ -65,7 +63,6 @@ class ControlledDispatchController extends Controller
 
         DB::beginTransaction();
         try {
-            // guardar cabecera del despacho controlado
             $dispatch = ControlledDispatch::create([
                 'correlativo' => $request->correlativo_despacho,
                 'fecha_despacho' => $request->fecha_despacho,
@@ -74,16 +71,15 @@ class ControlledDispatchController extends Controller
                 'establecimiento_destino' => $destino,
                 'direccion_destino' => $request->direccion_destino,
                 'condiciones_transporte' => $request->condiciones_transporte,
-                'series_recetas' => $request->series_recetas, // nuevo campo para talonarios
+                'series_recetas' => $request->series_recetas,
                 'firma_despacha' => $request->firma_despacha,
                 'firma_recibe' => $request->firma_recibe,
             ]);
 
-            // procesar cada producto controlado
             foreach ($request->productos as $index => $nombreProducto) {
-                // validacion de seguridad por si intentan inyectar un producto no permitido
+                // validacion de seguridad para evitar que manipulen el form para inyectar medicamentos normales
                 if(!in_array($nombreProducto, $this->controlados)) {
-                    throw new \Exception("El producto '{$nombreProducto}' no es un farmaco controlado valido.");
+                    throw new \Exception("El producto '{$nombreProducto}' no es un farmaco controlado valido en este sistema.");
                 }
 
                 $lote = !empty($request->lotes[$index]) ? $request->lotes[$index] : 'S/L';
@@ -112,10 +108,9 @@ class ControlledDispatchController extends Controller
                     if ($inventory->cantidad < $cantidadSolicitada) {
                         throw new \Exception("Stock insuficiente para '{$nombreProducto}'.");
                     }
-                    
+
                     $inventory->decrement('cantidad', $cantidadSolicitada);
 
-                    // registrar en trazabilidad normal para mantener el kardex global sincronizado
                     StockMovement::create([
                         'producto' => $nombreProducto,
                         'lote' => $lote,
@@ -133,11 +128,11 @@ class ControlledDispatchController extends Controller
                 }
             }
 
-            DB::commit(); 
+            DB::commit();
             return redirect()->back()->with('success', 'Despacho Controlado N° ' . $dispatch->correlativo . ' generado con exito.');
 
         } catch (\Exception $e) {
-            DB::rollBack(); 
+            DB::rollBack();
             return redirect()->back()->with('error', 'Error en el despacho: ' . $e->getMessage());
         }
     }
