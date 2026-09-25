@@ -14,7 +14,6 @@ class InventorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Limpiamos usando el nombre de tabla en inglés 'inventories'
         DB::table('inventories')->truncate();
 
         $inventarios = [
