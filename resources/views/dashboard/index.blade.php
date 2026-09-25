@@ -1,16 +1,16 @@
 @extends('layouts.app')
-@section('title', 'Dashboard')
+
 
 @section('content')
     <div class="w-full px-4 sm:px-6 pt-0 pb-6 space-y-5">
-        
+
         <!-- CABECERA Y FILTRO GLOBAL -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
             <div>
                 <h1 class="text-2xl font-black text-slate-900 tracking-tight">Dashboard</h1>
                 <p class="text-[13px] font-medium text-slate-500 mt-0.5">Resumen operativo y estado general de la Droguería</p>
             </div>
-            
+
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
                 <!-- Filtro Global de Período -->
                 <form method="GET" action="{{ route('dashboard.index') }}" class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-200 w-full sm:w-auto">
@@ -34,7 +34,7 @@
 
         <!-- 1. GRID DE KPIs (MÉTRICAS CLAVES) -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            
+
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="p-2 bg-blue-50 rounded-lg text-blue-600 border border-blue-100">
@@ -113,7 +113,7 @@
 
         <!-- 2. SECCIÓN PRINCIPAL: Trazabilidad y QR -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
+
             <!-- Flujo Reciente de Movimientos -->
             <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col min-h-[380px]">
                 <div class="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
@@ -123,13 +123,13 @@
                     </h2>
                     <a href="{{ route('traceability.index') ?? '#' }}" class="text-[12px] font-bold text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-md">Ver Kardex completo &rarr;</a>
                 </div>
-                
+
                 <div class="space-y-0 flex-1 overflow-y-auto pr-2 pl-2">
                     <?php if(count($recentMovements) > 0): ?>
                         <?php foreach($recentMovements as $mov): ?>
-                            <?php 
+                            <?php
                                 $isRec = $mov->tipo === 'Recepción';
-                                $dotColor = $isRec ? 'bg-emerald-500 ring-emerald-50' : 'bg-blue-500 ring-blue-50'; 
+                                $dotColor = $isRec ? 'bg-emerald-500 ring-emerald-50' : 'bg-blue-500 ring-blue-50';
                                 $badgeColor = $isRec ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200';
                             ?>
                             <div class="flex gap-4 relative">
@@ -183,7 +183,7 @@
                             <div class="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center group-hover:scale-110 transition-transform"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg></div>
                             <span class="text-[12px] font-bold text-slate-700">Trazabilidad</span>
                         </a>
-                        <a href="#" class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-amber-50 hover:border-amber-200 transition-colors group">
+                        <a href="{{ route('inventario.index') ?? '#' }}" class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-amber-50 hover:border-amber-200 transition-colors group">
                             <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></div>
                             <span class="text-[12px] font-bold text-slate-700">Inventario</span>
                         </a>
@@ -198,14 +198,14 @@
                             Último Lote Ingresado
                         </h2>
                     </div>
-                    
+
                     <?php if($latestInventory): ?>
                         <div class="flex flex-col items-center flex-1 justify-center">
                             <!-- Marco del QR -->
                             <div class="w-36 h-36 bg-slate-50 p-3 rounded-2xl mb-5 shadow-sm border border-slate-200 relative group" id="qr-container">
                                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PROD:{{ urlencode($latestInventory->producto) }}|LOTE:{{ urlencode($latestInventory->lote) }}|STOCK:{{$latestInventory->cantidad }}" alt="QR Code" class="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-300">
                             </div>
-                            
+
                             <!-- Datos del Lote -->
                             <div class="text-center w-full bg-slate-50 rounded-xl p-4 border border-slate-100">
                                 <h3 class="font-black text-[14px] text-slate-800 leading-tight mb-2 truncate px-2" title="{{ $latestInventory->producto }}">{{ $latestInventory->producto }}</h3>
@@ -223,7 +223,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <button onclick="printQR()" class="w-full mt-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                 Imprimir Etiqueta
@@ -306,7 +306,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            
+
             <div class="p-6 bg-slate-50 flex flex-col items-center">
                 <div class="bg-white border-[3px] border-slate-200 border-dashed rounded-2xl p-2 w-full max-w-sm flex flex-col items-center relative min-h-[250px]">
                     <div id="reader-dashboard" class="w-full rounded-xl overflow-hidden shadow-inner bg-black flex items-center justify-center text-white text-xs">Iniciando cámara...</div>
@@ -333,27 +333,27 @@
             }
 
             document.getElementById('scannerModalDashboard').classList.remove('hidden');
-            
+
             dashboardScanner = new Html5QrcodeScanner(
-                "reader-dashboard", 
-                { fps: 10, qrbox: {width: 250, height: 250}, aspectRatio: 1.0, supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA] }, 
+                "reader-dashboard",
+                { fps: 10, qrbox: {width: 250, height: 250}, aspectRatio: 1.0, supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA] },
                 false
             );
-            
+
             dashboardScanner.render(onScanDashboardSuccess, onScanDashboardFailure);
         }
 
         function closeDashboardScanner() {
-            if(dashboardScanner) { 
-                dashboardScanner.clear().catch(e => console.error(e)); 
-                dashboardScanner = null; 
+            if(dashboardScanner) {
+                dashboardScanner.clear().catch(e => console.error(e));
+                dashboardScanner = null;
             }
             document.getElementById('scannerModalDashboard').classList.add('hidden');
         }
 
         function onScanDashboardSuccess(decodedText) {
             closeDashboardScanner();
-            
+
             let parsedData = {};
             let chunks = decodedText.split('|');
             chunks.forEach(chunk => {

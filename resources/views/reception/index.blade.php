@@ -5,40 +5,43 @@
 
 @section('actions')
     <button type="button" onclick="openHistoryModal()"
-        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all duration-150 w-full sm:w-auto">
+        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all duration-150 w-full sm:w-auto">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         Ver Historial
     </button>
 @endsection
 
 @section('content')
+    <!-- migas de pan -->
+    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
+        <span class="text-slate-400 font-semibold">01</span>
+        <span>Abastecimiento</span>
+        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        <span class="font-semibold text-slate-800">Recepción</span>
+    </div>
+
     <div class="space-y-6">
+        <!-- notificaciones de exito -->
         @if(session('success'))
-            <div class="p-4 mb-4 text-sm text-teal-800 rounded-lg bg-teal-50 border border-teal-200 font-medium shadow-sm" role="alert">
+            <div class="p-4 mb-4 text-sm text-teal-800 rounded-xl bg-teal-50 border border-teal-200 font-medium shadow-sm" role="alert">
                 {{ session('success') }}
             </div>
         @endif
 
-        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
-            <span class="font-mono-das text-slate-400 font-semibold">01</span>
-            <span>Abastecimiento</span>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            <span class="font-medium text-slate-800">Recepción</span>
-        </div>
-
         <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+            <!-- cabecera del formulario -->
             <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h2 class="text-[15px] font-bold text-slate-800">Registro de Ingreso de Mercadería</h2>
+                    <h2 class="text-[15px] font-bold text-slate-800">Registro de Ingreso de Mercaderia</h2>
                     <p class="text-[12px] text-slate-500 mt-0.5">Complete los datos del documento, proveedor y productos a recepcionar.</p>
                 </div>
             </div>
 
-            <!-- Formulario Principal -->
+            <!-- formulario principal -->
             <form action="{{ route('reception.store') }}" method="POST" class="divide-y divide-slate-100" id="receptionForm">
                 @csrf
 
-                <!-- SECCIÓN 1: Documento -->
+                <!-- seccion 1: documento -->
                 <div class="p-6">
                     <div class="flex items-center gap-2 mb-4">
                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -50,7 +53,7 @@
                             <input type="text" value="{{ $nextCorrelativo ?? '1' }}" readonly class="w-full bg-slate-100 border border-slate-200 text-teal-700 font-bold rounded-lg block py-2.5 px-3.5 text-[13px] cursor-not-allowed">
                         </div>
                         <div>
-                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Fecha de Recepción <span class="text-rose-500">*</span></label>
+                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Fecha de Recepcion <span class="text-rose-500">*</span></label>
                             <input type="date" name="fecha_recepcion" value="{{ date('Y-m-d') }}" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                         </div>
                         <div>
@@ -58,7 +61,7 @@
                             <select name="tipo_documento" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione...</option>
                                 <option value="Factura">Factura</option>
-                                <option value="Guia">Guía de Despacho</option>
+                                <option value="Guia">Guia de Despacho</option>
                             </select>
                         </div>
                         <div>
@@ -70,22 +73,22 @@
                             <input type="text" name="orden_compra" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Origen de la Mercadería <span class="text-rose-500">*</span></label>
+                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Origen de la Mercaderia <span class="text-rose-500">*</span></label>
                             <select name="origen" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione origen...</option>
                                 <option value="CENABAST">CENABAST</option>
                                 <option value="COMPRA DIRECTA DAS">COMPRA DIRECTA DAS</option>
                                 <option value="SSTHNO">SERVICIO DE SALUD TALCAHUANO</option>
                                 <option value="Traspaso">Traspaso</option>
-                                <option value="Donacion">Donación</option>
-                                <option value="Prestamo">Préstamo</option>
+                                <option value="Donacion">Donacion</option>
+                                <option value="Prestamo">Prestamo</option>
                                 <option value="Canje">Canje</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- SECCIÓN 2: Proveedor -->
+                <!-- seccion 2: proveedor -->
                 <div class="p-6 bg-slate-50/40">
                     <div class="flex items-center gap-2 mb-4">
                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
@@ -97,7 +100,7 @@
                             <input type="text" id="rut_proveedor_display" readonly placeholder="Auto-completado" class="w-full bg-slate-100 border border-slate-200 text-slate-600 rounded-lg block py-2.5 px-3.5 text-[13px] font-mono-das cursor-not-allowed">
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Razón Social / Nombre Proveedor <span class="text-rose-500">*</span></label>
+                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Razon Social / Nombre Proveedor <span class="text-rose-500">*</span></label>
                             <select name="provider_id" id="provider_select" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione proveedor...</option>
                                 @foreach($providers as $provider)
@@ -110,7 +113,7 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN 3: Múltiples Productos -->
+                <!-- seccion 3: multiples productos -->
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
@@ -122,9 +125,9 @@
                         </button>
                     </div>
 
-                    <!-- Contenedor Dinámico -->
+                    <!-- contenedor dinamico -->
                     <div id="productos_container" class="space-y-4">
-                        <!-- Molde de Producto -->
+                        <!-- molde de producto -->
                         <div class="producto-item relative border border-slate-200 bg-slate-50/50 p-4 rounded-xl shadow-sm">
                             <button type="button" class="btn-remove-product hidden absolute top-3 right-3 text-slate-400 hover:text-rose-600 transition-colors" title="Eliminar fila">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -141,7 +144,7 @@
                                     </select>
                                 </div>
                                 <div class="lg:col-span-2">
-                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoría <span class="text-rose-500">*</span></label>
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoria <span class="text-rose-500">*</span></label>
                                     <select name="tipo_producto[]" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" disabled selected>Seleccione...</option>
                                         <option value="F-PALIATIVOS">CUIDADOS PALIATIVOS</option>
@@ -172,10 +175,10 @@
                         </div>
                     </div>
 
-                    <!-- Gran Total Recepción -->
+                    <!-- gran total recepcion -->
                     <div class="mt-4 bg-teal-50/80 border border-teal-200/80 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                         <div>
-                            <h4 class="text-[14px] font-bold text-teal-900">Gran Total Recepción (IVA Incluido)</h4>
+                            <h4 class="text-[14px] font-bold text-teal-900">Gran Total Recepcion (IVA Incluido)</h4>
                             <p class="text-[12px] text-teal-600 mt-0.5">Suma de todos los productos ingresados + 19% IVA</p>
                         </div>
                         <div class="relative w-full sm:w-52">
@@ -185,7 +188,7 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN 4: Firmas -->
+                <!-- seccion 4: firmas -->
                 <div class="p-6 bg-slate-50/40">
                     <div class="flex items-center gap-2 mb-4">
                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
@@ -193,7 +196,7 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <!-- Firma Proveedor -->
+                        <!-- firma proveedor -->
                         <div class="flex flex-col items-center">
                             <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma Quien Entrega (Proveedor)</p>
                             <input type="hidden" name="firma_proveedor" id="firma_proveedor_input">
@@ -202,7 +205,7 @@
                             </div>
                         </div>
 
-                        <!-- Firma Receptor -->
+                        <!-- firma receptor -->
                         <div class="flex flex-col items-center">
                             <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma Quien Recibe (DAS)</p>
                             <input type="hidden" name="firma_receptor" id="firma_receptor_input">
@@ -213,34 +216,73 @@
                     </div>
                 </div>
 
-                <!-- Botones Finales -->
+                <!-- botones finales -->
                 <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3">
                     <button type="reset" id="btn_limpiar" class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-100 transition-colors shadow-sm">Limpiar Formulario</button>
                     <button type="submit" name="action" value="save_and_download" class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-lg text-[13px] font-semibold hover:bg-blue-700 flex items-center justify-center gap-2 transition-all shadow-sm">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Guardar y Descargar PDF
                     </button>
                     <button type="submit" name="action" value="save_only" class="w-full sm:w-auto px-5 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 flex items-center justify-center gap-2 transition-all shadow-sm">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Confirmar Recepción
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Confirmar Recepcion
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL 1: HISTORIAL -->
+    <!-- modal 1: historial -->
     <div id="historyModal" class="fixed inset-0 z-40 hidden bg-slate-900/50 backdrop-blur-sm transition-opacity" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
             <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 max-w-5xl w-full">
+                
+                <!-- cabecera historial -->
                 <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
                     <h3 class="text-lg font-bold text-slate-800">Historial de Recepciones</h3>
                     <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-600">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-                <div class="p-0 max-h-[60vh] overflow-y-auto">
+
+                <!-- filtros dinamicos del historial -->
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros de Busqueda</span>
+                        <button type="button" onclick="limpiarFiltrosRecepcion()" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 transition-colors">Limpiar Filtros</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <!-- filtro correlativo -->
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">N° Correlativo</label>
+                            <input type="text" id="filtroCorrelativoRec" oninput="filtrarRecepciones()" placeholder="Ej: 123" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                        </div>
+                        
+                        <!-- filtro fecha -->
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Fecha Recepcion</label>
+                            <input type="date" id="filtroFechaRec" oninput="filtrarRecepciones()" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                        </div>
+
+                        <!-- filtro proveedor con sugerencias -->
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Proveedor</label>
+                            <input type="text" id="filtroProveedorRec" list="sugerencias-proveedores" oninput="filtrarRecepciones()" placeholder="Ej: Cenabast" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                            <datalist id="sugerencias-proveedores">
+                                @foreach($receptions ?? [] as $rec)
+                                    @if(isset($rec->provider))
+                                        <option value="{{ $rec->provider->name ?? $rec->provider->nombre ?? $rec->provider->razon_social }}">
+                                    @endif
+                                @endforeach
+                            </datalist>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- tabla del historial -->
+                <div class="p-0 max-h-[50vh] overflow-y-auto bg-white">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-white border-b border-slate-200 text-[12px] uppercase text-slate-500 sticky top-0 shadow-sm">
+                            <tr class="bg-white border-b border-slate-200 text-[12px] uppercase text-slate-500 sticky top-0 shadow-sm z-10">
                                 <th class="px-6 py-3 font-semibold">N°</th>
                                 <th class="px-6 py-3 font-semibold">Fecha</th>
                                 <th class="px-6 py-3 font-semibold">Proveedor</th>
@@ -250,7 +292,8 @@
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-[13px] text-slate-700">
                             @forelse($receptions ?? [] as $rec)
-                            <tr class="hover:bg-slate-50">
+                            <!-- clase identificadora para filtrado -->
+                            <tr class="hover:bg-slate-50 fila-recepcion">
                                 <td class="px-6 py-4 font-bold text-slate-800">#{{ $rec->correlativo }}</td>
                                 <td class="px-6 py-4">{{ \Carbon\Carbon::parse($rec->fecha_recepcion)->format('d-m-Y') }}</td>
                                 <td class="px-6 py-4">{{ $rec->provider->name ?? $rec->provider->nombre ?? $rec->provider->razon_social ?? 'N/A' }}</td>
@@ -274,13 +317,13 @@
         </div>
     </div>
 
-    <!-- MODAL 2: DETALLE -->
+    <!-- modal 2: detalle -->
     <div id="detailModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm transition-opacity" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
             <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 max-w-4xl w-full flex flex-col max-h-[90vh]">
                 <div class="px-6 py-4 border-b border-slate-200 bg-slate-800 flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-bold text-white">Resumen de Recepción</h3>
+                        <h3 class="text-lg font-bold text-white">Resumen de Recepcion</h3>
                         <p class="text-slate-300 text-xs">Correlativo Interno: <span id="m_correlativo" class="font-bold text-teal-400"></span></p>
                     </div>
                     <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white">
@@ -290,7 +333,7 @@
                 <div class="p-6 bg-slate-50 overflow-y-auto">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div class="bg-white p-4 rounded-lg border border-slate-200">
-                            <h4 class="text-[11px] font-bold text-teal-600 uppercase mb-3">Información del Documento</h4>
+                            <h4 class="text-[11px] font-bold text-teal-600 uppercase mb-3">Informacion del Documento</h4>
                             <div class="space-y-2 text-[13px]">
                                 <div class="flex justify-between"><span class="text-slate-500">Documento:</span> <span class="font-medium text-slate-800" id="m_doc"></span></div>
                                 <div class="flex justify-between"><span class="text-slate-500">Fecha:</span> <span class="font-medium text-slate-800" id="m_fecha"></span></div>
@@ -301,13 +344,13 @@
                         <div class="bg-white p-4 rounded-lg border border-slate-200">
                             <h4 class="text-[11px] font-bold text-teal-600 uppercase mb-3">Proveedor</h4>
                             <div class="space-y-2 text-[13px]">
-                                <div class="flex flex-col"><span class="text-slate-500 text-xs">Razón Social:</span> <span class="font-bold text-slate-800" id="m_proveedor"></span></div>
+                                <div class="flex flex-col"><span class="text-slate-500 text-xs">Razon Social:</span> <span class="font-bold text-slate-800" id="m_proveedor"></span></div>
                                 <div class="flex flex-col mt-2"><span class="text-slate-500 text-xs">RUT:</span> <span class="font-medium text-slate-800 font-mono-das" id="m_rut_proveedor"></span></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tabla de Productos Modal -->
+                    <!-- tabla de productos modal -->
                     <div class="bg-white rounded-lg border border-slate-200 overflow-hidden mb-4">
                         <table class="w-full text-left text-[12px]">
                             <thead class="bg-slate-100 border-b border-slate-200 text-slate-600 uppercase font-semibold">
@@ -319,7 +362,7 @@
                                 </tr>
                             </thead>
                             <tbody id="m_items_table" class="divide-y divide-slate-100 text-slate-800">
-                                <!-- Filas inyectadas por JS -->
+                                <!-- filas inyectadas por js -->
                             </tbody>
                         </table>
                         <div class="bg-teal-50 border-t border-teal-100 p-3 flex justify-between items-center">
@@ -335,7 +378,7 @@
                             <span id="m_no_firma_proveedor" class="text-xs text-slate-400 italic">No registrada</span>
                         </div>
                         <div class="bg-white p-3 rounded-lg border border-slate-200 text-center h-24">
-                            <p class="text-[11px] text-slate-500 font-semibold mb-1 uppercase">Firma Recepción</p>
+                            <p class="text-[11px] text-slate-500 font-semibold mb-1 uppercase">Firma Recepcion</p>
                             <img id="m_img_receptor" src="" class="hidden mx-auto max-h-12" alt="Firma">
                             <span id="m_no_firma_receptor" class="text-xs text-slate-400 italic">No registrada</span>
                         </div>
@@ -349,19 +392,60 @@
         </div>
     </div>
 
-    <!-- Importar CDN de Signature Pad -->
+    <!-- importar cdn de signature pad -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 
     <script>
+        // limpia los filtros de la bandeja de recepciones
+        function limpiarFiltrosRecepcion() {
+            document.getElementById('filtroCorrelativoRec').value = '';
+            document.getElementById('filtroFechaRec').value = '';
+            document.getElementById('filtroProveedorRec').value = '';
+            filtrarRecepciones();
+        }
+
+        // filtrado dinamico multi-criterio de la tabla de recepciones
+        function filtrarRecepciones() {
+            let inputCorrelativo = document.getElementById('filtroCorrelativoRec').value.toLowerCase();
+            let inputFecha = document.getElementById('filtroFechaRec').value;
+            let inputProveedor = document.getElementById('filtroProveedorRec').value.toLowerCase();
+            
+            let fechaFormateada = "";
+            if (inputFecha) {
+                let partes = inputFecha.split('-');
+                if (partes.length === 3) {
+                    fechaFormateada = partes[2] + '-' + partes[1] + '-' + partes[0];
+                }
+            }
+
+            let filas = document.querySelectorAll('.fila-recepcion');
+
+            filas.forEach(fila => {
+                let correlativoText = fila.children[0].textContent.toLowerCase();
+                let fechaText = fila.children[1].textContent.trim();
+                let proveedorText = fila.children[2].textContent.toLowerCase();
+                
+                let coincideCorrelativo = correlativoText.includes(inputCorrelativo);
+                let coincideFecha = fechaFormateada === "" || fechaText.includes(fechaFormateada);
+                let coincideProveedor = proveedorText.includes(inputProveedor);
+
+                if (coincideCorrelativo && coincideFecha && coincideProveedor) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. Lógica Autocompletar Proveedor
+            // 1. logica autocompletar proveedor
             const providerSelect = document.getElementById('provider_select');
             const rutInput = document.getElementById('rut_proveedor_display');
             providerSelect.addEventListener('change', function() {
                 rutInput.value = this.options[this.selectedIndex].getAttribute('data-rut') || '';
             });
 
-            // 2. Lógica Dinámica de Productos y Totales
+            // 2. logica dinamica de productos y totales
             const container = document.getElementById('productos_container');
 
             function calcularTotalGeneral() {
@@ -380,61 +464,61 @@
                 }
             }
 
-            // Asignar eventos de suma a la primera fila original
+            // asignar eventos de suma a la primera fila original
             document.querySelectorAll('.calc-qty, .calc-price').forEach(inp => {
                 inp.addEventListener('input', calcularTotalGeneral);
             });
 
-            // Agregar nueva fila de producto
+            // agregar nueva fila de producto
             document.getElementById('btn_add_product').addEventListener('click', function() {
                 const firstItem = container.querySelector('.producto-item');
                 const clone = firstItem.cloneNode(true);
 
-                // Limpiar valores clonados
+                // limpiar valores clonados
                 clone.querySelectorAll('input').forEach(inp => inp.value = '');
                 clone.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
 
-                // Mostrar botón de eliminar (que en la fila 1 está oculto)
+                // mostrar boton de eliminar (que en la fila 1 esta oculto)
                 const btnRemove = clone.querySelector('.btn-remove-product');
                 btnRemove.classList.remove('hidden');
                 btnRemove.addEventListener('click', function() {
                     clone.remove();
-                    calcularTotalGeneral(); // Recalcular al borrar
+                    calcularTotalGeneral(); // recalcular al borrar
                 });
 
-                // Asignar eventos de suma a los nuevos inputs
+                // asignar eventos de suma a los nuevos inputs
                 clone.querySelector('.calc-qty').addEventListener('input', calcularTotalGeneral);
                 clone.querySelector('.calc-price').addEventListener('input', calcularTotalGeneral);
 
                 container.appendChild(clone);
             });
 
-            // 3. Funcionalidad de Firmas Digitales
+            // 3. funcionalidad de firmas digitales
             const padOptions = { penColor: 'rgb(15, 23, 42)', backgroundColor: 'rgba(255, 255, 255, 1)' };
             const signatureProv = new SignaturePad(document.getElementById('pad_proveedor'), padOptions);
             const signatureRec = new SignaturePad(document.getElementById('pad_receptor'), padOptions);
 
-            // 4. Limpieza del formulario COMPLETO (Incluye firmas)
+            // 4. limpieza del formulario completo (incluye firmas)
             document.getElementById('btn_limpiar').addEventListener('click', function(e) {
                 signatureProv.clear();
                 signatureRec.clear();
                 document.getElementById('valor_final_iva').value = '';
 
-                // Borra los productos extra y deja solo el primero
+                // borra los productos extra y deja solo el primero
                 const items = container.querySelectorAll('.producto-item');
                 for(let i = 1; i < items.length; i++) {
                     items[i].remove();
                 }
             });
 
-            // 5. Antes de Enviar, inyectar firmas base64
+            // 5. antes de enviar, inyectar firmas base64
             document.getElementById('receptionForm').addEventListener('submit', function() {
                 if (!signatureProv.isEmpty()) document.getElementById('firma_proveedor_input').value = signatureProv.toDataURL('image/png');
                 if (!signatureRec.isEmpty()) document.getElementById('firma_receptor_input').value = signatureRec.toDataURL('image/png');
             });
         });
 
-        // 6. Modales (Historial y Detalle)
+        // 6. modales (historial y detalle)
         function openHistoryModal() { document.getElementById('historyModal').classList.remove('hidden'); }
         function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); }
 
@@ -447,7 +531,7 @@
             document.getElementById('m_proveedor').innerText = providerName;
             document.getElementById('m_rut_proveedor').innerText = providerRut;
 
-            // Llenar tabla de items
+            // llenar tabla de items
             const tbody = document.getElementById('m_items_table');
             tbody.innerHTML = '';
 
@@ -464,7 +548,7 @@
 
             document.getElementById('m_total').innerText = '$' + parseFloat(data.valor_total_recepcion).toLocaleString('es-CL');
 
-            // Firmas
+            // firmas
             const imgProv = document.getElementById('m_img_proveedor');
             const noFirmaProv = document.getElementById('m_no_firma_proveedor');
             if(data.firma_proveedor) { imgProv.src = data.firma_proveedor; imgProv.classList.remove('hidden'); noFirmaProv.classList.add('hidden'); }

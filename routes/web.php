@@ -52,7 +52,8 @@ Route::middleware('auth')->group(function () {
 
     // 5. Vistas Generales y Dashboards
 
-
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard.index');
 
     // Rutas para la Barra de Búsqueda Global y Notificaciones
     Route::get('/api/global-search', [GlobalSearchController::class, 'search'])->name('global.search');
