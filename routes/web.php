@@ -51,25 +51,29 @@ Route::middleware('auth')->group(function () {
     // 4. cierre de sesion (movido dentro del middleware para mayor seguridad)
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    // 5. vistas generales y dashboards
+// --- Rutas exclusivas para el rol Administrador ---
+Route::middleware(['auth', 'role:Administrador'])->group(function () {
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard.index');
+    // 5. Vistas generales y dashboards
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-    // rutas para la barra de busqueda global y notificaciones
+    // Rutas para la barra de búsqueda global y notificaciones
     Route::get('/api/global-search', [GlobalSearchController::class, 'search'])->name('global.search');
     Route::get('/api/notifications', [GlobalSearchController::class, 'notifications'])->name('global.notifications');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    // modulo de despacho de controlados
+    Route::get('/despacho_controlado', [ControlledDispatchController::class, 'index'])->name('controlled_dispatch.index');
+    Route::post('/despacho_controlado', [ControlledDispatchController::class, 'store'])->name('controlled_dispatch.store');
+    Route::get('/despacho_controlado/{id}/pdf', [ControlledDispatchController::class, 'pdf'])->name('controlled_dispatch.pdf');
+
+    //13. solicitudes de establecimientos
+        Route::resource('requests', SolicitudController::class);
+});
 
     // modulo de despacho general
     Route::get('/despacho', [DispatchController::class, 'index'])->name('despacho.index');
     Route::post('/despacho', [DispatchController::class, 'store'])->name('despacho.store');
     Route::get('/despacho/{id}/pdf', [DispatchController::class, 'pdf'])->name('despacho.pdf');
 
-    // modulo de despacho de controlados
-    Route::get('/despacho_controlado', [ControlledDispatchController::class, 'index'])->name('controlled_dispatch.index');
-    Route::post('/despacho_controlado', [ControlledDispatchController::class, 'store'])->name('controlled_dispatch.store');
-    Route::get('/despacho_controlado/{id}/pdf', [ControlledDispatchController::class, 'pdf'])->name('controlled_dispatch.pdf');
 
     // modulo de trazabilidad
     Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
@@ -170,7 +174,5 @@ Route::middleware('auth')->group(function () {
     )->name('shelf.updatePosition');
 
 
-    //13. solicitudes de establecimientos
-        Route::resource('requests', SolicitudController::class);
 
 });
