@@ -5,87 +5,119 @@
         $totalLotes = $inventories->count();
         $totalUnidades = $inventories->sum('cantidad');
     @endphp
-    <div class="w-full">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+
+    <div class="w-full p-4 sm:p-6 space-y-6">
+
+        <!-- encabezado acciones principales -->
+        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-5">
             <div>
-                <h1 class="text-2xl sm:text-3xl text-gray-800 font-semibold">Cuarentena</h1>
-                <p class="text-gray-500 mt-1">
-                    Lista de lotes en cuarentena
-                </p>
+                <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 mb-1.5">
+                    <span class="font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-semibold">02</span>
+                    <span>Bodega</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    <span class="font-bold text-teal-700">Cuarentena</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Productos en cuarentena</h1>
+                <p class="text-slate-500 text-sm mt-1">Lista de productos en cuarentena actualmente</p>
             </div>
 
+            <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+                <button type="button" onclick="openHistory()"
+                    class="flex-1 sm:flex-none px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 hover:text-teal-700 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Ver Historial
+                </button>
+            </div>
         </div>
-        <!-- Tarjetas de Resumen -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <!-- Total -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
-                <div
-                    class="absolute right-0 top-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110">
-                </div>
-                <div class="relative flex items-start justify-between">
-                    <div>
-                        <p class="text-sm font-semibold text-slate-500 mb-1">Total de lotes</p>
-                        <h4 class="text-3xl font-extrabold text-slate-800">
-                            {{ $totalLotes }}
-                        </h4>
-                    </div>
-                    <div class="p-3 bg-yellow-400 text-white rounded-xl shadow-md shadow-blue-200">
-                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                        </svg>
-                    </div>
-                </div>
+
+    </div>
+    <!-- Tarjetas de Resumen -->
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Total -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
+            <div
+                class="absolute right-0 top-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110">
             </div>
-
-
-            <!-- Unidades totales -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
-                <div
-                    class="absolute right-0 top-0 w-24 h-24 bg-emerald-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110">
+            <div class="relative flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-slate-500 mb-1">Total de lotes</p>
+                    <h4 class="text-3xl font-extrabold text-slate-800">
+                        {{ $totalLotes }}
+                    </h4>
                 </div>
-                <div class="relative flex items-start justify-between">
-                    <div>
-                        <p class="text-sm font-semibold text-slate-500 mb-1">Unidades totales</p>
-
-                        <h4 class="text-3xl font-extrabold text-slate-800">
-                            {{ number_format($totalUnidades, 0, ',', '.') }}
-                        </h4>
-                    </div>
-                    <div class="p-3 bg-emerald-500 text-white rounded-xl shadow-md shadow-emerald-200">
-                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- Nuevos -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
-                <div
-                    class="absolute right-0 top-0 w-24 h-24 bg-purple-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110">
-                </div>
-                <div class="relative flex items-start justify-between">
-                    <div>
-                        <p class="text-sm font-semibold text-slate-500 mb-1">Alertas sanitarias</p>
-
-                        <h4 class="text-3xl font-extrabold text-slate-800">
-
-                        </h4>
-                    </div>
-                    <div class="p-3 bg-purple-600 text-white rounded-xl shadow-md shadow-purple-200">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
-                    </div>
+                <div class="p-3 bg-yellow-400 text-white rounded-xl shadow-md shadow-blue-200">
+                    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                    </svg>
                 </div>
             </div>
         </div>
 
-        <!--Tabla cuarentena-->
 
+        <!-- Unidades totales -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
+            <div
+                class="absolute right-0 top-0 w-24 h-24 bg-emerald-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110">
+            </div>
+            <div class="relative flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-slate-500 mb-1">Unidades totales</p>
+
+                    <h4 class="text-3xl font-extrabold text-slate-800">
+                        {{ number_format($totalUnidades, 0, ',', '.') }}
+                    </h4>
+                </div>
+                <div class="p-3 bg-emerald-500 text-white rounded-xl shadow-md shadow-emerald-200">
+                    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!--Tabla cuarentena-->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+
+        <div
+            class="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/50">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-white border border-teal-100 shadow-sm flex items-center justify-center">
+                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">Directorio de Productos en cuarentena</h3>
+                    <p class="text-[11px] text-slate-500 font-medium">Agrupados por categoría y lotes en cuarentena</p>
+                </div>
+            </div>
+
+            <form method="GET" action="{{ route('quarantine.index') }}" class="relative w-full sm:w-96">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input type="text" name="search" value="{{ request('search') }}"
+                    placeholder="Buscar por producto, categoría o lote..."
+                    class="block w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors text-slate-700 shadow-sm placeholder:text-slate-400">
+            </form>
+        </div>
         <div class="overflow-x-auto w-full">
             @php
                 $invRaw = isset($inventories)
@@ -134,7 +166,8 @@
                                         </svg>
                                     </div>
                                     <p class="text-[15px] font-bold text-slate-600">Bodega sin productos registrados</p>
-                                    <p class="text-[13px] text-slate-500 mt-1 max-w-sm">No existen medicamentos o insumos en
+                                    <p class="text-[13px] text-slate-500 mt-1 max-w-sm">No existen medicamentos o insumos
+                                        en
                                         el inventario actual. Registre una Recepción o una carga masiva para poblar la
                                         tabla.</p>
                                 </div>
@@ -381,6 +414,75 @@
                 </tbody>
             </table>
         </div>
+        <div id="qrModal"
+            class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+            <div class="relative w-full max-w-sm flex flex-col items-center">
+
+                <!-- Etiqueta Simulada (Fondo Blanco) -->
+                <div
+                    class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
+                    <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none">
+                    </div>
+
+                    <div class="w-full flex flex-col items-center mb-4 z-10 border-b-2 border-black pb-3">
+                        <h2 class="text-[17px] text-black font-black tracking-widest uppercase">DROGUERÍA DAS</h2>
+                        <span class="text-[11px] text-black font-bold font-mono tracking-widest uppercase mt-0.5">Control
+                            de Trazabilidad</span>
+                    </div>
+
+                    <!-- Contenedor del QR. Dimensiones fijas para que qrcode.js lo lea correctamente -->
+                    <div class="bg-white p-2 mb-4 z-10 flex justify-center w-full">
+                        <div id="qrcode" class="w-[140px] h-[140px]"></div>
+                    </div>
+
+                    <div class="w-full z-10 space-y-2.5 px-2">
+                        <div class="text-center mb-4">
+                            <span id="qrProducto"
+                                class="text-[14px] font-black text-black block leading-tight uppercase">PRODUCTO</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-[12px] font-mono border-t border-b border-black py-2.5">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Lote Identificador</span>
+                                <span id="qrLote" class="font-bold text-black text-[13px]">L-000</span>
+                            </div>
+                            <div class="flex flex-col text-right">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Fecha Vencimiento</span>
+                                <span id="qrVencimiento" class="font-bold text-black text-[13px]">00/00/00</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-end pt-1.5">
+                            <div class="flex flex-col max-w-[60%]">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Origen / Bodega</span>
+                                <span id="qrProveedor"
+                                    class="font-bold text-black text-[12px] truncate uppercase">INTERNO</span>
+                            </div>
+                            <div class="flex flex-col text-right">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Stock Físico</span>
+                                <span id="qrStock" class="font-black text-black text-[17px]">0 UNID.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-center gap-4 w-full">
+                    <button type="button" onclick="closeQRModal()"
+                        class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md cursor-pointer">
+                        Cerrar Vista
+                    </button>
+                    <button type="button" onclick="window.print()"
+                        class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                            </path>
+                        </svg>
+                        Imprimir Etiqueta
+                    </button>
+                </div>
+            </div>
+        </div>
         <!-- 5. MODAL: Editar Estado de Lote (Diseño Limpio) -->
         <div id="editLoteModal"
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
@@ -392,7 +494,8 @@
                         class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
+                                d="M6 18L18 6M6 6l12 12">
+                            </path>
                         </svg>
                     </button>
                 </div>
@@ -442,6 +545,9 @@
             @endif
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <script>
         // Acordeón de tabla maestra
         function toggleLotes(key) {
@@ -515,7 +621,7 @@
                         height: 140,
                         colorDark: "#0f172a",
                         colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.M
+                        correctLevel: QRCode.CorrectLevel.L
                     });
                 } catch (error) {
                     console.error("Error al renderizar el código QR:", error);

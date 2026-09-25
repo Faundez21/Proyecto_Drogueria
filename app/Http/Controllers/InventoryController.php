@@ -76,7 +76,7 @@ class InventoryController extends Controller
             'estado' => $request->estado,
         ]);
 
-        return redirect()->route('inventario.index')
+        return redirect()->back()
             ->with('success', 'El estado del lote fue actualizado correctamente.');
     }
 }

@@ -1,19 +1,21 @@
 <?php
 
-//  Controladores de Autenticación
+// controladores de autenticacion
 use App\Http\Controllers\Auth\LoginController;
 
-//  Controladores de Módulos y Operaciones
+// controladores de modulos y operaciones
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\DistributionController;
 use App\Http\Controllers\QuarantineController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\QRController;
+use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\ControlledDispatchController; // nuevo controlador
 use App\Http\Controllers\TraceabilityController;
 use App\Http\Controllers\GlobalSearchController;
+
 
 //  Controladores de Estructura de Almacén (Mantenedores)
 use App\Http\Controllers\AisleController;
@@ -21,53 +23,58 @@ use App\Http\Controllers\ShelfController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PositionController;
 
-//  Controladores de Usuarios
+// controladores de usuarios
 use App\Http\Controllers\UserController;
 
 use Illuminate\Support\Facades\Route;
 
-// Rutas Públicas Estas rutas son accesibles sin necesidad de iniciar sesión.
+// rutas publicas. estas rutas son accesibles sin necesidad de iniciar sesion.
 
-// 1. Redirección principal al login
+// 1. redireccion principal al login
 Route::redirect('/', '/login');
 
-// 2. Rutas de Login
+// 2. rutas de login
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 
-// 3. Ruta de recuperación de contraseña
+// 3. ruta de recuperacion de contraseña
 Route::get('/recuperar-password', function () {
     return view('auth.forgot-password');
 })->name('password.request');
 
 /*
- Rutas Privadas (Protegidas)
- Todas estas rutas requieren que el usuario esté autenticado (middleware auth).
+ rutas privadas (protegidas)
+ todas estas rutas requieren que el usuario este autenticado (middleware auth).
 */
 
 Route::middleware('auth')->group(function () {
 
-    // 4. Cierre de sesión (Movido dentro del middleware para mayor seguridad)
+    // 4. cierre de sesion (movido dentro del middleware para mayor seguridad)
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    // 5. Vistas Generales y Dashboards
+    // 5. vistas generales y dashboards
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard.index');
 
-    // Rutas para la Barra de Búsqueda Global y Notificaciones
+    // rutas para la barra de busqueda global y notificaciones
     Route::get('/api/global-search', [GlobalSearchController::class, 'search'])->name('global.search');
     Route::get('/api/notifications', [GlobalSearchController::class, 'notifications'])->name('global.notifications');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
+    // modulo de despacho general
     Route::get('/despacho', [DispatchController::class, 'index'])->name('despacho.index');
     Route::post('/despacho', [DispatchController::class, 'store'])->name('despacho.store');
     Route::get('/despacho/{id}/pdf', [DispatchController::class, 'pdf'])->name('despacho.pdf');
 
+    // modulo de despacho de controlados
+    Route::get('/despacho_controlado', [ControlledDispatchController::class, 'index'])->name('controlled_dispatch.index');
+    Route::post('/despacho_controlado', [ControlledDispatchController::class, 'store'])->name('controlled_dispatch.store');
+    Route::get('/despacho_controlado/{id}/pdf', [ControlledDispatchController::class, 'pdf'])->name('controlled_dispatch.pdf');
+
+    // modulo de trazabilidad
     Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
     Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
-
-
 
     Route::get('/reportes', function () {
         return view('reportes.index');
@@ -77,26 +84,26 @@ Route::middleware('auth')->group(function () {
         return view('error');
     })->name('error');
 
-    // Usuarios
+    // usuarios
     Route::get('/users', [UserController::class, 'index'])
         ->name('users.index');
 
 
-    // Inventario
+    // inventario
     Route::get('/inventario', [InventoryController::class, 'index'])
         ->name('inventario.index');
 
-    Route::post('/inventario/guardar', [InventoryController::class, 'store'])
+    Route::post('/inventario', [InventoryController::class, 'store'])
         ->name('inventario.store');
 
     Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])
         ->name('inventario.import');
-        
+
     Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])
         ->name('inventario.update');
 
 
-    // 6. Módulo de Recepción
+    // 6. modulo de recepcion
     Route::prefix('reception')->name('reception.')->group(function () {
 
         Route::get('/', [ReceptionController::class, 'index'])
@@ -110,7 +117,7 @@ Route::middleware('auth')->group(function () {
     });
 
 
-    // 7. Módulo de Proveedores
+    // 7. modulo de proveedores
     Route::prefix('proveedores')->name('providers.')->group(function () {
 
         Route::get('/', [ProviderController::class, 'index'])
@@ -130,7 +137,7 @@ Route::middleware('auth')->group(function () {
     });
 
 
-    // 5. Rutas de mantenedores
+    // 8. rutas de mantenedores
 
     Route::resource('aisle', AisleController::class);
 
@@ -141,26 +148,30 @@ Route::middleware('auth')->group(function () {
     Route::resource('position', PositionController::class);
 
 
-    // 6. Ruta de distribución
+    // 9. ruta de distribucion
 
     Route::resource('distribution', DistributionController::class);
 
 
-    // 7. Ruta de cuarentena
+    // 10. ruta de cuarentena
 
     Route::resource('quarantine', QuarantineController::class);
 
 
-    // 8. Ruta de QR
+    // 11. ruta de qr
 
     Route::resource('qr', QRController::class);
 
 
-    // 9. ruta para mover posiciones 3d
+    // 12. ruta para mover posiciones 3d
 
     Route::post(
         '/shelf/{id}/update-position',
         [ShelfController::class, 'updatePosition']
     )->name('shelf.updatePosition');
+
+
+    //13. solicitudes de establecimientos
+        Route::resource('requests', SolicitudController::class);
 
 });
