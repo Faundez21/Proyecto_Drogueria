@@ -663,27 +663,7 @@
                         const markers = [];
                         const palleteGeo = new THREE.BoxGeometry(4, 3, 4);
 
-                        // Materiales (5 Colores)
-                        const matVerde = new THREE.MeshStandardMaterial({
-                            color: '#22c55e',
-                            roughness: 0.7
-                        });
-                        const matAzul = new THREE.MeshStandardMaterial({
-                            color: '#3b82f6',
-                            roughness: 0.7
-                        });
-                        const matNaranja = new THREE.MeshStandardMaterial({
-                            color: '#f97316',
-                            roughness: 0.7
-                        });
-                        const matMorado = new THREE.MeshStandardMaterial({
-                            color: '#a855f7',
-                            roughness: 0.7
-                        });
-                        const matGris = new THREE.MeshStandardMaterial({
-                            color: '#64748b',
-                            roughness: 0.7
-                        });
+
 
 
                         // Convertimos la variable de Laravel a un objeto de JavaScript
@@ -725,20 +705,25 @@
 
                         // Recorrer los datos reales de la BD y dibujarlos
                         dbShelves.forEach(shelf => {
-                            // Adaptamos los datos de la BD
+
+                            const materialPasillo = new THREE.MeshStandardMaterial({
+                                color: shelf.aisle ? shelf.aisle.color : '#64748b',
+                                roughness: 0.7
+                            });
+
                             const rackData = {
                                 id: shelf.id,
                                 code: shelf.name,
-                                status: 'Disponible', // Por defecto hasta conectar niveles posiciones
-                                product: shelf.description || 'Sin descripción',
-                                stock: '-',
-                                lot: '-',
-                                venc: '-',
+                                status: 'Disponible',
                                 aisle: shelf.aisle ? shelf.aisle.name : 'Sin pasillo'
                             };
 
-                            // Dibujamos la estantería usando las coordenadas de la BD
-                            createSingleRack(shelf.pos_x, shelf.pos_z, matAzul, rackData);
+                            createSingleRack(
+                                shelf.pos_x,
+                                shelf.pos_z,
+                                materialPasillo,
+                                rackData
+                            );
                         });
 
                         // Función para generar bloques de estanterías

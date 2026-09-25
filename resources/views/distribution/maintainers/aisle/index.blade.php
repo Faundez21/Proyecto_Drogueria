@@ -230,7 +230,20 @@
 
                         </div>
 
+                        <!--color-->
+                        <div>
+                            <label for="color" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Color
+                            </label>
+                            <input type="color" name="color" value="#3B82F6"
+                                class="w-12 h-10 rounded-lg border border-slate-300 cursor-pointer">
+                            <span class="text-xs text-slate-500">
+                                Este color se aplicará a las estanterías del pasillo.
+                            </span>
+                        </div>
+
                     </div>
+
 
                     <!-- Botones -->
                     <div class="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
