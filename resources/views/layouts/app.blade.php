@@ -184,11 +184,12 @@
         .search-result-item:focus,
         .search-result-item.active {
             background-color: #f0fdfa !important;
+            border-color: #ccfbf1 !important;
             outline: none;
         }
 
-        .search-result-item:focus svg,
-        .search-result-item.active svg {
+        .search-result-item:focus svg.shrink-0,
+        .search-result-item.active svg.shrink-0 {
             color: #0f766e;
             transform: scale(1.1);
         }
@@ -325,8 +326,8 @@
 
                     <!-- Grupo Despacho (con submenú) -->
                     <div class="flex flex-col space-y-0.5">
-                        <a href="{{ route('despacho.index') }}"
-                            class="nav-row {{ request()->routeIs('despacho.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                        <a href="{{ route('dispatch.index') }}"
+                            class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                                     d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
@@ -611,7 +612,7 @@
         <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden transform scale-95 transition-transform duration-200 flex flex-col max-h-[80vh]"
             id="search-modal-card">
 
-            <div class="flex items-center px-4 border-b border-slate-100 bg-slate-50/50 shrink-0">
+            <div class="flex items-center px-4 border-b border-slate-100 bg-slate-50/50 shrink-0 relative">
                 <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -619,13 +620,23 @@
                 </svg>
                 <input type="text" id="global-search-input" oninput="performGlobalSearch(this.value)"
                     onkeydown="handleSearchKeydown(event)" placeholder="Buscar Lote, Fármaco o RUT Proveedor..."
-                    class="w-full px-3 py-4 text-[14px] bg-transparent border-0 focus:outline-none text-slate-800 placeholder-slate-400 font-medium">
-                <div id="search-loader" class="hidden mr-3 loader"></div>
+                    class="w-full px-3 py-4 text-[14px] bg-transparent border-0 focus:outline-none text-slate-800 placeholder-slate-400 font-medium pr-12">
+                
+                <!-- Botón Limpiar (X) -->
+                <button id="search-clear-btn" onclick="clearSearch()" class="hidden absolute right-16 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-colors focus:outline-none">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                
+                <!-- Loader -->
+                <div id="search-loader" class="hidden absolute right-16 loader"></div>
+                
                 <kbd onclick="closeSearchModal()"
-                    class="cursor-pointer font-mono-das text-[10px] px-2 py-1 rounded border border-slate-200 bg-white text-slate-400 hover:bg-slate-100 transition-colors">ESC</kbd>
+                    class="cursor-pointer font-mono-das text-[10px] px-2 py-1 rounded border border-slate-200 bg-white text-slate-400 hover:bg-slate-100 transition-colors ml-2">ESC</kbd>
             </div>
 
-            <div id="search-results" class="p-2 overflow-y-auto space-y-1 sidebar-scroll flex-1">
+            <div id="search-results" class="p-2 overflow-y-auto space-y-1 sidebar-scroll flex-1 pb-4">
                 <div class="px-3 py-6 text-center text-[12px] text-slate-400">Escribe al menos 2 letras para buscar en
                     toda la base de datos...</div>
             </div>
@@ -650,64 +661,112 @@
         let searchTimeout = null;
         let selectedSearchIndex = -1;
         let searchResultsCount = 0;
+        let searchAbortController = null; // Nuevo controlador de interrupción
+
+        // Helper para escapar caracteres especiales de Regex
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Limpiar búsqueda
+        function clearSearch() {
+            const input = document.getElementById('global-search-input');
+            input.value = '';
+            input.focus();
+            performGlobalSearch('');
+        }
 
         function performGlobalSearch(query) {
             const resultsContainer = document.getElementById('search-results');
             const loader = document.getElementById('search-loader');
+            const clearBtn = document.getElementById('search-clear-btn');
             selectedSearchIndex = -1; // Reset flechas
+            const cleanQuery = query.trim();
 
-            if (query.length < 2) {
+            // Mostrar u ocultar el botón "X"
+            if (cleanQuery.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            // Cancelar la petición anterior si existe
+            if (searchAbortController) {
+                searchAbortController.abort();
+            }
+
+            if (cleanQuery.length < 2) {
+                loader.classList.add('hidden');
                 resultsContainer.innerHTML =
                     '<div class="px-3 py-6 text-center text-[12px] text-slate-400">Escribe al menos 2 letras para iniciar la búsqueda.</div>';
                 return;
             }
 
+            // Ocultar X y mostrar loader temporalmente
+            clearBtn.classList.add('hidden');
             loader.classList.remove('hidden');
 
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
-                fetch(`/api/global-search?q=${encodeURIComponent(query)}`)
-                    .then(res => res.json())
+                // Instanciar el nuevo AbortController
+                searchAbortController = new AbortController();
+
+                fetch(`/api/global-search?q=${encodeURIComponent(cleanQuery)}`, {
+                    signal: searchAbortController.signal
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Error en red');
+                        return res.json();
+                    })
                     .then(data => {
                         loader.classList.add('hidden');
+                        clearBtn.classList.remove('hidden'); // Restaurar botón X
                         searchResultsCount = data.length;
 
                         if (data.length === 0) {
-                            resultsContainer.innerHTML =
-                                '<div class="px-3 py-6 text-center text-[12px] text-slate-500 font-medium">No se encontraron coincidencias en la base de datos.</div>';
+                            resultsContainer.innerHTML = `
+                                <div class="px-3 py-10 flex flex-col items-center justify-center text-center">
+                                    <svg class="w-10 h-10 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span class="text-[13px] text-slate-500 font-medium">No se encontraron coincidencias.</span>
+                                    <span class="text-[11px] text-slate-400 mt-1">Intenta con otro término o código.</span>
+                                </div>`;
                             return;
                         }
 
                         let html = '';
                         let currentType = '';
+                        // Usar función escapeRegExp para prevenir errores con caracteres especiales
+                        const safeQuery = escapeRegExp(cleanQuery);
+                        const regex = new RegExp(`(${safeQuery})`, 'gi');
 
                         data.forEach((item, index) => {
                             if (currentType !== item.type) {
-                                html +=
-                                    `<div class="px-3 py-1.5 mt-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono-das">${item.type}</div>`;
+                                html += `
+                                    <div class="px-3 py-2 mt-2 flex items-center gap-2">
+                                        <div class="h-px bg-slate-100 flex-1"></div>
+                                        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono-das">${item.type}</span>
+                                        <div class="h-px bg-slate-100 flex-1"></div>
+                                    </div>`;
                                 currentType = item.type;
                             }
 
-                            // Resaltador Mágico (Yellow/Teal)
-                            const regex = new RegExp(`(${query})`, 'gi');
-                            const highlightedTitle = item.title ? item.title.replace(regex,
-                                '<span class="highlight-text">$1</span>') : 'N/A';
-                            const highlightedSubtitle = item.subtitle ? item.subtitle.replace(regex,
-                                '<span class="highlight-text">$1</span>') : '';
+                            // Resaltador Mágico Seguro
+                            const highlightedTitle = item.title ? item.title.replace(regex, '<span class="highlight-text">$1</span>') : 'N/A';
+                            const highlightedSubtitle = item.subtitle ? item.subtitle.replace(regex, '<span class="highlight-text">$1</span>') : '';
 
                             html += `
-                                <a href="${item.url}" id="search-item-${index}" class="search-result-item flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 transition-colors">
-                                    <div class="flex items-center gap-3">
-                                        <span class="p-1.5 rounded-md bg-slate-100 text-slate-500 transition-colors">
+                                <a href="${item.url}" id="search-item-${index}" class="search-result-item flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 transition-all duration-200 border border-transparent mt-0.5 group">
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <span class="p-1.5 rounded-md bg-slate-100 text-slate-500 transition-colors group-hover:bg-teal-100/50 group-hover:text-teal-600 shrink-0">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg>
                                         </span>
-                                        <div class="flex flex-col">
-                                            <span class="text-[13px] font-bold">${highlightedTitle}</span>
-                                            <span class="text-[11px] text-slate-500 font-mono">${highlightedSubtitle}</span>
+                                        <div class="flex flex-col min-w-0">
+                                            <span class="text-[13px] font-bold truncate">${highlightedTitle}</span>
+                                            <span class="text-[11px] text-slate-500 font-mono truncate">${highlightedSubtitle}</span>
                                         </div>
                                     </div>
-                                    <span class="go-icon text-[11px] font-mono-das text-teal-600 opacity-0 transition-opacity flex items-center gap-1">
-                                        Entrar <kbd class="px-1.5 py-0.5 rounded border border-teal-200 bg-white">↵</kbd>
+                                    <span class="go-icon text-[11px] font-mono-das text-teal-600 opacity-0 transition-opacity flex items-center gap-1.5 shrink-0 pl-2">
+                                        <span class="hidden sm:inline">Entrar</span> <kbd class="px-1.5 py-0.5 rounded border border-teal-200 bg-white">↵</kbd>
                                     </span>
                                 </a>
                             `;
@@ -715,12 +774,19 @@
 
                         resultsContainer.innerHTML = html;
                     })
-                    .catch(() => {
+                    .catch((error) => {
+                        // Ignorar el error si la petición fue abortada por tipear rápido
+                        if (error.name === 'AbortError') return; 
+                        
                         loader.classList.add('hidden');
-                        resultsContainer.innerHTML =
-                            '<div class="px-3 py-6 text-center text-[12px] text-rose-500">Error de conexión.</div>';
+                        clearBtn.classList.remove('hidden');
+                        resultsContainer.innerHTML = `
+                            <div class="px-3 py-8 text-center flex flex-col items-center">
+                                <svg class="w-8 h-8 text-rose-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                <span class="text-[12px] text-rose-500 font-medium">Error de conexión al buscar.</span>
+                            </div>`;
                     });
-            }, 250);
+            }, 300); // 300ms de debounce es un estándar ideal
         }
 
         // --- NAVEGACIÓN POR TECLADO EN BÚSQUEDA ---
@@ -747,8 +813,9 @@
                 const activeEl = document.getElementById(`search-item-${selectedSearchIndex}`);
                 if (activeEl) {
                     activeEl.classList.add('active');
+                    // Scroll inteligente centrado al navegar
                     activeEl.scrollIntoView({
-                        block: 'nearest',
+                        block: 'center',
                         behavior: 'smooth'
                     });
                 }
@@ -848,6 +915,7 @@
             const modal = document.getElementById('search-modal');
             const card = document.getElementById('search-modal-card');
             const input = document.getElementById('global-search-input');
+            const clearBtn = document.getElementById('search-clear-btn');
 
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -855,6 +923,7 @@
                 card.classList.remove('scale-95');
                 card.classList.add('scale-100');
                 input.value = '';
+                clearBtn.classList.add('hidden');
                 document.getElementById('search-results').innerHTML =
                     '<div class="px-3 py-6 text-center text-[12px] text-slate-400">Escribe al menos 2 letras para buscar en toda la base de datos...</div>';
                 input.focus();
