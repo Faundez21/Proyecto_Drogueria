@@ -47,7 +47,7 @@ class ControlledDispatchController extends Controller
             ->orderBy('fecha_vencimiento', 'asc')
             ->get();
 
-        return view('despacho_controlado.index', compact('correlativo', 'dispatches', 'inventarioDisponible'));
+        return view('controlled_dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible'));
     }
 
     public function store(Request $request)
@@ -140,7 +140,7 @@ class ControlledDispatchController extends Controller
     public function pdf($id)
     {
         $despacho = ControlledDispatch::with('items')->findOrFail($id);
-        $pdf = Pdf::loadView('despacho_controlado.pdf', compact('despacho'));
+        $pdf = Pdf::loadView('controlled_dispatch.pdf', compact('despacho'));
         return $pdf->stream('Guia_Controlados_'.$despacho->correlativo.'.pdf');
     }
 }
