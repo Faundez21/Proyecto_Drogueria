@@ -212,7 +212,7 @@
                             </div>
                             <!-- AQUÍ SE MUESTRA EL ERROR ROJO SI FALLA -->
                             @error('email')
-                                <span class="text-sm text-red-600 mt-1 font-medium block">{{ $message }}</span>
+                            <span class="text-sm text-red-600 mt-1 font-medium block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -232,7 +232,7 @@
                                     placeholder="Ingresa tu contraseña">
                             </div>
                             @error('password')
-                                <span class="text-sm text-red-600 mt-1 font-medium block">{{ $message }}</span>
+                            <span class="text-sm text-red-600 mt-1 font-medium block">{{ $message }}</span>
                             @enderror
 
                             <div class="flex justify-end mt-2">
@@ -251,20 +251,62 @@
                             </svg>
                         </button>
                     </form>
-
+                    <!-- Texto original con botón que activa el modal -->
                     <p class="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-600">
-                        ¿No tienes una cuenta? <a href="#"
-                            class="font-medium text-blue-700 hover:text-blue-900">Contacta al administrador</a>
+                        ¿No tienes una cuenta?
+                        <button onclick="toggleModal(true)" class="font-medium text-blue-700 hover:text-blue-900 focus:outline-none">
+                            Contacta al administrador
+                        </button>
                     </p>
+
+                    <!-- Contenedor del Fondo del Modal (Oculto inicialmente) -->
+                    <div id="contactModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                        <!-- Caja del Modal -->
+                        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 text-center transform transition-all">
+
+                            <!-- Icono o Encabezado -->
+                            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 mb-4">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                </svg>
+                            </div>
+
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Contactar al Administrador</h3>
+                            <p class="text-sm text-gray-500 mb-6">
+                                Escribe a <span class="font-medium text-gray-700">drogueriatalcahuano@gmail.com</span> o usa tu aplicación de correos para solicitar tu cuenta.
+                            </p>
+
+                            <!-- Botones de Acción -->
+                            <div class="flex flex-col sm:flex-row gap-2 justify-end">
+                                <button onclick="toggleModal(false)" class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                                    Cancelar
+                                </button>
+                                <a href="mailto:drogueriatalcahuano@gmail.com" onclick="toggleModal(false)" class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-center transition-colors">
+                                    Abrir Correo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="mt-8 lg:absolute lg:bottom-8 w-full text-center">
-                    <p class="text-[11px] sm:text-xs text-gray-400">&copy; {{ date('Y') }} Drogueria DAS. Todos los
-                        derechos reservados.</p>
+                    <p class="text-[11px] sm:text-xs text-gray-400">&copy; {{ date('Y') }} Drogueria DAS. Todos los derechos reservados.</p>
                 </div>
             </div>
         </div>
 
+        <script>
+            function toggleModal(show) {
+                const modal = document.getElementById('contactModal');
+                if (show) {
+                    modal.classList.remove('hidden');
+                } else {
+                    modal.classList.add('hidden');
+                }
+            }
+        </script>
     </body>
 
     </html>
+    
