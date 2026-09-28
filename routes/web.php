@@ -63,14 +63,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     // modulo de despacho general
-    Route::get('/despacho', [DispatchController::class, 'index'])->name('despacho.index');
-    Route::post('/despacho', [DispatchController::class, 'store'])->name('despacho.store');
-    Route::get('/despacho/{id}/pdf', [DispatchController::class, 'pdf'])->name('despacho.pdf');
+    Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch.index');
+    Route::post('/dispatch', [DispatchController::class, 'store'])->name('dispatch.store');
+    Route::get('/dispatch/{id}/pdf', [DispatchController::class, 'pdf'])->name('dispatch.pdf');
 
     // modulo de despacho de controlados
-    Route::get('/despacho_controlado', [ControlledDispatchController::class, 'index'])->name('controlled_dispatch.index');
-    Route::post('/despacho_controlado', [ControlledDispatchController::class, 'store'])->name('controlled_dispatch.store');
-    Route::get('/despacho_controlado/{id}/pdf', [ControlledDispatchController::class, 'pdf'])->name('controlled_dispatch.pdf');
+    Route::get('/controlled_dispatch', [ControlledDispatchController::class, 'index'])->name('controlled_dispatch.index');
+    Route::post('/controlled_dispatch', [ControlledDispatchController::class, 'store'])->name('controlled_dispatch.store');
+    Route::get('/controlled_dispatch/{id}/pdf', [ControlledDispatchController::class, 'pdf'])->name('controlled_dispatch.pdf');
 
     // modulo de trazabilidad
     Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
