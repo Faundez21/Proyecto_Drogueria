@@ -118,7 +118,7 @@ Route::middleware('auth')->group(function () {
 
 
     // 7. modulo de proveedores
-    Route::prefix('proveedores')->name('providers.')->group(function () {
+    Route::prefix('suppliers')->name('providers.')->group(function () {
 
         Route::get('/', [ProviderController::class, 'index'])
             ->name('index');
