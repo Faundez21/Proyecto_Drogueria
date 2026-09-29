@@ -96,7 +96,8 @@ class GlobalSearchController extends Controller
                 ->get();
 
             foreach($vencimientos as $vence) {
-                $dias = Carbon::parse($vence->fecha_vencimiento)->diffInDays(Carbon::now());
+                // CORRECCIÓN: Se agrega intval() para asegurar un número entero
+                $dias = intval(Carbon::parse($vence->fecha_vencimiento)->diffInDays(Carbon::now()));
                 $estado = Carbon::parse($vence->fecha_vencimiento)->isPast() ? 'Vencido hace' : 'Vence en';
                 
                 $notifications[] = [
