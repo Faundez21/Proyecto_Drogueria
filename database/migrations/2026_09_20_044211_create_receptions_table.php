@@ -27,13 +27,13 @@ return new class extends Migration
                 $table->string('numero_documento');
                 $table->string('orden_compra')->nullable();
                 $table->string('origen');
-                
+
                 $table->foreignId('provider_id')->constrained('providers')->onDelete('restrict');
-                
+
                 $table->decimal('valor_total_recepcion', 15, 2)->default(0);
                 $table->longText('firma_proveedor')->nullable();
                 $table->longText('firma_receptor')->nullable();
-                
+
                 $table->timestamps();
             });
         }
@@ -43,17 +43,17 @@ return new class extends Migration
             Schema::create('reception_items', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('reception_id')->constrained('receptions')->onDelete('cascade');
-                
-      
+
+
                 $table->foreignId('product_id')->constrained('products')->onDelete('restrict');
-                
+
                 $table->string('tipo_producto');
                 $table->string('lote')->nullable();
                 $table->date('fecha_vencimiento')->nullable();
                 $table->integer('cantidad');
                 $table->decimal('valor_unitario', 15, 2)->nullable();
                 $table->decimal('valor_total_item', 15, 2)->nullable();
-                
+
                 $table->timestamps();
             });
         }
