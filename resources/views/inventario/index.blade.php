@@ -170,10 +170,6 @@
                                 class="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl text-[12.5px] font-bold transition-all shadow-sm">
                                 Limpiar Filtros
                             </a>
-                            <button type="submit"
-                                class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[12.5px] font-bold transition-all shadow-sm cursor-pointer">
-                                Aplicar Filtros
-                            </button>
                         </div>
                     </div>
                 </form>

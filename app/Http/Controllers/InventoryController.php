@@ -34,22 +34,24 @@ class InventoryController extends Controller
     {
         $validated = $request->validate([
             'correlativo_interno' => 'nullable|integer',
-            'fecha_recepcion' => 'required|date',
-            'tipo_documento' => 'required|string',
-            'numero_documento' => 'required|string',
-            'orden_compra' => 'nullable|string',
-            'origen_mercaderia' => 'required|string',
-            'rut_proveedor' => 'required|string',
-            'razon_social' => 'required|string',
-            'producto' => 'required|string',
-            'categoria' => 'required|string',
-            'lote' => 'nullable|string',
-            'fecha_vencimiento' => 'nullable|date',
-            'cantidad' => 'required|integer|min:1',
+            'fecha_recepcion'     => 'required|date',
+            'tipo_documento'      => 'required|string',
+            'numero_documento'    => 'required|string',
+            'orden_compra'        => 'nullable|string',
+            'origen_mercaderia'   => 'required|string',
+            'rut_proveedor'       => 'required|string',
+            'razon_social'        => 'required|string',
+            'producto'            => 'required|string',
+            'categoria'           => 'required|string',
+            'lote'                => 'nullable|string',
+            'fecha_vencimiento'   => 'nullable|date',
+            'cantidad'            => 'required|integer|min:1',
+            'minimo'              => 'nullable|integer|min:0',
             'valor_neto_unitario' => 'required|numeric|min:0',
         ]);
 
-        $validated['estado'] = 'Disponible';
+        $validated['estado'] = $request->input('estado', 'Disponible');
+        $validated['minimo'] = $request->input('minimo', 0); 
 
         Inventory::create($validated);
 
