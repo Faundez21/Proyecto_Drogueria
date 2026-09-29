@@ -234,7 +234,7 @@
     <div id="historyModal" class="fixed inset-0 z-40 hidden bg-slate-900/50 backdrop-blur-sm transition-opacity" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
             <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 max-w-5xl w-full">
-                
+
                 <!-- cabecera historial -->
                 <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
                     <h3 class="text-lg font-bold text-slate-800">Historial de Recepciones</h3>
@@ -249,14 +249,14 @@
                         <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros de Busqueda</span>
                         <button type="button" onclick="limpiarFiltrosRecepcion()" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 transition-colors">Limpiar Filtros</button>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <!-- filtro correlativo -->
                         <div>
                             <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">N° Correlativo</label>
                             <input type="text" id="filtroCorrelativoRec" oninput="filtrarRecepciones()" placeholder="Ej: 123" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
                         </div>
-                        
+
                         <!-- filtro fecha -->
                         <div>
                             <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Fecha Recepcion</label>
@@ -409,7 +409,7 @@
             let inputCorrelativo = document.getElementById('filtroCorrelativoRec').value.toLowerCase();
             let inputFecha = document.getElementById('filtroFechaRec').value;
             let inputProveedor = document.getElementById('filtroProveedorRec').value.toLowerCase();
-            
+
             let fechaFormateada = "";
             if (inputFecha) {
                 let partes = inputFecha.split('-');
@@ -424,7 +424,7 @@
                 let correlativoText = fila.children[0].textContent.toLowerCase();
                 let fechaText = fila.children[1].textContent.trim();
                 let proveedorText = fila.children[2].textContent.toLowerCase();
-                
+
                 let coincideCorrelativo = correlativoText.includes(inputCorrelativo);
                 let coincideFecha = fechaFormateada === "" || fechaText.includes(fechaFormateada);
                 let coincideProveedor = proveedorText.includes(inputProveedor);
