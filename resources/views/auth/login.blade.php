@@ -10,6 +10,9 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -227,7 +230,7 @@
 
                 <p class="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-600">
                     ¿No tienes una cuenta?
-                    <button onclick="toggleModal(true)" class="font-medium text-blue-700 hover:text-blue-900 focus:outline-none">
+                    <button onclick="contactarAdministrador()" class="font-medium text-blue-700 hover:text-blue-900 focus:outline-none">
                         Contacta al administrador
                     </button>
                 </p>
@@ -242,140 +245,57 @@
         </div>
     </div>
 
-    <!-- MODAL 1: RECUPERACIÓN DE CONTRASEÑA -->
-    <div id="modalRecuperacion"
-        class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-        <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden">
-            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-800">Recuperar Contraseña</h2>
-                    <p class="text-sm text-slate-500 mt-1">Solicita al administrador restablecer tu acceso.</p>
-                </div>
-                <button type="button" onclick="cerrarModalRecuperacion()"
-                    class="text-slate-400 hover:text-slate-600 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="p-6">
-                <form action="#" method="POST" onsubmit="enviarSolicitudRecuperacion(event)">
-                    @csrf
-                    <div class="mb-6">
-                        <label for="email_recuperacion" class="block text-sm font-medium text-slate-700 mb-2">
-                            Correo Electrónico
-                        </label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                </svg>
-                            </div>
-                            <input type="email" id="email_recuperacion" name="email" required
-                                class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
-                                placeholder="ejemplo@drogueriadas.com">
-                        </div>
-                    </div>
-                    <div class="flex flex-col-reverse sm:flex-row gap-3">
-                        <button type="button" onclick="cerrarModalRecuperacion()"
-                            class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium transition-colors">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                            class="w-full sm:flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-sm flex justify-center items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
-                            Enviar solicitud
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2: CONTACTAR AL ADMINISTRADOR -->
-    <div id="contactModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center transform transition-all border border-slate-100">
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 mb-4">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                </svg>
-            </div>
-
-            <h3 class="text-lg font-bold text-slate-800 mb-2">Contactar al Administrador</h3>
-            <p class="text-sm text-slate-500 mb-6">
-                Escribe a <span class="font-medium text-slate-700">drogueriatalcahuano@gmail.com</span> o usa tu aplicación de correos para solicitar tu cuenta.
-            </p>
-
-            <div class="flex flex-col-reverse sm:flex-row gap-3 justify-end">
-                <button onclick="toggleModal(false)" class="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors">
-                    Cancelar
-                </button>
-                <a href="mailto:drogueriatalcahuano@gmail.com" onclick="toggleModal(false)" class="w-full sm:flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg text-center transition-colors shadow-sm">
-                    Abrir Correo
-                </a>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Funciones del Modal de Recuperar Contraseña
+        // Modal con SweetAlert2 para Recuperar Contraseña
         function abrirModalRecuperacion(event) {
             event.preventDefault();
-            const modal = document.getElementById('modalRecuperacion');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.classList.add('overflow-hidden');
-            setTimeout(function() {
-                document.getElementById('email_recuperacion').focus();
-            }, 100);
+            Swal.fire({
+                title: 'Recuperar Contraseña',
+                text: 'Solicita al administrador restablecer tu acceso.',
+                input: 'email',
+                inputPlaceholder: 'ejemplo@drogueriadas.com',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563eb', // bg-blue-600 de Tailwind
+                cancelButtonColor: '#94a3b8',  // bg-slate-400 de Tailwind
+                confirmButtonText: 'Enviar solicitud',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                        return '¡Necesitas ingresar un correo electrónico!'
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Aquí puedes agregar la petición AJAX (axios/fetch) hacia tu backend
+                    Swal.fire({
+                        title: '¡Solicitud enviada!',
+                        text: `Se ha enviado la solicitud de recuperación para ${result.value}`,
+                        icon: 'success',
+                        confirmButtonColor: '#2563eb'
+                    });
+                }
+            });
         }
 
-        function cerrarModalRecuperacion() {
-            const modal = document.getElementById('modalRecuperacion');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.classList.remove('overflow-hidden');
-        }
-
-        function enviarSolicitudRecuperacion(event) {
-            event.preventDefault();
-            alert('¡Solicitud enviada con éxito!');
-            cerrarModalRecuperacion();
-        }
-
-        // Eventos Clic por fuera de los modales
-        document.getElementById('modalRecuperacion').addEventListener('click', function(event) {
-            if (event.target === this) {
-                cerrarModalRecuperacion();
-            }
-        });
-
-        document.getElementById('contactModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                toggleModal(false);
-            }
-        });
-
-        // Evento Escapar con el teclado para cerrar modales
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                cerrarModalRecuperacion();
-                toggleModal(false);
-            }
-        });
-
-        // Función del Modal de Contactar Administrador
-        function toggleModal(show) {
-            const modal = document.getElementById('contactModal');
-            if (show) {
-                modal.classList.remove('hidden');
-                document.body.classList.add('overflow-hidden');
-            } else {
-                modal.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden');
-            }
+        // Modal con SweetAlert2 para Contactar Administrador
+        function contactarAdministrador() {
+            Swal.fire({
+                title: 'Contactar al Administrador',
+                text: 'Escribe a drogueriatalcahuano@gmail.com o usa tu aplicación de correos para solicitar tu cuenta.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Abrir Correo',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'mailto:drogueriatalcahuano@gmail.com';
+                }
+            });
         }
     </script>
 </body>
