@@ -14,6 +14,27 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReceptionController extends Controller
 {
+    // Lista estricta de medicamentos controlados para poder identificarlos en recepción
+    private $controlados = [
+        'Alprazolam 0.5 mg comprimidos',
+        'Buprenorfina 35 mcg/h parche',
+        'Clonazepam 0.5 mg comprimidos',
+        'Clonazepam 2 mg comprimidos',
+        'Diazepam 10 mg comprimidos',
+        'Diazepam 10 mg/2 ml ampolla',
+        'Fenobarbital 100 mg comprimidos',
+        'Lorazepam 4 mg/2ml ampolla',
+        'Lorazepam 2 mg comprimido sublingual',
+        'Midazolam 15 mg/3ml ampolla',
+        'Midazolam 5mg/ml ampolla',
+        'Metilfenidato Clorhidrato 10 mg comprimidos',
+        'Morfina 10mg/ml ampolla',
+        'Morfina 20 mg/ml Frasco gotas',
+        'Petidina 100 mg/2ml ampolla',
+        'Zolpidem 10 mg comprimidos',
+        'Recetas Cheque Estupefacientes'
+    ];
+
     public function index()
     {
         $providers = Provider::all();
@@ -23,8 +44,9 @@ class ReceptionController extends Controller
         $receptions = Reception::with(['provider', 'items.product'])->orderBy('created_at', 'desc')->get();
 
         $nextCorrelativo = Reception::max('correlativo') + 1;
+        $controlados = $this->controlados;
 
-        return view('reception.index', compact('providers', 'receptions', 'products', 'nextCorrelativo'));
+        return view('reception.index', compact('providers', 'receptions', 'products', 'nextCorrelativo', 'controlados'));
     }
 
     public function store(Request $request)
@@ -52,7 +74,7 @@ class ReceptionController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. Guardar la Cabecera de la Recepción
+            // 1. Guardar la Cabecera de la Recepción (Sin firma de proveedor)
             $reception = Reception::create([
                 'correlativo' => $correlativo_autogenerado,
                 'fecha_recepcion' => $request->fecha_recepcion,
@@ -62,7 +84,6 @@ class ReceptionController extends Controller
                 'origen' => $request->origen,
                 'provider_id' => $request->provider_id,
                 'valor_total_recepcion' => 0,
-                'firma_proveedor' => $request->firma_proveedor,
                 'firma_receptor' => $request->firma_receptor,
             ]);
 
@@ -80,13 +101,18 @@ class ReceptionController extends Controller
                 $loteRecibido = $request->lote[$index] ?? 'S/L';
                 $fechaVence = $request->fecha_vencimiento[$index] ?? null;
 
+                // Asignar categoría automáticamente si es un medicamento controlado
+                $categoriaProducto = in_array($nombreProducto, $this->controlados) 
+                    ? 'Controlado' 
+                    : ($request->tipo_producto[$index] ?? 'General');
+
                 $total_neto_recepcion += $subtotal_item;
 
                 // Guardar en reception_items
                 ReceptionItem::create([
                     'reception_id' => $reception->id,
                     'product_id' => $prod_id,
-                    'tipo_producto' => $request->tipo_producto[$index] ?? null,
+                    'tipo_producto' => $categoriaProducto,
                     'lote' => $loteRecibido,
                     'fecha_vencimiento' => $fechaVence,
                     'cantidad' => $cantidad,
@@ -120,7 +146,7 @@ class ReceptionController extends Controller
                         'rut_proveedor' => $rutProveedor,
                         'razon_social' => $nombreProveedor,
                         'producto' => $nombreProducto,
-                        'categoria' => $request->tipo_producto[$index] ?? 'General',
+                        'categoria' => $categoriaProducto,
                         'estado' => 'Cuarentena', // Se asume Cuarentena al ingresar
                         'lote' => $loteRecibido,
                         'fecha_vencimiento' => $fechaVence,
