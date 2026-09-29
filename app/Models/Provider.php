@@ -17,9 +17,6 @@ class Provider extends Model
         'email', 
         'phone', 
         'address', 
-        'bank_name', 
-        'account_type', 
-        'account_number', 
         'status'
     ];
 }

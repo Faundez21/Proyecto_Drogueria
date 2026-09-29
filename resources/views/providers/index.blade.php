@@ -168,9 +168,6 @@
                             data-phone="{{ $provider->phone }}"
                             data-address="{{ $provider->address }}"
                             data-category="{{ $provider->category }}"
-                            data-bank-name="{{ $provider->bank_name }}"
-                            data-account-type="{{ $provider->account_type }}"
-                            data-account-number="{{ $provider->account_number }}"
                             data-status="{{ $provider->status }}">
 
                             <td class="px-6 py-4">
@@ -310,7 +307,6 @@
             </div>
 
             <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-
                 <!-- Sección: Información Comercial -->
                 <div>
                     <h4 class="text-[13px] font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">Información Comercial y Contacto</h4>
@@ -341,27 +337,8 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Sección: Información Bancaria -->
-                <div>
-                    <h4 class="text-[13px] font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">Información Bancaria</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Banco</p>
-                            <p id="detail-bank-name" class="text-[13.5px] font-semibold text-slate-700"></p>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tipo de Cuenta</p>
-                            <p id="detail-account-type" class="text-[13.5px] font-semibold text-slate-700"></p>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nº de Cuenta</p>
-                            <p id="detail-account-number" class="font-mono-das text-[13.5px] font-semibold text-slate-700"></p>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+
             <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50">
                 <button type="button" class="js-modal-close px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 w-full sm:w-auto transition-colors" data-close="modal-detail">
                     Cerrar
@@ -390,7 +367,7 @@
 
             <div id="form-errors" class="hidden px-6 pt-5 pb-0 text-[13px] font-medium text-red-600"></div>
 
-            <form class="p-6 space-y-6 overflow-y-auto">
+            <form class="p-6 space-y-6 overflow-y-auto" onsubmit="return false;">
                 <input type="hidden" id="provider-id" value="">
 
                 <!-- SECCIÓN 1: DATOS GENERALES -->
@@ -444,32 +421,6 @@
                         <div class="sm:col-span-2">
                             <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Dirección Completa</label>
                             <input type="text" id="provider-address" placeholder="Ej: Av. Providencia 1234, Santiago" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 3: DATOS BANCARIOS -->
-                <div>
-                    <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Datos Bancarios</h4>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Banco</label>
-                            <input type="text" id="provider-bank-name" placeholder="Ej: Banco Estado" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Tipo de Cuenta</label>
-                            <select id="provider-account-type" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
-                                <option value="">Seleccione...</option>
-                                <option value="Cuenta Corriente">Cuenta Corriente</option>
-                                <option value="Cuenta Vista">Cuenta Vista</option>
-                                <option value="Cuenta de Ahorro">Cuenta de Ahorro</option>
-                                <option value="Cuenta RUT">Cuenta RUT</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Número de Cuenta</label>
-                            <input type="text" id="provider-account-number" placeholder="Ej: 123456789" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
                         </div>
                     </div>
                 </div>
@@ -573,14 +524,11 @@
                     id: row.dataset.id || '',
                     name: row.dataset.name || '',
                     rut: row.dataset.rut || '',
-                    business_line: row.dataset.businessLine || '', // Nuevo
+                    business_line: row.dataset.businessLine || '',
                     email: row.dataset.email || '',
                     phone: row.dataset.phone || '',
-                    address: row.dataset.address || '',            // Nuevo
+                    address: row.dataset.address || '',
                     category: row.dataset.category || '',
-                    bank_name: row.dataset.bankName || '',         // Nuevo
-                    account_type: row.dataset.accountType || '',   // Nuevo
-                    account_number: row.dataset.accountNumber || '',// Nuevo
                     status: row.dataset.status || 'inactivo'
                 };
             }
@@ -598,14 +546,13 @@
                     document.getElementById('detail-email').textContent = p.email || 'No registrado';
                     document.getElementById('detail-phone').textContent = p.phone || 'No registrado';
                     document.getElementById('detail-category').textContent = p.category;
-                    document.getElementById('detail-initials').textContent = p.name.substring(0,2).toUpperCase();
 
-                    // Nuevos campos en el detalle
+                    // Mejora: Obtener iniciales seguras aunque haya múltiples espacios
+                    const initials = p.name.split(' ').filter(n => n).map(n => n[0]).slice(0, 2).join('').toUpperCase();
+                    document.getElementById('detail-initials').textContent = initials;
+
                     document.getElementById('detail-business-line').textContent = p.business_line || 'No registrado';
                     document.getElementById('detail-address').textContent = p.address || 'No registrada';
-                    document.getElementById('detail-bank-name').textContent = p.bank_name || 'No registrado';
-                    document.getElementById('detail-account-type').textContent = p.account_type || 'No registrado';
-                    document.getElementById('detail-account-number').textContent = p.account_number || 'No registrado';
 
                     const statusBadge = document.getElementById('detail-status');
                     statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${p.status === 'activo' ? 'bg-emerald-500' : 'bg-slate-400'}"></span> ${p.status === 'activo' ? 'Activo' : 'Inactivo'}`;
@@ -635,10 +582,6 @@
                     document.getElementById('provider-phone').value = p.phone || '+56 ';
                     document.getElementById('provider-address').value = p.address;
 
-                    document.getElementById('provider-bank-name').value = p.bank_name;
-                    document.getElementById('provider-account-type').value = p.account_type;
-                    document.getElementById('provider-account-number').value = p.account_number;
-
                     document.querySelector(`input[name="edit-status"][value="${p.status}"]`).checked = true;
                     document.getElementById('status-container').classList.remove('hidden');
                 } else {
@@ -653,10 +596,6 @@
                     document.getElementById('provider-email').value = '';
                     document.getElementById('provider-phone').value = '+56 ';
                     document.getElementById('provider-address').value = '';
-
-                    document.getElementById('provider-bank-name').value = '';
-                    document.getElementById('provider-account-type').value = '';
-                    document.getElementById('provider-account-number').value = '';
 
                     document.querySelector('input[name="edit-status"][value="activo"]').checked = true;
                     document.getElementById('status-container').classList.add('hidden');
@@ -685,9 +624,6 @@
                     email: document.getElementById('provider-email').value.trim(),
                     phone: document.getElementById('provider-phone').value.trim(),
                     address: document.getElementById('provider-address').value.trim(),
-                    bank_name: document.getElementById('provider-bank-name').value.trim(),
-                    account_type: document.getElementById('provider-account-type').value,
-                    account_number: document.getElementById('provider-account-number').value.trim(),
                     status: document.querySelector('input[name="edit-status"]:checked').value
                 };
 
