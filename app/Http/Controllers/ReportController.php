@@ -12,6 +12,11 @@ class ReportController extends Controller
         // 1. Iniciar la consulta
         $query = Inventory::query();
 
+        //esto hace de que no se muestre los productos en cuarentena
+        $query = Inventory::where(function ($q) {
+            $q->where('estado', '!=', 'Cuarentena')
+                ->orWhereNull('estado');
+        });
         // Cargar relaciones si están definidas en el modelo
         $relations = [];
         if (method_exists(Inventory::class, 'producto')) {
@@ -32,7 +37,7 @@ class ReportController extends Controller
             $relations[] = 'shelf';
         }
 
-        if (!empty($relations)) {
+        if (! empty($relations)) {
             $query->with($relations);
         }
 
@@ -40,13 +45,13 @@ class ReportController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('producto', 'like', "%{$search}%")
-                  ->orWhere('lote', 'like', "%{$search}%")
-                  ->orWhere('categoria', 'like', "%{$search}%");
+                    ->orWhere('lote', 'like', "%{$search}%")
+                    ->orWhere('categoria', 'like', "%{$search}%");
 
                 if (method_exists(Inventory::class, 'producto')) {
-                    $q->orWhereHas('producto', fn($qp) => $qp->where('nombre', 'like', "%{$search}%"));
+                    $q->orWhereHas('producto', fn ($qp) => $qp->where('nombre', 'like', "%{$search}%"));
                 } elseif (method_exists(Inventory::class, 'product')) {
-                    $q->orWhereHas('product', fn($qp) => $qp->where('nombre', 'like', "%{$search}%"));
+                    $q->orWhereHas('product', fn ($qp) => $qp->where('nombre', 'like', "%{$search}%"));
                 }
             });
         }
@@ -59,7 +64,7 @@ class ReportController extends Controller
             $pasillo = $request->input('pasillo');
             $query->where(function ($q) use ($pasillo) {
                 $q->where('pasillo_nombre', $pasillo)
-                  ->orWhere('pasillo', $pasillo);
+                    ->orWhere('pasillo', $pasillo);
             });
         }
 
@@ -67,8 +72,8 @@ class ReportController extends Controller
             $estante = $request->input('estante');
             $query->where(function ($q) use ($estante) {
                 $q->where('estanteria_nombre', $estante)
-                  ->orWhere('estante', $estante)
-                  ->orWhere('estanteria', $estante);
+                    ->orWhere('estante', $estante)
+                    ->orWhere('estanteria', $estante);
             });
         }
 

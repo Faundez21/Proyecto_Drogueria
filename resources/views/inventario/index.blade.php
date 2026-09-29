@@ -105,20 +105,39 @@
 
                     <div id="filtersPanel" class="{{ $hasActiveFilters ? '' : 'hidden' }} space-y-4 pt-4 mt-4 border-t border-slate-200">
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                            <!-- BUSCAR -->
-                            <div class="lg:col-span-2">
-                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Buscar</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
-                                    <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
-                                        placeholder="Producto, categoría o lote..."
-                                        class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-slate-700 shadow-sm placeholder:text-slate-400">
-                                </div>
-                            </div>
+                            <!-- BUSCAR CON DESPLEGABLE PERSONALIZADO -->
+<div class="lg:col-span-2 relative" id="searchContainer">
+    <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Buscar</label>
+    <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+
+        <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
+            placeholder="Producto, categoría o lote..." autocomplete="off"
+            onfocus="showSearchDropdown()" oninput="filterSearchDropdown()"
+            class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-slate-700 shadow-sm placeholder:text-slate-400">
+    </div>
+
+    <!-- Lista desplegable situada justo debajo del campo de búsqueda -->
+    <div id="searchDropdown" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100 sidebar-scroll">
+        @if(isset($productosLista) && count($productosLista) > 0)
+            @foreach($productosLista as $prodNombre)
+                <div class="search-item px-3.5 py-2.5 text-[12.5px] font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-900 cursor-pointer transition-colors flex items-center justify-between"
+                     onclick="selectSearchProduct('{{ $prodNombre }}')">
+                    <span>{{ $prodNombre }}</span>
+                    <svg class="w-3.5 h-3.5 text-slate-300 hover:text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            @endforeach
+        @else
+            <div class="px-3.5 py-2.5 text-[12px] text-slate-400 text-center">No hay productos registrados</div>
+        @endif
+    </div>
+</div>
 
                             <div>
                                 <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Categoría</label>
@@ -1193,5 +1212,54 @@
 
         function openMerma() { document.getElementById('mermaModal').classList.remove('hidden'); }
         function closeMerma() { document.getElementById('mermaModal').classList.add('hidden'); }
+
+
+    // Funciones para el campo de búsqueda
+        function showSearchDropdown() {
+    const dropdown = document.getElementById('searchDropdown');
+    if (dropdown) dropdown.classList.remove('hidden');
+}
+
+function selectSearchProduct(productName) {
+    const input = document.getElementById('searchInput');
+    if (input) input.value = productName;
+
+    const dropdown = document.getElementById('searchDropdown');
+    if (dropdown) dropdown.classList.add('hidden');
+
+    const form = document.getElementById('filtersForm');
+    if (form) {
+        form.submit();
+    }
+}
+
+function filterSearchDropdown() {
+    const input = document.getElementById('searchInput');
+    const filter = (input ? input.value : '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const items = document.querySelectorAll('#searchDropdown .search-item');
+
+    let visibleCount = 0;
+    items.forEach(item => {
+        const text = item.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (text.includes(filter)) {
+            item.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            item.classList.add('hidden');
+        }
+    });
+
+    const dropdown = document.getElementById('searchDropdown');
+    if (dropdown) dropdown.classList.remove('hidden');
+}
+
+// Cierra el menú al hacer clic fuera del campo de búsqueda
+document.addEventListener('click', function(event) {
+    const container = document.getElementById('searchContainer');
+    const dropdown = document.getElementById('searchDropdown');
+    if (container && dropdown && !container.contains(event.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
     </script>
 @endsection
