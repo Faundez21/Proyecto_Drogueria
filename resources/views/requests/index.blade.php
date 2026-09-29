@@ -151,7 +151,6 @@
                     <!-- contenedor dinamico -->
                     <div id="productos_container" class="space-y-4">
 
-                        <!-- producto inicial -->
                         <div class="producto-item relative border border-slate-200 bg-white p-4 rounded-xl shadow-sm">
 
                             <button type="button"
@@ -165,7 +164,27 @@
                             </button>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
+                                        Programa <span class="text-rose-500">*</span>
+                                    </label>
 
+                                    <select name="programa[]" required
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        <option value="" disabled selected>
+                                            Seleccione...
+                                        </option>
+                                        <option value="Morbilidad General">
+                                            Morbilidad General
+                                        </option>
+                                        <option value="Cardiovascular">
+                                            Cardiovascular
+                                        </option>
+                                        <option value="IRA/ERA">
+                                            IRA/ERA
+                                        </option>
+                                    </select>
+                                </div>
                                 <div class="lg:col-span-2">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Producto <span class="text-rose-500">*</span>
@@ -196,24 +215,21 @@
 
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
-                                        Programa <span class="text-rose-500">*</span>
+                                        Consumo mensual del mes anterior <span class="text-rose-500">*</span>
                                     </label>
 
-                                    <select name="programa[]" required
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
-                                        <option value="" disabled selected>
-                                            Seleccione...
-                                        </option>
-                                        <option value="Morbilidad General">
-                                            Morbilidad General
-                                        </option>
-                                        <option value="Cardiovascular">
-                                            Cardiovascular
-                                        </option>
-                                        <option value="IRA/ERA">
-                                            IRA/ERA
-                                        </option>
-                                    </select>
+                                    <input type="number" name="consumo_anterior[]" min="0" readonly
+                                        placeholder="Se calculará automáticamente"
+                                        class="w-full bg-slate-100 border border-slate-200 text-slate-500 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold cursor-not-allowed">
+                                </div>
+
+                                <div>
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
+                                        Cantidad en stock actualmente <span class="text-rose-500">*</span>
+                                    </label>
+
+                                    <input type="number" name="cantidad[]" min="1" required placeholder="Ej: 20"
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold">
                                 </div>
 
                                 <div>

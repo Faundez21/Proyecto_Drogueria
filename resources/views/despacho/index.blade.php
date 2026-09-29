@@ -415,6 +415,7 @@
             </td>
         </tr>
     </template>
+
     <!-- ventana modal para visualizar solicitudes pendientes -->
     <div id="SolicitudesModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
@@ -551,8 +552,8 @@
                                                 <tr>
                                                     <th class="px-4 py-3">Producto</th>
                                                     <th class="px-4 py-3">Lote</th>
-                                                    <th class="px-4 py-3 text-center">Consumo Anterior</th>
-                                                    <th class="px-4 py-3 text-center">Stock Actual</th>
+                                                    <th class="px-4 py-3 text-center">Consumo mensual anterior</th>
+                                                    <th class="px-4 py-3 text-center">Stock Actual del establecimiento</th>
                                                     <th class="px-4 py-3 text-center">Solicitado</th>
                                                     <th class="px-4 py-3">Programa</th>
                                                 </tr>
@@ -638,142 +639,6 @@
                                                     </td>
                                                 </tr>
 
-                                            </tbody>
-                                        </table>
-
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-
-
-                        <!-- solicitud 002 -->
-                        <tr class="bg-white hover:bg-slate-50 transition-colors cursor-pointer group"
-                            onclick="toggleSolicitud('solicitud-2')">
-                            <td class="px-6 py-4 text-center">
-                                <button type="button"
-                                    class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200">
-                                    <svg class="w-4 h-4 transform transition-transform duration-300"
-                                        id="arrow-solicitud-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                            </td>
-
-                            <td class="px-6 py-4 font-mono font-extrabold text-slate-800">
-                                #00022
-                            </td>
-
-                            <td class="px-6 py-4 font-bold text-slate-800">
-                                CESFAM SAN VICENTE
-                            </td>
-
-                            <td class="px-6 py-4 font-medium text-slate-600">
-                                28-09-2026
-                            </td>
-
-                            <td class="px-6 py-4 text-center font-bold text-slate-700">
-                                2
-                            </td>
-
-                            <td class="px-6 py-4 text-center">
-                                <span
-                                    class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
-                                    Pendiente
-                                </span>
-                            </td>
-                        </tr>
-
-                        <!-- detalle solicitud 002 -->
-                        <tr id="solicitud-2" class="hidden bg-slate-100/50 shadow-inner">
-                            <td colspan="6" class="p-0 border-b border-slate-300">
-                                <div class="py-4 pr-6 pl-14">
-
-                                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-
-                                        <div class="px-4 py-3 bg-slate-700 text-white flex justify-between items-center">
-                                            <div>
-                                                <span class="text-[10px] font-bold uppercase tracking-widest">
-                                                    Detalle de Solicitud #00022
-                                                </span>
-
-                                                <p class="text-[11px] text-slate-300 mt-0.5">
-                                                    CESFAM SAN VICENTE
-                                                </p>
-                                            </div>
-
-                                            <button type="button"
-                                                class="px-3 py-1.5 bg-[#0f968c] hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-colors">
-                                                Usar Solicitud
-                                            </button>
-                                        </div>
-
-                                        <table class="w-full text-left text-[12px] whitespace-nowrap">
-                                            <thead
-                                                class="bg-slate-50 text-slate-500 uppercase font-extrabold border-b border-slate-200 text-[10px]">
-                                                <tr>
-                                                    <th class="px-4 py-3">Producto</th>
-                                                    <th class="px-4 py-3">Lote</th>
-                                                    <th class="px-4 py-3 text-center">Consumo Anterior</th>
-                                                    <th class="px-4 py-3 text-center">Stock Actual</th>
-                                                    <th class="px-4 py-3 text-center">Solicitado</th>
-                                                    <th class="px-4 py-3">Programa</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody class="divide-y divide-slate-100 text-slate-700">
-                                                <tr class="hover:bg-slate-50">
-                                                    <td class="px-4 py-3 font-bold">
-                                                        Losartán 50 mg
-                                                    </td>
-
-                                                    <td class="px-4 py-3 font-mono font-bold">
-                                                        L24089
-                                                    </td>
-
-                                                    <td class="px-4 py-3 text-center">
-                                                        100
-                                                    </td>
-
-                                                    <td class="px-4 py-3 text-center font-extrabold text-blue-700">
-                                                        300
-                                                    </td>
-
-                                                    <td class="px-4 py-3 text-center font-extrabold text-teal-700">
-                                                        80
-                                                    </td>
-
-                                                    <td class="px-4 py-3">
-                                                        Cardiovascular
-                                                    </td>
-                                                </tr>
-
-                                                <tr class="hover:bg-slate-50">
-                                                    <td class="px-4 py-3 font-bold">
-                                                        Amoxicilina 500 mg
-                                                    </td>
-
-                                                    <td class="px-4 py-3 font-mono font-bold">
-                                                        L24115
-                                                    </td>
-
-                                                    <td class="px-4 py-3 text-center">
-                                                        60
-                                                    </td>
-
-                                                    <td class="px-4 py-3 text-center font-extrabold text-blue-700">
-                                                        180
-                                                    </td>
-
-                                                    <td class="px-4 py-3 text-center font-extrabold text-teal-700">
-                                                        50
-                                                    </td>
-
-                                                    <td class="px-4 py-3">
-                                                        Morbilidad General
-                                                    </td>
-                                                </tr>
                                             </tbody>
                                         </table>
 
