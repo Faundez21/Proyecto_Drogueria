@@ -25,9 +25,20 @@ class InventoryController extends Controller
             });
         }
 
-        $inventories = $query->latest()->paginate(10);
+        //esta es lista de productos para el filtro
+        $productosLista = Inventory::where(function ($q) {
+            $q->where('estado', '!=', 'Cuarentena')
+                ->orWhereNull('estado');
+        })
+            ->pluck('producto')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+        // ---------------------------
 
-        return view('inventario.index', compact('inventories'));
+        $inventories = $query->latest()->paginate(10)->withQueryString();
+        return view('inventario.index', compact('inventories', 'productosLista'));
     }
 
     public function store(Request $request)
@@ -46,10 +57,12 @@ class InventoryController extends Controller
             'lote' => 'nullable|string',
             'fecha_vencimiento' => 'nullable|date',
             'cantidad' => 'required|integer|min:1',
+            'minimo' => 'nullable|integer|min:0',
             'valor_neto_unitario' => 'required|numeric|min:0',
         ]);
 
-        $validated['estado'] = 'Disponible';
+        $validated['estado'] = $request->input('estado', 'Disponible');
+        $validated['minimo'] = $request->input('minimo', 0);
 
         Inventory::create($validated);
 
@@ -75,6 +88,8 @@ class InventoryController extends Controller
         $inventory->update([
             'estado' => $request->estado,
         ]);
+        $inventory->motivo = $request->input('motivo');
+        $inventory->save();
 
         return redirect()->back()
             ->with('success', 'El estado del lote fue actualizado correctamente.');

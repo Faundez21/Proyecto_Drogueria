@@ -233,6 +233,7 @@
                         class="text-[10px] font-medium text-slate-400 tracking-[0.2em] uppercase mt-1.5 leading-none">Droguería</span>
                 </div>
             </a>
+
             <button onclick="toggleSidebar()"
                 class="absolute right-4 lg:hidden p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,17 +245,18 @@
 
         <nav class="flex-1 px-3 py-5 space-y-6 overflow-y-auto sidebar-scroll">
             <div>
-                <a href="{{ route('dashboard.index') }}"
-                    class="nav-row {{ request()->routeIs('dashboard.*') ? 'is-active' : '' }} flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px]">
-                    <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                        </path>
-                    </svg>
-                    Panel Principal
-                </a>
-            </div>
-
+                @role('Administrador')
+                    <a href="{{ route('dashboard.index') }}"
+                        class="nav-row {{ request()->routeIs('dashboard.*') ? 'is-active' : '' }} flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px]">
+                        <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                            </path>
+                        </svg>
+                        Panel Principal
+                    </a>
+                </div>
+            @endrole
             <!-- Paso 1: Abastecimiento -->
             <div class="flow-section">
                 <div class="flex items-center gap-2 mb-2 px-2">
@@ -313,68 +315,66 @@
                         </div>
                     </a>
                 </div>
+
             </div>
 
             <!-- Paso 3: Salida -->
-            <div class="flow-section">
-                <div class="flex items-center gap-2 mb-2 px-2">
-                    <span
-                        class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">03</span>
-                    <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Salida</p>
-                </div>
-                <div class="flow-rail pl-[27px] space-y-0.5">
+<div class="flow-section">
+    <div class="flex items-center gap-2 mb-2 px-2">
+        <span class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">03</span>
+        <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Salida</p>
+    </div>
+    <div class="flow-rail pl-[27px] space-y-0.5">
+        <div class="flex flex-col space-y-0.5">
+            <a href="{{ route('despacho.index') }}"
+                class="nav-row {{ request()->routeIs('despacho.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                        d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                </svg>
+                Despacho Normal
+            </a>
+            @role('Administrador')
+                <!-- Submenú Controlado -->
+                <div class="relative pl-6">
+                    <div class="absolute left-3.5 top-0 bottom-4 w-px bg-slate-700/60"></div>
+                    <div class="absolute left-3.5 top-1/2 w-2.5 h-px bg-slate-700/60"></div>
 
-                    <!-- Grupo Despacho (con submenú) -->
-                    <div class="flex flex-col space-y-0.5">
-                        <a href="{{ route('dispatch.index') }}"
-                            class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                    d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
-                            </svg>
-                            Despacho Normal
-                        </a>
-
-                        <!-- Submenú Controlado -->
-                        <div class="relative pl-6">
-                            <!-- Conector visual tipo L -->
-                            <div class="absolute left-3.5 top-0 bottom-4 w-px bg-slate-700/60"></div>
-                            <div class="absolute left-3.5 top-1/2 w-2.5 h-px bg-slate-700/60"></div>
-
-                            <a href="{{ route('controlled_dispatch.index') }}"
-                                class="nav-row {{ request()->routeIs('controlled_dispatch.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[12px]">
-                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                    </path>
-                                </svg>
-                                Despacho Controlado
-                            </a>
-                        </div>
-                    </div>
-
-                    <a href="{{ route('distribution.index') }}"
-                        class="nav-row {{ request()->routeIs('distribution.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="{{ route('controlled_dispatch.index') }}"
+                        class="nav-row {{ request()->routeIs('controlled_dispatch.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[12px]">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                        </svg>
-                        Distribución
-                    </a>
-
-                    <a href="{{ route('requests.index') }}"
-                        class="nav-row {{ request()->routeIs('requests.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4">
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
                             </path>
                         </svg>
-                        Solicitudes
+                        Despacho Controlado
                     </a>
                 </div>
-            </div>
+            @endrole
+        </div>
 
+        <a href="{{ route('distribution.index') }}"
+            class="nav-row {{ request()->routeIs('distribution.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+            </svg>
+            Distribución
+        </a>
+
+        @role('Administrador')
+            <a href="{{ route('requests.index') }}"
+                class="nav-row {{ request()->routeIs('requests.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4">
+                    </path>
+                </svg>
+                Solicitudes
+            </a>
+        @endrole
+    </div>
+</div>
             <!-- Paso 4: Control -->
             <div class="flow-section">
                 <div class="flex items-center gap-2 mb-2 px-2">
@@ -426,7 +426,6 @@
             @endauth
         </nav>
     </aside>
-
     <!-- Contenedor principal -->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
 
@@ -475,39 +474,39 @@
                     </svg>
                     <div class="text-[13px] font-mono-das tracking-tight" id="live-clock"></div>
                 </div>
+                @role('Administrador')
+                    <!-- Notificaciones Dinámicas -->
+                    <div class="relative" id="notifications-container">
+                        <button onclick="toggleNotifications()" type="button"
+                            class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                                </path>
+                            </svg>
+                            <span id="notif-badge"
+                                class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full pulse-dot border-2 border-white"
+                                style="background-color: var(--alert);"></span>
+                        </button>
 
-                <!-- Notificaciones Dinámicas -->
-                <div class="relative" id="notifications-container">
-                    <button onclick="toggleNotifications()" type="button"
-                        class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
-                            </path>
-                        </svg>
-                        <span id="notif-badge"
-                            class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full pulse-dot border-2 border-white"
-                            style="background-color: var(--alert);"></span>
-                    </button>
-
-                    <div id="notifications-menu"
-                        class="hidden absolute right-0 mt-2 w-[340px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
-                        <div
-                            class="px-4 py-3.5 flex justify-between items-center border-b border-slate-100 bg-slate-50">
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-[13px] font-semibold text-slate-800">Notificaciones</h3>
-                                <span id="notif-count"
-                                    class="text-white text-[10px] font-mono-das font-semibold px-1.5 py-0.5 rounded bg-slate-400">0</span>
+                        <div id="notifications-menu"
+                            class="hidden absolute right-0 mt-2 w-[340px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
+                            <div
+                                class="px-4 py-3.5 flex justify-between items-center border-b border-slate-100 bg-slate-50">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-[13px] font-semibold text-slate-800">Notificaciones</h3>
+                                    <span id="notif-count"
+                                        class="text-white text-[10px] font-mono-das font-semibold px-1.5 py-0.5 rounded bg-slate-400">0</span>
+                                </div>
+                            </div>
+                            <div id="notif-list" class="max-h-[320px] overflow-y-auto p-2 space-y-1 sidebar-scroll">
+                                <div class="p-4 text-center text-slate-400 text-xs">Cargando alertas...</div>
                             </div>
                         </div>
-                        <div id="notif-list" class="max-h-[320px] overflow-y-auto p-2 space-y-1 sidebar-scroll">
-                            <div class="p-4 text-center text-slate-400 text-xs">Cargando alertas...</div>
-                        </div>
                     </div>
-                </div>
 
-                <div class="hidden sm:block h-6 w-px mx-1 bg-slate-200"></div>
-
+                    <div class="hidden sm:block h-6 w-px mx-1 bg-slate-200"></div>
+                @endrole
                 <!-- Perfil -->
                 @auth
                     <div class="relative" id="user-menu-container">
