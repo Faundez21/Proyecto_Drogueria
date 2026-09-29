@@ -14,7 +14,6 @@ class InventorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Limpia la tabla para evitar registros duplicados al reejecutar el seeder
         DB::table('inventories')->truncate();
 
         $inventarios = [
@@ -35,6 +34,7 @@ class InventorySeeder extends Seeder
                 'cantidad'            => 500,
                 'valor_neto_unitario' => 15.50,
                 'estado'              => 'Disponible',
+                'motivo'              => null,
                 'pasillo'             => 'Pasillo 1',
                 'estante'             => 'A-2',
             ],
@@ -55,6 +55,7 @@ class InventorySeeder extends Seeder
                 'cantidad'            => 300,
                 'valor_neto_unitario' => 18.00,
                 'estado'              => 'Disponible',
+                'motivo'              => null,
                 'pasillo'             => 'Pasillo 1',
                 'estante'             => 'A-2',
             ],
@@ -71,10 +72,11 @@ class InventorySeeder extends Seeder
                 'producto'            => 'PARACETAMOL 500MG COMPRIMIDOS',
                 'categoria'           => 'Fármacos',
                 'lote'                => 'L-7711X',
-                'fecha_vencimiento'   => Carbon::now()->subDays(10)->format('Y-m-d'), // Vencido
+                'fecha_vencimiento'   => Carbon::now()->subDays(10)->format('Y-m-d'),
                 'cantidad'            => 50,
                 'valor_neto_unitario' => 15.50,
                 'estado'              => 'Merma',
+                'motivo'              => 'Producto vencido en estantería',
                 'pasillo'             => 'Pasillo Merma',
                 'estante'             => 'M-1',
             ],
@@ -95,6 +97,7 @@ class InventorySeeder extends Seeder
                 'cantidad'            => 1200,
                 'valor_neto_unitario' => 25.00,
                 'estado'              => 'Cuarentena',
+                'motivo'              => 'En espera de certificación de control de calidad',
                 'pasillo'             => 'Pasillo 2',
                 'estante'             => 'B-1',
             ],
@@ -115,6 +118,7 @@ class InventorySeeder extends Seeder
                 'cantidad'            => 2500,
                 'valor_neto_unitario' => 85.00,
                 'estado'              => 'Disponible',
+                'motivo'              => null,
                 'pasillo'             => 'Pasillo 4',
                 'estante'             => 'C-3',
             ],
@@ -132,9 +136,10 @@ class InventorySeeder extends Seeder
                 'categoria'           => 'Fármacos',
                 'lote'                => 'AMX-441',
                 'fecha_vencimiento'   => Carbon::now()->addMonths(4)->format('Y-m-d'),
-                'cantidad'            => 8, // Stock bajo
+                'cantidad'            => 8,
                 'valor_neto_unitario' => 45.00,
                 'estado'              => 'Disponible',
+                'motivo'              => null,
                 'pasillo'             => 'Pasillo 1',
                 'estante'             => 'A-1',
             ],

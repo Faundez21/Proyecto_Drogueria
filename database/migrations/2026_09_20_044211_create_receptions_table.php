@@ -9,7 +9,7 @@ return new class extends Migration
     public function up()
     {
         // tabla de productos
-        if (!Schema::hasTable('products')) {
+        if (! Schema::hasTable('products')) {
             Schema::create('products', function (Blueprint $table) {
                 $table->id();
                 $table->string('nombre');
@@ -18,7 +18,7 @@ return new class extends Migration
         }
 
         //  tabla de recepciones
-        if (!Schema::hasTable('receptions')) {
+        if (! Schema::hasTable('receptions')) {
             Schema::create('receptions', function (Blueprint $table) {
                 $table->id();
                 $table->integer('correlativo')->nullable();
@@ -39,11 +39,10 @@ return new class extends Migration
         }
 
         // tabla de productos
-        if (!Schema::hasTable('reception_items')) {
+        if (! Schema::hasTable('reception_items')) {
             Schema::create('reception_items', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('reception_id')->constrained('receptions')->onDelete('cascade');
-
 
                 $table->foreignId('product_id')->constrained('products')->onDelete('restrict');
 

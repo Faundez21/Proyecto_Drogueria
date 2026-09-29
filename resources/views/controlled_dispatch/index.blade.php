@@ -48,7 +48,7 @@
 
         <form action="{{ route('controlled_dispatch.store') }}" method="POST" id="despachoForm">
             @csrf
-            
+
             <!-- seccion de datos del remitente y correlativo -->
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
                 <div>
@@ -74,7 +74,7 @@
                 <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide mb-4">1. Tipo, Destino y Logistica</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
-                    
+
                     <!-- clasificacion interno/externo -->
                     <div class="md:col-span-2">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Clasificacion del Despacho <span class="text-rose-500">*</span></label>
@@ -227,9 +227,9 @@
                 <select name="productos[]" required onchange="llenarDatosFila(this)" class="w-full bg-white border border-slate-300 focus:border-rose-500 rounded-lg px-2.5 py-2 text-[12px] font-bold text-slate-800 outline-none shadow-sm cursor-pointer transition-colors">
                     <option value="" disabled selected>Seleccione estupefaciente...</option>
                     @foreach($inventarioDisponible as $inv)
-                        <option value="{{ $inv->producto }}" 
-                                data-lote="{{ $inv->lote ?? 'S/L' }}" 
-                                data-vence="{{ $inv->fecha_vencimiento ?? '' }}" 
+                        <option value="{{ $inv->producto }}"
+                                data-lote="{{ $inv->lote ?? 'S/L' }}"
+                                data-vence="{{ $inv->fecha_vencimiento ?? '' }}"
                                 data-stock="{{ $inv->cantidad ?? 0 }}">
                             {{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})
                         </option>
@@ -283,7 +283,7 @@
                     <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros de Busqueda</span>
                     <button type="button" onclick="limpiarFiltrosBandeja()" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 transition-colors">Limpiar Filtros</button>
                 </div>
-                
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Correlativo</label>
@@ -492,7 +492,7 @@
             const val = document.getElementById('clasificacion_select').value;
             const divInt = document.getElementById('div_interno');
             const divExt = document.getElementById('div_externo');
-            
+
             const selInt = document.getElementById('establecimiento_interno');
             const selExtTipo = document.getElementById('tipo_externo');
             const inpExtDest = document.getElementById('establecimiento_externo');
@@ -501,10 +501,10 @@
             if (val === 'Interno') {
                 divInt.classList.remove('hidden');
                 divExt.classList.add('hidden');
-                
+
                 selInt.setAttribute('name', 'establecimiento_destino');
                 selInt.setAttribute('required', 'true');
-                
+
                 selExtTipo.removeAttribute('name');
                 selExtTipo.removeAttribute('required');
                 inpExtDest.removeAttribute('name');
@@ -514,7 +514,7 @@
                 inpDir.classList.add('bg-slate-50', 'cursor-not-allowed');
                 inpDir.classList.remove('bg-white');
                 inpDir.placeholder = "Se autocompletara al seleccionar destino...";
-                
+
                 actualizarDireccionInterna();
             } else if (val === 'Externo') {
                 divInt.classList.add('hidden');
@@ -538,11 +538,11 @@
 
         function actualizarDireccionInterna() {
             if(document.getElementById('clasificacion_select').value !== 'Interno') return;
-            
+
             const select = document.getElementById('establecimiento_interno');
             const input = document.getElementById('direccion_destino');
             const selectedOption = select.options[select.selectedIndex];
-            
+
             if (selectedOption && selectedOption.dataset.direccion) {
                 input.value = selectedOption.dataset.direccion;
             } else {
@@ -568,7 +568,7 @@
             let selectClasificacion = document.getElementById('filtroClasificacion').value.toLowerCase();
             let inputDestino = document.getElementById('filtroDestino').value.toLowerCase();
             let selectEstado = document.getElementById('filtroEstadoBandeja').value.toLowerCase();
-            
+
             let fechaFormateada = "";
             if (inputFecha) {
                 let partes = inputFecha.split('-');
@@ -585,7 +585,7 @@
                 let clasificacionText = fila.children[3].textContent.toLowerCase();
                 let destinoText = fila.children[4].textContent.toLowerCase();
                 let estadoText = fila.children[5].textContent.toLowerCase();
-                
+
                 let coincideCorrelativo = correlativoText.includes(inputCorrelativo);
                 let coincideFecha = fechaFormateada === "" || fechaText.includes(fechaFormateada);
                 let coincideClasificacion = selectClasificacion === "" || clasificacionText.includes(selectClasificacion);
@@ -655,7 +655,7 @@
                 let select = tr.querySelector('select[name="productos[]"]');
                 let options = Array.from(select.options);
                 let targetOption = options.find(opt => opt.value === data.producto && opt.getAttribute('data-lote') === data.lote);
-                
+
                 if (targetOption) {
                     select.value = targetOption.value;
                     llenarDatosFila(select);
@@ -666,41 +666,41 @@
 
         function llenarDatosFila(selectElement) {
             let option = selectElement.options[selectElement.selectedIndex];
-            if (!option || option.disabled) return; 
+            if (!option || option.disabled) return;
 
             let tr = selectElement.closest('tr');
             let loteInput = tr.querySelector('input[name="lotes[]"]');
             let venceInput = tr.querySelector('input[name="vencimientos[]"]');
             let cantInput = tr.querySelector('input[name="cantidades[]"]');
-            
+
             let stockBadge = tr.querySelector('.stock-max-badge');
             let stockContainer = tr.querySelector('.stock-container');
             let fefoContainer = tr.querySelector('.fefo-container');
 
             loteInput.value = option.getAttribute('data-lote');
             venceInput.value = option.getAttribute('data-vence');
-            
+
             let stock = parseInt(option.getAttribute('data-stock'));
-            cantInput.setAttribute('max', stock); 
+            cantInput.setAttribute('max', stock);
             stockBadge.textContent = stock;
             stockContainer.classList.remove('hidden');
             
             fefoContainer.innerHTML = '';
             venceInput.classList.remove('text-rose-700', 'font-extrabold', 'bg-rose-50');
-            
+
             if(venceInput.value) {
                 try {
                     let fVence = new Date(venceInput.value);
                     let hoy = new Date();
                     let mesesRestantes = (fVence.getFullYear() - hoy.getFullYear()) * 12 + (fVence.getMonth() - hoy.getMonth());
-                    
+
                     if(mesesRestantes <= 6) {
                         venceInput.classList.add('text-rose-700', 'font-extrabold', 'bg-rose-50');
                         fefoContainer.innerHTML = '<span class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] bg-rose-500 text-white font-bold px-1.5 py-0.5 rounded shadow-sm">PRONTO A VENCER</span>';
                     }
                 } catch(e) {}
             }
-            
+
             cantInput.focus();
         }
 
@@ -722,10 +722,10 @@
         function validarStock(input) {
             let maxVal = parseInt(input.getAttribute('max'));
             let currentVal = parseInt(input.value);
-            
+
             if(!isNaN(maxVal) && !isNaN(currentVal)) {
                 if(currentVal > maxVal) {
-                    input.value = maxVal; 
+                    input.value = maxVal;
                     input.classList.add('border-rose-500', 'bg-rose-50', 'text-rose-700', 'ring-2', 'ring-rose-500/20');
                     setTimeout(() => {
                         input.classList.remove('border-rose-500', 'bg-rose-50', 'text-rose-700', 'ring-2', 'ring-rose-500/20');
@@ -747,16 +747,16 @@
         }
 
         function closeScanner() {
-            if(html5QrcodeScanner) { 
-                html5QrcodeScanner.clear().catch(e => console.error(e)); 
-                html5QrcodeScanner = null; 
+            if(html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(e => console.error(e));
+                html5QrcodeScanner = null;
             }
             document.getElementById('scannerModal').classList.add('hidden');
         }
 
         function onScanSuccess(decodedText) {
             closeScanner();
-            
+
             let parsedData = {};
             let chunks = decodedText.split('|');
             chunks.forEach(chunk => {
@@ -778,7 +778,7 @@
 
             let emptySelect = Array.from(tbody.querySelectorAll('select[name="productos[]"]')).find(sel => sel.value === '');
             let tr;
-            
+
             if(emptySelect) {
                 tr = emptySelect.closest('tr');
             } else {
@@ -788,14 +788,14 @@
             let select = tr.querySelector('select[name="productos[]"]');
             let options = Array.from(select.options);
             let targetOption = options.find(opt => opt.value === rowData.producto && opt.getAttribute('data-lote') === rowData.lote);
-            
+
             if (targetOption) {
                 select.value = targetOption.value;
                 llenarDatosFila(select);
                 tr.querySelector('input[name="cantidades[]"]').focus();
             } else {
                 alert("El producto o lote escaneado ya no tiene stock disponible en la bodega.");
-                if (!emptySelect && tbody.children.length > 1) tr.remove(); 
+                if (!emptySelect && tbody.children.length > 1) tr.remove();
             }
         }
 
