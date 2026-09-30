@@ -12,6 +12,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
+        
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
             --sidebar-bg: #0F172A;
@@ -204,6 +208,11 @@
             color: #0f766e;
             padding: 0 2px;
             border-radius: 3px;
+        }
+        
+        /* Ajuste de fuente para modales de SweetAlert */
+        .swal2-popup {
+            font-family: 'IBM Plex Sans', sans-serif !important;
         }
     </style>
 </head>
@@ -548,9 +557,10 @@
                                     {{ auth()->user()->email ?? 'usuario@ejemplo.com' }}</p>
                             </div>
                             <div class="p-1.5">
-                                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                                <form id="logout-form" method="POST" action="{{ route('logout') }}" class="w-full">
                                     @csrf
-                                    <button type="submit"
+                                    <!-- Botón de logout modificado para disparar SweetAlert -->
+                                    <button type="button" onclick="confirmLogout()"
                                         class="flex w-full items-center gap-3 px-3 py-2 rounded-md text-[12.5px] font-medium text-left transition-colors hover:bg-rose-50 text-rose-600">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -656,6 +666,74 @@
 
     <!-- SCRIPT MAESTRO DE FUNCIONALIDAD GLOBAL -->
     <script>
+        // --- SWEETALERT2: CONFIGURACIÓN GLOBAL ---
+        
+        // 1. Instancia global para notificaciones tipo Toast
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3500,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        // 2. Interceptor de Flash Messages de Laravel
+        @if(session('success'))
+            Toast.fire({
+                icon: 'success',
+                title: '{!! addslashes(session('success')) !!}'
+            });
+        @endif
+
+        @if(session('error'))
+            Toast.fire({
+                icon: 'error',
+                title: '{!! addslashes(session('error')) !!}'
+            });
+        @endif
+
+        @if(session('warning'))
+            Toast.fire({
+                icon: 'warning',
+                title: '{!! addslashes(session('warning')) !!}'
+            });
+        @endif
+
+        @if(session('info'))
+            Toast.fire({
+                icon: 'info',
+                title: '{!! addslashes(session('info')) !!}'
+            });
+        @endif
+
+        // 3. Confirmación de Cierre de Sesión con SweetAlert2
+        function confirmLogout() {
+            // Cerramos el menú flotante para que no interfiera visualmente
+            const userMenu = document.getElementById('user-menu');
+            if (userMenu) closeMenu(userMenu);
+
+            Swal.fire({
+                title: '¿Cerrar sesión?',
+                text: "Tendrás que volver a ingresar tus credenciales para acceder al sistema.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#0D9488', // Teal 600 (var--accent)
+                cancelButtonColor: '#E11D48', // Rose 600 (var--danger)
+                confirmButtonText: 'Sí, cerrar sesión',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true, // Pone el botón de confirmar a la derecha
+                focusCancel: true // Foco en el botón cancelar para evitar clics accidentales
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('logout-form').submit();
+                }
+            });
+        }
+
         // --- BÚSQUEDA GLOBAL "NIVEL INSANO" ---
         let searchTimeout = null;
         let selectedSearchIndex = -1;
