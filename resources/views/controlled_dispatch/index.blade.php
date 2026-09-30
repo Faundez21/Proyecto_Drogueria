@@ -472,6 +472,8 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <!-- IMPLEMENTACION SWEETALERT 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         let signatureDespacha = null;
@@ -555,7 +557,7 @@
                 inpDir.classList.remove('bg-slate-50', 'cursor-not-allowed');
                 inpDir.classList.add('bg-white');
                 inpDir.value = '';
-                inpDir.placeholder = 'Ingrese la direccion manualmente...';
+                inpDir.placeholder = 'Ingrese la direccion manually...';
             }
         }
 
@@ -761,7 +763,12 @@
 
         function openScanner() {
             if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-                alert("Advertencia: Para usar la camara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Aviso de Seguridad',
+                    text: 'Para usar la cámara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.',
+                    confirmButtonColor: '#e11d48'
+                });
             }
 
             // Aquí se muestra el modal que ahora sí existe en el HTML
@@ -790,7 +797,12 @@
             });
 
             if(!parsedData.PROD || !parsedData.STOCK) {
-                alert("QR no compatible con el sistema.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Formato Inválido',
+                    text: 'QR no compatible con el sistema.',
+                    confirmButtonColor: '#e11d48'
+                });
                 return;
             }
 
@@ -819,7 +831,12 @@
                 llenarDatosFila(select);
                 tr.querySelector('input[name="cantidades[]"]').focus();
             } else {
-                alert("El producto o lote escaneado ya no tiene stock disponible en la bodega.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Sin Stock',
+                    text: 'El producto o lote escaneado ya no tiene stock disponible en la bodega.',
+                    confirmButtonColor: '#e11d48'
+                });
                 if (!emptySelect && tbody.children.length > 1) tr.remove();
             }
         }
