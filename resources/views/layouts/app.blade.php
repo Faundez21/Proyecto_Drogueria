@@ -326,8 +326,8 @@
     </div>
     <div class="flow-rail pl-[27px] space-y-0.5">
         <div class="flex flex-col space-y-0.5">
-            <a href="{{ route('despacho.index') }}"
-                class="nav-row {{ request()->routeIs('despacho.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+            <a href="{{ route('dispatch.index') }}"
+                class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                         d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
@@ -620,17 +620,17 @@
                 <input type="text" id="global-search-input" oninput="performGlobalSearch(this.value)"
                     onkeydown="handleSearchKeydown(event)" placeholder="Buscar Lote, Fármaco o RUT Proveedor..."
                     class="w-full px-3 py-4 text-[14px] bg-transparent border-0 focus:outline-none text-slate-800 placeholder-slate-400 font-medium pr-12">
-                
+
                 <!-- Botón Limpiar (X) -->
                 <button id="search-clear-btn" onclick="clearSearch()" class="hidden absolute right-16 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-colors focus:outline-none">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
-                
+
                 <!-- Loader -->
                 <div id="search-loader" class="hidden absolute right-16 loader"></div>
-                
+
                 <kbd onclick="closeSearchModal()"
                     class="cursor-pointer font-mono-das text-[10px] px-2 py-1 rounded border border-slate-200 bg-white text-slate-400 hover:bg-slate-100 transition-colors ml-2">ESC</kbd>
             </div>
@@ -775,8 +775,8 @@
                     })
                     .catch((error) => {
                         // Ignorar el error si la petición fue abortada por tipear rápido
-                        if (error.name === 'AbortError') return; 
-                        
+                        if (error.name === 'AbortError') return;
+
                         loader.classList.add('hidden');
                         clearBtn.classList.remove('hidden');
                         resultsContainer.innerHTML = `
