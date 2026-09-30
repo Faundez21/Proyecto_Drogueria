@@ -35,7 +35,7 @@ class InventoryController extends Controller
             ->unique()
             ->sort()
             ->values();
-        // ---------------------------
+        
 
         $inventories = $query->latest()->paginate(10)->withQueryString();
         return view('inventario.index', compact('inventories', 'productosLista'));

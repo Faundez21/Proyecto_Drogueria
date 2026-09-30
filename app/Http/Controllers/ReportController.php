@@ -105,8 +105,18 @@ class ReportController extends Controller
                 break;
         }
 
-        $inventories = $query->paginate(10)->withQueryString();
+        $productosLista = Inventory::where(function ($q) {
+            $q->where('estado', '!=', 'Cuarentena')
+                ->orWhereNull('estado');
+        })
+            ->pluck('producto')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
 
-        return view('reportes.index', compact('inventories'));
+
+        $inventories = $query->latest()->paginate(10)->withQueryString();
+        return view('reportes.index', compact('inventories', 'productosLista'));
     }
 }
