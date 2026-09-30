@@ -44,7 +44,7 @@
     <div class="w-full space-y-6">
 
         <!-- Migas de pan -->
-        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
+        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-2 px-1 pt-2">
             <span class="text-slate-400 font-semibold">02</span>
             <span>Almacenamiento</span>
             <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -106,38 +106,37 @@
                     <div id="filtersPanel" class="{{ $hasActiveFilters ? '' : 'hidden' }} space-y-4 pt-4 mt-4 border-t border-slate-200">
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                             <!-- BUSCAR CON DESPLEGABLE PERSONALIZADO -->
-<div class="lg:col-span-2 relative" id="searchContainer">
-    <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Buscar</label>
-    <div class="relative">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-        </div>
+                            <div class="lg:col-span-2 relative" id="searchContainer">
+                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Buscar</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
 
-        <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
-            placeholder="Producto, categoría o lote..." autocomplete="off"
-            onfocus="showSearchDropdown()" oninput="filterSearchDropdown()"
-            class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-slate-700 shadow-sm placeholder:text-slate-400">
-    </div>
+                                    <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
+                                        placeholder="Producto, categoría o lote..." autocomplete="off"
+                                        onfocus="showSearchDropdown()" oninput="filterSearchDropdown()"
+                                        class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-slate-700 shadow-sm placeholder:text-slate-400">
+                                </div>
 
-    <!-- Lista desplegable situada justo debajo del campo de búsqueda -->
-    <div id="searchDropdown" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100 sidebar-scroll">
-        @if(isset($productosLista) && count($productosLista) > 0)
-            @foreach($productosLista as $prodNombre)
-                <div class="search-item px-3.5 py-2.5 text-[12.5px] font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-900 cursor-pointer transition-colors flex items-center justify-between"
-                     onclick="selectSearchProduct('{{ $prodNombre }}')">
-                    <span>{{ $prodNombre }}</span>
-                    <svg class="w-3.5 h-3.5 text-slate-300 hover:text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </div>
-            @endforeach
-        @else
-            <div class="px-3.5 py-2.5 text-[12px] text-slate-400 text-center">No hay productos registrados</div>
-        @endif
-    </div>
-</div>
+                                <div id="searchDropdown" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100 sidebar-scroll">
+                                    @if(isset($productosLista) && count($productosLista) > 0)
+                                        @foreach($productosLista as $prodNombre)
+                                            <div class="search-item px-3.5 py-2.5 text-[12.5px] font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-900 cursor-pointer transition-colors flex items-center justify-between"
+                                                 onclick="selectSearchProduct('{{ $prodNombre }}')">
+                                                <span>{{ $prodNombre }}</span>
+                                                <svg class="w-3.5 h-3.5 text-slate-300 hover:text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                </svg>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="px-3.5 py-2.5 text-[12px] text-slate-400 text-center">No hay productos registrados</div>
+                                    @endif
+                                </div>
+                            </div>
 
                             <div>
                                 <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Categoría</label>
@@ -189,6 +188,9 @@
                                 class="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl text-[12.5px] font-bold transition-all shadow-sm">
                                 Limpiar Filtros
                             </a>
+                            <button type="submit" class="px-4 py-2 bg-teal-600 text-white rounded-xl text-[12.5px] font-bold shadow-sm hover:bg-teal-700 transition-all cursor-pointer">
+                                Aplicar Filtros
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -208,11 +210,7 @@
 
             <div class="overflow-x-auto w-full">
                 @php
-                    $invRaw = isset($inventories)
-                        ? (method_exists($inventories, 'items')
-                            ? $inventories->items()
-                            : $inventories)
-                        : [];
+                    $invRaw = isset($inventories) ? (method_exists($inventories, 'items') ? $inventories->items() : $inventories) : [];
                     $invCollection = collect($invRaw);
 
                     $mainInventories = $invCollection->reject(function ($item) {
@@ -222,12 +220,8 @@
 
                     $groupedInventories = $mainInventories->groupBy(function ($item) {
                         $prod = is_object($item) ? $item->product ?? null : null;
-                        if ($prod && isset($prod->nombre)) {
-                            return $prod->nombre;
-                        }
-                        if (is_object($item) && isset($item->producto)) {
-                            return $item->producto;
-                        }
+                        if ($prod && isset($prod->nombre)) return $prod->nombre;
+                        if (is_object($item) && isset($item->producto)) return $item->producto;
                         return 'Producto General';
                     });
                 @endphp
@@ -266,9 +260,7 @@
                                     });
                                     $groupKey = 'grp_' . md5($nombreProducto);
                                     $primerLote = $lotes->first();
-                                    $categoriaLote = is_object($primerLote)
-                                        ? $primerLote->categoria ?? 'General'
-                                        : 'General';
+                                    $categoriaLote = is_object($primerLote) ? $primerLote->categoria ?? 'General' : 'General';
                                 @endphp
 
                                 <tr id="product-row-{{ $groupKey }}"
@@ -344,7 +336,7 @@
                                                                 @php
                                                                     $loteData = is_object($loteObj) ? $loteObj : (object) $loteObj;
                                                                     $badgeVencimientoClass = 'text-slate-500';
-                                                                    $fechaVencRaw = $loteData->fecha_vencimiento ?? null;
+                                                                    $fechaVencRaw = data_get($loteData, 'fecha_vencimiento');
                                                                     $textoVencimiento = 'N/A';
 
                                                                     if (!empty($fechaVencRaw)) {
@@ -370,14 +362,14 @@
                                                                         }
                                                                     }
 
-                                                                    $pasilloVal = $loteData->pasillo_nombre ?? (is_object($loteData->aisle ?? null) ? $loteData->aisle->nombre ?? ($loteData->aisle->name ?? null) : $loteData->pasillo ?? 'P.A');
-                                                                    $estanteVal = $loteData->estanteria_nombre ?? (is_object($loteData->shelf ?? null) ? $loteData->shelf->nombre ?? ($loteData->shelf->name ?? null) : $loteData->estante ?? ($loteData->estanteria ?? 'P.A'));
-                                                                    $stockLote = $loteData->stock_total ?? ($loteData->cantidad ?? 0);
+                                                                    $pasilloVal = data_get($loteData, 'pasillo_nombre') ?? data_get($loteData, 'aisle.nombre') ?? data_get($loteData, 'pasillo') ?? 'P.A';
+                                                                    $estanteVal = data_get($loteData, 'estanteria_nombre') ?? data_get($loteData, 'shelf.nombre') ?? data_get($loteData, 'estante') ?? 'P.A';
+                                                                    $stockLote = data_get($loteData, 'stock_total') ?? data_get($loteData, 'cantidad') ?? 0;
                                                                     $isCuarentena = isset($loteData->cuarentena) ? (bool) $loteData->cuarentena : strtolower($loteData->estado ?? '') === 'cuarentena';
-                                                                    $loteId = $loteData->id ?? 0;
-                                                                    $loteCodigo = $loteData->lote ?? 'S/L';
+                                                                    $loteId = data_get($loteData, 'id') ?? 0;
+                                                                    $loteCodigo = data_get($loteData, 'lote') ?? 'S/L';
                                                                     $estadoActualStr = $isCuarentena ? 'Cuarentena' : ($loteData->estado ?? 'Disponible');
-                                                                    $loteMotivo = $loteData->motivo ?? ($loteData->observacion ?? ($loteData->descripcion ?? ''));
+                                                                    $loteMotivo = data_get($loteData, 'motivo') ?? data_get($loteData, 'observacion') ?? '';
                                                                 @endphp
                                                                 <tr class="lote-item-row hover:bg-slate-50 transition-colors"
                                                                     data-lote-code="{{ strtolower(trim($loteCodigo)) }}"
@@ -447,13 +439,12 @@
         </div>
 
         <!-- Modal: Historial de Movimientos -->
-        <div id="HistoryModal"
-            class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
+        <div id="HistoryModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-7xl flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <div>
-                        <h2 class="text-lg font-bold text-white tracking-wide">Historial de Movimientos de Inventario</h2>
-                        <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro de auditoría de recepciones e importaciones.</p>
+                        <h2 class="text-lg font-bold text-white tracking-wide">Historial General de Inventario</h2>
+                        <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro de auditoría de recepciones, ingresos manuales y movimientos.</p>
                     </div>
                     <button type="button" onclick="closeHistory()"
                         class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
@@ -467,12 +458,12 @@
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
                         <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm">
                             <tr>
-                                <th class="px-6 py-4">Fecha</th>
+                                <th class="px-6 py-4">Fecha y Hora</th>
                                 <th class="px-6 py-4">Doc / Correlativo</th>
                                 <th class="px-6 py-4">Proveedor</th>
                                 <th class="px-6 py-4">Producto</th>
                                 <th class="px-6 py-4 text-center">Lote</th>
-                                <th class="px-6 py-4 text-center">Estado</th>
+                                <th class="px-6 py-4 text-center">Responsable</th>
                                 <th class="px-6 py-4 text-center">Cantidad</th>
                                 <th class="px-6 py-4 text-center">Acción</th>
                             </tr>
@@ -481,26 +472,49 @@
                             @forelse($inventories ?? [] as $item)
                                 @php
                                     $itemObj = is_object($item) ? $item : (object) $item;
-                                    $prodNombre = is_object($itemObj->product ?? null) ? ($itemObj->product->nombre ?? 'Producto') : ($itemObj->producto ?? 'Producto');
-                                    $cant = $itemObj->stock_total ?? $itemObj->cantidad ?? 0;
-                                    $loteCodigo = $itemObj->lote ?? (is_object($itemObj->loteRef ?? null) ? $itemObj->loteRef->lote ?? null : null) ?? 'S/L';
+                                    $prodNombre = data_get($itemObj, 'product.nombre') ?? data_get($itemObj, 'producto') ?? 'Producto Desconocido';
+                                    $cant = data_get($itemObj, 'stock_total') ?? data_get($itemObj, 'cantidad') ?? 0;
+                                    $loteCodigo = data_get($itemObj, 'lote') ?? data_get($itemObj, 'loteRef.lote') ?? 'S/L';
+                                    
+                                    // FECHA Y HORA (Usamos created_at para el ingreso de inventario)
+                                    $rawDate = data_get($itemObj, 'created_at') ?? data_get($itemObj, 'updated_at');
+                                    if ($rawDate) {
+                                        try {
+                                            $fechaFormateada = \Carbon\Carbon::parse($rawDate)->format('d/m/Y H:i');
+                                        } catch(\Exception $e) {
+                                            $fechaFormateada = 'Fecha Inválida';
+                                        }
+                                    } else {
+                                        $fechaFormateada = 'Sin Registro';
+                                    }
+
+                                    // USUARIO RESPONSABLE
+                                    $uName = data_get($itemObj, 'user.name') ?? data_get($itemObj, 'usuario.name') ?? data_get($itemObj, 'causer.name');
+                                    $uLast = data_get($itemObj, 'user.last_name') ?? data_get($itemObj, 'usuario.last_name') ?? data_get($itemObj, 'causer.last_name');
+                                    
+                                    if (!empty($uName)) {
+                                        $usuarioResp = trim($uName . ' ' . $uLast);
+                                    } else {
+                                        $strUser = data_get($itemObj, 'usuario_nombre') ?? data_get($itemObj, 'responsable') ?? data_get($itemObj, 'usuario');
+                                        $usuarioResp = (is_string($strUser) && !empty(trim($strUser))) ? $strUser : 'No registrado';
+                                    }
                                 @endphp
                                 <tr class="hover:bg-slate-100/70 transition-colors">
                                     <td class="px-6 py-3.5 text-slate-500 font-medium">
-                                        {{ !empty($itemObj->fecha_recepcion) ? \Carbon\Carbon::parse($itemObj->fecha_recepcion)->format('d-m-Y') : 'N/A' }}
+                                        {{ $fechaFormateada }}
                                     </td>
                                     <td class="px-6 py-3.5 font-semibold text-slate-800">
                                         {{ $itemObj->tipo_documento ?? 'Doc' }} #{{ $itemObj->numero_documento ?? '000' }}
                                     </td>
-                                    <td class="px-6 py-3.5 text-slate-600">{{ $itemObj->razon_social ?? 'Proveedor' }}</td>
+                                    <td class="px-6 py-3.5 text-slate-600">{{ $itemObj->razon_social ?? 'Interno/Proveedor' }}</td>
                                     <td class="px-6 py-3.5 font-bold text-slate-800">{{ $prodNombre }}</td>
                                     <td class="px-6 py-3.5 text-center">
                                         <span class="px-2.5 py-1 rounded bg-slate-200 text-slate-800 font-mono font-extrabold text-[12px] border border-slate-300">
                                             {{ $loteCodigo }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-3.5 text-center">
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Completado</span>
+                                    <td class="px-6 py-3.5 text-center font-medium text-slate-700">
+                                        {{ $usuarioResp }}
                                     </td>
                                     <td class="px-6 py-3.5 text-center font-extrabold text-emerald-600">+{{ $cant }}</td>
                                     <td class="px-6 py-3.5 text-center">
@@ -534,41 +548,29 @@
         </div>
 
         <!-- Modal: Importar Carga Masiva -->
-        <div id="importModal"
-            class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="importModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 flex flex-col w-full max-w-md overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <h2 class="text-lg font-bold text-white tracking-wide">Importar Carga Masiva</h2>
-                    <button type="button" onclick="closeImport()"
-                        class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+                    <button type="button" onclick="closeImport()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-
                 <div class="p-6 bg-slate-50">
-                    <p class="text-[13px] text-slate-600 mb-5 text-center leading-relaxed">Descargue la plantilla oficial, complete los datos de los productos y suba el archivo Excel (.xlsx o .csv) para registrar el inventario masivamente.</p>
+                    <p class="text-[13px] text-slate-600 mb-5 text-center leading-relaxed">Descargue la plantilla oficial, complete los datos de los productos y suba el archivo Excel para registrar el inventario masivamente.</p>
 
-                    <a href="{{ Route::has('inventario.template') ? route('inventario.template') : '#' }}"
-                        class="w-full mb-6 flex justify-center items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-100 hover:text-teal-700 transition-all font-bold text-[13px] shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                        </svg>
+                    <a href="{{ Route::has('inventario.template') ? route('inventario.template') : '#' }}" class="w-full mb-6 flex justify-center items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-100 hover:text-teal-700 transition-all font-bold text-[13px] shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         Descargar Plantilla Oficial
                     </a>
 
-                    <form action="{{ Route::has('inventario.import') ? route('inventario.import') : '#' }}" method="POST" enctype="multipart/form-data"
-                        class="bg-white border border-dashed border-slate-300 hover:border-teal-400 transition-colors rounded-xl p-6 flex flex-col items-center gap-4 text-center shadow-sm">
+                    <form action="{{ Route::has('inventario.import') ? route('inventario.import') : '#' }}" method="POST" enctype="multipart/form-data" class="bg-white border border-dashed border-slate-300 hover:border-teal-400 transition-colors rounded-xl p-6 flex flex-col items-center gap-4 text-center shadow-sm">
                         @csrf
                         <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-teal-600 mb-1">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         </div>
                         <input type="file" id="excel" name="excel" class="hidden" accept=".xlsx, .xls, .csv" onchange="updateFileName(this)">
-                        <label for="excel"
-                            class="w-full bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-teal-700 px-4 py-2 rounded-lg cursor-pointer inline-flex items-center justify-center gap-2 text-[13px] font-bold transition-all shadow-sm">
+                        <label for="excel" class="w-full bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-teal-700 px-4 py-2 rounded-lg cursor-pointer inline-flex items-center justify-center gap-2 text-[13px] font-bold transition-all shadow-sm">
                             <span id="fileNameLabel">Explorar Archivos</span>
                         </label>
                         <span class="text-[11px] text-slate-400 font-medium">Formatos soportados: .xlsx, .csv</span>
@@ -582,19 +584,15 @@
         </div>
 
         <!-- Modal: Ingreso Manual -->
-        <div id="DepositModal"
-            class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="DepositModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <div>
                         <h2 class="text-lg font-bold text-white tracking-wide">Ingreso Directo de Producto</h2>
                         <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro individual directo a bodega.</p>
                     </div>
-                    <button type="button" onclick="closeDeposit()"
-                        class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+                    <button type="button" onclick="closeDeposit()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
@@ -607,21 +605,17 @@
                                     <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">1. Datos del Documento</h4>
                                 </div>
                             </div>
-
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">N° Correlativo Interno</label>
-                                <input type="number" name="correlativo_interno" placeholder="Opcional"
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <input type="number" name="correlativo_interno" placeholder="Opcional" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Fecha Recepción <span class="text-rose-500">*</span></label>
-                                <input type="date" name="fecha_recepcion" required value="{{ date('Y-m-d') }}"
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <input type="date" name="fecha_recepcion" required value="{{ date('Y-m-d') }}" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo Documento <span class="text-rose-500">*</span></label>
-                                <select name="tipo_documento" required
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                <select name="tipo_documento" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="" disabled selected>Seleccione...</option>
                                     <option value="Factura">Factura</option>
                                     <option value="Guía de Despacho">Guía de Despacho</option>
@@ -630,8 +624,7 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">N° Documento <span class="text-rose-500">*</span></label>
-                                <input type="text" name="numero_documento" required
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <input type="text" name="numero_documento" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
 
                             <div class="sm:col-span-2 mt-4">
@@ -639,16 +632,13 @@
                                     <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">2. Detalle Físico e Ubicación</h4>
                                 </div>
                             </div>
-
                             <div class="sm:col-span-2">
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Producto <span class="text-rose-500">*</span></label>
-                                <input type="text" name="producto" placeholder="Ej. PARACETAMOL 500MG COMPRIMIDOS" required
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
+                                <input type="text" name="producto" placeholder="Ej. PARACETAMOL 500MG COMPRIMIDOS" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Categoría <span class="text-rose-500">*</span></label>
-                                <select name="categoria" required
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                <select name="categoria" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="" disabled selected>Seleccionar...</option>
                                     <option value="Fármacos">Fármacos</option>
                                     <option value="Insumos Clínicos">Insumos Clínicos</option>
@@ -656,70 +646,57 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Estado de Ingreso <span class="text-rose-500">*</span></label>
-                                <select name="estado" required
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-medium">
+                                <select name="estado" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-medium">
                                     <option value="Disponible">Disponible Directo</option>
                                     <option value="Cuarentena" selected>A Cuarentena (Sugerido)</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Pasillo Ubicación</label>
-                                <input type="text" name="pasillo" placeholder="Ej. Pasillo A1"
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <input type="text" name="pasillo" placeholder="Ej. Pasillo A1" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Estante Ubicación</label>
-                                <input type="text" name="estante" placeholder="Ej. Estante 03"
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <input type="text" name="estante" placeholder="Ej. Estante 03" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Lote / Serie</label>
-                                <input type="text" name="lote" placeholder="Ej. L-4893"
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono font-bold" />
+                                <input type="text" name="lote" placeholder="Ej. L-4893" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono font-bold" />
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">F. Vencimiento</label>
-                                <input type="date" name="fecha_vencimiento"
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <input type="date" name="fecha_vencimiento" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Cantidad a Ingresar <span class="text-rose-500">*</span></label>
-                                <input type="number" name="cantidad" placeholder="0" min="1" required
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
+                                <input type="number" name="cantidad" placeholder="0" min="1" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
-                    <button type="button" onclick="closeDeposit()"
-                        class="px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar</button>
-                    <button type="button" onclick="document.getElementById('manualDepositForm').submit()"
-                        class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm text-[13px] font-bold cursor-pointer">Confirmar Ingreso</button>
+                    <button type="button" onclick="closeDeposit()" class="px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar</button>
+                    <button type="button" onclick="document.getElementById('manualDepositForm').submit()" class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm text-[13px] font-bold cursor-pointer">Confirmar Ingreso</button>
                 </div>
             </div>
         </div>
 
         <!-- Modal: Etiqueta QR -->
-        <div id="qrModal"
-            class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="qrModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="relative w-full max-w-sm flex flex-col items-center">
                 <div class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
-
                     <div class="w-full flex flex-col items-center mb-4 z-10 border-b-2 border-black pb-3">
                         <h2 class="text-[17px] text-black font-black tracking-widest uppercase">DROGUERÍA DAS</h2>
                         <span class="text-[11px] text-black font-bold font-mono tracking-widest uppercase mt-0.5">Control de Trazabilidad</span>
                     </div>
-
                     <div class="bg-white p-2 mb-4 z-10 flex justify-center w-full">
                         <div id="qrcode" class="w-[140px] h-[140px]"></div>
                     </div>
-
                     <div class="w-full z-10 space-y-2.5 px-2">
                         <div class="text-center mb-4">
                             <span id="qrProducto" class="text-[14px] font-black text-black block leading-tight uppercase">PRODUCTO</span>
                         </div>
-
                         <div class="grid grid-cols-2 gap-2 text-[12px] font-mono border-t border-b border-black py-2.5">
                             <div class="flex flex-col">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Lote Identificador</span>
@@ -730,7 +707,6 @@
                                 <span id="qrVencimiento" class="font-bold text-black text-[13px]">00/00/00</span>
                             </div>
                         </div>
-
                         <div class="flex justify-between items-end pt-1.5">
                             <div class="flex flex-col max-w-[60%]">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Origen / Bodega</span>
@@ -743,17 +719,10 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="mt-6 flex justify-center gap-4 w-full">
-                    <button type="button" onclick="closeQRModal()"
-                        class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md cursor-pointer">
-                        Cerrar Vista
-                    </button>
-                    <button type="button" onclick="window.print()"
-                        class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                        </svg>
+                    <button type="button" onclick="closeQRModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md cursor-pointer">Cerrar Vista</button>
+                    <button type="button" onclick="window.print()" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                         Imprimir Etiqueta
                     </button>
                 </div>
@@ -761,16 +730,12 @@
         </div>
 
         <!-- Modal: Editar Lote -->
-        <div id="editLoteModal"
-            class="hidden fixed inset-0 z-[60] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="editLoteModal" class="hidden fixed inset-0 z-[60] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <h2 class="text-[16px] font-bold text-white tracking-wide">Actualizar Estado de Lote</h2>
-                    <button type="button" onclick="closeEditLote()"
-                        class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+                    <button type="button" onclick="closeEditLote()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-lg cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
@@ -807,19 +772,16 @@
                     </div>
 
                     <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
-                        <button type="button" onclick="closeEditLote()"
-                            class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 text-[13px] font-bold transition-colors shadow-sm cursor-pointer">Cancelar</button>
-                        <button type="submit"
-                            class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[13px] font-bold transition-all shadow-sm cursor-pointer">Confirmar Cambio</button>
+                        <button type="button" onclick="closeEditLote()" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 text-[13px] font-bold transition-colors shadow-sm cursor-pointer">Cancelar</button>
+                        <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[13px] font-bold transition-all shadow-sm cursor-pointer">Confirmar Cambio</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Modal: Ver Mermas -->
-        <div id="mermaModal"
-            class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-5xl flex flex-col overflow-hidden">
+        <!-- Modal: Ver Mermas (CON FECHA Y USUARIO) -->
+        <div id="mermaModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-rose-800 flex justify-between items-center">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-xl bg-rose-700 border border-rose-600 flex items-center justify-center text-white">
@@ -829,27 +791,24 @@
                         </div>
                         <div>
                             <h2 class="text-lg font-bold text-white tracking-wide">Registro de Productos Mermados</h2>
-                            <p class="text-[12px] text-rose-200 mt-0.5 font-medium">Listado exclusivo de medicamentos e insumos marcados con estado Merma.</p>
+                            <p class="text-[12px] text-rose-200 mt-0.5 font-medium">Listado histórico de medicamentos e insumos dados de baja, con fecha y responsable.</p>
                         </div>
                     </div>
-                    <button type="button" onclick="closeMerma()"
-                        class="text-rose-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+                    <button type="button" onclick="closeMerma()" class="text-rose-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-lg cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
                 <div class="overflow-x-auto max-h-[60vh] bg-slate-50">
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
-                        <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm">
+                        <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm z-10">
                             <tr>
+                                <th class="px-6 py-4">Fecha Movimiento</th>
                                 <th class="px-6 py-4">Producto</th>
-                                <th class="px-6 py-4">Lote / Serie</th>
-                                <th class="px-6 py-4">Fecha Vencimiento</th>
-                                <th class="px-6 py-4">Motivo</th>
-                                <th class="px-6 py-4 text-center">Estado Sanitario</th>
-                                <th class="px-6 py-4 text-center">Cantidad Mermada</th>
+                                <th class="px-6 py-4 text-center">Lote / Serie</th>
+                                <th class="px-6 py-4">Responsable</th>
+                                <th class="px-6 py-4">Motivo Documentado</th>
+                                <th class="px-6 py-4 text-center">Cant. Mermada</th>
                                 <th class="px-6 py-4 text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -865,33 +824,50 @@
                             @forelse($mermas as $mItem)
                                 @php
                                     $mObj = is_object($mItem) ? $mItem : (object) $mItem;
-                                    $mNombre = is_object($mObj->product ?? null)
-                                        ? $mObj->product->nombre ?? 'Producto'
-                                        : $mObj->producto ?? 'Producto';
-                                    $mStock = $mObj->stock_total ?? ($mObj->cantidad ?? 0);
-                                    $mVenc = !empty($mObj->fecha_vencimiento)
-                                        ? \Carbon\Carbon::parse($mObj->fecha_vencimiento)->format('d/m/Y')
-                                        : 'N/A';
-
-                                    $mMotivo = $mObj->motivo ?? ($mObj->observacion ?? ($mObj->descripcion ?? null));
-                                    if (empty($mMotivo)) {
-                                        $mMotivo = 'Sin motivo especificado';
+                                    
+                                    // 1. FECHA (Lectura Segura y Formateada)
+                                    $rawDateMerma = data_get($mObj, 'updated_at') ?? data_get($mObj, 'created_at');
+                                    if ($rawDateMerma) {
+                                        try {
+                                            $fechaMerma = \Carbon\Carbon::parse($rawDateMerma)->format('d/m/Y H:i');
+                                        } catch(\Exception $e) {
+                                            $fechaMerma = 'Fecha Inválida';
+                                        }
+                                    } else {
+                                        $fechaMerma = 'Sin Registro';
                                     }
 
-                                    $mLoteId = $mObj->id ?? 0;
-                                    $mLoteCodigo = $mObj->lote ?? 'S/L';
+                                    // 2. PRODUCTO Y LOTE
+                                    $mNombre = data_get($mObj, 'product.nombre') ?? data_get($mObj, 'producto') ?? 'Producto Desconocido';
+                                    $mStock = data_get($mObj, 'stock_total') ?? data_get($mObj, 'cantidad') ?? 0;
+                                    $mLoteCodigo = data_get($mObj, 'lote') ?? 'S/L';
+                                    $mLoteId = data_get($mObj, 'id') ?? 0;
+
+                                    // 3. RESPONSABLE (Lectura Segura)
+                                    $uName = data_get($mObj, 'user.name') ?? data_get($mObj, 'usuario.name') ?? data_get($mObj, 'causer.name');
+                                    $uLast = data_get($mObj, 'user.last_name') ?? data_get($mObj, 'usuario.last_name') ?? data_get($mObj, 'causer.last_name');
+                                    
+                                    if (!empty($uName)) {
+                                        $usuarioMerma = trim($uName . ' ' . $uLast);
+                                    } else {
+                                        $strUser = data_get($mObj, 'usuario_nombre') ?? data_get($mObj, 'responsable') ?? data_get($mObj, 'usuario');
+                                        $usuarioMerma = (is_string($strUser) && !empty(trim($strUser))) ? $strUser : 'No registrado';
+                                    }
+
+                                    // 4. MOTIVO
+                                    $mMotivo = data_get($mObj, 'motivo') ?? data_get($mObj, 'observacion') ?? data_get($mObj, 'descripcion') ?? 'Sin motivo especificado';
                                 @endphp
                                 <tr class="hover:bg-rose-50/40 transition-colors">
+                                    <td class="px-6 py-3.5 text-slate-500 font-medium">{{ $fechaMerma }}</td>
                                     <td class="px-6 py-3.5 font-bold text-slate-800">{{ $mNombre }}</td>
-                                    <td class="px-6 py-3.5 font-mono font-bold text-slate-700">{{ $mLoteCodigo }}</td>
-                                    <td class="px-6 py-3.5 text-slate-500 font-medium">{{ $mVenc }}</td>
-                                    <td class="px-6 py-3.5 italic text-slate-600 max-w-xs truncate" title="{{ $mMotivo }}">
-                                        {{ $mMotivo }}
-                                    </td>
                                     <td class="px-6 py-3.5 text-center">
-                                        <span class="px-2.5 py-1 rounded text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-200 uppercase">
-                                            MERMA
+                                        <span class="px-2.5 py-1 rounded bg-slate-200 text-slate-800 font-mono font-extrabold text-[12px] border border-slate-300">
+                                            {{ $mLoteCodigo }}
                                         </span>
+                                    </td>
+                                    <td class="px-6 py-3.5 text-slate-700 font-semibold">{{ $usuarioMerma }}</td>
+                                    <td class="px-6 py-3.5 italic text-rose-600 max-w-xs truncate" title="{{ $mMotivo }}">
+                                        {{ $mMotivo }}
                                     </td>
                                     <td class="px-6 py-3.5 text-center font-extrabold text-rose-600">
                                         {{ number_format($mStock, 0, ',', '.') }} Unid.
@@ -901,9 +877,7 @@
                                             onclick="openEditLote('{{ e($mLoteId) }}', '{{ e($mLoteCodigo) }}', '{{ e($mNombre) }}', 'Merma', '{{ e($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}')"
                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center justify-center"
                                             title="Cambiar Estado">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                            </svg>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                         </button>
                                     </td>
                                 </tr>
@@ -911,9 +885,7 @@
                                 <tr>
                                     <td colspan="7" class="px-6 py-12 text-center text-slate-400 font-medium">
                                         <div class="flex flex-col items-center justify-center">
-                                            <svg class="w-10 h-10 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
+                                            <svg class="w-10 h-10 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                             <span>No hay productos marcados en estado de merma actualmente.</span>
                                         </div>
                                     </td>
@@ -925,8 +897,7 @@
 
                 <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-between items-center">
                     <span class="text-xs text-slate-500 font-medium">Total de lotes mermados: <b>{{ $mermas->count() }}</b></span>
-                    <button type="button" onclick="closeMerma()"
-                        class="px-6 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
+                    <button type="button" onclick="closeMerma()" class="px-6 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
                         Cerrar
                     </button>
                 </div>
@@ -939,12 +910,7 @@
 
     <script>
         function normalizeText(text) {
-            return (text || '')
-                .toString()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .trim()
-                .toLowerCase();
+            return (text || '').toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
         }
 
         function filterTableByLocation() {
@@ -1027,7 +993,6 @@
 
                     if (lotesSubrow) {
                         lotesSubrow.classList.remove('hidden');
-
                         const arrow = document.getElementById('arrow-' + groupKey);
                         const iconContainer = document.getElementById('icon-' + groupKey);
                         if (arrow) arrow.classList.add('rotate-90');
@@ -1062,9 +1027,7 @@
             const filteredText = document.getElementById('filteredProductName');
             const searchInput = document.getElementById('searchInput');
 
-            if (searchInput) {
-                searchInput.value = codigoLote !== 'S/L' ? codigoLote : nombreProducto;
-            }
+            if (searchInput) searchInput.value = codigoLote !== 'S/L' ? codigoLote : nombreProducto;
 
             if (alertBanner && filteredText) {
                 filteredText.textContent = `${nombreProducto} (Lote: ${codigoLote})`;
@@ -1095,9 +1058,7 @@
 
         function toggleFiltersPanel() {
             const panel = document.getElementById('filtersPanel');
-            if (panel) {
-                panel.classList.toggle('hidden');
-            }
+            if (panel) panel.classList.toggle('hidden');
         }
 
         function toggleLotes(key) {
@@ -1126,9 +1087,7 @@
 
         function openEditLote(id, lote, producto, estado, motivo = '') {
             const form = document.getElementById('editLoteForm');
-            if (form) {
-                form.action = "/inventario/" + id;
-            }
+            if (form) form.action = "/inventario/" + id;
 
             document.getElementById('modal_producto_nombre').textContent = producto;
             document.getElementById('modal_lote_nombre').textContent = "LOTE: " + lote;
@@ -1143,9 +1102,7 @@
             estadoSelect.value = selectedVal;
 
             let motivoInput = document.getElementById('modal_motivo');
-            if (motivoInput) {
-                motivoInput.value = motivo;
-            }
+            if (motivoInput) motivoInput.value = motivo;
 
             toggleMotivoField(selectedVal);
             document.getElementById('editLoteModal').classList.remove('hidden');
@@ -1197,69 +1154,58 @@
             }, 150);
         }
 
-        function closeQRModal() {
-            document.getElementById('qrModal').classList.add('hidden');
-        }
-
+        function closeQRModal() { document.getElementById('qrModal').classList.add('hidden'); }
         function openHistory() { document.getElementById('HistoryModal').classList.remove('hidden'); }
         function closeHistory() { document.getElementById('HistoryModal').classList.add('hidden'); }
-
         function openImport() { document.getElementById('importModal').classList.remove('hidden'); }
         function closeImport() { document.getElementById('importModal').classList.add('hidden'); }
-
         function openDeposit() { document.getElementById('DepositModal').classList.remove('hidden'); }
         function closeDeposit() { document.getElementById('DepositModal').classList.add('hidden'); }
-
         function openMerma() { document.getElementById('mermaModal').classList.remove('hidden'); }
         function closeMerma() { document.getElementById('mermaModal').classList.add('hidden'); }
 
-
-    // Funciones para el campo de búsqueda
         function showSearchDropdown() {
-    const dropdown = document.getElementById('searchDropdown');
-    if (dropdown) dropdown.classList.remove('hidden');
-}
-
-function selectSearchProduct(productName) {
-    const input = document.getElementById('searchInput');
-    if (input) input.value = productName;
-
-    const dropdown = document.getElementById('searchDropdown');
-    if (dropdown) dropdown.classList.add('hidden');
-
-    const form = document.getElementById('filtersForm');
-    if (form) {
-        form.submit();
-    }
-}
-
-function filterSearchDropdown() {
-    const input = document.getElementById('searchInput');
-    const filter = (input ? input.value : '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const items = document.querySelectorAll('#searchDropdown .search-item');
-
-    let visibleCount = 0;
-    items.forEach(item => {
-        const text = item.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        if (text.includes(filter)) {
-            item.classList.remove('hidden');
-            visibleCount++;
-        } else {
-            item.classList.add('hidden');
+            const dropdown = document.getElementById('searchDropdown');
+            if (dropdown) dropdown.classList.remove('hidden');
         }
-    });
 
-    const dropdown = document.getElementById('searchDropdown');
-    if (dropdown) dropdown.classList.remove('hidden');
-}
+        function selectSearchProduct(productName) {
+            const input = document.getElementById('searchInput');
+            if (input) input.value = productName;
 
-// Cierra el menú al hacer clic fuera del campo de búsqueda
-document.addEventListener('click', function(event) {
-    const container = document.getElementById('searchContainer');
-    const dropdown = document.getElementById('searchDropdown');
-    if (container && dropdown && !container.contains(event.target)) {
-        dropdown.classList.add('hidden');
-    }
-});
+            const dropdown = document.getElementById('searchDropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+
+            const form = document.getElementById('filtersForm');
+            if (form) form.submit();
+        }
+
+        function filterSearchDropdown() {
+            const input = document.getElementById('searchInput');
+            const filter = (input ? input.value : '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const items = document.querySelectorAll('#searchDropdown .search-item');
+
+            let visibleCount = 0;
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if (text.includes(filter)) {
+                    item.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            const dropdown = document.getElementById('searchDropdown');
+            if (dropdown) dropdown.classList.remove('hidden');
+        }
+
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('searchContainer');
+            const dropdown = document.getElementById('searchDropdown');
+            if (container && dropdown && !container.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
     </script>
 @endsection
