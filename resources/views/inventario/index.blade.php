@@ -6,33 +6,29 @@
 @section('actions')
     <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
         <button type="button" onclick="openMerma()"
-            class="flex-1 sm:flex-none px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-[13px] font-bold hover:bg-rose-100 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                </path>
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-[13px] font-semibold hover:bg-rose-100 transition-all duration-200 shadow-sm hover:shadow cursor-pointer">
+            <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
             </svg>
             Ver Mermas
         </button>
         <button type="button" onclick="openHistory()"
-            class="flex-1 sm:flex-none px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 hover:text-teal-700 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-[13px] font-semibold hover:bg-slate-50 hover:text-teal-700 transition-all duration-200 shadow-sm hover:shadow cursor-pointer">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             Ver Historial
         </button>
         <button type="button" onclick="openImport()"
-            class="flex-1 sm:flex-none px-5 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-all text-[13px] font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
+            <svg class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
             </svg>
             Carga Masiva
         </button>
         <button type="button" onclick="openDeposit()"
-            class="flex-1 sm:flex-none px-5 py-2.5 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all text-[13px] font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-            <svg class="w-4 h-4 text-teal-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
+            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
             Ingreso Manual
@@ -41,172 +37,162 @@
 @endsection
 
 @section('content')
-    <div class="w-full space-y-6">
+    <div class="space-y-6">
 
-        <!-- Migas de pan -->
-        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-2 px-1 pt-2">
-            <span class="text-slate-400 font-semibold">02</span>
+        <!-- Ruta de navegación -->
+        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
+            <span class="font-mono-das text-slate-400 font-semibold">02</span>
             <span>Almacenamiento</span>
-            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            <span class="font-semibold text-slate-800">Inventario</span>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            <span class="font-medium text-slate-800">Inventario</span>
         </div>
 
         <!-- Contenedor Principal Tabla Inventario -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
 
-            <!-- Filtros Avanzados -->
-            <div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col gap-4">
-                <form id="filtersForm" method="GET" action="{{ Route::has('inventario.index') ? route('inventario.index') : '#' }}">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-white border border-teal-100 shadow-sm flex items-center justify-center">
-                                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-base font-bold text-slate-800">Directorio de Productos</h3>
-                                <p class="text-[11px] text-slate-500 font-medium">Agrupados por categoría, pasillo/estante y stock total</p>
-                            </div>
-                        </div>
-
-                        <button type="button" onclick="toggleFiltersPanel()"
-                            class="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:text-teal-700 hover:bg-slate-50 rounded-xl text-[13px] font-bold shadow-sm flex items-center gap-2 transition-all cursor-pointer">
-                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                                </path>
-                            </svg>
-                            <span>Filtros Avanzados</span>
-                        </button>
-                    </div>
-
-                    @php
-                        $hasActiveFilters = request()->filled('search') || request()->filled('categoria') || request()->filled('pasillo') || request()->filled('estante') || request()->filled('per_page') || request()->filled('order_by');
-
-                        $invRawList = isset($inventories) ? (method_exists($inventories, 'items') ? $inventories->items() : $inventories) : [];
-
-                        $invNonMermaList = collect($invRawList)->reject(function($item) {
-                            $obj = is_object($item) ? $item : (object)$item;
-                            return str_contains(strtolower($obj->estado ?? ''), 'merma');
-                        });
-
-                        $pasillosUnicos = $invNonMermaList->map(function($item) {
-                            $obj = is_object($item) ? $item : (object)$item;
-                            return $obj->pasillo_nombre ?? (is_object($obj->aisle ?? null) ? $obj->aisle->nombre ?? ($obj->aisle->name ?? null) : $obj->pasillo ?? null);
-                        })->filter()->unique()->sort();
-
-                        $estantesUnicos = $invNonMermaList->map(function($item) {
-                            $obj = is_object($item) ? $item : (object)$item;
-                            return $obj->estanteria_nombre ?? (is_object($obj->shelf ?? null) ? $obj->shelf->nombre ?? ($obj->shelf->name ?? null) : $obj->estante ?? ($obj->estanteria ?? null));
-                        })->filter()->unique()->sort();
-                    @endphp
-
-                    <div id="filtersPanel" class="{{ $hasActiveFilters ? '' : 'hidden' }} space-y-4 pt-4 mt-4 border-t border-slate-200">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                            <!-- BUSCAR CON DESPLEGABLE PERSONALIZADO -->
-                            <div class="lg:col-span-2 relative" id="searchContainer">
-                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Buscar</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
-
-                                    <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
-                                        placeholder="Producto, categoría o lote..." autocomplete="off"
-                                        onfocus="showSearchDropdown()" oninput="filterSearchDropdown()"
-                                        class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-slate-700 shadow-sm placeholder:text-slate-400">
-                                </div>
-
-                                <div id="searchDropdown" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100 sidebar-scroll">
-                                    @if(isset($productosLista) && count($productosLista) > 0)
-                                        @foreach($productosLista as $prodNombre)
-                                            <div class="search-item px-3.5 py-2.5 text-[12.5px] font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-900 cursor-pointer transition-colors flex items-center justify-between"
-                                                 onclick="selectSearchProduct('{{ $prodNombre }}')">
-                                                <span>{{ $prodNombre }}</span>
-                                                <svg class="w-3.5 h-3.5 text-slate-300 hover:text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                                </svg>
-                                            </div>
-                                        @endforeach
-                                    @else
-                                        <div class="px-3.5 py-2.5 text-[12px] text-slate-400 text-center">No hay productos registrados</div>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Categoría</label>
-                                <select name="categoria"
-                                    class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
-                                    <option value="">Todas</option>
-                                    <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
-                                    <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Pasillo</label>
-                                <select name="pasillo" id="pasilloSelect" onchange="filterTableByLocation()"
-                                    class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
-                                    <option value="">Todos los Pasillos</option>
-                                    @foreach($pasillosUnicos as $pas)
-                                        <option value="{{ $pas }}" {{ request('pasillo') == $pas ? 'selected' : '' }}>{{ $pas }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Estante</label>
-                                <select name="estante" id="estanteSelect" onchange="filterTableByLocation()"
-                                    class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
-                                    <option value="">Todos los Estantes</option>
-                                    @foreach($estantesUnicos as $est)
-                                        <option value="{{ $est }}" {{ request('estante') == $est ? 'selected' : '' }}>{{ $est }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Ordenar por</label>
-                                <select name="order_by"
-                                    class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
-                                    <option value="recent" {{ request('order_by', 'recent') == 'recent' ? 'selected' : '' }}>Más recientes</option>
-                                    <option value="nombre_asc" {{ request('order_by') == 'nombre_asc' ? 'selected' : '' }}>Nombre (A-Z)</option>
-                                    <option value="stock_desc" {{ request('order_by') == 'stock_desc' ? 'selected' : '' }}>Mayor Stock</option>
-                                    <option value="stock_asc" {{ request('order_by') == 'stock_asc' ? 'selected' : '' }}>Menor Stock</option>
-                                    <option value="vencimiento" {{ request('order_by') == 'vencimiento' ? 'selected' : '' }}>Próximos a Vencer</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-end items-center gap-3 pt-3 border-t border-slate-200/80">
-                            <a href="{{ Route::has('inventario.index') ? route('inventario.index') : '#' }}"
-                                class="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl text-[12.5px] font-bold transition-all shadow-sm">
-                                Limpiar Filtros
-                            </a>
-                            <button type="submit" class="px-4 py-2 bg-teal-600 text-white rounded-xl text-[12.5px] font-bold shadow-sm hover:bg-teal-700 transition-all cursor-pointer">
-                                Aplicar Filtros
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <div id="activeFilterAlert" class="hidden px-5 py-3 bg-teal-50 border-b border-teal-200 flex justify-between items-center text-xs text-teal-800 font-bold">
-                <span class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Filtro activo: <span id="filteredProductName" class="underline"></span>
-                </span>
-                <button type="button" onclick="clearClientFilter()" class="px-3 py-1 bg-white border border-teal-300 rounded-lg text-teal-700 hover:bg-teal-100 transition-colors shadow-sm cursor-pointer text-[11px]">
-                    Limpiar Filtros
+            <!-- Cabecera de la tabla y botón de filtros -->
+            <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
+                <h3 class="text-[15px] font-bold text-slate-800">Directorio de Productos</h3>
+                <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    Filtros Avanzados
                 </button>
             </div>
+
+            @php
+                $hasActiveFilters = request()->filled('search') || request()->filled('categoria') || request()->filled('pasillo') || request()->filled('estante') || request()->filled('order_by');
+
+                $invRawList = isset($inventories) ? (method_exists($inventories, 'items') ? $inventories->items() : $inventories) : [];
+
+                $invNonMermaList = collect($invRawList)->reject(function($item) {
+                    $obj = is_object($item) ? $item : (object)$item;
+                    return str_contains(strtolower($obj->estado ?? ''), 'merma');
+                });
+
+                $pasillosUnicos = $invNonMermaList->map(function($item) {
+                    $obj = is_object($item) ? $item : (object)$item;
+                    return $obj->pasillo_nombre ?? (is_object($obj->aisle ?? null) ? $obj->aisle->nombre ?? ($obj->aisle->name ?? null) : $obj->pasillo ?? null);
+                })->filter()->unique()->sort();
+
+                $estantesUnicos = $invNonMermaList->map(function($item) {
+                    $obj = is_object($item) ? $item : (object)$item;
+                    return $obj->estanteria_nombre ?? (is_object($obj->shelf ?? null) ? $obj->shelf->nombre ?? ($obj->shelf->name ?? null) : $obj->estante ?? ($obj->estanteria ?? null));
+                })->filter()->unique()->sort();
+            @endphp
+
+            <!-- Formulario de Filtros -->
+            <form method="GET" action="{{ Route::has('inventario.index') ? route('inventario.index') : '#' }}" id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                    
+                    <!-- Búsqueda con Dropdown -->
+                    <div class="xl:col-span-2 relative" id="searchContainer">
+                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Buscar</label>
+                        <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
+                            placeholder="Producto, categoría o lote..." autocomplete="off"
+                            onfocus="showSearchDropdown()" oninput="filterSearchDropdown()"
+                            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        
+                        <div id="searchDropdown" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100">
+                            @if(isset($productosLista) && count($productosLista) > 0)
+                                @foreach($productosLista as $prodNombre)
+                                    <div class="search-item px-3.5 py-2.5 text-[12.5px] font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-900 cursor-pointer transition-colors flex items-center justify-between"
+                                         onclick="selectSearchProduct('{{ $prodNombre }}')">
+                                        <span>{{ $prodNombre }}</span>
+                                        <svg class="w-3.5 h-3.5 text-slate-300 hover:text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="px-3.5 py-2.5 text-[12px] text-slate-400 text-center">No hay productos registrados</div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
+                        <select name="categoria" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                            <option value="">Todas</option>
+                            <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
+                            <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Pasillo</label>
+                        <select name="pasillo" id="pasilloSelect" onchange="filterTableByLocation()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                            <option value="">Todos</option>
+                            @foreach($pasillosUnicos as $pas)
+                                <option value="{{ $pas }}" {{ request('pasillo') == $pas ? 'selected' : '' }}>{{ $pas }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Estante</label>
+                        <select name="estante" id="estanteSelect" onchange="filterTableByLocation()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                            <option value="">Todos</option>
+                            @foreach($estantesUnicos as $est)
+                                <option value="{{ $est }}" {{ request('estante') == $est ? 'selected' : '' }}>{{ $est }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Ordenar por</label>
+                        <select name="order_by" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                            <option value="recent" {{ request('order_by', 'recent') == 'recent' ? 'selected' : '' }}>Más recientes</option>
+                            <option value="nombre_asc" {{ request('order_by') == 'nombre_asc' ? 'selected' : '' }}>Nombre (A-Z)</option>
+                            <option value="stock_desc" {{ request('order_by') == 'stock_desc' ? 'selected' : '' }}>Mayor Stock</option>
+                            <option value="stock_asc" {{ request('order_by') == 'stock_asc' ? 'selected' : '' }}>Menor Stock</option>
+                            <option value="vencimiento" {{ request('order_by') == 'vencimiento' ? 'selected' : '' }}>Próximos a Vencer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-5 flex items-center justify-end gap-3 border-t border-slate-200/60 pt-4">
+                    <a href="{{ Route::has('inventario.index') ? route('inventario.index') : '#' }}" class="px-4 py-2 rounded-lg text-[12.5px] font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors">
+                        Limpiar Filtros
+                    </a>
+                    <button type="submit" class="px-4 py-2 rounded-lg text-[12.5px] font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-md transition-all">
+                        Aplicar Filtros
+                    </button>
+                </div>
+            </form>
+
+            <!-- Alerta Verde de Filtros Activos (Blade + JS) -->
+            @if(request()->filled('pasillo') || request()->filled('estante') || request()->filled('categoria') || request()->filled('search'))
+                <div id="activeFilterAlert" class="px-5 py-3 bg-teal-50 border-b border-teal-200 flex justify-between items-center text-xs text-teal-800 font-bold">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Filtro activo: <span id="filteredProductName" class="underline">
+                            {{ implode(' | ', array_filter([
+                                request('search') ? 'Búsqueda: ' . request('search') : null,
+                                request('categoria') ? 'Cat: ' . request('categoria') : null,
+                                request('pasillo') ? 'Pasillo: ' . request('pasillo') : null,
+                                request('estante') ? 'Estante: ' . request('estante') : null
+                            ])) }}
+                        </span>
+                    </span>
+                    <a href="{{ Route::has('inventario.index') ? route('inventario.index') : '#' }}" class="px-3 py-1 bg-white border border-teal-300 rounded-lg text-teal-700 hover:bg-teal-100 transition-colors shadow-sm cursor-pointer text-[11px]">
+                        Limpiar Filtros
+                    </a>
+                </div>
+            @else
+                <div id="activeFilterAlert" class="hidden px-5 py-3 bg-teal-50 border-b border-teal-200 flex justify-between items-center text-xs text-teal-800 font-bold">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Filtro activo: <span id="filteredProductName" class="underline"></span>
+                    </span>
+                    <button type="button" onclick="clearClientFilter()" class="px-3 py-1 bg-white border border-teal-300 rounded-lg text-teal-700 hover:bg-teal-100 transition-colors shadow-sm cursor-pointer text-[11px]">
+                        Limpiar Filtros
+                    </button>
+                </div>
+            @endif
 
             <div class="overflow-x-auto w-full">
                 @php
@@ -226,30 +212,26 @@
                     });
                 @endphp
 
-                <table class="w-full text-left text-sm whitespace-nowrap">
-                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-extrabold">
-                        <tr>
-                            <th scope="col" class="px-6 py-4 w-14 text-center">Detalle</th>
-                            <th scope="col" class="px-6 py-4">Producto Principal</th>
-                            <th scope="col" class="px-6 py-4">Categoría</th>
-                            <th scope="col" class="px-6 py-4 text-center">Lotes Activos</th>
-                            <th scope="col" class="px-6 py-4 text-center">Stock Físico Acumulado</th>
+                <table class="w-full text-left border-collapse min-w-[900px]">
+                    <thead>
+                        <tr class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
+                            <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
+                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Producto Principal</th>
+                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock Físico Acumulado</th>
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-slate-100" id="mainTableBody">
+                    <tbody class="divide-y divide-slate-100 text-[13px]" id="mainTableBody">
                         @if ($groupedInventories->isEmpty())
                             <tr>
-                                <td colspan="5" class="px-6 py-16 text-center">
-                                    <div class="flex flex-col items-center justify-center text-slate-400">
-                                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
-                                            <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                            </svg>
-                                        </div>
-                                        <p class="text-[15px] font-bold text-slate-600">Bodega sin productos activos</p>
-                                        <p class="text-[13px] text-slate-500 mt-1 max-w-sm">No existen medicamentos o insumos disponibles en el directorio actual.</p>
+                                <td colspan="5" class="px-6 py-12 text-center">
+                                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-400 mb-3">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                     </div>
+                                    <p class="text-[14px] font-medium text-slate-600">Bodega sin productos activos</p>
+                                    <p class="text-[13px] text-slate-400 mt-1">No existen medicamentos o insumos disponibles en el directorio actual.</p>
                                 </td>
                             </tr>
                         @else
@@ -265,7 +247,7 @@
 
                                 <tr id="product-row-{{ $groupKey }}"
                                     data-product-name="{{ strtolower(trim($nombreProducto)) }}"
-                                    class="product-master-row bg-white hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                                    class="product-master-row hover:bg-slate-50 transition-colors group cursor-pointer"
                                     onclick="toggleLotes('{{ $groupKey }}')">
                                     <td class="px-6 py-4 text-center relative">
                                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors"></div>
@@ -279,28 +261,28 @@
                                         </button>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="font-extrabold text-slate-800 text-[14px]">{{ $nombreProducto }}</span>
+                                        <span class="font-bold text-slate-800">{{ $nombreProducto }}</span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2.5 py-1 rounded bg-slate-100 text-slate-600 text-[11px] font-bold border border-slate-200">{{ $categoriaLote }}</span>
+                                        <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white text-slate-600 border border-slate-200 shadow-sm whitespace-nowrap">{{ $categoriaLote }}</span>
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <span class="font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{{ $lotes->count() }}</span>
-                                        <span class="text-slate-400 text-[11px] font-semibold uppercase">Lote(s)</span>
+                                        <span class="font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">{{ $lotes->count() }}</span>
+                                        <span class="text-slate-400 text-[11.5px] font-semibold uppercase ml-1">Lote(s)</span>
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         @if ($stockTotalProducto > 10)
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                                 {{ number_format($stockTotalProducto, 0, ',', '.') }} Unidades
                                             </span>
                                         @elseif($stockTotalProducto > 0)
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                                 {{ number_format($stockTotalProducto, 0, ',', '.') }} Unid. (Bajo)
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-rose-50 text-rose-700 border border-rose-200 shadow-sm">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                                 0 Unidades (Agotado)
                                             </span>
@@ -308,8 +290,8 @@
                                     </td>
                                 </tr>
 
-                                <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-100/50 shadow-inner">
-                                    <td colspan="5" class="p-0 border-b border-slate-300">
+                                <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-50/50 shadow-inner">
+                                    <td colspan="5" class="p-0 border-b border-slate-200">
                                         <div class="py-4 pr-6 pl-14">
                                             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                                                 <div class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
@@ -321,7 +303,7 @@
                                                     </span>
                                                 </div>
                                                 <div class="overflow-x-auto">
-                                                    <table class="w-full text-left text-xs whitespace-nowrap">
+                                                    <table class="w-full text-left whitespace-nowrap">
                                                         <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 text-[10px] tracking-wider">
                                                             <tr>
                                                                 <th class="px-4 py-3">Lote / Vencimiento</th>
@@ -331,7 +313,7 @@
                                                                 <th class="px-4 py-3 text-center">Acciones</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody class="divide-y divide-slate-100 text-slate-700">
+                                                        <tbody class="divide-y divide-slate-100 text-slate-700 text-[12px]">
                                                             @foreach ($lotes as $loteObj)
                                                                 @php
                                                                     $loteData = is_object($loteObj) ? $loteObj : (object) $loteObj;
@@ -376,7 +358,7 @@
                                                                     data-pasillo="{{ strtolower(trim($pasilloVal)) }}"
                                                                     data-estante="{{ strtolower(trim($estanteVal)) }}">
                                                                     <td class="px-4 py-3">
-                                                                        <span class="font-mono font-extrabold text-slate-800 text-[13px]">{{ $loteCodigo }}</span><br>
+                                                                        <span class="font-mono font-bold text-slate-800">{{ $loteCodigo }}</span><br>
                                                                         <span class="text-[10px] uppercase font-semibold {{ $badgeVencimientoClass }}">Vence: {{ $textoVencimiento }}</span>
                                                                     </td>
                                                                     <td class="px-4 py-3">
@@ -401,7 +383,7 @@
                                                                         @endif
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
-                                                                        <span class="font-extrabold text-slate-800 text-[14px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
+                                                                        <span class="font-extrabold text-slate-800 text-[13px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center flex justify-center gap-2">
                                                                         <button type="button"
@@ -431,11 +413,55 @@
                 </table>
             </div>
 
-            <div class="px-6 py-4 border-t border-slate-200 bg-white">
-                @if (isset($inventories) && method_exists($inventories, 'links'))
-                    {{ $inventories->links() }}
-                @endif
+            <!-- Paginación -->
+            @if(isset($inventories) && method_exists($inventories, 'hasPages') && $inventories->hasPages())
+            <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 bg-white rounded-b-2xl">
+                <div class="text-[13px] text-slate-500 text-center sm:text-left font-medium">
+                    Mostrando del <span class="font-bold text-slate-800">{{ $inventories->firstItem() ?? 0 }}</span> al <span class="font-bold text-slate-800">{{ $inventories->lastItem() ?? 0 }}</span> de <span class="font-bold text-slate-800">{{ $inventories->total() }}</span> registros
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    @if ($inventories->onFirstPage())
+                        <span class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed">Anterior</span>
+                    @else
+                        <a href="{{ $inventories->previousPageUrl() }}" class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors">Anterior</a>
+                    @endif
+
+                    @php
+                        $start = max($inventories->currentPage() - 2, 1);
+                        $end = min($inventories->currentPage() + 2, $inventories->lastPage());
+                    @endphp
+
+                    @if($start > 1)
+                        <a href="{{ $inventories->url(1) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">1</a>
+                        @if($start > 2)
+                            <span class="px-1 text-slate-400">...</span>
+                        @endif
+                    @endif
+
+                    @for ($i = $start; $i <= $end; $i++)
+                        @if ($i == $inventories->currentPage())
+                            <span class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-bold bg-blue-50 text-blue-600 border border-blue-100 shadow-sm">{{ $i }}</span>
+                        @else
+                            <a href="{{ $inventories->url($i) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">{{ $i }}</a>
+                        @endif
+                    @endfor
+
+                    @if($end < $inventories->lastPage())
+                        @if($end < $inventories->lastPage() - 1)
+                            <span class="px-1 text-slate-400">...</span>
+                        @endif
+                        <a href="{{ $inventories->url($inventories->lastPage()) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">{{ $inventories->lastPage() }}</a>
+                    @endif
+
+                    @if ($inventories->hasMorePages())
+                        <a href="{{ $inventories->nextPageUrl() }}" class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors">Siguiente</a>
+                    @else
+                        <span class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed">Siguiente</span>
+                    @endif
+                </div>
             </div>
+            @endif
         </div>
 
         <!-- Modal: Historial de Movimientos -->
@@ -909,6 +935,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnToggleFilters = document.getElementById('toggle-filters-btn');
+            const filtersPanel = document.getElementById('filters-panel');
+
+            if(window.location.search.includes('categoria') || window.location.search.includes('pasillo') || window.location.search.includes('estante') || window.location.search.includes('order_by') || window.location.search.includes('search')) {
+                if(filtersPanel) filtersPanel.classList.remove('hidden');
+            }
+
+            if(btnToggleFilters && filtersPanel) {
+                btnToggleFilters.addEventListener('click', () => {
+                    filtersPanel.classList.toggle('hidden');
+                });
+            }
+        });
+
         function normalizeText(text) {
             return (text || '').toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
         }
@@ -1057,7 +1098,7 @@
         }
 
         function toggleFiltersPanel() {
-            const panel = document.getElementById('filtersPanel');
+            const panel = document.getElementById('filters-panel');
             if (panel) panel.classList.toggle('hidden');
         }
 
@@ -1176,7 +1217,7 @@
             const dropdown = document.getElementById('searchDropdown');
             if (dropdown) dropdown.classList.add('hidden');
 
-            const form = document.getElementById('filtersForm');
+            const form = document.getElementById('filters-panel');
             if (form) form.submit();
         }
 
@@ -1207,5 +1248,16 @@
                 dropdown.classList.add('hidden');
             }
         });
+
+        function updateFileName(input) {
+            const label = document.getElementById('fileNameLabel');
+            if (input.files && input.files.length > 0) {
+                label.textContent = input.files[0].name;
+                label.classList.add('text-teal-600');
+            } else {
+                label.textContent = 'Explorar Archivos';
+                label.classList.remove('text-teal-600');
+            }
+        }
     </script>
 @endsection
