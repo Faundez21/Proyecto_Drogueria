@@ -385,7 +385,7 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse ring-4 ring-amber-50"></span>
                     Lotes Retenidos / En Cuarentena
                 </h2>
-                <a href="#"
+                <a href="{{ route('quarantine.index') ?? '#' }}"
                     class="text-[12px] font-bold text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-md">Gestionar
                     cuarentenas</a>
             </div>
