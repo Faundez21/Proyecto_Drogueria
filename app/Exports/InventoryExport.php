@@ -42,7 +42,6 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
 
     public function map($inventory): array
     {
-        // Resolución segura de nombres según la estructura de tu modelo
         $producto = is_object($inventory->producto) ? ($inventory->producto->nombre ?? 'S/N') : ($inventory->producto ?? 'General');
         $pasillo = $inventory->pasillo_nombre ?? (is_object($inventory->aisle ?? null) ? $inventory->aisle->nombre ?? ($inventory->aisle->name ?? 'S/A') : $inventory->pasillo ?? 'S/A');
         $estante = $inventory->estanteria_nombre ?? (is_object($inventory->shelf ?? null) ? $inventory->shelf->nombre ?? ($inventory->shelf->name ?? 'S/E') : $inventory->estante ?? ($inventory->estanteria ?? 'S/E'));
@@ -54,7 +53,7 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
             try {
                 $fechaVencimiento = \Carbon\Carbon::parse($fechaVencimiento)->format('d/m/Y');
             } catch (\Exception $e) {
-                // mantener como viene si falla el parseo
+                // Mantiene el valor original si falla
             }
         } else {
             $fechaVencimiento = 'N/A';
@@ -72,7 +71,6 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
         ];
     }
 
-    // Aquí está la corrección: indicamos que devuelve un array
     public function styles(Worksheet $sheet): array
     {
         return [
