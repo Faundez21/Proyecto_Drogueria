@@ -2,34 +2,28 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Guia de Despacho Controlado {{ $despacho->correlativo }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
+    <title>Guia de Despacho {{ $despacho->correlativo }}</title>
     <style>
         body { font-family: 'Helvetica', sans-serif; font-size: 12px; color: #333; }
-        
-        /* cabecera con color rojo carmesi para diferenciar de guias normales */
-        .header { width: 100%; border-bottom: 2px solid #be123c; padding-bottom: 10px; margin-bottom: 20px; }
+        .header { width: 100%; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 20px; }
         .header table { width: 100%; border: none; }
         .header td { border: none; }
-        .title { font-size: 18px; font-weight: bold; text-align: right; color: #be123c; }
-        
-        /* cajas de informacion */
+        .title { font-size: 18px; font-weight: bold; text-align: right; color: #0f172a; }
         .box { border: 1px solid #ccc; padding: 10px; border-radius: 5px; margin-bottom: 15px; line-height: 1.6; }
-        .box-warning { border: 1px solid #facc15; background-color: #fefce8; padding: 10px; border-radius: 5px; margin-bottom: 15px; line-height: 1.6; }
-        
-        /* tabla de productos */
         table.items { width: 100%; border-collapse: collapse; margin-top: 10px; }
         table.items th, table.items td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        table.items th { background-color: #fff1f2; font-size: 11px; text-transform: uppercase; color: #be123c; }
+        table.items th { background-color: #f8fafc; font-size: 11px; text-transform: uppercase; }
         
         /* estilos para las firmas */
         table.signatures { width: 100%; margin-top: 60px; text-align: center; border: none; }
         table.signatures td { border: none; vertical-align: bottom; }
         .signature-line { width: 60%; margin: 0 auto; border-top: 1px solid #333; padding-top: 5px; margin-top: 5px; font-size: 11px; }
         
-        /* pie de pagina */
         .footer { position: fixed; bottom: 30px; width: 100%; text-align: center; font-size: 10px; border-top: 1px solid #ccc; padding-top: 10px; color: #666; }
     </style>
 </head>
+
 <body>
     
     <!-- cabecera del documento -->
@@ -42,14 +36,14 @@
                     Blanco Encalada 450, Talcahuano
                 </td>
                 <td width="40%" class="title">
-                    GUIA ESTUPEFACIENTES {{ strtoupper($despacho->clasificacion ?? 'INTERNA') }}<br>
+                    GUIA DE DESPACHO {{ strtoupper($despacho->clasificacion ?? 'INTERNA') }}<br>
                     N° {{ $despacho->correlativo }}
                 </td>
             </tr>
         </table>
     </div>
 
-    <!-- informacion general del despacho controlado -->
+    <!-- caja de informacion de destino y logistica -->
     <div class="box">
         <strong>CLASIFICACION:</strong> {{ ucfirst($despacho->clasificacion ?? 'Interno') }}<br>
         <strong>DESTINO:</strong> {{ $despacho->establecimiento_destino }}<br>
@@ -58,19 +52,11 @@
         <strong>CONDICIONES:</strong> {{ $despacho->condiciones_transporte ?? 'Transporte Normal' }}
     </div>
 
-    <!-- seccion exclusiva para series de recetas cheque -->
-    @if($despacho->series_recetas)
-        <div class="box-warning">
-            <strong style="color: #ca8a04;">SERIES RECETAS CHEQUE DESPACHADAS:</strong><br>
-            {{ $despacho->series_recetas }}
-        </div>
-    @endif
-
     <!-- tabla de productos extraidos -->
     <table class="items">
         <thead>
             <tr>
-                <th>Producto Controlado</th>
+                <th>Producto</th>
                 <th>Lote</th>
                 <th>Vencimiento</th>
                 <th>Programa</th>
@@ -90,10 +76,10 @@
         </tbody>
     </table>
 
-    <!-- firmas de responsabilidad civil y sanitaria -->
+    <!-- seccion de firmas agregadas recientemente -->
     <table class="signatures">
         <tr>
-            <!-- firma de quien despacha (q.f) -->
+            <!-- firma de quien despacha -->
             <td style="width: 50%;">
                 @if(isset($despacho->firma_despacha) && $despacho->firma_despacha)
                     <img src="{{ $despacho->firma_despacha }}" style="max-height: 80px;" alt="Firma Despacha">
@@ -101,7 +87,7 @@
                     <div style="height: 80px;"></div>
                 @endif
                 <div class="signature-line">
-                    <strong>Firma Quien Despacha (Q.F)</strong><br>
+                    <strong>Firma Quien Despacha</strong><br>
                     Bodega Central / DAS
                 </div>
             </td>

@@ -48,7 +48,7 @@
 
         <form action="{{ route('controlled_dispatch.store') }}" method="POST" id="despachoForm">
             @csrf
-            
+
             <!-- seccion de datos del remitente y correlativo -->
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
                 <div>
@@ -74,7 +74,7 @@
                 <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide mb-4">1. Tipo, Destino y Logistica</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
-                    
+
                     <!-- clasificacion interno/externo -->
                     <div class="md:col-span-2">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Clasificacion del Despacho <span class="text-rose-500">*</span></label>
@@ -104,18 +104,9 @@
                         <select id="establecimiento_interno" onchange="actualizarDireccionInterna()" class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                             <option value="" disabled selected>Seleccione el Establecimiento...</option>
                             <option value="CESFAM LOS CERROS" data-direccion="Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano">CESFAM LOS CERROS</option>
-                            <option value="CECOSF CENTINELA" data-direccion="Calle Punta Peñablanca 1301, poblacion Centinela, Talcahuano">CECOSF CENTINELA</option>
-                            <option value="CECOSF LOS LOBOS - LA GLORIA" data-direccion="Calle Los Lobos 1960, poblacion Los Lobos, Talcahuano">CECOSF LOS LOBOS - LA GLORIA</option>
-                            <option value="POSTA TUMBE" data-direccion="Maryland s/n, Caleta Tumbes, Talcahuano">POSTA TUMBE</option>
                             <option value="CESFAM PAULINA AVENDAÑO" data-direccion="Calle Carlos Dittborn 4100, Villa San Martin, Talcahuano">CESFAM PAULINA AVENDAÑO</option>
                             <option value="CESFAM SAN VICENTE" data-direccion="Calle Brasil 360, San Vicente, Talcahuano">CESFAM SAN VICENTE</option>
-                            <option value="CECOSF LIBERTAD GAETE" data-direccion="Calle Isla San Ambrosio 509, poblacion Libertad, Talcahuano">CECOSF LIBERTAD GAETE</option>
-                            <option value="CECOSF 8 DE MAYO" data-direccion="Calle Aysen 7370, poblacion Diego Portales, Talcahuano">CECOSF 8 DE MAYO</option>
-                            <option value="CECOSF ESMERALDA" data-direccion="Calle San Miguel 546, Poblacion Patricio Lynch, Talcahuano">CECOSF ESMERALDA</option>
                             <option value="CESFAM LEOCAN PORTUS" data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM LEOCAN PORTUS</option>
-                            <option value="SAR SAN VICENTE" data-direccion="Juan de la Cruz Tapia s/n, Talcahuano">SAR SAN VICENTE</option>
-                            <option value="SAR LOS CERROS" data-direccion="Calle Coliumo S/N Nueva los Lobos, Talcahuano">SAR LOS CERROS</option>
-                            <option value="UAPO" data-direccion="Calle Blanco Encalada 1142, Talcahuano">UAPO</option>
                         </select>
                     </div>
 
@@ -236,9 +227,9 @@
                 <select name="productos[]" required onchange="llenarDatosFila(this)" class="w-full bg-white border border-slate-300 focus:border-rose-500 rounded-lg px-2.5 py-2 text-[12px] font-bold text-slate-800 outline-none shadow-sm cursor-pointer transition-colors">
                     <option value="" disabled selected>Seleccione estupefaciente...</option>
                     @foreach($inventarioDisponible as $inv)
-                        <option value="{{ $inv->producto }}" 
-                                data-lote="{{ $inv->lote ?? 'S/L' }}" 
-                                data-vence="{{ $inv->fecha_vencimiento ?? '' }}" 
+                        <option value="{{ $inv->producto }}"
+                                data-lote="{{ $inv->lote ?? 'S/L' }}"
+                                data-vence="{{ $inv->fecha_vencimiento ?? '' }}"
                                 data-stock="{{ $inv->cantidad ?? 0 }}">
                             {{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})
                         </option>
@@ -292,7 +283,7 @@
                     <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros de Busqueda</span>
                     <button type="button" onclick="limpiarFiltrosBandeja()" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 transition-colors">Limpiar Filtros</button>
                 </div>
-                
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Correlativo</label>
@@ -456,8 +447,33 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- AQUÍ ESTÁ LA SOLUCIÓN: VENTANA MODAL PARA EL ESCÁNER QR -->
+    <div id="scannerModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg flex flex-col overflow-hidden">
+            <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Escanear Etiqueta QR</h2>
+                    <p class="text-[12px] text-slate-300 mt-1 uppercase tracking-wider font-semibold">Acerque el código a la cámara</p>
+                </div>
+                <button type="button" onclick="closeScanner()" class="text-slate-400 hover:text-white transition-colors bg-white/10 p-2 rounded-lg cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 bg-slate-50 flex items-center justify-center">
+                <!-- CONTENEDOR 'reader' DONDE HTML5-QRCODE INYECTA LA CÁMARA -->
+                <div id="reader" class="w-full rounded-lg overflow-hidden border-2 border-dashed border-rose-300 bg-white"></div>
+            </div>
+            <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end">
+                <button type="button" onclick="closeScanner()" class="px-6 py-2.5 bg-rose-600 text-white hover:bg-rose-700 rounded-xl transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar Escaneo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <!-- IMPLEMENTACION SWEETALERT 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         let signatureDespacha = null;
@@ -501,7 +517,7 @@
             const val = document.getElementById('clasificacion_select').value;
             const divInt = document.getElementById('div_interno');
             const divExt = document.getElementById('div_externo');
-            
+
             const selInt = document.getElementById('establecimiento_interno');
             const selExtTipo = document.getElementById('tipo_externo');
             const inpExtDest = document.getElementById('establecimiento_externo');
@@ -510,10 +526,10 @@
             if (val === 'Interno') {
                 divInt.classList.remove('hidden');
                 divExt.classList.add('hidden');
-                
+
                 selInt.setAttribute('name', 'establecimiento_destino');
                 selInt.setAttribute('required', 'true');
-                
+
                 selExtTipo.removeAttribute('name');
                 selExtTipo.removeAttribute('required');
                 inpExtDest.removeAttribute('name');
@@ -523,7 +539,7 @@
                 inpDir.classList.add('bg-slate-50', 'cursor-not-allowed');
                 inpDir.classList.remove('bg-white');
                 inpDir.placeholder = "Se autocompletara al seleccionar destino...";
-                
+
                 actualizarDireccionInterna();
             } else if (val === 'Externo') {
                 divInt.classList.add('hidden');
@@ -541,17 +557,17 @@
                 inpDir.classList.remove('bg-slate-50', 'cursor-not-allowed');
                 inpDir.classList.add('bg-white');
                 inpDir.value = '';
-                inpDir.placeholder = 'Ingrese la direccion manualmente...';
+                inpDir.placeholder = 'Ingrese la direccion manually...';
             }
         }
 
         function actualizarDireccionInterna() {
             if(document.getElementById('clasificacion_select').value !== 'Interno') return;
-            
+
             const select = document.getElementById('establecimiento_interno');
             const input = document.getElementById('direccion_destino');
             const selectedOption = select.options[select.selectedIndex];
-            
+
             if (selectedOption && selectedOption.dataset.direccion) {
                 input.value = selectedOption.dataset.direccion;
             } else {
@@ -577,7 +593,7 @@
             let selectClasificacion = document.getElementById('filtroClasificacion').value.toLowerCase();
             let inputDestino = document.getElementById('filtroDestino').value.toLowerCase();
             let selectEstado = document.getElementById('filtroEstadoBandeja').value.toLowerCase();
-            
+
             let fechaFormateada = "";
             if (inputFecha) {
                 let partes = inputFecha.split('-');
@@ -594,7 +610,7 @@
                 let clasificacionText = fila.children[3].textContent.toLowerCase();
                 let destinoText = fila.children[4].textContent.toLowerCase();
                 let estadoText = fila.children[5].textContent.toLowerCase();
-                
+
                 let coincideCorrelativo = correlativoText.includes(inputCorrelativo);
                 let coincideFecha = fechaFormateada === "" || fechaText.includes(fechaFormateada);
                 let coincideClasificacion = selectClasificacion === "" || clasificacionText.includes(selectClasificacion);
@@ -664,7 +680,7 @@
                 let select = tr.querySelector('select[name="productos[]"]');
                 let options = Array.from(select.options);
                 let targetOption = options.find(opt => opt.value === data.producto && opt.getAttribute('data-lote') === data.lote);
-                
+
                 if (targetOption) {
                     select.value = targetOption.value;
                     llenarDatosFila(select);
@@ -675,41 +691,41 @@
 
         function llenarDatosFila(selectElement) {
             let option = selectElement.options[selectElement.selectedIndex];
-            if (!option || option.disabled) return; 
+            if (!option || option.disabled) return;
 
             let tr = selectElement.closest('tr');
             let loteInput = tr.querySelector('input[name="lotes[]"]');
             let venceInput = tr.querySelector('input[name="vencimientos[]"]');
             let cantInput = tr.querySelector('input[name="cantidades[]"]');
-            
+
             let stockBadge = tr.querySelector('.stock-max-badge');
             let stockContainer = tr.querySelector('.stock-container');
             let fefoContainer = tr.querySelector('.fefo-container');
 
             loteInput.value = option.getAttribute('data-lote');
             venceInput.value = option.getAttribute('data-vence');
-            
+
             let stock = parseInt(option.getAttribute('data-stock'));
-            cantInput.setAttribute('max', stock); 
+            cantInput.setAttribute('max', stock);
             stockBadge.textContent = stock;
             stockContainer.classList.remove('hidden');
             
             fefoContainer.innerHTML = '';
             venceInput.classList.remove('text-rose-700', 'font-extrabold', 'bg-rose-50');
-            
+
             if(venceInput.value) {
                 try {
                     let fVence = new Date(venceInput.value);
                     let hoy = new Date();
                     let mesesRestantes = (fVence.getFullYear() - hoy.getFullYear()) * 12 + (fVence.getMonth() - hoy.getMonth());
-                    
+
                     if(mesesRestantes <= 6) {
                         venceInput.classList.add('text-rose-700', 'font-extrabold', 'bg-rose-50');
                         fefoContainer.innerHTML = '<span class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] bg-rose-500 text-white font-bold px-1.5 py-0.5 rounded shadow-sm">PRONTO A VENCER</span>';
                     }
                 } catch(e) {}
             }
-            
+
             cantInput.focus();
         }
 
@@ -731,10 +747,10 @@
         function validarStock(input) {
             let maxVal = parseInt(input.getAttribute('max'));
             let currentVal = parseInt(input.value);
-            
+
             if(!isNaN(maxVal) && !isNaN(currentVal)) {
                 if(currentVal > maxVal) {
-                    input.value = maxVal; 
+                    input.value = maxVal;
                     input.classList.add('border-rose-500', 'bg-rose-50', 'text-rose-700', 'ring-2', 'ring-rose-500/20');
                     setTimeout(() => {
                         input.classList.remove('border-rose-500', 'bg-rose-50', 'text-rose-700', 'ring-2', 'ring-rose-500/20');
@@ -747,25 +763,32 @@
 
         function openScanner() {
             if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-                alert("Advertencia: Para usar la camara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Aviso de Seguridad',
+                    text: 'Para usar la cámara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.',
+                    confirmButtonColor: '#e11d48'
+                });
             }
 
+            // Aquí se muestra el modal que ahora sí existe en el HTML
             document.getElementById('scannerModal').classList.remove('hidden');
+            
             html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250}, aspectRatio: 1.0 }, false);
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
         }
 
         function closeScanner() {
-            if(html5QrcodeScanner) { 
-                html5QrcodeScanner.clear().catch(e => console.error(e)); 
-                html5QrcodeScanner = null; 
+            if(html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(e => console.error(e));
+                html5QrcodeScanner = null;
             }
             document.getElementById('scannerModal').classList.add('hidden');
         }
 
         function onScanSuccess(decodedText) {
             closeScanner();
-            
+
             let parsedData = {};
             let chunks = decodedText.split('|');
             chunks.forEach(chunk => {
@@ -774,7 +797,12 @@
             });
 
             if(!parsedData.PROD || !parsedData.STOCK) {
-                alert("QR no compatible con el sistema.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Formato Inválido',
+                    text: 'QR no compatible con el sistema.',
+                    confirmButtonColor: '#e11d48'
+                });
                 return;
             }
 
@@ -787,7 +815,7 @@
 
             let emptySelect = Array.from(tbody.querySelectorAll('select[name="productos[]"]')).find(sel => sel.value === '');
             let tr;
-            
+
             if(emptySelect) {
                 tr = emptySelect.closest('tr');
             } else {
@@ -797,18 +825,24 @@
             let select = tr.querySelector('select[name="productos[]"]');
             let options = Array.from(select.options);
             let targetOption = options.find(opt => opt.value === rowData.producto && opt.getAttribute('data-lote') === rowData.lote);
-            
+
             if (targetOption) {
                 select.value = targetOption.value;
                 llenarDatosFila(select);
                 tr.querySelector('input[name="cantidades[]"]').focus();
             } else {
-                alert("El producto o lote escaneado ya no tiene stock disponible en la bodega.");
-                if (!emptySelect && tbody.children.length > 1) tr.remove(); 
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Sin Stock',
+                    text: 'El producto o lote escaneado ya no tiene stock disponible en la bodega.',
+                    confirmButtonColor: '#e11d48'
+                });
+                if (!emptySelect && tbody.children.length > 1) tr.remove();
             }
         }
 
         function onScanFailure(error) {
+            // Se ignora silenciosamente para no saturar la consola en cada frame fallido
         }
     </script>
 @endsection

@@ -139,12 +139,15 @@
                                     <select name="product_id[]" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" disabled selected>Buscar producto...</option>
                                         @foreach($products as $product)
-                                            <option value="{{ $product->id }}">{{ $product->nombre }}</option>
+                                            <option value="{{ $product->id }}">
+                                                {{ $product->nombre }} 
+                                                @if(in_array($product->nombre, $controlados ?? [])) 🔴 (Controlado) @endif
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="lg:col-span-2">
-                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoria <span class="text-rose-500">*</span></label>
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoria (Si no es controlado) <span class="text-rose-500">*</span></label>
                                     <select name="tipo_producto[]" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" disabled selected>Seleccione...</option>
                                         <option value="F-PALIATIVOS">CUIDADOS PALIATIVOS</option>
@@ -192,26 +195,15 @@
                 <div class="p-6 bg-slate-50/40">
                     <div class="flex items-center gap-2 mb-4">
                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                        <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">4. Firmas Digitales</h3>
+                        <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">4. Firma Digital</h3>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <!-- firma proveedor -->
-                        <div class="flex flex-col items-center">
-                            <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma Quien Entrega (Proveedor)</p>
-                            <input type="hidden" name="firma_proveedor" id="firma_proveedor_input">
-                            <div class="border-2 border-dashed border-slate-300 rounded-lg bg-white overflow-hidden shadow-sm w-full max-w-[400px]">
-                                <canvas id="pad_proveedor" width="400" height="150" class="cursor-crosshair touch-none w-full"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- firma receptor -->
-                        <div class="flex flex-col items-center">
-                            <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma Quien Recibe (DAS)</p>
-                            <input type="hidden" name="firma_receptor" id="firma_receptor_input">
-                            <div class="border-2 border-dashed border-teal-300 rounded-lg bg-white overflow-hidden shadow-sm w-full max-w-[400px]">
-                                <canvas id="pad_receptor" width="400" height="150" class="cursor-crosshair touch-none w-full"></canvas>
-                            </div>
+                    <div class="flex flex-col items-center justify-center max-w-md mx-auto">
+                        <!-- firma receptor unica -->
+                        <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma Quien Recibe (DAS)</p>
+                        <input type="hidden" name="firma_receptor" id="firma_receptor_input">
+                        <div class="border-2 border-dashed border-teal-300 rounded-lg bg-white overflow-hidden shadow-sm w-full">
+                            <canvas id="pad_receptor" width="400" height="150" class="cursor-crosshair touch-none w-full"></canvas>
                         </div>
                     </div>
                 </div>
@@ -371,18 +363,15 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-center h-24">
-                            <p class="text-[11px] text-slate-500 font-semibold mb-1 uppercase">Firma Entrega</p>
-                            <img id="m_img_proveedor" src="" class="hidden mx-auto max-h-12" alt="Firma">
-                            <span id="m_no_firma_proveedor" class="text-xs text-slate-400 italic">No registrada</span>
-                        </div>
-                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-center h-24">
+                    <!-- Firma Modal -->
+                    <div class="flex justify-center mt-4">
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-center h-24 w-64">
                             <p class="text-[11px] text-slate-500 font-semibold mb-1 uppercase">Firma Recepcion</p>
                             <img id="m_img_receptor" src="" class="hidden mx-auto max-h-12" alt="Firma">
                             <span id="m_no_firma_receptor" class="text-xs text-slate-400 italic">No registrada</span>
                         </div>
                     </div>
+
                 </div>
                 <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-xl">
                     <button onclick="closeDetailModal()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50">Cerrar</button>
@@ -493,14 +482,12 @@
                 container.appendChild(clone);
             });
 
-            // 3. funcionalidad de firmas digitales
+            // 3. funcionalidad de firma digital
             const padOptions = { penColor: 'rgb(15, 23, 42)', backgroundColor: 'rgba(255, 255, 255, 1)' };
-            const signatureProv = new SignaturePad(document.getElementById('pad_proveedor'), padOptions);
             const signatureRec = new SignaturePad(document.getElementById('pad_receptor'), padOptions);
 
-            // 4. limpieza del formulario completo (incluye firmas)
+            // 4. limpieza del formulario completo (incluye firma)
             document.getElementById('btn_limpiar').addEventListener('click', function(e) {
-                signatureProv.clear();
                 signatureRec.clear();
                 document.getElementById('valor_final_iva').value = '';
 
@@ -513,7 +500,6 @@
 
             // 5. antes de enviar, inyectar firmas base64
             document.getElementById('receptionForm').addEventListener('submit', function() {
-                if (!signatureProv.isEmpty()) document.getElementById('firma_proveedor_input').value = signatureProv.toDataURL('image/png');
                 if (!signatureRec.isEmpty()) document.getElementById('firma_receptor_input').value = signatureRec.toDataURL('image/png');
             });
         });
@@ -548,12 +534,7 @@
 
             document.getElementById('m_total').innerText = '$' + parseFloat(data.valor_total_recepcion).toLocaleString('es-CL');
 
-            // firmas
-            const imgProv = document.getElementById('m_img_proveedor');
-            const noFirmaProv = document.getElementById('m_no_firma_proveedor');
-            if(data.firma_proveedor) { imgProv.src = data.firma_proveedor; imgProv.classList.remove('hidden'); noFirmaProv.classList.add('hidden'); }
-            else { imgProv.classList.add('hidden'); noFirmaProv.classList.remove('hidden'); }
-
+            // firma receptor
             const imgRec = document.getElementById('m_img_receptor');
             const noFirmaRec = document.getElementById('m_no_firma_receptor');
             if(data.firma_receptor) { imgRec.src = data.firma_receptor; imgRec.classList.remove('hidden'); noFirmaRec.classList.add('hidden'); }

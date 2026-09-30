@@ -1,366 +1,532 @@
 @extends('layouts.app')
 
+@section('title', 'Reportes')
+@section('subtitle', 'Visualización y exportación de datos consolidados.')
+
+@section('actions')
+    <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+        <a href=""
+            class="flex-1 sm:flex-none px-5 py-2.5 bg-[#0d9488] hover:bg-[#0f766e] text-white rounded-2xl font-bold text-[13px] shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer border border-transparent">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+            </svg>
+            <span>Exportar a Excel</span>
+        </a>
+
+        <a href=""
+            class="flex-1 sm:flex-none px-5 py-2.5 bg-rose-600 text-white rounded-2xl text-[12px] font-bold hover:bg-rose-700 text-white rounded-2xl font-bold text-[13px] shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer border border-transparent">
+            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                </path>
+            </svg>
+            <span>Exportar a PDF</span>
+        </a>
+    </div>
+@endsection
+
 @section('content')
-    <div class="max-w-7xl mx-auto p-4 sm:p-6 mt-4">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <div>
-                <h1 class="text-2xl sm:text-3xl text-gray-800 font-semibold">Reportes</h1>
-                <p class="text-gray-500 mt-1">
-                    Visualización y exportación de datos del sistema.
-                </p>
-            </div>
-            <!-- Ambos botones para exportar -->
-            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                <button
-                    class="flex justify-center items-center gap-2 bg-red-600 border border-transparent text-white px-4 py-2.5 sm:py-2 rounded-lg hover:bg-red-700 transition-colors font-medium text-sm shadow-sm w-full sm:w-auto">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                        </path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-6 4h6m-4-8h.01">
-                        </path>
-                    </svg>
-                    Exportar PDF
-                </button>
+    <div class="w-full space-y-6">
 
-                <button
-                    class="flex justify-center items-center gap-2 bg-emerald-600 border border-transparent text-white px-4 py-2.5 sm:py-2 rounded-lg hover:bg-emerald-700 transition-colors font-medium text-sm shadow-sm w-full sm:w-auto">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                        </path>
-                    </svg>
-                    Exportar Excel
-                </button>
-            </div>
+        <!-- Migas de pan -->
+        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
+            <span class="text-slate-400 font-semibold">04</span>
+            <span>Control</span>
+            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            <span class="font-semibold text-slate-800">Reportes</span>
         </div>
 
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-8">
-            <!-- Barra de busqueda -->
-            <div class="mb-5">
-                <label for="busqueda" class="block text-sm font-medium text-slate-700 mb-1">Búsqueda</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
+        <!-- Contenedor Principal Tabla Inventario -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+
+            <!-- Filtros Avanzados -->
+            <div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col gap-4">
+                <!-- Se envía al action actual del controlador de Reportes -->
+                <form id="filtersForm" method="GET" action="{{ Route::has('reportes.index') ? route('reportes.index') : (Route::has('reportes') ? route('reportes') : url()->current()) }}">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-white border border-teal-100 shadow-sm flex items-center justify-center">
+                                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800">Reporte Consolidado de Stock</h3>
+                                <p class="text-[11px] text-slate-500 font-medium">Filtre los resultados antes de realizar las descargas</p>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="toggleFiltersPanel()"
+                            class="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:text-teal-700 hover:bg-slate-50 rounded-xl text-[13px] font-bold shadow-sm flex items-center gap-2 transition-all cursor-pointer">
+                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                                </path>
+                            </svg>
+                            <span>Filtros Avanzados</span>
+                        </button>
                     </div>
-                    <input type="text" id="busqueda" placeholder="Buscar por ID o Nombre de Producto..."
-                        class="pl-10 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                </div>
+
+                    @php
+                        $hasActiveFilters = request()->filled('search') || request()->filled('categoria') || request()->filled('pasillo') || request()->filled('estante') || request()->filled('per_page') || request()->filled('order_by');
+
+                        $invRawList = isset($inventories) ? (method_exists($inventories, 'items') ? $inventories->items() : $inventories) : [];
+
+                        $invNonMermaList = collect($invRawList)->reject(function($item) {
+                            $obj = is_object($item) ? $item : (object)$item;
+                            return str_contains(strtolower($obj->estado ?? ''), 'merma');
+                        });
+
+                        $pasillosUnicos = $invNonMermaList->map(function($item) {
+                            $obj = is_object($item) ? $item : (object)$item;
+                            return $obj->pasillo_nombre ?? (is_object($obj->aisle ?? null) ? $obj->aisle->nombre ?? ($obj->aisle->name ?? null) : $obj->pasillo ?? null);
+                        })->filter()->unique()->sort();
+
+                        $estantesUnicos = $invNonMermaList->map(function($item) {
+                            $obj = is_object($item) ? $item : (object)$item;
+                            return $obj->estanteria_nombre ?? (is_object($obj->shelf ?? null) ? $obj->shelf->nombre ?? ($obj->shelf->name ?? null) : $obj->estante ?? ($obj->estanteria ?? null));
+                        })->filter()->unique()->sort();
+                    @endphp
+
+                    <div id="filtersPanel" class="{{ $hasActiveFilters ? '' : 'hidden' }} space-y-4 pt-4 mt-4 border-t border-slate-200">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            <!-- BUSCAR -->
+                            <div class="lg:col-span-2">
+                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Buscar</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
+                                        placeholder="Producto, categoría o lote..."
+                                        class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-slate-700 shadow-sm placeholder:text-slate-400">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Categoría</label>
+                                <select name="categoria"
+                                    class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
+                                    <option value="">Todas</option>
+                                    <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
+                                    <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Pasillo</label>
+                                <select name="pasillo" id="pasilloSelect" onchange="filterTableByLocation()"
+                                    class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
+                                    <option value="">Todos los Pasillos</option>
+                                    @foreach($pasillosUnicos as $pas)
+                                        <option value="{{ $pas }}" {{ request('pasillo') == $pas ? 'selected' : '' }}>{{ $pas }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Estante</label>
+                                <select name="estante" id="estanteSelect" onchange="filterTableByLocation()"
+                                    class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
+                                    <option value="">Todos los Estantes</option>
+                                    @foreach($estantesUnicos as $est)
+                                        <option value="{{ $est }}" {{ request('estante') == $est ? 'selected' : '' }}>{{ $est }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5 tracking-wider">Ordenar por</label>
+                                <select name="order_by"
+                                    class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-[12.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
+                                    <option value="recent" {{ request('order_by', 'recent') == 'recent' ? 'selected' : '' }}>Más recientes</option>
+                                    <option value="nombre_asc" {{ request('order_by') == 'nombre_asc' ? 'selected' : '' }}>Nombre (A-Z)</option>
+                                    <option value="stock_desc" {{ request('order_by') == 'stock_desc' ? 'selected' : '' }}>Mayor Stock</option>
+                                    <option value="stock_asc" {{ request('order_by') == 'stock_asc' ? 'selected' : '' }}>Menor Stock</option>
+                                    <option value="vencimiento" {{ request('order_by') == 'vencimiento' ? 'selected' : '' }}>Próximos a Vencer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end items-center gap-3 pt-3 border-t border-slate-200/80">
+                            <a href="{{ Route::has('reportes.index') ? route('reportes.index') : (Route::has('reportes') ? route('reportes') : url()->current()) }}"
+                                class="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl text-[12.5px] font-bold transition-all shadow-sm">
+                                Limpiar Filtros
+                            </a>
+
+                        </div>
+                    </div>
+                </form>
             </div>
 
-            <!-- div de los filtros -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-
-                <div>
-                    <label for="filtro_categoria" class="block text-xs font-medium text-slate-600 mb-1">Categoría</label>
-                    <select id="filtro_categoria"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 transition-all bg-white">
-                        <option value="">Todas las categorías</option>
-                        <option value="farmacos">Fármacos</option>
-                        <option value="insumos">Insumos</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="filtro_pasillo" class="block text-xs font-medium text-slate-600 mb-1">Pasillo</label>
-                    <select id="filtro_pasillo"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 transition-all bg-white">
-                        <option value="">Todos los pasillos</option>
-                        <option value="A">Pasillo A</option>
-                        <option value="B">Pasillo B</option>
-                        <option value="C">Pasillo C</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="filtro_estante" class="block text-xs font-medium text-slate-600 mb-1">Estante</label>
-                    <select id="filtro_estante"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 transition-all bg-white">
-                        <option value="">Todos los estantes</option>
-                        <option value="1">Estante 1</option>
-                        <option value="2">Estante 2</option>
-                        <option value="3">Estante 3</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="filtro_stock" class="block text-xs font-medium text-slate-600 mb-1">Nivel de Stock</label>
-                    <select id="filtro_stock"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 transition-all bg-white">
-                        <option value="">Cualquier cantidad</option>
-                        <option value="disponible">Disponible (Normal)</option>
-                        <option value="pocas">Pocas unidades (Crítico)</option>
-                        <option value="agotado">Agotado (0 unidades)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="filtro_cuarentena" class="block text-xs font-medium text-slate-600 mb-1">Estado /
-                        Cuarentena</label>
-                    <select id="filtro_cuarentena"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 transition-all bg-white">
-                        <option value="">Cualquier estado</option>
-                        <option value="no">Libre (No)</option>
-                        <option value="si">Retenido (Sí)</option>
-                    </select>
-                </div>
-                <div class="sm:col-span-2 lg:col-span-4 flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100 w-full">
-                    <button type="reset"
-                        class="px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium shadow-sm">
-                        Limpiar Filtros
-                    </button>
-                    <button type="button"
-                        class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition-colors font-medium text-sm flex items-center gap-2 shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                            </path>
-                        </svg>
-                        Aplicar Filtros
-                    </button>
-                </div>
-
+            <div id="activeFilterAlert" class="hidden px-5 py-3 bg-teal-50 border-b border-teal-200 flex justify-between items-center text-xs text-teal-800 font-bold">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Filtro activo: <span id="filteredProductName" class="underline"></span>
+                </span>
+                <button type="button" onclick="clearClientFilter()" class="px-3 py-1 bg-white border border-teal-300 rounded-lg text-teal-700 hover:bg-teal-100 transition-colors shadow-sm cursor-pointer text-[11px]">
+                    Limpiar Filtros
+                </button>
             </div>
-        </div>
-        <!-- Tabla (misma q la de inventario)-->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
             <div class="overflow-x-auto w-full">
-                <table class="min-w-[1100px] w-full text-left text-sm font-light text-gray-800 whitespace-nowrap">
+                @php
+                    $invRaw = isset($inventories)
+                        ? (method_exists($inventories, 'items')
+                            ? $inventories->items()
+                            : $inventories)
+                        : [];
+                    $invCollection = collect($invRaw);
 
-                    <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                    $mainInventories = $invCollection->reject(function ($item) {
+                        $itemObj = is_object($item) ? $item : (object) $item;
+                        return str_contains(strtolower($itemObj->estado ?? ''), 'merma');
+                    });
+
+                    $groupedInventories = $mainInventories->groupBy(function ($item) {
+                        $prod = is_object($item) ? $item->product ?? ($item->producto ?? null) : null;
+                        if (is_object($prod) && isset($prod->nombre)) {
+                            return $prod->nombre;
+                        }
+                        if (is_string($prod)) {
+                            return $prod;
+                        }
+                        if (is_object($item) && isset($item->producto)) {
+                            return is_object($item->producto) ? ($item->producto->nombre ?? 'Producto General') : $item->producto;
+                        }
+                        return 'Producto General';
+                    });
+                @endphp
+
+                <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-extrabold">
                         <tr>
-                            <th scope="col" class="px-4 py-4">ID</th>
-                            <th scope="col" class="px-4 py-4">Producto</th>
-                            <th scope="col" class="px-4 py-4">Categoría</th>
-                            <th scope="col" class="px-4 py-4">Pasillo</th>
-                            <th scope="col" class="px-4 py-4">Estante</th>
-                            <th scope="col" class="px-4 py-4 text-center">Cuarentena</th>
-                            <th scope="col" class="px-4 py-4">Stock Total</th>
-                            <th scope="col" class="px-4 py-4 text-center">Acciones</th>
+                            <th scope="col" class="px-6 py-4 w-14 text-center">Detalle</th>
+                            <th scope="col" class="px-6 py-4">Producto Principal</th>
+                            <th scope="col" class="px-6 py-4">Categoría</th>
+                            <th scope="col" class="px-6 py-4 text-center">Lotes Activos</th>
+                            <th scope="col" class="px-6 py-4 text-center">Stock Físico Acumulado</th>
                         </tr>
                     </thead>
 
-                    <tbody>
-                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors">
-                            <td class="px-4 py-3 font-medium text-gray-600">1001</td>
-                            <td class="px-4 py-3 font-bold text-slate-800">PARACETAMOL 500MG</td>
-                            <td class="px-4 py-3 text-gray-600">Fármacos</td>
-                            <td class="px-4 py-3 text-gray-600 font-medium">Pasillo A </td>
-                            <td class="px-4 py-3 text-gray-600">Estante 1</td>
-                            <td class="px-4 py-3 text-center text-gray-500 font-medium">No</td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                    850 Unidades
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-                                <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                    title="Desactivar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
+                    <tbody class="divide-y divide-slate-100" id="mainTableBody">
+                        @if ($groupedInventories->isEmpty())
+                            <tr>
+                                <td colspan="5" class="px-6 py-16 text-center">
+                                    <div class="flex flex-col items-center justify-center text-slate-400">
+                                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
+                                            <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                            </svg>
+                                        </div>
+                                        <p class="text-[15px] font-bold text-slate-600">Sin datos registrados para reportes</p>
+                                        <p class="text-[13px] text-slate-500 mt-1 max-w-sm">No existen registros que coincidan con la búsqueda requerida.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @else
+                            @foreach ($groupedInventories as $nombreProducto => $lotes)
+                                @php
+                                    $stockTotalProducto = $lotes->sum(function ($i) {
+                                        return is_object($i) ? $i->stock_total ?? ($i->cantidad ?? 0) : 0;
+                                    });
+                                    $groupKey = 'grp_' . md5($nombreProducto);
+                                    $primerLote = $lotes->first();
+                                    $categoriaLote = is_object($primerLote)
+                                        ? $primerLote->categoria ?? 'General'
+                                        : 'General';
+                                @endphp
 
-                        <tr class="border-b border-neutral-200 bg-red-50/40 hover:bg-red-50 transition-colors">
-                            <td class="px-4 py-3 font-medium text-red-800">1042</td>
-                            <td class="px-4 py-3 font-bold text-red-900">ERITROMICINA 500 MG CM REC.</td>
-                            <td class="px-4 py-3 text-red-800">Fármacos</td>
-                            <td class="px-4 py-3 text-red-800 font-medium">Pasillo A</td>
-                            <td class="px-4 py-3 text-red-800">Estante 3</td>
-                            <td class="px-4 py-3 text-center text-red-800 font-medium">No</td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-300">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                        </path>
-                                    </svg>
-                                    15 Unidades
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-                                <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                    title="Desactivar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
+                                <tr id="product-row-{{ $groupKey }}"
+                                    data-product-name="{{ strtolower(trim($nombreProducto)) }}"
+                                    class="product-master-row bg-white hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                                    onclick="toggleLotes('{{ $groupKey }}')">
+                                    <td class="px-6 py-4 text-center relative">
+                                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors"></div>
+                                        <button type="button"
+                                            class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-teal-100 group-hover:text-teal-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200 group-hover:border-teal-200"
+                                            id="icon-{{ $groupKey }}">
+                                            <svg class="w-4 h-4 transform transition-transform duration-300"
+                                                id="arrow-{{ $groupKey }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="font-extrabold text-slate-800 text-[14px]">{{ $nombreProducto }}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-1 rounded bg-slate-100 text-slate-600 text-[11px] font-bold border border-slate-200">{{ $categoriaLote }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{{ $lotes->count() }}</span>
+                                        <span class="text-slate-400 text-[11px] font-semibold uppercase">Lote(s)</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        @if ($stockTotalProducto > 10)
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} Unidades
+                                            </span>
+                                        @elseif($stockTotalProducto > 0)
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} Unid. (Bajo)
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-rose-50 text-rose-700 border border-rose-200 shadow-sm">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                0 Unidades (Agotado)
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
 
-                        <tr class="border-b border-neutral-200 bg-white hover:bg-gray-50 transition-colors opacity-75">
-                            <td class="px-4 py-3 font-medium text-gray-500">2055</td>
-                            <td class="px-4 py-3 font-bold text-gray-600">AGUJA 21 G X 1,5 DESECHABLE</td>
-                            <td class="px-4 py-3 text-gray-500">Insumos</td>
-                            <td class="px-4 py-3 text-gray-500 font-medium">Pasillo B</td>
-                            <td class="px-4 py-3 text-gray-500">Estante 2</td>
-                            <td class="px-4 py-3 text-center text-gray-500 font-medium">No</td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-300">
-                                    0 Unidades (Agotado)
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-                                <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <!-- Botón Desactivar -->
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                    title="Desactivar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
+                                <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-100/50 shadow-inner">
+                                    <td colspan="5" class="p-0 border-b border-slate-300">
+                                        <div class="py-4 pr-6 pl-14">
+                                            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                                <div class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
+                                                    <span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                                        </svg>
+                                                        Desglose Físico de Lotes
+                                                    </span>
+                                                </div>
+                                                <div class="overflow-x-auto">
+                                                    <table class="w-full text-left text-xs whitespace-nowrap">
+                                                        <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 text-[10px] tracking-wider">
+                                                            <tr>
+                                                                <th class="px-4 py-3">Lote / Vencimiento</th>
+                                                                <th class="px-4 py-3">Ubicación (Pasillo/Estante)</th>
+                                                                <th class="px-4 py-3 text-center">Estado Sanitario</th>
+                                                                <th class="px-4 py-3 text-center">Stock de Lote</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="divide-y divide-slate-100 text-slate-700">
+                                                            @foreach ($lotes as $loteObj)
+                                                                @php
+                                                                    $loteData = is_object($loteObj) ? $loteObj : (object) $loteObj;
+                                                                    $badgeVencimientoClass = 'text-slate-500';
+                                                                    $fechaVencRaw = $loteData->fecha_vencimiento ?? null;
+                                                                    $textoVencimiento = 'N/A';
 
-                        <tr class="border-b border-neutral-200 bg-orange-50 hover:bg-orange-100 transition-colors">
-                            <td class="px-4 py-3 font-medium text-orange-800">1088</td>
-                            <td class="px-4 py-3 font-bold text-orange-900">IBUPROFENO 400MG</td>
-                            <td class="px-4 py-3 text-orange-800">Fármacos</td>
-                            <td class="px-4 py-3 text-orange-800 font-medium">Pasillo C</td>
-                            <td class="px-4 py-3 text-orange-800">Estante 1</td>
-                            <td class="px-4 py-3 text-center">
-                                <span
-                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-orange-200 text-orange-800 border border-orange-300">
-                                    Sí
-                                </span>
-                            </td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-gray-800 border border-gray-300">
-                                    320 Unidades
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-center flex justify-center gap-1">
-                                <button
-                                    class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                    title="Ver Detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                    title="Desactivar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
+                                                                    if (!empty($fechaVencRaw)) {
+                                                                        try {
+                                                                            $fVenc = \Carbon\Carbon::parse($fechaVencRaw);
+                                                                            $textoVencimiento = $fVenc->format('d/m/Y');
+                                                                            $now = \Carbon\Carbon::now();
 
+                                                                            if ($fVenc->isPast()) {
+                                                                                $badgeVencimientoClass = 'text-rose-600 font-extrabold';
+                                                                            } else {
+                                                                                $diasRestantes = $now->diffInDays($fVenc, false);
+                                                                                if ($diasRestantes > 90) {
+                                                                                    $badgeVencimientoClass = 'text-emerald-600 font-bold';
+                                                                                } elseif ($diasRestantes >= 0) {
+                                                                                    $badgeVencimientoClass = 'text-amber-600 font-bold';
+                                                                                } else {
+                                                                                    $badgeVencimientoClass = 'text-rose-600 font-extrabold';
+                                                                                }
+                                                                            }
+                                                                        } catch (\Exception $e) {
+                                                                            $textoVencimiento = $fechaVencRaw;
+                                                                        }
+                                                                    }
+
+                                                                    $pasilloVal = $loteData->pasillo_nombre ?? (is_object($loteData->aisle ?? null) ? $loteData->aisle->nombre ?? ($loteData->aisle->name ?? null) : $loteData->pasillo ?? 'P.A');
+                                                                    $estanteVal = $loteData->estanteria_nombre ?? (is_object($loteData->shelf ?? null) ? $loteData->shelf->nombre ?? ($loteData->shelf->name ?? null) : $loteData->estante ?? ($loteData->estanteria ?? 'P.A'));
+                                                                    $stockLote = $loteData->stock_total ?? ($loteData->cantidad ?? 0);
+                                                                    $isCuarentena = isset($loteData->cuarentena) ? (bool) $loteData->cuarentena : strtolower($loteData->estado ?? '') === 'cuarentena';
+                                                                    $loteCodigo = $loteData->lote ?? 'S/L';
+                                                                @endphp
+                                                                <tr class="lote-item-row hover:bg-slate-50 transition-colors"
+                                                                    data-lote-code="{{ strtolower(trim($loteCodigo)) }}"
+                                                                    data-pasillo="{{ strtolower(trim($pasilloVal)) }}"
+                                                                    data-estante="{{ strtolower(trim($estanteVal)) }}">
+                                                                    <td class="px-4 py-3">
+                                                                        <span class="font-mono font-extrabold text-slate-800 text-[13px]">{{ $loteCodigo }}</span><br>
+                                                                        <span class="text-[10px] uppercase font-semibold {{ $badgeVencimientoClass }}">Vence: {{ $textoVencimiento }}</span>
+                                                                    </td>
+                                                                    <td class="px-4 py-3">
+                                                                        <div class="flex items-center gap-1.5 text-[11px]">
+                                                                            <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">P:</span> <b class="text-slate-800">{{ $pasilloVal }}</b></span>
+                                                                            <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">E:</span> <b class="text-slate-800">{{ $estanteVal }}</b></span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        @if ($isCuarentena)
+                                                                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+                                                                                CUARENTENA
+                                                                            </span>
+                                                                        @elseif($stockLote <= 0)
+                                                                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-slate-100 text-slate-600 border border-slate-200">
+                                                                                AGOTADO
+                                                                            </span>
+                                                                        @else
+                                                                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                                                DISPONIBLE
+                                                                            </span>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        <span class="font-extrabold text-slate-800 text-[14px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
                     </tbody>
                 </table>
             </div>
 
-            <div
-                class="px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-b-2xl">
-                <span class="text-sm text-slate-500">Mostrando del <span class="font-medium text-slate-900">1</span> al
-                    <span class="font-medium text-slate-900">10</span> de <span
-                        class="font-medium text-slate-900">142</span> productos</span>
-                <div class="flex items-center gap-1">
-                    <button
-                        class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-400 cursor-not-allowed bg-slate-50">Anterior</button>
-                    <button
-                        class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-100">1</button>
-                    <button
-                        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">2</button>
-                    <button
-                        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 font-medium">3</button>
-                    <span class="px-1 text-slate-400">...</span>
-                    <button
-                        class="px-3 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">Siguiente</button>
-                </div>
+            <!-- Pie de la Tabla con enlaces a la paginación -->
+            <div class="px-6 py-4 border-t border-slate-200 bg-white">
+                @if (isset($inventories) && method_exists($inventories, 'links'))
+                    {{ $inventories->links() }}
+                @endif
             </div>
         </div>
-    @endsection
+
+    </div>
+
+    <script>
+        function normalizeText(text) {
+            return (text || '')
+                .toString()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim()
+                .toLowerCase();
+        }
+
+        function filterTableByLocation() {
+            const pasilloVal = normalizeText(document.getElementById('pasilloSelect').value);
+            const estanteVal = normalizeText(document.getElementById('estanteSelect').value);
+            const masterRows = document.querySelectorAll('.product-master-row');
+
+            masterRows.forEach(row => {
+                const groupKey = row.id.replace('product-row-', '');
+                const lotesSubrow = document.getElementById('lotes-' + groupKey);
+
+                if (!lotesSubrow) return;
+
+                const loteRows = lotesSubrow.querySelectorAll('.lote-item-row');
+                let visiblesCount = 0;
+
+                loteRows.forEach(loteRow => {
+                    const lotePasillo = normalizeText(loteRow.getAttribute('data-pasillo'));
+                    const loteEstante = normalizeText(loteRow.getAttribute('data-estante'));
+
+                    const matchPasillo = !pasilloVal || lotePasillo === pasilloVal || lotePasillo.includes(pasilloVal);
+                    const matchEstante = !estanteVal || loteEstante === estanteVal || loteEstante.includes(estanteVal);
+
+                    if (matchPasillo && matchEstante) {
+                        loteRow.classList.remove('hidden');
+                        visiblesCount++;
+                    } else {
+                        loteRow.classList.add('hidden');
+                    }
+                });
+
+                if (visiblesCount > 0) {
+                    row.classList.remove('hidden');
+                    if (pasilloVal || estanteVal) {
+                        lotesSubrow.classList.remove('hidden');
+                        const arrow = document.getElementById('arrow-' + groupKey);
+                        const iconContainer = document.getElementById('icon-' + groupKey);
+                        if (arrow) arrow.classList.add('rotate-90');
+                        if (iconContainer) {
+                            iconContainer.classList.remove('bg-slate-100', 'text-slate-400', 'border-slate-200');
+                            iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
+                        }
+                    }
+                } else {
+                    row.classList.add('hidden');
+                    lotesSubrow.classList.add('hidden');
+                }
+            });
+
+            const alertBanner = document.getElementById('activeFilterAlert');
+            const filteredText = document.getElementById('filteredProductName');
+
+            if (pasilloVal || estanteVal) {
+                let textoAlert = [];
+                if (pasilloVal) textoAlert.push(`Pasillo: ${document.getElementById('pasilloSelect').value}`);
+                if (estanteVal) textoAlert.push(`Estante: ${document.getElementById('estanteSelect').value}`);
+
+                if (filteredText) filteredText.textContent = textoAlert.join(' | ');
+                if (alertBanner) alertBanner.classList.remove('hidden');
+            } else {
+                if (alertBanner) alertBanner.classList.add('hidden');
+            }
+        }
+
+        function clearClientFilter() {
+            const masterRows = document.querySelectorAll('.product-master-row');
+            masterRows.forEach(row => row.classList.remove('hidden'));
+
+            const loteRows = document.querySelectorAll('.lote-item-row');
+            loteRows.forEach(loteRow => {
+                loteRow.classList.remove('hidden', 'bg-teal-50/80');
+            });
+
+            const pasilloSel = document.getElementById('pasilloSelect');
+            const estanteSel = document.getElementById('estanteSelect');
+            if (pasilloSel) pasilloSel.value = '';
+            if (estanteSel) estanteSel.value = '';
+
+            const alertBanner = document.getElementById('activeFilterAlert');
+            if (alertBanner) alertBanner.classList.add('hidden');
+
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+        }
+
+        function toggleFiltersPanel() {
+            const panel = document.getElementById('filtersPanel');
+            if (panel) {
+                panel.classList.toggle('hidden');
+            }
+        }
+
+        function toggleLotes(key) {
+            const row = document.getElementById('lotes-' + key);
+            const arrow = document.getElementById('arrow-' + key);
+            const iconContainer = document.getElementById('icon-' + key);
+
+            if (row) {
+                if (row.classList.contains('hidden')) {
+                    row.classList.remove('hidden');
+                    if (arrow) arrow.classList.add('rotate-90');
+                    if (iconContainer) {
+                        iconContainer.classList.remove('bg-slate-100', 'text-slate-400', 'border-slate-200');
+                        iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
+                    }
+                } else {
+                    row.classList.add('hidden');
+                    if (arrow) arrow.classList.remove('rotate-90');
+                    if (iconContainer) {
+                        iconContainer.classList.remove('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
+                        iconContainer.classList.add('bg-slate-100', 'text-slate-400', 'border-slate-200');
+                    }
+                }
+            }
+        }
+    </script>
+@endsection
