@@ -150,7 +150,7 @@ Route::middleware('auth')->group(function () {
 
     // 9. ruta de distribucion
 
-    Route::resource('distribution', DistributionController::class);
+    Route::resource('distribution', DistributionController::class); 
 
 
     // 10. ruta de cuarentena
