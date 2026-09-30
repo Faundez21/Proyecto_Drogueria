@@ -326,8 +326,8 @@
     </div>
     <div class="flow-rail pl-[27px] space-y-0.5">
         <div class="flex flex-col space-y-0.5">
-            <a href="{{ route('despacho.index') }}"
-                class="nav-row {{ request()->routeIs('despacho.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+            <a href="{{ route('dispatch.index') }}"
+                class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                         d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
