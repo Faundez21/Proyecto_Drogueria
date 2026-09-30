@@ -970,7 +970,7 @@
     </div>
 
     <!-- librerias externas -->
-    <script src="https://unpkg.com/html5-qrcode"></script>
+     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 
     <script>
