@@ -12,7 +12,7 @@ class Reception extends Model
     protected $fillable = [
         'correlativo', 'fecha_recepcion', 'tipo_documento', 'numero_documento', 
         'orden_compra', 'origen', 'provider_id', 'valor_total_recepcion', 
-        'firma_proveedor', 'firma_receptor'
+        'firma_receptor'
     ];
 
     public function provider()

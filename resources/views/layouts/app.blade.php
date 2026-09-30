@@ -12,6 +12,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
+        
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
             --sidebar-bg: #0F172A;
@@ -184,11 +188,12 @@
         .search-result-item:focus,
         .search-result-item.active {
             background-color: #f0fdfa !important;
+            border-color: #ccfbf1 !important;
             outline: none;
         }
 
-        .search-result-item:focus svg,
-        .search-result-item.active svg {
+        .search-result-item:focus svg.shrink-0,
+        .search-result-item.active svg.shrink-0 {
             color: #0f766e;
             transform: scale(1.1);
         }
@@ -203,6 +208,11 @@
             color: #0f766e;
             padding: 0 2px;
             border-radius: 3px;
+        }
+        
+        /* Ajuste de fuente para modales de SweetAlert */
+        .swal2-popup {
+            font-family: 'IBM Plex Sans', sans-serif !important;
         }
     </style>
 </head>
@@ -232,6 +242,7 @@
                         class="text-[10px] font-medium text-slate-400 tracking-[0.2em] uppercase mt-1.5 leading-none">Droguería</span>
                 </div>
             </a>
+
             <button onclick="toggleSidebar()"
                 class="absolute right-4 lg:hidden p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,17 +254,18 @@
 
         <nav class="flex-1 px-3 py-5 space-y-6 overflow-y-auto sidebar-scroll">
             <div>
-                <a href="{{ route('dashboard.index') }}"
-                    class="nav-row {{ request()->routeIs('dashboard.*') ? 'is-active' : '' }} flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px]">
-                    <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                        </path>
-                    </svg>
-                    Panel Principal
-                </a>
-            </div>
-
+                @role('Administrador')
+                    <a href="{{ route('dashboard.index') }}"
+                        class="nav-row {{ request()->routeIs('dashboard.*') ? 'is-active' : '' }} flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px]">
+                        <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                            </path>
+                        </svg>
+                        Panel Principal
+                    </a>
+                </div>
+            @endrole
             <!-- Paso 1: Abastecimiento -->
             <div class="flow-section">
                 <div class="flex items-center gap-2 mb-2 px-2">
@@ -312,68 +324,66 @@
                         </div>
                     </a>
                 </div>
+
             </div>
 
             <!-- Paso 3: Salida -->
-            <div class="flow-section">
-                <div class="flex items-center gap-2 mb-2 px-2">
-                    <span
-                        class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">03</span>
-                    <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Salida</p>
-                </div>
-                <div class="flow-rail pl-[27px] space-y-0.5">
+<div class="flow-section">
+    <div class="flex items-center gap-2 mb-2 px-2">
+        <span class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">03</span>
+        <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Salida</p>
+    </div>
+    <div class="flow-rail pl-[27px] space-y-0.5">
+        <div class="flex flex-col space-y-0.5">
+            <a href="{{ route('dispatch.index') }}"
+                class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                        d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                </svg>
+                Despacho Normal
+            </a>
+            @role('Administrador')
+                <!-- Submenú Controlado -->
+                <div class="relative pl-6">
+                    <div class="absolute left-3.5 top-0 bottom-4 w-px bg-slate-700/60"></div>
+                    <div class="absolute left-3.5 top-1/2 w-2.5 h-px bg-slate-700/60"></div>
 
-                    <!-- Grupo Despacho (con submenú) -->
-                    <div class="flex flex-col space-y-0.5">
-                        <a href="{{ route('despacho.index') }}"
-                            class="nav-row {{ request()->routeIs('despacho.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                    d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
-                            </svg>
-                            Despacho Normal
-                        </a>
-
-                        <!-- Submenú Controlado -->
-                        <div class="relative pl-6">
-                            <!-- Conector visual tipo L -->
-                            <div class="absolute left-3.5 top-0 bottom-4 w-px bg-slate-700/60"></div>
-                            <div class="absolute left-3.5 top-1/2 w-2.5 h-px bg-slate-700/60"></div>
-
-                            <a href="{{ route('controlled_dispatch.index') }}"
-                                class="nav-row {{ request()->routeIs('controlled_dispatch.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[12px]">
-                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                    </path>
-                                </svg>
-                                Despacho Controlado
-                            </a>
-                        </div>
-                    </div>
-
-                    <a href="{{ route('distribution.index') }}"
-                        class="nav-row {{ request()->routeIs('distribution.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="{{ route('controlled_dispatch.index') }}"
+                        class="nav-row {{ request()->routeIs('controlled_dispatch.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[12px]">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                        </svg>
-                        Distribución
-                    </a>
-
-                    <a href="{{ route('requests.index') }}"
-                        class="nav-row {{ request()->routeIs('requests.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4">
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
                             </path>
                         </svg>
-                        Solicitudes
+                        Despacho Controlado
                     </a>
                 </div>
-            </div>
+            @endrole
+        </div>
 
+        <a href="{{ route('distribution.index') }}"
+            class="nav-row {{ request()->routeIs('distribution.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+            </svg>
+            Distribución
+        </a>
+
+        @role('Administrador')
+            <a href="{{ route('requests.index') }}"
+                class="nav-row {{ request()->routeIs('requests.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4">
+                    </path>
+                </svg>
+                Solicitudes
+            </a>
+        @endrole
+    </div>
+</div>
             <!-- Paso 4: Control -->
             <div class="flow-section">
                 <div class="flex items-center gap-2 mb-2 px-2">
@@ -425,7 +435,6 @@
             @endauth
         </nav>
     </aside>
-
     <!-- Contenedor principal -->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
 
@@ -474,39 +483,39 @@
                     </svg>
                     <div class="text-[13px] font-mono-das tracking-tight" id="live-clock"></div>
                 </div>
+                @role('Administrador')
+                    <!-- Notificaciones Dinámicas -->
+                    <div class="relative" id="notifications-container">
+                        <button onclick="toggleNotifications()" type="button"
+                            class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                                </path>
+                            </svg>
+                            <span id="notif-badge"
+                                class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full pulse-dot border-2 border-white"
+                                style="background-color: var(--alert);"></span>
+                        </button>
 
-                <!-- Notificaciones Dinámicas -->
-                <div class="relative" id="notifications-container">
-                    <button onclick="toggleNotifications()" type="button"
-                        class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
-                            </path>
-                        </svg>
-                        <span id="notif-badge"
-                            class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full pulse-dot border-2 border-white"
-                            style="background-color: var(--alert);"></span>
-                    </button>
-
-                    <div id="notifications-menu"
-                        class="hidden absolute right-0 mt-2 w-[340px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
-                        <div
-                            class="px-4 py-3.5 flex justify-between items-center border-b border-slate-100 bg-slate-50">
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-[13px] font-semibold text-slate-800">Notificaciones</h3>
-                                <span id="notif-count"
-                                    class="text-white text-[10px] font-mono-das font-semibold px-1.5 py-0.5 rounded bg-slate-400">0</span>
+                        <div id="notifications-menu"
+                            class="hidden absolute right-0 mt-2 w-[340px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
+                            <div
+                                class="px-4 py-3.5 flex justify-between items-center border-b border-slate-100 bg-slate-50">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-[13px] font-semibold text-slate-800">Notificaciones</h3>
+                                    <span id="notif-count"
+                                        class="text-white text-[10px] font-mono-das font-semibold px-1.5 py-0.5 rounded bg-slate-400">0</span>
+                                </div>
+                            </div>
+                            <div id="notif-list" class="max-h-[320px] overflow-y-auto p-2 space-y-1 sidebar-scroll">
+                                <div class="p-4 text-center text-slate-400 text-xs">Cargando alertas...</div>
                             </div>
                         </div>
-                        <div id="notif-list" class="max-h-[320px] overflow-y-auto p-2 space-y-1 sidebar-scroll">
-                            <div class="p-4 text-center text-slate-400 text-xs">Cargando alertas...</div>
-                        </div>
                     </div>
-                </div>
 
-                <div class="hidden sm:block h-6 w-px mx-1 bg-slate-200"></div>
-
+                    <div class="hidden sm:block h-6 w-px mx-1 bg-slate-200"></div>
+                @endrole
                 <!-- Perfil -->
                 @auth
                     <div class="relative" id="user-menu-container">
@@ -548,9 +557,10 @@
                                     {{ auth()->user()->email ?? 'usuario@ejemplo.com' }}</p>
                             </div>
                             <div class="p-1.5">
-                                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                                <form id="logout-form" method="POST" action="{{ route('logout') }}" class="w-full">
                                     @csrf
-                                    <button type="submit"
+                                    <!-- Botón de logout modificado para disparar SweetAlert -->
+                                    <button type="button" onclick="confirmLogout()"
                                         class="flex w-full items-center gap-3 px-3 py-2 rounded-md text-[12.5px] font-medium text-left transition-colors hover:bg-rose-50 text-rose-600">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -611,7 +621,7 @@
         <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden transform scale-95 transition-transform duration-200 flex flex-col max-h-[80vh]"
             id="search-modal-card">
 
-            <div class="flex items-center px-4 border-b border-slate-100 bg-slate-50/50 shrink-0">
+            <div class="flex items-center px-4 border-b border-slate-100 bg-slate-50/50 shrink-0 relative">
                 <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -619,13 +629,23 @@
                 </svg>
                 <input type="text" id="global-search-input" oninput="performGlobalSearch(this.value)"
                     onkeydown="handleSearchKeydown(event)" placeholder="Buscar Lote, Fármaco o RUT Proveedor..."
-                    class="w-full px-3 py-4 text-[14px] bg-transparent border-0 focus:outline-none text-slate-800 placeholder-slate-400 font-medium">
-                <div id="search-loader" class="hidden mr-3 loader"></div>
+                    class="w-full px-3 py-4 text-[14px] bg-transparent border-0 focus:outline-none text-slate-800 placeholder-slate-400 font-medium pr-12">
+                
+                <!-- Botón Limpiar (X) -->
+                <button id="search-clear-btn" onclick="clearSearch()" class="hidden absolute right-16 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-colors focus:outline-none">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                
+                <!-- Loader -->
+                <div id="search-loader" class="hidden absolute right-16 loader"></div>
+                
                 <kbd onclick="closeSearchModal()"
-                    class="cursor-pointer font-mono-das text-[10px] px-2 py-1 rounded border border-slate-200 bg-white text-slate-400 hover:bg-slate-100 transition-colors">ESC</kbd>
+                    class="cursor-pointer font-mono-das text-[10px] px-2 py-1 rounded border border-slate-200 bg-white text-slate-400 hover:bg-slate-100 transition-colors ml-2">ESC</kbd>
             </div>
 
-            <div id="search-results" class="p-2 overflow-y-auto space-y-1 sidebar-scroll flex-1">
+            <div id="search-results" class="p-2 overflow-y-auto space-y-1 sidebar-scroll flex-1 pb-4">
                 <div class="px-3 py-6 text-center text-[12px] text-slate-400">Escribe al menos 2 letras para buscar en
                     toda la base de datos...</div>
             </div>
@@ -646,68 +666,184 @@
 
     <!-- SCRIPT MAESTRO DE FUNCIONALIDAD GLOBAL -->
     <script>
+        // --- SWEETALERT2: CONFIGURACIÓN GLOBAL ---
+        
+        // 1. Instancia global para notificaciones tipo Toast
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3500,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        // 2. Interceptor de Flash Messages de Laravel
+        @if(session('success'))
+            Toast.fire({
+                icon: 'success',
+                title: '{!! addslashes(session('success')) !!}'
+            });
+        @endif
+
+        @if(session('error'))
+            Toast.fire({
+                icon: 'error',
+                title: '{!! addslashes(session('error')) !!}'
+            });
+        @endif
+
+        @if(session('warning'))
+            Toast.fire({
+                icon: 'warning',
+                title: '{!! addslashes(session('warning')) !!}'
+            });
+        @endif
+
+        @if(session('info'))
+            Toast.fire({
+                icon: 'info',
+                title: '{!! addslashes(session('info')) !!}'
+            });
+        @endif
+
+        // 3. Confirmación de Cierre de Sesión con SweetAlert2
+        function confirmLogout() {
+            // Cerramos el menú flotante para que no interfiera visualmente
+            const userMenu = document.getElementById('user-menu');
+            if (userMenu) closeMenu(userMenu);
+
+            Swal.fire({
+                title: '¿Cerrar sesión?',
+                text: "Tendrás que volver a ingresar tus credenciales para acceder al sistema.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#0D9488', // Teal 600 (var--accent)
+                cancelButtonColor: '#E11D48', // Rose 600 (var--danger)
+                confirmButtonText: 'Sí, cerrar sesión',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true, // Pone el botón de confirmar a la derecha
+                focusCancel: true // Foco en el botón cancelar para evitar clics accidentales
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('logout-form').submit();
+                }
+            });
+        }
+
         // --- BÚSQUEDA GLOBAL "NIVEL INSANO" ---
         let searchTimeout = null;
         let selectedSearchIndex = -1;
         let searchResultsCount = 0;
+        let searchAbortController = null; // Nuevo controlador de interrupción
+
+        // Helper para escapar caracteres especiales de Regex
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Limpiar búsqueda
+        function clearSearch() {
+            const input = document.getElementById('global-search-input');
+            input.value = '';
+            input.focus();
+            performGlobalSearch('');
+        }
 
         function performGlobalSearch(query) {
             const resultsContainer = document.getElementById('search-results');
             const loader = document.getElementById('search-loader');
+            const clearBtn = document.getElementById('search-clear-btn');
             selectedSearchIndex = -1; // Reset flechas
+            const cleanQuery = query.trim();
 
-            if (query.length < 2) {
+            // Mostrar u ocultar el botón "X"
+            if (cleanQuery.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            // Cancelar la petición anterior si existe
+            if (searchAbortController) {
+                searchAbortController.abort();
+            }
+
+            if (cleanQuery.length < 2) {
+                loader.classList.add('hidden');
                 resultsContainer.innerHTML =
                     '<div class="px-3 py-6 text-center text-[12px] text-slate-400">Escribe al menos 2 letras para iniciar la búsqueda.</div>';
                 return;
             }
 
+            // Ocultar X y mostrar loader temporalmente
+            clearBtn.classList.add('hidden');
             loader.classList.remove('hidden');
 
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
-                fetch(`/api/global-search?q=${encodeURIComponent(query)}`)
-                    .then(res => res.json())
+                // Instanciar el nuevo AbortController
+                searchAbortController = new AbortController();
+
+                fetch(`/api/global-search?q=${encodeURIComponent(cleanQuery)}`, {
+                    signal: searchAbortController.signal
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Error en red');
+                        return res.json();
+                    })
                     .then(data => {
                         loader.classList.add('hidden');
+                        clearBtn.classList.remove('hidden'); // Restaurar botón X
                         searchResultsCount = data.length;
 
                         if (data.length === 0) {
-                            resultsContainer.innerHTML =
-                                '<div class="px-3 py-6 text-center text-[12px] text-slate-500 font-medium">No se encontraron coincidencias en la base de datos.</div>';
+                            resultsContainer.innerHTML = `
+                                <div class="px-3 py-10 flex flex-col items-center justify-center text-center">
+                                    <svg class="w-10 h-10 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span class="text-[13px] text-slate-500 font-medium">No se encontraron coincidencias.</span>
+                                    <span class="text-[11px] text-slate-400 mt-1">Intenta con otro término o código.</span>
+                                </div>`;
                             return;
                         }
 
                         let html = '';
                         let currentType = '';
+                        // Usar función escapeRegExp para prevenir errores con caracteres especiales
+                        const safeQuery = escapeRegExp(cleanQuery);
+                        const regex = new RegExp(`(${safeQuery})`, 'gi');
 
                         data.forEach((item, index) => {
                             if (currentType !== item.type) {
-                                html +=
-                                    `<div class="px-3 py-1.5 mt-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono-das">${item.type}</div>`;
+                                html += `
+                                    <div class="px-3 py-2 mt-2 flex items-center gap-2">
+                                        <div class="h-px bg-slate-100 flex-1"></div>
+                                        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono-das">${item.type}</span>
+                                        <div class="h-px bg-slate-100 flex-1"></div>
+                                    </div>`;
                                 currentType = item.type;
                             }
 
-                            // Resaltador Mágico (Yellow/Teal)
-                            const regex = new RegExp(`(${query})`, 'gi');
-                            const highlightedTitle = item.title ? item.title.replace(regex,
-                                '<span class="highlight-text">$1</span>') : 'N/A';
-                            const highlightedSubtitle = item.subtitle ? item.subtitle.replace(regex,
-                                '<span class="highlight-text">$1</span>') : '';
+                            // Resaltador Mágico Seguro
+                            const highlightedTitle = item.title ? item.title.replace(regex, '<span class="highlight-text">$1</span>') : 'N/A';
+                            const highlightedSubtitle = item.subtitle ? item.subtitle.replace(regex, '<span class="highlight-text">$1</span>') : '';
 
                             html += `
-                                <a href="${item.url}" id="search-item-${index}" class="search-result-item flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 transition-colors">
-                                    <div class="flex items-center gap-3">
-                                        <span class="p-1.5 rounded-md bg-slate-100 text-slate-500 transition-colors">
+                                <a href="${item.url}" id="search-item-${index}" class="search-result-item flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 transition-all duration-200 border border-transparent mt-0.5 group">
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <span class="p-1.5 rounded-md bg-slate-100 text-slate-500 transition-colors group-hover:bg-teal-100/50 group-hover:text-teal-600 shrink-0">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg>
                                         </span>
-                                        <div class="flex flex-col">
-                                            <span class="text-[13px] font-bold">${highlightedTitle}</span>
-                                            <span class="text-[11px] text-slate-500 font-mono">${highlightedSubtitle}</span>
+                                        <div class="flex flex-col min-w-0">
+                                            <span class="text-[13px] font-bold truncate">${highlightedTitle}</span>
+                                            <span class="text-[11px] text-slate-500 font-mono truncate">${highlightedSubtitle}</span>
                                         </div>
                                     </div>
-                                    <span class="go-icon text-[11px] font-mono-das text-teal-600 opacity-0 transition-opacity flex items-center gap-1">
-                                        Entrar <kbd class="px-1.5 py-0.5 rounded border border-teal-200 bg-white">↵</kbd>
+                                    <span class="go-icon text-[11px] font-mono-das text-teal-600 opacity-0 transition-opacity flex items-center gap-1.5 shrink-0 pl-2">
+                                        <span class="hidden sm:inline">Entrar</span> <kbd class="px-1.5 py-0.5 rounded border border-teal-200 bg-white">↵</kbd>
                                     </span>
                                 </a>
                             `;
@@ -715,12 +851,19 @@
 
                         resultsContainer.innerHTML = html;
                     })
-                    .catch(() => {
+                    .catch((error) => {
+                        // Ignorar el error si la petición fue abortada por tipear rápido
+                        if (error.name === 'AbortError') return; 
+                        
                         loader.classList.add('hidden');
-                        resultsContainer.innerHTML =
-                            '<div class="px-3 py-6 text-center text-[12px] text-rose-500">Error de conexión.</div>';
+                        clearBtn.classList.remove('hidden');
+                        resultsContainer.innerHTML = `
+                            <div class="px-3 py-8 text-center flex flex-col items-center">
+                                <svg class="w-8 h-8 text-rose-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                <span class="text-[12px] text-rose-500 font-medium">Error de conexión al buscar.</span>
+                            </div>`;
                     });
-            }, 250);
+            }, 300); // 300ms de debounce es un estándar ideal
         }
 
         // --- NAVEGACIÓN POR TECLADO EN BÚSQUEDA ---
@@ -747,8 +890,9 @@
                 const activeEl = document.getElementById(`search-item-${selectedSearchIndex}`);
                 if (activeEl) {
                     activeEl.classList.add('active');
+                    // Scroll inteligente centrado al navegar
                     activeEl.scrollIntoView({
-                        block: 'nearest',
+                        block: 'center',
                         behavior: 'smooth'
                     });
                 }
@@ -848,6 +992,7 @@
             const modal = document.getElementById('search-modal');
             const card = document.getElementById('search-modal-card');
             const input = document.getElementById('global-search-input');
+            const clearBtn = document.getElementById('search-clear-btn');
 
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -855,6 +1000,7 @@
                 card.classList.remove('scale-95');
                 card.classList.add('scale-100');
                 input.value = '';
+                clearBtn.classList.add('hidden');
                 document.getElementById('search-results').innerHTML =
                     '<div class="px-3 py-6 text-center text-[12px] text-slate-400">Escribe al menos 2 letras para buscar en toda la base de datos...</div>';
                 input.focus();

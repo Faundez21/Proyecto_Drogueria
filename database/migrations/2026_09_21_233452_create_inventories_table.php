@@ -29,10 +29,12 @@ return new class extends Migration
             $table->string('lote')->nullable();
             $table->date('fecha_vencimiento')->nullable();
             $table->integer('cantidad');
+            $table->integer('minimo')->default(0);
             $table->decimal('valor_neto_unitario', 15, 2)->default(0);
 
             // Estado del Lote (Disponible, Cuarentena, Merma)
             $table->string('estado')->default('Disponible');
+            $table->text('motivo')->nullable();
 
             // Ubicación física
             $table->string('pasillo')->nullable();

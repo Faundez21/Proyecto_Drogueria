@@ -47,7 +47,7 @@ class ControlledDispatchController extends Controller
             ->orderBy('fecha_vencimiento', 'asc')
             ->get();
 
-        return view('despacho_controlado.index', compact('correlativo', 'dispatches', 'inventarioDisponible'));
+        return view('controlled_dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible'));
     }
 
     public function store(Request $request)
@@ -72,14 +72,13 @@ class ControlledDispatchController extends Controller
                 'direccion_destino' => $request->direccion_destino,
                 'condiciones_transporte' => $request->condiciones_transporte,
                 'series_recetas' => $request->series_recetas,
-                'firma_despacha' => $request->firma_despacha,
-                'firma_recibe' => $request->firma_recibe,
+                'firma_recibe' => $request->firma_recibe, // Solo guardamos firma de quien recibe
             ]);
 
             foreach ($request->productos as $index => $nombreProducto) {
                 // validacion de seguridad para evitar que manipulen el form para inyectar medicamentos normales
                 if(!in_array($nombreProducto, $this->controlados)) {
-                    throw new \Exception("El producto '{$nombreProducto}' no es un farmaco controlado valido en este sistema.");
+                    throw new \Exception("El producto '{$nombreProducto}' no es un fármaco controlado válido en este sistema.");
                 }
 
                 $lote = !empty($request->lotes[$index]) ? $request->lotes[$index] : 'S/L';
@@ -140,7 +139,7 @@ class ControlledDispatchController extends Controller
     public function pdf($id)
     {
         $despacho = ControlledDispatch::with('items')->findOrFail($id);
-        $pdf = Pdf::loadView('despacho_controlado.pdf', compact('despacho'));
+        $pdf = Pdf::loadView('controlled_dispatch.pdf', compact('despacho'));
         return $pdf->stream('Guia_Controlados_'.$despacho->correlativo.'.pdf');
     }
 }

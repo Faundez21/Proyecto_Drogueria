@@ -10,6 +10,7 @@ use App\Http\Controllers\DistributionController;
 use App\Http\Controllers\QuarantineController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\DispatchController;
 use App\Http\Controllers\ControlledDispatchController; // nuevo controlador
@@ -36,11 +37,6 @@ Route::redirect('/', '/login');
 // 2. rutas de login
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
-
-// 3. ruta de recuperacion de contraseña
-Route::get('/recuperar-password', function () {
-    return view('auth.forgot-password');
-})->name('password.request');
 
 /*
  rutas privadas (protegidas)
@@ -76,31 +72,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
     Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
 
-    Route::get('/reportes', function () {
-        return view('reportes.index');
-    })->name('reportes.index');
-
-    Route::get('/error', function () {
-        return view('error');
-    })->name('error');
+// modulo de reportes
+    Route::get('/reportes', [ReportController::class, 'index'])->name('reportes.index');
 
     // usuarios
     Route::get('/users', [UserController::class, 'index'])
         ->name('users.index');
 
-
-    // inventario
-    Route::get('/inventario', [InventoryController::class, 'index'])
-        ->name('inventario.index');
-
-    Route::post('/inventario', [InventoryController::class, 'store'])
-        ->name('inventario.store');
-
-    Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])
-        ->name('inventario.import');
-
-    Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])
-        ->name('inventario.update');
+//inventario
+    Route::get('/inventario', [InventoryController::class, 'index'])->name('inventario.index');
+    Route::post('/inventario', [InventoryController::class, 'store'])->name('inventario.store');
+    Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])->name('inventario.import');
+    Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])->name('inventario.update');
 
 
     // 6. modulo de recepcion

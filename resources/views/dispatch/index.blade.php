@@ -100,7 +100,7 @@
             </div>
         </div>
 
-        <form action="{{ route('despacho.store') }}" method="POST" id="despachoForm">
+        <form action="{{ route('dispatch.store') }}" method="POST" id="despachoForm">
             @csrf
 
             <!-- seccion de datos del remitente y correlativo -->
@@ -828,14 +828,8 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center" onclick="event.stopPropagation();">
-                                    <a href="{{ route('despacho.pdf', $despacho->id) }}" target="_blank"
-                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 hover:border-rose-600 rounded-lg text-[11px] font-bold transition-colors shadow-sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                            </path>
-                                        </svg>
+                                    <a href="{{ route('dispatch.pdf', $despacho->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 hover:border-rose-600 rounded-lg text-[11px] font-bold transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                         VER PDF
                                     </a>
                                 </td>
@@ -976,8 +970,10 @@
     </div>
 
     <!-- librerias externas -->
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <!-- IMPLEMENTACION SWEETALERT 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // instancias de firmas para que sean globales en la vista
@@ -1306,7 +1302,12 @@
 
         function openScanner() {
             if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-                alert("Advertencia: Para usar la camara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Aviso de Seguridad',
+                    text: 'Para usar la cámara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.',
+                    confirmButtonColor: '#0f968c'
+                });
             }
 
             document.getElementById('scannerModal').classList.remove('hidden');
@@ -1341,7 +1342,12 @@
             });
 
             if (!parsedData.PROD || !parsedData.STOCK) {
-                alert("QR no compatible con el sistema.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Formato Inválido',
+                    text: 'QR no compatible con el sistema.',
+                    confirmButtonColor: '#0f968c'
+                });
                 return;
             }
 
@@ -1372,10 +1378,16 @@
                 llenarDatosFila(select);
                 tr.querySelector('input[name="cantidades[]"]').focus();
             } else {
-                alert("El producto o lote escaneado ya no tiene stock disponible en la bodega.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Sin Stock',
+                    text: 'El producto o lote escaneado ya no tiene stock disponible en la bodega.',
+                    confirmButtonColor: '#0f968c'
+                });
                 if (!emptySelect && tbody.children.length > 1) tr.remove();
             }
         }
+        
         // funciones para mostrar u ocultar las solicitudes
         function openSolicitudes() {
             document.getElementById('SolicitudesModal').classList.remove('hidden');

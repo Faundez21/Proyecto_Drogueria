@@ -31,7 +31,6 @@
         .signatures-wrapper { margin-top: 40px; width: 100%; page-break-inside: avoid; }
         .signatures-table { width: 100%; border-collapse: collapse; }
         .signature-box { width: 45%; text-align: center; vertical-align: bottom; padding: 5px; }
-        .signature-spacer { width: 10%; }
         .signature-image-container { height: 55px; margin-bottom: 2px; }
         .signature-img { max-width: 150px; height: 50px; object-fit: contain; }
         .signature-line { width: 90%; border-top: 1px solid #64748b; margin: 0 auto 4px auto; }
@@ -127,18 +126,10 @@
     <div class="signatures-wrapper">
         <table class="signatures-table">
             <tr>
-                <td class="signature-box">
-                    <div class="signature-image-container">
-                        @if(!empty($reception->firma_proveedor))
-                            <img src="{{ $reception->firma_proveedor }}" class="signature-img">
-                        @endif
-                    </div>
-                    <div class="signature-line"></div>
-                    <p class="signature-title">Entregado Por (Proveedor)</p>
-                    <p class="signature-subtitle">Nombre, RUT y Firma / Chofer</p>
-                </td>
-                <td class="signature-spacer"></td>
-                <td class="signature-box">
+                <!-- Columnas vacías para centrar la firma usando el 100% de la tabla -->
+                <td style="width: 27.5%;"></td>
+                
+                <td class="signature-box" style="width: 45%;">
                     <div class="signature-image-container">
                         @if(!empty($reception->firma_receptor))
                             <img src="{{ $reception->firma_receptor }}" class="signature-img">
@@ -148,6 +139,8 @@
                     <p class="signature-title">Recibido Conforme (DAS)</p>
                     <p class="signature-subtitle">Firma y Timbre Encargado Droguería</p>
                 </td>
+
+                <td style="width: 27.5%;"></td>
             </tr>
         </table>
     </div>

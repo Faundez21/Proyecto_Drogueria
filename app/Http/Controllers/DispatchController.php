@@ -47,7 +47,7 @@ class DispatchController extends Controller
             ->orderBy('fecha_vencimiento', 'asc')
             ->get();
 
-        return view('despacho.index', compact('correlativo', 'dispatches', 'inventarioDisponible'));
+        return view('dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible'));
     }
 
     public function store(Request $request)
@@ -139,7 +139,7 @@ class DispatchController extends Controller
     public function pdf($id)
     {
         $despacho = Dispatch::with('items')->findOrFail($id);
-        $pdf = Pdf::loadView('despacho.pdf', compact('despacho'));
+        $pdf = Pdf::loadView('dispatch.pdf', compact('despacho'));
         return $pdf->stream('Guia_Despacho_'.$despacho->correlativo.'.pdf');
     }
 }

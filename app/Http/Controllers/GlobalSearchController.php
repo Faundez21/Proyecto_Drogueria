@@ -96,7 +96,8 @@ class GlobalSearchController extends Controller
                 ->get();
 
             foreach($vencimientos as $vence) {
-                $dias = Carbon::parse($vence->fecha_vencimiento)->diffInDays(Carbon::now());
+                // Se usa intval() para limpiar los decimales y dejar el número entero
+                $dias = intval(Carbon::parse($vence->fecha_vencimiento)->diffInDays(Carbon::now()));
                 $estado = Carbon::parse($vence->fecha_vencimiento)->isPast() ? 'Vencido hace' : 'Vence en';
                 
                 $notifications[] = [
@@ -116,13 +117,18 @@ class GlobalSearchController extends Controller
                 ->limit(3)->get();
                 
             foreach($cuarentena as $cuar) {
-                $dias = (int) floor(Carbon::parse($cuar->created_at)->startOfDay()->diffInDays(now()->startOfDay()));
+                // Se usa updated_at para que cuente los días desde que se cambió el estado a cuarentena
+                $dias = (int) floor(Carbon::parse($cuar->updated_at ?? $cuar->created_at)->startOfDay()->diffInDays(now()->startOfDay()));
+                
+                // Mensaje dinámico si recién se mandó a cuarentena hoy (0 días)
+                $mensajeCuarentena = $dias == 0 ? "Lote {$cuar->lote} fue enviado a cuarentena hoy." : "Lote {$cuar->lote} lleva {$dias} días retenido.";
+
                 $notifications[] = [
                     'color' => 'text-amber-600',
                     'bg' => 'bg-amber-100',
                     'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>',
                     'title' => 'Lote en Cuarentena',
-                    'message' => "Lote {$cuar->lote} lleva {$dias} días retenido.",
+                    'message' => $mensajeCuarentena,
                     'time' => 'Revisión',
                     'url' => route('quarantine.index')
                 ];

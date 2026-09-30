@@ -268,15 +268,8 @@
                             </div>
                             <span class="text-[12px] font-bold text-slate-700">Recepción</span>
                         </a>
-                        <a href="{{ route('despacho.index') ?? '#' }}"
-                            class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-colors group">
-                            <div
-                                class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
-                                </svg>
-                            </div>
+                        <a href="{{ route('dispatch.index') ?? '#' }}" class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-colors group">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg></div>
                             <span class="text-[12px] font-bold text-slate-700">Despacho</span>
                         </a>
                         <a href="{{ route('traceability.index') ?? '#' }}"
@@ -392,7 +385,7 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse ring-4 ring-amber-50"></span>
                     Lotes Retenidos / En Cuarentena
                 </h2>
-                <a href="#"
+                <a href="{{ route('quarantine.index') ?? '#' }}"
                     class="text-[12px] font-bold text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-md">Gestionar
                     cuarentenas</a>
             </div>
