@@ -5,7 +5,8 @@
 
 @section('actions')
     <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
-        <a href=""
+        <!-- Botón Exportar a Excel -->
+        <button type="button" onclick="exportarReporte('excel')"
             class="flex-1 sm:flex-none px-5 py-2.5 bg-[#0d9488] hover:bg-[#0f766e] text-white rounded-2xl font-bold text-[13px] shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer border border-transparent">
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -13,17 +14,18 @@
                 </path>
             </svg>
             <span>Exportar a Excel</span>
-        </a>
+        </button>
 
-        <a href=""
-            class="flex-1 sm:flex-none px-5 py-2.5 bg-rose-600 text-white rounded-2xl text-[12px] font-bold hover:bg-rose-700 text-white rounded-2xl font-bold text-[13px] shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer border border-transparent">
+        <!-- Botón Exportar a PDF -->
+        <button type="button" onclick="exportarReporte('pdf')"
+            class="flex-1 sm:flex-none px-5 py-2.5 bg-rose-600 text-white rounded-2xl text-[12px] font-bold hover:bg-rose-700 rounded-2xl font-bold text-[13px] shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer border border-transparent">
             <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
                 </path>
             </svg>
             <span>Exportar a PDF</span>
-        </a>
+        </button>
     </div>
 @endsection
 
@@ -528,5 +530,30 @@
                 }
             }
         }
+        function exportarReporte(tipo) {
+    // Definimos las rutas absolutas generadas por Laravel
+    const urlExcel = "{{ route('reportes.excel') }}";
+    const urlPdf = "{{ route('reportes.pdf') }}";
+    
+    // Elegimos la URL base según el botón presionado
+    let targetUrl = new URL(tipo === 'excel' ? urlExcel : urlPdf);
+    
+    // Obtenemos el formulario que contiene los filtros
+    const form = document.getElementById('filtersForm');
+    
+    if (form) {
+        // Extraemos todos los valores actuales de los inputs y selects
+        const formData = new FormData(form);
+        for (const [key, value] of formData.entries()) {
+            // Solo adjuntamos a la URL si el campo no está vacío
+            if (value.trim() !== '') {
+                targetUrl.searchParams.append(key, value);
+            }
+        }
+    }
+    
+    // Redirigimos para forzar la descarga con los filtros aplicados
+    window.location.href = targetUrl.toString();
+}
     </script>
 @endsection
