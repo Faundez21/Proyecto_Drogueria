@@ -17,7 +17,6 @@ use App\Http\Controllers\ControlledDispatchController; // nuevo controlador
 use App\Http\Controllers\TraceabilityController;
 use App\Http\Controllers\GlobalSearchController;
 
-
 //  Controladores de Estructura de Almacén (Mantenedores)
 use App\Http\Controllers\AisleController;
 use App\Http\Controllers\ShelfController;
@@ -73,8 +72,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
 
 // modulo de reportes
-    Route::get('/reportes', [ReportController::class, 'index'])->name('reportes.index');
 
+
+Route::get('/reportes', [ReportController::class, 'index'])->name('reportes.index');
+Route::get('/reportes/exportar/excel', [ReportController::class, 'exportExcel'])->name('reportes.excel');
+Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->name('reportes.pdf');
     // usuarios
     Route::get('/users', [UserController::class, 'index'])
         ->name('users.index');
