@@ -970,8 +970,10 @@
     </div>
 
     <!-- librerias externas -->
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <!-- IMPLEMENTACION SWEETALERT 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // instancias de firmas para que sean globales en la vista
@@ -1300,7 +1302,12 @@
 
         function openScanner() {
             if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-                alert("Advertencia: Para usar la camara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Aviso de Seguridad',
+                    text: 'Para usar la cámara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.',
+                    confirmButtonColor: '#0f968c'
+                });
             }
 
             document.getElementById('scannerModal').classList.remove('hidden');
@@ -1335,7 +1342,12 @@
             });
 
             if (!parsedData.PROD || !parsedData.STOCK) {
-                alert("QR no compatible con el sistema.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Formato Inválido',
+                    text: 'QR no compatible con el sistema.',
+                    confirmButtonColor: '#0f968c'
+                });
                 return;
             }
 
@@ -1366,10 +1378,16 @@
                 llenarDatosFila(select);
                 tr.querySelector('input[name="cantidades[]"]').focus();
             } else {
-                alert("El producto o lote escaneado ya no tiene stock disponible en la bodega.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Sin Stock',
+                    text: 'El producto o lote escaneado ya no tiene stock disponible en la bodega.',
+                    confirmButtonColor: '#0f968c'
+                });
                 if (!emptySelect && tbody.children.length > 1) tr.remove();
             }
         }
+        
         // funciones para mostrar u ocultar las solicitudes
         function openSolicitudes() {
             document.getElementById('SolicitudesModal').classList.remove('hidden');

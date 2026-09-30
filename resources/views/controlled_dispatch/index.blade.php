@@ -447,8 +447,33 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- AQUÍ ESTÁ LA SOLUCIÓN: VENTANA MODAL PARA EL ESCÁNER QR -->
+    <div id="scannerModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg flex flex-col overflow-hidden">
+            <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Escanear Etiqueta QR</h2>
+                    <p class="text-[12px] text-slate-300 mt-1 uppercase tracking-wider font-semibold">Acerque el código a la cámara</p>
+                </div>
+                <button type="button" onclick="closeScanner()" class="text-slate-400 hover:text-white transition-colors bg-white/10 p-2 rounded-lg cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 bg-slate-50 flex items-center justify-center">
+                <!-- CONTENEDOR 'reader' DONDE HTML5-QRCODE INYECTA LA CÁMARA -->
+                <div id="reader" class="w-full rounded-lg overflow-hidden border-2 border-dashed border-rose-300 bg-white"></div>
+            </div>
+            <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end">
+                <button type="button" onclick="closeScanner()" class="px-6 py-2.5 bg-rose-600 text-white hover:bg-rose-700 rounded-xl transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar Escaneo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <!-- IMPLEMENTACION SWEETALERT 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         let signatureDespacha = null;
@@ -532,7 +557,7 @@
                 inpDir.classList.remove('bg-slate-50', 'cursor-not-allowed');
                 inpDir.classList.add('bg-white');
                 inpDir.value = '';
-                inpDir.placeholder = 'Ingrese la direccion manualmente...';
+                inpDir.placeholder = 'Ingrese la direccion manually...';
             }
         }
 
@@ -738,10 +763,17 @@
 
         function openScanner() {
             if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-                alert("Advertencia: Para usar la camara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Aviso de Seguridad',
+                    text: 'Para usar la cámara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.',
+                    confirmButtonColor: '#e11d48'
+                });
             }
 
+            // Aquí se muestra el modal que ahora sí existe en el HTML
             document.getElementById('scannerModal').classList.remove('hidden');
+            
             html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250}, aspectRatio: 1.0 }, false);
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
         }
@@ -765,7 +797,12 @@
             });
 
             if(!parsedData.PROD || !parsedData.STOCK) {
-                alert("QR no compatible con el sistema.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Formato Inválido',
+                    text: 'QR no compatible con el sistema.',
+                    confirmButtonColor: '#e11d48'
+                });
                 return;
             }
 
@@ -794,12 +831,18 @@
                 llenarDatosFila(select);
                 tr.querySelector('input[name="cantidades[]"]').focus();
             } else {
-                alert("El producto o lote escaneado ya no tiene stock disponible en la bodega.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Sin Stock',
+                    text: 'El producto o lote escaneado ya no tiene stock disponible en la bodega.',
+                    confirmButtonColor: '#e11d48'
+                });
                 if (!emptySelect && tbody.children.length > 1) tr.remove();
             }
         }
 
         function onScanFailure(error) {
+            // Se ignora silenciosamente para no saturar la consola en cada frame fallido
         }
     </script>
 @endsection
