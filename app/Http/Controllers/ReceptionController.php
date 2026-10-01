@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth; // <-- IMPORTANTE: Agregar Auth
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReceptionController extends Controller
@@ -74,7 +75,7 @@ class ReceptionController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. Guardar la Cabecera de la Recepción (Sin firma de proveedor)
+            // 1. Guardar la Cabecera de la Recepción
             $reception = Reception::create([
                 'correlativo' => $correlativo_autogenerado,
                 'fecha_recepcion' => $request->fecha_recepcion,
@@ -131,12 +132,16 @@ class ReceptionController extends Controller
                     })->first();
 
                 if ($inventarioExistente) {
-                    // Si el lote ya existe, sumamos la cantidad al stock físico actual
+                    // Si el lote ya existe, sumamos la cantidad al stock físico actual y registramos el usuario
                     $inventarioExistente->increment('cantidad', $cantidad);
-                    $inventarioExistente->update(['valor_neto_unitario' => $valor_u]);
+                    $inventarioExistente->update([
+                        'valor_neto_unitario' => $valor_u,
+                        'user_id' => Auth::id() // <-- Registramos quién hizo la actualización
+                    ]);
                 } else {
-                    // Si es nuevo, creamos el registro
+                    // Si es nuevo, creamos el registro y le asignamos el user_id
                     Inventory::create([
+                        'user_id' => Auth::id(), // <-- Registramos quién lo ingresó
                         'correlativo_interno' => $correlativo_autogenerado,
                         'fecha_recepcion' => $request->fecha_recepcion,
                         'tipo_documento' => $request->tipo_documento,
