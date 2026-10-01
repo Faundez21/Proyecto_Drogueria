@@ -222,13 +222,15 @@
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock Físico Acumulado</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">QR</th>
+</tr>
                         </tr>
                     </thead>
 
                     <tbody class="divide-y divide-slate-100 text-[13px]" id="mainTableBody">
                         @if ($groupedInventories->isEmpty())
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center">
+                                <td colspan="6" class="px-6 py-12 text-center">
                                     <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-400 mb-3">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                     </div>
@@ -245,6 +247,28 @@
                                     $groupKey = 'grp_' . md5($nombreProducto);
                                     $primerLote = $lotes->first();
                                     $categoriaLote = is_object($primerLote) ? $primerLote->categoria ?? 'General' : 'General';
+
+$loteMasProximo = $lotes->filter(function($l) {
+        $fecha = is_object($l) ? $l->fecha_vencimiento ?? null : null;
+        return !empty($fecha);
+    })->sortBy(function($l) {
+        return \Carbon\Carbon::parse(is_object($l) ? $l->fecha_vencimiento : $l['fecha_vencimiento']);
+    })->first() ?? $primerLote;
+
+    $proxLoteData = is_object($loteMasProximo) ? $loteMasProximo : (object)$loteMasProximo;
+    $proxLoteId = data_get($proxLoteData, 'id', 0);
+    $proxLoteCodigo = data_get($proxLoteData, 'lote', 'S/L');
+    $proxLoteStock = data_get($proxLoteData, 'stock_total') ?? data_get($proxLoteData, 'cantidad', 0);
+
+    $proxLoteVencRaw = data_get($proxLoteData, 'fecha_vencimiento');
+    $proxLoteVencText = 'N/A';
+    if (!empty($proxLoteVencRaw)) {
+        try {
+            $proxLoteVencText = \Carbon\Carbon::parse($proxLoteVencRaw)->format('d/m/Y');
+        } catch (\Exception $e) {
+            $proxLoteVencText = $proxLoteVencRaw;
+        }
+    }
                                 @endphp
 
                                 <tr id="product-row-{{ $groupKey }}"
@@ -294,10 +318,20 @@
                                             </span>
                                         @endif
                                     </td>
+                                    <td class="px-6 py-4 text-center" onclick="event.stopPropagation()">
+        <button type="button"
+            onclick="openQRModal('{{ e($proxLoteId) }}', '{{ e($nombreProducto) }}', '{{ e($proxLoteCodigo) }}', '{{ e($proxLoteVencText) }}', '{{ $proxLoteStock }}', 'Droguería DAS')"
+            class="p-2 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold"
+            title="Generar Etiqueta QR del lote más próximo a vencer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+            </svg>
+        </button>
+    </td>
                                 </tr>
 
                                 <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-50/50 shadow-inner">
-                                    <td colspan="5" class="p-0 border-b border-slate-200">
+                                    <td colspan="6" class="p-0 border-b border-slate-200">
                                         <div class="py-4 pr-6 pl-14">
                                             <div
                                                 class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -419,20 +453,8 @@
                                                                         <span class="font-extrabold text-slate-800 text-[13px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
                                                                     </td>
                                                                     <td
-                                                                        class="px-4 py-3 text-center flex justify-center gap-2">
-                                                                        <button type="button"
-                                                                            onclick="openQRModal('{{ e($loteId) }}', '{{ e($nombreProducto) }}', '{{ e($loteCodigo) }}', '{{ e($textoVencimiento) }}', '{{ $stockLote }}', 'Droguería DAS')"
-                                                                            class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer"
-                                                                            title="Generar Etiqueta QR">
-                                                                            <svg class="w-4 h-4" fill="none"
-                                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                                <path stroke-linecap="round"
-                                                                                    stroke-linejoin="round"
-                                                                                    stroke-width="2"
-                                                                                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z">
-                                                                                </path>
-                                                                            </svg>
-                                                                        </button>
+                                                                        class="px-4 py-3 text-center ">
+
 
                                                                         <button type="button"
                                                                             onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}')"
