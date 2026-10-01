@@ -4,6 +4,7 @@
 @section('subtitle', 'Lista de medicamentos e insumos bloqueados o retenidos preventivamente.')
 
 @section('actions')
+@role('Administrador')
     <button type="button" onclick="openHistory()"
         class="flex-1 sm:flex-none px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 hover:text-amber-600 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -11,6 +12,7 @@
         </svg>
         Ver Historial
     </button>
+@endrole
 @endsection
 
 @section('content')
@@ -524,9 +526,6 @@
 
         // Modal Editar Lote
         function openEditLote(id, lote, producto, estado, motivo = '') {
-    // Cierra cualquier modal que pudiera estar abierto de fondo
-    closeMerma();
-    closeHistory();
             document.getElementById('editLoteForm').action = "/inventario/" + id;
             document.getElementById('modal_producto_nombre').textContent = producto;
             document.getElementById('modal_lote_nombre').textContent = "LOTE: " + lote;

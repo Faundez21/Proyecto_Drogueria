@@ -4,6 +4,7 @@
 @section('subtitle', 'Registro y gestión de solicitudes de establecimientos.')
 
 @section('actions')
+@role('Administrador')
     <button type="button"
         class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all duration-150 w-full sm:w-auto">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -12,6 +13,7 @@
         </svg>
         Ver Historial
     </button>
+@endrole
 @endsection
 
 @section('content')
