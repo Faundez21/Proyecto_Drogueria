@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PasswordResetToken;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,11 @@ class UserController extends Controller
     {
         $users = User::all();
 
-        return view('users.index', compact('users'));
+        $passwordRequests = PasswordResetToken::where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('users.index', compact('users', 'passwordRequests'));
     }
 
     /**
