@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Dispatch;
 use App\Models\DispatchItem;
 use App\Models\Inventory;
+use App\Models\EstablishmentItem;
+use App\Models\EstablishmentRequest;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +49,28 @@ class DispatchController extends Controller
             ->orderBy('fecha_vencimiento', 'asc')
             ->get();
 
-        return view('dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible'));
+        //traemos las solicitudes por establecimientos
+        $solicitudes = EstablishmentRequest::with('items.product')
+            ->where('estado', 'Pendiente')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('dispatch.index', compact(
+            'correlativo',
+            'dispatches',
+            'inventarioDisponible',
+            'solicitudes'
+        ));
+
+    }
+    public function solicitudes()
+    {
+        $solicitudes = EstablishmentRequest::with('items.product')
+            ->where('estado', 'Pendiente')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($solicitudes);
     }
 
     public function store(Request $request)
@@ -77,7 +100,7 @@ class DispatchController extends Controller
 
             foreach ($request->productos as $index => $nombreProducto) {
                 // validacion de seguridad para evitar inyeccion de controlados
-                if(in_array($nombreProducto, $this->controlados)) {
+                if (in_array($nombreProducto, $this->controlados)) {
                     throw new \Exception("El producto '{$nombreProducto}' es controlado y no puede procesarse por esta via.");
                 }
 
@@ -95,8 +118,8 @@ class DispatchController extends Controller
                 ]);
 
                 $inventory = Inventory::where('producto', $nombreProducto)
-                    ->where(function($q) use ($lote) {
-                        if($lote == 'S/L') {
+                    ->where(function ($q) use ($lote) {
+                        if ($lote == 'S/L') {
                             $q->whereNull('lote')->orWhere('lote', 'S/L')->orWhere('lote', '');
                         } else {
                             $q->where('lote', $lote);
@@ -140,6 +163,6 @@ class DispatchController extends Controller
     {
         $despacho = Dispatch::with('items')->findOrFail($id);
         $pdf = Pdf::loadView('dispatch.pdf', compact('despacho'));
-        return $pdf->stream('Guia_Despacho_'.$despacho->correlativo.'.pdf');
+        return $pdf->stream('Guia_Despacho_' . $despacho->correlativo . '.pdf');
     }
 }
