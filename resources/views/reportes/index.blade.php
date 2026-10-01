@@ -171,13 +171,17 @@
                                     class="product-master-row hover:bg-slate-50 transition-colors group cursor-pointer"
                                     onclick="toggleLotes('{{ $groupKey }}')">
                                     <td class="px-6 py-4 text-center relative">
-                                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors"></div>
+                                        <div
+                                            class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors">
+                                        </div>
                                         <button type="button"
                                             class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-teal-100 group-hover:text-teal-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200 group-hover:border-teal-200"
                                             id="icon-{{ $groupKey }}">
                                             <svg class="w-4 h-4 transform transition-transform duration-300"
-                                                id="arrow-{{ $groupKey }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                id="arrow-{{ $groupKey }}" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7"></path>
                                             </svg>
                                         </button>
                                     </td>
@@ -214,11 +218,18 @@
                                 <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-50/50 shadow-inner">
                                     <td colspan="5" class="p-0 border-b border-slate-200">
                                         <div class="py-4 pr-6 pl-14">
-                                            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                                                <div class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
-                                                    <span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                            <div
+                                                class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                                <div
+                                                    class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
+                                                    <span
+                                                        class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                                            </path>
                                                         </svg>
                                                         Desglose Físico de Lotes
                                                     </span>
@@ -236,7 +247,9 @@
                                                         <tbody class="divide-y divide-slate-100 text-slate-700 text-[12px]">
                                                             @foreach ($lotes as $loteObj)
                                                                 @php
-                                                                    $loteData = is_object($loteObj) ? $loteObj : (object) $loteObj;
+                                                                    $loteData = is_object($loteObj)
+                                                                        ? $loteObj
+                                                                        : (object) $loteObj;
                                                                     $badgeVencimientoClass = 'text-slate-500';
                                                                     $textoVencimiento = 'N/A';
 
@@ -245,7 +258,8 @@
                                                                             $fVenc = \Carbon\Carbon::parse($loteData->fecha_vencimiento);
                                                                             $textoVencimiento = $fVenc->format('d/m/Y');
                                                                             if ($fVenc->isPast()) {
-                                                                                $badgeVencimientoClass = 'text-rose-600 font-extrabold';
+                                                                                $badgeVencimientoClass =
+                                                                                    'text-rose-600 font-extrabold';
                                                                             } else {
                                                                                 $diasRestantes = now()->diffInDays($fVenc, false);
                                                                                 if ($diasRestantes > 90) $badgeVencimientoClass = 'text-emerald-600 font-bold';
@@ -257,10 +271,26 @@
                                                                         }
                                                                     }
 
-                                                                    $pasilloVal = $loteData->pasillo_nombre ?? (is_object($loteData->aisle ?? null) ? $loteData->aisle->nombre ?? ($loteData->aisle->name ?? null) : $loteData->pasillo ?? 'P.A');
-                                                                    $estanteVal = $loteData->estanteria_nombre ?? (is_object($loteData->shelf ?? null) ? $loteData->shelf->nombre ?? ($loteData->shelf->name ?? null) : $loteData->estante ?? ($loteData->estanteria ?? 'P.A'));
-                                                                    $stockLote = $loteData->stock_total ?? ($loteData->cantidad ?? 0);
-                                                                    $isCuarentena = isset($loteData->cuarentena) ? (bool) $loteData->cuarentena : strtolower($loteData->estado ?? '') === 'cuarentena';
+                                                                    $pasilloVal =
+                                                                        $loteData->pasillo_nombre ??
+                                                                        (is_object($loteData->aisle ?? null)
+                                                                            ? $loteData->aisle->nombre ??
+                                                                                ($loteData->aisle->name ?? null)
+                                                                            : $loteData->pasillo ?? 'P.A');
+                                                                    $estanteVal =
+                                                                        $loteData->estanteria_nombre ??
+                                                                        (is_object($loteData->shelf ?? null)
+                                                                            ? $loteData->shelf->nombre ??
+                                                                                ($loteData->shelf->name ?? null)
+                                                                            : $loteData->estante ??
+                                                                                ($loteData->estanteria ?? 'P.A'));
+                                                                    $stockLote =
+                                                                        $loteData->stock_total ??
+                                                                        ($loteData->cantidad ?? 0);
+                                                                    $isCuarentena = isset($loteData->cuarentena)
+                                                                        ? (bool) $loteData->cuarentena
+                                                                        : strtolower($loteData->estado ?? '') ===
+                                                                            'cuarentena';
                                                                     $loteCodigo = $loteData->lote ?? 'S/L';
                                                                 @endphp
                                                                 <tr class="lote-item-row hover:bg-slate-50 transition-colors">
@@ -270,8 +300,14 @@
                                                                     </td>
                                                                     <td class="px-4 py-3">
                                                                         <div class="flex items-center gap-1.5 text-[11px]">
-                                                                            <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">P:</span> <b class="text-slate-800">{{ $pasilloVal }}</b></span>
-                                                                            <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">E:</span> <b class="text-slate-800">{{ $estanteVal }}</b></span>
+                                                                            <span
+                                                                                class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span
+                                                                                    class="text-slate-400">P:</span> <b
+                                                                                    class="text-slate-800">{{ $pasilloVal }}</b></span>
+                                                                            <span
+                                                                                class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span
+                                                                                    class="text-slate-400">E:</span> <b
+                                                                                    class="text-slate-800">{{ $estanteVal }}</b></span>
                                                                         </div>
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
@@ -399,10 +435,10 @@
         function exportarReporte(tipo) {
             const urlExcel = "{{ route('reportes.excel') }}";
             const urlPdf = "{{ route('reportes.pdf') }}";
-            
+
             let targetUrl = new URL(tipo === 'excel' ? urlExcel : urlPdf, window.location.origin);
             const form = document.getElementById('filters-panel');
-            
+
             if (form) {
                 const formData = new FormData(form);
                 for (const [key, value] of formData.entries()) {
@@ -411,7 +447,7 @@
                     }
                 }
             }
-            
+
             window.location.href = targetUrl.toString();
         }
     </script>

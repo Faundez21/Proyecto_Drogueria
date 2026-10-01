@@ -19,13 +19,15 @@ use App\Http\Controllers\GlobalSearchController;
 
 //  Controladores de Estructura de Almacén (Mantenedores)
 use App\Http\Controllers\AisleController;
-use App\Http\Controllers\ShelfController;
+// controladores de modulos y operaciones
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\PasswordResetRequestController;
 use App\Http\Controllers\PositionController;
+//  Controladores de Estructura de Almacén (Mantenedores)
+use App\Http\Controllers\ShelfController;
 
 // controladores de usuarios
 use App\Http\Controllers\UserController;
-
 use Illuminate\Support\Facades\Route;
 
 // rutas publicas. estas rutas son accesibles sin necesidad de iniciar sesion.
@@ -56,6 +58,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/global-search', [GlobalSearchController::class, 'search'])->name('global.search');
     Route::get('/api/notifications', [GlobalSearchController::class, 'notifications'])->name('global.notifications');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    // Asignar contraseña por el Administrador
+
+    Route::post('/users/reset-password/{email}', [PasswordResetRequestController::class, 'resetPassword'])
+        ->name('users.reset_password');
 
     // modulo de despacho general
     Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch.index');
@@ -71,8 +77,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
     Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
 
-    // modulo de reportes
-    Route::get('/reportes', [ReportController::class, 'index'])->name('reportes.index');
+// modulo de reportes
 
 
 Route::get('/reportes', [ReportController::class, 'index'])->name('reportes.index');
@@ -82,12 +87,11 @@ Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->na
     Route::get('/users', [UserController::class, 'index'])
         ->name('users.index');
 
-    //inventario
+    // inventario
     Route::get('/inventario', [InventoryController::class, 'index'])->name('inventario.index');
     Route::post('/inventario', [InventoryController::class, 'store'])->name('inventario.store');
     Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])->name('inventario.import');
     Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])->name('inventario.update');
-
 
     // 6. modulo de recepcion
     Route::prefix('reception')->name('reception.')->group(function () {
@@ -101,7 +105,6 @@ Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->na
         Route::get('/{reception}/pdf', [ReceptionController::class, 'downloadPdf'])
             ->name('pdf');
     });
-
 
     // 7. modulo de proveedores
     Route::prefix('suppliers')->name('providers.')->group(function () {
@@ -122,7 +125,6 @@ Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->na
             ->name('toggle-status');
     });
 
-
     // 8. rutas de mantenedores
 
     Route::resource('aisle', AisleController::class);
@@ -133,21 +135,17 @@ Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->na
 
     Route::resource('position', PositionController::class);
 
-
     // 9. ruta de distribucion
 
     Route::resource('distribution', DistributionController::class);
-
 
     // 10. ruta de cuarentena
 
     Route::resource('quarantine', QuarantineController::class);
 
-
     // 11. ruta de qr
 
     Route::resource('qr', QRController::class);
-
 
     // 12. ruta para mover posiciones 3d
 
@@ -161,4 +159,10 @@ Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->na
     Route::resource('requests', EstablishmentRequestController::class);
     Route::get('/dispatch/solicitudes', [DispatchController::class, 'solicitudes'])
         ->name('dispatch.solicitudes');
+    // 13. solicitudes de establecimientos
+    Route::resource('requests', EstablishmentRequestController::class);
+
 });
+// Enviar solicitud desde el Login
+Route::post('/password-reset-request', [PasswordResetRequestController::class, 'store'])
+    ->name('password.request.store');

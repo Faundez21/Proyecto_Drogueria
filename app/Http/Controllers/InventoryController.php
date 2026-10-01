@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Inventory;
 use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel; 
+use Maatwebsite\Excel\Facades\Excel;
 
 class InventoryController extends Controller
 {
@@ -90,7 +90,7 @@ class InventoryController extends Controller
         ]);
 
         $data = $request->all();
-        
+
         $data['user_id'] = Auth::id();
 
         Inventory::create($data);

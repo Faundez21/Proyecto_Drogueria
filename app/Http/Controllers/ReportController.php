@@ -68,7 +68,7 @@ class ReportController extends Controller
                 } elseif (method_exists(Inventory::class, 'aisle')) {
                     $q->orWhereHas('aisle', fn($qp) => $qp->where('nombre', $pasillo));
                 }
-                
+
                 if (Schema::hasColumn('inventories', 'pasillo_nombre')) $q->orWhere('pasillo_nombre', $pasillo);
                 if (Schema::hasColumn('inventories', 'pasillo')) $q->orWhere('pasillo', $pasillo);
             });
@@ -134,10 +134,10 @@ class ReportController extends Controller
     {
         $query = $this->buildInventoryQuery($request);
         $inventories = $query->get(); // Extrae todos los resultados sin paginar
-        
+
         $pdf = Pdf::loadView('reportes.pdf', compact('inventories'));
         $pdf->setPaper('A4', 'landscape'); // Formato horizontal para que quepan las columnas
-        
+
         return $pdf->download('reporte_inventario_'.date('Ymd_His').'.pdf');
     }
 }
