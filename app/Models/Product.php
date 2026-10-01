@@ -19,4 +19,5 @@ class Product extends Model
     {
         return $this->hasMany(ReceptionItem::class, 'product_id');
     }
+
 }

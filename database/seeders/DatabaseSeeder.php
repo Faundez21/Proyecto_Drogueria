@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         // 2. Luego se crean los productos
         $this->call(ProductSeeder::class);
         // inventario
-        $this->call([ InventorySeeder::class]);
+        $this->call([InventorySeeder::class]);
         // 3. Finalmente la recepción (que depende de proveedor y producto)
         $this->call(ReceptionSeeder::class);
 

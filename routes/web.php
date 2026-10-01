@@ -11,7 +11,7 @@ use App\Http\Controllers\QuarantineController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\SolicitudController;
+use App\Http\Controllers\EstablishmentRequestController;
 use App\Http\Controllers\DispatchController;
 use App\Http\Controllers\ControlledDispatchController; // nuevo controlador
 use App\Http\Controllers\TraceabilityController;
@@ -71,7 +71,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
     Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
 
-// modulo de reportes
+    // modulo de reportes
+    Route::get('/reportes', [ReportController::class, 'index'])->name('reportes.index');
 
 
 Route::get('/reportes', [ReportController::class, 'index'])->name('reportes.index');
@@ -81,7 +82,7 @@ Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->na
     Route::get('/users', [UserController::class, 'index'])
         ->name('users.index');
 
-//inventario
+    //inventario
     Route::get('/inventario', [InventoryController::class, 'index'])->name('inventario.index');
     Route::post('/inventario', [InventoryController::class, 'store'])->name('inventario.store');
     Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])->name('inventario.import');
@@ -157,6 +158,7 @@ Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->na
 
 
     //13. solicitudes de establecimientos
-        Route::resource('requests', SolicitudController::class);
-
+    Route::resource('requests', EstablishmentRequestController::class);
+    Route::get('/dispatch/solicitudes', [DispatchController::class, 'solicitudes'])
+        ->name('dispatch.solicitudes');
 });
