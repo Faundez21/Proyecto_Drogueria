@@ -1,26 +1,31 @@
 <?php
 
 // controladores de autenticacion
-use App\Http\Controllers\AisleController;
 use App\Http\Controllers\Auth\LoginController;
+
 // controladores de modulos y operaciones
-use App\Http\Controllers\ControlledDispatchController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\DistributionController;
-use App\Http\Controllers\GlobalSearchController;
+use App\Http\Controllers\QuarantineController;
+use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SolicitudController;
+use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\ControlledDispatchController; // nuevo controlador
+use App\Http\Controllers\TraceabilityController;
+use App\Http\Controllers\GlobalSearchController;
+
+//  Controladores de Estructura de Almacén (Mantenedores)
+use App\Http\Controllers\AisleController;
+// controladores de modulos y operaciones
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PasswordResetRequestController;
 use App\Http\Controllers\PositionController;
-use App\Http\Controllers\ProviderController; // nuevo controlador
-use App\Http\Controllers\QuarantineController;
-use App\Http\Controllers\ReceptionController;
 //  Controladores de Estructura de Almacén (Mantenedores)
-use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ShelfController;
-use App\Http\Controllers\SolicitudController;
-use App\Http\Controllers\TraceabilityController;
+
 // controladores de usuarios
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -72,9 +77,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
     Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
 
-    // modulo de reportes
-    Route::get('/reportes', [ReportController::class, 'index'])->name('reportes.index');
+// modulo de reportes
 
+
+Route::get('/reportes', [ReportController::class, 'index'])->name('reportes.index');
+Route::get('/reportes/exportar/excel', [ReportController::class, 'exportExcel'])->name('reportes.excel');
+Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->name('reportes.pdf');
     // usuarios
     Route::get('/users', [UserController::class, 'index'])
         ->name('users.index');
