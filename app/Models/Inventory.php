@@ -10,6 +10,7 @@ class Inventory extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id', // <-- AGREGA ESTA LÍNEA AQUÍ
         'correlativo_interno',
         'fecha_recepcion',
         'tipo_documento',
@@ -29,4 +30,9 @@ class Inventory extends Model
         'pasillo',
         'estante',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
