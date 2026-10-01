@@ -6,7 +6,7 @@
         <!-- Encabezado con Botón de Notificación y Nuevo Usuario -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-slate-800">Gestión de Usuarios</h1>
+                <h1 class="text-2xl font-bold text-slate-800">Usuarios y Permisos</h1>
                 <p class="text-sm text-slate-500 mt-1">Administra los accesos, roles y atiende las solicitudes del sistema.</p>
             </div>
 
@@ -143,6 +143,7 @@
     </div>
 
     <!-- Modal Múltiples Solicitudes de Recuperación de Cuenta -->
+    <!-- Modal Múltiples Solicitudes de Recuperación de Cuenta -->
     <div id="RecoveryModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-8 w-full max-w-2xl">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
@@ -166,20 +167,29 @@
                 </button>
             </div>
 
-            <!-- Listado de Solicitudes (Solo Vista) -->
+            <!-- Formulario oculto reutilizable para enviar la asignación de clave -->
+            <form id="assignPasswordForm" method="POST" action="">
+                @csrf
+                <input type="hidden" name="password" id="hidden_password_input">
+            </form>
+
+            <!-- Listado de Solicitudes Dinámicas -->
             <div class="space-y-3 max-h-96 overflow-y-auto pr-1">
                 @forelse ($passwordRequests as $req)
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-amber-50/50 border border-amber-200/60 rounded-xl gap-3">
                         <div>
-                            <p class="text-sm font-bold text-slate-800">{{ $req['email'] }}</p>
-                            <span class="text-xs text-amber-700 font-medium">Solicitado: {{ $req['time'] }}</span>
+                            <p class="text-sm font-bold text-slate-800">{{ $req->email }}</p>
+                            <span class="text-xs text-amber-700 font-medium">
+                                Solicitado: {{ \Carbon\Carbon::parse($req->created_at)->locale('es')->diffForHumans() }}
+                            </span>
                         </div>
-                        <button type="button"
+
+                        <button type="button" onclick="promptNewPassword('{{ $req->email }}')"
                             class="w-full sm:w-auto px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 0121 9z"></path>
                             </svg>
-                            Generar nueva clave
+                            Asignar nueva clave
                         </button>
                     </div>
                 @empty
@@ -273,6 +283,50 @@
 
         function closeCreate() {
             document.getElementById('CreateModal').classList.add('hidden');
+        }
+
+
+        function openRecoveryModal() {
+            document.getElementById('RecoveryModal').classList.remove('hidden');
+        }
+
+        function closeRecoveryModal() {
+            document.getElementById('RecoveryModal').classList.add('hidden');
+        }
+
+        function openCreate() {
+            document.getElementById('CreateModal').classList.remove('hidden');
+        }
+
+        function closeCreate() {
+            document.getElementById('CreateModal').classList.add('hidden');
+        }
+
+        // --- AGREGAR ESTA NUEVA FUNCIÓN AQUI ---
+        function promptNewPassword(email) {
+            Swal.fire({
+                title: 'Asignar Nueva Contraseña',
+                text: `Ingresa la nueva clave para ${email}:`,
+                input: 'password',
+                inputPlaceholder: 'Mínimo 8 caracteres',
+                showCancelButton: true,
+                confirmButtonColor: '#d97706',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Guardar Contraseña',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                inputValidator: (value) => {
+                    if (!value) return '¡Debes ingresar una contraseña!';
+                    if (value.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('assignPasswordForm');
+                    form.action = `/users/reset-password/${encodeURIComponent(email)}`;
+                    document.getElementById('hidden_password_input').value = result.value;
+                    form.submit();
+                }
+            });
         }
     </script>
 @endsection
