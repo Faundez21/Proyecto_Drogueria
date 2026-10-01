@@ -598,9 +598,6 @@
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 w-full max-w-4xl overflow-hidden">
 
-<<<<<<< HEAD
-
-=======
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
                     <div>
                         <h2 class="text-xl font-bold text-slate-800">Historial de Posiciones</h2>
@@ -651,7 +648,6 @@
 
             </div>
         </div>
->>>>>>> origin/Nicolas
         <!-- Funciones con JS para abrir y cerrar el modal -->
 
         <script>

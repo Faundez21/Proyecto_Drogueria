@@ -4,6 +4,7 @@
 @section('subtitle', 'Lista de medicamentos e insumos bloqueados o retenidos preventivamente.')
 
 @section('actions')
+@role('Administrador')
     <button type="button" onclick="openHistory()"
         class="flex-1 sm:flex-none px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 hover:text-amber-600 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -11,6 +12,7 @@
         </svg>
         Ver Historial
     </button>
+@endrole
 @endsection
 
 @section('content')
@@ -287,7 +289,7 @@
         </div>
 
         <!-- 1. MODAL: Etiqueta QR -->
-        <div id="qrModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="qrModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="relative w-full max-w-sm flex flex-col items-center">
                 <div class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
@@ -339,7 +341,7 @@
         </div>
 
         <!-- 2. MODAL: Editar Estado de Lote (Liberar o Merma) -->
-        <div id="editLoteModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="editLoteModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-sm flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <h2 class="text-[16px] font-bold text-white tracking-wide">Gestionar Cuarentena</h2>
@@ -369,7 +371,7 @@
                                 <option value="Merma">🔴 Declarar Merma (Desecho / Rechazo)</option>
                             </select>
                         </div>
-                        
+
                         <div id="motivoContainer">
                             <label for="modal_motivo" class="block text-[13px] font-bold text-slate-700 mb-1.5">
                                 Motivo de la Acción / Observación <span class="text-rose-500">*</span>
@@ -389,7 +391,7 @@
         </div>
 
         <!-- 3. MODAL: Historial de Movimientos de Cuarentena -->
-        <div id="HistoryModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="HistoryModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <div>
@@ -416,7 +418,7 @@
                         <tbody class="divide-y divide-slate-100">
                             @forelse($inventories->take(15) as $movimiento)
                                 @php
-                                    // 1. FECHA CORREGIDA 
+                                    // 1. FECHA CORREGIDA
                                     // Se lee directamente de la instancia Carbon del modelo Eloquent
                                     $fechaMov = 'Sin Registro';
                                     if (isset($movimiento->updated_at) && $movimiento->updated_at) {
@@ -424,7 +426,7 @@
                                     } elseif (isset($movimiento->created_at) && $movimiento->created_at) {
                                         $fechaMov = $movimiento->created_at->format('d/m/Y H:i');
                                     }
-                                    
+
                                     // 2. PRODUCTO Y LOTE
                                     $prodNom = $movimiento->producto ?? 'Producto Desconocido';
                                     $loteCod = $movimiento->lote ?? 'S/L';
@@ -443,7 +445,7 @@
                                     // 4. ESTADO Y MOTIVO
                                     $estadoMov = strtolower($movimiento->estado ?? 'cuarentena');
                                     $motivoMov = $movimiento->motivo ?? 'Ingreso a retención preventiva';
-                                    
+
                                     if (str_contains($estadoMov, 'disponible')) {
                                         $badgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
                                         $badgeText  = 'LIBERADO';
@@ -530,7 +532,7 @@
 
             let estadoSelect = document.getElementById('modal_estado');
             let estadoFormat = (estado || '').toLowerCase();
-            
+
             if (estadoFormat.includes('cuarentena')) estadoSelect.value = 'Cuarentena';
             else if (estadoFormat.includes('merma')) estadoSelect.value = 'Merma';
             else estadoSelect.value = 'Disponible';
@@ -554,7 +556,7 @@
             const motivoInput = document.getElementById('modal_motivo');
             // Como toda acción técnica a partir de cuarentena requiere registro, siempre es required
             motivoInput.setAttribute('required', 'required');
-            
+
             if (estado === 'Disponible') {
                 motivoInput.placeholder = "Indique motivo de la liberación técnica...";
             } else if (estado === 'Merma') {

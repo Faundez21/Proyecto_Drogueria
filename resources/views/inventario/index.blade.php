@@ -12,6 +12,7 @@
             </svg>
             Ver Mermas
         </button>
+        @role('Administrador')
         <button type="button" onclick="openHistory()"
             class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-[13px] font-semibold hover:bg-slate-50 hover:text-teal-700 transition-all duration-200 shadow-sm hover:shadow cursor-pointer">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,6 +20,7 @@
             </svg>
             Ver Historial
         </button>
+        @endrole
         <button type="button" onclick="openImport()"
             class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
             <svg class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +85,7 @@
             <!-- Formulario de Filtros -->
             <form method="GET" action="{{ Route::has('inventario.index') ? route('inventario.index') : '#' }}" id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                    
+
                     <!-- Búsqueda con Dropdown -->
                     <div class="xl:col-span-2 relative" id="searchContainer">
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Buscar</label>
@@ -91,7 +93,7 @@
                             placeholder="Producto, categoría o lote..." autocomplete="off"
                             onfocus="showSearchDropdown()" oninput="filterSearchDropdown()"
                             class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
-                        
+
                         <div id="searchDropdown" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100">
                             @if(isset($productosLista) && count($productosLista) > 0)
                                 @foreach($productosLista as $prodNombre)
@@ -220,13 +222,15 @@
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock Físico Acumulado</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">QR</th>
+</tr>
                         </tr>
                     </thead>
 
                     <tbody class="divide-y divide-slate-100 text-[13px]" id="mainTableBody">
                         @if ($groupedInventories->isEmpty())
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center">
+                                <td colspan="6" class="px-6 py-12 text-center">
                                     <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-400 mb-3">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                     </div>
@@ -243,6 +247,28 @@
                                     $groupKey = 'grp_' . md5($nombreProducto);
                                     $primerLote = $lotes->first();
                                     $categoriaLote = is_object($primerLote) ? $primerLote->categoria ?? 'General' : 'General';
+
+$loteMasProximo = $lotes->filter(function($l) {
+        $fecha = is_object($l) ? $l->fecha_vencimiento ?? null : null;
+        return !empty($fecha);
+    })->sortBy(function($l) {
+        return \Carbon\Carbon::parse(is_object($l) ? $l->fecha_vencimiento : $l['fecha_vencimiento']);
+    })->first() ?? $primerLote;
+
+    $proxLoteData = is_object($loteMasProximo) ? $loteMasProximo : (object)$loteMasProximo;
+    $proxLoteId = data_get($proxLoteData, 'id', 0);
+    $proxLoteCodigo = data_get($proxLoteData, 'lote', 'S/L');
+    $proxLoteStock = data_get($proxLoteData, 'stock_total') ?? data_get($proxLoteData, 'cantidad', 0);
+
+    $proxLoteVencRaw = data_get($proxLoteData, 'fecha_vencimiento');
+    $proxLoteVencText = 'N/A';
+    if (!empty($proxLoteVencRaw)) {
+        try {
+            $proxLoteVencText = \Carbon\Carbon::parse($proxLoteVencRaw)->format('d/m/Y');
+        } catch (\Exception $e) {
+            $proxLoteVencText = $proxLoteVencRaw;
+        }
+    }
                                 @endphp
 
                                 <tr id="product-row-{{ $groupKey }}"
@@ -250,13 +276,17 @@
                                     class="product-master-row hover:bg-slate-50 transition-colors group cursor-pointer"
                                     onclick="toggleLotes('{{ $groupKey }}')">
                                     <td class="px-6 py-4 text-center relative">
-                                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors"></div>
+                                        <div
+                                            class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors">
+                                        </div>
                                         <button type="button"
                                             class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-teal-100 group-hover:text-teal-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200 group-hover:border-teal-200"
                                             id="icon-{{ $groupKey }}">
                                             <svg class="w-4 h-4 transform transition-transform duration-300"
-                                                id="arrow-{{ $groupKey }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                id="arrow-{{ $groupKey }}" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7"></path>
                                             </svg>
                                         </button>
                                     </td>
@@ -288,16 +318,33 @@
                                             </span>
                                         @endif
                                     </td>
+                                    <td class="px-6 py-4 text-center" onclick="event.stopPropagation()">
+        <button type="button"
+            onclick="openQRModal('{{ e($proxLoteId) }}', '{{ e($nombreProducto) }}', '{{ e($proxLoteCodigo) }}', '{{ e($proxLoteVencText) }}', '{{ $proxLoteStock }}', 'Droguería DAS')"
+            class="p-2 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold"
+            title="Generar Etiqueta QR del lote más próximo a vencer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+            </svg>
+        </button>
+    </td>
                                 </tr>
 
                                 <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-50/50 shadow-inner">
-                                    <td colspan="5" class="p-0 border-b border-slate-200">
+                                    <td colspan="6" class="p-0 border-b border-slate-200">
                                         <div class="py-4 pr-6 pl-14">
-                                            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                                                <div class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
-                                                    <span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                            <div
+                                                class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                                <div
+                                                    class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
+                                                    <span
+                                                        class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                                            </path>
                                                         </svg>
                                                         Desglose Físico de Lotes
                                                     </span>
@@ -316,27 +363,38 @@
                                                         <tbody class="divide-y divide-slate-100 text-slate-700 text-[12px]">
                                                             @foreach ($lotes as $loteObj)
                                                                 @php
-                                                                    $loteData = is_object($loteObj) ? $loteObj : (object) $loteObj;
+                                                                    $loteData = is_object($loteObj)
+                                                                        ? $loteObj
+                                                                        : (object) $loteObj;
                                                                     $badgeVencimientoClass = 'text-slate-500';
                                                                     $fechaVencRaw = data_get($loteData, 'fecha_vencimiento');
                                                                     $textoVencimiento = 'N/A';
 
                                                                     if (!empty($fechaVencRaw)) {
                                                                         try {
-                                                                            $fVenc = \Carbon\Carbon::parse($fechaVencRaw);
+                                                                            $fVenc = \Carbon\Carbon::parse(
+                                                                                $fechaVencRaw,
+                                                                            );
                                                                             $textoVencimiento = $fVenc->format('d/m/Y');
                                                                             $now = \Carbon\Carbon::now();
 
                                                                             if ($fVenc->isPast()) {
-                                                                                $badgeVencimientoClass = 'text-rose-600 font-extrabold';
+                                                                                $badgeVencimientoClass =
+                                                                                    'text-rose-600 font-extrabold';
                                                                             } else {
-                                                                                $diasRestantes = $now->diffInDays($fVenc, false);
+                                                                                $diasRestantes = $now->diffInDays(
+                                                                                    $fVenc,
+                                                                                    false,
+                                                                                );
                                                                                 if ($diasRestantes > 90) {
-                                                                                    $badgeVencimientoClass = 'text-emerald-600 font-bold';
+                                                                                    $badgeVencimientoClass =
+                                                                                        'text-emerald-600 font-bold';
                                                                                 } elseif ($diasRestantes >= 0) {
-                                                                                    $badgeVencimientoClass = 'text-amber-600 font-bold';
+                                                                                    $badgeVencimientoClass =
+                                                                                        'text-amber-600 font-bold';
                                                                                 } else {
-                                                                                    $badgeVencimientoClass = 'text-rose-600 font-extrabold';
+                                                                                    $badgeVencimientoClass =
+                                                                                        'text-rose-600 font-extrabold';
                                                                                 }
                                                                             }
                                                                         } catch (\Exception $e) {
@@ -363,21 +421,30 @@
                                                                     </td>
                                                                     <td class="px-4 py-3">
                                                                         <div class="flex items-center gap-1.5 text-[11px]">
-                                                                            <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">P:</span> <b class="text-slate-800">{{ $pasilloVal }}</b></span>
-                                                                            <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">E:</span> <b class="text-slate-800">{{ $estanteVal }}</b></span>
+                                                                            <span
+                                                                                class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span
+                                                                                    class="text-slate-400">P:</span> <b
+                                                                                    class="text-slate-800">{{ $pasilloVal }}</b></span>
+                                                                            <span
+                                                                                class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span
+                                                                                    class="text-slate-400">E:</span> <b
+                                                                                    class="text-slate-800">{{ $estanteVal }}</b></span>
                                                                         </div>
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
                                                                         @if ($isCuarentena)
-                                                                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+                                                                            <span
+                                                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
                                                                                 CUARENTENA
                                                                             </span>
                                                                         @elseif($stockLote <= 0)
-                                                                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-slate-100 text-slate-600 border border-slate-200">
+                                                                            <span
+                                                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-slate-100 text-slate-600 border border-slate-200">
                                                                                 AGOTADO
                                                                             </span>
                                                                         @else
-                                                                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                                            <span
+                                                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                                                                 DISPONIBLE
                                                                             </span>
                                                                         @endif
@@ -385,17 +452,22 @@
                                                                     <td class="px-4 py-3 text-center">
                                                                         <span class="font-extrabold text-slate-800 text-[13px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
                                                                     </td>
-                                                                    <td class="px-4 py-3 text-center flex justify-center gap-2">
-                                                                        <button type="button"
-                                                                            onclick="openQRModal('{{ e($loteId) }}', '{{ e($nombreProducto) }}', '{{ e($loteCodigo) }}', '{{ e($textoVencimiento) }}', '{{ $stockLote }}', 'Droguería DAS')"
-                                                                            class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Generar Etiqueta QR">
-                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                                                                        </button>
+                                                                    <td
+                                                                        class="px-4 py-3 text-center ">
+
 
                                                                         <button type="button"
                                                                             onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}')"
-                                                                            class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Cambiar Estado">
-                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                                            class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer"
+                                                                            title="Cambiar Estado">
+                                                                            <svg class="w-4 h-4" fill="none"
+                                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    stroke-width="2"
+                                                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                                                </path>
+                                                                            </svg>
                                                                         </button>
                                                                     </td>
                                                                 </tr>
@@ -465,7 +537,7 @@
         </div>
 
         <!-- Modal: Historial de Movimientos -->
-        <div id="HistoryModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="HistoryModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-7xl flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <div>
@@ -475,14 +547,16 @@
                     <button type="button" onclick="closeHistory()"
                         class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
 
                 <div class="overflow-x-auto max-h-[60vh] bg-slate-50">
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
-                        <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm">
+                        <thead
+                            class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm">
                             <tr>
                                 <th class="px-6 py-4">Fecha y Hora</th>
                                 <th class="px-6 py-4">Doc / Correlativo</th>
@@ -501,7 +575,7 @@
                                     $prodNombre = data_get($itemObj, 'product.nombre') ?? data_get($itemObj, 'producto') ?? 'Producto Desconocido';
                                     $cant = data_get($itemObj, 'stock_total') ?? data_get($itemObj, 'cantidad') ?? 0;
                                     $loteCodigo = data_get($itemObj, 'lote') ?? data_get($itemObj, 'loteRef.lote') ?? 'S/L';
-                                    
+
                                     // FECHA Y HORA (Usamos created_at para el ingreso de inventario)
                                     $rawDate = data_get($itemObj, 'created_at') ?? data_get($itemObj, 'updated_at');
                                     if ($rawDate) {
@@ -517,7 +591,7 @@
                                     // USUARIO RESPONSABLE
                                     $uName = data_get($itemObj, 'user.name') ?? data_get($itemObj, 'usuario.name') ?? data_get($itemObj, 'causer.name');
                                     $uLast = data_get($itemObj, 'user.last_name') ?? data_get($itemObj, 'usuario.last_name') ?? data_get($itemObj, 'causer.last_name');
-                                    
+
                                     if (!empty($uName)) {
                                         $usuarioResp = trim($uName . ' ' . $uLast);
                                     } else {
@@ -535,29 +609,36 @@
                                     <td class="px-6 py-3.5 text-slate-600">{{ $itemObj->razon_social ?? 'Interno/Proveedor' }}</td>
                                     <td class="px-6 py-3.5 font-bold text-slate-800">{{ $prodNombre }}</td>
                                     <td class="px-6 py-3.5 text-center">
-                                        <span class="px-2.5 py-1 rounded bg-slate-200 text-slate-800 font-mono font-extrabold text-[12px] border border-slate-300">
+                                        <span
+                                            class="px-2.5 py-1 rounded bg-slate-200 text-slate-800 font-mono font-extrabold text-[12px] border border-slate-300">
                                             {{ $loteCodigo }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-3.5 text-center font-medium text-slate-700">
                                         {{ $usuarioResp }}
                                     </td>
-                                    <td class="px-6 py-3.5 text-center font-extrabold text-emerald-600">+{{ $cant }}</td>
+                                    <td class="px-6 py-3.5 text-center font-extrabold text-emerald-600">
+                                        +{{ $cant }}</td>
                                     <td class="px-6 py-3.5 text-center">
                                         <button type="button"
                                             onclick="filterTableByLote('{{ e($prodNombre) }}', '{{ e($loteCodigo) }}')"
                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center justify-center"
                                             title="Ver este lote específico">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                </path>
                                             </svg>
                                         </button>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="px-6 py-12 text-center text-slate-400 font-medium">No hay movimientos registrados recientes.</td>
+                                    <td colspan="8" class="px-6 py-12 text-center text-slate-400 font-medium">No hay
+                                        movimientos registrados recientes.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -574,7 +655,7 @@
         </div>
 
         <!-- Modal: Importar Carga Masiva -->
-        <div id="importModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="importModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 flex flex-col w-full max-w-md overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <h2 class="text-lg font-bold text-white tracking-wide">Importar Carga Masiva</h2>
@@ -601,7 +682,8 @@
                         </label>
                         <span class="text-[11px] text-slate-400 font-medium">Formatos soportados: .xlsx, .csv</span>
 
-                        <button type="submit" class="w-full px-4 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all text-[13px] font-bold shadow-sm mt-3 cursor-pointer">
+                        <button type="submit"
+                            class="w-full px-4 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all text-[13px] font-bold shadow-sm mt-3 cursor-pointer">
                             Procesar e Importar
                         </button>
                     </form>
@@ -610,7 +692,7 @@
         </div>
 
         <!-- Modal: Ingreso Manual -->
-        <div id="DepositModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="DepositModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <div>
@@ -623,12 +705,14 @@
                 </div>
 
                 <div class="p-6 sm:p-8 overflow-y-auto bg-slate-50/50">
-                    <form action="{{ Route::has('inventario.store') ? route('inventario.store') : '#' }}" method="POST" id="manualDepositForm">
+                    <form action="{{ Route::has('inventario.store') ? route('inventario.store') : '#' }}" method="POST"
+                        id="manualDepositForm">
                         @csrf
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                             <div class="sm:col-span-2">
                                 <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-2">
-                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">1. Datos del Documento</h4>
+                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">1. Datos del
+                                        Documento</h4>
                                 </div>
                             </div>
                             <div>
@@ -655,7 +739,8 @@
 
                             <div class="sm:col-span-2 mt-4">
                                 <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-2">
-                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">2. Detalle Físico e Ubicación</h4>
+                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">2. Detalle
+                                        Físico e Ubicación</h4>
                                 </div>
                             </div>
                             <div class="sm:col-span-2">
@@ -708,20 +793,22 @@
         </div>
 
         <!-- Modal: Etiqueta QR -->
-        <div id="qrModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="qrModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="relative w-full max-w-sm flex flex-col items-center">
                 <div class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
                     <div class="w-full flex flex-col items-center mb-4 z-10 border-b-2 border-black pb-3">
                         <h2 class="text-[17px] text-black font-black tracking-widest uppercase">DROGUERÍA DAS</h2>
-                        <span class="text-[11px] text-black font-bold font-mono tracking-widest uppercase mt-0.5">Control de Trazabilidad</span>
+                        <span class="text-[11px] text-black font-bold font-mono tracking-widest uppercase mt-0.5">Control
+                            de Trazabilidad</span>
                     </div>
                     <div class="bg-white p-2 mb-4 z-10 flex justify-center w-full">
                         <div id="qrcode" class="w-[140px] h-[140px]"></div>
                     </div>
                     <div class="w-full z-10 space-y-2.5 px-2">
                         <div class="text-center mb-4">
-                            <span id="qrProducto" class="text-[14px] font-black text-black block leading-tight uppercase">PRODUCTO</span>
+                            <span id="qrProducto"
+                                class="text-[14px] font-black text-black block leading-tight uppercase">PRODUCTO</span>
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-[12px] font-mono border-t border-b border-black py-2.5">
                             <div class="flex flex-col">
@@ -736,7 +823,8 @@
                         <div class="flex justify-between items-end pt-1.5">
                             <div class="flex flex-col max-w-[60%]">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Origen / Bodega</span>
-                                <span id="qrProveedor" class="font-bold text-black text-[12px] truncate uppercase">INTERNO</span>
+                                <span id="qrProveedor"
+                                    class="font-bold text-black text-[12px] truncate uppercase">INTERNO</span>
                             </div>
                             <div class="flex flex-col text-right">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Stock Físico</span>
@@ -756,7 +844,7 @@
         </div>
 
         <!-- Modal: Editar Lote -->
-        <div id="editLoteModal" class="hidden fixed inset-0 z-[60] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="editLoteModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[10000] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <h2 class="text-[16px] font-bold text-white tracking-wide">Actualizar Estado de Lote</h2>
@@ -770,15 +858,19 @@
                     @method('PUT')
                     <div class="p-6 space-y-4">
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Modificando Lote de:</span>
-                            <p id="modal_producto_nombre" class="text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
+                            <span
+                                class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Modificando
+                                Lote de:</span>
+                            <p id="modal_producto_nombre"
+                                class="text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
                             <div class="mt-2 inline-block bg-white border border-slate-300 px-3 py-1 rounded-lg shadow-sm">
                                 <p id="modal_lote_nombre" class="text-[13px] font-mono font-bold text-slate-700"></p>
                             </div>
                         </div>
 
                         <div>
-                            <label for="modal_estado" class="block text-[13px] font-bold text-slate-700 mb-2">Seleccione Nuevo Estado Físico *</label>
+                            <label for="modal_estado" class="block text-[13px] font-bold text-slate-700 mb-2">Seleccione
+                                Nuevo Estado Físico *</label>
                             <select id="modal_estado" name="estado" onchange="toggleMotivoField(this.value)" required
                                 class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 font-semibold text-slate-700 shadow-sm cursor-pointer transition-colors">
                                 <option value="Disponible">🟢 Disponible (Liberado para entrega)</option>
@@ -791,8 +883,7 @@
                             <label for="modal_motivo" class="block text-[13px] font-bold text-slate-700 mb-1.5">
                                 Motivo <span class="text-rose-500">*</span>
                             </label>
-                            <textarea id="modal_motivo" name="motivo" rows="3"
-                                placeholder="Indique la razón de la merma o cuarentena..."
+                            <textarea id="modal_motivo" name="motivo" rows="3" placeholder="Indique la razón de la merma o cuarentena..."
                                 class="w-full rounded-xl border border-slate-300 bg-white p-3 text-[12px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-slate-700 shadow-sm"></textarea>
                         </div>
                     </div>
@@ -806,13 +897,16 @@
         </div>
 
         <!-- Modal: Ver Mermas (CON FECHA Y USUARIO) -->
-        <div id="mermaModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="mermaModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-rose-800 flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-rose-700 border border-rose-600 flex items-center justify-center text-white">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-rose-700 border border-rose-600 flex items-center justify-center text-white">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                </path>
                             </svg>
                         </div>
                         <div>
@@ -850,7 +944,7 @@
                             @forelse($mermas as $mItem)
                                 @php
                                     $mObj = is_object($mItem) ? $mItem : (object) $mItem;
-                                    
+
                                     // 1. FECHA (Lectura Segura y Formateada)
                                     $rawDateMerma = data_get($mObj, 'updated_at') ?? data_get($mObj, 'created_at');
                                     if ($rawDateMerma) {
@@ -872,7 +966,7 @@
                                     // 3. RESPONSABLE (Lectura Segura)
                                     $uName = data_get($mObj, 'user.name') ?? data_get($mObj, 'usuario.name') ?? data_get($mObj, 'causer.name');
                                     $uLast = data_get($mObj, 'user.last_name') ?? data_get($mObj, 'usuario.last_name') ?? data_get($mObj, 'causer.last_name');
-                                    
+
                                     if (!empty($uName)) {
                                         $usuarioMerma = trim($uName . ' ' . $uLast);
                                     } else {
@@ -972,8 +1066,10 @@
                     const lotePasillo = normalizeText(loteRow.getAttribute('data-pasillo'));
                     const loteEstante = normalizeText(loteRow.getAttribute('data-estante'));
 
-                    const matchPasillo = !pasilloVal || lotePasillo === pasilloVal || lotePasillo.includes(pasilloVal);
-                    const matchEstante = !estanteVal || loteEstante === estanteVal || loteEstante.includes(estanteVal);
+                    const matchPasillo = !pasilloVal || lotePasillo === pasilloVal || lotePasillo.includes(
+                        pasilloVal);
+                    const matchEstante = !estanteVal || loteEstante === estanteVal || loteEstante.includes(
+                        estanteVal);
 
                     if (matchPasillo && matchEstante) {
                         loteRow.classList.remove('hidden');
@@ -992,7 +1088,8 @@
                         if (arrow) arrow.classList.add('rotate-90');
                         if (iconContainer) {
                             iconContainer.classList.remove('bg-slate-100', 'text-slate-400', 'border-slate-200');
-                            iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
+                            iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600',
+                            'shadow-md');
                         }
                     }
                 } else {
@@ -1039,14 +1136,16 @@
                         if (arrow) arrow.classList.add('rotate-90');
                         if (iconContainer) {
                             iconContainer.classList.remove('bg-slate-100', 'text-slate-400', 'border-slate-200');
-                            iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600', 'shadow-md');
+                            iconContainer.classList.add('bg-teal-600', 'text-white', 'border-teal-600',
+                            'shadow-md');
                         }
 
                         const loteRows = lotesSubrow.querySelectorAll('.lote-item-row');
                         loteRows.forEach(loteRow => {
                             const rowLoteCode = normalizeText(loteRow.getAttribute('data-lote-code'));
 
-                            if (loteNorm !== 's/l' && (rowLoteCode.includes(loteNorm) || loteNorm.includes(rowLoteCode))) {
+                            if (loteNorm !== 's/l' && (rowLoteCode.includes(loteNorm) || loteNorm.includes(
+                                    rowLoteCode))) {
                                 loteRow.classList.remove('hidden');
                                 loteRow.classList.add('bg-teal-50/80');
                             } else if (loteNorm === 's/l') {
@@ -1182,7 +1281,8 @@
             setTimeout(function() {
                 try {
                     new QRCode(qrContainer, {
-                        text: 'LOTE:' + lote + '|PROD:' + producto + '|VENCE:' + vencimiento + '|STOCK:' + stock,
+                        text: 'LOTE:' + lote + '|PROD:' + producto + '|VENCE:' + vencimiento + '|STOCK:' +
+                            stock,
                         width: 140,
                         height: 140,
                         colorDark: "#0f172a",
