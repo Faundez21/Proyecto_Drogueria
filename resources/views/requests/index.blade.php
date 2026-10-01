@@ -51,7 +51,7 @@
             </div>
 
             <!-- formulario principal -->
-            <form action="#" method="POST" class="divide-y divide-slate-100" id="requestForm">
+            <form action="{{ route('requests.store') }}" method="POST" class="divide-y divide-slate-100" id="requestForm">
                 @csrf
 
                 <!-- seccion 1: establecimiento -->
@@ -192,24 +192,17 @@
 
                                     <select name="producto[]" required
                                         class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+
                                         <option value="" disabled selected>
                                             Buscar producto...
                                         </option>
-                                        <option value="Paracetamol 500 mg">
-                                            Paracetamol 500 mg
-                                        </option>
-                                        <option value="Ibuprofeno 400 mg">
-                                            Ibuprofeno 400 mg
-                                        </option>
-                                        <option value="Amoxicilina 500 mg">
-                                            Amoxicilina 500 mg
-                                        </option>
-                                        <option value="Losartan 50 mg">
-                                            Losartan 50 mg
-                                        </option>
-                                        <option value="Salbutamol 100 mcg">
-                                            Salbutamol 100 mcg
-                                        </option>
+
+                                        @foreach ($products as $product)
+                                            <option value="{{ $product->id }}">
+                                                {{ $product->nombre }}
+                                            </option>
+                                        @endforeach
+
                                     </select>
                                 </div>
 
@@ -228,7 +221,8 @@
                                         Cantidad en stock actualmente <span class="text-rose-500">*</span>
                                     </label>
 
-                                    <input type="number" name="cantidad[]" min="1" required placeholder="Ej: 20"
+                                    <input type="number" name="stock_actual[]" min="1" required
+                                        placeholder="Ej: 20"
                                         class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold">
                                 </div>
 
@@ -237,7 +231,8 @@
                                         Cantidad Solicitada <span class="text-rose-500">*</span>
                                     </label>
 
-                                    <input type="number" name="cantidad[]" min="1" required placeholder="Ej: 50"
+                                    <input type="number" name="cantidad_solicitada[]" min="1" required
+                                        placeholder="Ej: 50"
                                         class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold">
                                 </div>
 
@@ -404,11 +399,11 @@
                 let totalUnidades = 0;
 
                 items.forEach(item => {
-                    const cantidad = parseInt(
-                        item.querySelector('input[name="cantidad[]"]').value
+                    const cantidad_solicitada = parseInt(
+                        item.querySelector('input[name="cantidad_solicitada[]"]').value
                     ) || 0;
 
-                    totalUnidades += cantidad;
+                    totalUnidades += cantidad_solicitada;
                 });
 
                 document.getElementById('total_productos').innerText = items.length;
@@ -416,7 +411,7 @@
             }
 
             // actualizar resumen al cambiar cantidades
-            document.querySelectorAll('input[name="cantidad[]"]').forEach(input => {
+            document.querySelectorAll('input[name="cantidad_solicitada[]"]').forEach(input => {
                 input.addEventListener('input', actualizarResumen);
             });
 
@@ -466,8 +461,7 @@
             });
 
             // evitar envio mientras la vista es visual
-            document.getElementById('requestForm').addEventListener('submit', function(e) {
-                e.preventDefault();
+            document.getElementById('requestForm').addEventListener('submit', function() {
 
                 if (!signatureRecibe.isEmpty()) {
                     document.getElementById('firma_recibe_input').value =

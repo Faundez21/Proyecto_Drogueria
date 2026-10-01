@@ -146,34 +146,7 @@
                 <p class="text-[9px] text-amber-600 font-extrabold mt-1 tracking-wider uppercase">Bloqueados temporal</p>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div class="flex items-center justify-between gap-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-teal-50 rounded-lg text-teal-600 border border-teal-100">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                            </svg>
-                        </div>
-                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                            Consumo promedio
-                        </p>
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-2 gap-2 mb-4">
-
-                </div>
-
-                <div>
-                    <h3 class="text-xl font-black text-slate-800">
-                        125
-                    </h3>
-
-                    <p class="text-[9px] text-slate-400 font-extrabold mt-1 tracking-wider uppercase">
-                        Unidades promedio mensual
-                    </p>
-                </div>
 
             </div>
 
