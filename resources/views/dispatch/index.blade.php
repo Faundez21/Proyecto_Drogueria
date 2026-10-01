@@ -484,168 +484,208 @@
 
                     <tbody class="divide-y divide-slate-100">
 
-                        <!-- solicitud 001 -->
-                        <tr class="bg-white hover:bg-slate-50 transition-colors cursor-pointer group"
-                            onclick="toggleSolicitud('solicitud-1')">
-                            <td class="px-6 py-4 text-center">
-                                <button type="button"
-                                    class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200">
-                                    <svg class="w-4 h-4 transform transition-transform duration-300"
-                                        id="arrow-solicitud-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                            </td>
+                        @forelse($solicitudes as $solicitud)
 
-                            <td class="px-6 py-4 font-mono font-extrabold text-slate-800">
-                                #00021
-                            </td>
+                            @php
+                                $solicitudKey = 'solicitud-' . $solicitud->id;
+                            @endphp
 
-                            <td class="px-6 py-4 font-bold text-slate-800">
-                                CECOSF CENTINELA
-                            </td>
+                            <!-- solicitud -->
+                            <tr class="bg-white hover:bg-slate-50 transition-colors cursor-pointer group"
+                                onclick="toggleSolicitud('{{ $solicitudKey }}')">
 
-                            <td class="px-6 py-4 font-medium text-slate-600">
-                                28-09-2026
-                            </td>
+                                <td class="px-6 py-4 text-center">
+                                    <button type="button"
+                                        class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200">
 
-                            <td class="px-6 py-4 text-center font-bold text-slate-700">
-                                4
-                            </td>
+                                        <svg class="w-4 h-4 transform transition-transform duration-300"
+                                            id="arrow-{{ $solicitudKey }}" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
 
-                            <td class="px-6 py-4 text-center">
-                                <span
-                                    class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
-                                    Pendiente
-                                </span>
-                            </td>
-                        </tr>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7">
+                                            </path>
 
-                        <!-- detalle solicitud 001 -->
-                        <tr id="solicitud-1" class="hidden bg-slate-100/50 shadow-inner">
-                            <td colspan="6" class="p-0 border-b border-slate-300">
-                                <div class="py-4 pr-6 pl-14">
+                                        </svg>
 
-                                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                    </button>
+                                </td>
 
-                                        <div class="px-4 py-3 bg-slate-700 text-white flex justify-between items-center">
-                                            <div>
-                                                <span class="text-[10px] font-bold uppercase tracking-widest">
-                                                    Detalle de Solicitud #00021
-                                                </span>
+                                <td class="px-6 py-4 font-mono font-extrabold text-slate-800">
+                                    {{ $solicitud->numero_solicitud }}
+                                </td>
 
-                                                <p class="text-[11px] text-slate-300 mt-0.5">
-                                                    CECOSF CENTINELA
-                                                </p>
+                                <td class="px-6 py-4 font-bold text-slate-800">
+                                    {{ $solicitud->establecimiento }}
+                                </td>
+
+                                <td class="px-6 py-4 font-medium text-slate-600">
+                                    {{ \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d-m-Y') }}
+                                </td>
+
+                                <td class="px-6 py-4 text-center font-bold text-slate-700">
+                                    {{ $solicitud->items->count() }}
+                                </td>
+
+                                <td class="px-6 py-4 text-center">
+
+                                    @if ($solicitud->estado === 'Pendiente')
+                                        <span
+                                            class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
+                                            Pendiente
+                                        </span>
+                                    @elseif ($solicitud->estado === 'Parcial')
+                                        <span
+                                            class="bg-blue-100 text-blue-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
+                                            Parcial
+                                        </span>
+                                    @else
+                                        <span
+                                            class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
+                                            {{ $solicitud->estado }}
+                                        </span>
+                                    @endif
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- detalle de la solicitud -->
+                            <tr id="{{ $solicitudKey }}" class="hidden bg-slate-100/50 shadow-inner">
+
+                                <td colspan="6" class="p-0 border-b border-slate-300">
+
+                                    <div class="py-4 pr-6 pl-14">
+
+                                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+
+                                            <!-- cabecera del detalle -->
+                                            <div
+                                                class="px-4 py-3 bg-slate-700 text-white flex justify-between items-center">
+
+                                                <div>
+
+                                                    <span class="text-[10px] font-bold uppercase tracking-widest">
+                                                        Detalle de Solicitud {{ $solicitud->numero_solicitud }}
+                                                    </span>
+
+                                                    <p class="text-[11px] text-slate-300 mt-0.5">
+                                                        {{ $solicitud->establecimiento }}
+                                                    </p>
+
+                                                </div>
+
+                                                <button type="button" onclick="usarSolicitud({{ $solicitud->id }})"
+                                                    class="px-3 py-1.5 bg-[#0f968c] hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-colors">
+                                                    Usar Solicitud
+                                                </button>
+
                                             </div>
 
-                                            <button type="button"
-                                                class="px-3 py-1.5 bg-[#0f968c] hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-colors">
-                                                Usar Solicitud
-                                            </button>
+
+                                            <!-- tabla de productos -->
+                                            <table class="w-full text-left text-[12px] whitespace-nowrap">
+
+                                                <thead
+                                                    class="bg-slate-50 text-slate-500 uppercase font-extrabold border-b border-slate-200 text-[10px]">
+
+                                                    <tr>
+
+                                                        <th class="px-4 py-3">
+                                                            Producto
+                                                        </th>
+
+                                                        <th class="px-4 py-3 text-center">
+                                                            Consumo mensual anterior
+                                                        </th>
+
+                                                        <th class="px-4 py-3 text-center">
+                                                            Stock Actual del establecimiento
+                                                        </th>
+
+                                                        <th class="px-4 py-3 text-center">
+                                                            Solicitado
+                                                        </th>
+
+                                                    </tr>
+
+                                                </thead>
+
+
+                                                <tbody class="divide-y divide-slate-100 text-slate-700">
+
+                                                    @foreach ($solicitud->items as $item)
+                                                        <tr class="hover:bg-slate-50">
+
+                                                            <td class="px-4 py-3 font-bold">
+                                                                {{ $item->product->nombre }}
+                                                            </td>
+
+                                                            <td class="px-4 py-3 text-center">
+                                                                {{ $item->consumo_anterior ?? '—' }}
+                                                            </td>
+
+                                                            <td class="px-4 py-3 text-center font-extrabold text-blue-700">
+                                                                {{ $item->stock_actual }}
+                                                            </td>
+
+                                                            <td class="px-4 py-3 text-center font-extrabold text-teal-700">
+                                                                {{ $item->cantidad_solicitada }}
+                                                            </td>
+
+                                                        </tr>
+                                                    @endforeach
+
+                                                </tbody>
+
+                                            </table>
+
                                         </div>
 
-                                        <table class="w-full text-left text-[12px] whitespace-nowrap">
-                                            <thead
-                                                class="bg-slate-50 text-slate-500 uppercase font-extrabold border-b border-slate-200 text-[10px]">
-                                                <tr>
-                                                    <th class="px-4 py-3">Producto</th>
-                                                    <th class="px-4 py-3">Lote</th>
-                                                    <th class="px-4 py-3 text-center">Consumo mensual anterior</th>
-                                                    <th class="px-4 py-3 text-center">Stock Actual del establecimiento</th>
-                                                    <th class="px-4 py-3 text-center">Solicitado</th>
-                                                    <th class="px-4 py-3">Programa</th>
-                                                </tr>
-                                            </thead>
+                                    </div>
 
-                                            <tbody class="divide-y divide-slate-100 text-slate-700">
+                                </td>
 
-                                                <tr class="hover:bg-slate-50">
-                                                    <td class="px-4 py-3 font-bold">
-                                                        Paracetamol 500 mg
-                                                    </td>
+                            </tr>
 
-                                                    <td class="px-4 py-3 font-mono font-bold">
-                                                        L24051
-                                                    </td>
+                        @empty
 
-                                                    <td class="px-4 py-3 text-center">
-                                                        120
-                                                    </td>
+                            <tr>
 
-                                                    <td class="px-4 py-3 text-center font-extrabold text-blue-700">
-                                                        450
-                                                    </td>
+                                <td colspan="6" class="px-6 py-16 text-center">
 
-                                                    <td class="px-4 py-3 text-center font-extrabold text-teal-700">
-                                                        100
-                                                    </td>
+                                    <div class="flex flex-col items-center justify-center text-slate-400">
 
-                                                    <td class="px-4 py-3">
-                                                        Morbilidad General
-                                                    </td>
-                                                </tr>
+                                        <div
+                                            class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
 
-                                                <tr class="hover:bg-slate-50">
-                                                    <td class="px-4 py-3 font-bold">
-                                                        Ibuprofeno 400 mg
-                                                    </td>
+                                            <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
 
-                                                    <td class="px-4 py-3 font-mono font-bold">
-                                                        L24072
-                                                    </td>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2z">
+                                                </path>
 
-                                                    <td class="px-4 py-3 text-center">
-                                                        80
-                                                    </td>
+                                            </svg>
 
-                                                    <td class="px-4 py-3 text-center font-extrabold text-blue-700">
-                                                        230
-                                                    </td>
+                                        </div>
 
-                                                    <td class="px-4 py-3 text-center font-extrabold text-teal-700">
-                                                        60
-                                                    </td>
+                                        <p class="text-[15px] font-bold text-slate-600">
+                                            No hay solicitudes pendientes
+                                        </p>
 
-                                                    <td class="px-4 py-3">
-                                                        Cardiovascular
-                                                    </td>
-                                                </tr>
-
-                                                <tr class="hover:bg-slate-50">
-                                                    <td class="px-4 py-3 font-bold">
-                                                        Salbutamol 100 mcg
-                                                    </td>
-
-                                                    <td class="px-4 py-3 font-mono font-bold">
-                                                        L24102
-                                                    </td>
-
-                                                    <td class="px-4 py-3 text-center">
-                                                        40
-                                                    </td>
-
-                                                    <td class="px-4 py-3 text-center font-extrabold text-blue-700">
-                                                        120
-                                                    </td>
-
-                                                    <td class="px-4 py-3 text-center font-extrabold text-teal-700">
-                                                        30
-                                                    </td>
-
-                                                    <td class="px-4 py-3">
-                                                        IRA/ERA
-                                                    </td>
-                                                </tr>
-
-                                            </tbody>
-                                        </table>
+                                        <p class="text-[13px] text-slate-500 mt-1 max-w-sm">
+                                            No existen solicitudes de establecimientos pendientes de despacho.
+                                        </p>
 
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
 
                     </tbody>
                 </table>
@@ -828,8 +868,14 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center" onclick="event.stopPropagation();">
-                                    <a href="{{ route('dispatch.pdf', $despacho->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 hover:border-rose-600 rounded-lg text-[11px] font-bold transition-colors shadow-sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    <a href="{{ route('dispatch.pdf', $despacho->id) }}" target="_blank"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 hover:border-rose-600 rounded-lg text-[11px] font-bold transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                            </path>
+                                        </svg>
                                         VER PDF
                                     </a>
                                 </td>
@@ -979,6 +1025,7 @@
         // instancias de firmas para que sean globales en la vista
         let signatureDespacha = null;
         let signatureRecibe = null;
+        const solicitudes = @json($solicitudes);
 
         document.addEventListener('DOMContentLoaded', function() {
             // inicializar pads de firmas si existen
@@ -1387,7 +1434,7 @@
                 if (!emptySelect && tbody.children.length > 1) tr.remove();
             }
         }
-        
+
         // funciones para mostrar u ocultar las solicitudes
         function openSolicitudes() {
             document.getElementById('SolicitudesModal').classList.remove('hidden');
@@ -1409,6 +1456,106 @@
                 row.classList.add('hidden');
                 arrow.classList.remove('rotate-90');
             }
+        }
+
+        // funcion para usar una solicitud y rellenar el formulario de despacho
+        function usarSolicitud(id) {
+
+            // Buscar la solicitud por su ID en la variable global
+            const solicitud = solicitudes.find(s => s.id === id);
+
+            if (!solicitud) return;
+
+            // seleccionar clasificacion interna
+            const clasificacion = document.getElementById('clasificacion_select');
+            clasificacion.value = 'Interno';
+            toggleClasificacion();
+
+            // seleccionar establecimiento
+            const selectEstablecimiento = document.getElementById('establecimiento_interno');
+
+            const establecimientoSolicitud = solicitud.establecimiento
+                .trim()
+                .toLowerCase();
+
+            const opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option =>
+                option.value.trim().toLowerCase() === establecimientoSolicitud
+            );
+
+            if (opcionEstablecimiento) {
+                selectEstablecimiento.value = opcionEstablecimiento.value;
+                actualizarDireccionInterna();
+            }
+
+            // rellenar observaciones
+            const observaciones = document.querySelector(
+                'input[name="condiciones_transporte"]'
+            );
+
+            if (observaciones) {
+                observaciones.value = solicitud.observaciones ?? '';
+            }
+
+            // eliminar las filas actuales de productos
+            while (tbody.children.length > 0) {
+                tbody.children[0].remove();
+            }
+
+            let productosFaltantes = [];
+
+            // agregar los productos de la solicitud
+            solicitud.items.forEach(item => {
+                const tr = addRow();
+                const selectProducto = tr.querySelector(
+                    'select[name="productos[]"]'
+                );
+
+                const nombreProducto = item.product.nombre
+                    .trim()
+                    .toLowerCase();
+
+                const opcionProducto = Array.from(selectProducto.options).find(option =>
+                    option.value.trim().toLowerCase() === nombreProducto
+                );
+
+                if (opcionProducto) {
+                    selectProducto.value = opcionProducto.value;
+
+                    // Llena la fila con lotes y límites
+                    llenarDatosFila(selectProducto);
+
+                    const cantidad = tr.querySelector(
+                        'input[name="cantidades[]"]'
+                    );
+                    cantidad.value = item.cantidad_solicitada;
+
+                    // Forzar que la cantidad no exceda el stock real que tienes actualmente
+                    validarStock(cantidad);
+                } else {
+                    // si el producto no tiene stock disponible o está controlado, se elimna esta fila y lo guardamos
+                    tr.remove();
+                    productosFaltantes.push(item.product.nombre);
+                }
+            });
+
+            // Si nos quedamos sin filas (porque no había stock de nada), dejar 1 fila lista para usar
+            if (tbody.children.length === 0) {
+                addRow();
+            }
+
+            // alerta para notificar que no haya stock de algun producto solicitado
+            if (productosFaltantes.length > 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Falta de Stock o Controlado',
+                    text: 'Los siguientes productos no se agregaron porque ya no tienen stock o son controlados por sistema: ' +
+                        productosFaltantes.join(', '),
+                    confirmButtonColor: '#0f968c'
+                });
+            }
+
+            // cerrar modal de solicitudes
+            closeSolicitudes();
         }
 
         function onScanFailure(error) {}
