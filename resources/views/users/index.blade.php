@@ -11,14 +11,6 @@
             </div>
 
             <div class="flex items-center gap-3 w-full sm:w-auto">
-                <!-- Botón de Solicitudes con Contador -->
-                @php
-                    $passwordRequests = $passwordRequests ?? [
-                        ['id' => 1, 'email' => 'correo.ejemplo@drogueriadas.com', 'time' => 'Hace 10 min'],
-                        ['id' => 2, 'email' => 'correo.ejemplo2@drogueriadas.com', 'time' => 'Hace 25 min'],
-                    ];
-                @endphp
-
                 <button type="button" onclick="openRecoveryModal()"
                     class="relative bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-semibold py-2.5 px-4 rounded-lg flex items-center gap-2 transition-all shadow-sm cursor-pointer">
                     @if(count($passwordRequests) > 0)
@@ -142,7 +134,6 @@
         </div>
     </div>
 
-    <!-- Modal Múltiples Solicitudes de Recuperación de Cuenta -->
     <!-- Modal Múltiples Solicitudes de Recuperación de Cuenta -->
     <div id="RecoveryModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-8 w-full max-w-2xl">
@@ -302,7 +293,7 @@
             document.getElementById('CreateModal').classList.add('hidden');
         }
 
-        // --- AGREGAR ESTA NUEVA FUNCIÓN AQUI ---
+        // Funcion de SweetAlert para asignar nueva contraseña a un usuario
         function promptNewPassword(email) {
             Swal.fire({
                 title: 'Asignar Nueva Contraseña',
