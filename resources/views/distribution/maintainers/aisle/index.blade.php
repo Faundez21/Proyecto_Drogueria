@@ -3,7 +3,7 @@
 @section('content')
     <div class="w-full">
         <!-- miga de pan -->
-        <div class="flex items-center gap-2 text-gray-500 mb-4">
+        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-2 px-1 pt-2">
             <a href="{{ route('distribution.index') }}" class="hover:text-blue-900">
                 Distribución
             </a>
@@ -42,10 +42,13 @@
 
             </div>
 
-            <button onclick="openCreate()"
-                class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-lg cursor-pointer shadow-sm">
-                + Nuevo pasillo
-            </button>
+            <button type="button" onclick="openCreate()"
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
+            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Nuevo pasillo
+        </button>
 
         </div>
 
