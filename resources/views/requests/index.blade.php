@@ -4,16 +4,16 @@
 @section('subtitle', 'Registro y gestión de solicitudes de establecimientos.')
 
 @section('actions')
-@role('Administrador')
-    <button type="button"
-        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all duration-150 w-full sm:w-auto">
-        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        Ver Historial
-    </button>
-@endrole
+    @role('Administrador')
+        <button type="button"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all duration-150 w-full sm:w-auto">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Ver Historial
+        </button>
+    @endrole
 @endsection
 
 @section('content')
@@ -213,9 +213,9 @@
                                         Consumo mensual del mes anterior <span class="text-rose-500">*</span>
                                     </label>
 
-                                    <input type="number" name="consumo_anterior[]" min="0" readonly
-                                        placeholder="Se calculará automáticamente"
-                                        class="w-full bg-slate-100 border border-slate-200 text-slate-500 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold cursor-not-allowed">
+                                    <input type="number" name="stock_actual[]" min="1" required
+                                        placeholder="Ej: 500"
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold">
                                 </div>
 
                                 <div>

@@ -1473,11 +1473,7 @@
 
             // seleccionar establecimiento
             const selectEstablecimiento = document.getElementById('establecimiento_interno');
-
-            const establecimientoSolicitud = solicitud.establecimiento
-                .trim()
-                .toLowerCase();
-
+            const establecimientoSolicitud = solicitud.establecimiento.trim().toLowerCase();
             const opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option =>
                 option.value.trim().toLowerCase() === establecimientoSolicitud
             );
@@ -1488,10 +1484,7 @@
             }
 
             // rellenar observaciones
-            const observaciones = document.querySelector(
-                'input[name="condiciones_transporte"]'
-            );
-
+            const observaciones = document.querySelector('input[name="condiciones_transporte"]');
             if (observaciones) {
                 observaciones.value = solicitud.observaciones ?? '';
             }
@@ -1506,13 +1499,8 @@
             // agregar los productos de la solicitud
             solicitud.items.forEach(item => {
                 const tr = addRow();
-                const selectProducto = tr.querySelector(
-                    'select[name="productos[]"]'
-                );
-
-                const nombreProducto = item.product.nombre
-                    .trim()
-                    .toLowerCase();
+                const selectProducto = tr.querySelector('select[name="productos[]"]');
+                const nombreProducto = item.product.nombre.trim().toLowerCase();
 
                 const opcionProducto = Array.from(selectProducto.options).find(option =>
                     option.value.trim().toLowerCase() === nombreProducto
@@ -1524,24 +1512,31 @@
                     // Llena la fila con lotes y límites
                     llenarDatosFila(selectProducto);
 
-                    const cantidad = tr.querySelector(
-                        'input[name="cantidades[]"]'
-                    );
+                    const cantidad = tr.querySelector('input[name="cantidades[]"]');
                     cantidad.value = item.cantidad_solicitada;
 
-                    // Forzar que la cantidad no exceda el stock real que tienes actualmente
                     validarStock(cantidad);
                 } else {
-                    // si el producto no tiene stock disponible o está controlado, se elimna esta fila y lo guardamos
+                    // si el producto no tiene stock disponible o está controlado, se elimina esta fila y lo guardamos
                     tr.remove();
                     productosFaltantes.push(item.product.nombre);
                 }
             });
 
-            // Si nos quedamos sin filas (porque no había stock de nada), dejar 1 fila lista para usar
+            // Si nos quedamos sin filas, dejar 1 fila lista para usar
             if (tbody.children.length === 0) {
                 addRow();
             }
+
+            // Si la solicitud tiene una firma registrada, la dibujamos en el pad del receptor
+            if (solicitud.firma_solicitante) {
+                // signatureRecibe es la variable global que controla tu <canvas id="pad_recibe">
+                signatureRecibe.fromDataURL(solicitud.firma_solicitante);
+            } else {
+                // Si no traía firma, limpiamos por si acaso había algo dibujado antes
+                signatureRecibe.clear();
+            }
+            // -----------------------------------
 
             // alerta para notificar que no haya stock de algun producto solicitado
             if (productosFaltantes.length > 0) {
@@ -1557,6 +1552,7 @@
             // cerrar modal de solicitudes
             closeSolicitudes();
         }
+
 
         function onScanFailure(error) {}
     </script>

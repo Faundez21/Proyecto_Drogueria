@@ -5,7 +5,7 @@
 
         <!-- miga de pan -->
 
-        <div class="flex items-center gap-2 text-gray-500 mb-4">
+        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-2 px-1 pt-2">
 
             <a href="{{ route('distribution.index') }}" class="hover:text-blue-900">
 
