@@ -96,10 +96,9 @@ class GlobalSearchController extends Controller
                 ->get();
 
             foreach($vencimientos as $vence) {
-                // Se usa intval() para limpiar los decimales y dejar el número entero
                 $dias = intval(Carbon::parse($vence->fecha_vencimiento)->diffInDays(Carbon::now()));
                 $estado = Carbon::parse($vence->fecha_vencimiento)->isPast() ? 'Vencido hace' : 'Vence en';
-                
+
                 $notifications[] = [
                     'color' => 'text-rose-600',
                     'bg' => 'bg-rose-100',
@@ -115,12 +114,10 @@ class GlobalSearchController extends Controller
                 ->where('estado', 'Cuarentena')
                 ->where('cantidad', '>', 0)
                 ->limit(3)->get();
-                
+
             foreach($cuarentena as $cuar) {
-                // Se usa updated_at para que cuente los días desde que se cambió el estado a cuarentena
                 $dias = (int) floor(Carbon::parse($cuar->updated_at ?? $cuar->created_at)->startOfDay()->diffInDays(now()->startOfDay()));
-                
-                // Mensaje dinámico si recién se mandó a cuarentena hoy (0 días)
+
                 $mensajeCuarentena = $dias == 0 ? "Lote {$cuar->lote} fue enviado a cuarentena hoy." : "Lote {$cuar->lote} lleva {$dias} días retenido.";
 
                 $notifications[] = [
@@ -133,7 +130,29 @@ class GlobalSearchController extends Controller
                     'url' => route('quarantine.index')
                 ];
             }
-        } catch (\Exception $e) {}
+
+            $stockBajo = DB::table('inventories')
+                ->where('estado', 'Disponible')
+                ->where('cantidad', '>', 0)
+                ->whereRaw('cantidad <= CASE WHEN minimo > 0 THEN minimo ELSE 0 END')
+                ->orderBy('cantidad', 'asc')
+                ->limit(3)
+                ->get();
+
+            foreach($stockBajo as $bajo) {
+                $notifications[] = [
+                    'color' => 'text-orange-600',
+                    'bg' => 'bg-orange-100',
+                    'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+                    'title' => 'Stock Bajo',
+                    'message' => "{$bajo->producto} (Lote " . ($bajo->lote ?? 'S/L') . "): quedan {$bajo->cantidad} uds. (mínimo {$bajo->minimo}).",
+                    'time' => 'Reponer',
+                    'url' => route('inventario.index') . '?search=' . urlencode($bajo->producto)
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return response()->json([
             'count' => count($notifications),

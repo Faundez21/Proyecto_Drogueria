@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Inventory;
+use App\Services\InventoryService;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -79,21 +80,31 @@ class InventoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'fecha_recepcion'   => 'required|date',
-            'tipo_documento'    => 'required|string',
-            'numero_documento'  => 'required|string',
-            'producto'          => 'required|string',
-            'categoria'         => 'required|string',
-            'estado'            => 'required|string',
-            'cantidad'          => 'required|numeric|min:1',
+            'tipo_documento'    => 'required|string|max:255',
+            'numero_documento'  => 'required|string|max:255',
+            'orden_compra'      => 'nullable|string|max:255',
+            'origen_mercaderia' => 'nullable|string|max:255',
+            'rut_proveedor'     => 'nullable|string|max:20',
+            'razon_social'      => 'nullable|string|max:255',
+            'producto'          => 'required|string|max:255',
+            'categoria'         => 'required|string|max:255',
+            'estado'            => 'required|in:Disponible,Cuarentena,Merma',
+            'motivo'            => 'nullable|string|max:1000',
+            'lote'              => 'nullable|string|max:255',
+            'fecha_vencimiento' => 'nullable|date',
+            'cantidad'          => 'required|integer|min:1',
+            'valor_neto_unitario' => 'nullable|numeric|min:0',
+            'pasillo'           => 'nullable|string|max:50',
+            'estante'           => 'nullable|string|max:50',
         ]);
 
-        $data = $request->all();
+        $validated['user_id'] = Auth::id();
+        $validated['lote'] = $validated['lote'] ?: 'S/L';
+        $validated['product_id'] = InventoryService::productoId($validated['producto']);
 
-        $data['user_id'] = Auth::id();
-
-        Inventory::create($data);
+        Inventory::create($validated);
 
         return redirect()->back()->with('success', 'Producto ingresado exitosamente a bodega.');
     }

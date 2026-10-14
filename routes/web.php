@@ -166,3 +166,16 @@ Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->na
 // Enviar solicitud desde el Login
 Route::post('/password-reset-request', [PasswordResetRequestController::class, 'store'])
     ->name('password.request.store');
+
+    //probar pagina 404
+Route::get('/probar-404', function () {
+    abort(404);
+});
+    //probar pagina 402
+Route::get('/probar-402', function () {
+    abort(402);
+});
+    //probar pagina 403
+Route::get('/probar-403', function () {
+    abort(403);
+});
