@@ -106,8 +106,8 @@
 
         <!-- migas de pan -->
         <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-2 px-1 pt-2">
-            <span class="text-slate-400 font-semibold">02</span>
-            <span>Almacenamiento</span>
+            <span class="text-slate-400 font-semibold">03</span>
+            <span>Salida</span>
             <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
@@ -382,19 +382,7 @@
                                 class="w-full bg-[#1e293b] border border-slate-700 rounded-lg py-2.5 pl-9 pr-3 text-xs sm:text-sm text-gray-300 focus:outline-none focus:border-blue-500 placeholder-gray-500 transition">
                         </div>
 
-                        <!-- Leyenda de colores -->
-                        <div class="flex flex-col gap-3 mt-2 text-xs sm:text-sm font-medium text-gray-300">
-                            <div class="flex items-center gap-3"><span class="w-3.5 h-3.5 rounded bg-[#22c55e]"></span>
-                                Disponible</div>
-                            <div class="flex items-center gap-3"><span class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span>
-                                Ocupado</div>
-                            <div class="flex items-center gap-3"><span class="w-3.5 h-3.5 rounded bg-[#f97316]"></span>
-                                Cuarentena</div>
-                            <div class="flex items-center gap-3"><span class="w-3.5 h-3.5 rounded bg-[#a855f7]"></span>
-                                Reservado</div>
-                            <div class="flex items-center gap-3"><span class="w-3.5 h-3.5 rounded bg-[#64748b]"></span>
-                                Mantenimiento</div>
-                        </div>
+
                     </div>
                 </aside>
 
