@@ -35,4 +35,19 @@ class Inventory extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function movements()
+    {
+        return $this->hasMany(StockMovement::class);
+    }
+
+    public function dispatchItems()
+    {
+        return $this->hasMany(DispatchItem::class);
+    }
 }
