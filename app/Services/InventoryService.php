@@ -18,6 +18,22 @@ class InventoryService
         return config('drogueria.controlados');
     }
 
+    public static function esCesfam(string $establecimiento): bool
+    {
+        foreach (config('drogueria.establecimientos') as $est) {
+            if (mb_strtolower(trim($est['nombre'])) === mb_strtolower(trim($establecimiento))) {
+                return $est['tipo'] === 'CESFAM';
+            }
+        }
+
+        return str_starts_with(mb_strtolower(trim($establecimiento)), 'cesfam ');
+    }
+
+    public static function establecimientos(): array
+    {
+        return config('drogueria.establecimientos');
+    }
+
     /**
      * Descuenta stock del inventario.
      * Si se indica un lote concreto consume solo ese lote; si no,

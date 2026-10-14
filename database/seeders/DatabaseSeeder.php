@@ -20,5 +20,8 @@ class DatabaseSeeder extends Seeder
         // 3. Finalmente la recepción (que depende de proveedor y producto)
         $this->call(ReceptionSeeder::class);
 
+        // 4. Distribución física (pasillos y estanterías alineadas con el inventario)
+        $this->call([DistributionSeeder::class]);
+
     }
 }

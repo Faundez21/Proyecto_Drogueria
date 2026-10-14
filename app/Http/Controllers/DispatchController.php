@@ -6,8 +6,8 @@ use App\Models\Dispatch;
 use App\Models\DispatchItem;
 use App\Models\EstablishmentRequest;
 use App\Models\Inventory;
-use App\Models\Product;
 use App\Services\InventoryService;
+use App\Services\SolicitudService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +35,10 @@ class DispatchController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible', 'solicitudes'));
+        $controlados = InventoryService::controlados();
+        $establecimientos = InventoryService::establecimientos();
+
+        return view('dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible', 'solicitudes', 'controlados', 'establecimientos'));
     }
 
     public function solicitudes()
@@ -75,12 +78,19 @@ class DispatchController extends Controller
 
         $destino = $validated['establecimiento_destino'];
         if ($validated['clasificacion'] === 'Externo') {
-            $destino = ($validated['tipo_externo_despacho'] ? $validated['tipo_externo_despacho'] . ' - ' : '') . $validated['establecimiento_destino'];
+            $destino = (! empty($validated['tipo_externo_despacho']) ? $validated['tipo_externo_despacho'] . ' - ' : '') . $validated['establecimiento_destino'];
         }
 
         DB::beginTransaction();
 
         try {
+            $firmaRecibe = $validated['firma_recibe'] ?? null;
+
+            if (! $firmaRecibe && ! empty($validated['establishment_request_id'])) {
+                $firmaRecibe = EstablishmentRequest::where('id', $validated['establishment_request_id'])
+                    ->value('firma_solicitante');
+            }
+
             $correlativo = $this->generarCorrelativo();
 
             $dispatch = Dispatch::create([
@@ -89,10 +99,10 @@ class DispatchController extends Controller
                 'clasificacion' => $validated['clasificacion'],
                 'estado_liberacion' => $validated['estado_liberacion'],
                 'establecimiento_destino' => $destino,
-                'direccion_destino' => $validated['direccion_destino'],
-                'condiciones_transporte' => $validated['condiciones_transporte'],
-                'firma_despacha' => $validated['firma_despacha'],
-                'firma_recibe' => $validated['firma_recibe'],
+                'direccion_destino' => $validated['direccion_destino'] ?? null,
+                'condiciones_transporte' => $validated['condiciones_transporte'] ?? null,
+                'firma_despacha' => $validated['firma_despacha'] ?? null,
+                'firma_recibe' => $firmaRecibe,
             ]);
 
             foreach ($validated['productos'] as $index => $nombreProducto) {
@@ -130,8 +140,12 @@ class DispatchController extends Controller
                 }
             }
 
-            if (! empty($validated['establishment_request_id'])) {
-                $this->descontarDeSolicitud($validated['establishment_request_id'], $validated['productos'], $validated['cantidades']);
+            if (! empty($validated['establishment_request_id'] ?? null)) {
+                SolicitudService::registrarDespacho(
+                    (int) $validated['establishment_request_id'],
+                    $validated['productos'],
+                    $validated['cantidades']
+                );
             }
 
             DB::commit();
@@ -154,45 +168,6 @@ class DispatchController extends Controller
         $nextId = (int) Dispatch::lockForUpdate()->max('id') + 1;
 
         return 'GD-' . date('Y') . '-' . str_pad((string) $nextId, 4, '0', STR_PAD_LEFT);
-    }
-
-    private function descontarDeSolicitud(int $solicitudId, array $productos, array $cantidades): void
-    {
-        $solicitud = EstablishmentRequest::with('items')->find($solicitudId);
-
-        if (! $solicitud || ! in_array($solicitud->estado, ['Pendiente', 'Parcial'])) {
-            return;
-        }
-
-        $entregadoPorProducto = [];
-        foreach ($productos as $i => $nombre) {
-            $productId = Product::where('nombre', $nombre)->value('id');
-            if ($productId) {
-                $entregadoPorProducto[$productId] = ($entregadoPorProducto[$productId] ?? 0) + (int) $cantidades[$i];
-            }
-        }
-
-        $completa = true;
-
-        foreach ($solicitud->items as $item) {
-            $aporte = $entregadoPorProducto[$item->product_id] ?? 0;
-
-            if ($aporte <= 0) {
-                if ($item->cantidad_despachada < $item->cantidad_solicitada) {
-                    $completa = false;
-                }
-                continue;
-            }
-
-            $nuevoDespachado = min($item->cantidad_solicitada, $item->cantidad_despachada + $aporte);
-            $item->update(['cantidad_despachada' => $nuevoDespachado]);
-
-            if ($nuevoDespachado < $item->cantidad_solicitada) {
-                $completa = false;
-            }
-        }
-
-        $solicitud->update(['estado' => $completa ? 'Despachado' : 'Parcial']);
     }
 
     public function pdf($id)

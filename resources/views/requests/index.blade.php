@@ -77,17 +77,25 @@
                                 Establecimiento <span class="text-rose-500">*</span>
                             </label>
 
-                            <select name="establecimiento" id="establecimiento_select" required
+                            <select name="establecimiento" id="establecimiento_select" required onchange="actualizarProductosDisponibles()"
                                 class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione establecimiento...</option>
-                                <option value="CECOSF Centinela">CECOSF Centinela</option>
-                                <option value="CECOSF San Vicente">CECOSF San Vicente</option>
-                                <option value="CECOSF Esmeralda">CECOSF Esmeralda</option>
-                                <option value="CECOSF Los Lobos">CECOSF Los Lobos</option>
-                                <option value="CECOSF Libertad">CECOSF Libertad</option>
-                                <option value="CESFAM San Vicente">CESFAM San Vicente</option>
-                                <option value="Posta Rural">Posta Rural</option>
+                                <optgroup label="CESFAM (pueden solicitar estupefacientes)">
+                                    @foreach ($establecimientos as $est)
+                                        @if ($est['tipo'] === 'CESFAM')
+                                            <option value="{{ $est['nombre'] }}">{{ $est['nombre'] }}</option>
+                                        @endif
+                                    @endforeach
+                                </optgroup>
+                                <optgroup label="Otros establecimientos (solo medicamentos e insumos)">
+                                    @foreach ($establecimientos as $est)
+                                        @if ($est['tipo'] === 'Otros')
+                                            <option value="{{ $est['nombre'] }}">{{ $est['nombre'] }}</option>
+                                        @endif
+                                    @endforeach
+                                </optgroup>
                             </select>
+                            <p id="establecimientoAviso" class="text-[11px] text-slate-400 mt-1 font-medium"></p>
                         </div>
 
                         <div>
@@ -193,17 +201,31 @@
                                     </label>
 
                                     <select name="producto[]" required
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-producto">
 
                                         <option value="" disabled selected>
                                             Buscar producto...
                                         </option>
 
-                                        @foreach ($products as $product)
-                                            <option value="{{ $product->id }}">
-                                                {{ $product->nombre }}
-                                            </option>
-                                        @endforeach
+                                        <optgroup label="Medicamentos e Insumos" class="optgroup-normal">
+                                            @foreach ($products as $product)
+                                                @if (! in_array($product->nombre, $controlados))
+                                                    <option value="{{ $product->id }}">
+                                                        {{ $product->nombre }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </optgroup>
+
+                                        <optgroup label="Estupefacientes (solo CESFAM)" class="optgroup-controlado" disabled>
+                                            @foreach ($products as $product)
+                                                @if (in_array($product->nombre, $controlados))
+                                                    <option value="{{ $product->id }}">
+                                                        {{ $product->nombre }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </optgroup>
 
                                     </select>
                                 </div>
@@ -391,6 +413,39 @@
             };
 
             signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
+
+            // Habilitar/Deshabilitar estupefacientes según el tipo de establecimiento
+            window.actualizarProductosDisponibles = function() {
+                const seleccion = document.getElementById('establecimiento_select').value;
+                const esCesfam = seleccion.trim().toLowerCase().startsWith('cesfam ');
+
+                const aviso = document.getElementById('establecimientoAviso');
+                if (aviso) {
+                    aviso.textContent = esCesfam
+                        ? 'CESFAM: puede solicitar medicamentos, insumos y estupefacientes (estos últimos se despachan por el módulo de Despacho Controlado).'
+                        : (seleccion ? 'Solo puede solicitar medicamentos e insumos. Los estupefacientes están restringidos a los CESFAM.' : '');
+                    aviso.className = esCesfam
+                        ? 'text-[11px] text-teal-600 mt-1 font-semibold'
+                        : 'text-[11px] text-slate-400 mt-1 font-medium';
+                }
+
+                document.querySelectorAll('.select-producto').forEach(select => {
+                    const grupo = select.querySelector('.optgroup-controlado');
+                    if (!grupo) return;
+
+                    grupo.disabled = !esCesfam;
+                    grupo.style.display = esCesfam ? '' : 'none';
+
+                    if (!esCesfam && grupo.selected) {
+                        select.selectedIndex = 0;
+                    }
+                    if (!esCesfam) {
+                        grupo.querySelectorAll('option').forEach(op => op.selected = false);
+                    }
+                });
+            };
+
+            window.actualizarProductosDisponibles();
 
             // contenedor de productos
             const container = document.getElementById('productos_container');

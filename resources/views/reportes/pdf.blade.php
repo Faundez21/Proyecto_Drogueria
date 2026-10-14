@@ -66,14 +66,17 @@
                 <th>Vencimiento</th>
                 <th>Ubicación (Pasillo - Estante)</th>
                 <th class="text-center">Stock</th>
+                <th class="text-right">V. Unitario</th>
+                <th class="text-right">V. Total</th>
             </tr>
         </thead>
         <tbody>
             @if(count($inventories) == 0)
                 <tr>
-                    <td colspan="6" class="text-center">No hay registros que coincidan con la búsqueda.</td>
+                    <td colspan="8" class="text-center">No hay registros que coincidan con la búsqueda.</td>
                 </tr>
             @else
+                @php $sumaTotalPdf = 0; @endphp
                 @foreach($inventories as $inv)
                     @php
                         // Normalizando datos igual que en la exportación Excel
@@ -81,6 +84,9 @@
                         $pasillo = $inv->pasillo_nombre ?? (is_object($inv->aisle ?? null) ? $inv->aisle->nombre ?? ($inv->aisle->name ?? 'S/A') : $inv->pasillo ?? 'S/A');
                         $estante = $inv->estanteria_nombre ?? (is_object($inv->shelf ?? null) ? $inv->shelf->nombre ?? ($inv->shelf->name ?? 'S/E') : $inv->estante ?? ($inv->estanteria ?? 'S/E'));
                         $stock = $inv->stock_total ?? ($inv->cantidad ?? 0);
+                        $valorUnitario = (float) ($inv->valor_neto_unitario ?? 0);
+                        $valorTotal = ((float) $stock) * $valorUnitario;
+                        $sumaTotalPdf += $valorTotal;
                         
                         $fechaVenc = $inv->fecha_vencimiento;
                         $textoVenc = 'N/A';
@@ -109,8 +115,14 @@
                         <td class="{{ $classVenc }}">{{ $textoVenc }}</td>
                         <td>{{ $pasillo }} - {{ $estante }}</td>
                         <td class="text-center font-bold">{{ number_format($stock, 0, ',', '.') }}</td>
+                        <td class="text-right">${{ number_format($valorUnitario, 2, ',', '.') }}</td>
+                        <td class="text-right font-bold">${{ number_format($valorTotal, 0, ',', '.') }}</td>
                     </tr>
                 @endforeach
+                <tr>
+                    <td colspan="7" class="text-right font-bold">VALOR TOTAL DEL INVENTARIO</td>
+                    <td class="text-right font-bold" style="background-color: #0d9488; color: white;">${{ number_format($sumaTotalPdf, 0, ',', '.') }}</td>
+                </tr>
             @endif
         </tbody>
     </table>

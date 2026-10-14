@@ -38,6 +38,9 @@ class InventoryController extends Controller
         if ($request->filled('estante')) {
             $query->where('estante', $request->estante);
         }
+        if ($request->filled('programa')) {
+            $query->where('programa', $request->programa);
+        }
 
         // 3. Ordenamiento Dinámico
         if ($request->filled('order_by')) {
@@ -72,7 +75,14 @@ class InventoryController extends Controller
                             ->orderBy('producto', 'asc')
                             ->pluck('producto');
 
-        return view('inventario.index', compact('inventories', 'productosLista'));
+        // 6. Programas disponibles para el filtro
+        $programasLista = Inventory::whereNotNull('programa')
+                            ->where('programa', '!=', '')
+                            ->distinct()
+                            ->orderBy('programa', 'asc')
+                            ->pluck('programa');
+
+        return view('inventario.index', compact('inventories', 'productosLista', 'programasLista'));
     }
 
     /**
@@ -98,11 +108,22 @@ class InventoryController extends Controller
             'valor_neto_unitario' => 'nullable|numeric|min:0',
             'pasillo'           => 'nullable|string|max:50',
             'estante'           => 'nullable|string|max:50',
+            'programa'          => 'nullable|string|max:255',
+            'nivel'             => 'nullable|string|max:100',
+            'posicion'          => 'nullable|string|max:100',
+            'solicitud_pedido_mensual' => 'nullable|boolean',
+            'solicitud_stock_critico'  => 'nullable|boolean',
+            'adelanto_de_pedido'       => 'nullable|boolean',
+            'traspaso'                 => 'nullable|boolean',
         ]);
 
         $validated['user_id'] = Auth::id();
-        $validated['lote'] = $validated['lote'] ?: 'S/L';
+        $validated['lote'] = ($validated['lote'] ?? '') ?: 'S/L';
         $validated['product_id'] = InventoryService::productoId($validated['producto']);
+
+        foreach (['solicitud_pedido_mensual', 'solicitud_stock_critico', 'adelanto_de_pedido', 'traspaso'] as $flag) {
+            $validated[$flag] = $request->boolean($flag);
+        }
 
         Inventory::create($validated);
 
@@ -148,11 +169,24 @@ class InventoryController extends Controller
         ]);
 
         try {
-             Excel::import(new \App\Imports\InventoriesImport(Auth::id()), $request->file('excel'));
+            $import = new \App\Imports\InventoriesImport(Auth::id());
+            Excel::import($import, $request->file('excel'));
 
-            return redirect()->back()->with('success', 'Carga masiva procesada correctamente.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Hubo un error al procesar el archivo: ' . $e->getMessage());
+            $total = $import->importados();
+
+            return redirect()->back()->with('success', "Carga masiva procesada: {$total} registro(s) de inventario importado(s).");
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $primerError = collect($e->failures())->first();
+            $fila = $primerError ? $primerError->row() + 1 : '?';
+            $mensaje = $primerError ? $primerError->errors()[0] : 'Archivo inválido.';
+
+            return redirect()->back()->with('error', "Fila {$fila}: {$mensaje}");
+        } catch (\Throwable $e) {
+            \Log::error('Error en carga masiva de inventario: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Hubo un error al procesar el archivo. Verifique el formato de la plantilla.');
         }
     }
 
