@@ -50,6 +50,8 @@ class ReceptionController extends Controller
             'fecha_vencimiento.*' => 'nullable|date',
             'tipo_producto' => 'nullable|array',
             'tipo_producto.*' => 'nullable|string|max:255',
+            'programa' => 'nullable|array',
+            'programa.*' => 'nullable|string|max:255',
         ]);
 
         $provider = Provider::findOrFail($validated['provider_id']);
@@ -64,11 +66,11 @@ class ReceptionController extends Controller
                 'fecha_recepcion' => $validated['fecha_recepcion'],
                 'tipo_documento' => $validated['tipo_documento'],
                 'numero_documento' => $validated['numero_documento'],
-                'orden_compra' => $validated['orden_compra'],
+                'orden_compra' => $validated['orden_compra'] ?? null,
                 'origen' => $validated['origen'],
                 'provider_id' => $validated['provider_id'],
                 'valor_total_recepcion' => 0,
-                'firma_receptor' => $validated['firma_receptor'],
+                'firma_receptor' => $validated['firma_receptor'] ?? null,
             ]);
 
             $factorIva = 1 + config('drogueria.iva');
@@ -107,7 +109,7 @@ class ReceptionController extends Controller
                     'fecha_recepcion' => $validated['fecha_recepcion'],
                     'tipo_documento' => $validated['tipo_documento'],
                     'numero_documento' => $validated['numero_documento'],
-                    'orden_compra' => $validated['orden_compra'],
+                    'orden_compra' => $validated['orden_compra'] ?? null,
                     'origen_mercaderia' => $validated['origen'],
                     'rut_proveedor' => $provider->rut,
                     'razon_social' => $provider->name,
@@ -118,6 +120,7 @@ class ReceptionController extends Controller
                     'fecha_vencimiento' => $fechaVence,
                     'cantidad' => $cantidad,
                     'valor_neto_unitario' => $valorU,
+                    'programa' => $validated['programa'][$index] ?? null,
                     'pasillo' => 'P.A',
                     'estante' => 'P.A',
                 ]);

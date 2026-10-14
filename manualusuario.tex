@@ -1,0 +1,200 @@
+\documentclass[a4paper, 12pt]{article}
+
+% --- PAQUETES ESENCIALES ---
+\usepackage[table,xcdraw]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern} 
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{graphicx}
+\usepackage[left=2.5cm, right=2.5cm, top=3cm, bottom=3cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{colortbl}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{tikz}
+
+% --- CONFIGURACIÓN DE COLORES Y ESTILOS ---
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{headergray}{HTML}{333333}
+\definecolor{ucsblue}{HTML}{004B87}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=ucsblue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Manual de Usuario: Plataforma Droguería Comunal},
+}
+
+\lstset{
+    backgroundcolor=\color{codegray},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=none,
+    captionpos=b,
+    tabsize=2,
+    showstringspaces=false,
+    inputencoding=utf8,
+    extendedchars=true,
+    literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1
+}
+
+% Configuración de cabeceras y pies de página
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Manual de Usuario - Droguería Comunal}
+\fancyhead[R]{DAS Talcahuano}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+% --- PORTADA ---
+\begin{titlepage}
+    \begin{flushleft}
+        % Si no tienes el logo.png en tu carpeta, comenta la siguiente línea para que compile sin error
+        \includegraphics[width=3cm]{logo.png} 
+    \end{flushleft}
+    \centering
+    
+    \vspace{1cm}
+    {\Large \textbf{Universidad Católica de la Santísima Concepción}}\\[3cm]
+    
+    {\Huge \textbf{Ingeniería de Ejecución Informática}}\\[0.5cm]
+    {\Large \textbf{Manual de Usuario: Plataforma de Gestión Inteligente de la Droguería Comunal}}\\[0.5cm]
+    
+    \vfill
+    
+    \begin{minipage}{0.45\textwidth}
+        \raggedright
+        \textbf{Supervisor:}\\
+        Pablo Cáceres Sáez \\
+        \textbf{Profesor Evaluador:}\\
+        Nicolas Pérez \\
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \raggedleft
+        \textbf{Autor / Desarrollador:}\\
+        Cristóbal Matías Faúndez Stuardo \\
+        \textbf{Organización:}\\
+        DAS Talcahuano \\
+    \end{minipage}
+    
+    \vfill
+    {\large 04 de diciembre de 2026}
+\end{titlepage}
+
+% --- ÍNDICE ---
+\newpage
+\tableofcontents
+\newpage
+
+% --- INTRODUCCIÓN ---
+\section{Introducción}
+El presente Manual de Usuario tiene como objetivo guiar al personal de la Dirección de Administración de Salud (DAS) de Talcahuano en el uso correcto de la Plataforma de Gestión de la Droguería Comunal. Este sistema ha sido diseñado para digitalizar y optimizar los procesos de inventario, recepción, distribución y trazabilidad de insumos médicos y fármacos.
+
+% --- SECCIÓN: AUTENTICACIÓN ---
+\section{Acceso al Sistema (Auth)}
+Para ingresar a la plataforma, el usuario debe contar con credenciales autorizadas por el administrador del sistema.
+
+\begin{figure}[H]
+    \centering
+    \framebox[\textwidth]{\rule{0pt}{5cm} [Imagen: Pantalla de Login / Autenticación]}
+    \caption{Vista de inicio de sesión del sistema.}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Usuario:} Ingrese su correo electrónico institucional.
+    \item \textbf{Contraseña:} Ingrese su clave secreta.
+    \item \textbf{Recuperación:} Si olvidó su clave, haga clic en "Olvidé mi contraseña" para recibir un correo de recuperación.
+\end{itemize}
+
+% --- SECCIÓN: DASHBOARD ---
+\section{Panel Principal (Dashboard)}
+Una vez iniciada la sesión, el sistema redirige al Panel Principal o \textit{Dashboard}. Aquí se presenta un resumen gráfico y cuantitativo del estado actual de la droguería.
+
+\begin{figure}[H]
+    \centering
+    \framebox[\textwidth]{\rule{0pt}{6cm} [Imagen: Vista del Dashboard (Gráficos, KPIs)]}
+    \caption{Panel principal con indicadores clave de rendimiento.}
+\end{figure}
+
+% --- SECCIÓN: GESTIÓN DE INVENTARIO Y RECEPCIÓN ---
+\section{Gestión de Productos}
+
+\subsection{Inventario}
+El módulo de \textbf{Inventario} permite visualizar todos los productos disponibles en la droguería, sus lotes y fechas de vencimiento.
+
+\subsection{Recepción (Reception)}
+Para ingresar nuevos productos al sistema tras una orden de compra:
+\begin{enumerate}
+    \item Diríjase al módulo de Recepción.
+    \item Registre el documento de respaldo (Factura o Guía de despacho).
+    \item Ingrese los lotes, cantidades y fechas de caducidad.
+\end{enumerate}
+
+\subsection{Proveedores (Providers)}
+En esta sección se gestiona el directorio de proveedores aprobados para abastecer a la droguería, permitiendo actualizar datos de contacto y condiciones comerciales.
+
+% --- SECCIÓN: DESPACHO Y DISTRIBUCIÓN ---
+\section{Manejo de Salidas y Despachos}
+
+\subsection{Solicitudes (Requests)}
+Los centros de salud (CESFAM, CECOSF, etc.) envían sus requerimientos mediante el módulo de \textbf{Solicitudes}. El personal de la droguería puede aprobar, rechazar o modificar estas peticiones.
+
+\subsection{Despacho General (Dispatch) y Distribución}
+Una vez aprobada una solicitud, pasa al módulo de \textbf{Despacho}. Aquí se preparan los bultos o \textit{picking} y se asignan a la ruta de \textbf{Distribución}.
+
+\subsection{Despacho Controlado (Controlled Dispatch)}
+Los medicamentos sujetos a control legal o estupefacientes poseen un flujo de \textbf{Despacho Controlado}. Este módulo exige validaciones adicionales, firmas digitales o registros de responsables técnicos antes de autorizar la salida del recinto.
+
+% --- SECCIÓN: CUARENTENA Y TRAZABILIDAD ---
+\section{Control de Calidad y Seguimiento}
+
+\subsection{Cuarentena (Quarantine)}
+Si un producto es devuelto, presenta daños, o existe una alerta sanitaria (por ejemplo, del ISP), debe ser trasladado lógicamente al módulo de \textbf{Cuarentena}. Los productos en este estado no pueden ser despachados hasta su resolución (destrucción o reingreso).
+
+\begin{figure}[H]
+    \centering
+    \framebox[\textwidth]{\rule{0pt}{4cm} [Imagen: Módulo de Cuarentena]}
+    \caption{Gestión de lotes retenidos o en cuarentena.}
+\end{figure}
+
+\subsection{Trazabilidad (Traceability)}
+El sistema guarda un registro inmutable del ciclo de vida de cada lote. Desde este módulo puede consultar quién recibió, almacenó y despachó un fármaco en particular, buscando por código de barras o lote.
+
+% --- SECCIÓN: REPORTES ---
+\section{Reportes (Reportes)}
+Este módulo permite la generación de documentos exportables (PDF, Excel) sobre el valor valorizado del inventario, productos próximos a vencer, estadísticas de consumo por centro de salud y eficacia de despachos.
+
+% --- SECCIÓN: USUARIOS Y PERFIL ---
+\section{Administración de Usuarios y Perfil}
+\subsection{Mi Perfil (Profile)}
+Cada usuario puede modificar sus datos personales, cambiar su contraseña y personalizar la vista de su cuenta.
+\subsection{Usuarios (Users)}
+Exclusivo para administradores. Permite crear nuevos usuarios, asignar roles (Bodeguero, Químico Farmacéutico, Administrador) y revocar accesos.
+
+% --- SECCIÓN: RESOLUCIÓN DE ERRORES ---
+\section{Resolución de Problemas (Errors)}
+El sistema cuenta con pantallas de error amigables para guiar al usuario cuando algo sale mal. A continuación, se detallan los códigos más comunes:
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|c|X|}
+\hline
+\rowcolor{ucsblue} \textcolor{white}{\textbf{Código de Error}} & \textcolor{white}{\textbf{Descripción y Solución}} \\ \hline
+\textbf{Error 402} & \textbf{Pago o Acción Requerida:} El sistema ha bloqueado temporalmente una función que requiere validación previa o suscripción. Contacte a soporte de TI. \\ \hline
+\textbf{Error 403} & \textbf{Acceso Denegado (Forbidden):} Usted no tiene los permisos suficientes o el rol necesario para ver esta pantalla (Ej. Un bodeguero intentando crear usuarios). \\ \hline
+\textbf{Error 404} & \textbf{Página No Encontrada (Not Found):} El enlace al que intenta acceder no existe o el registro (producto/solicitud) fue eliminado. \\ \hline
+\end{tabularx}
+\caption{Guía de errores comunes del sistema.}
+\end{table}
+
+\end{document}

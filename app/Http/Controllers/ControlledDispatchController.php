@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ControlledDispatch;
+use App\Models\ControlledDispatchItem;
+use App\Models\EstablishmentRequest;
 use App\Models\Inventory;
 use App\Services\InventoryService;
+use App\Services\SolicitudService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +30,15 @@ class ControlledDispatchController extends Controller
             ->orderByRaw('CASE WHEN fecha_vencimiento IS NULL THEN 1 ELSE 0 END ASC, fecha_vencimiento ASC, id ASC')
             ->get();
 
-        return view('controlled_dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible'));
+        $solicitudes = EstablishmentRequest::with('items.product')
+            ->whereIn('estado', ['Pendiente', 'Parcial'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $controlados = InventoryService::controlados();
+        $establecimientos = InventoryService::establecimientos();
+
+        return view('controlled_dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible', 'solicitudes', 'controlados', 'establecimientos'));
     }
 
     public function store(Request $request)
@@ -52,16 +63,24 @@ class ControlledDispatchController extends Controller
             'programas.*' => 'nullable|string|max:255',
             'cantidades' => 'required|array|min:1',
             'cantidades.*' => 'required|integer|min:1',
+            'establishment_request_id' => 'nullable|integer|exists:establishment_requests,id',
         ]);
 
         $destino = $validated['establecimiento_destino'];
         if ($validated['clasificacion'] === 'Externo') {
-            $destino = ($validated['tipo_externo_despacho'] ? $validated['tipo_externo_despacho'] . ' - ' : '') . $validated['establecimiento_destino'];
+            $destino = (! empty($validated['tipo_externo_despacho']) ? $validated['tipo_externo_despacho'] . ' - ' : '') . $validated['establecimiento_destino'];
         }
 
         DB::beginTransaction();
 
         try {
+            $firmaRecibe = $validated['firma_recibe'] ?? null;
+
+            if (! $firmaRecibe && ! empty($validated['establishment_request_id'])) {
+                $firmaRecibe = EstablishmentRequest::where('id', $validated['establishment_request_id'])
+                    ->value('firma_solicitante');
+            }
+
             $nextId = (int) ControlledDispatch::lockForUpdate()->max('id') + 1;
             $correlativo = 'GDC-' . date('Y') . '-' . str_pad((string) $nextId, 4, '0', STR_PAD_LEFT);
 
@@ -71,10 +90,10 @@ class ControlledDispatchController extends Controller
                 'clasificacion' => $validated['clasificacion'],
                 'estado_liberacion' => $validated['estado_liberacion'],
                 'establecimiento_destino' => $destino,
-                'direccion_destino' => $validated['direccion_destino'],
-                'condiciones_transporte' => $validated['condiciones_transporte'],
-                'series_recetas' => $validated['series_recetas'],
-                'firma_recibe' => $validated['firma_recibe'],
+                'direccion_destino' => $validated['direccion_destino'] ?? null,
+                'condiciones_transporte' => $validated['condiciones_transporte'] ?? null,
+                'series_recetas' => $validated['series_recetas'] ?? null,
+                'firma_recibe' => $firmaRecibe,
             ]);
 
             foreach ($validated['productos'] as $index => $nombreProducto) {
@@ -110,6 +129,14 @@ class ControlledDispatchController extends Controller
                         'documento_respaldo' => 'Guia Controlada N° ' . $correlativo,
                     ]);
                 }
+            }
+
+            if (! empty($validated['establishment_request_id'] ?? null)) {
+                SolicitudService::registrarDespacho(
+                    (int) $validated['establishment_request_id'],
+                    $validated['productos'],
+                    $validated['cantidades']
+                );
             }
 
             DB::commit();

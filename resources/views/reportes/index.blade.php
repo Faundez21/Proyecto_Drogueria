@@ -36,6 +36,26 @@
             <span class="font-medium text-slate-800">Reportes</span>
         </div>
 
+        <!-- KPI de Valorización -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="sm:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Valor Total del Stock (según filtros)</p>
+                    <p class="text-2xl font-extrabold text-slate-800 font-mono-das">$ {{ number_format($valorTotal, 0, ',', '.') }}</p>
+                    <p class="text-[11px] text-slate-400 font-medium">Valor neto: cantidad en stock × valor unitario de cada lote Disponible</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 flex flex-col justify-center">
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nota de valorización</p>
+                <p class="text-[12px] text-slate-600 mt-1 leading-relaxed">Los lotes en <b class="text-amber-600">Cuarentena</b> o <b class="text-rose-600">Merma</b> no se incluyen en este reporte porque no constituyen stock disponible.</p>
+            </div>
+        </div>
+
         <!-- Contenedor Principal Tabla Inventario -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
 
@@ -99,6 +119,16 @@
                     </div>
 
                     <div>
+                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Programa</label>
+                        <select name="programa" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                            <option value="">Todos</option>
+                            @foreach($programasUnicos as $prog)
+                                <option value="{{ $prog }}" {{ request('programa') == $prog ? 'selected' : '' }}>{{ $prog }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Ordenar por</label>
                         <select name="order_by" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="recent" {{ request('order_by', 'recent') == 'recent' ? 'selected' : '' }}>Más recientes</option>
@@ -140,15 +170,17 @@
                             <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Producto Principal</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
+                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Programa</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock Físico Acumulado</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
                         </tr>
                     </thead>
 
                     <tbody class="divide-y divide-slate-100 text-[13px]" id="mainTableBody">
                         @if ($groupedInventories->isEmpty())
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center">
+                                <td colspan="7" class="px-6 py-12 text-center">
                                     <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-400 mb-3">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                     </div>
@@ -161,6 +193,10 @@
                                 @php
                                     $stockTotalProducto = $lotes->sum(function ($i) {
                                         return is_object($i) ? $i->stock_total ?? ($i->cantidad ?? 0) : 0;
+                                    });
+                                    $valorTotalProducto = $lotes->sum(function ($i) {
+                                        $obj = is_object($i) ? $i : (object) $i;
+                                        return ((float) ($obj->cantidad ?? 0)) * ((float) ($obj->valor_neto_unitario ?? 0));
                                     });
                                     $groupKey = 'grp_' . md5($nombreProducto);
                                     $primerLote = $lotes->first();
@@ -191,6 +227,14 @@
                                     <td class="px-6 py-4">
                                         <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white text-slate-600 border border-slate-200 shadow-sm whitespace-nowrap">{{ $categoriaLote }}</span>
                                     </td>
+                                    <td class="px-6 py-4">
+                                        @php $programaProducto = is_object($primerLote) ? ($primerLote->programa ?? '') : ''; @endphp
+                                        @if ($programaProducto)
+                                            <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm whitespace-nowrap">{{ $programaProducto }}</span>
+                                        @else
+                                            <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-medium bg-slate-50 text-slate-400 border border-slate-100 shadow-sm whitespace-nowrap">Sin programa</span>
+                                        @endif
+                                    </td>
                                     <td class="px-6 py-4 text-center">
                                         <span class="font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">{{ $lotes->count() }}</span>
                                         <span class="text-slate-400 text-[11.5px] font-semibold uppercase ml-1">Lote(s)</span>
@@ -213,10 +257,15 @@
                                             </span>
                                         @endif
                                     </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-[12.5px] font-bold bg-slate-50 text-slate-800 border border-slate-200 shadow-sm whitespace-nowrap font-mono-das">
+                                            $ {{ number_format($valorTotalProducto, 0, ',', '.') }}
+                                        </span>
+                                    </td>
                                 </tr>
 
                                 <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-50/50 shadow-inner">
-                                    <td colspan="5" class="p-0 border-b border-slate-200">
+                                    <td colspan="7" class="p-0 border-b border-slate-200">
                                         <div class="py-4 pr-6 pl-14">
                                             <div
                                                 class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -242,6 +291,8 @@
                                                                 <th class="px-4 py-3">Ubicación (Pasillo/Estante)</th>
                                                                 <th class="px-4 py-3 text-center">Estado Sanitario</th>
                                                                 <th class="px-4 py-3 text-center">Stock de Lote</th>
+                                                                <th class="px-4 py-3 text-center">Valor Unitario</th>
+                                                                <th class="px-4 py-3 text-center">Valor Total Lote</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody class="divide-y divide-slate-100 text-slate-700 text-[12px]">
@@ -321,6 +372,12 @@
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
                                                                         <span class="font-extrabold text-slate-800 text-[13px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
+                                                                    </td>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        <span class="text-[12px] font-semibold text-slate-600 font-mono-das">$ {{ number_format((float) ($loteData->valor_neto_unitario ?? 0), 2, ',', '.') }}</span>
+                                                                    </td>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[12px] font-bold bg-teal-50 text-teal-800 border border-teal-200 font-mono-das">$ {{ number_format(((float) $stockLote) * ((float) ($loteData->valor_neto_unitario ?? 0)), 0, ',', '.') }}</span>
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
