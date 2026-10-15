@@ -2,63 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Inventory;
+use SimpleSoftwareIO\QrCode\Generator;
 
 class QRController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function image(Inventory $inventory)
     {
-        return view("qr.index");
-    }
+        $contenido = sprintf(
+            'LOTE:%s|PROD:%s|VENCE:%s|STOCK:%s',
+            $inventory->lote ?? 'S/L',
+            $inventory->producto,
+            $inventory->fecha_vencimiento ? \Carbon\Carbon::parse($inventory->fecha_vencimiento)->format('d/m/Y') : 'N/A',
+            $inventory->cantidad
+        );
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $svg = (new Generator())
+            ->format('svg')
+            ->size(300)
+            ->margin(0)
+            ->errorCorrection('M')
+            ->generate($contenido);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response($svg)->header('Content-Type', 'image/svg+xml');
     }
 }

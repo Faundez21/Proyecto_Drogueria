@@ -168,9 +168,6 @@
                             data-phone="{{ $provider->phone }}"
                             data-address="{{ $provider->address }}"
                             data-category="{{ $provider->category }}"
-                            data-bank-name="{{ $provider->bank_name }}"
-                            data-account-type="{{ $provider->account_type }}"
-                            data-account-number="{{ $provider->account_number }}"
                             data-status="{{ $provider->status }}">
 
                             <td class="px-6 py-4">
@@ -310,7 +307,6 @@
             </div>
 
             <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-
                 <!-- Sección: Información Comercial -->
                 <div>
                     <h4 class="text-[13px] font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">Información Comercial y Contacto</h4>
@@ -341,27 +337,8 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Sección: Información Bancaria -->
-                <div>
-                    <h4 class="text-[13px] font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">Información Bancaria</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Banco</p>
-                            <p id="detail-bank-name" class="text-[13.5px] font-semibold text-slate-700"></p>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tipo de Cuenta</p>
-                            <p id="detail-account-type" class="text-[13.5px] font-semibold text-slate-700"></p>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nº de Cuenta</p>
-                            <p id="detail-account-number" class="font-mono-das text-[13.5px] font-semibold text-slate-700"></p>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+
             <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50">
                 <button type="button" class="js-modal-close px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 w-full sm:w-auto transition-colors" data-close="modal-detail">
                     Cerrar
@@ -388,9 +365,7 @@
                 </button>
             </div>
 
-            <div id="form-errors" class="hidden px-6 pt-5 pb-0 text-[13px] font-medium text-red-600"></div>
-
-            <form class="p-6 space-y-6 overflow-y-auto">
+            <form class="p-6 space-y-6 overflow-y-auto" onsubmit="return false;">
                 <input type="hidden" id="provider-id" value="">
 
                 <!-- SECCIÓN 1: DATOS GENERALES -->
@@ -448,32 +423,6 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN 3: DATOS BANCARIOS -->
-                <div>
-                    <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Datos Bancarios</h4>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Banco</label>
-                            <input type="text" id="provider-bank-name" placeholder="Ej: Banco Estado" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Tipo de Cuenta</label>
-                            <select id="provider-account-type" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
-                                <option value="">Seleccione...</option>
-                                <option value="Cuenta Corriente">Cuenta Corriente</option>
-                                <option value="Cuenta Vista">Cuenta Vista</option>
-                                <option value="Cuenta de Ahorro">Cuenta de Ahorro</option>
-                                <option value="Cuenta RUT">Cuenta RUT</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Número de Cuenta</label>
-                            <input type="text" id="provider-account-number" placeholder="Ej: 123456789" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
-                        </div>
-                    </div>
-                </div>
-
                 <!-- ESTADO (Sólo visible al editar) -->
                 <div id="status-container">
                     <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Estado del Proveedor</h4>
@@ -501,31 +450,8 @@
         </div>
     </div>
 
-    <!-- Modal 3: Confirmación -->
-    <div id="modal-confirm" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity" data-close="modal-confirm"></div>
-        <div class="relative w-full max-w-sm rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 bg-white shadow-2xl border border-slate-200" id="modal-confirm-panel">
-            <div class="p-8 text-center">
-                <div id="confirm-icon-container" class="w-16 h-16 rounded-full flex items-center justify-center mb-5 mx-auto bg-slate-50 text-slate-600">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                </div>
-                <h3 class="text-[18px] font-bold text-slate-800">Confirmación</h3>
-                <p id="confirm-message" class="text-[14px] text-slate-500 mt-2 leading-relaxed">
-                    ¿Confirmas la acción?
-                </p>
-            </div>
-            <div class="flex gap-3 p-4 border-t border-slate-100 bg-slate-50">
-                <button type="button" class="js-modal-close flex-1 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 transition-colors" data-close="modal-confirm">
-                    Cancelar
-                </button>
-                <button type="button" id="modal-confirm-action" class="flex-1 px-4 py-2.5 rounded-xl text-[13px] font-bold text-white shadow-md transition-all">
-                    Confirmar
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Script de Lógica -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const csrfToken = '{{ csrf_token() }}';
@@ -573,14 +499,11 @@
                     id: row.dataset.id || '',
                     name: row.dataset.name || '',
                     rut: row.dataset.rut || '',
-                    business_line: row.dataset.businessLine || '', // Nuevo
+                    business_line: row.dataset.businessLine || '',
                     email: row.dataset.email || '',
                     phone: row.dataset.phone || '',
-                    address: row.dataset.address || '',            // Nuevo
+                    address: row.dataset.address || '',
                     category: row.dataset.category || '',
-                    bank_name: row.dataset.bankName || '',         // Nuevo
-                    account_type: row.dataset.accountType || '',   // Nuevo
-                    account_number: row.dataset.accountNumber || '',// Nuevo
                     status: row.dataset.status || 'inactivo'
                 };
             }
@@ -598,14 +521,12 @@
                     document.getElementById('detail-email').textContent = p.email || 'No registrado';
                     document.getElementById('detail-phone').textContent = p.phone || 'No registrado';
                     document.getElementById('detail-category').textContent = p.category;
-                    document.getElementById('detail-initials').textContent = p.name.substring(0,2).toUpperCase();
 
-                    // Nuevos campos en el detalle
+                    const initials = p.name.split(' ').filter(n => n).map(n => n[0]).slice(0, 2).join('').toUpperCase();
+                    document.getElementById('detail-initials').textContent = initials;
+
                     document.getElementById('detail-business-line').textContent = p.business_line || 'No registrado';
                     document.getElementById('detail-address').textContent = p.address || 'No registrada';
-                    document.getElementById('detail-bank-name').textContent = p.bank_name || 'No registrado';
-                    document.getElementById('detail-account-type').textContent = p.account_type || 'No registrado';
-                    document.getElementById('detail-account-number').textContent = p.account_number || 'No registrado';
 
                     const statusBadge = document.getElementById('detail-status');
                     statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${p.status === 'activo' ? 'bg-emerald-500' : 'bg-slate-400'}"></span> ${p.status === 'activo' ? 'Activo' : 'Inactivo'}`;
@@ -619,8 +540,6 @@
 
             // --- 2. Formulario de Guardado ---
             function openEditForm(row = null) {
-                document.getElementById('form-errors').classList.add('hidden');
-
                 if (row) {
                     const p = getProviderFromRow(row);
                     document.getElementById('modal-edit-title').textContent = 'Editar Proveedor';
@@ -634,10 +553,6 @@
                     document.getElementById('provider-email').value = p.email;
                     document.getElementById('provider-phone').value = p.phone || '+56 ';
                     document.getElementById('provider-address').value = p.address;
-
-                    document.getElementById('provider-bank-name').value = p.bank_name;
-                    document.getElementById('provider-account-type').value = p.account_type;
-                    document.getElementById('provider-account-number').value = p.account_number;
 
                     document.querySelector(`input[name="edit-status"][value="${p.status}"]`).checked = true;
                     document.getElementById('status-container').classList.remove('hidden');
@@ -653,10 +568,6 @@
                     document.getElementById('provider-email').value = '';
                     document.getElementById('provider-phone').value = '+56 ';
                     document.getElementById('provider-address').value = '';
-
-                    document.getElementById('provider-bank-name').value = '';
-                    document.getElementById('provider-account-type').value = '';
-                    document.getElementById('provider-account-number').value = '';
 
                     document.querySelector('input[name="edit-status"][value="activo"]').checked = true;
                     document.getElementById('status-container').classList.add('hidden');
@@ -685,9 +596,6 @@
                     email: document.getElementById('provider-email').value.trim(),
                     phone: document.getElementById('provider-phone').value.trim(),
                     address: document.getElementById('provider-address').value.trim(),
-                    bank_name: document.getElementById('provider-bank-name').value.trim(),
-                    account_type: document.getElementById('provider-account-type').value,
-                    account_number: document.getElementById('provider-account-number').value.trim(),
                     status: document.querySelector('input[name="edit-status"]:checked').value
                 };
 
@@ -697,13 +605,17 @@
                 }
 
                 if (!data.name || !data.rut || !data.category || !data.email) {
-                    const err = document.getElementById('form-errors');
-                    err.innerHTML = 'Faltan campos obligatorios (*). Completa el formulario.';
-                    err.classList.remove('hidden');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Faltan datos',
+                        text: 'Completa los campos obligatorios (*).',
+                        confirmButtonColor: '#0d9488'
+                    });
                     return;
                 }
 
-                const url = id ? `/proveedores/${id}` : '/proveedores';
+                // Aquí usamos /suppliers como prefijo para coincidir con web.php
+                const url = id ? `/suppliers/${id}` : '/suppliers';
                 const method = id ? 'PUT' : 'POST';
                 const btn = document.getElementById('modal-edit-action');
 
@@ -718,70 +630,83 @@
                     });
 
                     if (response.ok) {
-                        window.location.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Guardado!',
+                            text: 'El proveedor se ha guardado correctamente.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.reload();
+                        });
                     } else {
                         const result = await response.json();
-                        const err = document.getElementById('form-errors');
-                        err.innerHTML = result.message || 'Error al guardar. Verifica que el RUT no esté duplicado.';
-                        err.classList.remove('hidden');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al guardar',
+                            text: result.message || 'Verifica que el RUT o correo no estén duplicados.',
+                            confirmButtonColor: '#0d9488'
+                        });
                     }
                 } catch (e) {
-                    alert('Error de red. Revisa tu conexión.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de red',
+                        text: 'Revisa tu conexión e inténtalo nuevamente.',
+                        confirmButtonColor: '#0d9488'
+                    });
                 } finally {
                     btn.disabled = false;
                     btn.textContent = 'Guardar Proveedor';
                 }
             });
 
-            // --- 3. Botón Activar/Desactivar ---
+            // --- 3. Botón Activar/Desactivar con SweetAlert2 ---
             document.querySelectorAll('.js-toggle-status').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const row = e.target.closest('.provider-row');
                     if (!row) return;
-                    selectedRow = row;
                     const p = getProviderFromRow(row);
                     const isActivo = p.status === 'activo';
+                    
+                    const actionText = isActivo ? 'desactivar' : 'reactivar';
+                    const confirmColor = isActivo ? '#e11d48' : '#0d9488'; // Rose o Teal
+                    const confirmText = isActivo ? 'Sí, Desactivar' : 'Sí, Reactivar';
 
-                    document.getElementById('confirm-message').innerHTML = `¿Estás seguro que deseas <b>${isActivo ? 'desactivar' : 'reactivar'}</b> a <br>${p.name}?`;
-
-                    const actionBtn = document.getElementById('modal-confirm-action');
-                    actionBtn.textContent = isActivo ? 'Sí, Desactivar' : 'Sí, Reactivar';
-                    actionBtn.className = isActivo
-                        ? 'flex-1 px-4 py-2.5 rounded-xl text-[13px] font-bold text-white shadow-md bg-rose-600 hover:bg-rose-700 transition-all'
-                        : 'flex-1 px-4 py-2.5 rounded-xl text-[13px] font-bold text-white shadow-md bg-teal-600 hover:bg-teal-700 transition-all';
-
-                    const iconContainer = document.getElementById('confirm-icon-container');
-                    iconContainer.className = isActivo
-                        ? 'w-16 h-16 rounded-full flex items-center justify-center mb-5 mx-auto bg-rose-50 text-rose-600 shadow-inner'
-                        : 'w-16 h-16 rounded-full flex items-center justify-center mb-5 mx-auto bg-teal-50 text-teal-600 shadow-inner';
-
-                    openModal('modal-confirm');
-                });
-            });
-
-            document.getElementById('modal-confirm-action').addEventListener('click', async () => {
-                if (!selectedRow) return;
-                const id = selectedRow.dataset.id;
-                const btn = document.getElementById('modal-confirm-action');
-
-                btn.disabled = true;
-                btn.textContent = 'Procesando...';
-
-                try {
-                    const response = await fetch(`/proveedores/${id}/toggle-status`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                    Swal.fire({
+                        title: '¿Confirmas la acción?',
+                        html: `¿Estás seguro que deseas <b>${actionText}</b> a <br><strong>${p.name}</strong>?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: confirmColor,
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: confirmText,
+                        cancelButtonText: 'Cancelar'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                // Aquí usamos /suppliers como prefijo para coincidir con web.php
+                                const response = await fetch(`/suppliers/${p.id}/toggle-status`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                                });
+                                
+                                if (response.ok) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Estado actualizado',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    }).then(() => window.location.reload());
+                                } else {
+                                    Swal.fire('Error', 'No se pudo actualizar el estado.', 'error');
+                                }
+                            } catch (e) {
+                                Swal.fire('Error de red', 'No se pudo conectar con el servidor.', 'error');
+                            }
+                        }
                     });
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        alert('Error al intentar cambiar el estado.');
-                    }
-                } catch (e) {
-                    alert('Error de red.');
-                } finally {
-                    closeModal('modal-confirm');
-                }
+                });
             });
         });
     </script>

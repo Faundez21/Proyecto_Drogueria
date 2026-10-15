@@ -3,23 +3,29 @@
 @section('content')
     <div class="w-full">
 
-        <!-- miga de pan -->
+        <!-- migas de pan -->
 
-        <div class="flex items-center gap-2 text-gray-500 mb-4">
+        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
 
-            <a href="{{ route('distribution.index') }}" class="hover:text-blue-900">
+            <span class="text-slate-400 font-semibold">03</span>
 
-                Distribución
+            <span>Salida</span>
 
-            </a>
+            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 
-            <span>/</span>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 
-            <span class="text-gray-800 font-medium">
+            </svg>
 
-                Posiciones
+            <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 transition-colors">Distribución</a>
 
-            </span>
+            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+
+            </svg>
+
+            <span class="font-semibold text-slate-800">Posiciones</span>
             @role('Administrador')
                 <div class="flex gap-2 w-full sm:w-auto ml-auto">
                     <button type="button" onclick="openHistory()"
@@ -598,9 +604,6 @@
             class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 w-full max-w-4xl overflow-hidden">
 
-<<<<<<< HEAD
-
-=======
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
                     <div>
                         <h2 class="text-xl font-bold text-slate-800">Historial de Posiciones</h2>
@@ -651,7 +654,6 @@
 
             </div>
         </div>
->>>>>>> origin/Nicolas
         <!-- Funciones con JS para abrir y cerrar el modal -->
 
         <script>

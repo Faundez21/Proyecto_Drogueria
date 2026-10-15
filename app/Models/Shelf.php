@@ -13,7 +13,8 @@ class Shelf extends Model
         'aisle_id',
         'pos_x',
         'pos_z',
-        'rotation'
+        'rotation',
+        'capacidad'
     ];
 
     // relacion una estantería pertenece a un pasillo

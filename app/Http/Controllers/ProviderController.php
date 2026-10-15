@@ -84,9 +84,6 @@ class ProviderController extends Controller
             'phone'          => 'nullable|string|max:20',
             'business_line'  => 'nullable|string|max:255',
             'address'        => 'nullable|string|max:255',
-            'bank_name'      => 'nullable|string|max:255',
-            'account_type'   => 'nullable|string|max:255',
-            'account_number' => 'nullable|string|max:255',
         ]);
 
         Provider::create($validated);
@@ -103,9 +100,6 @@ class ProviderController extends Controller
             'phone'          => 'nullable|string|max:20',
             'business_line'  => 'nullable|string|max:255',
             'address'        => 'nullable|string|max:255',
-            'bank_name'      => 'nullable|string|max:255',
-            'account_type'   => 'nullable|string|max:255',
-            'account_number' => 'nullable|string|max:255',
         ]);
 
         $provider->update($validated);

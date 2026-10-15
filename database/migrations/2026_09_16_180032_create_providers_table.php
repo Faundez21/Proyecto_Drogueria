@@ -17,9 +17,6 @@ return new class extends Migration
             $table->string('email');
             $table->string('phone')->nullable();
             $table->string('address')->nullable(); // Dirección
-            $table->string('bank_name')->nullable(); // Banco
-            $table->string('account_type')->nullable(); // Tipo de Cuenta
-            $table->string('account_number')->nullable(); // Número de Cuenta
             $table->enum('status', ['activo', 'inactivo'])->default('activo');
             $table->timestamps();
         });

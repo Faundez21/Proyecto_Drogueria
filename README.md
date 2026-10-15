@@ -7,40 +7,49 @@
 
 ## 📖 Sobre el Proyecto
 
-**Droguería DAS** es un sistema web moderno e integral diseñado específicamente para la gestión eficiente de inventarios, control de lotes y operaciones logísticas en el sector farmacéutico. 
-
-El sistema centraliza las operaciones diarias, permitiendo un control estricto sobre la trazabilidad de los medicamentos desde su ingreso hasta su despacho final.
+**Plataforma de Gestión Inteligente de la Droguería Comunal** es un sistema web transaccional desarrollado para la Dirección de Administración de Salud (DAS) de Talcahuano. Centraliza el abastecimiento farmacéutico comunal, reemplazando planillas dispersas por un control estricto que incluye metodología FEFO, trazabilidad inmutable, visor 3D de la bodega y control legal de estupefacientes.
 
 ## ✨ Características Principales
 
-* **Dashboard Analítico:** Panel de control con métricas en tiempo real sobre ventas, alertas de stock y órdenes procesadas.
-* **Control de Inventario:** Gestión detallada de productos, ubicaciones físicas y lotes.
-* **Módulo de Trazabilidad:** Rastreo completo del ciclo de vida de los medicamentos y auditoría de movimientos.
-* **Sistema QR:** Generación de códigos para identificación rápida de productos y lotes.
-* **Gestión de Cuarentena:** Aislamiento y control de productos pendientes de análisis o con problemas de calidad.
-* **Operaciones Logísticas:** Flujos dedicados para Recepción, Despacho y Distribución.
+- **Despacho Inteligente (FEFO):** Asignación automática server-side del lote con la fecha de vencimiento más próxima (First Expired, First Out).
+- **Despachos Controlados:** Módulo segregado exclusivo para estupefacientes, validado contra solicitudes de CESFAM y registro de recetas cheque.
+- **Distribución 3D:** Visor interactivo (Three.js) de pasillos, estanterías, niveles y posiciones, con cálculo de ocupación porcentual en tiempo real.
+- **Trazabilidad Inmutable:** Registro detallado de todo movimiento de stock (usuario, lote, documento de respaldo, cantidad y fecha).
+- **Gestión de Lotes y Códigos QR:** Generación automática de etiquetas QR en SVG para cada lote físico.
+- **Roles y Permisos por Vista:** Control de acceso granular (Spatie) para Administrador, Químico Farmacéutico y Operador/Bodeguero.
 
-## 🛠️ Tecnologías Utilizadas
+## 🛠️ Stack Tecnológico
 
-* **Framework Backend:** Laravel 
-* **Framework Frontend:** Tailwind CSS
-* **Motor de Plantillas:** Blade
-* **Base de Datos:** MySQL
+- **Backend:** Laravel 13 (PHP 8.3+)
+- **Frontend:** Blade, Tailwind CSS 3.4, Alpine.js (Vite)
+- **Base de Datos:** MySQL 8
+- **Librerías Clave:** Three.js (3D), html5-qrcode (Escáner), SignaturePad (Firmas), DomPDF, Laravel Excel.
 
-## ⚙️ Requisitos Previos
+---
 
-Antes de instalar el proyecto, asegúrate de tener instalado en tu entorno local:
+## 👨‍💻 Guía para Desarrolladores (Modo Desarrollo)
 
-* PHP >= 8.2
-* Composer
-* Node.js y NPM
-* Base de datos MySQL o PostgreSQL
+Esta sección está documentada para el próximo desarrollador que asuma el mantenimiento o evolución del sistema. 
 
-## 🚀 Instalación y Configuración Local
+### 1. Requisitos Previos del Entorno
+- PHP >= 8.3
+- Composer v2
+- Node.js (v18+) y NPM
+- MySQL 8 o MariaDB equivalente
+- Git
 
-Sigue estos pasos para levantar el entorno de desarrollo en tu máquina local:
+### 2. Instalación Paso a Paso
 
-1. **Clonar el repositorio**
-   ```bash
-   git clone [https://github.com/tu-usuario/drogueria-das.git](https://github.com/tu-usuario/drogueria-das.git)
-   cd drogueria-das
+```bash
+# 1. Clonar el repositorio
+git clone [https://github.com/Faundez21/Proyecto_Drogueria.git]
+cd drogueria-das
+
+# 2. Instalar dependencias del backend
+composer install
+
+# 3. Instalar dependencias del frontend
+npm install
+
+# 4. Configurar variables de entorno
+cp .env.example .env
