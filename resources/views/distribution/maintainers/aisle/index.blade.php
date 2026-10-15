@@ -2,17 +2,18 @@
 
 @section('content')
     <div class="w-full">
-        <!-- miga de pan -->
-        <div class="flex items-center gap-2 text-gray-500 mb-4">
-            <a href="{{ route('distribution.index') }}" class="hover:text-blue-900">
-                Distribución
-            </a>
-
-            <span>/</span>
-
-            <span class="text-gray-800 font-medium">
-                Pasillos
-            </span>
+        <!-- migas de pan -->
+        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
+            <span class="text-slate-400 font-semibold">03</span>
+            <span>Salida</span>
+            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 transition-colors">Distribución</a>
+            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <span class="font-semibold text-slate-800">Pasillos</span>
             @role('Administrador')
                 <div class="flex gap-2 w-full sm:w-auto ml-auto">
                     <button type="button" onclick="openHistory()"
@@ -230,7 +231,20 @@
 
                         </div>
 
+                        <!--color-->
+                        <div>
+                            <label for="color" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Color
+                            </label>
+                            <input type="color" name="color" value="#3B82F6"
+                                class="w-12 h-10 rounded-lg border border-slate-300 cursor-pointer">
+                            <span class="text-xs text-slate-500">
+                                Este color se aplicará a las estanterías del pasillo.
+                            </span>
+                        </div>
+
                     </div>
+
 
                     <!-- Botones -->
                     <div class="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">

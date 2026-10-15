@@ -4,120 +4,177 @@ namespace App\Http\Controllers;
 
 use App\Models\Dispatch;
 use App\Models\DispatchItem;
+use App\Models\EstablishmentRequest;
 use App\Models\Inventory;
-use App\Models\StockMovement;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Services\InventoryService;
+use App\Services\SolicitudService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DispatchController extends Controller
 {
     public function index()
     {
-        // 1. Generar Correlativo Automático No Editable
         $lastDispatch = Dispatch::orderBy('id', 'desc')->first();
         $nextId = $lastDispatch ? $lastDispatch->id + 1 : 1;
-        $correlativo = 'GD-' . date('Y') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
+        $correlativo = 'GD-' . date('Y') . '-' . str_pad((string) $nextId, 4, '0', STR_PAD_LEFT);
 
-        // 2. Traer el historial de despachos para la Bandeja
         $dispatches = Dispatch::with('items')->orderBy('created_at', 'desc')->get();
 
-        // 3. Traer el Inventario Disponible ordenado por Vencimiento (Regla FEFO)
-        // Usamos la columna 'cantidad' directamente como está en tu base de datos
-        $inventarioDisponible = Inventory::where('cantidad', '>', 0)
-            ->orderBy('fecha_vencimiento', 'asc')
+        $inventarioDisponible = Inventory::whereNotIn('producto', InventoryService::controlados())
+            ->where('estado', 'Disponible')
+            ->where('cantidad', '>', 0)
+            ->orderByRaw('CASE WHEN fecha_vencimiento IS NULL THEN 1 ELSE 0 END ASC, fecha_vencimiento ASC, id ASC')
             ->get();
 
-        return view('despacho.index', compact('correlativo', 'dispatches', 'inventarioDisponible'));
+        $solicitudes = EstablishmentRequest::with('items.product')
+            ->whereIn('estado', ['Pendiente', 'Parcial'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $controlados = InventoryService::controlados();
+        $establecimientos = InventoryService::establecimientos();
+
+        return view('dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible', 'solicitudes', 'controlados', 'establecimientos'));
+    }
+
+    public function solicitudes()
+    {
+        $solicitudes = EstablishmentRequest::with('items.product')
+            ->whereIn('estado', ['Pendiente', 'Parcial'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($solicitudes);
     }
 
     public function store(Request $request)
     {
-        // Validamos que la solicitud traiga productos
-        if (!$request->has('productos') || count($request->productos) === 0) {
-            return redirect()->back()->with('error', 'Debe agregar al menos un producto al despacho.');
+        $validated = $request->validate([
+            'fecha_despacho' => 'required|date',
+            'clasificacion' => 'required|in:Interno,Externo',
+            'estado_liberacion' => 'required|string|max:255',
+            'establecimiento_destino' => 'required|string|max:255',
+            'tipo_externo_despacho' => 'nullable|string|max:255',
+            'direccion_destino' => 'nullable|string|max:255',
+            'condiciones_transporte' => 'nullable|string|max:500',
+            'firma_despacha' => 'nullable|string',
+            'firma_recibe' => 'nullable|string',
+            'establishment_request_id' => 'nullable|integer|exists:establishment_requests,id',
+            'productos' => 'required|array|min:1',
+            'productos.*' => 'required|string|max:255',
+            'lotes' => 'nullable|array',
+            'lotes.*' => 'nullable|string|max:255',
+            'vencimientos' => 'nullable|array',
+            'vencimientos.*' => 'nullable|date',
+            'programas' => 'nullable|array',
+            'programas.*' => 'nullable|string|max:255',
+            'cantidades' => 'required|array|min:1',
+            'cantidades.*' => 'required|integer|min:1',
+        ]);
+
+        $destino = $validated['establecimiento_destino'];
+        if ($validated['clasificacion'] === 'Externo') {
+            $destino = (! empty($validated['tipo_externo_despacho']) ? $validated['tipo_externo_despacho'] . ' - ' : '') . $validated['establecimiento_destino'];
         }
 
-        // Iniciamos transacción para proteger los datos
         DB::beginTransaction();
+
         try {
-            // 1. Guardar Cabecera del Despacho
+            $firmaRecibe = $validated['firma_recibe'] ?? null;
+
+            if (! $firmaRecibe && ! empty($validated['establishment_request_id'])) {
+                $firmaRecibe = EstablishmentRequest::where('id', $validated['establishment_request_id'])
+                    ->value('firma_solicitante');
+            }
+
+            $correlativo = $this->generarCorrelativo();
+
             $dispatch = Dispatch::create([
-                'correlativo' => $request->correlativo_despacho,
-                'fecha_despacho' => $request->fecha_despacho,
-                'estado_liberacion' => $request->estado_liberacion,
-                'establecimiento_destino' => $request->establecimiento_destino,
-                'direccion_destino' => $request->direccion_destino,
-                'condiciones_transporte' => $request->condiciones_transporte,
+                'correlativo' => $correlativo,
+                'fecha_despacho' => $validated['fecha_despacho'],
+                'clasificacion' => $validated['clasificacion'],
+                'estado_liberacion' => $validated['estado_liberacion'],
+                'establecimiento_destino' => $destino,
+                'direccion_destino' => $validated['direccion_destino'] ?? null,
+                'condiciones_transporte' => $validated['condiciones_transporte'] ?? null,
+                'firma_despacha' => $validated['firma_despacha'] ?? null,
+                'firma_recibe' => $firmaRecibe,
             ]);
 
-            // 2. Procesar cada producto, descontar inventario y trazar movimiento
-            foreach ($request->productos as $index => $nombreProducto) {
-                $lote = !empty($request->lotes[$index]) ? $request->lotes[$index] : 'S/L';
-                $cantidadSolicitada = (int) $request->cantidades[$index];
-                $fechaVence = !empty($request->vencimientos[$index]) ? $request->vencimientos[$index] : null;
+            foreach ($validated['productos'] as $index => $nombreProducto) {
+                if (InventoryService::esControlado($nombreProducto)) {
+                    throw new \RuntimeException("El producto '{$nombreProducto}' es controlado y no puede procesarse por esta vía.");
+                }
 
-                // Crear el ítem del despacho (para historial de la guía)
-                DispatchItem::create([
-                    'dispatch_id' => $dispatch->id,
-                    'producto' => $nombreProducto,
-                    'lote' => $lote,
-                    'fecha_vencimiento' => $fechaVence,
-                    'programa' => $request->programas[$index] ?? 'General',
-                    'cantidad' => $cantidadSolicitada,
-                ]);
+                $asignaciones = InventoryService::consumir(
+                    $nombreProducto,
+                    (int) $validated['cantidades'][$index],
+                    $validated['lotes'][$index] ?? null
+                );
 
-                // Buscar el producto exacto en el Inventario para descontar
-                $inventory = Inventory::where('producto', $nombreProducto)
-                    ->where(function($q) use ($lote) {
-                        if($lote == 'S/L') {
-                            $q->whereNull('lote')->orWhere('lote', 'S/L')->orWhere('lote', '');
-                        } else {
-                            $q->where('lote', $lote);
-                        }
-                    })->first();
+                foreach ($asignaciones as $asignacion) {
+                    $batch = $asignacion['inventory'];
 
-                if ($inventory) {
-                    if ($inventory->cantidad < $cantidadSolicitada) {
-                        throw new \Exception("Stock insuficiente para '{$nombreProducto}'. Stock actual disponible: {$inventory->cantidad}");
-                    }
-                    
-                    // REBAJAMOS EL STOCK FÍSICO
-                    $inventory->decrement('cantidad', $cantidadSolicitada);
-
-                    // --- NUEVO: REGISTRAR EN LA TABLA DE TRAZABILIDAD ---
-                    StockMovement::create([
+                    DispatchItem::create([
+                        'dispatch_id' => $dispatch->id,
+                        'inventory_id' => $batch->id,
                         'producto' => $nombreProducto,
-                        'lote' => $lote,
-                        'fecha_vencimiento' => $fechaVence,
-                        'tipo_movimiento' => 'Despacho',
-                        'cantidad' => -$cantidadSolicitada, // En negativo porque sale de bodega
-                        'fecha_hora' => now(),
-                        'origen_destino' => 'Hacia: ' . $request->establecimiento_destino,
-                        'documento_respaldo' => 'Guía N° ' . $request->correlativo_despacho,
-                        'estado_lote' => $inventory->estado ?? 'Vigente'
+                        'lote' => $batch->lote ?? 'S/L',
+                        'fecha_vencimiento' => $batch->fecha_vencimiento,
+                        'programa' => $validated['programas'][$index] ?? 'General',
+                        'cantidad' => $asignacion['cantidad'],
                     ]);
 
-                } else {
-                    throw new \Exception("No se encontró el lote '{$lote}' del producto '{$nombreProducto}' en la bodega.");
+                    InventoryService::registrarMovimiento($batch, [
+                        'user_id' => Auth::id(),
+                        'tipo_movimiento' => 'Despacho',
+                        'cantidad' => -$asignacion['cantidad'],
+                        'fecha_hora' => now(),
+                        'origen_destino' => 'Hacia: ' . $destino,
+                        'documento_respaldo' => 'Guia N° ' . $correlativo,
+                    ]);
                 }
             }
 
-            // Confirmar y guardar todos los cambios en la base de datos
-            DB::commit(); 
-            return redirect()->back()->with('success', 'Despacho N° ' . $dispatch->correlativo . ' generado y stock descontado con éxito.');
+            if (! empty($validated['establishment_request_id'] ?? null)) {
+                SolicitudService::registrarDespacho(
+                    (int) $validated['establishment_request_id'],
+                    $validated['productos'],
+                    $validated['cantidades']
+                );
+            }
 
-        } catch (\Exception $e) {
-            // Anular todo si hay error
-            DB::rollBack(); 
-            return redirect()->back()->with('error', 'Error en el despacho: ' . $e->getMessage());
+            DB::commit();
+
+            return redirect()->back()->with('success', "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.");
+        } catch (\RuntimeException $e) {
+            DB::rollBack();
+
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Error en despacho: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return redirect()->back()->with('error', 'Ocurrió un error al generar el despacho. Intente nuevamente.');
         }
+    }
+
+    private function generarCorrelativo(): string
+    {
+        $nextId = (int) Dispatch::lockForUpdate()->max('id') + 1;
+
+        return 'GD-' . date('Y') . '-' . str_pad((string) $nextId, 4, '0', STR_PAD_LEFT);
     }
 
     public function pdf($id)
     {
         $despacho = Dispatch::with('items')->findOrFail($id);
-        $pdf = Pdf::loadView('despacho.pdf', compact('despacho'));
-        return $pdf->stream('Guia_Despacho_'.$despacho->correlativo.'.pdf');
+        $pdf = Pdf::loadView('dispatch.pdf', compact('despacho'));
+
+        return $pdf->stream('Guia_Despacho_' . $despacho->correlativo . '.pdf');
     }
 }

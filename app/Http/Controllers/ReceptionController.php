@@ -3,163 +3,155 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
+use App\Models\Product;
+use App\Models\Provider;
 use App\Models\Reception;
 use App\Models\ReceptionItem;
-use App\Models\Provider;
-use App\Models\Product; 
-use App\Models\StockMovement;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Services\InventoryService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReceptionController extends Controller
 {
     public function index()
     {
-        $providers = Provider::all();
-        // Carga los productos maestros para el desplegable de recepción
-        $products = Product::all();
-        // Traemos las recepciones con su proveedor y con los items
+        $providers = Provider::orderBy('name')->get();
+        $products = Product::orderBy('nombre')->get();
         $receptions = Reception::with(['provider', 'items.product'])->orderBy('created_at', 'desc')->get();
+        $nextCorrelativo = (int) Reception::max('correlativo') + 1;
+        $controlados = InventoryService::controlados();
 
-        $nextCorrelativo = Reception::max('correlativo') + 1;
-
-        return view('reception.index', compact('providers', 'receptions', 'products', 'nextCorrelativo'));
+        return view('reception.index', compact('providers', 'receptions', 'products', 'nextCorrelativo', 'controlados'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'fecha_recepcion' => 'required|date',
-            'tipo_documento' => 'required|string',
-            'numero_documento' => 'required|string',
-            'origen' => 'required|string',
+            'tipo_documento' => 'required|string|max:255',
+            'numero_documento' => 'required|string|max:255',
+            'orden_compra' => 'nullable|string|max:255',
+            'origen' => 'required|string|max:255',
             'provider_id' => 'required|exists:providers,id',
+            'firma_receptor' => 'nullable|string',
+            'action' => 'nullable|string|in:save,save_and_download',
             'product_id' => 'required|array|min:1',
-            'product_id.*' => 'required|integer',
+            'product_id.*' => 'required|integer|exists:products,id',
             'cantidad_unitaria' => 'required|array|min:1',
             'cantidad_unitaria.*' => 'required|integer|min:1',
+            'valor_unitario' => 'nullable|array',
+            'valor_unitario.*' => 'nullable|numeric|min:0',
+            'lote' => 'nullable|array',
+            'lote.*' => 'nullable|string|max:255',
+            'fecha_vencimiento' => 'nullable|array',
+            'fecha_vencimiento.*' => 'nullable|date',
+            'tipo_producto' => 'nullable|array',
+            'tipo_producto.*' => 'nullable|string|max:255',
+            'programa' => 'nullable|array',
+            'programa.*' => 'nullable|string|max:255',
         ]);
 
-        // obtiene información del proveedor para registrar en inventario y trazabilidad
-        $provider = Provider::findOrFail($request->provider_id);
-        $rutProveedor = $provider->rut ?? 'S/R';
-        $nombreProveedor = $provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor';
+        $provider = Provider::findOrFail($validated['provider_id']);
 
-        $correlativo_autogenerado = Reception::max('correlativo') + 1;
-
-        // Iniciamos transacción
         DB::beginTransaction();
 
         try {
-            // 1. Guardar la Cabecera de la Recepción
+            $correlativo = (int) Reception::lockForUpdate()->max('correlativo') + 1;
+
             $reception = Reception::create([
-                'correlativo' => $correlativo_autogenerado,
-                'fecha_recepcion' => $request->fecha_recepcion,
-                'tipo_documento' => $request->tipo_documento,
-                'numero_documento' => $request->numero_documento,
-                'orden_compra' => $request->orden_compra,
-                'origen' => $request->origen,
-                'provider_id' => $request->provider_id,
+                'correlativo' => $correlativo,
+                'fecha_recepcion' => $validated['fecha_recepcion'],
+                'tipo_documento' => $validated['tipo_documento'],
+                'numero_documento' => $validated['numero_documento'],
+                'orden_compra' => $validated['orden_compra'] ?? null,
+                'origen' => $validated['origen'],
+                'provider_id' => $validated['provider_id'],
                 'valor_total_recepcion' => 0,
-                'firma_proveedor' => $request->firma_proveedor,
-                'firma_receptor' => $request->firma_receptor,
+                'firma_receptor' => $validated['firma_receptor'] ?? null,
             ]);
 
+            $factorIva = 1 + config('drogueria.iva');
             $total_neto_recepcion = 0;
 
-            // 2. Guardar cada Producto asociado (Bucle dinámico)
-            foreach ($request->product_id as $index => $prod_id) {
-                // obtener el nombre del producto para inventario y trazabilidad
-                $product = Product::find($prod_id);
-                $nombreProducto = $product ? $product->nombre : 'Producto #' . $prod_id;
+            foreach ($validated['product_id'] as $index => $prodId) {
+                $product = Product::find($prodId);
+                $nombreProducto = $product?->nombre ?? 'Producto #' . $prodId;
 
-                $cantidad = $request->cantidad_unitaria[$index];
-                $valor_u = $request->valor_unitario[$index] ?? 0;
-                $subtotal_item = $cantidad * $valor_u;
-                $loteRecibido = $request->lote[$index] ?? 'S/L';
-                $fechaVence = $request->fecha_vencimiento[$index] ?? null;
+                $cantidad = (int) $validated['cantidad_unitaria'][$index];
+                $valorU = (float) ($validated['valor_unitario'][$index] ?? 0);
+                $subtotal = $cantidad * $valorU;
+                $fechaVence = $validated['fecha_vencimiento'][$index] ?? null;
 
-                $total_neto_recepcion += $subtotal_item;
+                $categoria = InventoryService::esControlado($nombreProducto)
+                    ? 'Controlado'
+                    : ($validated['tipo_producto'][$index] ?? 'General');
 
-                // Guardar en reception_items
+                $total_neto_recepcion += $subtotal;
+
                 ReceptionItem::create([
                     'reception_id' => $reception->id,
-                    'product_id' => $prod_id,
-                    'tipo_producto' => $request->tipo_producto[$index] ?? null,
-                    'lote' => $loteRecibido,
+                    'product_id' => $prodId,
+                    'tipo_producto' => $categoria,
+                    'lote' => $validated['lote'][$index] ?? null,
                     'fecha_vencimiento' => $fechaVence,
                     'cantidad' => $cantidad,
-                    'valor_unitario' => $valor_u,
-                    'valor_total_item' => $subtotal_item * 1.19,
+                    'valor_unitario' => $valorU,
+                    'valor_total_item' => $subtotal * $factorIva,
                 ]);
 
-                // 3. Lógica Inteligente de Inventario (Acumular o Crear Fila Nueva)
-                $inventarioExistente = Inventory::where('producto', $nombreProducto)
-                    ->where(function($q) use ($loteRecibido) {
-                        if ($loteRecibido == 'S/L') {
-                            $q->whereNull('lote')->orWhere('lote', 'S/L')->orWhere('lote', '');
-                        } else {
-                            $q->where('lote', $loteRecibido);
-                        }
-                    })->first();
-
-                if ($inventarioExistente) {
-                    // Si el lote ya existe, sumamos la cantidad al stock físico actual
-                    $inventarioExistente->increment('cantidad', $cantidad);
-                    $inventarioExistente->update(['valor_neto_unitario' => $valor_u]);
-                } else {
-                    // Si es nuevo, creamos el registro
-                    Inventory::create([
-                        'correlativo_interno' => $correlativo_autogenerado,
-                        'fecha_recepcion' => $request->fecha_recepcion,
-                        'tipo_documento' => $request->tipo_documento,
-                        'numero_documento' => $request->numero_documento,
-                        'orden_compra' => $request->orden_compra,
-                        'origen_mercaderia' => $request->origen,
-                        'rut_proveedor' => $rutProveedor,
-                        'razon_social' => $nombreProveedor,
-                        'producto' => $nombreProducto,
-                        'categoria' => $request->tipo_producto[$index] ?? 'General',
-                        'estado' => 'Cuarentena', // Se asume Cuarentena al ingresar
-                        'lote' => $loteRecibido,
-                        'fecha_vencimiento' => $fechaVence,
-                        'cantidad' => $cantidad,
-                        'valor_neto_unitario' => $valor_u,
-                        'pasillo' => 'P.A',
-                        'estante' => 'P.A',
-                    ]);
-                }
-
-                // tabla trazabilidad (stock_movements) para cada producto recibido
-                StockMovement::create([
+                $batch = InventoryService::ingresar([
+                    'user_id' => Auth::id(),
+                    'product_id' => $prodId,
+                    'correlativo_interno' => $correlativo,
+                    'fecha_recepcion' => $validated['fecha_recepcion'],
+                    'tipo_documento' => $validated['tipo_documento'],
+                    'numero_documento' => $validated['numero_documento'],
+                    'orden_compra' => $validated['orden_compra'] ?? null,
+                    'origen_mercaderia' => $validated['origen'],
+                    'rut_proveedor' => $provider->rut,
+                    'razon_social' => $provider->name,
                     'producto' => $nombreProducto,
-                    'lote' => $loteRecibido,
+                    'categoria' => $categoria,
+                    'estado' => 'Cuarentena',
+                    'lote' => $validated['lote'][$index] ?? 'S/L',
                     'fecha_vencimiento' => $fechaVence,
+                    'cantidad' => $cantidad,
+                    'valor_neto_unitario' => $valorU,
+                    'programa' => $validated['programa'][$index] ?? null,
+                    'pasillo' => 'P.A',
+                    'estante' => 'P.A',
+                ]);
+
+                InventoryService::registrarMovimiento($batch, [
+                    'user_id' => Auth::id(),
                     'tipo_movimiento' => 'Recepción',
-                    'cantidad' => $cantidad, // Positivo porque entra a bodega
+                    'cantidad' => $cantidad,
                     'fecha_hora' => now(),
-                    'origen_destino' => 'Desde: ' . $nombreProveedor,
-                    'documento_respaldo' => $request->tipo_documento . ' ' . $request->numero_documento,
-                    'estado_lote' => 'Cuarentena'
+                    'origen_destino' => 'Desde: ' . $provider->name,
+                    'documento_respaldo' => $validated['tipo_documento'] . ' ' . $validated['numero_documento'],
+                    'estado_lote' => 'Cuarentena',
                 ]);
             }
 
-            // 4. Actualizar el Gran Total de la Recepción (IVA incluido)
-            $reception->update(['valor_total_recepcion' => $total_neto_recepcion * 1.19]);
+            $reception->update(['valor_total_recepcion' => $total_neto_recepcion * $factorIva]);
 
-            // Confirmar transacción
             DB::commit();
 
-            if ($request->action == 'save_and_download') {
+            if (($validated['action'] ?? '') === 'save_and_download') {
                 return redirect()->route('reception.pdf', $reception->id);
             }
 
-            return redirect()->route('reception.index')->with('success', 'Recepción guardada exitosamente y registrada en trazabilidad. N°: ' . $correlativo_autogenerado);
-
-        } catch (\Exception $e) {
+            return redirect()
+                ->route('reception.index')
+                ->with('success', "Recepción guardada y registrada en trazabilidad. N°: {$correlativo}");
+        } catch (\Throwable $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Ocurrió un error: ' . $e->getMessage());
+            Log::error('Error al guardar recepción: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return redirect()->back()->with('error', 'Ocurrió un error al guardar la recepción. Intente nuevamente.')->withInput();
         }
     }
 
@@ -167,6 +159,7 @@ class ReceptionController extends Controller
     {
         $reception->load(['provider', 'items.product']);
         $pdf = Pdf::loadView('reception.pdf', compact('reception'));
+
         return $pdf->download("recepcion_{$reception->numero_documento}.pdf");
     }
 }

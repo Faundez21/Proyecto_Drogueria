@@ -1,6 +1,31 @@
 @extends('layouts.app')
 
+@section('title', 'Distribución de la Droguería')
+
+@section('subtitle', 'Distribución física y organización de la bodega')
+
+@section('actions')
+    <a href="{{ route('shelf.index') }}"
+        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20h16M4 4h16M4 12h16">
+            </path>
+        </svg>
+        Gestionar Estanterías
+    </a>
+@endsection
+
 @section('content')
+    <!-- migas de pan -->
+    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
+        <span class="text-slate-400 font-semibold">03</span>
+        <span>Salida</span>
+        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+        <span class="font-semibold text-slate-800">Distribución</span>
+    </div>
+
     <!-- Scripts requeridos -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -95,37 +120,12 @@
         }
     </style>
 
-    <!-- Barra Superior: Navegación -->
-    <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div class="flex items-center gap-2 text-sm font-medium text-slate-500">
-            <a href="#" class="hover:text-blue-600 transition-colors flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                    </path>
-                </svg>
-                Distribución
-            </a>
-        </div>
-    </div>
-
     <div class="w-full">
-        <!-- Encabezado Principal -->
-        <div class="mb-6">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Distribución de la droguería</h1>
-            <p class="text-gray-500 mt-1 text-sm sm:text-base">Distribución física y organización de la bodega</p>
-        </div>
-
         <!-- Sección de Mantenedores (Enlaces Rápidos) -->
         <div class="mb-8">
-            <h2 class="text-lg sm:text-xl font-bold text-gray-800">Mantenedores</h2>
-            <p class="text-gray-500 mt-1 mb-4 text-sm sm:text-base">Acceder a los mantenedores de la distribución física de
-                la droguería</p>
-
             <!-- BOTONES MANTENEDORES -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-                <!-- BOTÓN PASILLO -->
                 <!-- BOTÓN PASILLO -->
                 <a href="{{ route('aisle.index') }}"
                     class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
@@ -364,7 +364,7 @@
                         <div x-show="sidebarOpen" x-transition
                             class="p-3 sm:p-4 pt-0 border-t border-slate-700/50 mt-1 flex flex-col gap-3">
                             <div class="relative">
-                                <select
+                                <select style="background-image: none;"
                                     class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2.5 text-xs sm:text-sm text-white font-medium focus:outline-none focus:border-blue-500 cursor-pointer appearance-none">
                                     <option>Nivel 1</option>
                                     <option>Nivel 2</option>
@@ -392,23 +392,20 @@
                                     class="w-full bg-[#1e293b] border border-slate-700 rounded-lg py-2.5 pl-9 pr-3 text-xs sm:text-sm text-gray-300 focus:outline-none focus:border-blue-500 placeholder-gray-500 transition">
                             </div>
 
-                            <!-- Leyenda de colores -->
+                            <!-- Leyenda de ocupación -->
                             <div class="flex flex-col gap-3 mt-2 text-xs sm:text-sm font-medium text-gray-300">
                                 <div class="flex items-center gap-3"><span
                                         class="w-3.5 h-3.5 rounded bg-[#22c55e]"></span>
-                                    Disponible</div>
-                                <div class="flex items-center gap-3"><span
-                                        class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span>
-                                    Ocupado</div>
+                                    Ocupación baja (< 50%)</div>
                                 <div class="flex items-center gap-3"><span
                                         class="w-3.5 h-3.5 rounded bg-[#f97316]"></span>
-                                    Cuarentena</div>
+                                    Ocupación media (50-79%)</div>
                                 <div class="flex items-center gap-3"><span
-                                        class="w-3.5 h-3.5 rounded bg-[#a855f7]"></span>
-                                    Reservado</div>
+                                        class="w-3.5 h-3.5 rounded bg-[#ef4444]"></span>
+                                    Ocupación crítica (&ge; 80%)</div>
                                 <div class="flex items-center gap-3"><span
-                                        class="w-3.5 h-3.5 rounded bg-[#64748b]"></span>
-                                    Mantenimiento</div>
+                                        class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span>
+                                    Sin capacidad definida</div>
                             </div>
                         </div>
                     </aside>
@@ -435,28 +432,56 @@
                             </button>
                         </div>
                         <div class="text-xs sm:text-sm space-y-1 sm:space-y-2 text-gray-300">
-                            <p class="font-medium text-white" x-text="rackData.product"></p>
-                            <p>Lote: <span class="font-mono bg-slate-800 px-1 py-0.5 rounded"
-                                    x-text="rackData.lot"></span>
-                            </p>
-                            <p>Venc: <span x-text="rackData.venc"></span></p>
-                            <p>Stock: <span x-text="rackData.stock"></span></p>
+                            <p class="font-medium text-white" x-text="rackData.aisle ? 'Pasillo: ' + rackData.aisle : ''"></p>
+
+                            <!-- Ocupación -->
+                            <div class="bg-slate-800/70 border border-slate-700 rounded-lg px-2.5 py-2">
+                                <div class="flex justify-between items-center text-[11px] font-bold text-gray-300">
+                                    <span x-text="rackData.ocupacionLabel"></span>
+                                    <span class="font-mono" x-text="rackData.pct !== null ? rackData.pct + '%' : 'Sin límite'"></span>
+                                </div>
+                                <div class="mt-1.5 h-2 bg-slate-700 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full transition-all duration-500"
+                                        :style="'width:' + (rackData.pct ?? 0) + '%; background-color:' + (rackData.pct >= 80 ? '#ef4444' : (rackData.pct >= 50 ? '#f97316' : '#22c55e'))"></div>
+                                </div>
+                                <p class="text-[10px] text-gray-400 mt-1 font-mono">
+                                    <span x-text="rackData.stock.toLocaleString('es-CL')"></span>
+                                    <span x-show="rackData.capacidad > 0" x-text="'/ ' + rackData.capacidad.toLocaleString('es-CL') + ' u'"></span>
+                                </p>
+                            </div>
+
+                            <template x-if="rackData.items && rackData.items.length > 1">
+                                <div class="max-h-40 overflow-y-auto space-y-1.5 pr-1">
+                                    <template x-for="(item, idx) in rackData.items" :key="idx">
+                                        <div class="flex justify-between items-center gap-2 bg-slate-800/70 border border-slate-700 rounded-lg px-2.5 py-1.5">
+                                            <div class="min-w-0">
+                                                <p class="font-semibold text-white truncate" x-text="item.producto"></p>
+                                                <p class="text-[10px] text-gray-400 font-mono truncate">
+                                                    Lote: <span x-text="item.lote"></span>
+                                                    <span x-show="item.nivel"> · Niv: <span x-text="item.nivel"></span></span>
+                                                    <span x-show="item.posicion"> · Pos: <span x-text="item.posicion"></span></span>
+                                                </p>
+                                                <p class="text-[10px] text-blue-400 font-semibold" x-show="item.programa" x-text="item.programa"></p>
+                                            </div>
+                                            <span class="text-emerald-400 font-bold text-xs shrink-0" x-text="item.cantidad + ' u'"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="!rackData.items || rackData.items.length === 0">
+                                <p class="text-gray-400 text-xs">No hay medicamentos disponibles en esta estantería.</p>
+                            </template>
                         </div>
 
                         <div class="mt-3 sm:mt-4 mb-3 sm:mb-4">
                             <span class="px-2 py-1 text-[10px] sm:text-xs font-semibold rounded-md border inline-block"
                                 :class="{
-                                    'bg-green-900/40 text-green-400 border-green-800': rackData
-                                        .status === 'Disponible',
-                                    'bg-blue-900/40 text-blue-400 border-blue-800': rackData.status === 'Ocupado',
-                                    'bg-orange-900/40 text-orange-400 border-orange-800': rackData
-                                        .status === 'Cuarentena',
-                                    'bg-purple-900/40 text-purple-400 border-purple-800': rackData
-                                        .status === 'Reservado',
-                                    'bg-slate-700/60 text-slate-300 border-slate-600': rackData
-                                        .status === 'Mantenimiento'
+                                    'bg-green-900/40 text-green-400 border-green-800': rackData.pct !== null && rackData.pct < 50,
+                                    'bg-orange-900/40 text-orange-400 border-orange-800': rackData.pct !== null && rackData.pct >= 50 && rackData.pct < 80,
+                                    'bg-rose-900/40 text-rose-400 border-rose-800': rackData.pct !== null && rackData.pct >= 80,
+                                    'bg-blue-900/40 text-blue-400 border-blue-800': rackData.pct === null
                                 }"
-                                x-text="rackData.status"></span>
+                                x-text="rackData.ocupacionLabel"></span>
                         </div>
                         <div class="flex gap-2">
                             <button @click.stop="habilitarMovimiento()"
@@ -565,7 +590,7 @@
                         }));
                     },
                     verDetalle() {
-                        alert(`Redirigiendo a detalle de la posición: ${this.rackData.code}`);
+                        window.location.href = "{{ route('inventario.index') }}?estante=" + encodeURIComponent(this.rackData.code);
                     },
                     habilitarMovimiento() {
                         this.tooltipVisible = false; // Ocultamos el panel para que no estorbe
@@ -661,129 +686,351 @@
                         // Arrays de gestión para los Racks
                         const racks = [];
                         const markers = [];
-                        const palleteGeo = new THREE.BoxGeometry(4, 3, 4);
 
-                        // Materiales (5 Colores)
-                        const matVerde = new THREE.MeshStandardMaterial({
-                            color: '#22c55e',
-                            roughness: 0.7
-                        });
-                        const matAzul = new THREE.MeshStandardMaterial({
-                            color: '#3b82f6',
-                            roughness: 0.7
-                        });
-                        const matNaranja = new THREE.MeshStandardMaterial({
-                            color: '#f97316',
-                            roughness: 0.7
-                        });
-                        const matMorado = new THREE.MeshStandardMaterial({
-                            color: '#a855f7',
-                            roughness: 0.7
-                        });
-                        const matGris = new THREE.MeshStandardMaterial({
-                            color: '#64748b',
-                            roughness: 0.7
-                        });
+
 
 
                         // Convertimos la variable de Laravel a un objeto de JavaScript
                         const dbShelves = @json($shelves);
 
-                        function createSingleRack(x, z, material, data) {
-                            // Crear la malla 3D individual
-                            const mesh = new THREE.Mesh(palleteGeo, material.clone());
-                            mesh.position.set(x, 1.5, z); // Altura fija en Y = 1.5
-                            mesh.castShadow = true;
-                            mesh.receiveShadow = true;
-                            mesh.userData = data;
-                            mesh.userData.originalEmissive = mesh.material.emissive.getHex();
-
-                            racks.push(mesh);
-                            scene.add(mesh);
-
-                            // Crear el marcador HTML flotante (la etiqueta con el nombre)
-                            const centerVec = new THREE.Vector3(x, 4.5, z);
-                            const markerDiv = document.createElement('div');
-
-                            let bgClass = 'marker-blue'; // Color por defecto
-                            if (data.status === 'Disponible') bgClass = 'marker-green';
-                            else if (data.status === 'Ocupado') bgClass = 'marker-blue';
-                            else if (data.status === 'Cuarentena') bgClass = 'marker-orange';
-                            else if (data.status === 'Reservado') bgClass = 'marker-purple';
-                            else if (data.status === 'Mantenimiento') bgClass = 'marker-gray';
-
-                            markerDiv.className =
-                                `rack-marker px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shadow-md ${bgClass}`;
-                            markerDiv.textContent = data.code;
-
-                            labelsContainer.appendChild(markerDiv);
-                            markers.push({
-                                element: markerDiv,
-                                pos3D: centerVec
+                        // Stock real del inventario agrupado por estante (ubicacion fisica)
+                        const stockData = @json($stock);
+                        const stockByShelf = {};
+                        stockData.forEach(item => {
+                            const key = (item.estante ?? '').trim();
+                            if (!key) return;
+                            if (!stockByShelf[key]) stockByShelf[key] = [];
+                            stockByShelf[key].push({
+                                producto: item.producto,
+                                lote: item.lote ?? 'S/L',
+                                nivel: item.nivel ?? '',
+                                posicion: item.posicion ?? '',
+                                programa: item.programa ?? '',
+                                cantidad: item.cantidad ?? 0,
+                                vence: item.fecha_vencimiento ?? ''
                             });
+                        });
+
+                        // Colores por nivel de ocupación
+                        const COLOR_BAJO = 0x22c55e;   // < 50%
+                        const COLOR_MEDIO = 0xf97316;  // 50-79%
+                        const COLOR_ALTO = 0xef4444;   // >= 80%
+                        const COLOR_SIN_LIMITE = 0x3b82f6;
+
+                        function colorOcupacion(pct) {
+                            if (pct === null) return COLOR_SIN_LIMITE;
+                            if (pct >= 80) return COLOR_ALTO;
+                            if (pct >= 50) return COLOR_MEDIO;
+                            return COLOR_BAJO;
+                        }
+
+                        function etiquetaOcupacion(pct) {
+                            if (pct === null) return 'Sin capacidad';
+                            if (pct >= 80) return 'Ocupación Crítica';
+                            if (pct >= 50) return 'Ocupación Media';
+                            return 'Ocupación Baja';
+                        }
+
+                        // Pasillos: zonas de piso coloreadas (pasillos visibles)
+                        const zonasPasillo = {};
+                        dbShelves.forEach(shelf => {
+                            const nombrePasillo = shelf.aisle ? shelf.aisle.name : 'Sin pasillo';
+                            if (!zonasPasillo[nombrePasillo]) {
+                                zonasPasillo[nombrePasillo] = {
+                                    color: shelf.aisle ? shelf.aisle.color : '#64748b',
+                                    shelves: []
+                                };
+                            }
+                            zonasPasillo[nombrePasillo].shelves.push(shelf);
+                        });
+
+                        Object.entries(zonasPasillo).forEach(([nombrePasillo, zona]) => {
+                            const pisoMat = new THREE.MeshStandardMaterial({
+                                color: zona.color,
+                                transparent: true,
+                                opacity: 0.22,
+                                roughness: 0.9
+                            });
+                            const bordeMat = new THREE.MeshStandardMaterial({
+                                color: zona.color,
+                                roughness: 0.6
+                            });
+
+                            const shelfxs = zona.shelves.map(s => s.pos_x);
+                            const shelfzs = zona.shelves.map(s => s.pos_z);
+                            const minX = Math.min(...shelfxs) - 3;
+                            const maxX = Math.max(...shelfxs) + 3;
+                            const minZ = Math.min(...shelfzs) - 3;
+                            const maxZ = Math.max(...shelfzs) + 3;
+                            const ancho = maxX - minX;
+                            const profundo = maxZ - minZ;
+                            const cx = (minX + maxX) / 2;
+                            const cz = (minZ + maxZ) / 2;
+
+                            const zonaPiso = new THREE.Mesh(new THREE.BoxGeometry(ancho, 0.12, profundo), pisoMat);
+                            zonaPiso.position.set(cx, 0.06, cz);
+                            zonaPiso.receiveShadow = true;
+                            scene.add(zonaPiso);
+
+                            const bordeZona = new THREE.Mesh(new THREE.BoxGeometry(ancho + 0.6, 0.1, 0.5), bordeMat);
+                            bordeZona.position.set(cx, 0.05, maxZ + 0.55);
+                            scene.add(bordeZona);
+
+                            const marcadorAisle = document.createElement('div');
+                            marcadorAisle.className = 'rack-marker px-2 py-0.5 rounded text-[9px] font-bold shadow-md uppercase tracking-widest';
+                            marcadorAisle.style.backgroundColor = zona.color;
+                            marcadorAisle.style.color = 'white';
+                            marcadorAisle.textContent = nombrePasillo;
+                            labelsContainer.appendChild(marcadorAisle);
+                            markers.push({
+                                element: marcadorAisle,
+                                pos3D: new THREE.Vector3(cx, 1.2, maxZ + 1.6)
+                            });
+                        });
+
+                        // Estanterías realistas: postes + niveles + posiciones
+                        const ALTURA_NIVEL = 2.0;
+                        const ESPESOR = 0.15;
+
+                        function texturaTexto(texto, colorFondo, colorTexto, tamanoFuente) {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = 128;
+                            canvas.height = 48;
+                            const ctx = canvas.getContext('2d');
+                            ctx.fillStyle = colorFondo;
+                            ctx.fillRect(0, 0, 128, 48);
+                            ctx.fillStyle = colorTexto;
+                            ctx.font = 'bold ' + (tamanoFuente || 28) + 'px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            const cortado = String(texto).length > 9 ? String(texto).slice(0, 8) + '…' : String(texto);
+                            ctx.fillText(cortado, 64, 26);
+                            const tex = new THREE.CanvasTexture(canvas);
+                            tex.anisotropy = 4;
+                            return new THREE.MeshBasicMaterial({ map: tex });
+                        }
+
+                        function crearEstanteriaRealista(shelf, rackData) {
+                            const grupo = new THREE.Group();
+                            const nivelesData = [...(shelf.levels ?? [])]
+                                .sort((a, b) => (parseInt(a.number ?? 0) || 0) - (parseInt(b.number ?? 0) || 0));
+                            const nNiveles = Math.min(Math.max(nivelesData.length, 3), 5);
+                            const alturaTotal = nNiveles * ALTURA_NIVEL + 0.8;
+
+                            const colorPasillo = shelf.aisle ? shelf.aisle.color : '#64748b';
+                            const matPoste = new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.5 });
+                            const matRepisa = new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: 0.7 });
+                            const matOcupado = new THREE.MeshStandardMaterial({ color: '#10b981', roughness: 0.4 });
+                            const matLibre = new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.85 });
+
+                            const postes = [
+                                [-1.85, -1.85], [1.85, -1.85],
+                                [-1.85, 1.85], [1.85, 1.85]
+                            ];
+                            postes.forEach(([dx, dz]) => {
+                                const poste = new THREE.Mesh(new THREE.BoxGeometry(0.22, alturaTotal, 0.22), matPoste);
+                                poste.position.set(dx, alturaTotal / 2, dz);
+                                poste.castShadow = true;
+                                grupo.add(poste);
+                            });
+
+                            // Estructura de niveles/posiciones reales (con fallback)
+                            const posicionesPorNivel = [];
+                            for (let i = 0; i < nNiveles; i++) {
+                                const nivelReal = nivelesData[i] ?? null;
+                                const positionsData = nivelReal && (nivelReal.positions ?? []).length > 0
+                                    ? nivelReal.positions
+                                    : [{ name: 'P1' }, { name: 'P2' }, { name: 'P3' }];
+                                posicionesPorNivel.push(positionsData.slice(0, 4));
+                            }
+
+                            // Colocación REAL del stock: cada item en su nivel/posición
+                            const digitos = (s) => (String(s ?? '').match(/\d+/g) || []).join('');
+                            const ocupacionMapa = {};
+                            let colocados = 0;
+
+                            (rackData.items ?? []).forEach(item => {
+                                const nivDig = digitos(item.nivel);
+                                let li = -1;
+
+                                if (nivDig) {
+                                    li = posicionesPorNivel.findIndex((_, idx) => {
+                                        const numReal = nivelesData[idx] ? digitos(nivelesData[idx].number) : String(idx + 1);
+                                        return numReal === nivDig;
+                                    });
+                                    if (li === -1) {
+                                        const idx = parseInt(nivDig, 10) - 1;
+                                        if (idx >= 0 && idx < nNiveles) li = idx;
+                                    }
+                                }
+
+                                if (li === -1 && rackData.pct === null) {
+                                    for (let i = 0; i < nNiveles && li === -1; i++) {
+                                        for (let j = 0; j < posicionesPorNivel[i].length; j++) {
+                                            if (!ocupacionMapa[i + '-' + j]) { li = i; break; }
+                                        }
+                                    }
+                                }
+
+                                if (li === -1) return;
+
+                                const posList = posicionesPorNivel[li];
+                                let sj = -1;
+                                const posDig = digitos(item.posicion);
+
+                                if (posDig) {
+                                    sj = posList.findIndex(p => digitos(p.name) === posDig);
+                                }
+                                if (sj === -1) {
+                                    for (let j = 0; j < posList.length; j++) {
+                                        if (!ocupacionMapa[li + '-' + j]) { sj = j; break; }
+                                    }
+                                }
+                                if (sj === -1) return;
+
+                                const key = li + '-' + sj;
+                                if (!ocupacionMapa[key]) {
+                                    ocupacionMapa[key] = item;
+                                    colocados++;
+                                }
+                            });
+
+                            // Total de slots para repartir el resto según el % de ocupación
+                            const totalSlots = posicionesPorNivel.reduce((acc, p) => acc + p.length, 0);
+                            const slotsMeta = rackData.pct !== null ? Math.round(totalSlots * rackData.pct / 100) : colocados;
+                            let extrasPorColocar = Math.max(0, slotsMeta - colocados);
+
+                            for (let i = 0; i < nNiveles; i++) {
+                                const yRepisa = 0.4 + i * ALTURA_NIVEL;
+
+                                const repisa = new THREE.Mesh(new THREE.BoxGeometry(4, ESPESOR, 4), matRepisa);
+                                repisa.position.set(0, yRepisa, 0);
+                                repisa.castShadow = true;
+                                repisa.receiveShadow = true;
+                                grupo.add(repisa);
+
+                                // Placa con el NÚMERO real del nivel (frente del nivel)
+                                const numNivel = nivelesData[i]
+                                    ? (nivelesData[i].number ?? (i + 1))
+                                    : (i + 1);
+                                const placaNivel = new THREE.Mesh(
+                                    new THREE.PlaneGeometry(0.75, 0.3),
+                                    texturaTexto('N' + numNivel, '#334155', '#ffffff', 30)
+                                );
+                                placaNivel.position.set(-1.85, yRepisa + 0.22, 2.03);
+                                grupo.add(placaNivel);
+
+                                const posList = posicionesPorNivel[i];
+                                const nSlots = posList.length;
+                                const anchoSlot = 3.7 / nSlots;
+
+                                for (let j = 0; j < nSlots; j++) {
+                                    const key = i + '-' + j;
+                                    const itemReal = ocupacionMapa[key];
+                                    let ocupado = Boolean(itemReal);
+
+                                    if (!ocupado && extrasPorColocar > 0) {
+                                        ocupado = true;
+                                        extrasPorColocar--;
+                                    }
+
+                                    const slot = new THREE.Mesh(
+                                        new THREE.BoxGeometry(anchoSlot - 0.25, 0.14, 3.6),
+                                        ocupado ? matOcupado.clone() : matLibre.clone()
+                                    );
+                                    slot.position.set(
+                                        -1.85 + anchoSlot / 2 + j * anchoSlot,
+                                        yRepisa + 0.12,
+                                        0
+                                    );
+                                    slot.castShadow = true;
+                                    grupo.add(slot);
+
+                                    // Placa con el NOMBRE real de la posición (frente del slot)
+                                    const nombrePos = posList[j].name ?? ('P' + (j + 1));
+                                    const placaPos = new THREE.Mesh(
+                                        new THREE.PlaneGeometry(Math.min(anchoSlot - 0.35, 1.1), 0.22),
+                                        texturaTexto(nombrePos, ocupado ? '#065f46' : '#64748b', '#ffffff', 22)
+                                    );
+                                    placaPos.position.set(
+                                        slot.position.x,
+                                        yRepisa + 0.12,
+                                        1.82
+                                    );
+                                    grupo.add(placaPos);
+                                }
+                            }
+
+                            const techo = new THREE.Mesh(new THREE.BoxGeometry(4, ESPESOR, 4), matPoste);
+                            techo.position.set(0, alturaTotal, 0);
+                            grupo.add(techo);
+
+                            grupo.position.set(shelf.pos_x, 0, shelf.pos_z);
+                            scene.add(grupo);
+                            rackData.alturaTotal = alturaTotal;
+                            rackData.nNiveles = nNiveles;
+
+                            return grupo;
                         }
 
                         // Recorrer los datos reales de la BD y dibujarlos
                         dbShelves.forEach(shelf => {
-                            // Adaptamos los datos de la BD
+                            const items = stockByShelf[shelf.name.trim()] ?? [];
+                            const totalStock = items.reduce((acc, i) => acc + (i.cantidad ?? 0), 0);
+                            const capacidad = parseInt(shelf.capacidad ?? 0) || 0;
+                            const pct = capacidad > 0 ? Math.min(100, Math.round((totalStock / capacidad) * 100)) : null;
+
                             const rackData = {
                                 id: shelf.id,
                                 code: shelf.name,
-                                status: 'Disponible', // Por defecto hasta conectar niveles posiciones
-                                product: shelf.description || 'Sin descripción',
-                                stock: '-',
-                                lot: '-',
-                                venc: '-',
-                                aisle: shelf.aisle ? shelf.aisle.name : 'Sin pasillo'
+                                status: items.length > 0 ? 'Ocupado' : 'Disponible',
+                                aisle: shelf.aisle ? shelf.aisle.name : 'Sin pasillo',
+                                stock: totalStock,
+                                capacidad: capacidad,
+                                pct: pct,
+                                ocupacionLabel: etiquetaOcupacion(pct),
+                                product: items.length > 0 ? items[0].producto : 'Sin stock asignado',
+                                lot: items.length > 0 ? items[0].lote : '-',
+                                venc: items.length > 0 ? items[0].vence : '-',
+                                items: items
                             };
 
-                            // Dibujamos la estantería usando las coordenadas de la BD
-                            createSingleRack(shelf.pos_x, shelf.pos_z, matAzul, rackData);
-                        });
+                            // Estantería realista (postes, niveles, posiciones)
+                            crearEstanteriaRealista(shelf, rackData);
 
-                        // Función para generar bloques de estanterías
-                        function createRackCluster(x, z, cols, rows, material, data) {
-                            const clusterGroup = new THREE.Group();
-                            let centerVec = new THREE.Vector3(0, 0, 0);
-                            let count = 0;
+                            // Hitbox invisible para interacción (raycast, drag, selección)
+                            const alturaHitbox = rackData.alturaTotal + 0.5;
+                            const hitMat = new THREE.MeshStandardMaterial({
+                                color: colorOcupacion(pct),
+                                transparent: true,
+                                opacity: 0,
+                                roughness: 0.3,
+                                emissive: colorOcupacion(pct),
+                                emissiveIntensity: 0
+                            });
+                            const mesh = new THREE.Mesh(new THREE.BoxGeometry(4.4, alturaHitbox, 4.4), hitMat);
+                            mesh.position.set(shelf.pos_x, alturaHitbox / 2, shelf.pos_z);
+                            mesh.userData = rackData;
+                            mesh.userData.originalEmissive = 0;
+                            racks.push(mesh);
+                            scene.add(mesh);
 
-                            for (let i = 0; i < cols; i++) {
-                                for (let j = 0; j < rows; j++) {
-                                    const mesh = new THREE.Mesh(palleteGeo, material.clone());
-                                    mesh.position.set(x + i * 4.2, 1.5, z + j * 4.2);
-                                    mesh.castShadow = true;
-                                    mesh.receiveShadow = true;
-                                    mesh.userData = data;
-                                    mesh.userData.originalEmissive = mesh.material.emissive.getHex();
-                                    racks.push(mesh);
-                                    clusterGroup.add(mesh);
-                                    centerVec.add(mesh.position);
-                                    count++;
-                                }
-                            }
-                            scene.add(clusterGroup);
-
-                            // Crear marcador HTML flotante
-                            centerVec.divideScalar(count);
-                            centerVec.y += 3.5;
-
+                            // Marcador HTML flotante: código + % ocupación + unidades
                             const markerDiv = document.createElement('div');
-                            let bgClass = '';
-                            if (data.status === 'Disponible') bgClass = 'marker-green';
-                            else if (data.status === 'Ocupado') bgClass = 'marker-blue';
-                            else if (data.status === 'Cuarentena') bgClass = 'marker-orange';
-                            else if (data.status === 'Reservado') bgClass = 'marker-purple';
-                            else bgClass = 'marker-gray';
-
                             markerDiv.className =
-                                `rack-marker px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shadow-md ${bgClass}`;
-                            markerDiv.textContent = data.code;
+                                `rack-marker px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shadow-md marker-ocu`;
+                            markerDiv.style.backgroundColor = '#' + colorOcupacion(pct).toString(16).padStart(6, '0');
+                            markerDiv.style.color = 'white';
+                            markerDiv.textContent = capacidad > 0
+                                ? `${rackData.code} · ${pct}% (${totalStock.toLocaleString('es-CL')}u)`
+                                : `${rackData.code} · ${totalStock.toLocaleString('es-CL')}u`;
+
                             labelsContainer.appendChild(markerDiv);
                             markers.push({
                                 element: markerDiv,
-                                pos3D: centerVec
+                                pos3D: new THREE.Vector3(shelf.pos_x, alturaHitbox + 1.6, shelf.pos_z)
                             });
-                        }
+                        });
 
                         // Poblando los racks dentro del perímetro 80x50
 
@@ -796,14 +1043,25 @@
 
                         function highlightRack(mesh, isHover) {
                             if (!mesh) return;
-                            const targetColor = isHover ? 0x444444 : 0x666666;
                             racks.forEach(r => {
-                                if (r.userData.code === mesh.userData.code) r.material.emissive.setHex(targetColor);
+                                if (r.userData.code === mesh.userData.code) {
+                                    r.material.opacity = isHover ? 0.16 : 0.3;
+                                    r.material.emissiveIntensity = isHover ? 0.4 : 0.75;
+                                }
                             });
                         }
 
+                        function quitarBrillo(mesh) {
+                            if (!mesh || mesh === selectedObject) return;
+                            mesh.material.opacity = 0;
+                            mesh.material.emissiveIntensity = 0;
+                        }
+
                         function resetAllHighlights() {
-                            racks.forEach(r => r.material.emissive.setHex(0x000000));
+                            racks.forEach(r => {
+                                r.material.opacity = 0;
+                                r.material.emissiveIntensity = 0;
+                            });
                             selectedObject = null;
                         }
 
@@ -819,8 +1077,7 @@
                         wrapper.addEventListener('pointermove', (event) => {
                             if (event.target.closest('header') || event.target.closest('aside') || event.target.closest(
                                     '.z-30') || event.target.closest('.bottom-6')) {
-                                if (hoveredObject && hoveredObject !== selectedObject) hoveredObject.material.emissive
-                                    .setHex(0x000000);
+                                quitarBrillo(hoveredObject);
                                 hoveredObject = null;
                                 wrapper.style.cursor = 'default';
                                 return;
@@ -832,15 +1089,13 @@
 
                             if (intersects.length > 0) {
                                 if (hoveredObject !== intersects[0].object) {
-                                    if (hoveredObject && hoveredObject !== selectedObject) hoveredObject.material
-                                        .emissive.setHex(0x000000);
+                                    quitarBrillo(hoveredObject);
                                     hoveredObject = intersects[0].object;
                                     wrapper.style.cursor = 'pointer';
                                     if (hoveredObject !== selectedObject) highlightRack(hoveredObject, true);
                                 }
                             } else {
-                                if (hoveredObject && hoveredObject !== selectedObject) hoveredObject.material.emissive
-                                    .setHex(0x000000);
+                                quitarBrillo(hoveredObject);
                                 hoveredObject = null;
                                 wrapper.style.cursor = 'default';
                             }
@@ -853,7 +1108,10 @@
                             const query = e.detail.toLowerCase();
                             resetAllHighlights();
                             if (!query) return;
-                            const found = racks.find(r => r.userData.code.toLowerCase().includes(query));
+                            const found = racks.find(r =>
+                                r.userData.code.toLowerCase().includes(query) ||
+                                (r.userData.items ?? []).some(i => (i.producto ?? '').toLowerCase().includes(query))
+                            );
                             if (found) {
                                 selectedObject = found;
                                 highlightRack(found, false);
@@ -927,8 +1185,7 @@
 
                             if (event.target.closest('header') || event.target.closest('aside') || event.target.closest(
                                     '.z-30') || event.target.closest('.bottom-6')) {
-                                if (hoveredObject && hoveredObject !== selectedObject) hoveredObject.material.emissive
-                                    .setHex(0x000000);
+                                quitarBrillo(hoveredObject);
                                 hoveredObject = null;
                                 wrapper.style.cursor = 'default';
                                 return;
@@ -937,15 +1194,13 @@
                             const intersects = raycaster.intersectObjects(racks);
                             if (intersects.length > 0) {
                                 if (hoveredObject !== intersects[0].object) {
-                                    if (hoveredObject && hoveredObject !== selectedObject) hoveredObject.material
-                                        .emissive.setHex(0x000000);
+                                    quitarBrillo(hoveredObject);
                                     hoveredObject = intersects[0].object;
                                     wrapper.style.cursor = 'pointer';
                                     if (hoveredObject !== selectedObject) highlightRack(hoveredObject, true);
                                 }
                             } else {
-                                if (hoveredObject && hoveredObject !== selectedObject) hoveredObject.material.emissive
-                                    .setHex(0x000000);
+                                quitarBrillo(hoveredObject);
                                 hoveredObject = null;
                                 wrapper.style.cursor = 'default';
                             }

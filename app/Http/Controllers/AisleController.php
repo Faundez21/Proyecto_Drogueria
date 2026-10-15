@@ -28,10 +28,13 @@ class AisleController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
+            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
         ]);
         Aisle::create([
             'name' => $request->name,
             'description' => $request->description,
+            'color' => $request->color,
+
         ]);
         return redirect()->route('aisle.index')->with('success', 'Pasillo creado exitosamente.');
     }
@@ -60,11 +63,15 @@ class AisleController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
+            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+
         ]);
 
         $aisle->update([
             'name' => $request->name,
             'description' => $request->description,
+            'color' => $request->color,
+
         ]);
 
         return redirect()
