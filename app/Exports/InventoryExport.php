@@ -35,7 +35,10 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
             'Fecha Vencimiento',
             'Pasillo',
             'Estante',
+            'Programa',
             'Stock Físico',
+            'Valor Neto Unitario',
+            'Valor Total',
             'Estado'
         ];
     }
@@ -47,7 +50,9 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
         $estante = $inventory->estanteria_nombre ?? (is_object($inventory->shelf ?? null) ? $inventory->shelf->nombre ?? ($inventory->shelf->name ?? 'S/E') : $inventory->estante ?? ($inventory->estanteria ?? 'S/E'));
         $stock = $inventory->stock_total ?? ($inventory->cantidad ?? 0);
         $estado = $inventory->estado ?? 'Activo';
-        
+        $valorUnitario = (float) ($inventory->valor_neto_unitario ?? 0);
+        $valorTotal = ((float) $stock) * $valorUnitario;
+
         $fechaVencimiento = $inventory->fecha_vencimiento;
         if($fechaVencimiento) {
             try {
@@ -66,7 +71,10 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
             $fechaVencimiento,
             $pasillo,
             $estante,
+            $inventory->programa ?? 'S/P',
             $stock,
+            $valorUnitario,
+            $valorTotal,
             $estado
         ];
     }

@@ -1,30 +1,30 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Product;
 use App\Models\EstablishmentRequest;
+use App\Services\InventoryService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EstablishmentRequestController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $products = Product::orderBy('nombre')->get();
+        $controlados = InventoryService::controlados();
+        $establecimientos = InventoryService::establecimientos();
 
-        return view('requests.index', compact('products'));
-    }
-    public function show(EstablishmentRequest $establishmentRequest)
-    {
-        //
+        return view('requests.index', compact('products', 'controlados', 'establecimientos'));
     }
 
     public function store(Request $request)
     {
+        $nombresEstablecimientos = array_column(InventoryService::establecimientos(), 'nombre');
+
         $validated = $request->validate([
-            'establecimiento' => 'required|string',
+            'establecimiento' => ['required', 'string', Rule::in($nombresEstablecimientos)],
             'fecha_solicitud' => 'required|date',
             'responsable' => 'required|string',
             'cargo' => 'nullable|string',
@@ -33,6 +33,9 @@ class EstablishmentRequestController extends Controller
 
             'producto' => 'required|array',
             'producto.*' => 'required|integer|exists:products,id',
+
+            'programa' => 'nullable|array',
+            'programa.*' => 'nullable|string',
 
             'consumo_anterior' => 'nullable|array',
             'consumo_anterior.*' => 'nullable|integer|min:0',
@@ -43,6 +46,20 @@ class EstablishmentRequestController extends Controller
             'cantidad_solicitada' => 'required|array',
             'cantidad_solicitada.*' => 'required|integer|min:1',
         ]);
+
+        $esCesfam = InventoryService::esCesfam($validated['establecimiento']);
+
+        // Solo los CESFAM pueden solicitar estupefacientes
+        foreach ($validated['producto'] as $index => $productId) {
+            $nombre = Product::find($productId)->nombre ?? '';
+            $nombreProducto = $validated['producto'][$index];
+
+            if (InventoryService::esControlado($nombre) && ! $esCesfam) {
+                return back()
+                    ->with('error', "El establecimiento '{$validated['establecimiento']}' no puede solicitar estupefacientes. Solo los CESFAM tienen acceso.")
+                    ->withInput();
+            }
+        }
 
         $establishmentRequest = EstablishmentRequest::create([
             'establecimiento' => $validated['establecimiento'],
@@ -71,20 +88,6 @@ class EstablishmentRequestController extends Controller
 
         return redirect()
             ->route('requests.index')
-            ->with('success', 'Solicitud registrada exitosamente.');
-    }
-    public function edit(EstablishmentRequest $establishmentRequest)
-    {
-        //
-    }
-
-    public function update(Request $request, EstablishmentRequest $establishmentRequest)
-    {
-        //
-    }
-
-    public function destroy(EstablishmentRequest $establishmentRequest)
-    {
-        //
+            ->with('success', "Solicitud registrada para {$validated['establecimiento']}. Los estupefacientes (si los hay) se despachan por el módulo de Despacho Controlado.");
     }
 }

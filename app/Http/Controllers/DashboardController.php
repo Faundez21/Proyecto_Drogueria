@@ -58,7 +58,9 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        $cantidadCuarentena = $lotesCuarentenaDb->count();
+        $cantidadCuarentena = Inventory::where('estado', 'Cuarentena')
+            ->where('cantidad', '>', 0)
+            ->count();
 
         // 3. TRAZABILIDAD RECIENTE (Últimos 6 movimientos dinámicos)
         $recentMovements = collect();

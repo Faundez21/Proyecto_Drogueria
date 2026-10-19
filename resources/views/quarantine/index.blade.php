@@ -195,8 +195,12 @@
                                                             <tr>
                                                                 <th class="px-4 py-3">Lote / Vencimiento</th>
                                                                 <th class="px-4 py-3">Ubicación Física</th>
+                                                                <th class="px-4 py-3">Categoría</th>
+                                                                <th class="px-4 py-3">Programa</th>
                                                                 <th class="px-4 py-3 text-center">Estado de Seguridad</th>
                                                                 <th class="px-4 py-3 text-center">Stock de Lote</th>
+                                                                <th class="px-4 py-3 text-center">Valor Unitario</th>
+                                                                <th class="px-4 py-3 text-center">Valor Total Lote</th>
                                                                 <th class="px-4 py-3 text-center">Acciones y Controles</th>
                                                             </tr>
                                                         </thead>
@@ -231,6 +235,10 @@
                                                                     $loteId = data_get($loteData, 'id') ?? 0;
                                                                     $loteCodigo = data_get($loteData, 'lote') ?? 'S/L';
                                                                     $loteMotivo = data_get($loteData, 'motivo') ?? data_get($loteData, 'observacion') ?? 'Bloqueo preventivo';
+                                                                    $valorUnitarioLote = (float) (data_get($loteData, 'valor_neto_unitario') ?? 0);
+                                                                    $valorTotalLote = ((float) $stockLote) * $valorUnitarioLote;
+                                                                    $loteCategoria = data_get($loteData, 'categoria') ?? 'General';
+                                                                    $lotePrograma = data_get($loteData, 'programa') ?? '';
                                                                 @endphp
                                                                 <tr class="hover:bg-slate-50 transition-colors">
                                                                     <td class="px-4 py-3">
@@ -243,11 +251,27 @@
                                                                             <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">E:</span> <b class="text-slate-800">{{ $estanteVal }}</b></span>
                                                                         </div>
                                                                     </td>
+                                                                    <td class="px-4 py-3">
+                                                                        <span class="inline-flex px-2.5 py-1 rounded-lg text-[11.5px] font-semibold bg-white text-slate-600 border border-slate-200 shadow-sm whitespace-nowrap">{{ $loteCategoria }}</span>
+                                                                    </td>
+                                                                    <td class="px-4 py-3">
+                                                                        @if ($lotePrograma)
+                                                                            <span class="inline-flex px-2.5 py-1 rounded-lg text-[11.5px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm whitespace-nowrap">{{ $lotePrograma }}</span>
+                                                                        @else
+                                                                            <span class="text-[11.5px] text-slate-400 font-medium">—</span>
+                                                                        @endif
+                                                                    </td>
                                                                     <td class="px-4 py-3 text-center">
                                                                         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">CUARENTENA</span>
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
                                                                         <span class="font-extrabold text-slate-800 text-[14px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
+                                                                    </td>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        <span class="text-[12px] font-semibold text-slate-600 font-mono-das">$ {{ number_format($valorUnitarioLote, 2, ',', '.') }}</span>
+                                                                    </td>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[12px] font-bold bg-teal-50 text-teal-800 border border-teal-200 font-mono-das">$ {{ number_format($valorTotalLote, 0, ',', '.') }}</span>
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center flex justify-center gap-2">
                                                                         <!-- Botón QR -->
@@ -258,7 +282,7 @@
                                                                             </svg>
                                                                         </button>
                                                                         <!-- Botón Editar Estado -->
-                                                                        <button type="button" onclick="openEditLote('{{ addslashes($loteId) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($nombreProducto) }}', 'Cuarentena', '{{ addslashes($loteMotivo) }}')"
+                                                                        <button type="button" onclick="openEditLote('{{ addslashes($loteId) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($nombreProducto) }}', 'Cuarentena', '{{ addslashes($loteMotivo) }}', '{{ addslashes($loteCategoria) }}', '{{ addslashes($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}')"
                                                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Cambiar Estado (Liberar / Merma)">
                                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -359,6 +383,27 @@
                             <p id="modal_producto_nombre" class="text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
                             <div class="mt-2 inline-block bg-white border border-slate-300 px-3 py-1 rounded-lg shadow-sm">
                                 <p id="modal_lote_nombre" class="text-[13px] font-mono font-bold text-slate-700"></p>
+                            </div>
+                            <div class="flex justify-center gap-1.5 mt-2 flex-wrap">
+                                <span id="modal_categoria_chip"
+                                    class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200"></span>
+                                <span id="modal_programa_chip"
+                                    class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Valor Unitario</span>
+                                <p id="modal_valor_unitario" class="text-[13px] font-bold text-slate-800 font-mono-das">$ 0</p>
+                            </div>
+                            <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Stock</span>
+                                <p id="modal_cantidad" class="text-[13px] font-bold text-slate-800">0</p>
+                            </div>
+                            <div class="bg-teal-50 border border-teal-200 rounded-xl p-2.5 text-center shadow-sm">
+                                <span class="text-[10px] font-bold text-teal-500 uppercase block">Valor Total</span>
+                                <p id="modal_valor_total" class="text-[13px] font-extrabold text-teal-800 font-mono-das">$ 0</p>
                             </div>
                         </div>
 
@@ -525,10 +570,33 @@
         }
 
         // Modal Editar Lote
-        function openEditLote(id, lote, producto, estado, motivo = '') {
+        function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0) {
             document.getElementById('editLoteForm').action = "/inventario/" + id;
             document.getElementById('modal_producto_nombre').textContent = producto;
             document.getElementById('modal_lote_nombre').textContent = "LOTE: " + lote;
+
+            const fmt = (n) => '$ ' + Number(n || 0).toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const valorU = parseFloat(valorUnitario) || 0;
+            const cant = parseInt(cantidad) || 0;
+
+            document.getElementById('modal_valor_unitario').textContent = fmt(valorU);
+            document.getElementById('modal_cantidad').textContent = cant.toLocaleString('es-CL') + ' u';
+            document.getElementById('modal_valor_total').textContent = fmt(valorU * cant);
+
+            const chipCat = document.getElementById('modal_categoria_chip');
+            if (chipCat) {
+                chipCat.textContent = categoria || 'Sin categoría';
+                chipCat.style.display = '';
+            }
+            const chipProg = document.getElementById('modal_programa_chip');
+            if (chipProg) {
+                if (programa) {
+                    chipProg.textContent = programa;
+                    chipProg.style.display = '';
+                } else {
+                    chipProg.style.display = 'none';
+                }
+            }
 
             let estadoSelect = document.getElementById('modal_estado');
             let estadoFormat = (estado || '').toLowerCase();
