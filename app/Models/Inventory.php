@@ -10,7 +10,7 @@ class Inventory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', // <-- AGREGA ESTA LÍNEA AQUÍ
+        'user_id',
         'correlativo_interno',
         'fecha_recepcion',
         'tipo_documento',

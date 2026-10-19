@@ -14,10 +14,10 @@ class ProviderController extends Controller
 
         // 1. Filtros de búsqueda
         if ($request->filled('search')) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('rut', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
+                    ->orWhere('rut', 'like', '%' . $request->search . '%')
+                    ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -35,29 +35,42 @@ class ProviderController extends Controller
 
         if ($request->filled('sort')) {
             $sort = $request->sort;
-            if ($sort == 'recent') $query->orderBy('created_at', 'desc');
-            if ($sort == 'oldest') $query->orderBy('created_at', 'asc');
-            if ($sort == 'az') $query->orderBy('name', 'asc');
-            if ($sort == 'za') $query->orderBy('name', 'desc');
+            if ($sort == 'recent')
+                $query->orderBy('created_at', 'desc');
+            if ($sort == 'oldest')
+                $query->orderBy('created_at', 'asc');
+            if ($sort == 'az')
+                $query->orderBy('name', 'asc');
+            if ($sort == 'za')
+                $query->orderBy('name', 'desc');
         } else {
-            $query->orderBy('created_at', 'desc'); 
+            $query->orderBy('created_at', 'desc');
         }
 
         // 2. Cálculo de KPIs
         $total = $query->count();
         $activos = (clone $query)->where('status', 'activo')->count();
         $porcentajeActivos = $total > 0 ? round(($activos / $total) * 100) : 0;
-        
+
         $mesActual = Carbon::now()->month;
         $anioActual = Carbon::now()->year;
         $agregadosMes = Provider::whereMonth('created_at', $mesActual)
-                                ->whereYear('created_at', $anioActual)
-                                ->count();
+            ->whereYear('created_at', $anioActual)
+            ->count();
 
         $mesesNombres = [
-            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril', 
-            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto', 
-            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+            1 => 'Enero',
+            2 => 'Febrero',
+            3 => 'Marzo',
+            4 => 'Abril',
+            5 => 'Mayo',
+            6 => 'Junio',
+            7 => 'Julio',
+            8 => 'Agosto',
+            9 => 'Septiembre',
+            10 => 'Octubre',
+            11 => 'Noviembre',
+            12 => 'Diciembre'
         ];
         $nombreMesActual = $mesesNombres[$mesActual] . ' ' . $anioActual;
 
@@ -69,21 +82,35 @@ class ProviderController extends Controller
         $allProviders = Provider::select('name', 'rut')->get();
 
         return view('providers.index', compact(
-            'providers', 'total', 'activos', 'porcentajeActivos', 
-            'agregadosMes', 'nombreMesActual', 'mesesNombres', 'allProviders', 'perPage'
+            'providers',
+            'total',
+            'activos',
+            'porcentajeActivos',
+            'agregadosMes',
+            'nombreMesActual',
+            'mesesNombres',
+            'allProviders',
+            'perPage'
         ));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'rut'            => 'required|string|max:20|unique:providers',
-            'name'           => 'required|string|max:255',
-            'category'       => 'required|string',
-            'email'          => 'required|email|max:255',
-            'phone'          => 'nullable|string|max:20',
-            'business_line'  => 'nullable|string|max:255',
-            'address'        => 'nullable|string|max:255',
+            'rut' => 'required|string|max:20|unique:providers',
+            'name' => 'required|string|max:255',
+            'category' => 'required|string',
+            'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'business_line' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+        ], [
+            'rut.required' => 'El RUT es obligatorio.',
+            'rut.unique' => 'Este RUT ya está registrado.',
+            'name.required' => 'El nombre del proveedor es obligatorio.',
+            'category.required' => 'Debes seleccionar una categoría.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Ingresa una dirección de correo electrónico válida.',
         ]);
 
         Provider::create($validated);
@@ -93,13 +120,21 @@ class ProviderController extends Controller
     public function update(Request $request, Provider $provider)
     {
         $validated = $request->validate([
-            'name'           => 'required|string|max:255',
-            'rut'            => 'required|string|max:20|unique:providers,rut,' . $provider->id,
-            'email'          => 'required|email|max:255',
-            'category'       => 'required|string',
-            'phone'          => 'nullable|string|max:20',
-            'business_line'  => 'nullable|string|max:255',
-            'address'        => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
+            'rut' => 'required|string|min:8|max:20|unique:providers,rut,' . $provider->id,
+            'email' => 'required|email|max:255',
+            'category' => 'required|string',
+            'phone' => 'nullable|string|min:9|max:20',
+            'business_line' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+        ], [
+            'rut.required' => 'El RUT es obligatorio.',
+            'rut.min' => 'El RUT debe tener al menos 8 caracteres.',
+            'rut.unique' => 'Este RUT ya está registrado.',
+            'name.required' => 'El nombre del proveedor es obligatorio.',
+            'category.required' => 'Debes seleccionar una categoría.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Ingresa una dirección de correo electrónico válida.',
         ]);
 
         $provider->update($validated);
@@ -111,5 +146,5 @@ class ProviderController extends Controller
         $provider->status = $provider->status === 'activo' ? 'inactivo' : 'activo';
         $provider->save();
         return response()->json(['success' => true, 'new_status' => $provider->status]);
-    } 
+    }
 }

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Inventory;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-
+use App\Models\StockMovement;
 class InventoryController extends Controller
 {
     /**
@@ -21,9 +21,9 @@ class InventoryController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('producto', 'LIKE', "%{$search}%")
-                  ->orWhere('lote', 'LIKE', "%{$search}%")
-                  ->orWhere('categoria', 'LIKE', "%{$search}%")
-                  ->orWhere('rut_proveedor', 'LIKE', "%{$search}%");
+                    ->orWhere('lote', 'LIKE', "%{$search}%")
+                    ->orWhere('categoria', 'LIKE', "%{$search}%")
+                    ->orWhere('rut_proveedor', 'LIKE', "%{$search}%");
             });
         }
 
@@ -67,9 +67,9 @@ class InventoryController extends Controller
 
         // 5. Generar lista de productos únicos para el autocompletado de la vista
         $productosLista = Inventory::select('producto')
-                            ->distinct()
-                            ->orderBy('producto', 'asc')
-                            ->pluck('producto');
+            ->distinct()
+            ->orderBy('producto', 'asc')
+            ->pluck('producto');
 
         return view('inventario.index', compact('inventories', 'productosLista'));
     }
@@ -80,13 +80,13 @@ class InventoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'fecha_recepcion'   => 'required|date',
-            'tipo_documento'    => 'required|string',
-            'numero_documento'  => 'required|string',
-            'producto'          => 'required|string',
-            'categoria'         => 'required|string',
-            'estado'            => 'required|string',
-            'cantidad'          => 'required|numeric|min:1',
+            'fecha_recepcion' => 'required|date',
+            'tipo_documento' => 'required|string',
+            'numero_documento' => 'required|string',
+            'producto' => 'required|string',
+            'categoria' => 'required|string',
+            'estado' => 'required|string',
+            'cantidad' => 'required|numeric|min:1',
         ]);
 
         $data = $request->all();
@@ -104,18 +104,33 @@ class InventoryController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'estado' => 'required|string',
+            'estado' => 'required|in:Cuarentena,Disponible,Merma',
+            'motivo' => 'nullable|string|max:1000',
         ]);
 
         $inventory = Inventory::findOrFail($id);
+        $estadoAnterior = $inventory->estado;
 
         $data = $request->only(['estado', 'motivo']);
-
         $data['user_id'] = Auth::id();
 
         $inventory->update($data);
 
-        // Mensaje dinámico según el estado seleccionado
+        // Registrar el movimiento solo cuando cambia el estado
+        if ($estadoAnterior !== $inventory->estado) {
+            StockMovement::create([
+                'producto' => $inventory->producto,
+                'lote' => $inventory->lote,
+                'fecha_vencimiento' => $inventory->fecha_vencimiento,
+                'tipo_movimiento' => 'Cambio de estado',
+                'cantidad' => $inventory->cantidad,
+                'fecha_hora' => now(),
+                'origen_destino' => 'Desde: ' . $estadoAnterior . ' / Hacia: ' . $inventory->estado,
+                'documento_respaldo' => 'Gestión de inventario',
+                'estado_lote' => $inventory->estado,
+            ]);
+        }
+
         if ($data['estado'] == 'Cuarentena') {
             $mensaje = 'El lote ha sido bloqueado y enviado a cuarentena.';
         } elseif ($data['estado'] == 'Merma') {
@@ -137,7 +152,7 @@ class InventoryController extends Controller
         ]);
 
         try {
-             Excel::import(new \App\Imports\InventoriesImport(Auth::id()), $request->file('excel'));
+            Excel::import(new \App\Imports\InventoriesImport(Auth::id()), $request->file('excel'));
 
             return redirect()->back()->with('success', 'Carga masiva procesada correctamente.');
         } catch (\Exception $e) {
