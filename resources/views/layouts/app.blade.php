@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
-        
+
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -209,7 +209,7 @@
             padding: 0 2px;
             border-radius: 3px;
         }
-        
+
         /* Ajuste de fuente para modales de SweetAlert */
         .swal2-popup {
             font-family: 'IBM Plex Sans', sans-serif !important;
@@ -217,451 +217,471 @@
     </style>
 </head>
 
-<body class="antialiased overflow-hidden flex h-screen">
+<body class="antialiased min-h-screen bg-slate-100">
 
-    <!-- Overlay móvil -->
-    <div id="sidebar-overlay"
-        class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300"
-        onclick="toggleSidebar()"></div>
+    @auth
+        <div class="flex h-screen overflow-hidden">
 
-    <!-- Sidebar -->
-    <aside id="sidebar"
-        class="fixed inset-y-0 left-0 w-[260px] flex flex-col z-50 transform -translate-x-full lg:translate-x-0 lg:static lg:shrink-0 transition-transform duration-300 ease-in-out"
-        style="background-color: var(--sidebar-bg); box-shadow: 2px 0 8px rgba(0,0,0,0.15);">
+            <!-- Overlay móvil -->
+            <div id="sidebar-overlay"
+                class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300"
+                onclick="toggleSidebar()"></div>
 
-        <div class="h-[75px] flex items-center px-5 shrink-0 relative border-b border-slate-800 bg-[#0F172A]">
-            <a href="{{ route('dashboard.index') }}" class="brand-container flex items-center gap-3.5 group">
-                <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-[#0F172A]">
-                    <img src="{{ asset('images/favicon.svg') }}" alt="Logo DAS"
-                        class="brand-logo-img w-full h-full object-contain">
-                </div>
-                <div class="flex flex-col justify-center mt-0.5">
-                    <span
-                        class="font-mono-das font-bold text-[19px] text-white tracking-widest leading-none group-hover:text-teal-400 transition-colors">DAS</span>
-                    <span
-                        class="text-[10px] font-medium text-slate-400 tracking-[0.2em] uppercase mt-1.5 leading-none">Droguería</span>
-                </div>
-            </a>
+            <!-- Sidebar -->
+            <aside id="sidebar"
+                class="fixed inset-y-0 left-0 w-[260px] flex flex-col z-50 transform -translate-x-full lg:translate-x-0 lg:static lg:shrink-0 transition-transform duration-300 ease-in-out"
+                style="background-color: var(--sidebar-bg); box-shadow: 2px 0 8px rgba(0,0,0,0.15);">
 
-            <button onclick="toggleSidebar()"
-                class="absolute right-4 lg:hidden p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-            </button>
-        </div>
-
-        <nav class="flex-1 px-3 py-5 space-y-6 overflow-y-auto sidebar-scroll">
-            <div>
-                @can('ver.dashboard')
-                    <a href="{{ route('dashboard.index') }}"
-                        class="nav-row {{ request()->routeIs('dashboard.*') ? 'is-active' : '' }} flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px]">
-                        <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                            </path>
-                        </svg>
-                        Panel Principal
-                    </a>
-                @endcan
-            </div>
-            <div class="flow-section">
-                <div class="flex items-center gap-2 mb-2 px-2">
-                    <span
-                        class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">01</span>
-                    <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Abastecimiento</p>
-                </div>
-                <div class="flow-rail pl-[27px] space-y-0.5">
-                    <a href="{{ route('providers.index') }}"
-                        class="nav-row {{ request()->routeIs('providers.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                            </path>
-                        </svg>
-                        Proveedores
-                    </a>
-                    <a href="{{ route('reception.index') }}"
-                        class="nav-row {{ request()->routeIs('reception.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
-                            </path>
-                        </svg>
-                        Recepción
-                    </a>
-                </div>
-            </div>
-
-            <!-- Paso 2: Almacenamiento -->
-            <div class="flow-section">
-                <div class="flex items-center gap-2 mb-2 px-2">
-                    <span
-                        class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">02</span>
-                    <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Almacenamiento</p>
-                </div>
-                <div class="flow-rail pl-[27px] space-y-0.5">
-                    <a href="{{ route('inventario.index') }}"
-                        class="nav-row {{ request()->routeIs('inventario.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
-                            </path>
-                        </svg>
-                        Inventario
-                    </a>
-                    <a href="{{ route('quarantine.index') }}"
-                        class="nav-row {{ request()->routeIs('quarantine.*') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                </path>
-                            </svg>
-                            Cuarentena
+                <div class="h-[75px] flex items-center px-5 shrink-0 relative border-b border-slate-800 bg-[#0F172A]">
+                    <a href="{{ route('dashboard.index') }}" class="brand-container flex items-center gap-3.5 group">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-[#0F172A]">
+                            <img src="{{ asset('images/favicon.svg') }}" alt="Logo DAS"
+                                class="brand-logo-img w-full h-full object-contain">
+                        </div>
+                        <div class="flex flex-col justify-center mt-0.5">
+                            <span
+                                class="font-mono-das font-bold text-[19px] text-white tracking-widest leading-none group-hover:text-teal-400 transition-colors">DAS</span>
+                            <span
+                                class="text-[10px] font-medium text-slate-400 tracking-[0.2em] uppercase mt-1.5 leading-none">Droguería</span>
                         </div>
                     </a>
-                </div>
 
-            </div>
-
-            <!-- Paso 3: Salida -->
-<div class="flow-section">
-    <div class="flex items-center gap-2 mb-2 px-2">
-        <span class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">03</span>
-        <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Salida</p>
-    </div>
-    <div class="flow-rail pl-[27px] space-y-0.5">
-        <div class="flex flex-col space-y-0.5">
-            <a href="{{ route('dispatch.index') }}"
-                class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                        d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
-                </svg>
-                Despacho Normal
-            </a>
-            @can('ver.despacho_controlado')
-                <!-- Submenú Controlado -->
-                <div class="relative pl-6">
-                    <div class="absolute left-3.5 top-0 bottom-4 w-px bg-slate-700/60"></div>
-                    <div class="absolute left-3.5 top-1/2 w-2.5 h-px bg-slate-700/60"></div>
-
-                    <a href="{{ route('controlled_dispatch.index') }}"
-                        class="nav-row {{ request()->routeIs('controlled_dispatch.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[12px]">
-                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                    <button onclick="toggleSidebar()"
+                        class="absolute right-4 lg:hidden p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                             </path>
                         </svg>
-                        Despacho Controlado
-                    </a>
+                    </button>
                 </div>
-        @endcan
-        </div>
 
-        <a href="{{ route('distribution.index') }}"
-            class="nav-row {{ request()->routeIs('distribution.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-            </svg>
-            Distribución
-        </a>
-
-        @can('ver.solicitudes')
-            <a href="{{ route('requests.index') }}"
-                class="nav-row {{ request()->routeIs('requests.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4">
-                    </path>
-                </svg>
-                Solicitudes
-            </a>
-        @endcan
-    </div>
-</div>
-            <!-- Paso 4: Control -->
-            <div class="flow-section">
-                <div class="flex items-center gap-2 mb-2 px-2">
-                    <span
-                        class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">04</span>
-                    <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Control</p>
-                </div>
-                <div class="flow-rail pl-[27px] space-y-0.5">
-                    <a href="{{ route('traceability.index') }}"
-                        class="nav-row {{ request()->routeIs('traceability.*') || request()->routeIs('trazabilidad.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
-                            </path>
-                        </svg>
-                        Trazabilidad
-                    </a>
-                    <a href="{{ route('reportes.index') }}"
-                        class="nav-row {{ request()->routeIs('reportes.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                            </path>
-                        </svg>
-                        Reportes
-                    </a>
-                </div>
-            </div>
-
-            <!-- Administración -->
-            @can('ver.usuarios')
-                <div class="pt-6 pb-4 border-t border-slate-800">
-                    <p class="text-[11.5px] font-semibold tracking-wide uppercase px-2 mb-2 text-slate-500">
-                        Configuración</p>
-                    <div class="space-y-0.5">
-                        <a href="{{ route('users.index') }}"
-                            class="nav-row {{ request()->routeIs('users.*') || request()->routeIs('roles.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                                </path>
-                            </svg>
-                            Usuarios y Permisos
-                        </a>
+                <nav class="flex-1 px-3 py-5 space-y-6 overflow-y-auto sidebar-scroll">
+                    <div>
+                        @can('ver.dashboard')
+                            <a href="{{ route('dashboard.index') }}"
+                                class="nav-row {{ request()->routeIs('dashboard.*') ? 'is-active' : '' }} flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px]">
+                                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                                    </path>
+                                </svg>
+                                Panel Principal
+                            </a>
+                        @endcan
                     </div>
-                </div>
-            @endcan
-        </nav>
-    </aside>
-    <!-- Contenedor principal -->
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+                    <div class="flow-section">
+                        <div class="flex items-center gap-2 mb-2 px-2">
+                            <span
+                                class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">01</span>
+                            <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Abastecimiento</p>
+                        </div>
+                        <div class="flow-rail pl-[27px] space-y-0.5">
+                            <a href="{{ route('providers.index') }}"
+                                class="nav-row {{ request()->routeIs('providers.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                    </path>
+                                </svg>
+                                Proveedores
+                            </a>
+                            <a href="{{ route('reception.index') }}"
+                                class="nav-row {{ request()->routeIs('reception.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+                                    </path>
+                                </svg>
+                                Recepción
+                            </a>
+                        </div>
+                    </div>
 
-        <!-- Barra superior -->
-        <header class="h-[70px] flex items-center justify-between px-4 sm:px-6 z-10 shrink-0 sticky top-0"
-            style="background-color: var(--nav-bg); border-bottom: 1px solid var(--border-light); box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                    <!-- Paso 2: Almacenamiento -->
+                    <div class="flow-section">
+                        <div class="flex items-center gap-2 mb-2 px-2">
+                            <span
+                                class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">02</span>
+                            <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Almacenamiento</p>
+                        </div>
+                        <div class="flow-rail pl-[27px] space-y-0.5">
+                            <a href="{{ route('inventario.index') }}"
+                                class="nav-row {{ request()->routeIs('inventario.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                                    </path>
+                                </svg>
+                                Inventario
+                            </a>
+                            <a href="{{ route('quarantine.index') }}"
+                                class="nav-row {{ request()->routeIs('quarantine.*') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
+                                <div class="flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                        </path>
+                                    </svg>
+                                    Cuarentena
+                                </div>
+                            </a>
+                        </div>
 
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()"
-                    class="p-2 -ml-2 rounded-md lg:hidden text-slate-500 hover:bg-slate-100 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
+                    </div>
+
+                    <!-- Paso 3: Salida -->
+                    <div class="flow-section">
+                        <div class="flex items-center gap-2 mb-2 px-2">
+                            <span
+                                class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">03</span>
+                            <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Salida</p>
+                        </div>
+                        <div class="flow-rail pl-[27px] space-y-0.5">
+                            <div class="flex flex-col space-y-0.5">
+                                <a href="{{ route('dispatch.index') }}"
+                                    class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                            d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                                    </svg>
+                                    Despacho Normal
+                                </a>
+                                @can('ver.despacho_controlado')
+                                    <!-- Submenú Controlado -->
+                                    <div class="relative pl-6">
+                                        <div class="absolute left-3.5 top-0 bottom-4 w-px bg-slate-700/60"></div>
+                                        <div class="absolute left-3.5 top-1/2 w-2.5 h-px bg-slate-700/60"></div>
+
+                                        <a href="{{ route('controlled_dispatch.index') }}"
+                                            class="nav-row {{ request()->routeIs('controlled_dispatch.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[12px]">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                                </path>
+                                            </svg>
+                                            Despacho Controlado
+                                        </a>
+                                    </div>
+                                @endcan
+                            </div>
+
+                            <a href="{{ route('distribution.index') }}"
+                                class="nav-row {{ request()->routeIs('distribution.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                </svg>
+                                Distribución
+                            </a>
+
+                            @can('ver.solicitudes')
+                                <a href="{{ route('requests.index') }}"
+                                    class="nav-row {{ request()->routeIs('requests.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4">
+                                        </path>
+                                    </svg>
+                                    Solicitudes
+                                </a>
+                            @endcan
+                        </div>
+                    </div>
+                    <!-- Paso 4: Control -->
+                    <div class="flow-section">
+                        <div class="flex items-center gap-2 mb-2 px-2">
+                            <span
+                                class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">04</span>
+                            <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Control</p>
+                        </div>
+                        <div class="flow-rail pl-[27px] space-y-0.5">
+                            <a href="{{ route('traceability.index') }}"
+                                class="nav-row {{ request()->routeIs('traceability.*') || request()->routeIs('trazabilidad.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
+                                    </path>
+                                </svg>
+                                Trazabilidad
+                            </a>
+                            <a href="{{ route('reportes.index') }}"
+                                class="nav-row {{ request()->routeIs('reportes.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                    </path>
+                                </svg>
+                                Reportes
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Administración -->
+                    @can('ver.usuarios')
+                        <div class="pt-6 pb-4 border-t border-slate-800">
+                            <p class="text-[11.5px] font-semibold tracking-wide uppercase px-2 mb-2 text-slate-500">
+                                Configuración</p>
+                            <div class="space-y-0.5">
+                                <a href="{{ route('users.index') }}"
+                                    class="nav-row {{ request()->routeIs('users.*') || request()->routeIs('roles.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                        </path>
+                                    </svg>
+                                    Usuarios y Permisos
+                                </a>
+                            </div>
+                        </div>
+                    @endcan
+                </nav>
+            </aside>
+            <!-- Contenedor principal -->
+            <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+
+                <!-- Barra superior -->
+                <header class="h-[70px] flex items-center justify-between px-4 sm:px-6 z-10 shrink-0 sticky top-0"
+                    style="background-color: var(--nav-bg); border-bottom: 1px solid var(--border-light); box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleSidebar()"
+                            class="p-2 -ml-2 rounded-md lg:hidden text-slate-500 hover:bg-slate-100 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Buscador Interactivo (Ctrl + K) -->
+                    <div class="flex-1 max-w-2xl mx-4">
+                        <div onclick="openSearchModal()"
+                            class="hidden sm:flex items-center justify-between w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white hover:border-teal-500/50 hover:shadow-md transition-all duration-200 text-slate-500 cursor-pointer group">
+                            <div class="flex items-center gap-2.5">
+                                <svg class="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-colors"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <span class="text-[13px] group-hover:text-slate-700 transition-colors">Buscar en
+                                    inventario,
+                                    lotes o catálogo...</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <kbd
+                                    class="font-mono-das text-[10px] px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-400 group-hover:border-slate-400 transition-colors">Ctrl</kbd>
+                                <kbd
+                                    class="font-mono-das text-[10px] px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-400 group-hover:border-slate-400 transition-colors">K</kbd>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                        <div class="hidden xl:flex items-center gap-2.5 pr-4 border-r border-slate-200">
+                            <svg class="w-[18px] h-[18px]" style="color: var(--accent);" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div class="text-[13px] font-mono-das tracking-tight" id="live-clock"></div>
+                        </div>
+                        <!-- Notificaciones Dinámicas -->
+                        <div class="relative" id="notifications-container">
+                            <button onclick="toggleNotifications()" type="button"
+                                class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                                    </path>
+                                </svg>
+                                <span id="notif-badge"
+                                    class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full pulse-dot border-2 border-white"
+                                    style="background-color: var(--alert);"></span>
+                            </button>
+
+                            <div id="notifications-menu"
+                                class="hidden absolute right-0 mt-2 w-[340px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
+                                <div
+                                    class="px-4 py-3.5 flex justify-between items-center border-b border-slate-100 bg-slate-50">
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="text-[13px] font-semibold text-slate-800">Notificaciones</h3>
+                                        <span id="notif-count"
+                                            class="text-white text-[10px] font-mono-das font-semibold px-1.5 py-0.5 rounded bg-slate-400">0</span>
+                                    </div>
+                                </div>
+                                <div id="notif-list" class="max-h-[320px] overflow-y-auto p-2 space-y-1 sidebar-scroll">
+                                    <div class="p-4 text-center text-slate-400 text-xs">Cargando alertas...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Perfil -->
+                        <div class="relative" id="user-menu-container">
+                            <button onclick="toggleUserMenu()" type="button"
+                                class="flex items-center gap-2.5 p-1 rounded-md hover:bg-slate-100 transition-colors">
+                                <div class="relative">
+                                    <div class="w-8 h-8 rounded-md flex items-center justify-center font-mono-das text-[11px] font-semibold text-white shadow-sm"
+                                        style="background-color: var(--accent);">
+                                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}{{ strtoupper(substr(auth()->user()->last_name ?? 'S', 0, 1)) }}
+                                    </div>
+                                    <div
+                                        class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-green-500">
+                                    </div>
+                                </div>
+                                <div class="hidden md:flex flex-col items-start text-left leading-tight">
+                                    <span
+                                        class="text-[12.5px] font-medium text-slate-700">{{ auth()->user()->name ?? 'Usuario' }}</span>
+                                    <span class="text-[10.5px] mt-0.5 text-slate-400">
+                                        @if (method_exists(auth()->user(), 'hasRole') && auth()->user()->hasRole('Administrador'))
+                                            Administrador
+                                        @else
+                                            Operador
+                                        @endif
+                                    </span>
+                                </div>
+                                <svg class="w-3.5 h-3.5 hidden md:block text-slate-400" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7">
+                                    </path>
+                                </svg>
+                            </button>
+
+                            <div id="user-menu"
+                                class="hidden absolute right-0 mt-2 w-[240px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
+                                <div class="p-4 border-b border-slate-100 bg-slate-50">
+                                    <p class="text-[13px] font-semibold text-slate-800">
+                                        {{ auth()->user()->name ?? 'Usuario' }}</p>
+                                    <p class="text-[12px] truncate mt-0.5 text-slate-500">
+                                        {{ auth()->user()->email ?? 'usuario@ejemplo.com' }}</p>
+                                </div>
+                                <div class="p-1.5">
+                                    <form id="logout-form" method="POST" action="{{ route('logout') }}"
+                                        class="w-full">
+                                        @csrf
+                                        <!-- Botón de logout modificado para disparar SweetAlert -->
+                                        <button type="button" onclick="confirmLogout()"
+                                            class="flex w-full items-center gap-3 px-3 py-2 rounded-md text-[12.5px] font-medium text-left transition-colors hover:bg-rose-50 text-rose-600">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                                </path>
+                                            </svg>
+                                            Cerrar Sesión
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Contenido principal -->
+                <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                    <div class="max-w-[1600px] mx-auto space-y-6">
+
+
+                        <!-- ENCABEZADO DINÁMICO DE PÁGINA (Resuelve el problema de los botones) -->
+
+                        @if (View::hasSection('title') || View::hasSection('actions'))
+                            <div
+                                class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-5">
+                                <div>
+                                    @hasSection('title')
+                                        <h1 class="text-[22px] font-bold text-slate-800 tracking-tight leading-none">
+                                            @yield('title')</h1>
+                                    @endif
+                                    @hasSection('subtitle')
+                                        <p class="text-[13px] text-slate-500 mt-2 font-medium">@yield('subtitle')</p>
+                                    @endif
+                                </div>
+
+                                @hasSection('actions')
+                                    <div class="flex items-center gap-3 shrink-0">
+                                        @yield('actions')
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
+
+                        <div class="w-full">
+                            @yield('content')
+                        </div>
+                    </div>
+                </main>
             </div>
 
-            <!-- Buscador Interactivo (Ctrl + K) -->
-            <div class="flex-1 max-w-2xl mx-4">
-                <div onclick="openSearchModal()"
-                    class="hidden sm:flex items-center justify-between w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white hover:border-teal-500/50 hover:shadow-md transition-all duration-200 text-slate-500 cursor-pointer group">
-                    <div class="flex items-center gap-2.5">
-                        <svg class="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-colors" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
+            <!-- MODAL DE BÚSQUEDA GLOBAL "NIVEL INSANO" (Navegación por Teclado) -->
+
+            <div id="search-modal"
+                class="fixed inset-0 z-50 hidden flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-200"
+                onclick="if(event.target === this) closeSearchModal()">
+                <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden transform scale-95 transition-transform duration-200 flex flex-col max-h-[80vh]"
+                    id="search-modal-card">
+
+                    <div class="flex items-center px-4 border-b border-slate-100 bg-slate-50/50 shrink-0 relative">
+                        <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
-                        <span class="text-[13px] group-hover:text-slate-700 transition-colors">Buscar en inventario,
-                            lotes o catálogo...</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <kbd
-                            class="font-mono-das text-[10px] px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-400 group-hover:border-slate-400 transition-colors">Ctrl</kbd>
-                        <kbd
-                            class="font-mono-das text-[10px] px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-400 group-hover:border-slate-400 transition-colors">K</kbd>
-                    </div>
-                </div>
-            </div>
+                        <input type="text" id="global-search-input" oninput="performGlobalSearch(this.value)"
+                            onkeydown="handleSearchKeydown(event)" placeholder="Buscar Lote, Fármaco o RUT Proveedor..."
+                            class="w-full px-3 py-4 text-[14px] bg-transparent border-0 focus:outline-none text-slate-800 placeholder-slate-400 font-medium pr-12">
 
-            <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
-                <div class="hidden xl:flex items-center gap-2.5 pr-4 border-r border-slate-200">
-                    <svg class="w-[18px] h-[18px]" style="color: var(--accent);" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div class="text-[13px] font-mono-das tracking-tight" id="live-clock"></div>
-                </div>
-                <!-- Notificaciones Dinámicas -->
-                <div class="relative" id="notifications-container">
-                        <button onclick="toggleNotifications()" type="button"
-                            class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
-                                </path>
-                            </svg>
-                            <span id="notif-badge"
-                                class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full pulse-dot border-2 border-white"
-                                style="background-color: var(--alert);"></span>
-                        </button>
-
-                        <div id="notifications-menu"
-                            class="hidden absolute right-0 mt-2 w-[340px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
-                            <div
-                                class="px-4 py-3.5 flex justify-between items-center border-b border-slate-100 bg-slate-50">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-[13px] font-semibold text-slate-800">Notificaciones</h3>
-                                    <span id="notif-count"
-                                        class="text-white text-[10px] font-mono-das font-semibold px-1.5 py-0.5 rounded bg-slate-400">0</span>
-                                </div>
-                            </div>
-                            <div id="notif-list" class="max-h-[320px] overflow-y-auto p-2 space-y-1 sidebar-scroll">
-                                <div class="p-4 text-center text-slate-400 text-xs">Cargando alertas...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                <!-- Perfil -->
-                @auth
-                    <div class="relative" id="user-menu-container">
-                        <button onclick="toggleUserMenu()" type="button"
-                            class="flex items-center gap-2.5 p-1 rounded-md hover:bg-slate-100 transition-colors">
-                            <div class="relative">
-                                <div class="w-8 h-8 rounded-md flex items-center justify-center font-mono-das text-[11px] font-semibold text-white shadow-sm"
-                                    style="background-color: var(--accent);">
-                                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}{{ strtoupper(substr(auth()->user()->last_name ?? 'S', 0, 1)) }}
-                                </div>
-                                <div
-                                    class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-green-500">
-                                </div>
-                            </div>
-                            <div class="hidden md:flex flex-col items-start text-left leading-tight">
-                                <span
-                                    class="text-[12.5px] font-medium text-slate-700">{{ auth()->user()->name ?? 'Usuario' }}</span>
-                                <span class="text-[10.5px] mt-0.5 text-slate-400">
-                                    @if (method_exists(auth()->user(), 'hasRole') && auth()->user()->hasRole('Administrador'))
-                                        Administrador
-                                    @else
-                                        Operador
-                                    @endif
-                                </span>
-                            </div>
-                            <svg class="w-3.5 h-3.5 hidden md:block text-slate-400" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                                </path>
+                        <!-- Botón Limpiar (X) -->
+                        <button id="search-clear-btn" onclick="clearSearch()"
+                            class="hidden absolute right-16 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-colors focus:outline-none">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>
 
-                        <div id="user-menu"
-                            class="hidden absolute right-0 mt-2 w-[240px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
-                            <div class="p-4 border-b border-slate-100 bg-slate-50">
-                                <p class="text-[13px] font-semibold text-slate-800">
-                                    {{ auth()->user()->name ?? 'Usuario' }}</p>
-                                <p class="text-[12px] truncate mt-0.5 text-slate-500">
-                                    {{ auth()->user()->email ?? 'usuario@ejemplo.com' }}</p>
-                            </div>
-                            <div class="p-1.5">
-                                <form id="logout-form" method="POST" action="{{ route('logout') }}" class="w-full">
-                                    @csrf
-                                    <!-- Botón de logout modificado para disparar SweetAlert -->
-                                    <button type="button" onclick="confirmLogout()"
-                                        class="flex w-full items-center gap-3 px-3 py-2 rounded-md text-[12.5px] font-medium text-left transition-colors hover:bg-rose-50 text-rose-600">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                            </path>
-                                        </svg>
-                                        Cerrar Sesión
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
+                        <!-- Loader -->
+                        <div id="search-loader" class="hidden absolute right-16 loader"></div>
+
+                        <kbd onclick="closeSearchModal()"
+                            class="cursor-pointer font-mono-das text-[10px] px-2 py-1 rounded border border-slate-200 bg-white text-slate-400 hover:bg-slate-100 transition-colors ml-2">ESC</kbd>
                     </div>
-                @endauth
-            </div>
-        </header>
 
-        <!-- Contenido principal -->
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-            <div class="max-w-[1600px] mx-auto space-y-6">
+                    <div id="search-results" class="p-2 overflow-y-auto space-y-1 sidebar-scroll flex-1 pb-4">
+                        <div class="px-3 py-6 text-center text-[12px] text-slate-400">Escribe al menos 2 letras para buscar
+                            en
+                            toda la base de datos...</div>
+                    </div>
 
-
-                <!-- ENCABEZADO DINÁMICO DE PÁGINA (Resuelve el problema de los botones) -->
-
-                @if (View::hasSection('title') || View::hasSection('actions'))
                     <div
-                        class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-5">
-                        <div>
-                            @hasSection('title')
-                                <h1 class="text-[22px] font-bold text-slate-800 tracking-tight leading-none">
-                                    @yield('title')</h1>
-                            @endif
-                            @hasSection('subtitle')
-                                <p class="text-[13px] text-slate-500 mt-2 font-medium">@yield('subtitle')</p>
-                            @endif
+                        class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <span class="flex items-center gap-1"><kbd
+                                    class="px-1 py-0.5 rounded border border-slate-200 bg-white">↑</kbd><kbd
+                                    class="px-1 py-0.5 rounded border border-slate-200 bg-white">↓</kbd> Navegar</span>
+                            <span class="flex items-center gap-1 ml-2"><kbd
+                                    class="px-1 py-0.5 rounded border border-slate-200 bg-white">↵</kbd> Entrar</span>
                         </div>
-
-                        @hasSection('actions')
-                            <div class="flex items-center gap-3 shrink-0">
-                                @yield('actions')
-                            </div>
-                        @endif
+                        <span class="font-mono-das">Droguería DAS</span>
                     </div>
-                @endif
-
-
-                <div class="w-full">
-                    @yield('content')
                 </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- MODAL DE BÚSQUEDA GLOBAL "NIVEL INSANO" (Navegación por Teclado) -->
-
-    <div id="search-modal"
-        class="fixed inset-0 z-50 hidden flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-200"
-        onclick="if(event.target === this) closeSearchModal()">
-        <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden transform scale-95 transition-transform duration-200 flex flex-col max-h-[80vh]"
-            id="search-modal-card">
-
-            <div class="flex items-center px-4 border-b border-slate-100 bg-slate-50/50 shrink-0 relative">
-                <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-                <input type="text" id="global-search-input" oninput="performGlobalSearch(this.value)"
-                    onkeydown="handleSearchKeydown(event)" placeholder="Buscar Lote, Fármaco o RUT Proveedor..."
-                    class="w-full px-3 py-4 text-[14px] bg-transparent border-0 focus:outline-none text-slate-800 placeholder-slate-400 font-medium pr-12">
-
-                <!-- Botón Limpiar (X) -->
-                <button id="search-clear-btn" onclick="clearSearch()" class="hidden absolute right-16 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-colors focus:outline-none">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-
-                <!-- Loader -->
-                <div id="search-loader" class="hidden absolute right-16 loader"></div>
-
-                <kbd onclick="closeSearchModal()"
-                    class="cursor-pointer font-mono-das text-[10px] px-2 py-1 rounded border border-slate-200 bg-white text-slate-400 hover:bg-slate-100 transition-colors ml-2">ESC</kbd>
-            </div>
-
-            <div id="search-results" class="p-2 overflow-y-auto space-y-1 sidebar-scroll flex-1 pb-4">
-                <div class="px-3 py-6 text-center text-[12px] text-slate-400">Escribe al menos 2 letras para buscar en
-                    toda la base de datos...</div>
-            </div>
-
-            <div
-                class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 shrink-0">
-                <div class="flex items-center gap-2">
-                    <span class="flex items-center gap-1"><kbd
-                            class="px-1 py-0.5 rounded border border-slate-200 bg-white">↑</kbd><kbd
-                            class="px-1 py-0.5 rounded border border-slate-200 bg-white">↓</kbd> Navegar</span>
-                    <span class="flex items-center gap-1 ml-2"><kbd
-                            class="px-1 py-0.5 rounded border border-slate-200 bg-white">↵</kbd> Entrar</span>
-                </div>
-                <span class="font-mono-das">Droguería DAS</span>
             </div>
         </div>
-    </div>
+    @else
+        <main class="min-h-screen flex items-center justify-center p-4">
+            <div class="w-full max-w-2xl">
+                @yield('content')
+            </div>
+        </main>
+    @endauth
 
     <!-- SCRIPT MAESTRO DE FUNCIONALIDAD GLOBAL -->
     <script>
         // --- SWEETALERT2: CONFIGURACIÓN GLOBAL ---
-        
+
         // 1. Instancia global para notificaciones tipo Toast
         const Toast = Swal.mixin({
             toast: true,
@@ -676,28 +696,28 @@
         });
 
         // 2. Interceptor de Flash Messages de Laravel
-        @if(session('success'))
+        @if (session('success'))
             Toast.fire({
                 icon: 'success',
                 title: @json(session('success'))
             });
         @endif
 
-        @if(session('error'))
+        @if (session('error'))
             Toast.fire({
                 icon: 'error',
                 title: @json(session('error'))
             });
         @endif
 
-        @if(session('warning'))
+        @if (session('warning'))
             Toast.fire({
                 icon: 'warning',
                 title: @json(session('warning'))
             });
         @endif
 
-        @if(session('info'))
+        @if (session('info'))
             Toast.fire({
                 icon: 'info',
                 title: @json(session('info'))
@@ -783,8 +803,8 @@
                 searchAbortController = new AbortController();
 
                 fetch(`/api/global-search?q=${encodeURIComponent(cleanQuery)}`, {
-                    signal: searchAbortController.signal
-                })
+                        signal: searchAbortController.signal
+                    })
                     .then(res => {
                         if (!res.ok) throw new Error('Error en red');
                         return res.json();
@@ -822,8 +842,10 @@
                             }
 
                             // Resaltador Mágico Seguro
-                            const highlightedTitle = item.title ? item.title.replace(regex, '<span class="highlight-text">$1</span>') : 'N/A';
-                            const highlightedSubtitle = item.subtitle ? item.subtitle.replace(regex, '<span class="highlight-text">$1</span>') : '';
+                            const highlightedTitle = item.title ? item.title.replace(regex,
+                                '<span class="highlight-text">$1</span>') : 'N/A';
+                            const highlightedSubtitle = item.subtitle ? item.subtitle.replace(regex,
+                                '<span class="highlight-text">$1</span>') : '';
 
                             html += `
                                 <a href="${item.url}" id="search-item-${index}" class="search-result-item flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 transition-all duration-200 border border-transparent mt-0.5 group">
