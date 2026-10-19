@@ -16,6 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Carga la sesión para la gestión global de excepciones 
+        $middleware->use([
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        ]);
+
         // Alias de middlewares para usar en web.php
         $middleware->alias([
             'auth' => Authenticate::class,
