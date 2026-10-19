@@ -38,9 +38,13 @@ class ShelfController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
             'aisle_id' => 'required|exists:aisles,id',
+            'capacidad' => 'nullable|integer|min:0|max:1000000',
         ]);
 
-        Shelf::create($request->all());
+        $datos = $request->only(['name', 'description', 'aisle_id', 'capacidad']);
+        $datos['capacidad'] = (int) ($datos['capacidad'] ?? 0);
+
+        Shelf::create($datos);
 
         return redirect()->route('shelf.index')->with('success', 'Estantería creada exitosamente.');
     }
@@ -72,9 +76,13 @@ class ShelfController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
             'aisle_id' => 'required|exists:aisles,id',
+            'capacidad' => 'nullable|integer|min:0|max:1000000',
         ]);
 
-        $shelf->update($request->all());
+        $datos = $request->only(['name', 'description', 'aisle_id', 'capacidad']);
+        $datos['capacidad'] = (int) ($datos['capacidad'] ?? 0);
+
+        $shelf->update($datos);
 
         return redirect()->route('shelf.index')->with('success', 'Estantería actualizada exitosamente.');
 

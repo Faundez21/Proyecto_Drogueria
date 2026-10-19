@@ -2,17 +2,18 @@
 
 @section('content')
     <div class="w-full">
-        <!-- miga de pan -->
-        <div class="flex items-center gap-2 text-gray-500 mb-4">
-            <a href="{{ route('distribution.index') }}" class="hover:text-blue-900">
-                Distribución
-            </a>
-
-            <span>/</span>
-
-            <span class="text-gray-800 font-medium">
-                Estanterías
-            </span>
+        <!-- migas de pan -->
+        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
+            <span class="text-slate-400 font-semibold">03</span>
+            <span>Salida</span>
+            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 transition-colors">Distribución</a>
+            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <span class="font-semibold text-slate-800">Estanterías</span>
             @role('Administrador')
                 <div class="flex gap-2 w-full sm:w-auto ml-auto">
                     <button type="button" onclick="openHistory()"
@@ -76,6 +77,10 @@
                         </th>
 
                         <th class="px-6 py-4 text-center">
+                            Capacidad (uds)
+                        </th>
+
+                        <th class="px-6 py-4 text-center">
                             Acciones
                         </th>
 
@@ -100,6 +105,13 @@
                             </td>
                             <td class="px-6 py-4 text-slate-500">{{ $shelf->aisle->name ?? 'Sin pasillo' }}</td>
                             <td class="px-6 py-4 text-center">
+                                @if ($shelf->capacidad > 0)
+                                    <span class="inline-flex px-2.5 py-1 rounded-lg text-[12px] font-bold bg-teal-50 text-teal-700 border border-teal-200">{{ number_format($shelf->capacidad, 0, ',', '.') }}</span>
+                                @else
+                                    <span class="text-[12px] text-slate-400 font-medium">Sin límite</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">
 
 
                                 <div class="flex justify-center gap-2">
@@ -119,7 +131,7 @@
 
                                     <!-- Editar -->
                                     <button
-                                        onclick='openEdit({{ $shelf->id }}, @json($shelf->name), {{ $shelf->aisle_id }}, @json($shelf->description))'
+                                        onclick='openEdit({{ $shelf->id }}, @json($shelf->name), {{ $shelf->aisle_id }}, @json($shelf->description), {{ $shelf->capacidad ?? 0 }})'
                                         class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                                         title="Editar estantería">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,6 +241,23 @@
                                 @endforeach
 
                             </select>
+
+                        </div>
+
+                        <!-- Capacidad -->
+                        <div class="mb-5">
+
+                            <label for="capacidad" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Capacidad (unidades de stock)
+                            </label>
+
+                            <input type="number" name="capacidad" id="capacidad" min="0" step="1" value="0"
+                                placeholder="Ej. 1500 (0 = sin límite)"
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-blue-100
+                        focus:border-blue-500 transition bg-white">
+
+                            <p class="text-[11px] text-slate-400 mt-1">Define la capacidad máxima de la estantería para calcular el % de ocupación en el visor 3D. Usa 0 si no desea límite.</p>
 
                         </div>
 
@@ -417,6 +446,20 @@
                             </select>
 
                         </div>
+                        <div class="mb-5">
+
+                            <label for="editCapacidad" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Capacidad (unidades de stock)
+                            </label>
+
+                            <input type="number" name="capacidad" id="editCapacidad" min="0" step="1" value="0"
+                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-blue-100
+                        focus:border-blue-500 transition bg-white">
+
+                            <p class="text-[11px] text-slate-400 mt-1">0 = sin límite.</p>
+
+                        </div>
                         <div>
 
                             <label for="editDescription" class="block text-sm font-semibold text-slate-700 mb-2">
@@ -543,12 +586,13 @@
                     .classList.add('hidden');
             }
 
-            function openEdit(id, name, aisleId, description) {
+            function openEdit(id, name, aisleId, description, capacidad = 0) {
                 document.getElementById('editModal').classList.remove('hidden');
 
                 document.getElementById('editName').value = name;
                 document.getElementById('editAisle').value = aisleId;
                 document.getElementById('editDescription').value = description || '';
+                document.getElementById('editCapacidad').value = capacidad || 0;
 
                 document.getElementById('editForm').action = '/shelf/' + id;
             }

@@ -254,7 +254,7 @@
 
         <nav class="flex-1 px-3 py-5 space-y-6 overflow-y-auto sidebar-scroll">
             <div>
-                @role('Administrador')
+                @can('ver.dashboard')
                     <a href="{{ route('dashboard.index') }}"
                         class="nav-row {{ request()->routeIs('dashboard.*') ? 'is-active' : '' }} flex items-center gap-3 px-3 py-2.5 rounded-md text-[13.5px]">
                         <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,9 +264,8 @@
                         </svg>
                         Panel Principal
                     </a>
-                </div>
-            @endrole
-            <!-- Paso 1: Abastecimiento -->
+                @endcan
+            </div>
             <div class="flow-section">
                 <div class="flex items-center gap-2 mb-2 px-2">
                     <span
@@ -343,7 +342,7 @@
                 </svg>
                 Despacho Normal
             </a>
-            @role('Administrador')
+            @can('ver.despacho_controlado')
                 <!-- Submenú Controlado -->
                 <div class="relative pl-6">
                     <div class="absolute left-3.5 top-0 bottom-4 w-px bg-slate-700/60"></div>
@@ -359,7 +358,7 @@
                         Despacho Controlado
                     </a>
                 </div>
-            @endrole
+        @endcan
         </div>
 
         <a href="{{ route('distribution.index') }}"
@@ -371,7 +370,7 @@
             Distribución
         </a>
 
-        @role('Administrador')
+        @can('ver.solicitudes')
             <a href="{{ route('requests.index') }}"
                 class="nav-row {{ request()->routeIs('requests.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -381,7 +380,7 @@
                 </svg>
                 Solicitudes
             </a>
-        @endrole
+        @endcan
     </div>
 </div>
             <!-- Paso 4: Control -->
@@ -414,25 +413,23 @@
             </div>
 
             <!-- Administración -->
-            @auth
-                @if (method_exists(auth()->user(), 'hasRole') && auth()->user()->hasRole('Administrador'))
-                    <div class="pt-6 pb-4 border-t border-slate-800">
-                        <p class="text-[11.5px] font-semibold tracking-wide uppercase px-2 mb-2 text-slate-500">
-                            Configuración</p>
-                        <div class="space-y-0.5">
-                            <a href="{{ route('users.index') }}"
-                                class="nav-row {{ request()->routeIs('users.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                                    </path>
-                                </svg>
-                                Usuarios y Permisos
-                            </a>
-                        </div>
+            @can('ver.usuarios')
+                <div class="pt-6 pb-4 border-t border-slate-800">
+                    <p class="text-[11.5px] font-semibold tracking-wide uppercase px-2 mb-2 text-slate-500">
+                        Configuración</p>
+                    <div class="space-y-0.5">
+                        <a href="{{ route('users.index') }}"
+                            class="nav-row {{ request()->routeIs('users.*') || request()->routeIs('roles.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                </path>
+                            </svg>
+                            Usuarios y Permisos
+                        </a>
                     </div>
-                @endif
-            @endauth
+                </div>
+            @endcan
         </nav>
     </aside>
     <!-- Contenedor principal -->
@@ -483,9 +480,8 @@
                     </svg>
                     <div class="text-[13px] font-mono-das tracking-tight" id="live-clock"></div>
                 </div>
-                @role('Administrador')
-                    <!-- Notificaciones Dinámicas -->
-                    <div class="relative" id="notifications-container">
+                <!-- Notificaciones Dinámicas -->
+                <div class="relative" id="notifications-container">
                         <button onclick="toggleNotifications()" type="button"
                             class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -514,8 +510,6 @@
                         </div>
                     </div>
 
-                    <div class="hidden sm:block h-6 w-px mx-1 bg-slate-200"></div>
-                @endrole
                 <!-- Perfil -->
                 @auth
                     <div class="relative" id="user-menu-container">
@@ -685,28 +679,28 @@
         @if(session('success'))
             Toast.fire({
                 icon: 'success',
-                title: '{!! addslashes(session('success')) !!}'
+                title: @json(session('success'))
             });
         @endif
 
         @if(session('error'))
             Toast.fire({
                 icon: 'error',
-                title: '{!! addslashes(session('error')) !!}'
+                title: @json(session('error'))
             });
         @endif
 
         @if(session('warning'))
             Toast.fire({
                 icon: 'warning',
-                title: '{!! addslashes(session('warning')) !!}'
+                title: @json(session('warning'))
             });
         @endif
 
         @if(session('info'))
             Toast.fire({
                 icon: 'info',
-                title: '{!! addslashes(session('info')) !!}'
+                title: @json(session('info'))
             });
         @endif
 

@@ -13,17 +13,16 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EstablishmentRequestController;
 use App\Http\Controllers\DispatchController;
-use App\Http\Controllers\ControlledDispatchController; // nuevo controlador
+use App\Http\Controllers\ControlledDispatchController;
 use App\Http\Controllers\TraceabilityController;
 use App\Http\Controllers\GlobalSearchController;
+use App\Http\Controllers\QRController;
 
 //  Controladores de Estructura de Almacén (Mantenedores)
 use App\Http\Controllers\AisleController;
-// controladores de modulos y operaciones
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PasswordResetRequestController;
 use App\Http\Controllers\PositionController;
-//  Controladores de Estructura de Almacén (Mantenedores)
 use App\Http\Controllers\ShelfController;
 
 // controladores de usuarios
@@ -39,6 +38,11 @@ Route::redirect('/', '/login');
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 
+// Enviar solicitud desde el Login (con throttle anti-abuso)
+Route::post('/password-reset-request', [PasswordResetRequestController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('password.request.store');
+
 /*
  rutas privadas (protegidas)
  todas estas rutas requieren que el usuario este autenticado (middleware auth).
@@ -46,123 +50,110 @@ Route::post('/login', [LoginController::class, 'authenticate']);
 
 Route::middleware('auth')->group(function () {
 
-    // 4. cierre de sesion (movido dentro del middleware para mayor seguridad)
+    // cierre de sesion
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    // 5. vistas generales y dashboards
-
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard.index');
+    // vistas generales y dashboards
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     // rutas para la barra de busqueda global y notificaciones
     Route::get('/api/global-search', [GlobalSearchController::class, 'search'])->name('global.search');
     Route::get('/api/notifications', [GlobalSearchController::class, 'notifications'])->name('global.notifications');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
-    // Asignar contraseña por el Administrador
 
-    Route::post('/users/reset-password/{email}', [PasswordResetRequestController::class, 'resetPassword'])
-        ->name('users.reset_password');
+    // ===== SOLO ADMINISTRADOR =====
+    Route::middleware('role:Administrador')->group(function () {
 
-    // modulo de despacho general
-    Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch.index');
-    Route::post('/dispatch', [DispatchController::class, 'store'])->name('dispatch.store');
-    Route::get('/dispatch/{id}/pdf', [DispatchController::class, 'pdf'])->name('dispatch.pdf');
+        // asignar contraseña por el administrador
+        Route::post('/users/reset-password/{email}', [PasswordResetRequestController::class, 'resetPassword'])
+            ->name('users.reset_password');
 
-    // modulo de despacho de controlados
-    Route::get('/controlled_dispatch', [ControlledDispatchController::class, 'index'])->name('controlled_dispatch.index');
-    Route::post('/controlled_dispatch', [ControlledDispatchController::class, 'store'])->name('controlled_dispatch.store');
-    Route::get('/controlled_dispatch/{id}/pdf', [ControlledDispatchController::class, 'pdf'])->name('controlled_dispatch.pdf');
+        // usuarios y roles
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::post('/roles', [UserController::class, 'storeRole'])->name('roles.store');
+        Route::put('/roles/{role}', [UserController::class, 'updateRole'])->name('roles.update');
+        Route::delete('/roles/{role}', [UserController::class, 'destroyRole'])->name('roles.destroy');
 
-    // modulo de trazabilidad
-    Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
-    Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline']);
+        // modulo de despacho de controlados
+        Route::get('/controlled_dispatch', [ControlledDispatchController::class, 'index'])->name('controlled_dispatch.index');
+        Route::post('/controlled_dispatch', [ControlledDispatchController::class, 'store'])->name('controlled_dispatch.store');
+        Route::get('/controlled_dispatch/{id}/pdf', [ControlledDispatchController::class, 'pdf'])->name('controlled_dispatch.pdf');
 
-// modulo de reportes
-
-
-Route::get('/reportes', [ReportController::class, 'index'])->name('reportes.index');
-Route::get('/reportes/exportar/excel', [ReportController::class, 'exportExcel'])->name('reportes.excel');
-Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])->name('reportes.pdf');
-    // usuarios
-    Route::get('/users', [UserController::class, 'index'])
-        ->name('users.index');
-
-    // inventario
-    Route::get('/inventario', [InventoryController::class, 'index'])->name('inventario.index');
-    Route::post('/inventario', [InventoryController::class, 'store'])->name('inventario.store');
-    Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])->name('inventario.import');
-    Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])->name('inventario.update');
-
-    // 6. modulo de recepcion
-    Route::prefix('reception')->name('reception.')->group(function () {
-
-        Route::get('/', [ReceptionController::class, 'index'])
-            ->name('index');
-
-        Route::post('/guardar', [ReceptionController::class, 'store'])
-            ->name('store');
-
-        Route::get('/{reception}/pdf', [ReceptionController::class, 'downloadPdf'])
-            ->name('pdf');
+        // solicitudes de establecimientos
+        Route::resource('requests', EstablishmentRequestController::class)->only(['index', 'store']);
     });
 
-    // 7. modulo de proveedores
-    Route::prefix('suppliers')->name('providers.')->group(function () {
+    // ===== ACCESO POR PERMISO DE VISTA (definido en roles) =====
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->middleware('permission:ver.dashboard')->name('dashboard.index');
 
-        Route::get('/', [ProviderController::class, 'index'])
-            ->name('index');
-
-        Route::get('/crear', [ProviderController::class, 'create'])
-            ->name('create');
-
-        Route::post('/', [ProviderController::class, 'store'])
-            ->name('store');
-
-        Route::put('/{provider}', [ProviderController::class, 'update'])
-            ->name('update');
-
-        Route::patch('/{provider}/toggle-status', [ProviderController::class, 'toggleStatus'])
-            ->name('toggle-status');
-    });
-
-    // 8. rutas de mantenedores
-
-    Route::resource('aisle', AisleController::class);
-
-    Route::resource('shelf', ShelfController::class);
-
-    Route::resource('level', LevelController::class);
-
-    Route::resource('position', PositionController::class);
-
-    // 9. ruta de distribucion
-
-    Route::resource('distribution', DistributionController::class);
-
-    // 10. ruta de cuarentena
-
-    Route::resource('quarantine', QuarantineController::class);
-
-    // 11. ruta de qr
-
-    Route::resource('qr', QRController::class);
-
-    // 12. ruta para mover posiciones 3d
-
-    Route::post(
-        '/shelf/{id}/update-position',
-        [ShelfController::class, 'updatePosition']
-    )->name('shelf.updatePosition');
-
-
-    //13. solicitudes de establecimientos
-    Route::resource('requests', EstablishmentRequestController::class);
+    Route::get('/dispatch', [DispatchController::class, 'index'])
+        ->middleware('permission:ver.despacho')->name('dispatch.index');
+    Route::post('/dispatch', [DispatchController::class, 'store'])
+        ->middleware('permission:ver.despacho')->name('dispatch.store');
+    Route::get('/dispatch/{id}/pdf', [DispatchController::class, 'pdf'])
+        ->middleware('permission:ver.despacho')->name('dispatch.pdf');
     Route::get('/dispatch/solicitudes', [DispatchController::class, 'solicitudes'])
-        ->name('dispatch.solicitudes');
-    // 13. solicitudes de establecimientos
-    Route::resource('requests', EstablishmentRequestController::class);
+        ->middleware('permission:ver.despacho')->name('dispatch.solicitudes');
 
+    Route::get('/traceability', [TraceabilityController::class, 'index'])
+        ->middleware('permission:ver.trazabilidad')->name('traceability.index');
+    Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline'])
+        ->middleware('permission:ver.trazabilidad')->name('traceability.timeline');
+
+    Route::get('/reportes', [ReportController::class, 'index'])
+        ->middleware('permission:ver.reportes')->name('reportes.index');
+    Route::get('/reportes/exportar/excel', [ReportController::class, 'exportExcel'])
+        ->middleware('permission:ver.reportes')->name('reportes.excel');
+    Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])
+        ->middleware('permission:ver.reportes')->name('reportes.pdf');
+
+    Route::get('/inventario', [InventoryController::class, 'index'])
+        ->middleware('permission:ver.inventario')->name('inventario.index');
+    Route::post('/inventario', [InventoryController::class, 'store'])
+        ->middleware('permission:ver.inventario')->name('inventario.store');
+    Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])
+        ->middleware('permission:ver.inventario')->name('inventario.import');
+    Route::get('/inventario/plantilla', [InventoryController::class, 'template'])
+        ->middleware('permission:ver.inventario')->name('inventario.template');
+    Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])
+        ->middleware('permission:ver.inventario')->name('inventario.update');
+
+    // modulo de recepcion
+    Route::prefix('reception')->name('reception.')->middleware('permission:ver.recepcion')->group(function () {
+        Route::get('/', [ReceptionController::class, 'index'])->name('index');
+        Route::post('/guardar', [ReceptionController::class, 'store'])->name('store');
+        Route::get('/{reception}/pdf', [ReceptionController::class, 'downloadPdf'])->name('pdf');
+    });
+
+    // modulo de proveedores
+    Route::prefix('suppliers')->name('providers.')->middleware('permission:ver.proveedores')->group(function () {
+        Route::get('/', [ProviderController::class, 'index'])->name('index');
+        Route::post('/', [ProviderController::class, 'store'])->name('store');
+        Route::put('/{provider}', [ProviderController::class, 'update'])->name('update');
+        Route::patch('/{provider}/toggle-status', [ProviderController::class, 'toggleStatus'])->name('toggle-status');
+    });
+
+    // rutas de mantenedores
+    Route::middleware('permission:ver.distribucion')->group(function () {
+        Route::resource('aisle', AisleController::class);
+        Route::resource('shelf', ShelfController::class);
+        Route::resource('level', LevelController::class);
+        Route::resource('position', PositionController::class);
+        Route::post('/shelf/{id}/update-position', [ShelfController::class, 'updatePosition'])
+            ->name('shelf.updatePosition');
+    });
+
+    // ruta de distribucion
+    Route::get('/distribution', [DistributionController::class, 'index'])
+        ->middleware('permission:ver.distribucion')->name('distribution.index');
+
+    // ruta de cuarentena
+    Route::get('/quarantine', [QuarantineController::class, 'index'])
+        ->middleware('permission:ver.cuarentena')->name('quarantine.index');
+
+    // codigos QR de etiquetas de inventario
+    Route::get('/qr/{inventory}/image', [QRController::class, 'image'])->name('qr.image');
 });
-// Enviar solicitud desde el Login
-Route::post('/password-reset-request', [PasswordResetRequestController::class, 'store'])
-    ->name('password.request.store');

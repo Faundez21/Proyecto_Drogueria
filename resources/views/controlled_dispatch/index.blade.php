@@ -40,14 +40,22 @@
             <div class="w-10 h-10 bg-rose-600/10 text-rose-600 rounded-xl flex items-center justify-center shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
             </div>
-            <div>
+            <div class="flex-1">
                 <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Despacho de Farmacos Controlados</h2>
-                <p class="text-[12px] text-slate-500 mt-0.5">Acceso restringido unicamente a estupefacientes y talonarios de recetas cheque.</p>
+                <p class="text-[12px] text-slate-500 mt-0.5">Acceso restringido unicamente a estupefacientes y talonarios de recetas cheque. Solo solicitudes de CESFAM.</p>
             </div>
+            <button type="button" onclick="openSolicitudesControlado()"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition-all duration-200">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4"></path>
+                </svg>
+                Ver Solicitudes (Estupefacientes)
+            </button>
         </div>
 
-        <form action="{{ route('controlled_dispatch.store') }}" method="POST" id="despachoForm">
+        <form action="{{ route('controlled_dispatch.store') }}" method="POST" id="despachoControladoForm">
             @csrf
+            <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
 
             <!-- seccion de datos del remitente y correlativo -->
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
@@ -469,6 +477,69 @@
         </div>
     </div>
 
+    <!-- modal de solicitudes con estupefacientes -->
+    <div id="SolicitudesControladoModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl flex flex-col max-h-[90vh] overflow-hidden">
+            <div class="px-6 py-5 bg-rose-700 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Solicitudes con Estupefacientes</h2>
+                    <p class="text-[12px] text-rose-100 mt-0.5">Solo solicitudes CESFAM. Los medicamentos no controlados se despachan por el módulo normal.</p>
+                </div>
+                <button type="button" onclick="closeSolicitudesControlado()" class="text-rose-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-lg cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto p-5 space-y-3">
+                @forelse ($solicitudes as $solicitud)
+                    @php
+                        $itemsControlado = $solicitud->items->filter(fn ($i) =>
+                            in_array($i->product->nombre ?? '', $controlados) &&
+                            ($i->cantidad_solicitada - $i->cantidad_despachada) > 0
+                        );
+                        $itemsNormal = $solicitud->items->filter(fn ($i) =>
+                            ! in_array($i->product->nombre ?? '', $controlados) &&
+                            ($i->cantidad_solicitada - $i->cantidad_despachada) > 0
+                        );
+                    @endphp
+
+                    @if ($itemsControlado->isNotEmpty())
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="px-4 py-3 bg-slate-50 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                                <div>
+                                    <p class="text-[13px] font-bold text-slate-800">{{ $solicitud->numero_solicitud }} — {{ $solicitud->establecimiento }}</p>
+                                    <p class="text-[11px] text-slate-500">{{ \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d-m-Y') }} · Responsable: {{ $solicitud->responsable }} · Estado: {{ $solicitud->estado }}</p>
+                                </div>
+                                <button type="button" onclick="usarSolicitudControlado({{ $solicitud->id }})"
+                                    class="px-4 py-2 text-[12px] font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition-colors cursor-pointer shrink-0">
+                                    Usar Solicitud
+                                </button>
+                            </div>
+                            <div class="px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                @foreach ($itemsControlado as $item)
+                                    <div class="flex justify-between items-center bg-rose-50 border border-rose-100 rounded-lg px-3 py-2 text-[12px]">
+                                        <span class="font-semibold text-slate-800 truncate">{{ $item->product->nombre }}</span>
+                                        <span class="font-bold text-rose-700 ml-2 shrink-0">x{{ $item->cantidad_solicitada - $item->cantidad_despachada }}</span>
+                                    </div>
+                                @endforeach
+                                @if ($itemsNormal->isNotEmpty())
+                                    <div class="sm:col-span-2 text-[11px] text-slate-500 italic">
+                                        + {{ $itemsNormal->count() }} producto(s) no controlado(s) en esta solicitud (van por Despacho Normal)
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                @empty
+                    <div class="text-center py-12 text-slate-400">
+                        <p class="text-sm font-medium">No hay solicitudes pendientes con estupefacientes.</p>
+                        <p class="text-[12px] mt-1">Solo las solicitudes de establecimientos CESFAM pueden contener estupefacientes.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
@@ -478,6 +549,110 @@
     <script>
         let signatureDespacha = null;
         let signatureRecibe = null;
+        const solicitudesControlado = @json($solicitudes);
+
+        const esControladoJS = (nombre) => @json($controlados).some(c => c.toLowerCase() === String(nombre ?? '').trim().toLowerCase());
+
+        // ===== SOLICITUDES (ESTUPEFACIENTES) =====
+        function openSolicitudesControlado() {
+            document.getElementById('SolicitudesControladoModal').classList.remove('hidden');
+        }
+        function closeSolicitudesControlado() {
+            document.getElementById('SolicitudesControladoModal').classList.add('hidden');
+        }
+
+        function usarSolicitudControlado(id) {
+            const solicitud = solicitudesControlado.find(s => s.id === id);
+            if (!solicitud) return;
+
+            // marcar la solicitud de origen
+            const requestInput = document.getElementById('establishment_request_id');
+            if (requestInput) requestInput.value = solicitud.id;
+
+            // clasificacion interna + establecimiento (matching insensible a mayusculas)
+            const clasificacion = document.getElementById('clasificacion_select');
+            clasificacion.value = 'Interno';
+            toggleClasificacion();
+
+            const selectEst = document.getElementById('establecimiento_interno');
+            const objetivo = (solicitud.establecimiento ?? '').trim().toLowerCase();
+            const opcionEst = Array.from(selectEst.options).find(op => op.value.trim().toLowerCase() === objetivo);
+            if (opcionEst) {
+                selectEst.value = opcionEst.value;
+                actualizarDireccionInterna();
+            }
+
+            // condiciones de transporte
+            const condiciones = document.querySelector('input[name="condiciones_transporte"]');
+            if (condiciones) condiciones.value = solicitud.observaciones ?? '';
+
+            // limpiar filas actuales
+            while (tbody.children.length > 0) tbody.children[0].remove();
+
+            let normales = [];
+            let sinStock = [];
+
+            solicitud.items.forEach(item => {
+                const nombreItem = item.product.nombre ?? ('Producto #' + item.product_id);
+                const pendiente = Math.max(0, item.cantidad_solicitada - (item.cantidad_despachada ?? 0));
+
+                if (pendiente <= 0) return;
+
+                if (!esControladoJS(nombreItem)) {
+                    normales.push(nombreItem + ' (x' + pendiente + ')');
+                    return;
+                }
+
+                const tr = addRow();
+                const selectProducto = tr.querySelector('select[name="productos[]"]');
+                const opcion = Array.from(selectProducto.options).find(op => op.value.trim().toLowerCase() === nombreItem.trim().toLowerCase());
+
+                if (opcion) {
+                    selectProducto.value = opcion.value;
+                    llenarDatosFila(selectProducto);
+                    const cantInput = tr.querySelector('input[name="cantidades[]"]');
+                    cantInput.value = pendiente;
+                    validarStock(cantInput);
+                } else {
+                    tr.remove();
+                    sinStock.push(nombreItem);
+                }
+            });
+
+            if (tbody.children.length === 0) addRow();
+
+            // precargar la firma del solicitante (firma de quien recibe)
+            if (solicitud.firma_solicitante) {
+                if (signatureRecibe) {
+                    signatureRecibe.clear();
+                    signatureRecibe.fromDataURL(solicitud.firma_solicitante);
+                }
+                const firmaInput = document.getElementById('firma_recibe_input');
+                if (firmaInput) firmaInput.value = solicitud.firma_solicitante;
+            } else {
+                if (signatureRecibe) signatureRecibe.clear();
+                const firmaInput = document.getElementById('firma_recibe_input');
+                if (firmaInput) firmaInput.value = '';
+            }
+
+            closeSolicitudesControlado();
+
+            if (normales.length > 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Medicamentos -> Despacho Normal',
+                    html: 'Los siguientes productos de la solicitud <b>' + (solicitud.numero_solicitud ?? '') + '</b> NO son estupefacientes y deben despacharse por el módulo <b>Despacho Normal</b>:<br><br><b>' + normales.join('<br>') + '</b>',
+                    confirmButtonColor: '#be123c'
+                });
+            } else if (sinStock.length > 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Falta de Stock',
+                    text: 'Sin stock Disponible de: ' + sinStock.join(', '),
+                    confirmButtonColor: '#be123c'
+                });
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             const padDespachaElem = document.getElementById('pad_despacha');
@@ -487,7 +662,7 @@
             if(padDespachaElem) signatureDespacha = new SignaturePad(padDespachaElem, padOptions);
             if(padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
 
-            const form = document.getElementById('despachoForm');
+            const form = document.getElementById('despachoControladoForm');
             if(form) {
                 form.addEventListener('submit', function() {
                     if (signatureDespacha && !signatureDespacha.isEmpty()) {

@@ -161,6 +161,16 @@
                                     </select>
                                 </div>
                                 <div>
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Programa</label>
+                                    <select name="programa[]"
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        <option value="" selected>Sin programa</option>
+                                        <option value="Morbilidad General">Morbilidad General</option>
+                                        <option value="Cardiovascular">Cardiovascular</option>
+                                        <option value="IRA/ERA">Respiratorio (IRA/ERA)</option>
+                                    </select>
+                                </div>
+                                <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Lote</label>
                                     <input type="text" name="lote[]" placeholder="Ej: L-4893" class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
                                 </div>

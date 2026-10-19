@@ -102,6 +102,7 @@
 
         <form action="{{ route('dispatch.store') }}" method="POST" id="despachoForm">
             @csrf
+            <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
 
             <!-- seccion de datos del remitente y correlativo -->
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
@@ -1026,6 +1027,9 @@
         let signatureDespacha = null;
         let signatureRecibe = null;
         const solicitudes = @json($solicitudes);
+        const listaControlados = @json($controlados);
+
+        const esControladoJS = (nombre) => listaControlados.some(c => c.toLowerCase() === String(nombre ?? '').trim().toLowerCase());
 
         document.addEventListener('DOMContentLoaded', function() {
             // inicializar pads de firmas si existen
@@ -1466,6 +1470,10 @@
 
             if (!solicitud) return;
 
+            // marcar la solicitud de origen para que el servidor la actualice al despachar
+            const requestInput = document.getElementById('establishment_request_id');
+            if (requestInput) requestInput.value = solicitud.id;
+
             // seleccionar clasificacion interna
             const clasificacion = document.getElementById('clasificacion_select');
             clasificacion.value = 'Interno';
@@ -1502,15 +1510,23 @@
             }
 
             let productosFaltantes = [];
+            let productosControlados = [];
 
-            // agregar los productos de la solicitud
+            // agregar los productos de la solicitud (los estupefacientes van al módulo controlado)
             solicitud.items.forEach(item => {
+                const nombreItem = item.product.nombre ?? ('Producto #' + item.product_id);
+
+                if (esControladoJS(nombreItem)) {
+                    productosControlados.push(nombreItem + ' (x' + Math.max(0, item.cantidad_solicitada - (item.cantidad_despachada ?? 0)) + ')');
+                    return;
+                }
+
                 const tr = addRow();
                 const selectProducto = tr.querySelector(
                     'select[name="productos[]"]'
                 );
 
-                const nombreProducto = item.product.nombre
+                const nombreProducto = nombreItem
                     .trim()
                     .toLowerCase();
 
@@ -1532,9 +1548,9 @@
                     // Forzar que la cantidad no exceda el stock real que tienes actualmente
                     validarStock(cantidad);
                 } else {
-                    // si el producto no tiene stock disponible o está controlado, se elimna esta fila y lo guardamos
+                    // si el producto no tiene stock disponible, se elimina esta fila y lo guardamos
                     tr.remove();
-                    productosFaltantes.push(item.product.nombre);
+                    productosFaltantes.push(nombreItem);
                 }
             });
 
@@ -1543,15 +1559,41 @@
                 addRow();
             }
 
-            // alerta para notificar que no haya stock de algun producto solicitado
+            // alerta para notificar productos sin stock
             if (productosFaltantes.length > 0) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Falta de Stock o Controlado',
-                    text: 'Los siguientes productos no se agregaron porque ya no tienen stock o son controlados por sistema: ' +
+                    title: 'Falta de Stock',
+                    text: 'Los siguientes productos no se agregaron porque no hay stock Disponible en bodega: ' +
                         productosFaltantes.join(', '),
                     confirmButtonColor: '#0f968c'
                 });
+            }
+
+            // alerta: los estupefacientes de esta solicitud van por Despacho Controlado
+            if (productosControlados.length > 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Estupefacientes -> Despacho Controlado',
+                    html: 'Los siguientes estupefacientes de la solicitud <b>' + (solicitud.numero_solicitud ?? '') +
+                        '</b> deben despacharse por el módulo <b>Despacho Controlado</b>:<br><br><b>' +
+                        productosControlados.join('<br>') + '</b>',
+                    confirmButtonColor: '#0f968c'
+                });
+            }
+
+            // precargar la firma del solicitante del establecimiento en el pad de recepcion
+            if (solicitud.firma_solicitante) {
+                if (signatureRecibe) {
+                    signatureRecibe.clear();
+                    signatureRecibe.fromDataURL(solicitud.firma_solicitante);
+                }
+                const firmaInput = document.getElementById('firma_recibe_input');
+                if (firmaInput) firmaInput.value = solicitud.firma_solicitante;
+            } else {
+                if (signatureRecibe) signatureRecibe.clear();
+                const firmaInput = document.getElementById('firma_recibe_input');
+                if (firmaInput) firmaInput.value = '';
             }
 
             // cerrar modal de solicitudes

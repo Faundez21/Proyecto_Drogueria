@@ -141,6 +141,16 @@
                     </div>
 
                     <div>
+                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Programa</label>
+                        <select name="programa" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                            <option value="">Todos</option>
+                            @foreach($programasLista as $prog)
+                                <option value="{{ $prog }}" {{ request('programa') == $prog ? 'selected' : '' }}>{{ $prog }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Ordenar por</label>
                         <select name="order_by" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="recent" {{ request('order_by', 'recent') == 'recent' ? 'selected' : '' }}>Más recientes</option>
@@ -163,7 +173,7 @@
             </form>
 
             <!-- Alerta Verde de Filtros Activos (Blade + JS) -->
-            @if(request()->filled('pasillo') || request()->filled('estante') || request()->filled('categoria') || request()->filled('search'))
+            @if(request()->filled('pasillo') || request()->filled('estante') || request()->filled('categoria') || request()->filled('programa') || request()->filled('search'))
                 <div id="activeFilterAlert" class="px-5 py-3 bg-teal-50 border-b border-teal-200 flex justify-between items-center text-xs text-teal-800 font-bold">
                     <span class="flex items-center gap-2">
                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +184,8 @@
                                 request('search') ? 'Búsqueda: ' . request('search') : null,
                                 request('categoria') ? 'Cat: ' . request('categoria') : null,
                                 request('pasillo') ? 'Pasillo: ' . request('pasillo') : null,
-                                request('estante') ? 'Estante: ' . request('estante') : null
+                                request('estante') ? 'Estante: ' . request('estante') : null,
+                                request('programa') ? 'Programa: ' . request('programa') : null
                             ])) }}
                         </span>
                     </span>
@@ -220,8 +231,10 @@
                             <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Producto Principal</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
+                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Programa</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock Físico Acumulado</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">QR</th>
 </tr>
                         </tr>
@@ -230,7 +243,7 @@
                     <tbody class="divide-y divide-slate-100 text-[13px]" id="mainTableBody">
                         @if ($groupedInventories->isEmpty())
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center">
+                                <td colspan="8" class="px-6 py-12 text-center">
                                     <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-400 mb-3">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                     </div>
@@ -243,6 +256,10 @@
                                 @php
                                     $stockTotalProducto = $lotes->sum(function ($i) {
                                         return is_object($i) ? $i->stock_total ?? ($i->cantidad ?? 0) : 0;
+                                    });
+                                    $valorTotalProducto = $lotes->sum(function ($i) {
+                                        $obj = is_object($i) ? $i : (object) $i;
+                                        return ((float) ($obj->cantidad ?? 0)) * ((float) ($obj->valor_neto_unitario ?? 0));
                                     });
                                     $groupKey = 'grp_' . md5($nombreProducto);
                                     $primerLote = $lotes->first();
@@ -296,6 +313,14 @@ $loteMasProximo = $lotes->filter(function($l) {
                                     <td class="px-6 py-4">
                                         <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white text-slate-600 border border-slate-200 shadow-sm whitespace-nowrap">{{ $categoriaLote }}</span>
                                     </td>
+                                    <td class="px-6 py-4">
+                                        @php $programaProducto = data_get($primerLote, 'programa') ?? (is_object($primerLote) ? ($primerLote->programa ?? '') : ''); @endphp
+                                        @if ($programaProducto)
+                                            <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm whitespace-nowrap">{{ $programaProducto }}</span>
+                                        @else
+                                            <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-medium bg-slate-50 text-slate-400 border border-slate-100 shadow-sm whitespace-nowrap">Sin programa</span>
+                                        @endif
+                                    </td>
                                     <td class="px-6 py-4 text-center">
                                         <span class="font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">{{ $lotes->count() }}</span>
                                         <span class="text-slate-400 text-[11.5px] font-semibold uppercase ml-1">Lote(s)</span>
@@ -318,6 +343,11 @@ $loteMasProximo = $lotes->filter(function($l) {
                                             </span>
                                         @endif
                                     </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-[12.5px] font-bold bg-slate-50 text-slate-800 border border-slate-200 shadow-sm whitespace-nowrap font-mono-das">
+                                            $ {{ number_format($valorTotalProducto, 0, ',', '.') }}
+                                        </span>
+                                    </td>
                                     <td class="px-6 py-4 text-center" onclick="event.stopPropagation()">
         <button type="button"
             onclick="openQRModal('{{ e($proxLoteId) }}', '{{ e($nombreProducto) }}', '{{ e($proxLoteCodigo) }}', '{{ e($proxLoteVencText) }}', '{{ $proxLoteStock }}', 'Droguería DAS')"
@@ -331,7 +361,7 @@ $loteMasProximo = $lotes->filter(function($l) {
                                 </tr>
 
                                 <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-50/50 shadow-inner">
-                                    <td colspan="6" class="p-0 border-b border-slate-200">
+                                    <td colspan="8" class="p-0 border-b border-slate-200">
                                         <div class="py-4 pr-6 pl-14">
                                             <div
                                                 class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -357,7 +387,8 @@ $loteMasProximo = $lotes->filter(function($l) {
                                                                 <th class="px-4 py-3">Ubicación (Pasillo/Estante)</th>
                                                                 <th class="px-4 py-3 text-center">Estado Sanitario</th>
                                                                 <th class="px-4 py-3 text-center">Stock de Lote</th>
-                                                                <th class="px-4 py-3 text-center">Acciones</th>
+                                                                <th class="px-4 py-3 text-center">Valor Unitario</th>
+                                                                <th class="px-4 py-3 text-center">Valor Total Lote</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody class="divide-y divide-slate-100 text-slate-700 text-[12px]">
@@ -410,6 +441,10 @@ $loteMasProximo = $lotes->filter(function($l) {
                                                                     $loteCodigo = data_get($loteData, 'lote') ?? 'S/L';
                                                                     $estadoActualStr = $isCuarentena ? 'Cuarentena' : ($loteData->estado ?? 'Disponible');
                                                                     $loteMotivo = data_get($loteData, 'motivo') ?? data_get($loteData, 'observacion') ?? '';
+                                                                    $valorUnitarioLote = (float) (data_get($loteData, 'valor_neto_unitario') ?? 0);
+                                                                    $valorTotalLote = ((float) $stockLote) * $valorUnitarioLote;
+                                                                    $loteCategoria = data_get($loteData, 'categoria') ?? 'General';
+                                                                    $lotePrograma = data_get($loteData, 'programa') ?? '';
                                                                 @endphp
                                                                 <tr class="lote-item-row hover:bg-slate-50 transition-colors"
                                                                     data-lote-code="{{ strtolower(trim($loteCodigo)) }}"
@@ -420,7 +455,7 @@ $loteMasProximo = $lotes->filter(function($l) {
                                                                         <span class="text-[10px] uppercase font-semibold {{ $badgeVencimientoClass }}">Vence: {{ $textoVencimiento }}</span>
                                                                     </td>
                                                                     <td class="px-4 py-3">
-                                                                        <div class="flex items-center gap-1.5 text-[11px]">
+                                                                        <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                                             <span
                                                                                 class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span
                                                                                     class="text-slate-400">P:</span> <b
@@ -429,6 +464,34 @@ $loteMasProximo = $lotes->filter(function($l) {
                                                                                 class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span
                                                                                     class="text-slate-400">E:</span> <b
                                                                                     class="text-slate-800">{{ $estanteVal }}</b></span>
+                                                                            @if ($nivelVal = data_get($loteData, 'nivel'))
+                                                                                <span
+                                                                                    class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span
+                                                                                        class="text-slate-400">N:</span> <b
+                                                                                        class="text-slate-800">{{ $nivelVal }}</b></span>
+                                                                            @endif
+                                                                            @if ($posicionVal = data_get($loteData, 'posicion'))
+                                                                                <span
+                                                                                    class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span
+                                                                                        class="text-slate-400">Pos:</span> <b
+                                                                                        class="text-slate-800">{{ $posicionVal }}</b></span>
+                                                                            @endif
+                                                                            @if ($progVal = data_get($loteData, 'programa'))
+                                                                                <span
+                                                                                    class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded shadow-sm border border-indigo-100 font-semibold">{{ $progVal }}</span>
+                                                                            @endif
+                                                                            @if (data_get($loteData, 'solicitud_pedido_mensual'))
+                                                                                <span class="bg-teal-50 text-teal-700 px-2 py-1 rounded shadow-sm border border-teal-100 font-semibold">Pedido Mensual</span>
+                                                                            @endif
+                                                                            @if (data_get($loteData, 'solicitud_stock_critico'))
+                                                                                <span class="bg-rose-50 text-rose-700 px-2 py-1 rounded shadow-sm border border-rose-100 font-semibold">Stock Crítico</span>
+                                                                            @endif
+                                                                            @if (data_get($loteData, 'adelanto_de_pedido'))
+                                                                                <span class="bg-blue-50 text-blue-700 px-2 py-1 rounded shadow-sm border border-blue-100 font-semibold">Adelanto</span>
+                                                                            @endif
+                                                                            @if (data_get($loteData, 'traspaso'))
+                                                                                <span class="bg-purple-50 text-purple-700 px-2 py-1 rounded shadow-sm border border-purple-100 font-semibold">Traspaso</span>
+                                                                            @endif
                                                                         </div>
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
@@ -452,12 +515,18 @@ $loteMasProximo = $lotes->filter(function($l) {
                                                                     <td class="px-4 py-3 text-center">
                                                                         <span class="font-extrabold text-slate-800 text-[13px]">{{ number_format($stockLote, 0, ',', '.') }}</span>
                                                                     </td>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        <span class="text-[12px] font-semibold text-slate-600 font-mono-das">$ {{ number_format($valorUnitarioLote, 2, ',', '.') }}</span>
+                                                                    </td>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[12px] font-bold bg-teal-50 text-teal-800 border border-teal-200 font-mono-das">$ {{ number_format($valorTotalLote, 0, ',', '.') }}</span>
+                                                                    </td>
                                                                     <td
                                                                         class="px-4 py-3 text-center ">
 
 
                                                                         <button type="button"
-                                                                            onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}')"
+                                                                            onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}', '{{ e($loteCategoria) }}', '{{ e($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}')"
                                                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer"
                                                                             title="Cambiar Estado">
                                                                             <svg class="w-4 h-4" fill="none"
@@ -771,6 +840,23 @@ $loteMasProximo = $lotes->filter(function($l) {
                                 <input type="text" name="estante" placeholder="Ej. Estante 03" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
                             <div>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Nivel</label>
+                                <input type="text" name="nivel" placeholder="Ej. Nivel 2" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Posición</label>
+                                <input type="text" name="posicion" placeholder="Ej. Posición A3" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Programa</label>
+                                <select name="programa" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                    <option value="" selected>Sin programa</option>
+                                    <option value="Morbilidad General">Morbilidad General</option>
+                                    <option value="Cardiovascular">Cardiovascular</option>
+                                    <option value="IRA/ERA">Respiratorio (IRA/ERA)</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Lote / Serie</label>
                                 <input type="text" name="lote" placeholder="Ej. L-4893" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono font-bold" />
                             </div>
@@ -781,6 +867,14 @@ $loteMasProximo = $lotes->filter(function($l) {
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Cantidad a Ingresar <span class="text-rose-500">*</span></label>
                                 <input type="number" name="cantidad" placeholder="0" min="1" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Valor Neto Unitario</label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-slate-400">$</span>
+                                    <input type="number" name="valor_neto_unitario" placeholder="0.00" min="0" step="0.01"
+                                        class="w-full rounded-lg border border-slate-300 bg-white pl-8 pr-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800 font-mono-das" />
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -803,7 +897,7 @@ $loteMasProximo = $lotes->filter(function($l) {
                             de Trazabilidad</span>
                     </div>
                     <div class="bg-white p-2 mb-4 z-10 flex justify-center w-full">
-                        <div id="qrcode" class="w-[140px] h-[140px]"></div>
+                        <img id="qrcode" alt="Código QR del lote" class="w-[140px] h-[140px]">
                     </div>
                     <div class="w-full z-10 space-y-2.5 px-2">
                         <div class="text-center mb-4">
@@ -865,6 +959,27 @@ $loteMasProximo = $lotes->filter(function($l) {
                                 class="text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
                             <div class="mt-2 inline-block bg-white border border-slate-300 px-3 py-1 rounded-lg shadow-sm">
                                 <p id="modal_lote_nombre" class="text-[13px] font-mono font-bold text-slate-700"></p>
+                            </div>
+                            <div class="flex justify-center gap-1.5 mt-2 flex-wrap">
+                                <span id="modal_categoria_chip"
+                                    class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200"></span>
+                                <span id="modal_programa_chip"
+                                    class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Valor Unitario</span>
+                                <p id="modal_valor_unitario" class="text-[13px] font-bold text-slate-800 font-mono-das">$ 0</p>
+                            </div>
+                            <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Stock</span>
+                                <p id="modal_cantidad" class="text-[13px] font-bold text-slate-800">0</p>
+                            </div>
+                            <div class="bg-teal-50 border border-teal-200 rounded-xl p-2.5 text-center shadow-sm">
+                                <span class="text-[10px] font-bold text-teal-500 uppercase block">Valor Total</span>
+                                <p id="modal_valor_total" class="text-[13px] font-extrabold text-teal-800 font-mono-das">$ 0</p>
                             </div>
                         </div>
 
@@ -929,6 +1044,8 @@ $loteMasProximo = $lotes->filter(function($l) {
                                 <th class="px-6 py-4">Responsable</th>
                                 <th class="px-6 py-4">Motivo Documentado</th>
                                 <th class="px-6 py-4 text-center">Cant. Mermada</th>
+                                <th class="px-6 py-4 text-center">Valor Unitario</th>
+                                <th class="px-6 py-4 text-center">Valor de la Merma</th>
                                 <th class="px-6 py-4 text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -976,6 +1093,10 @@ $loteMasProximo = $lotes->filter(function($l) {
 
                                     // 4. MOTIVO
                                     $mMotivo = data_get($mObj, 'motivo') ?? data_get($mObj, 'observacion') ?? data_get($mObj, 'descripcion') ?? 'Sin motivo especificado';
+
+                                    // 5. VALORIZACIÓN
+                                    $mValorUnitario = (float) (data_get($mObj, 'valor_neto_unitario') ?? 0);
+                                    $mValorTotal = ((float) $mStock) * $mValorUnitario;
                                 @endphp
                                 <tr class="hover:bg-rose-50/40 transition-colors">
                                     <td class="px-6 py-3.5 text-slate-500 font-medium">{{ $fechaMerma }}</td>
@@ -993,8 +1114,14 @@ $loteMasProximo = $lotes->filter(function($l) {
                                         {{ number_format($mStock, 0, ',', '.') }} Unid.
                                     </td>
                                     <td class="px-6 py-3.5 text-center">
+                                        <span class="text-[12px] font-semibold text-slate-600 font-mono-das">$ {{ number_format($mValorUnitario, 2, ',', '.') }}</span>
+                                    </td>
+                                    <td class="px-6 py-3.5 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[12px] font-bold bg-rose-100 text-rose-800 border border-rose-200 font-mono-das">- $ {{ number_format($mValorTotal, 0, ',', '.') }}</span>
+                                    </td>
+                                    <td class="px-6 py-3.5 text-center">
                                         <button type="button"
-                                            onclick="openEditLote('{{ e($mLoteId) }}', '{{ e($mLoteCodigo) }}', '{{ e($mNombre) }}', 'Merma', '{{ e($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}')"
+                                            onclick="openEditLote('{{ e($mLoteId) }}', '{{ e($mLoteCodigo) }}', '{{ e($mNombre) }}', 'Merma', '{{ e($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}', '{{ e($mObj->categoria ?? 'General') }}', '{{ e($mObj->programa ?? '') }}', '{{ $mValorUnitario }}', '{{ $mStock }}')"
                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center justify-center"
                                             title="Cambiar Estado">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
@@ -1003,7 +1130,7 @@ $loteMasProximo = $lotes->filter(function($l) {
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-12 text-center text-slate-400 font-medium">
+                                    <td colspan="9" class="px-6 py-12 text-center text-slate-400 font-medium">
                                         <div class="flex flex-col items-center justify-center">
                                             <svg class="w-10 h-10 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                             <span>No hay productos marcados en estado de merma actualmente.</span>
@@ -1011,6 +1138,19 @@ $loteMasProximo = $lotes->filter(function($l) {
                                     </td>
                                 </tr>
                             @endforelse
+                            @if ($mermas->isNotEmpty())
+                                <tr style="background-color: #fff1f2;">
+                                    <td colspan="7" class="px-6 py-4 text-right text-[12px] font-extrabold text-rose-800 uppercase tracking-wider">
+                                        Valor total merma ({{ $mermas->count() }} lote(s))
+                                    </td>
+                                    <td colspan="2" class="px-6 py-4 text-center">
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-[13px] font-extrabold bg-rose-600 text-white font-mono-das">- $ {{ number_format($mermas->sum(function ($mItem) {
+                                            $mObj = is_object($mItem) ? $mItem : (object) $mItem;
+                                            return ((float) (data_get($mObj, 'stock_total') ?? (data_get($mObj, 'cantidad') ?? 0))) * ((float) (data_get($mObj, 'valor_neto_unitario') ?? 0));
+                                        }), 0, ',', '.') }}</span>
+                                    </td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -1025,8 +1165,6 @@ $loteMasProximo = $lotes->filter(function($l) {
         </div>
 
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -1225,12 +1363,35 @@ $loteMasProximo = $lotes->filter(function($l) {
             }
         }
 
-        function openEditLote(id, lote, producto, estado, motivo = '') {
+        function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0) {
             const form = document.getElementById('editLoteForm');
             if (form) form.action = "/inventario/" + id;
 
             document.getElementById('modal_producto_nombre').textContent = producto;
             document.getElementById('modal_lote_nombre').textContent = "LOTE: " + lote;
+
+            const fmt = (n) => '$ ' + Number(n || 0).toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const valorU = parseFloat(valorUnitario) || 0;
+            const cant = parseInt(cantidad) || 0;
+
+            document.getElementById('modal_valor_unitario').textContent = fmt(valorU);
+            document.getElementById('modal_cantidad').textContent = cant.toLocaleString('es-CL') + ' u';
+            document.getElementById('modal_valor_total').textContent = fmt(valorU * cant);
+
+            const chipCat = document.getElementById('modal_categoria_chip');
+            if (chipCat) {
+                chipCat.textContent = categoria || 'Sin categoría';
+                chipCat.style.display = '';
+            }
+            const chipProg = document.getElementById('modal_programa_chip');
+            if (chipProg) {
+                if (programa) {
+                    chipProg.textContent = programa;
+                    chipProg.style.display = '';
+                } else {
+                    chipProg.style.display = 'none';
+                }
+            }
 
             let estadoSelect = document.getElementById('modal_estado');
             let estadoFormat = (estado || '').toLowerCase();
@@ -1275,24 +1436,8 @@ $loteMasProximo = $lotes->filter(function($l) {
             document.getElementById('qrStock').textContent = stock + " UNID.";
             document.getElementById('qrProveedor').textContent = proveedor;
 
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = '';
-
-            setTimeout(function() {
-                try {
-                    new QRCode(qrContainer, {
-                        text: 'LOTE:' + lote + '|PROD:' + producto + '|VENCE:' + vencimiento + '|STOCK:' +
-                            stock,
-                        width: 140,
-                        height: 140,
-                        colorDark: "#0f172a",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.M
-                    });
-                } catch (error) {
-                    console.error("Error al generar código QR:", error);
-                }
-            }, 150);
+            const qrImg = document.getElementById('qrcode');
+            qrImg.src = "{{ url('qr') }}/" + id + "/image";
         }
 
         function closeQRModal() { document.getElementById('qrModal').classList.add('hidden'); }
