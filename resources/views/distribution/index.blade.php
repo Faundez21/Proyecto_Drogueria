@@ -123,69 +123,48 @@
     <div class="w-full">
         <!-- Sección de Mantenedores (Enlaces Rápidos) -->
         <div class="mb-8">
-            <!-- BOTONES MANTENEDORES -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
                 <!-- BOTÓN PASILLO -->
                 <a href="{{ route('aisle.index') }}"
                     class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
-
                     <div class="flex items-center gap-3">
-
-                        <!-- ICONO PASILLO -->
                         <div
                             class="w-16 h-16 bg-orange-100 border border-orange-200 rounded-full flex items-center justify-center shrink-0">
-
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 403 403" fill="none"
                                 stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"
                                 class="w-10 h-10 text-orange-600">
-
                                 <path d="M64 115 H116 L153 153 V323 H64 Z" />
                                 <path d="M116 115 V323" />
                                 <path d="M116 183 L153 201" />
                                 <path d="M116 248 L153 267" />
                                 <path d="M80 180 H99" />
                                 <path d="M80 256 H99" />
-
                                 <path d="M339 115 H287 L250 153 V323 H339 Z" />
                                 <path d="M287 115 V323" />
                                 <path d="M287 183 L250 201" />
                                 <path d="M287 248 L250 267" />
                                 <path d="M304 180 H323" />
                                 <path d="M304 256 H323" />
-
                                 <path d="M155 71 H229 V117 H155 Z" />
                                 <path d="M183 117 V101 H201 V117" />
                                 <path d="M183 117 L192 132 L201 117" />
-
                             </svg>
-
                         </div>
-
                         <div class="w-[70%]">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800">
-                                Pasillos
-                            </h3>
-
-                            <p class="text-gray-500 text-sm mt-1">
-                                Administración de pasillos
-                            </p>
+                            <h3 class="text-base sm:text-lg font-bold text-gray-800">Pasillos</h3>
+                            <p class="text-gray-500 text-sm mt-1">Administración de pasillos</p>
                         </div>
-
                     </div>
-
                 </a>
 
                 <!-- BOTÓN ESTANTERÍA -->
                 <a href="{{ route('shelf.index') }}"
                     class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
-
                     <div class="flex items-center gap-3">
-
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="w-16 h-16 bg-blue-200 border border-blue-300 rounded-full p-3 text-blue-600">
-
                             <path d="M12 12V9a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3" />
                             <path d="M16 20v-3a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v3" />
                             <path d="M20 22V2" />
@@ -193,87 +172,51 @@
                             <path d="M4 20h16" />
                             <path d="M4 2v20" />
                             <path d="M4 4h16" />
-
                         </svg>
-
                         <div class="w-[70%]">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800">
-                                Estanterías
-                            </h3>
-
-                            <p class="text-gray-500 text-sm mt-1">
-                                Administración de estanterías
-                            </p>
+                            <h3 class="text-base sm:text-lg font-bold text-gray-800">Estanterías</h3>
+                            <p class="text-gray-500 text-sm mt-1">Administración de estanterías</p>
                         </div>
-
                     </div>
-
                 </a>
-
 
                 <!-- BOTÓN NIVEL -->
                 <a href="{{ route('level.index') }}"
                     class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
-
                     <div class="flex items-center gap-3">
-
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="w-16 h-16 bg-purple-200 border border-purple-300 rounded-full p-3 text-purple-600">
-
                             <path d="M2 8h20" />
                             <rect width="20" height="16" x="2" y="4" rx="2" />
                             <path d="M6 16h12" />
-
                         </svg>
-
                         <div class="w-[70%]">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800">
-                                Niveles
-                            </h3>
-
-                            <p class="text-gray-500 text-sm mt-1">
-                                Administración de niveles
-                            </p>
+                            <h3 class="text-base sm:text-lg font-bold text-gray-800">Niveles</h3>
+                            <p class="text-gray-500 text-sm mt-1">Administración de niveles</p>
                         </div>
-
                     </div>
-
                 </a>
-
 
                 <!-- BOTÓN POSICIÓN -->
                 <a href="{{ route('position.index') }}"
                     class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
-
                     <div class="flex items-center gap-3">
-
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="w-16 h-16 bg-orange-200 border border-orange-300 rounded-full p-3 text-orange-600">
-
                             <path
                                 d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
                             <circle cx="12" cy="10" r="3" />
-
                         </svg>
-
                         <div class="w-[70%]">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800">
-                                Posiciones
-                            </h3>
-
-                            <p class="text-gray-500 text-sm mt-1">
-                                Administración de posiciones
-                            </p>
+                            <h3 class="text-base sm:text-lg font-bold text-gray-800">Posiciones</h3>
+                            <p class="text-gray-500 text-sm mt-1">Administración de posiciones</p>
                         </div>
-
                     </div>
-
                 </a>
 
             </div>
-
 
             <!-- Visor 3D Interactivo -->
             <div class="w-full bg-white border border-gray-200 rounded-lg p-3 sm:p-6 shadow-sm mt-3">
@@ -336,10 +279,9 @@
                         </div>
                     </header>
 
-                    <!-- Sidebar Colapsable (Selector, Búsqueda y Leyenda exacto a la imagen) -->
+                    <!-- Sidebar Colapsable (Selector, Búsqueda y Leyenda) -->
                     <aside
                         class="absolute top-16 sm:top-24 left-3 sm:left-6 w-48 sm:w-56 glass-panel text-white rounded-xl shadow-2xl z-20 flex flex-col pointer-events-auto transition-all duration-300">
-                        <!-- Botón para colapsar -->
                         <div @click="sidebarOpen = !sidebarOpen"
                             class="flex justify-between items-center p-3 cursor-pointer hover:bg-slate-800/50 rounded-t-xl"
                             :class="{ 'rounded-b-xl': !sidebarOpen }">
@@ -397,17 +339,17 @@
                                 <div class="flex items-center gap-3"><span
                                         class="w-3.5 h-3.5 rounded bg-[#22c55e]"></span>
                                     Ocupación baja (< 50%)</div>
-                                <div class="flex items-center gap-3"><span
-                                        class="w-3.5 h-3.5 rounded bg-[#f97316]"></span>
-                                    Ocupación media (50-79%)</div>
-                                <div class="flex items-center gap-3"><span
-                                        class="w-3.5 h-3.5 rounded bg-[#ef4444]"></span>
-                                    Ocupación crítica (&ge; 80%)</div>
-                                <div class="flex items-center gap-3"><span
-                                        class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span>
-                                    Sin capacidad definida</div>
+                                        <div class="flex items-center gap-3"><span
+                                                class="w-3.5 h-3.5 rounded bg-[#f97316]"></span>
+                                            Ocupación media (50-79%)</div>
+                                        <div class="flex items-center gap-3"><span
+                                                class="w-3.5 h-3.5 rounded bg-[#ef4444]"></span>
+                                            Ocupación crítica (&ge; 80%)</div>
+                                        <div class="flex items-center gap-3"><span
+                                                class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span>
+                                            Sin capacidad definida</div>
+                                </div>
                             </div>
-                        </div>
                     </aside>
 
                     <!-- Tooltip (Panel de Detalle Flotante) -->
@@ -432,38 +374,48 @@
                             </button>
                         </div>
                         <div class="text-xs sm:text-sm space-y-1 sm:space-y-2 text-gray-300">
-                            <p class="font-medium text-white" x-text="rackData.aisle ? 'Pasillo: ' + rackData.aisle : ''"></p>
+                            <p class="font-medium text-white" x-text="rackData.aisle ? 'Pasillo: ' + rackData.aisle : ''">
+                            </p>
 
                             <!-- Ocupación -->
                             <div class="bg-slate-800/70 border border-slate-700 rounded-lg px-2.5 py-2">
                                 <div class="flex justify-between items-center text-[11px] font-bold text-gray-300">
                                     <span x-text="rackData.ocupacionLabel"></span>
-                                    <span class="font-mono" x-text="rackData.pct !== null ? rackData.pct + '%' : 'Sin límite'"></span>
+                                    <span class="font-mono"
+                                        x-text="rackData.pct !== null ? rackData.pct + '%' : 'Sin límite'"></span>
                                 </div>
                                 <div class="mt-1.5 h-2 bg-slate-700 rounded-full overflow-hidden">
                                     <div class="h-full rounded-full transition-all duration-500"
-                                        :style="'width:' + (rackData.pct ?? 0) + '%; background-color:' + (rackData.pct >= 80 ? '#ef4444' : (rackData.pct >= 50 ? '#f97316' : '#22c55e'))"></div>
+                                        :style="'width:' + (rackData.pct ?? 0) + '%; background-color:' + (rackData.pct >= 80 ?
+                                            '#ef4444' : (rackData.pct >= 50 ? '#f97316' : '#22c55e'))">
+                                    </div>
                                 </div>
                                 <p class="text-[10px] text-gray-400 mt-1 font-mono">
-                                    <span x-text="rackData.stock.toLocaleString('es-CL')"></span>
-                                    <span x-show="rackData.capacidad > 0" x-text="'/ ' + rackData.capacidad.toLocaleString('es-CL') + ' u'"></span>
+                                    <span x-text="(rackData.stock || 0).toLocaleString('es-CL')"></span>
+                                    <span x-show="rackData.capacidad > 0"
+                                        x-text="'/ ' + (rackData.capacidad || 0).toLocaleString('es-CL') + ' u'"></span>
                                 </p>
                             </div>
 
                             <template x-if="rackData.items && rackData.items.length > 1">
                                 <div class="max-h-40 overflow-y-auto space-y-1.5 pr-1">
                                     <template x-for="(item, idx) in rackData.items" :key="idx">
-                                        <div class="flex justify-between items-center gap-2 bg-slate-800/70 border border-slate-700 rounded-lg px-2.5 py-1.5">
+                                        <div
+                                            class="flex justify-between items-center gap-2 bg-slate-800/70 border border-slate-700 rounded-lg px-2.5 py-1.5">
                                             <div class="min-w-0">
                                                 <p class="font-semibold text-white truncate" x-text="item.producto"></p>
                                                 <p class="text-[10px] text-gray-400 font-mono truncate">
                                                     Lote: <span x-text="item.lote"></span>
-                                                    <span x-show="item.nivel"> · Niv: <span x-text="item.nivel"></span></span>
-                                                    <span x-show="item.posicion"> · Pos: <span x-text="item.posicion"></span></span>
+                                                    <span x-show="item.nivel"> · Niv: <span
+                                                            x-text="item.nivel"></span></span>
+                                                    <span x-show="item.posicion"> · Pos: <span
+                                                            x-text="item.posicion"></span></span>
                                                 </p>
-                                                <p class="text-[10px] text-blue-400 font-semibold" x-show="item.programa" x-text="item.programa"></p>
+                                                <p class="text-[10px] text-blue-400 font-semibold" x-show="item.programa"
+                                                    x-text="item.programa"></p>
                                             </div>
-                                            <span class="text-emerald-400 font-bold text-xs shrink-0" x-text="item.cantidad + ' u'"></span>
+                                            <span class="text-emerald-400 font-bold text-xs shrink-0"
+                                                x-text="item.cantidad + ' u'"></span>
                                         </div>
                                     </template>
                                 </div>
@@ -476,9 +428,12 @@
                         <div class="mt-3 sm:mt-4 mb-3 sm:mb-4">
                             <span class="px-2 py-1 text-[10px] sm:text-xs font-semibold rounded-md border inline-block"
                                 :class="{
-                                    'bg-green-900/40 text-green-400 border-green-800': rackData.pct !== null && rackData.pct < 50,
-                                    'bg-orange-900/40 text-orange-400 border-orange-800': rackData.pct !== null && rackData.pct >= 50 && rackData.pct < 80,
-                                    'bg-rose-900/40 text-rose-400 border-rose-800': rackData.pct !== null && rackData.pct >= 80,
+                                    'bg-green-900/40 text-green-400 border-green-800': rackData.pct !== null && rackData
+                                        .pct < 50,
+                                    'bg-orange-900/40 text-orange-400 border-orange-800': rackData.pct !== null &&
+                                        rackData.pct >= 50 && rackData.pct < 80,
+                                    'bg-rose-900/40 text-rose-400 border-rose-800': rackData.pct !== null && rackData
+                                        .pct >= 80,
                                     'bg-blue-900/40 text-blue-400 border-blue-800': rackData.pct === null
                                 }"
                                 x-text="rackData.ocupacionLabel"></span>
@@ -495,48 +450,53 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Stats Bar (Estadísticas globales) -->
+                    <!-- Bottom Stats Bar (DInámica con Alpine.js) -->
                     <div
                         class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] max-w-4xl glass-panel text-white rounded-xl p-4 shadow-2xl z-20 hidden lg:flex justify-between items-center px-8 divide-x divide-gray-700">
                         <div
                             class="flex-1 px-4 flex items-center gap-4 hover:scale-105 transition-transform cursor-default">
-                            <div class="p-2 bg-[#1e293b] rounded-lg text-gray-400"><svg class="w-5 h-5" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="p-2 bg-[#1e293b] rounded-lg text-gray-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
                                     </path>
-                                </svg></div>
+                                </svg>
+                            </div>
                             <div>
                                 <p class="text-[10px] xl:text-xs text-gray-400">Ubicaciones</p>
-                                <p class="text-base xl:text-lg font-bold">48</p>
+                                <p class="text-base xl:text-lg font-bold" x-text="stats.ubicaciones"></p>
                             </div>
                         </div>
                         <div
                             class="flex-1 px-4 flex items-center gap-4 hover:scale-105 transition-transform cursor-default">
-                            <div class="p-2 bg-[#1e293b] rounded-lg text-blue-400 border border-blue-900/50"><svg
-                                    class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="p-2 bg-[#1e293b] rounded-lg text-blue-400 border border-blue-900/50">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                                     </path>
-                                </svg></div>
+                                </svg>
+                            </div>
                             <div class="flex-1 flex justify-between items-center">
                                 <div>
                                     <p class="text-[10px] xl:text-xs text-gray-400">Ocupación</p>
-                                    <p class="text-base xl:text-lg font-bold">68%</p>
+                                    <p class="text-base xl:text-lg font-bold" x-text="stats.ocupacionPct + '%'"></p>
                                 </div>
-                                <span class="text-xs text-gray-400">32/48</span>
+                                <span class="text-xs text-gray-400"
+                                    x-text="stats.ocupadas + '/' + stats.ubicaciones"></span>
                             </div>
                         </div>
                         <div
                             class="flex-1 px-4 flex items-center gap-4 hover:scale-105 transition-transform cursor-default">
-                            <div class="p-2 bg-[#1e293b] rounded-lg text-purple-400"><svg class="w-5 h-5" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="p-2 bg-[#1e293b] rounded-lg text-purple-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                </svg></div>
+                                </svg>
+                            </div>
                             <div>
                                 <p class="text-[10px] xl:text-xs text-gray-400">Cap. Total</p>
-                                <p class="text-base xl:text-lg font-bold">2,500 m³</p>
+                                <p class="text-base xl:text-lg font-bold"
+                                    x-text="stats.capacidadTotal.toLocaleString('es-CL') + ' u'"></p>
                             </div>
                         </div>
                     </div>
@@ -549,10 +509,16 @@
             function warehouseApp() {
                 return {
                     viewMode: '3D',
-                    sidebarOpen: window.innerWidth >= 640, // Abierto en PC/Tablet, cerrado en celular
+                    sidebarOpen: window.innerWidth >= 640,
                     tooltipVisible: false,
                     rackData: {},
                     searchQuery: '',
+                    stats: {
+                        ubicaciones: 0,
+                        ocupacionPct: 0,
+                        ocupadas: 0,
+                        capacidadTotal: 0
+                    },
                     init() {
                         this.initThreeJS();
 
@@ -590,11 +556,12 @@
                         }));
                     },
                     verDetalle() {
-                        window.location.href = "{{ route('inventario.index') }}?estante=" + encodeURIComponent(this.rackData.code);
+                        window.location.href = "{{ route('inventario.index') }}?estante=" + encodeURIComponent(this.rackData
+                            .code);
                     },
                     habilitarMovimiento() {
-                        this.tooltipVisible = false; // Ocultamos el panel para que no estorbe
-                        window.dispatchEvent(new Event('start-moving')); // Le avisamos a Three.js
+                        this.tooltipVisible = false; // Ocultamos el panel
+                        window.dispatchEvent(new Event('start-moving')); // Avisamos a Three.js
                     },
 
                     // LÓGICA THREE.JS
@@ -636,10 +603,8 @@
                         dirLight.shadow.mapSize.height = 2048;
                         scene.add(dirLight);
 
-                        // --- ESTRUCTURA BASE (BORDES Y SUELO DE LA BODEGA) ---
+                        // --- ESTRUCTURA BASE (Suelo y Paredes) ---
                         const buildGroup = new THREE.Group();
-
-                        // Suelo unificado (80x50)
                         const floorMat = new THREE.MeshStandardMaterial({
                             color: '#cbd5e1',
                             roughness: 0.8
@@ -649,7 +614,6 @@
                         floor.receiveShadow = true;
                         buildGroup.add(floor);
 
-                        // Materiales para las paredes (Cristal semi-transparente + Zócalo sólido)
                         const wallMat = new THREE.MeshPhysicalMaterial({
                             color: '#94a3b8',
                             transparent: true,
@@ -662,40 +626,31 @@
                         });
 
                         function createBorderWall(w, h, d, x, y, z) {
-                            // Pared transparente superior
                             const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
-                            wall.position.set(x, y + 1, z); // Subir un poco para dar espacio al zócalo
+                            wall.position.set(x, y + 1, z);
                             buildGroup.add(wall);
 
-                            // Zócalo inferior (base sólida de la pared)
                             const baseHeight = 1.5;
                             const base = new THREE.Mesh(new THREE.BoxGeometry(w, baseHeight, d), wallSolidMat);
                             base.position.set(x, baseHeight / 2, z);
                             buildGroup.add(base);
                         }
 
-                        // Generar 4 paredes perimetrales alrededor del piso (80x50)
-                        createBorderWall(80, 10, 1, 0, 4, -25); // Pared Norte (Atrás)
-                        createBorderWall(80, 10, 1, 0, 4, 25); // Pared Sur (Frente)
-                        createBorderWall(1, 10, 50, 40, 4, 0); // Pared Este (Derecha)
-                        createBorderWall(1, 10, 50, -40, 4, 0); // Pared Oeste (Izquierda)
+                        createBorderWall(80, 10, 1, 0, 4, -25);
+                        createBorderWall(80, 10, 1, 0, 4, 25);
+                        createBorderWall(1, 10, 50, 40, 4, 0);
+                        createBorderWall(1, 10, 50, -40, 4, 0);
 
                         scene.add(buildGroup);
-                        // ------------------------------------------------------
 
-                        // Arrays de gestión para los Racks
+                        // --- VARIABLES GLOBALES DE THREEJS ---
                         const racks = [];
                         const markers = [];
 
-
-
-
-                        // Convertimos la variable de Laravel a un objeto de JavaScript
-                        const dbShelves = @json($shelves);
-
-                        // Stock real del inventario agrupado por estante (ubicacion fisica)
-                        const stockData = @json($stock);
+                        const dbShelves = @json($shelves ?? []);
+                        const stockData = @json($stock ?? []);
                         const stockByShelf = {};
+
                         stockData.forEach(item => {
                             const key = (item.estante ?? '').trim();
                             if (!key) return;
@@ -711,10 +666,9 @@
                             });
                         });
 
-                        // Colores por nivel de ocupación
-                        const COLOR_BAJO = 0x22c55e;   // < 50%
-                        const COLOR_MEDIO = 0xf97316;  // 50-79%
-                        const COLOR_ALTO = 0xef4444;   // >= 80%
+                        const COLOR_BAJO = 0x22c55e;
+                        const COLOR_MEDIO = 0xf97316;
+                        const COLOR_ALTO = 0xef4444;
                         const COLOR_SIN_LIMITE = 0x3b82f6;
 
                         function colorOcupacion(pct) {
@@ -731,64 +685,6 @@
                             return 'Ocupación Baja';
                         }
 
-                        // Pasillos: zonas de piso coloreadas (pasillos visibles)
-                        const zonasPasillo = {};
-                        dbShelves.forEach(shelf => {
-                            const nombrePasillo = shelf.aisle ? shelf.aisle.name : 'Sin pasillo';
-                            if (!zonasPasillo[nombrePasillo]) {
-                                zonasPasillo[nombrePasillo] = {
-                                    color: shelf.aisle ? shelf.aisle.color : '#64748b',
-                                    shelves: []
-                                };
-                            }
-                            zonasPasillo[nombrePasillo].shelves.push(shelf);
-                        });
-
-                        Object.entries(zonasPasillo).forEach(([nombrePasillo, zona]) => {
-                            const pisoMat = new THREE.MeshStandardMaterial({
-                                color: zona.color,
-                                transparent: true,
-                                opacity: 0.22,
-                                roughness: 0.9
-                            });
-                            const bordeMat = new THREE.MeshStandardMaterial({
-                                color: zona.color,
-                                roughness: 0.6
-                            });
-
-                            const shelfxs = zona.shelves.map(s => s.pos_x);
-                            const shelfzs = zona.shelves.map(s => s.pos_z);
-                            const minX = Math.min(...shelfxs) - 3;
-                            const maxX = Math.max(...shelfxs) + 3;
-                            const minZ = Math.min(...shelfzs) - 3;
-                            const maxZ = Math.max(...shelfzs) + 3;
-                            const ancho = maxX - minX;
-                            const profundo = maxZ - minZ;
-                            const cx = (minX + maxX) / 2;
-                            const cz = (minZ + maxZ) / 2;
-
-                            const zonaPiso = new THREE.Mesh(new THREE.BoxGeometry(ancho, 0.12, profundo), pisoMat);
-                            zonaPiso.position.set(cx, 0.06, cz);
-                            zonaPiso.receiveShadow = true;
-                            scene.add(zonaPiso);
-
-                            const bordeZona = new THREE.Mesh(new THREE.BoxGeometry(ancho + 0.6, 0.1, 0.5), bordeMat);
-                            bordeZona.position.set(cx, 0.05, maxZ + 0.55);
-                            scene.add(bordeZona);
-
-                            const marcadorAisle = document.createElement('div');
-                            marcadorAisle.className = 'rack-marker px-2 py-0.5 rounded text-[9px] font-bold shadow-md uppercase tracking-widest';
-                            marcadorAisle.style.backgroundColor = zona.color;
-                            marcadorAisle.style.color = 'white';
-                            marcadorAisle.textContent = nombrePasillo;
-                            labelsContainer.appendChild(marcadorAisle);
-                            markers.push({
-                                element: marcadorAisle,
-                                pos3D: new THREE.Vector3(cx, 1.2, maxZ + 1.6)
-                            });
-                        });
-
-                        // Estanterías realistas: postes + niveles + posiciones
                         const ALTURA_NIVEL = 2.0;
                         const ESPESOR = 0.15;
 
@@ -807,25 +703,40 @@
                             ctx.fillText(cortado, 64, 26);
                             const tex = new THREE.CanvasTexture(canvas);
                             tex.anisotropy = 4;
-                            return new THREE.MeshBasicMaterial({ map: tex });
+                            return new THREE.MeshBasicMaterial({
+                                map: tex
+                            });
                         }
 
                         function crearEstanteriaRealista(shelf, rackData) {
                             const grupo = new THREE.Group();
-                            const nivelesData = [...(shelf.levels ?? [])]
-                                .sort((a, b) => (parseInt(a.number ?? 0) || 0) - (parseInt(b.number ?? 0) || 0));
+                            const nivelesData = [...(shelf.levels ?? [])].sort((a, b) => (parseInt(a.number ?? 0) || 0) - (
+                                parseInt(b.number ?? 0) || 0));
                             const nNiveles = Math.min(Math.max(nivelesData.length, 3), 5);
                             const alturaTotal = nNiveles * ALTURA_NIVEL + 0.8;
 
-                            const colorPasillo = shelf.aisle ? shelf.aisle.color : '#64748b';
-                            const matPoste = new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.5 });
-                            const matRepisa = new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: 0.7 });
-                            const matOcupado = new THREE.MeshStandardMaterial({ color: '#10b981', roughness: 0.4 });
-                            const matLibre = new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.85 });
+                            const matPoste = new THREE.MeshStandardMaterial({
+                                color: '#334155',
+                                roughness: 0.5
+                            });
+                            const matRepisa = new THREE.MeshStandardMaterial({
+                                color: '#94a3b8',
+                                roughness: 0.7
+                            });
+                            const matOcupado = new THREE.MeshStandardMaterial({
+                                color: '#10b981',
+                                roughness: 0.4
+                            });
+                            const matLibre = new THREE.MeshStandardMaterial({
+                                color: '#e2e8f0',
+                                roughness: 0.85
+                            });
 
                             const postes = [
-                                [-1.85, -1.85], [1.85, -1.85],
-                                [-1.85, 1.85], [1.85, 1.85]
+                                [-1.85, -1.85],
+                                [1.85, -1.85],
+                                [-1.85, 1.85],
+                                [1.85, 1.85]
                             ];
                             postes.forEach(([dx, dz]) => {
                                 const poste = new THREE.Mesh(new THREE.BoxGeometry(0.22, alturaTotal, 0.22), matPoste);
@@ -834,17 +745,20 @@
                                 grupo.add(poste);
                             });
 
-                            // Estructura de niveles/posiciones reales (con fallback)
                             const posicionesPorNivel = [];
                             for (let i = 0; i < nNiveles; i++) {
                                 const nivelReal = nivelesData[i] ?? null;
-                                const positionsData = nivelReal && (nivelReal.positions ?? []).length > 0
-                                    ? nivelReal.positions
-                                    : [{ name: 'P1' }, { name: 'P2' }, { name: 'P3' }];
+                                const positionsData = nivelReal && (nivelReal.positions ?? []).length > 0 ? nivelReal
+                                    .positions : [{
+                                        name: 'P1'
+                                    }, {
+                                        name: 'P2'
+                                    }, {
+                                        name: 'P3'
+                                    }];
                                 posicionesPorNivel.push(positionsData.slice(0, 4));
                             }
 
-                            // Colocación REAL del stock: cada item en su nivel/posición
                             const digitos = (s) => (String(s ?? '').match(/\d+/g) || []).join('');
                             const ocupacionMapa = {};
                             let colocados = 0;
@@ -855,7 +769,8 @@
 
                                 if (nivDig) {
                                     li = posicionesPorNivel.findIndex((_, idx) => {
-                                        const numReal = nivelesData[idx] ? digitos(nivelesData[idx].number) : String(idx + 1);
+                                        const numReal = nivelesData[idx] ? digitos(nivelesData[idx].number) :
+                                            String(idx + 1);
                                         return numReal === nivDig;
                                     });
                                     if (li === -1) {
@@ -867,7 +782,10 @@
                                 if (li === -1 && rackData.pct === null) {
                                     for (let i = 0; i < nNiveles && li === -1; i++) {
                                         for (let j = 0; j < posicionesPorNivel[i].length; j++) {
-                                            if (!ocupacionMapa[i + '-' + j]) { li = i; break; }
+                                            if (!ocupacionMapa[i + '-' + j]) {
+                                                li = i;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -883,7 +801,10 @@
                                 }
                                 if (sj === -1) {
                                     for (let j = 0; j < posList.length; j++) {
-                                        if (!ocupacionMapa[li + '-' + j]) { sj = j; break; }
+                                        if (!ocupacionMapa[li + '-' + j]) {
+                                            sj = j;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (sj === -1) return;
@@ -895,7 +816,6 @@
                                 }
                             });
 
-                            // Total de slots para repartir el resto según el % de ocupación
                             const totalSlots = posicionesPorNivel.reduce((acc, p) => acc + p.length, 0);
                             const slotsMeta = rackData.pct !== null ? Math.round(totalSlots * rackData.pct / 100) : colocados;
                             let extrasPorColocar = Math.max(0, slotsMeta - colocados);
@@ -909,10 +829,7 @@
                                 repisa.receiveShadow = true;
                                 grupo.add(repisa);
 
-                                // Placa con el NÚMERO real del nivel (frente del nivel)
-                                const numNivel = nivelesData[i]
-                                    ? (nivelesData[i].number ?? (i + 1))
-                                    : (i + 1);
+                                const numNivel = nivelesData[i] ? (nivelesData[i].number ?? (i + 1)) : (i + 1);
                                 const placaNivel = new THREE.Mesh(
                                     new THREE.PlaneGeometry(0.75, 0.3),
                                     texturaTexto('N' + numNivel, '#334155', '#ffffff', 30)
@@ -938,25 +855,16 @@
                                         new THREE.BoxGeometry(anchoSlot - 0.25, 0.14, 3.6),
                                         ocupado ? matOcupado.clone() : matLibre.clone()
                                     );
-                                    slot.position.set(
-                                        -1.85 + anchoSlot / 2 + j * anchoSlot,
-                                        yRepisa + 0.12,
-                                        0
-                                    );
+                                    slot.position.set(-1.85 + anchoSlot / 2 + j * anchoSlot, yRepisa + 0.12, 0);
                                     slot.castShadow = true;
                                     grupo.add(slot);
 
-                                    // Placa con el NOMBRE real de la posición (frente del slot)
                                     const nombrePos = posList[j].name ?? ('P' + (j + 1));
                                     const placaPos = new THREE.Mesh(
                                         new THREE.PlaneGeometry(Math.min(anchoSlot - 0.35, 1.1), 0.22),
                                         texturaTexto(nombrePos, ocupado ? '#065f46' : '#64748b', '#ffffff', 22)
                                     );
-                                    placaPos.position.set(
-                                        slot.position.x,
-                                        yRepisa + 0.12,
-                                        1.82
-                                    );
+                                    placaPos.position.set(slot.position.x, yRepisa + 0.12, 1.82);
                                     grupo.add(placaPos);
                                 }
                             }
@@ -967,24 +875,30 @@
 
                             grupo.position.set(shelf.pos_x, 0, shelf.pos_z);
                             scene.add(grupo);
+
                             rackData.alturaTotal = alturaTotal;
                             rackData.nNiveles = nNiveles;
-
                             return grupo;
                         }
 
-                        // Recorrer los datos reales de la BD y dibujarlos
+                        // Calcular estadísticas globales
+                        let ubiTotal = 0;
+                        let capTotal = 0;
+                        let ocuTotal = 0;
+
                         dbShelves.forEach(shelf => {
                             const items = stockByShelf[shelf.name.trim()] ?? [];
                             const totalStock = items.reduce((acc, i) => acc + (i.cantidad ?? 0), 0);
                             const capacidad = parseInt(shelf.capacidad ?? 0) || 0;
-                            const pct = capacidad > 0 ? Math.min(100, Math.round((totalStock / capacidad) * 100)) : null;
+                            const pct = capacidad > 0 ? Math.min(100, Math.round((totalStock / capacidad) * 100)) :
+                            null;
 
                             const rackData = {
                                 id: shelf.id,
                                 code: shelf.name,
                                 status: items.length > 0 ? 'Ocupado' : 'Disponible',
                                 aisle: shelf.aisle ? shelf.aisle.name : 'Sin pasillo',
+                                aisleColor: shelf.aisle ? shelf.aisle.color : '#64748b',
                                 stock: totalStock,
                                 capacidad: capacidad,
                                 pct: pct,
@@ -995,10 +909,9 @@
                                 items: items
                             };
 
-                            // Estantería realista (postes, niveles, posiciones)
-                            crearEstanteriaRealista(shelf, rackData);
+                            // ACÁ CONECTAMOS LA HITBOX INVISIBLE CON EL MODELO VISUAL:
+                            const visualGroup = crearEstanteriaRealista(shelf, rackData);
 
-                            // Hitbox invisible para interacción (raycast, drag, selección)
                             const alturaHitbox = rackData.alturaTotal + 0.5;
                             const hitMat = new THREE.MeshStandardMaterial({
                                 color: colorOcupacion(pct),
@@ -1008,34 +921,132 @@
                                 emissive: colorOcupacion(pct),
                                 emissiveIntensity: 0
                             });
+
                             const mesh = new THREE.Mesh(new THREE.BoxGeometry(4.4, alturaHitbox, 4.4), hitMat);
                             mesh.position.set(shelf.pos_x, alturaHitbox / 2, shelf.pos_z);
                             mesh.userData = rackData;
-                            mesh.userData.originalEmissive = 0;
+                            mesh.userData.visualGroup = visualGroup; // <--- GUARDAMOS REFERENCIA AQUÍ
                             racks.push(mesh);
                             scene.add(mesh);
 
-                            // Marcador HTML flotante: código + % ocupación + unidades
                             const markerDiv = document.createElement('div');
                             markerDiv.className =
-                                `rack-marker px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shadow-md marker-ocu`;
+                                `rack-marker px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shadow-md`;
                             markerDiv.style.backgroundColor = '#' + colorOcupacion(pct).toString(16).padStart(6, '0');
                             markerDiv.style.color = 'white';
-                            markerDiv.textContent = capacidad > 0
-                                ? `${rackData.code} · ${pct}% (${totalStock.toLocaleString('es-CL')}u)`
-                                : `${rackData.code} · ${totalStock.toLocaleString('es-CL')}u`;
+                            markerDiv.textContent = capacidad > 0 ? `${rackData.code} · ${pct}%` : `${rackData.code}`;
 
                             labelsContainer.appendChild(markerDiv);
                             markers.push({
                                 element: markerDiv,
                                 pos3D: new THREE.Vector3(shelf.pos_x, alturaHitbox + 1.6, shelf.pos_z)
                             });
+
+                            // Sumar a estadísticas
+                            ubiTotal++;
+                            capTotal += capacidad;
+                            if (items.length > 0) ocuTotal++;
                         });
 
-                        // Poblando los racks dentro del perímetro 80x50
+                        // Actualizar Alpine Stats
+                        this.stats.ubicaciones = ubiTotal;
+                        this.stats.capacidadTotal = capTotal;
+                        this.stats.ocupadas = ocuTotal;
+                        this.stats.ocupacionPct = ubiTotal > 0 ? Math.round((ocuTotal / ubiTotal) * 100) : 0;
 
+                        // --- RENDERIZADO DINÁMICO DE PASILLOS ---
+                        let aisleMeshes = [];
+                        let aisleMarkers = [];
 
-                        // Raycaster (Interacción del Ratón/Touch)
+                        function renderAisles() {
+                            // 1. Limpiar mallas antiguas de los pasillos
+                            aisleMeshes.forEach(m => scene.remove(m));
+                            aisleMeshes = [];
+
+                            aisleMarkers.forEach(m => {
+                                if (m.element && m.element.parentNode) m.element.parentNode.removeChild(m.element);
+                                const idx = markers.indexOf(m);
+                                if (idx > -1) markers.splice(idx, 1);
+                            });
+                            aisleMarkers = [];
+
+                            // 2. Recalcular dimensiones en base a la posición actual de los racks
+                            const zonas = {};
+                            racks.forEach(rack => {
+                                const data = rack.userData;
+                                const nombre = data.aisle;
+                                if (nombre === 'Sin pasillo') return;
+
+                                if (!zonas[nombre]) {
+                                    zonas[nombre] = {
+                                        color: data.aisleColor || '#64748b',
+                                        minX: rack.position.x,
+                                        maxX: rack.position.x,
+                                        minZ: rack.position.z,
+                                        maxZ: rack.position.z
+                                    };
+                                } else {
+                                    zonas[nombre].minX = Math.min(zonas[nombre].minX, rack.position.x);
+                                    zonas[nombre].maxX = Math.max(zonas[nombre].maxX, rack.position.x);
+                                    zonas[nombre].minZ = Math.min(zonas[nombre].minZ, rack.position.z);
+                                    zonas[nombre].maxZ = Math.max(zonas[nombre].maxZ, rack.position.z);
+                                }
+                            });
+
+                            // 3. Dibujar de nuevo
+                            Object.entries(zonas).forEach(([nombre, zona]) => {
+                                const pisoMat = new THREE.MeshStandardMaterial({
+                                    color: zona.color,
+                                    transparent: true,
+                                    opacity: 0.22,
+                                    roughness: 0.9
+                                });
+                                const bordeMat = new THREE.MeshStandardMaterial({
+                                    color: zona.color,
+                                    roughness: 0.6
+                                });
+
+                                const minX = zona.minX - 3;
+                                const maxX = zona.maxX + 3;
+                                const minZ = zona.minZ - 3;
+                                const maxZ = zona.maxZ + 3;
+
+                                const ancho = maxX - minX;
+                                const profundo = maxZ - minZ;
+                                const cx = (minX + maxX) / 2;
+                                const cz = (minZ + maxZ) / 2;
+
+                                const zonaPiso = new THREE.Mesh(new THREE.BoxGeometry(ancho, 0.12, profundo), pisoMat);
+                                zonaPiso.position.set(cx, 0.06, cz);
+                                zonaPiso.receiveShadow = true;
+                                scene.add(zonaPiso);
+                                aisleMeshes.push(zonaPiso);
+
+                                const bordeZona = new THREE.Mesh(new THREE.BoxGeometry(ancho + 0.6, 0.1, 0.5),
+                                bordeMat);
+                                bordeZona.position.set(cx, 0.05, maxZ + 0.55);
+                                scene.add(bordeZona);
+                                aisleMeshes.push(bordeZona);
+
+                                const marcadorAisle = document.createElement('div');
+                                marcadorAisle.className =
+                                    'rack-marker px-2 py-0.5 rounded text-[9px] font-bold shadow-md uppercase tracking-widest';
+                                marcadorAisle.style.backgroundColor = zona.color;
+                                marcadorAisle.style.color = 'white';
+                                marcadorAisle.textContent = nombre;
+                                labelsContainer.appendChild(marcadorAisle);
+
+                                const markerObj = {
+                                    element: marcadorAisle,
+                                    pos3D: new THREE.Vector3(cx, 1.2, maxZ + 1.6)
+                                };
+                                markers.push(markerObj);
+                                aisleMarkers.push(markerObj);
+                            });
+                        }
+
+                        renderAisles(); // Generar pasillos por primera vez
+
                         const raycaster = new THREE.Raycaster();
                         const mouse = new THREE.Vector2();
                         let hoveredObject = null;
@@ -1073,37 +1084,6 @@
                             mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
                         }
 
-                        // Hover logic
-                        wrapper.addEventListener('pointermove', (event) => {
-                            if (event.target.closest('header') || event.target.closest('aside') || event.target.closest(
-                                    '.z-30') || event.target.closest('.bottom-6')) {
-                                quitarBrillo(hoveredObject);
-                                hoveredObject = null;
-                                wrapper.style.cursor = 'default';
-                                return;
-                            }
-
-                            getMousePos(event);
-                            raycaster.setFromCamera(mouse, camera);
-                            const intersects = raycaster.intersectObjects(racks);
-
-                            if (intersects.length > 0) {
-                                if (hoveredObject !== intersects[0].object) {
-                                    quitarBrillo(hoveredObject);
-                                    hoveredObject = intersects[0].object;
-                                    wrapper.style.cursor = 'pointer';
-                                    if (hoveredObject !== selectedObject) highlightRack(hoveredObject, true);
-                                }
-                            } else {
-                                quitarBrillo(hoveredObject);
-                                hoveredObject = null;
-                                wrapper.style.cursor = 'default';
-                            }
-                        });
-
-
-
-                        // Búsqueda y Cámaras
                         window.addEventListener('search-rack', (e) => {
                             const query = e.detail.toLowerCase();
                             resetAllHighlights();
@@ -1122,9 +1102,7 @@
                             }
                         });
 
-                        window.addEventListener('cam-zoom-in', () => {
-                            camera.position.lerp(controls.target, 0.3);
-                        });
+                        window.addEventListener('cam-zoom-in', () => camera.position.lerp(controls.target, 0.3));
                         window.addEventListener('cam-zoom-out', () => {
                             let dir = new THREE.Vector3().subVectors(camera.position, controls.target).multiplyScalar(
                                 1.3);
@@ -1147,41 +1125,44 @@
 
                         // --- LÓGICA DE MOVIMIENTO POR CLIC ---
                         let isMoving = false;
-                        // Un plano matemático exacto a la altura Y = 1.5 donde flotan las estanterías
                         const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -1.5);
 
                         window.addEventListener('start-moving', () => {
                             if (!selectedObject) return;
                             isMoving = true;
-                            controls.enabled = false; // Bloquea la cámara
+                            controls.enabled = false;
                             wrapper.style.cursor = 'move';
                         });
 
-                        // Hover logic modificado
                         wrapper.addEventListener('pointermove', (event) => {
                             getMousePos(event);
                             raycaster.setFromCamera(mouse, camera);
 
-                            // Si estamos en "Modo Mover", la estantería seleccionada sigue al mouse
                             if (isMoving && selectedObject) {
                                 const intersectPoint = new THREE.Vector3();
                                 raycaster.ray.intersectPlane(floorPlane, intersectPoint);
 
                                 if (intersectPoint) {
+                                    // 1. Movemos la hitbox
                                     selectedObject.position.x = intersectPoint.x;
                                     selectedObject.position.z = intersectPoint.z;
 
-                                    // Mueve la etiqueta flotante al mismo tiempo
-                                    const matchingMarker = markers.find(m => m.element.textContent === selectedObject
-                                        .userData.code);
+                                    // 2. Movemos el MODELO VISUAL (Estantería Realista)
+                                    if (selectedObject.userData.visualGroup) {
+                                        selectedObject.userData.visualGroup.position.x = intersectPoint.x;
+                                        selectedObject.userData.visualGroup.position.z = intersectPoint.z;
+                                    }
+
+                                    // 3. Movemos la etiqueta
+                                    const matchingMarker = markers.find(m => m.element.textContent.includes(
+                                        selectedObject.userData.code));
                                     if (matchingMarker) {
-                                        matchingMarker.pos3D.copy(selectedObject.position);
-                                        matchingMarker.pos3D.y = 4.5;
+                                        matchingMarker.pos3D.x = intersectPoint.x;
+                                        matchingMarker.pos3D.z = intersectPoint.z;
                                     }
                                 }
                                 return;
                             }
-
 
                             if (event.target.closest('header') || event.target.closest('aside') || event.target.closest(
                                     '.z-30') || event.target.closest('.bottom-6')) {
@@ -1206,15 +1187,12 @@
                             }
                         });
 
-                        // Clic logic modificado
                         wrapper.addEventListener('click', (event) => {
-                            // Si estamos moviendo una estantería, un clic significa "Soltar y Guardar"
                             if (isMoving && selectedObject) {
                                 isMoving = false;
-                                controls.enabled = true; // Reactivamos giro de cámara
+                                controls.enabled = true;
                                 wrapper.style.cursor = 'default';
 
-                                // Guardamos en la base de datos de Laravel
                                 fetch(`/shelf/${selectedObject.userData.id}/update-position`, {
                                         method: 'POST',
                                         headers: {
@@ -1230,7 +1208,9 @@
                                     .then(data => console.log('Posición guardada exitosamente'))
                                     .catch(error => console.error('Error guardando posición:', error));
 
-                                // Reabrimos el menú de opciones automáticamente
+                                // Recreamos los rectángulos del pasillo para que se ajusten a la nueva posición
+                                renderAisles();
+
                                 window.dispatchEvent(new CustomEvent('rack-selected', {
                                     detail: selectedObject.userData
                                 }));
@@ -1258,13 +1238,11 @@
                             }
                         });
 
-                        // Ciclo de renderizado
                         function animate() {
                             requestAnimationFrame(animate);
                             controls.update();
                             renderer.render(scene, camera);
 
-                            // Sincronizar etiquetas HTML en pantalla 2D sobre la escena 3D
                             markers.forEach(marker => {
                                 const vector = marker.pos3D.clone();
                                 vector.project(camera);
@@ -1283,7 +1261,6 @@
                         }
                         animate();
 
-                        // ResizeObserver
                         const resizeObserver = new ResizeObserver(entries => {
                             for (let entry of entries) {
                                 const {
