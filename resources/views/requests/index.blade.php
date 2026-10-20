@@ -3,18 +3,7 @@
 @section('title', 'Solicitudes')
 @section('subtitle', 'Registro y gestión de solicitudes de establecimientos.')
 
-@section('actions')
-    @role('Administrador')
-        <button type="button"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all duration-150 w-full sm:w-auto">
-            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            Ver Historial
-        </button>
-    @endrole
-@endsection
+
 
 @section('content')
     <!-- migas de pan -->
@@ -462,13 +451,15 @@
                 actualizarResumen();
             });
 
-            // evitar envio mientras la vista es visual
-            document.getElementById('requestForm').addEventListener('submit', function() {
-
-                if (!signatureRecibe.isEmpty()) {
-                    document.getElementById('firma_recibe_input').value =
-                        signatureRecibe.toDataURL('image/png');
+            document.getElementById('requestForm').addEventListener('submit', function(e) {
+                if (signatureRecibe.isEmpty()) {
+                    e.preventDefault();
+                    alert('Debe firmar la solicitud antes de enviarla.');
+                    return;
                 }
+
+                document.getElementById('firma_recibe_input').value =
+                    signatureRecibe.toDataURL('image/png');
             });
 
             actualizarResumen();

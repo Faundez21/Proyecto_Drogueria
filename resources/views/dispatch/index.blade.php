@@ -1267,6 +1267,7 @@
         }
 
         // llena los campos restringidos de acuerdo al producto seleccionado
+
         function llenarDatosFila(selectElement) {
             let option = selectElement.options[selectElement.selectedIndex];
             if (!option || option.disabled) return;
@@ -1280,35 +1281,63 @@
             let stockContainer = tr.querySelector('.stock-container');
             let fefoContainer = tr.querySelector('.fefo-container');
 
-            loteInput.value = option.getAttribute('data-lote');
-            venceInput.value = option.getAttribute('data-vence');
+            loteInput.value = option.getAttribute('data-lote') || '';
+            venceInput.value = option.getAttribute('data-vence') || '';
 
-            let stock = parseInt(option.getAttribute('data-stock'));
+            let stock = parseInt(option.getAttribute('data-stock')) || 0;
             cantInput.setAttribute('max', stock);
             stockBadge.textContent = stock;
             stockContainer.classList.remove('hidden');
 
-            // evalua la fecha para mostrar el badge rojo si esta por vencer en menos de 6 meses
             fefoContainer.innerHTML = '';
-            venceInput.classList.remove('text-rose-700', 'font-extrabold', 'bg-rose-50');
+            fefoContainer.classList.remove('hidden');
+            venceInput.classList.remove(
+                'text-rose-700',
+                'font-extrabold',
+                'bg-rose-50'
+            );
 
             if (venceInput.value) {
-                try {
-                    let fVence = new Date(venceInput.value);
-                    let hoy = new Date();
-                    let mesesRestantes = (fVence.getFullYear() - hoy.getFullYear()) * 12 + (fVence.getMonth() - hoy
-                        .getMonth());
+                const fechaVencimiento = new Date(venceInput.value + 'T00:00:00');
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
 
-                    if (mesesRestantes <= 6) {
-                        venceInput.classList.add('text-rose-700', 'font-extrabold', 'bg-rose-50');
-                        fefoContainer.innerHTML =
-                            '<span class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] bg-rose-500 text-white font-bold px-1.5 py-0.5 rounded shadow-sm">PRONTO A VENCER</span>';
+                const limite = new Date(hoy);
+                limite.setMonth(limite.getMonth() + 6);
+
+                if (!isNaN(fechaVencimiento.getTime())) {
+                    let texto = '';
+                    let color = '';
+
+                    if (fechaVencimiento < hoy) {
+                        texto = 'VENCIDO';
+                        color = 'bg-rose-700';
+                    } else if (fechaVencimiento <= limite) {
+                        texto = 'PRONTO A VENCER';
+                        color = 'bg-rose-500';
                     }
-                } catch (e) {}
+
+                    if (texto) {
+                        venceInput.classList.add(
+                            'text-rose-700',
+                            'font-extrabold',
+                            'bg-rose-50'
+                        );
+
+                        fefoContainer.innerHTML = `
+    <span class="absolute right-1 top-1/2 -translate-y-1/2
+        text-[7px] ${color} text-white font-bold
+        px-1 py-0.5 rounded whitespace-nowrap">
+        ${texto}
+    </span>
+`;
+                    }
+                }
             }
 
             cantInput.focus();
         }
+
 
         // funcion para quitar una fila dinamica del formulario
         function removeRow(button) {
