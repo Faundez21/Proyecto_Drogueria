@@ -7,7 +7,7 @@ use App\Models\Inventory;
 use App\Services\InventoryService;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-
+use App\Models\StockMovement;
 class InventoryController extends Controller
 {
     /**
@@ -22,9 +22,9 @@ class InventoryController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('producto', 'LIKE', "%{$search}%")
-                  ->orWhere('lote', 'LIKE', "%{$search}%")
-                  ->orWhere('categoria', 'LIKE', "%{$search}%")
-                  ->orWhere('rut_proveedor', 'LIKE', "%{$search}%");
+                    ->orWhere('lote', 'LIKE', "%{$search}%")
+                    ->orWhere('categoria', 'LIKE', "%{$search}%")
+                    ->orWhere('rut_proveedor', 'LIKE', "%{$search}%");
             });
         }
 
@@ -71,16 +71,16 @@ class InventoryController extends Controller
 
         // 5. Generar lista de productos únicos para el autocompletado de la vista
         $productosLista = Inventory::select('producto')
-                            ->distinct()
-                            ->orderBy('producto', 'asc')
-                            ->pluck('producto');
+            ->distinct()
+            ->orderBy('producto', 'asc')
+            ->pluck('producto');
 
         // 6. Programas disponibles para el filtro
         $programasLista = Inventory::whereNotNull('programa')
-                            ->where('programa', '!=', '')
-                            ->distinct()
-                            ->orderBy('programa', 'asc')
-                            ->pluck('programa');
+            ->where('programa', '!=', '')
+            ->distinct()
+            ->orderBy('programa', 'asc')
+            ->pluck('programa');
 
         return view('inventario.index', compact('inventories', 'productosLista', 'programasLista'));
     }
@@ -91,30 +91,30 @@ class InventoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'fecha_recepcion'   => 'required|date',
-            'tipo_documento'    => 'required|string|max:255',
-            'numero_documento'  => 'required|string|max:255',
-            'orden_compra'      => 'nullable|string|max:255',
+            'fecha_recepcion' => 'required|date',
+            'tipo_documento' => 'required|string|max:255',
+            'numero_documento' => 'required|string|max:255',
+            'orden_compra' => 'nullable|string|max:255',
             'origen_mercaderia' => 'nullable|string|max:255',
-            'rut_proveedor'     => 'nullable|string|max:20',
-            'razon_social'      => 'nullable|string|max:255',
-            'producto'          => 'required|string|max:255',
-            'categoria'         => 'required|string|max:255',
-            'estado'            => 'required|in:Disponible,Cuarentena,Merma',
-            'motivo'            => 'nullable|string|max:1000',
-            'lote'              => 'nullable|string|max:255',
+            'rut_proveedor' => 'nullable|string|max:20',
+            'razon_social' => 'nullable|string|max:255',
+            'producto' => 'required|string|max:255',
+            'categoria' => 'required|string|max:255',
+            'estado' => 'required|in:Disponible,Cuarentena,Merma',
+            'motivo' => 'nullable|string|max:1000',
+            'lote' => 'nullable|string|max:255',
             'fecha_vencimiento' => 'nullable|date',
-            'cantidad'          => 'required|integer|min:1',
+            'cantidad' => 'required|integer|min:1',
             'valor_neto_unitario' => 'nullable|numeric|min:0',
-            'pasillo'           => 'nullable|string|max:50',
-            'estante'           => 'nullable|string|max:50',
-            'programa'          => 'nullable|string|max:255',
-            'nivel'             => 'nullable|string|max:100',
-            'posicion'          => 'nullable|string|max:100',
+            'pasillo' => 'nullable|string|max:50',
+            'estante' => 'nullable|string|max:50',
+            'programa' => 'nullable|string|max:255',
+            'nivel' => 'nullable|string|max:100',
+            'posicion' => 'nullable|string|max:100',
             'solicitud_pedido_mensual' => 'nullable|boolean',
-            'solicitud_stock_critico'  => 'nullable|boolean',
-            'adelanto_de_pedido'       => 'nullable|boolean',
-            'traspaso'                 => 'nullable|boolean',
+            'solicitud_stock_critico' => 'nullable|boolean',
+            'adelanto_de_pedido' => 'nullable|boolean',
+            'traspaso' => 'nullable|boolean',
         ]);
 
         $validated['user_id'] = Auth::id();
@@ -136,17 +136,31 @@ class InventoryController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'estado' => 'required|string',
+            'estado' => 'required|in:Cuarentena,Disponible,Merma',
+            'motivo' => 'nullable|string|max:1000',
         ]);
-
         $inventory = Inventory::findOrFail($id);
-
+        $estadoAnterior = $inventory->estado;
         $data = $request->only(['estado', 'motivo']);
 
         $data['user_id'] = Auth::id();
 
         $inventory->update($data);
-
+        // registra el movimiento solo cuando cambia el estado
+        if ($estadoAnterior !== $inventory->estado) {
+            StockMovement::create([
+                'producto' => $inventory->producto,
+                'lote' => $inventory->lote,
+                'fecha_vencimiento' => $inventory->fecha_vencimiento,
+                'tipo_movimiento' => 'Cambio de estado',
+                'cantidad' => $inventory->cantidad,
+                'fecha_hora' => now(),
+                'origen_destino' => 'Desde: ' . $estadoAnterior
+                    . ' / Hacia: ' . $inventory->estado,
+                'documento_respaldo' => 'Gestión de inventario',
+                'estado_lote' => $inventory->estado,
+            ]);
+        }
         // Mensaje dinámico según el estado seleccionado
         if ($data['estado'] == 'Cuarentena') {
             $mensaje = 'El lote ha sido bloqueado y enviado a cuarentena.';
