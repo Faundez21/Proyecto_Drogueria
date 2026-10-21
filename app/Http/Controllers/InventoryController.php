@@ -166,6 +166,10 @@ class InventoryController extends Controller
         $validated['lote'] = ($validated['lote'] ?? '') ?: 'S/L';
         $validated['product_id'] = InventoryService::productoId($validated['producto']);
 
+        if (!isset($validated['valor_neto_unitario']) || $validated['valor_neto_unitario'] === '' || $validated['valor_neto_unitario'] === null) {
+            $validated['valor_neto_unitario'] = 0;
+        }
+
         foreach ($validated as $key => $value) {
             if ($value === '') {
                 $validated[$key] = null;
@@ -177,6 +181,8 @@ class InventoryController extends Controller
         }
 
         Inventory::create($validated);
+
+        return redirect()->back()->with('success', 'Producto ingresado exitosamente a bodega.');
 
         return redirect()->back()->with('success', 'Producto ingresado exitosamente a bodega.');
     }
