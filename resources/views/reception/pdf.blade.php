@@ -111,7 +111,7 @@
             <tr>
                 <td class="text-left"><strong style="font-size: 11px;">{{ $item->product->nombre ?? $item->producto ?? 'N/A' }}</strong></td>
                 <td><span style="background-color: #f1f5f9; padding: 2px 4px; border-radius: 3px; font-size: 9px; border: 1px solid #e2e8f0;">{{ $item->tipo_producto ?? $item->categoria }}</span></td>
-                <td><span style="background-color: #f1f5f9; padding: 2px 4px; border-radius: 3px; font-size: 9px; border: 1px solid #e2e8f0;">{{ $item->programa ?: 'Sin Programa' }}</span></td>
+                <td><span style="background-color: #f1f5f9; padding: 2px 4px; border-radius: 3px; font-size: 9px; border: 1px solid #e2e8f0;">{{ \App\Models\Inventory::where('product_id', $item->product_id) ->where('lote', $item->lote) ->where('correlativo_interno', $reception->correlativo) ->value('programa') ?: 'Sin Programa' }}</span></td>
                 <td><strong>{{ $item->lote ?: 'S/L' }}</strong><br><span style="font-size: 8px; color: #64748b;">{{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</span></td>
                 <td><strong style="font-size: 12px;">{{ $item->cantidad }}</strong></td>
                 <td class="text-right">${{ number_format($item->valor_total_item, 0, ',', '.') }}</td>
