@@ -98,7 +98,7 @@
                         <div id="searchDropdown" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100">
                             @if (isset($productosLista) && count($productosLista) > 0)
                                 @foreach ($productosLista as $prodNombre)
-                                    <div class="search-item px-3.5 py-2.5 text-[12.5px] font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-900 cursor-pointer transition-colors flex items-center justify-between" onclick="selectSearchProduct('{{ $prodNombre }}')">
+                                    <div class="search-item px-3.5 py-2.5 text-[12.5px] font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-900 cursor-pointer transition-colors flex items-center justify-between" onclick="selectSearchProduct('{{ addslashes($prodNombre) }}')">
                                         <span>{{ $prodNombre }}</span>
                                     </div>
                                 @endforeach
@@ -365,7 +365,6 @@
 
         <!-- MODAL: Etiqueta QR -->
         <div id="qrModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <!-- (Mismo código de QR que ya tenías) -->
             <div class="relative w-full max-w-sm flex flex-col items-center">
                 <div class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
@@ -396,8 +395,8 @@
         </div>
 
         <!-- MODAL: Editar Estado de Lote -->
-        <div id="editLoteModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-sm flex flex-col overflow-hidden">
+        <div id="editLoteModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[10000] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <h2 class="text-[16px] font-bold text-white tracking-wide">Gestionar Cuarentena</h2>
                     <button type="button" onclick="closeEditLote()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-lg cursor-pointer">
@@ -413,9 +412,17 @@
                             <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Producto Seleccionado:</span>
                             <p id="modal_producto_nombre" class="text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
                             <div class="mt-2 inline-block bg-white border border-slate-300 px-3 py-1 rounded-lg shadow-sm"><p id="modal_lote_nombre" class="text-[13px] font-mono font-bold text-slate-700"></p></div>
+                            <div class="flex justify-center gap-1.5 mt-2 flex-wrap">
+                                <span id="modal_categoria_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200"></span>
+                                <span id="modal_programa_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100"></span>
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Valor Unitario</span>
+                                <p id="modal_valor_unitario" class="text-[13px] font-bold text-slate-800 font-mono-das">$ 0</p>
+                            </div>
                             <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase block">Stock Retenido</span>
                                 <p id="modal_cantidad" class="text-[13px] font-bold text-slate-800">0</p>
@@ -624,6 +631,12 @@
             return (text || '').toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
         }
 
+        // Helper seguro: evita errores si un elemento no existe
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
         // Lógica de Filtros Frontend en Tabla de Directorio
         function filterTableByLocation() {
             const pasilloVal = normalizeText(document.getElementById('pasilloSelect').value);
@@ -754,22 +767,46 @@
 
         // Modales (Edición Lote)
         function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0) {
-            document.getElementById('editLoteForm').action = "/inventario/" + id;
-            document.getElementById('modal_producto_nombre').textContent = producto;
-            document.getElementById('modal_lote_nombre').textContent = "LOTE: " + lote;
+            const form = document.getElementById('editLoteForm');
+            if (form) form.action = "/inventario/" + id;
 
-            const fmt = (n) => '$ ' + Number(n || 0).toLocaleString('es-CL');
+            setText('modal_producto_nombre', producto);
+            setText('modal_lote_nombre', "LOTE: " + lote);
+
+            const fmt = (n) => '$ ' + Number(n || 0).toLocaleString('es-CL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
             const valorU = parseFloat(valorUnitario) || 0;
             const cant = parseInt(cantidad) || 0;
 
-            document.getElementById('modal_valor_unitario').textContent = fmt(valorU);
-            document.getElementById('modal_cantidad').textContent = cant.toLocaleString('es-CL') + ' u';
-            document.getElementById('modal_valor_total').textContent = fmt(valorU * cant);
+            setText('modal_valor_unitario', fmt(valorU));
+            setText('modal_cantidad', cant.toLocaleString('es-CL') + ' u');
+            setText('modal_valor_total', fmt(valorU * cant));
 
-            document.getElementById('modal_estado').value = estado;
-            document.getElementById('modal_motivo').value = motivo;
-            
-            toggleMotivoField(estado);
+            const chipCat = document.getElementById('modal_categoria_chip');
+            if (chipCat) {
+                chipCat.textContent = categoria || 'Sin categoría';
+                chipCat.style.display = '';
+            }
+            const chipProg = document.getElementById('modal_programa_chip');
+            if (chipProg) {
+                if (programa) {
+                    chipProg.textContent = programa;
+                    chipProg.style.display = '';
+                } else {
+                    chipProg.style.display = 'none';
+                }
+            }
+
+            const estadoSelect = document.getElementById('modal_estado');
+            const estadoFormat = (estado || '').toLowerCase();
+            let selectedVal = 'Cuarentena';
+            if (estadoFormat.includes('disponible')) selectedVal = 'Disponible';
+            else if (estadoFormat.includes('merma')) selectedVal = 'Merma';
+            if (estadoSelect) estadoSelect.value = selectedVal;
+
+            const motivoInput = document.getElementById('modal_motivo');
+            if (motivoInput) motivoInput.value = motivo;
+
+            toggleMotivoField(selectedVal);
             document.getElementById('editLoteModal').classList.remove('hidden');
         }
 
@@ -777,6 +814,7 @@
 
         function toggleMotivoField(estado) {
             const motivoInput = document.getElementById('modal_motivo');
+            if (!motivoInput) return;
             motivoInput.setAttribute('required', 'required');
             if (estado === 'Disponible') motivoInput.placeholder = "Indique motivo de la liberación...";
             else if (estado === 'Merma') motivoInput.placeholder = "Indique motivo del desecho...";
@@ -786,11 +824,11 @@
         // Modal QR
         function openQRModal(id, producto, lote, vencimiento, stock, proveedor) {
             document.getElementById('qrModal').classList.remove('hidden');
-            document.getElementById('qrProducto').textContent = producto;
-            document.getElementById('qrLote').textContent = lote;
-            document.getElementById('qrVencimiento').textContent = vencimiento;
-            document.getElementById('qrStock').textContent = stock + " UNID.";
-            document.getElementById('qrProveedor').textContent = proveedor;
+            setText('qrProducto', producto);
+            setText('qrLote', lote);
+            setText('qrVencimiento', vencimiento);
+            setText('qrStock', stock + " UNID.");
+            setText('qrProveedor', proveedor);
 
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
@@ -845,7 +883,7 @@
             if (rows.length > 0 && filteredEmptyRow) {
                 filteredEmptyRow.style.display = visibleCount === 0 ? '' : 'none';
             }
-            document.getElementById('historialCount').textContent = visibleCount;
+            setText('historialCount', visibleCount);
         }
 
         function clearHistorialFilters() {
