@@ -29,7 +29,7 @@ class EstablishmentRequestController extends Controller
             'responsable' => 'required|string',
             'cargo' => 'nullable|string',
             'observaciones' => 'nullable|string',
-            'firma_recibe' => 'nullable|string',
+            'firma_recibe' => 'required|string',
 
             'producto' => 'required|array',
             'producto.*' => 'required|integer|exists:products,id',
@@ -45,6 +45,8 @@ class EstablishmentRequestController extends Controller
 
             'cantidad_solicitada' => 'required|array',
             'cantidad_solicitada.*' => 'required|integer|min:1',
+        ], [
+            'firma_recibe.required' => 'Debes firmar la solicitud antes de enviarla.',
         ]);
 
         $esCesfam = InventoryService::esCesfam($validated['establecimiento']);
@@ -54,7 +56,7 @@ class EstablishmentRequestController extends Controller
             $nombre = Product::find($productId)->nombre ?? '';
             $nombreProducto = $validated['producto'][$index];
 
-            if (InventoryService::esControlado($nombre) && ! $esCesfam) {
+            if (InventoryService::esControlado($nombre) && !$esCesfam) {
                 return back()
                     ->with('error', "El establecimiento '{$validated['establecimiento']}' no puede solicitar estupefacientes. Solo los CESFAM tienen acceso.")
                     ->withInput();
