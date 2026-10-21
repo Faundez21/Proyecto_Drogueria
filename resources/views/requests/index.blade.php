@@ -66,7 +66,8 @@
                                 Establecimiento <span class="text-rose-500">*</span>
                             </label>
 
-                            <select name="establecimiento" id="establecimiento_select" required onchange="actualizarProductosDisponibles()"
+                            <select name="establecimiento" id="establecimiento_select" required
+                                onchange="actualizarProductosDisponibles()"
                                 class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione establecimiento...</option>
                                 <optgroup label="CESFAM (pueden solicitar estupefacientes)">
@@ -198,7 +199,7 @@
 
                                         <optgroup label="Medicamentos e Insumos" class="optgroup-normal">
                                             @foreach ($products as $product)
-                                                @if (! in_array($product->nombre, $controlados))
+                                                @if (!in_array($product->nombre, $controlados))
                                                     <option value="{{ $product->id }}">
                                                         {{ $product->nombre }}
                                                     </option>
@@ -206,7 +207,8 @@
                                             @endforeach
                                         </optgroup>
 
-                                        <optgroup label="Estupefacientes (solo CESFAM)" class="optgroup-controlado" disabled>
+                                        <optgroup label="Estupefacientes (solo CESFAM)" class="optgroup-controlado"
+                                            disabled>
                                             @foreach ($products as $product)
                                                 @if (in_array($product->nombre, $controlados))
                                                     <option value="{{ $product->id }}">
@@ -410,12 +412,14 @@
 
                 const aviso = document.getElementById('establecimientoAviso');
                 if (aviso) {
-                    aviso.textContent = esCesfam
-                        ? 'CESFAM: puede solicitar medicamentos, insumos y estupefacientes (estos últimos se despachan por el módulo de Despacho Controlado).'
-                        : (seleccion ? 'Solo puede solicitar medicamentos e insumos. Los estupefacientes están restringidos a los CESFAM.' : '');
-                    aviso.className = esCesfam
-                        ? 'text-[11px] text-teal-600 mt-1 font-semibold'
-                        : 'text-[11px] text-slate-400 mt-1 font-medium';
+                    aviso.textContent = esCesfam ?
+                        'CESFAM: puede solicitar medicamentos, insumos y estupefacientes (estos últimos se despachan por el módulo de Despacho Controlado).' :
+                        (seleccion ?
+                            'Solo puede solicitar medicamentos e insumos. Los estupefacientes están restringidos a los CESFAM.' :
+                            '');
+                    aviso.className = esCesfam ?
+                        'text-[11px] text-teal-600 mt-1 font-semibold' :
+                        'text-[11px] text-slate-400 mt-1 font-medium';
                 }
 
                 document.querySelectorAll('.select-producto').forEach(select => {
@@ -506,13 +510,23 @@
                 actualizarResumen();
             });
 
-            // evitar envio mientras la vista es visual
-            document.getElementById('requestForm').addEventListener('submit', function() {
+            // validar firma antes de enviar
+            document.getElementById('requestForm').addEventListener('submit', function(e) {
+                if (signatureRecibe.isEmpty()) {
+                    e.preventDefault();
 
-                if (!signatureRecibe.isEmpty()) {
-                    document.getElementById('firma_recibe_input').value =
-                        signatureRecibe.toDataURL('image/png');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Firma obligatoria',
+                        text: 'Debes firmar la solicitud antes de enviarla.',
+                        confirmButtonColor: '#0d9488'
+                    });
+
+                    return;
                 }
+
+                document.getElementById('firma_recibe_input').value =
+                    signatureRecibe.toDataURL('image/png');
             });
 
             actualizarResumen();
