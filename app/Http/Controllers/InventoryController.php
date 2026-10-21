@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Imports\InventoriesImport;
 use App\Models\Inventory;
 use App\Services\InventoryService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\StockMovement;
+use Maatwebsite\Excel\Validators\ValidationException;
+
 class InventoryController extends Controller
 {
     /**
@@ -16,7 +18,18 @@ class InventoryController extends Controller
     public function index(Request $request)
     {
         $query = Inventory::query();
-
+        $query->where('estado', 'Disponible');
+        // Solo el rol Administrador puede ver los productos de la categoría "Fármacos Controlados"
+        if (! auth()->user()->hasRole('Administrador')) {
+            $query->where('categoria', '!=', 'Fármacos Controlados');
+        } else {
+            if ($request->input('categoria') === 'Fármacos Controlados') {
+                $query->where('categoria', 'Fármacos Controlados');
+            }
+        }
+        if ($request->filled('categoria') && $request->input('categoria') !== 'Fármacos Controlados') {
+            $query->where('categoria', $request->categoria);
+        }
         // 1. Filtro de Búsqueda Global (Producto, Lote, Categoría)
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -81,8 +94,40 @@ class InventoryController extends Controller
             ->distinct()
             ->orderBy('programa', 'asc')
             ->pluck('programa');
+        $pasillosLista = Inventory::whereNotNull('pasillo')
+            ->where('pasillo', '!=', '')
+            ->distinct()
+            ->orderBy('pasillo', 'asc')
+            ->pluck('pasillo');
 
-        return view('inventario.index', compact('inventories', 'productosLista', 'programasLista'));
+        $estantesLista = Inventory::whereNotNull('estante')
+            ->where('estante', '!=', '')
+            ->distinct()
+            ->orderBy('estante', 'asc')
+            ->pluck('estante');
+
+        // Agregar las listas de Nivel y Posición que faltaban
+        $nivelesLista = Inventory::whereNotNull('nivel')
+            ->where('nivel', '!=', '')
+            ->distinct()
+            ->orderBy('nivel', 'asc')
+            ->pluck('nivel');
+
+        $posicionesLista = Inventory::whereNotNull('posicion')
+            ->where('posicion', '!=', '')
+            ->distinct()
+            ->orderBy('posicion', 'asc')
+            ->pluck('posicion');
+
+        return view('inventario.index', compact(
+            'inventories',
+            'productosLista',
+            'programasLista',
+            'pasillosLista',
+            'estantesLista',
+            'nivelesLista',
+            'posicionesLista'
+        ));
     }
 
     /**
@@ -121,11 +166,23 @@ class InventoryController extends Controller
         $validated['lote'] = ($validated['lote'] ?? '') ?: 'S/L';
         $validated['product_id'] = InventoryService::productoId($validated['producto']);
 
+        if (!isset($validated['valor_neto_unitario']) || $validated['valor_neto_unitario'] === '' || $validated['valor_neto_unitario'] === null) {
+            $validated['valor_neto_unitario'] = 0;
+        }
+
+        foreach ($validated as $key => $value) {
+            if ($value === '') {
+                $validated[$key] = null;
+            }
+        }
+
         foreach (['solicitud_pedido_mensual', 'solicitud_stock_critico', 'adelanto_de_pedido', 'traspaso'] as $flag) {
             $validated[$flag] = $request->boolean($flag);
         }
 
         Inventory::create($validated);
+
+        return redirect()->back()->with('success', 'Producto ingresado exitosamente a bodega.');
 
         return redirect()->back()->with('success', 'Producto ingresado exitosamente a bodega.');
     }
@@ -183,7 +240,7 @@ class InventoryController extends Controller
         ]);
 
         try {
-            $import = new \App\Imports\InventoriesImport(Auth::id());
+            $import = new InventoriesImport(Auth::id());
             Excel::import($import, $request->file('excel'));
 
             $total = $import->importados();
@@ -191,14 +248,14 @@ class InventoryController extends Controller
             return redirect()->back()->with('success', "Carga masiva procesada: {$total} registro(s) de inventario importado(s).");
         } catch (\RuntimeException $e) {
             return redirect()->back()->with('error', $e->getMessage());
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+        } catch (ValidationException $e) {
             $primerError = collect($e->failures())->first();
             $fila = $primerError ? $primerError->row() + 1 : '?';
             $mensaje = $primerError ? $primerError->errors()[0] : 'Archivo inválido.';
 
             return redirect()->back()->with('error', "Fila {$fila}: {$mensaje}");
         } catch (\Throwable $e) {
-            \Log::error('Error en carga masiva de inventario: ' . $e->getMessage());
+            \Log::error('Error en carga masiva de inventario: '.$e->getMessage());
 
             return redirect()->back()->with('error', 'Hubo un error al procesar el archivo. Verifique el formato de la plantilla.');
         }
