@@ -19,7 +19,7 @@ class InventoryController extends Controller
     {
         $query = Inventory::query();
         $query->where('estado', 'Disponible');
-        //Solo el rol Administrador puede ver los productos de la categoría "Fármacos Controlados"
+        // Solo el rol Administrador puede ver los productos de la categoría "Fármacos Controlados"
         if (! auth()->user()->hasRole('Administrador')) {
             $query->where('categoria', '!=', 'Fármacos Controlados');
         } else {
@@ -94,8 +94,40 @@ class InventoryController extends Controller
             ->distinct()
             ->orderBy('programa', 'asc')
             ->pluck('programa');
+        $pasillosLista = Inventory::whereNotNull('pasillo')
+            ->where('pasillo', '!=', '')
+            ->distinct()
+            ->orderBy('pasillo', 'asc')
+            ->pluck('pasillo');
 
-        return view('inventario.index', compact('inventories', 'productosLista', 'programasLista'));
+        $estantesLista = Inventory::whereNotNull('estante')
+            ->where('estante', '!=', '')
+            ->distinct()
+            ->orderBy('estante', 'asc')
+            ->pluck('estante');
+
+        // Agregar las listas de Nivel y Posición que faltaban
+        $nivelesLista = Inventory::whereNotNull('nivel')
+            ->where('nivel', '!=', '')
+            ->distinct()
+            ->orderBy('nivel', 'asc')
+            ->pluck('nivel');
+
+        $posicionesLista = Inventory::whereNotNull('posicion')
+            ->where('posicion', '!=', '')
+            ->distinct()
+            ->orderBy('posicion', 'asc')
+            ->pluck('posicion');
+
+        return view('inventario.index', compact(
+            'inventories',
+            'productosLista',
+            'programasLista',
+            'pasillosLista',
+            'estantesLista',
+            'nivelesLista',
+            'posicionesLista'
+        ));
     }
 
     /**
