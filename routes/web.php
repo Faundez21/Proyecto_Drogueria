@@ -1,30 +1,27 @@
 <?php
 
 // controladores de autenticacion
-use App\Http\Controllers\Auth\LoginController;
-
-// controladores de modulos y operaciones
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ReceptionController;
-use App\Http\Controllers\DistributionController;
-use App\Http\Controllers\QuarantineController;
-use App\Http\Controllers\ProviderController;
-use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\EstablishmentRequestController;
-use App\Http\Controllers\DispatchController;
-use App\Http\Controllers\ControlledDispatchController;
-use App\Http\Controllers\TraceabilityController;
-use App\Http\Controllers\GlobalSearchController;
-use App\Http\Controllers\QRController;
-
-//  Controladores de Estructura de Almacén (Mantenedores)
 use App\Http\Controllers\AisleController;
+// controladores de modulos y operaciones
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\ControlledDispatchController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\DistributionController;
+use App\Http\Controllers\EstablishmentRequestController;
+use App\Http\Controllers\GlobalSearchController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PasswordResetRequestController;
 use App\Http\Controllers\PositionController;
+use App\Http\Controllers\ProviderController;
+use App\Http\Controllers\QRController;
+//  Controladores de Estructura de Almacén (Mantenedores)
+use App\Http\Controllers\QuarantineController;
+use App\Http\Controllers\ReceptionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ShelfController;
-
+use App\Http\Controllers\TraceabilityController;
 // controladores de usuarios
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -71,7 +68,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
         Route::post('/roles', [UserController::class, 'storeRole'])->name('roles.store');
         Route::put('/roles/{role}', [UserController::class, 'updateRole'])->name('roles.update');
         Route::delete('/roles/{role}', [UserController::class, 'destroyRole'])->name('roles.destroy');

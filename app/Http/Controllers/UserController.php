@@ -48,9 +48,18 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
+            'email' => [
+                'required',
+                'string',
+                'email:rfc',
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+                'unique:users,email',
+            ],
+            'password' => 'required|string|min:8|max:64',
             'role' => 'nullable|string|exists:roles,name',
+            'status' => 'nullable|in:activo,inactivo',
+        ], [
+            'email.regex' => 'El correo debe tener una extensión válida (ej. .com, .cl).',
         ]);
 
         $user = User::create([
@@ -58,6 +67,7 @@ class UserController extends Controller
             'last_name' => $validated['last_name'],
             'email' => $validated['email'],
             'password' => $validated['password'],
+            'status' => $validated['status'] ?? 'activo',
         ]);
 
         $user->assignRole($validated['role'] ?? 'Usuario');
@@ -70,15 +80,30 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => [
+                'required',
+                'string',
+                'email:rfc',
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+                'unique:users,email,'.$user->id,
+            ],
             'role' => 'nullable|string|exists:roles,name',
+            'status' => 'nullable|in:activo,inactivo',
+        ], [
+            'email.regex' => 'El correo debe tener una extensión válida (ej. .com, .cl).',
         ]);
 
-        $user->update([
+        $userData = [
             'name' => $validated['name'],
             'last_name' => $validated['last_name'],
             'email' => $validated['email'],
-        ]);
+        ];
+
+        if (isset($validated['status'])) {
+            $userData['status'] = $validated['status'];
+        }
+
+        $user->update($userData);
 
         if (! empty($validated['role'])) {
             $user->syncRoles([$validated['role']]);
@@ -87,15 +112,21 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
-    public function destroy(User $user)
+    public function toggleStatus(User $user)
     {
         if ($user->id === auth()->id()) {
-            return redirect()->route('users.index')->with('error', 'No puedes eliminar tu propia cuenta.');
+            return redirect()->route('users.index')->with('error', 'No puedes cambiar el estado de tu propia cuenta.');
         }
 
-        $user->delete();
+        // Alternar el estado
+        $user->status = ($user->status === 'activo') ? 'inactivo' : 'activo';
+        $user->save();
 
-        return redirect()->route('users.index')->with('success', 'Usuario eliminado correctamente.');
+        $mensaje = ($user->status === 'activo')
+            ? "El usuario {$user->name} ha sido activado."
+            : "El usuario {$user->name} ha sido desactivado.";
+
+        return redirect()->route('users.index')->with('success', $mensaje);
     }
 
     public function storeRole(Request $request)
@@ -103,7 +134,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:roles,name',
             'modulos' => 'nullable|array',
-            'modulos.*' => 'string|in:' . implode(',', array_keys(self::MODULOS)),
+            'modulos.*' => 'string|in:'.implode(',', array_keys(self::MODULOS)),
         ]);
 
         $rol = Role::create(['name' => $validated['name']]);
@@ -115,9 +146,9 @@ class UserController extends Controller
     public function updateRole(Request $request, Role $role)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
+            'name' => 'required|string|max:255|unique:roles,name,'.$role->id,
             'modulos' => 'nullable|array',
-            'modulos.*' => 'string|in:' . implode(',', array_keys(self::MODULOS)),
+            'modulos.*' => 'string|in:'.implode(',', array_keys(self::MODULOS)),
         ]);
 
         $role->update(['name' => $validated['name']]);
@@ -147,7 +178,7 @@ class UserController extends Controller
 
         foreach ($modulos as $modulo) {
             if (array_key_exists($modulo, self::MODULOS)) {
-                $permisos[] = Permission::firstOrCreate(['name' => 'ver.' . $modulo])->name;
+                $permisos[] = Permission::firstOrCreate(['name' => 'ver.'.$modulo])->name;
             }
         }
 
