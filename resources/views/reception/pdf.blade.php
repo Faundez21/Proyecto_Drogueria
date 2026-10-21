@@ -115,7 +115,7 @@
                 <td class="text-right">${{ number_format($item->valor_total_item, 0, ',', '.') }}</td>
             </tr>
             @endforeach
-            
+
             <tr class="total-row">
                 <td colspan="4" class="text-right total-label" style="border-right: none;">GRAN TOTAL RECEPCIÓN (CON IVA 19%):</td>
                 <td class="text-right total-amount">${{ number_format($reception->valor_total_recepcion, 0, ',', '.') }}</td>
@@ -128,7 +128,7 @@
             <tr>
                 <!-- Columnas vacías para centrar la firma usando el 100% de la tabla -->
                 <td style="width: 27.5%;"></td>
-                
+
                 <td class="signature-box" style="width: 45%;">
                     <div class="signature-image-container">
                         @if(!empty($reception->firma_receptor))

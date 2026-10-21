@@ -87,7 +87,7 @@
                         $valorUnitario = (float) ($inv->valor_neto_unitario ?? 0);
                         $valorTotal = ((float) $stock) * $valorUnitario;
                         $sumaTotalPdf += $valorTotal;
-                        
+
                         $fechaVenc = $inv->fecha_vencimiento;
                         $textoVenc = 'N/A';
                         $classVenc = '';
