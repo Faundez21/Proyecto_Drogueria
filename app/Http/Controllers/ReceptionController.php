@@ -37,7 +37,7 @@ class ReceptionController extends Controller
             'origen' => 'required|string|max:255',
             'provider_id' => 'required|exists:providers,id',
             'firma_receptor' => 'nullable|string',
-            'action' => 'nullable|string|in:save,save_and_download',
+            'action' => 'nullable|string|in:save,save_only,save_and_download',
             'product_id' => 'required|array|min:1',
             'product_id.*' => 'required|integer|exists:products,id',
             'cantidad_unitaria' => 'required|array|min:1',
@@ -115,7 +115,7 @@ class ReceptionController extends Controller
                     'razon_social' => $provider->name,
                     'producto' => $nombreProducto,
                     'categoria' => $categoria,
-                    'estado' => 'Cuarentena',
+                    'estado' => 'Disponible',
                     'lote' => $validated['lote'][$index] ?? 'S/L',
                     'fecha_vencimiento' => $fechaVence,
                     'cantidad' => $cantidad,
@@ -132,7 +132,7 @@ class ReceptionController extends Controller
                     'fecha_hora' => now(),
                     'origen_destino' => 'Desde: ' . $provider->name,
                     'documento_respaldo' => $validated['tipo_documento'] . ' ' . $validated['numero_documento'],
-                    'estado_lote' => 'Cuarentena',
+                    'estado_lote' => 'Disponible',
                 ]);
             }
 

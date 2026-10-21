@@ -117,6 +117,11 @@
                             <option value="">Todas</option>
                             <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
                             <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
+                            @role('Administrador')
+                            <option value="Fármacos Controlados" {{ request('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>
+                                Fármacos Controlados
+                            </option>
+                            @endrole
                         </select>
                     </div>
 
@@ -389,6 +394,7 @@ $loteMasProximo = $lotes->filter(function($l) {
                                                                 <th class="px-4 py-3 text-center">Stock de Lote</th>
                                                                 <th class="px-4 py-3 text-center">Valor Unitario</th>
                                                                 <th class="px-4 py-3 text-center">Valor Total Lote</th>
+                                                                <th class="px-4 py-3 text-center w-12"></th>
                                                             </tr>
                                                         </thead>
                                                         <tbody class="divide-y divide-slate-100 text-slate-700 text-[12px]">
