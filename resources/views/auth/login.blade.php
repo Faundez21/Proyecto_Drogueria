@@ -13,11 +13,24 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+    input::-ms-reveal,
+    input::-ms-clear {
+        display: none;
+    }
+
+    input[type="password"]::-webkit-credentials-auto-fill-button,
+    input[type="password"]::-webkit-contacts-auto-fill-button {
+        visibility: hidden;
+        display: none !important;
+        pointer-events: none;
+        position: absolute;
+        right: 0;
+    }
+</style>
 </head>
 
 <body
