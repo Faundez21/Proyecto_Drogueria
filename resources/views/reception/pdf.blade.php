@@ -98,18 +98,20 @@
     <table class="items-table">
         <thead>
             <tr>
-                <th style="width: 42%; text-align: left;">Descripción del Producto</th>
-                <th style="width: 16%;">Categoría</th>
+                <th style="width: 32%; text-align: left;">Descripción del Producto</th>
+                <th style="width: 14%;">Categoría</th>
+                <th style="width: 14%;">Programa</th>
                 <th style="width: 14%;">Lote / Vence</th>
                 <th style="width: 8%;">Cant.</th>
-                <th style="width: 20%; text-align: right;">Total Item (+IVA)</th>
+                <th style="width: 18%; text-align: right;">Total Item (+IVA)</th>
             </tr>
         </thead>
         <tbody>
             @foreach($reception->items as $item)
             <tr>
-                <td class="text-left"><strong style="font-size: 11px;">{{ $item->product->nombre ?? 'N/A' }}</strong></td>
-                <td><span style="background-color: #f1f5f9; padding: 2px 4px; border-radius: 3px; font-size: 9px; border: 1px solid #e2e8f0;">{{ $item->tipo_producto }}</span></td>
+                <td class="text-left"><strong style="font-size: 11px;">{{ $item->product->nombre ?? $item->producto ?? 'N/A' }}</strong></td>
+                <td><span style="background-color: #f1f5f9; padding: 2px 4px; border-radius: 3px; font-size: 9px; border: 1px solid #e2e8f0;">{{ $item->tipo_producto ?? $item->categoria }}</span></td>
+                <td><span style="background-color: #f1f5f9; padding: 2px 4px; border-radius: 3px; font-size: 9px; border: 1px solid #e2e8f0;">{{ $item->programa ?: 'Sin Programa' }}</span></td>
                 <td><strong>{{ $item->lote ?: 'S/L' }}</strong><br><span style="font-size: 8px; color: #64748b;">{{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</span></td>
                 <td><strong style="font-size: 12px;">{{ $item->cantidad }}</strong></td>
                 <td class="text-right">${{ number_format($item->valor_total_item, 0, ',', '.') }}</td>
@@ -117,7 +119,7 @@
             @endforeach
 
             <tr class="total-row">
-                <td colspan="4" class="text-right total-label" style="border-right: none;">GRAN TOTAL RECEPCIÓN (CON IVA 19%):</td>
+                <td colspan="5" class="text-right total-label" style="border-right: none;">GRAN TOTAL RECEPCIÓN (CON IVA 19%):</td>
                 <td class="text-right total-amount">${{ number_format($reception->valor_total_recepcion, 0, ',', '.') }}</td>
             </tr>
         </tbody>
