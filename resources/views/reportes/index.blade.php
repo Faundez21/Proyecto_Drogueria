@@ -95,6 +95,11 @@
                             <option value="">Todas</option>
                             <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
                             <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
+                            @role('Administrador')
+                            <option value="Fármacos Controlados" {{ request('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>
+                                Fármacos Controlados
+                            </option>
+                            @endrole
                         </select>
                     </div>
 
