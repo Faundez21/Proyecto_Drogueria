@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StockMovement; 
 use App\Imports\InventoriesImport;
 use App\Models\Inventory;
 use App\Services\InventoryService;
@@ -18,7 +19,10 @@ class InventoryController extends Controller
     public function index(Request $request)
     {
         $query = Inventory::query();
+        
+        // El directorio principal SOLO muestra productos Disponibles
         $query->where('estado', 'Disponible');
+        
         // Solo el rol Administrador puede ver los productos de la categoría "Fármacos Controlados"
         if (! auth()->user()->hasRole('Administrador')) {
             $query->where('categoria', '!=', 'Fármacos Controlados');
@@ -27,9 +31,11 @@ class InventoryController extends Controller
                 $query->where('categoria', 'Fármacos Controlados');
             }
         }
+        
         if ($request->filled('categoria') && $request->input('categoria') !== 'Fármacos Controlados') {
             $query->where('categoria', $request->categoria);
         }
+        
         // 1. Filtro de Búsqueda Global (Producto, Lote, Categoría)
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -82,18 +88,26 @@ class InventoryController extends Controller
         // 4. Ejecución de la consulta con paginación
         $inventories = $query->paginate(15)->withQueryString();
 
+        // --- CONSULTAS INDEPENDIENTES PARA LOS MODALES ---
+        // Traemos todas las mermas sin importar paginación
+        $mermas = Inventory::with('user')->where('estado', 'Merma')->orderBy('updated_at', 'desc')->get();
+        // Traemos el historial global de ingresos (ejemplo los últimos 150)
+        $historial = Inventory::with('user')->orderBy('created_at', 'desc')->limit(150)->get();
+
+
         // 5. Generar lista de productos únicos para el autocompletado de la vista
         $productosLista = Inventory::select('producto')
             ->distinct()
             ->orderBy('producto', 'asc')
             ->pluck('producto');
 
-        // 6. Programas disponibles para el filtro
+        // 6. Listas para filtros (Programas, Pasillos, etc)
         $programasLista = Inventory::whereNotNull('programa')
             ->where('programa', '!=', '')
             ->distinct()
             ->orderBy('programa', 'asc')
             ->pluck('programa');
+            
         $pasillosLista = Inventory::whereNotNull('pasillo')
             ->where('pasillo', '!=', '')
             ->distinct()
@@ -106,7 +120,6 @@ class InventoryController extends Controller
             ->orderBy('estante', 'asc')
             ->pluck('estante');
 
-        // Agregar las listas de Nivel y Posición que faltaban
         $nivelesLista = Inventory::whereNotNull('nivel')
             ->where('nivel', '!=', '')
             ->distinct()
@@ -121,6 +134,8 @@ class InventoryController extends Controller
 
         return view('inventario.index', compact(
             'inventories',
+            'mermas',
+            'historial',
             'productosLista',
             'programasLista',
             'pasillosLista',
@@ -183,8 +198,6 @@ class InventoryController extends Controller
         Inventory::create($validated);
 
         return redirect()->back()->with('success', 'Producto ingresado exitosamente a bodega.');
-
-        return redirect()->back()->with('success', 'Producto ingresado exitosamente a bodega.');
     }
 
     /**
@@ -196,6 +209,7 @@ class InventoryController extends Controller
             'estado' => 'required|in:Cuarentena,Disponible,Merma',
             'motivo' => 'nullable|string|max:1000',
         ]);
+        
         $inventory = Inventory::findOrFail($id);
         $estadoAnterior = $inventory->estado;
         $data = $request->only(['estado', 'motivo']);
@@ -203,6 +217,7 @@ class InventoryController extends Controller
         $data['user_id'] = Auth::id();
 
         $inventory->update($data);
+        
         // registra el movimiento solo cuando cambia el estado
         if ($estadoAnterior !== $inventory->estado) {
             StockMovement::create([
@@ -212,12 +227,12 @@ class InventoryController extends Controller
                 'tipo_movimiento' => 'Cambio de estado',
                 'cantidad' => $inventory->cantidad,
                 'fecha_hora' => now(),
-                'origen_destino' => 'Desde: ' . $estadoAnterior
-                    . ' / Hacia: ' . $inventory->estado,
+                'origen_destino' => 'Desde: ' . $estadoAnterior . ' / Hacia: ' . $inventory->estado,
                 'documento_respaldo' => 'Gestión de inventario',
                 'estado_lote' => $inventory->estado,
             ]);
         }
+        
         // Mensaje dinámico según el estado seleccionado
         if ($data['estado'] == 'Cuarentena') {
             $mensaje = 'El lote ha sido bloqueado y enviado a cuarentena.';
