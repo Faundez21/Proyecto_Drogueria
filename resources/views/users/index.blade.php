@@ -146,12 +146,13 @@
                                             </svg>
                                         </button>
                                     @else
-                                        <form action="{{ route('users.toggle-status', $user->id) }}" method="POST"
+                                        <form id="toggle-form-{{ $user->id }}"
+                                            action="{{ route('users.toggle-status', $user->id) }}" method="POST"
                                             class="inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit"
-                                                onclick="return confirm('¿Deseas {{ ($user->status ?? 'activo') === 'activo' ? 'desactivar' : 'activar' }} al usuario {{ addslashes($user->name) }}?')"
+                                            <button type="button"
+                                                onclick="confirmToggleStatus('{{ $user->id }}', '{{ addslashes($user->name) }}', '{{ $user->status ?? 'activo' }}')"
                                                 class="p-2 rounded-lg transition-colors cursor-pointer {{ ($user->status ?? 'activo') === 'activo' ? 'text-slate-400 hover:text-rose-600 hover:bg-rose-50' : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100' }}"
                                                 title="{{ ($user->status ?? 'activo') === 'activo' ? 'Desactivar usuario' : 'Activar usuario' }}">
                                                 @if (($user->status ?? 'activo') === 'activo')
@@ -674,7 +675,6 @@
             }
             emailInput.setCustomValidity('');
 
-            // 2. Validar Contraseña (solo al crear un usuario nuevo)
             const passwordField = document.getElementById('passwordField');
             const passwordInput = document.getElementById('password');
 
@@ -703,7 +703,6 @@
             return true;
         }
 
-        // Limpiar mensajes de error personalizados mientras el usuario escribe
         document.addEventListener('DOMContentLoaded', function() {
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
@@ -719,5 +718,27 @@
                 });
             }
         });
+
+        function confirmToggleStatus(userId, userName, currentStatus) {
+            const isActivo = currentStatus === 'activo';
+            const actionText = isActivo ? 'desactivar' : 'activar';
+            const confirmButtonColor = isActivo ? '#e11d48' : '#059669';
+
+            Swal.fire({
+                title: `¿${isActivo ? 'Desactivar' : 'Activar'} usuario?`,
+                html: `¿Estás seguro de que deseas ${actionText} a <strong>${userName}</strong>?`,
+                icon: isActivo ? 'warning' : 'question',
+                showCancelButton: true,
+                confirmButtonColor: confirmButtonColor,
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: `Sí, ${actionText}`,
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`toggle-form-${userId}`).submit();
+                }
+            });
+        }
     </script>
 @endsection
