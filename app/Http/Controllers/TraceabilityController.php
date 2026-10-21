@@ -59,12 +59,15 @@ class TraceabilityController extends Controller
     public function getTimeline(Request $request)
     {
         $lote = $request->query('lote');
+        $producto = $request->query('producto');
 
-        if (! $lote) {
+        if (! $lote || ! $producto) {
             return response()->json([]);
         }
 
+        // Filtramos por lote y por producto para evitar colisiones
         $timeline = StockMovement::where('lote', $lote)
+            ->where('producto', $producto)
             ->orderBy('fecha_hora')
             ->orderBy('id')
             ->get()
@@ -76,7 +79,10 @@ class TraceabilityController extends Controller
                 'cantidad' => $mov->cantidad,
             ]);
 
-        $inventory = Inventory::where('lote', $lote)->first();
+        // Buscamos la ficha exacta del inventario cruzando lote y producto
+        $inventory = Inventory::where('lote', $lote)
+            ->where('producto', $producto)
+            ->first();
 
         $details = $inventory ? [
             'producto' => $inventory->producto ?? 'S/N',
