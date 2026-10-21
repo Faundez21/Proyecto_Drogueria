@@ -7,7 +7,8 @@
         class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all duration-200">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+            </path>
         </svg>
         Roles y Accesos
     </button>
@@ -36,18 +37,21 @@
         <div class="p-4 border-b border-slate-200 bg-white flex flex-col sm:flex-row justify-between sm:items-center gap-3">
             <div>
                 <h3 class="text-[15px] font-bold text-slate-800">Listado de Usuarios</h3>
-                <p class="text-[12px] text-slate-500 mt-0.5">Gestiona accesos, roles y atiende las solicitudes de recuperación.</p>
+                <p class="text-[12px] text-slate-500 mt-0.5">Gestiona accesos, roles y atiende las solicitudes de
+                    recuperación.</p>
             </div>
 
             @if (count($passwordRequests) > 0)
                 <button type="button" onclick="openRecoveryModal()"
                     class="relative inline-flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-semibold py-2 px-4 rounded-lg transition-all shadow-sm cursor-pointer text-[12.5px]">
                     <span class="relative flex h-2.5 w-2.5">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                     </span>
                     Solicitudes de recuperación
-                    <span class="bg-amber-200 text-amber-900 text-[11px] px-1.5 py-0.5 rounded-full font-bold">{{ count($passwordRequests) }}</span>
+                    <span
+                        class="bg-amber-200 text-amber-900 text-[11px] px-1.5 py-0.5 rounded-full font-bold">{{ count($passwordRequests) }}</span>
                 </button>
             @endif
         </div>
@@ -55,7 +59,8 @@
         <div class="overflow-x-auto w-full">
             <table class="w-full text-left border-collapse min-w-[720px]">
                 <thead>
-                    <tr class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
+                    <tr
+                        class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
                         <th class="px-6 py-4 whitespace-nowrap">Usuario</th>
                         <th class="px-6 py-4 whitespace-nowrap">Rol Asignado</th>
                         <th class="px-6 py-4 text-center whitespace-nowrap">Estado</th>
@@ -74,7 +79,8 @@
                                         {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr($user->last_name ?? '', 0, 1)) }}
                                     </div>
                                     <div class="min-w-0">
-                                        <div class="font-bold text-slate-800 truncate">{{ $user->name }} {{ $user->last_name }}</div>
+                                        <div class="font-bold text-slate-800 truncate">{{ $user->name }}
+                                            {{ $user->last_name }}</div>
                                         <div class="text-slate-500 text-[12px] truncate">{{ $user->email }}</div>
                                     </div>
                                 </div>
@@ -84,36 +90,45 @@
                                 @if ($user->roles->count() > 0)
                                     <div class="flex flex-wrap gap-1.5">
                                         @foreach ($user->roles as $rol)
-                                            <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 font-bold rounded-full text-[11px] border border-indigo-100 whitespace-nowrap">
+                                            <span
+                                                class="px-2.5 py-1 bg-indigo-50 text-indigo-700 font-bold rounded-full text-[11px] border border-indigo-100 whitespace-nowrap">
                                                 {{ $rol->name }}
                                             </span>
                                         @endforeach
                                     </div>
                                 @else
-                                    <span class="px-2.5 py-1 bg-slate-100 text-slate-600 font-bold rounded-full text-[11px] border border-slate-200">Sin Rol</span>
+                                    <span
+                                        class="px-2.5 py-1 bg-slate-100 text-slate-600 font-bold rounded-full text-[11px] border border-slate-200">Sin
+                                        Rol</span>
                                 @endif
                             </td>
 
                             <td class="px-6 py-4 text-center">
-                                <span class="inline-flex items-center gap-2 text-emerald-600 font-medium text-[12px]">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                    Activo
-                                </span>
+                                @if (($user->status ?? 'activo') === 'activo')
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                        Activo
+                                    </span>
+                                @else
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                        <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                                        Inactivo
+                                    </span>
+                                @endif
                             </td>
 
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-1.5">
 
-                                    <button type="button"
-                                        data-id="{{ $user->id }}"
-                                        data-name="{{ $user->name }}"
-                                        data-last="{{ $user->last_name }}"
-                                        data-email="{{ $user->email }}"
-                                        data-role="{{ $user->roles->first()->name ?? '' }}"
-                                        onclick="openEdit(this)"
+                                    <button type="button" data-id="{{ $user->id }}" data-name="{{ $user->name }}"
+                                        data-last="{{ $user->last_name }}" data-email="{{ $user->email }}"
+                                        data-role="{{ $user->roles->first()->name ?? '' }}" onclick="openEdit(this)"
                                         class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                                         title="Editar usuario">
-                                        <svg class="w-4.5 h-4.5 w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4.5 h-4.5 w-[18px] h-[18px]" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                                             </path>
@@ -121,26 +136,43 @@
                                     </button>
 
                                     @if ($user->id === auth()->id())
-                                        <button class="p-2 text-slate-300 cursor-not-allowed rounded-lg" title="No puedes eliminar tu propia cuenta" disabled>
-                                            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <button class="p-2 text-slate-300 cursor-not-allowed rounded-lg"
+                                            title="No puedes deshabilitar tu propia cuenta" disabled>
+                                            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
                                                 </path>
                                             </svg>
                                         </button>
                                     @else
-                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST"
-                                            onsubmit="return confirmDelete(event, '{{ addslashes($user->name) }}')" class="inline">
+                                        <form action="{{ route('users.toggle-status', $user->id) }}" method="POST"
+                                            class="inline">
                                             @csrf
-                                            @method('DELETE')
+                                            @method('PATCH')
                                             <button type="submit"
-                                                class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                                                title="Eliminar usuario">
-                                                <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                    </path>
-                                                </svg>
+                                                onclick="return confirm('¿Deseas {{ ($user->status ?? 'activo') === 'activo' ? 'desactivar' : 'activar' }} al usuario {{ addslashes($user->name) }}?')"
+                                                class="p-2 rounded-lg transition-colors cursor-pointer {{ ($user->status ?? 'activo') === 'activo' ? 'text-slate-400 hover:text-rose-600 hover:bg-rose-50' : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100' }}"
+                                                title="{{ ($user->status ?? 'activo') === 'activo' ? 'Desactivar usuario' : 'Activar usuario' }}">
+                                                @if (($user->status ?? 'activo') === 'activo')
+                                                    <!-- Icono Desactivar / Bloquear -->
+                                                    <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                                                        </path>
+                                                    </svg>
+                                                @else
+                                                    <!-- Icono Activar -->
+                                                    <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                        </path>
+                                                    </svg>
+                                                @endif
                                             </button>
                                         </form>
                                     @endif
@@ -166,23 +198,30 @@
     </div>
 
     <!-- Modal Roles y Accesos -->
-    <div id="RolesModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+    <div id="RolesModal"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+            class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
                 <div class="flex items-center gap-3">
                     <div class="p-2 bg-indigo-100 rounded-xl text-indigo-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
                         </svg>
                     </div>
                     <div>
                         <h2 class="text-xl font-bold text-slate-800">Roles y Accesos por Vista</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Define qué vistas puede ver cada rol. El rol Administrador siempre tiene acceso total.</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Define qué vistas puede ver cada rol. El rol Administrador
+                            siempre tiene acceso total.</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeRoles()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                <button type="button" onclick="closeRoles()"
+                    class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
                     </svg>
                 </button>
             </div>
@@ -190,17 +229,20 @@
             <!-- Listado de roles -->
             <div class="space-y-3 mb-6">
                 @foreach ($roles as $rol)
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div
+                        class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
                         <div class="min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <p class="text-sm font-bold text-slate-800">{{ $rol->name }}</p>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $rol->name === 'Administrador' ? 'bg-teal-100 text-teal-700' : 'bg-slate-200 text-slate-600' }}">
+                                <span
+                                    class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $rol->name === 'Administrador' ? 'bg-teal-100 text-teal-700' : 'bg-slate-200 text-slate-600' }}">
                                     {{ $rol->name === 'Administrador' ? 'Acceso total' : $rol->permissions->count() . ' vista(s)' }}
                                 </span>
                             </div>
                             <div class="flex flex-wrap gap-1 mt-2">
                                 @forelse ($rol->permissions as $perm)
-                                    <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                    <span
+                                        class="text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
                                         {{ str_replace('ver.', '', $perm->name) }}
                                     </span>
                                 @empty
@@ -211,15 +253,17 @@
 
                         <div class="flex items-center gap-1.5 shrink-0">
                             <button type="button"
-                                onclick='openRoleForm({{ json_encode(["id" => $rol->id, "name" => $rol->name, "modulos" => $rol->permissions->map(fn ($p) => str_replace("ver.", "", $p->name))->values()->all()]) }})'
+                                onclick='openRoleForm({{ json_encode(['id' => $rol->id, 'name' => $rol->name, 'modulos' => $rol->permissions->map(fn($p) => str_replace('ver.', '', $p->name))->values()->all()]) }})'
                                 class="px-3 py-1.5 text-[11.5px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors cursor-pointer">
                                 Editar accesos
                             </button>
-                            @if (! in_array($rol->name, ['Administrador', 'Usuario']))
-                                <form action="{{ route('roles.destroy', $rol->id) }}" method="POST" onsubmit="return confirm('¿Eliminar este rol?')">
+                            @if (!in_array($rol->name, ['Administrador', 'Usuario']))
+                                <form action="{{ route('roles.destroy', $rol->id) }}" method="POST"
+                                    onsubmit="return confirm('¿Eliminar este rol?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="px-3 py-1.5 text-[11.5px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors cursor-pointer">
+                                    <button type="submit"
+                                        class="px-3 py-1.5 text-[11.5px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors cursor-pointer">
                                         Eliminar
                                     </button>
                                 </form>
@@ -237,16 +281,22 @@
                     <div id="roleMethod"></div>
 
                     <div class="mb-4">
-                        <label for="role_name" class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Nombre del Rol <span class="text-rose-500">*</span></label>
-                        <input type="text" id="role_name" name="name" required placeholder="Ej. Bodeguero, Auditor..."
+                        <label for="role_name"
+                            class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Nombre del
+                            Rol <span class="text-rose-500">*</span></label>
+                        <input type="text" id="role_name" name="name" required
+                            placeholder="Ej. Bodeguero, Auditor..."
                             class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-[13px]">
                     </div>
 
-                    <label class="block text-[12px] font-bold text-slate-700 mb-2 uppercase tracking-wider">Acceso a Vistas</label>
+                    <label class="block text-[12px] font-bold text-slate-700 mb-2 uppercase tracking-wider">Acceso a
+                        Vistas</label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
                         @foreach ($modulos as $key => $label)
-                            <label class="flex items-center gap-2.5 bg-white border border-slate-200 rounded-lg px-3 py-2.5 cursor-pointer hover:border-indigo-300 transition-colors shadow-sm">
-                                <input type="checkbox" name="modulos[]" value="{{ $key }}" data-modulo="{{ $key }}"
+                            <label
+                                class="flex items-center gap-2.5 bg-white border border-slate-200 rounded-lg px-3 py-2.5 cursor-pointer hover:border-indigo-300 transition-colors shadow-sm">
+                                <input type="checkbox" name="modulos[]" value="{{ $key }}"
+                                    data-modulo="{{ $key }}"
                                     class="w-4 h-4 accent-indigo-600 rounded role-modulo">
                                 <span class="text-[12px] font-semibold text-slate-700">{{ $label }}</span>
                             </label>
@@ -285,23 +335,29 @@
     </div>
 
     <!-- Modal Solicitudes de Recuperación -->
-    <div id="RecoveryModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="RecoveryModal"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 w-full max-w-2xl">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
                 <div class="flex items-center gap-3">
                     <div class="p-2 bg-amber-100 rounded-xl text-amber-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
                         </svg>
                     </div>
                     <div>
                         <h2 class="text-xl font-bold text-slate-800">Solicitudes de Recuperación</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Usuarios que han solicitado restablecer su contraseña de acceso</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Usuarios que han solicitado restablecer su contraseña de
+                            acceso</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeRecoveryModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                <button type="button" onclick="closeRecoveryModal()"
+                    class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
                     </svg>
                 </button>
             </div>
@@ -313,7 +369,8 @@
 
             <div class="space-y-3 max-h-96 overflow-y-auto pr-1">
                 @forelse ($passwordRequests as $req)
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-amber-50/50 border border-amber-200/60 rounded-xl gap-3">
+                    <div
+                        class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-amber-50/50 border border-amber-200/60 rounded-xl gap-3">
                         <div>
                             <p class="text-sm font-bold text-slate-800">{{ $req->email }}</p>
                             <span class="text-xs text-amber-700 font-medium">
@@ -321,7 +378,8 @@
                             </span>
                         </div>
 
-                        <button type="button" data-email="{{ $req->email }}" onclick="promptNewPassword(this.dataset.email)"
+                        <button type="button" data-email="{{ $req->email }}"
+                            onclick="promptNewPassword(this.dataset.email)"
                             class="w-full sm:w-auto px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5">
                             Asignar nueva clave
                         </button>
@@ -343,63 +401,84 @@
     </div>
 
     <!-- Modal Crear / Editar Usuario -->
-    <div id="UserModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div id="UserModal"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+            class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
                 <div>
                     <h1 id="userModalTitle" class="text-xl font-bold text-slate-800">Crear Nuevo Usuario</h1>
                     <p class="text-sm text-slate-500 mt-0.5">El rol define las vistas a las que tendrá acceso.</p>
                 </div>
-                <button type="button" onclick="closeUserModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                <button type="button" onclick="closeUserModal()"
+                    class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
                     </svg>
                 </button>
             </div>
 
-            <form id="userModalForm" method="POST" action="{{ route('users.store') }}" class="space-y-4">
-                @csrf
+            <form id="userModalForm" method="POST" action="{{ route('users.store') }}" class="space-y-4" novalidate
+                onsubmit="return validateUserEmail(event)"> @csrf
                 <div id="userModalMethod"></div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="name" class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Nombre <span class="text-rose-500">*</span></label>
+                        <label for="name"
+                            class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Nombre <span
+                                class="text-rose-500">*</span></label>
                         <input type="text" id="name" name="name" required placeholder="Ej. Juan"
                             class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-[13px]">
                     </div>
 
                     <div>
-                        <label for="last_name" class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Apellido <span class="text-rose-500">*</span></label>
+                        <label for="last_name"
+                            class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Apellido
+                            <span class="text-rose-500">*</span></label>
                         <input type="text" id="last_name" name="last_name" required placeholder="Ej. Pérez"
                             class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-[13px]">
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label for="email" class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Correo Electrónico <span class="text-rose-500">*</span></label>
-                        <input type="email" id="email" name="email" required placeholder="ejemplo@drogueriadas.com"
+                        <label for="email"
+                            class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                            Correo Electrónico <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="email" id="email" name="email" required
+                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                            oninvalid="this.setCustomValidity(this.value === '' ? 'Completa este campo' : 'Ingresa un correo válido con su dominio (ej. usuario@ejemplo.com)')"
+                            oninput="this.setCustomValidity('')" placeholder="ejemplo@drogueriadas.com"
                             class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-[13px]">
                     </div>
-
                     <div class="sm:col-span-2" id="passwordField">
-                        <label for="password" class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Contraseña temporal <span class="text-rose-500">*</span></label>
-                        <input type="password" id="password" name="password" minlength="8" required placeholder="Mínimo 8 caracteres"
+                        <label for="password"
+                            class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                            Contraseña temporal <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="password" id="password" name="password" minlength="8" maxlength="64"
+                            placeholder="Entre 8 y 64 caracteres"
                             class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-[13px]">
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label for="role" class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                        <label for="role"
+                            class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
                             Rol del Usuario
-                            <span class="font-normal normal-case text-slate-400">(define las vistas a las que accede)</span>
+                            <span class="font-normal normal-case text-slate-400">(define las vistas a las que
+                                accede)</span>
                         </label>
                         <select id="role" name="role"
                             class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-[13px] bg-white">
                             @foreach ($roles as $rol)
                                 <option value="{{ $rol->name }}">
-                                    {{ $rol->name }} — {{ $rol->name === 'Administrador' ? 'acceso total' : $rol->permissions->count() . ' vista(s)' }}
+                                    {{ $rol->name }} —
+                                    {{ $rol->name === 'Administrador' ? 'acceso total' : $rol->permissions->count() . ' vista(s)' }}
                                 </option>
                             @endforeach
                         </select>
-                        <p class="text-[11px] text-slate-400 mt-1">Para crear o ajustar los accesos de un rol, usa el botón "Roles y Accesos".</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Para crear o ajustar los accesos de un rol, usa el botón
+                            "Roles y Accesos".</p>
                     </div>
                 </div>
 
@@ -419,11 +498,21 @@
 
     <!-- JS -->
     <script>
-        function openRecoveryModal() { document.getElementById('RecoveryModal').classList.remove('hidden'); }
-        function closeRecoveryModal() { document.getElementById('RecoveryModal').classList.add('hidden'); }
+        function openRecoveryModal() {
+            document.getElementById('RecoveryModal').classList.remove('hidden');
+        }
 
-        function openRoles() { document.getElementById('RolesModal').classList.remove('hidden'); }
-        function closeRoles() { document.getElementById('RolesModal').classList.add('hidden'); }
+        function closeRecoveryModal() {
+            document.getElementById('RecoveryModal').classList.add('hidden');
+        }
+
+        function openRoles() {
+            document.getElementById('RolesModal').classList.remove('hidden');
+        }
+
+        function closeRoles() {
+            document.getElementById('RolesModal').classList.add('hidden');
+        }
 
         function openCreate() {
             const form = document.getElementById('userModalForm');
@@ -456,7 +545,9 @@
             document.getElementById('UserModal').classList.remove('hidden');
         }
 
-        function closeUserModal() { document.getElementById('UserModal').classList.add('hidden'); }
+        function closeUserModal() {
+            document.getElementById('UserModal').classList.add('hidden');
+        }
 
         function openRoleForm(rol) {
             const box = document.getElementById('roleFormBox');
@@ -484,7 +575,10 @@
 
             document.getElementById('btnNewRole').classList.add('hidden');
             box.classList.remove('hidden');
-            box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            box.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
         }
 
         function cancelRoleForm() {
@@ -503,18 +597,57 @@
         function promptNewPassword(email) {
             Swal.fire({
                 title: 'Asignar Nueva Contraseña',
-                text: `Ingresa la nueva clave para ${email}:`,
-                input: 'password',
-                inputPlaceholder: 'Mínimo 8 caracteres',
+                html: `
+            <p class="text-[13px] text-slate-600 mb-4">Ingresa la nueva clave para <strong>${email}</strong>:</p>
+            <div class="relative w-full max-w-xs mx-auto">
+                <input type="password" id="swal_password_input" class="swal2-input !m-0 !w-full !pr-10 text-[13px]" placeholder="Mínimo 8 caracteres" style="box-sizing: border-box;">
+                <button type="button" id="toggle_swal_password" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors">
+                    <svg id="swal_eye_open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <svg id="swal_eye_closed" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.02 10.02 0 013.122-.363c4.478 0 8.268 2.943 9.542 7a9.97 9.97 0 01-2.022 3.829m-2.115 2.115A8 8 0 0112 15a3 3 0 01-3-3c0-.414.084-.81.236-1.168" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
+                    </svg>
+                </button>
+            </div>
+        `,
                 showCancelButton: true,
                 confirmButtonColor: '#d97706',
                 cancelButtonColor: '#94a3b8',
                 confirmButtonText: 'Guardar Contraseña',
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true,
-                inputValidator: (value) => {
-                    if (!value) return '¡Debes ingresar una contraseña!';
-                    if (value.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
+                didOpen: () => {
+                    const input = document.getElementById('swal_password_input');
+                    const btn = document.getElementById('toggle_swal_password');
+                    const eyeOpen = document.getElementById('swal_eye_open');
+                    const eyeClosed = document.getElementById('swal_eye_closed');
+
+                    btn.addEventListener('click', () => {
+                        if (input.type === 'password') {
+                            input.type = 'text';
+                            eyeOpen.classList.remove('hidden');
+                            eyeClosed.classList.add('hidden');
+                        } else {
+                            input.type = 'password';
+                            eyeOpen.classList.add('hidden');
+                            eyeClosed.classList.remove('hidden');
+                        }
+                    });
+                },
+                preConfirm: () => {
+                    const value = document.getElementById('swal_password_input').value;
+                    if (!value) {
+                        Swal.showValidationMessage('¡Debes ingresar una contraseña!');
+                        return false;
+                    }
+                    if (value.length < 8) {
+                        Swal.showValidationMessage('La contraseña debe tener al menos 8 caracteres.');
+                        return false;
+                    }
+                    return value;
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -525,5 +658,66 @@
                 }
             });
         }
+
+        function validateUserEmail(event) {
+            const emailInput = document.getElementById('email');
+            const emailValue = emailInput.value.trim();
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            // 1. Validar Correo Electrónico
+            if (!emailRegex.test(emailValue)) {
+                event.preventDefault();
+                emailInput.setCustomValidity('Ingresa un correo válido con su dominio (ej. usuario@ejemplo.com o .cl)');
+                emailInput.reportValidity();
+                emailInput.focus();
+                return false;
+            }
+            emailInput.setCustomValidity('');
+
+            // 2. Validar Contraseña (solo al crear un usuario nuevo)
+            const passwordField = document.getElementById('passwordField');
+            const passwordInput = document.getElementById('password');
+
+            if (passwordField && passwordField.style.display !== 'none') {
+                const passValue = passwordInput.value;
+
+                if (passValue.length < 8) {
+                    event.preventDefault();
+                    passwordInput.setCustomValidity('La contraseña debe tener al menos 8 caracteres.');
+                    passwordInput.reportValidity();
+                    passwordInput.focus();
+                    return false;
+                }
+
+                if (passValue.length > 64) {
+                    event.preventDefault();
+                    passwordInput.setCustomValidity('La contraseña no puede superar los 64 caracteres.');
+                    passwordInput.reportValidity();
+                    passwordInput.focus();
+                    return false;
+                }
+
+                passwordInput.setCustomValidity('');
+            }
+
+            return true;
+        }
+
+        // Limpiar mensajes de error personalizados mientras el usuario escribe
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+
+            if (emailInput) {
+                emailInput.addEventListener('input', function() {
+                    this.setCustomValidity('');
+                });
+            }
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    this.setCustomValidity('');
+                });
+            }
+        });
     </script>
 @endsection
