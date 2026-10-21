@@ -221,6 +221,7 @@ class InventoryController extends Controller
         // registra el movimiento solo cuando cambia el estado
         if ($estadoAnterior !== $inventory->estado) {
             StockMovement::create([
+                'user_id' => Auth::id(), // <-- CORRECCIÓN: usuario responsable del cambio
                 'producto' => $inventory->producto,
                 'lote' => $inventory->lote,
                 'fecha_vencimiento' => $inventory->fecha_vencimiento,
@@ -228,7 +229,8 @@ class InventoryController extends Controller
                 'cantidad' => $inventory->cantidad,
                 'fecha_hora' => now(),
                 'origen_destino' => 'Desde: ' . $estadoAnterior . ' / Hacia: ' . $inventory->estado,
-                'documento_respaldo' => 'Gestión de inventario',
+                // Se guarda el motivo escrito por el usuario (antes quedaba "Gestión de inventario")
+                'documento_respaldo' => $request->filled('motivo') ? $request->input('motivo') : 'Gestión de inventario',
                 'estado_lote' => $inventory->estado,
             ]);
         }
