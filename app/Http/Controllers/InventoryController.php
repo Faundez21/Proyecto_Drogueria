@@ -166,6 +166,12 @@ class InventoryController extends Controller
         $validated['lote'] = ($validated['lote'] ?? '') ?: 'S/L';
         $validated['product_id'] = InventoryService::productoId($validated['producto']);
 
+        foreach ($validated as $key => $value) {
+            if ($value === '') {
+                $validated[$key] = null;
+            }
+        }
+
         foreach (['solicitud_pedido_mensual', 'solicitud_stock_critico', 'adelanto_de_pedido', 'traspaso'] as $flag) {
             $validated[$flag] = $request->boolean($flag);
         }
