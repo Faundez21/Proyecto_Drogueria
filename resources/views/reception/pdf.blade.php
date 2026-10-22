@@ -45,7 +45,7 @@
         <tr>
             <td class="logo-container">
                 <div>
-                    <img src="{{ public_path('images/favicon.svg') }}" class="logo-icon" alt="Logo">
+                    <img src="{{ public_path('images/favicon4.png') }}" class="logo-icon" alt="Logo">
                     <h2 class="logo-title">DROGUERÍA DAS</h2>
                 </div>
                 <p class="logo-subtitle">Departamento de Salud - Abastecimiento Médico</p>

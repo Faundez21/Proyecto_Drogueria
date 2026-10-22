@@ -14,18 +14,18 @@
         table.items { width: 100%; border-collapse: collapse; margin-top: 10px; }
         table.items th, table.items td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         table.items th { background-color: #f8fafc; font-size: 11px; text-transform: uppercase; }
-        
+
         /* estilos para las firmas */
         table.signatures { width: 100%; margin-top: 60px; text-align: center; border: none; }
         table.signatures td { border: none; vertical-align: bottom; }
         .signature-line { width: 60%; margin: 0 auto; border-top: 1px solid #333; padding-top: 5px; margin-top: 5px; font-size: 11px; }
-        
+
         .footer { position: fixed; bottom: 30px; width: 100%; text-align: center; font-size: 10px; border-top: 1px solid #ccc; padding-top: 10px; color: #666; }
     </style>
 </head>
 
 <body>
-    
+
     <!-- cabecera del documento -->
     <div class="header">
         <table>
@@ -91,7 +91,7 @@
                     Bodega Central / DAS
                 </div>
             </td>
-            
+
             <!-- firma de quien recibe -->
             <td style="width: 50%;">
                 @if(isset($despacho->firma_recibe) && $despacho->firma_recibe)
