@@ -54,13 +54,18 @@
             border: 1px solid #1e293b;
         }
 
-        /* Estilos para Etiquetas Flotantes (Markers) y sus colores según imagen */
+        /* Etiquetas flotantes (se reposicionan solas para no solaparse) */
         .rack-marker {
             position: absolute;
             transform: translate(-50%, -100%);
+            transform-origin: 50% 100%;
             pointer-events: none;
             z-index: 10;
-            transition: opacity 0.2s;
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            will-change: left, top, transform;
         }
 
         .rack-marker::after {
@@ -71,6 +76,14 @@
             transform: translateX(-50%);
             border-width: 5px 5px 0;
             border-style: solid;
+            border-color: inherit;
+            border-color: var(--marker-color, #64748b) transparent transparent transparent;
+        }
+
+        /* Etiqueta de pasillo: estilo distinto al de las estanterías */
+        .rack-marker.aisle-marker {
+            opacity: 0.92;
+            border-style: dashed;
         }
 
         /* Colores exactos */
@@ -79,17 +92,9 @@
             color: white;
         }
 
-        .marker-green::after {
-            border-color: #22c55e transparent transparent transparent;
-        }
-
         .marker-blue {
             background-color: #3b82f6;
             color: white;
-        }
-
-        .marker-blue::after {
-            border-color: #3b82f6 transparent transparent transparent;
         }
 
         .marker-orange {
@@ -97,26 +102,14 @@
             color: white;
         }
 
-        .marker-orange::after {
-            border-color: #f97316 transparent transparent transparent;
-        }
-
         .marker-purple {
             background-color: #a855f7;
             color: white;
         }
 
-        .marker-purple::after {
-            border-color: #a855f7 transparent transparent transparent;
-        }
-
         .marker-gray {
             background-color: #64748b;
             color: white;
-        }
-
-        .marker-gray::after {
-            border-color: #64748b transparent transparent transparent;
         }
     </style>
 
@@ -241,7 +234,7 @@
                             <div
                                 class="inline-flex bg-white/90 backdrop-blur p-1 rounded-lg sm:rounded-full border border-gray-200 shadow-sm">
                                 <button @click="changeView('2D')"
-                                    :class="viewMode === '2D' ? 'bg-white shadow text-gray-800' :
+                                    :class="viewMode === '2D' ? 'bg-blue-500 text-white shadow' :
                                         'text-gray-500 hover:text-gray-700'"
                                     class="px-3 sm:px-5 py-1.5 text-xs sm:text-sm font-semibold rounded-md sm:rounded-full transition">2D</button>
                                 <button @click="changeView('3D')"
@@ -252,6 +245,15 @@
                         </div>
 
                         <div class="pointer-events-auto flex gap-1.5 sm:gap-2">
+                            <button @click="resetView()" title="Restablecer vista"
+                                class="w-8 h-8 sm:w-10 sm:h-10 bg-white/90 backdrop-blur rounded-lg border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:bg-white transition">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
+                                </svg>
+                            </button>
                             <button @click="zoomOut()" title="Alejar"
                                 class="w-8 h-8 sm:w-10 sm:h-10 bg-white/90 backdrop-blur rounded-lg border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:bg-white transition hidden sm:flex">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,11 +307,15 @@
                         <!-- Contenido interior del Sidebar -->
                         <div x-show="sidebarOpen" x-transition
                             class="p-3 sm:p-4 pt-0 border-t border-slate-700/50 mt-1 flex flex-col gap-3">
+
+                            <!-- Selector de nivel (dinámico: se llena con los niveles reales) -->
                             <div class="relative">
-                                <select style="background-image: none;"
+                                <select style="background-image: none;" x-model="selectedLevel" @change="changeLevel()"
                                     class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2.5 text-xs sm:text-sm text-white font-medium focus:outline-none focus:border-blue-500 cursor-pointer appearance-none">
-                                    <option>Nivel 1</option>
-                                    <option>Nivel 2</option>
+                                    <option value="">Todos los niveles</option>
+                                    <template x-for="lvl in levelOptions" :key="lvl.value">
+                                        <option :value="lvl.value" x-text="lvl.label"></option>
+                                    </template>
                                 </select>
                                 <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
@@ -336,20 +342,28 @@
 
                             <!-- Leyenda de ocupación -->
                             <div class="flex flex-col gap-3 mt-2 text-xs sm:text-sm font-medium text-gray-300">
-                                <div class="flex items-center gap-3"><span
-                                        class="w-3.5 h-3.5 rounded bg-[#22c55e]"></span>
-                                    Ocupación baja (< 50%)</div>
-                                        <div class="flex items-center gap-3"><span
-                                                class="w-3.5 h-3.5 rounded bg-[#f97316]"></span>
-                                            Ocupación media (50-79%)</div>
-                                        <div class="flex items-center gap-3"><span
-                                                class="w-3.5 h-3.5 rounded bg-[#ef4444]"></span>
-                                            Ocupación crítica (&ge; 80%)</div>
-                                        <div class="flex items-center gap-3"><span
-                                                class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span>
-                                            Sin capacidad definida</div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#22c55e]"></span>
+                                    Ocupación baja (&lt; 50%)
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#f97316]"></span>
+                                    Ocupación media (50-79%)
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#ef4444]"></span>
+                                    Ocupación crítica (&ge; 80%)
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span>
+                                    Sin capacidad definida
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#c9a36a]"></span>
+                                    Posición con stock (cajas)
                                 </div>
                             </div>
+                        </div>
                     </aside>
 
                     <!-- Tooltip (Panel de Detalle Flotante) -->
@@ -358,7 +372,7 @@
                         x-transition:leave="transition ease-in duration-100"
                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                         style="display: none;"
-                        class="absolute bottom-4 left-4 right-4 sm:bottom-auto sm:left-auto sm:top-24 sm:right-6 sm:w-72 glass-panel text-white rounded-xl p-4 sm:p-5 shadow-2xl z-30 pointer-events-auto border border-gray-700">
+                        class="absolute bottom-4 left-4 right-4 sm:bottom-auto sm:left-auto sm:top-24 sm:right-6 sm:w-72 max-h-[80%] overflow-y-auto glass-panel text-white rounded-xl p-4 sm:p-5 shadow-2xl z-30 pointer-events-auto border border-gray-700">
 
                         <div
                             class="border-b border-gray-700 pb-2 sm:pb-3 mb-2 sm:mb-3 relative flex justify-between items-center">
@@ -397,7 +411,35 @@
                                 </p>
                             </div>
 
-                            <template x-if="rackData.items && rackData.items.length > 1">
+                            <!-- Estructura: niveles y posiciones de la estantería -->
+                            <template x-if="rackData.estructura && rackData.estructura.length > 0">
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Niveles y
+                                        posiciones</p>
+                                    <div class="max-h-44 overflow-y-auto space-y-1.5 pr-1">
+                                        <template x-for="(nivel, ni) in [...rackData.estructura].reverse()"
+                                            :key="'n' + ni">
+                                            <div class="bg-slate-800/70 border border-slate-700 rounded-lg px-2.5 py-1.5">
+                                                <p class="text-[11px] font-bold text-white" x-text="nivel.label"></p>
+                                                <div class="flex flex-wrap gap-1 mt-1">
+                                                    <template x-for="(pos, pi) in nivel.posiciones" :key="'p' + pi">
+                                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono border"
+                                                            :class="pos.ocupado ?
+                                                                'bg-emerald-900/40 text-emerald-300 border-emerald-800' :
+                                                                'bg-slate-800 text-gray-400 border-slate-700'"
+                                                            :title="pos.ocupado ? pos.producto + ' · ' + pos.cantidad + ' u' :
+                                                                'Libre'"
+                                                            x-text="pos.name + (pos.ocupado ? ' · ' + pos.cantidad : '')"></span>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Productos almacenados (se muestra con 1 o más productos) -->
+                            <template x-if="rackData.items && rackData.items.length > 0">
                                 <div class="max-h-40 overflow-y-auto space-y-1.5 pr-1">
                                     <template x-for="(item, idx) in rackData.items" :key="idx">
                                         <div
@@ -450,7 +492,7 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Stats Bar (DInámica con Alpine.js) -->
+                    <!-- Bottom Stats Bar (Dinámica con Alpine.js) -->
                     <div
                         class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] max-w-4xl glass-panel text-white rounded-xl p-4 shadow-2xl z-20 hidden lg:flex justify-between items-center px-8 divide-x divide-gray-700">
                         <div
@@ -513,6 +555,8 @@
                     tooltipVisible: false,
                     rackData: {},
                     searchQuery: '',
+                    selectedLevel: '',
+                    levelOptions: [],
                     stats: {
                         ubicaciones: 0,
                         ocupacionPct: 0,
@@ -529,12 +573,31 @@
                         window.addEventListener('click-empty', () => {
                             this.tooltipVisible = false;
                         });
+                        // Escape cierra el panel de detalle
+                        window.addEventListener('keydown', (e) => {
+                            if (e.key === 'Escape') this.tooltipVisible = false;
+                        });
                     },
                     changeView(mode) {
                         this.viewMode = mode;
                         window.dispatchEvent(new CustomEvent('update-camera-view', {
                             detail: mode
                         }));
+                    },
+                    changeLevel() {
+                        window.dispatchEvent(new CustomEvent('filter-level', {
+                            detail: this.selectedLevel
+                        }));
+                    },
+                    resetView() {
+                        this.viewMode = '3D';
+                        this.selectedLevel = '';
+                        this.searchQuery = '';
+                        this.changeLevel();
+                        window.dispatchEvent(new CustomEvent('search-rack', {
+                            detail: ''
+                        }));
+                        window.dispatchEvent(new Event('cam-reset'));
                     },
                     zoomIn() {
                         window.dispatchEvent(new Event('cam-zoom-in'));
@@ -571,7 +634,7 @@
                         const labelsContainer = document.getElementById('labels-container');
 
                         const scene = new THREE.Scene();
-                        scene.background = new THREE.Color('#f8fafc');
+                        scene.background = new THREE.Color('#f1f5f9');
 
                         const camera = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 1, 1000);
                         const defaultCamPos = new THREE.Vector3(70, 75, 80);
@@ -581,6 +644,7 @@
                             antialias: true,
                             powerPreference: "high-performance"
                         });
+                        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
                         renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
                         renderer.shadowMap.enabled = true;
                         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -590,24 +654,85 @@
                         const defaultTarget = new THREE.Vector3(0, -5, 0);
                         controls.target.copy(defaultTarget);
                         controls.maxPolarAngle = Math.PI / 2 - 0.05;
+                        controls.minDistance = 10;
+                        controls.maxDistance = 220;
                         controls.enableDamping = true;
                         controls.dampingFactor = 0.05;
 
-                        // Iluminación
-                        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-                        scene.add(ambientLight);
-                        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+                        // --- Iluminación ---
+                        scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+                        scene.add(new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 0.4));
+                        const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
                         dirLight.position.set(40, 70, 30);
                         dirLight.castShadow = true;
                         dirLight.shadow.mapSize.width = 2048;
                         dirLight.shadow.mapSize.height = 2048;
+                        // Área de sombras que cubre toda la bodega (antes cubría solo una zona pequeña)
+                        dirLight.shadow.camera.left = -60;
+                        dirLight.shadow.camera.right = 60;
+                        dirLight.shadow.camera.top = 60;
+                        dirLight.shadow.camera.bottom = -60;
+                        dirLight.shadow.camera.near = 1;
+                        dirLight.shadow.camera.far = 220;
+                        dirLight.shadow.bias = -0.0004;
                         scene.add(dirLight);
 
-                        // --- ESTRUCTURA BASE (Suelo y Paredes) ---
+                        // --- ANIMACIÓN SUAVE DE CÁMARA ---
+                        let camAnim = null;
+
+                        function animateCamera(toPos, toTarget, ms) {
+                            camAnim = {
+                                fromPos: camera.position.clone(),
+                                fromTarget: controls.target.clone(),
+                                toPos: toPos.clone(),
+                                toTarget: toTarget.clone(),
+                                start: performance.now(),
+                                ms: ms || 700
+                            };
+                        }
+
+                        function stepCameraAnimation() {
+                            if (!camAnim) return;
+                            const t = Math.min(1, (performance.now() - camAnim.start) / camAnim.ms);
+                            const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // easeInOutQuad
+                            camera.position.lerpVectors(camAnim.fromPos, camAnim.toPos, e);
+                            controls.target.lerpVectors(camAnim.fromTarget, camAnim.toTarget, e);
+                            if (t >= 1) camAnim = null;
+                        }
+
+                        // Si el usuario toma el control, se cancela la animación
+                        controls.addEventListener('start', () => {
+                            camAnim = null;
+                        });
+
+                        function focusPoint(point) {
+                            const dir = camera.position.clone().sub(controls.target).normalize();
+                            const dist = Math.min(Math.max(camera.position.distanceTo(controls.target) * 0.7, 28), 60);
+                            animateCamera(point.clone().add(dir.multiplyScalar(dist)), point, 700);
+                        }
+
+                        // --- ESTRUCTURA BASE (Suelo con cuadrícula y Paredes) ---
                         const buildGroup = new THREE.Group();
+
+                        // Textura de cuadrícula para el piso (celdas de 2 x 2 unidades)
+                        const gridCanvas = document.createElement('canvas');
+                        gridCanvas.width = 64;
+                        gridCanvas.height = 64;
+                        const gctx = gridCanvas.getContext('2d');
+                        gctx.fillStyle = '#dbe3ec';
+                        gctx.fillRect(0, 0, 64, 64);
+                        gctx.strokeStyle = '#c3cfdb';
+                        gctx.lineWidth = 2;
+                        gctx.strokeRect(0, 0, 64, 64);
+                        const gridTex = new THREE.CanvasTexture(gridCanvas);
+                        gridTex.wrapS = THREE.RepeatWrapping;
+                        gridTex.wrapT = THREE.RepeatWrapping;
+                        gridTex.repeat.set(40, 25);
+                        gridTex.anisotropy = 8;
+
                         const floorMat = new THREE.MeshStandardMaterial({
-                            color: '#cbd5e1',
-                            roughness: 0.8
+                            map: gridTex,
+                            roughness: 0.85
                         });
                         const floor = new THREE.Mesh(new THREE.BoxGeometry(80, 1, 50), floorMat);
                         floor.position.set(0, -0.5, 0);
@@ -619,7 +744,8 @@
                             transparent: true,
                             opacity: 0.25,
                             roughness: 0.1,
-                            side: THREE.DoubleSide
+                            side: THREE.DoubleSide,
+                            depthWrite: false
                         });
                         const wallSolidMat = new THREE.MeshStandardMaterial({
                             color: '#64748b'
@@ -652,7 +778,7 @@
                         const stockByShelf = {};
 
                         stockData.forEach(item => {
-                            const key = (item.estante ?? '').trim();
+                            const key = String(item.estante ?? '').trim();
                             if (!key) return;
                             if (!stockByShelf[key]) stockByShelf[key] = [];
                             stockByShelf[key].push({
@@ -661,7 +787,7 @@
                                 nivel: item.nivel ?? '',
                                 posicion: item.posicion ?? '',
                                 programa: item.programa ?? '',
-                                cantidad: item.cantidad ?? 0,
+                                cantidad: Number(item.cantidad ?? 0) || 0,
                                 vence: item.fecha_vencimiento ?? ''
                             });
                         });
@@ -687,51 +813,116 @@
 
                         const ALTURA_NIVEL = 2.0;
                         const ESPESOR = 0.15;
+                        const MAX_NIVELES = 8;
+                        const MAX_POSICIONES = 8;
 
+                        // --- Utilidades de texto / números para comparar niveles y posiciones ---
+                        // txt: texto normalizado ("Nivel 1 " -> "nivel 1")
+                        const txt = (s) => String(s ?? '').trim().toLowerCase();
+                        // norm: último número del texto sin ceros a la izquierda ("A-01" -> "1", "Nivel 2" -> "2")
+                        const norm = (s) => {
+                            const m = String(s ?? '').match(/\d+/g);
+                            return m ? String(parseInt(m[m.length - 1], 10)) : '';
+                        };
+
+                        // Opciones del selector de niveles (se llenan al dibujar las estanterías)
+                        const nivelesGlobales = new Map();
+
+                        // Placa con texto (alta resolución para que se lea de cerca)
                         function texturaTexto(texto, colorFondo, colorTexto, tamanoFuente) {
                             const canvas = document.createElement('canvas');
-                            canvas.width = 128;
-                            canvas.height = 48;
+                            canvas.width = 256;
+                            canvas.height = 96;
                             const ctx = canvas.getContext('2d');
                             ctx.fillStyle = colorFondo;
-                            ctx.fillRect(0, 0, 128, 48);
+                            ctx.fillRect(0, 0, 256, 96);
+                            ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+                            ctx.lineWidth = 6;
+                            ctx.strokeRect(3, 3, 250, 90);
                             ctx.fillStyle = colorTexto;
-                            ctx.font = 'bold ' + (tamanoFuente || 28) + 'px Arial';
+                            ctx.font = 'bold ' + ((tamanoFuente || 28) * 2) + 'px Arial';
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
                             const cortado = String(texto).length > 9 ? String(texto).slice(0, 8) + '…' : String(texto);
-                            ctx.fillText(cortado, 64, 26);
+                            ctx.fillText(cortado, 128, 52);
                             const tex = new THREE.CanvasTexture(canvas);
-                            tex.anisotropy = 4;
+                            tex.anisotropy = 8;
                             return new THREE.MeshBasicMaterial({
                                 map: tex
                             });
                         }
 
-                        function crearEstanteriaRealista(shelf, rackData) {
+                        function crearEstanteriaRealista(shelf, rackData, px, pz) {
                             const grupo = new THREE.Group();
-                            const nivelesData = [...(shelf.levels ?? [])].sort((a, b) => (parseInt(a.number ?? 0) || 0) - (
-                                parseInt(b.number ?? 0) || 0));
-                            const nNiveles = Math.min(Math.max(nivelesData.length, 3), 5);
+
+                            // Color de las vigas = color del pasillo (identifica el pasillo de un vistazo)
+                            const colorPasillo = (shelf.aisle && shelf.aisle.color) ? shelf.aisle.color : '#f97316';
+                            const colorEstado = colorOcupacion(rackData.pct);
+
+                            // 1. Niveles reales de la BD (acepta "levels" o "niveles"), ordenados por número
+                            const ordenNivel = (l) => parseInt(norm(l.number ?? l.name) || '0', 10) || 0;
+                            const nivelesRaw = [...(shelf.levels ?? shelf.niveles ?? [])].sort((a, b) => ordenNivel(a) -
+                                ordenNivel(b));
+
+                            // Si la estantería no tiene niveles configurados se muestran 3 de referencia
+                            const base = nivelesRaw.length > 0 ?
+                                nivelesRaw.slice(0, MAX_NIVELES) :
+                                [1, 2, 3].map(n => ({
+                                    number: n,
+                                    positions: []
+                                }));
+
+                            // 2. Estructura normalizada: nivel -> posiciones
+                            const niveles = base.map((lv, idx) => {
+                                const number = lv.number ?? lv.name ?? (idx + 1);
+                                let posRaw = lv.positions ?? lv.posiciones ?? [];
+                                if (posRaw.length === 0) {
+                                    posRaw = [{
+                                        name: 'P1'
+                                    }, {
+                                        name: 'P2'
+                                    }, {
+                                        name: 'P3'
+                                    }];
+                                }
+                                const positions = posRaw.slice(0, MAX_POSICIONES).map((p, j) => ({
+                                    name: String(p.name ?? p.code ?? p.number ?? ('P' + (j + 1)))
+                                }));
+                                const numeric = /^\d+$/.test(String(number).trim());
+                                return {
+                                    number: number,
+                                    name: lv.name ?? null,
+                                    key: norm(number) || txt(number),
+                                    label: numeric ? 'Nivel ' + number : String(number),
+                                    positions: positions
+                                };
+                            });
+
+                            const nNiveles = niveles.length;
                             const alturaTotal = nNiveles * ALTURA_NIVEL + 0.8;
 
-                            const matPoste = new THREE.MeshStandardMaterial({
-                                color: '#334155',
-                                roughness: 0.5
-                            });
-                            const matRepisa = new THREE.MeshStandardMaterial({
-                                color: '#94a3b8',
-                                roughness: 0.7
-                            });
-                            const matOcupado = new THREE.MeshStandardMaterial({
-                                color: '#10b981',
-                                roughness: 0.4
-                            });
-                            const matLibre = new THREE.MeshStandardMaterial({
-                                color: '#e2e8f0',
-                                roughness: 0.85
+                            // Registrar niveles para el selector del panel
+                            niveles.forEach(n => {
+                                if (!nivelesGlobales.has(n.key)) nivelesGlobales.set(n.key, n.label);
                             });
 
+                            const matPoste = new THREE.MeshStandardMaterial({
+                                color: '#1e3a5f',
+                                roughness: 0.45,
+                                metalness: 0.3
+                            });
+                            const matTecho = new THREE.MeshStandardMaterial({
+                                color: '#334155',
+                                roughness: 0.6
+                            });
+
+                            // Pseudo-aleatorio estable (para que las cajas no cambien en cada carga)
+                            const seed = (n) => {
+                                const x = Math.sin(n * 12.9898 + (Number(shelf.id) || 1) * 78.233) * 43758.5453;
+                                return x - Math.floor(x);
+                            };
+
+                            // Postes
                             const postes = [
                                 [-1.85, -1.85],
                                 [1.85, -1.85],
@@ -745,136 +936,264 @@
                                 grupo.add(poste);
                             });
 
-                            const posicionesPorNivel = [];
-                            for (let i = 0; i < nNiveles; i++) {
-                                const nivelReal = nivelesData[i] ?? null;
-                                const positionsData = nivelReal && (nivelReal.positions ?? []).length > 0 ? nivelReal
-                                    .positions : [{
-                                        name: 'P1'
-                                    }, {
-                                        name: 'P2'
-                                    }, {
-                                        name: 'P3'
-                                    }];
-                                posicionesPorNivel.push(positionsData.slice(0, 4));
-                            }
+                            // Arriostres diagonales laterales (aspecto de rack industrial)
+                            [-1.85, 1.85].forEach(dx => {
+                                const largo = Math.sqrt(alturaTotal * alturaTotal + 3.7 * 3.7);
+                                const ang = Math.atan2(alturaTotal, 3.7);
+                                const brace = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, largo), matPoste);
+                                brace.position.set(dx, alturaTotal / 2, 0);
+                                brace.rotation.x = ang;
+                                grupo.add(brace);
+                            });
 
-                            const digitos = (s) => (String(s ?? '').match(/\d+/g) || []).join('');
+                            // 3. Asignar cada producto a su nivel y posición reales
+                            const buscarNivel = (item) => {
+                                const raw = item.nivel;
+                                if (raw === null || raw === undefined || String(raw).trim() === '') return -1;
+                                let idx = niveles.findIndex(n => txt(n.number) === txt(raw) || (n.name && txt(n
+                                    .name) === txt(raw)));
+                                if (idx === -1) {
+                                    const k = norm(raw);
+                                    if (k) idx = niveles.findIndex(n => n.key === k);
+                                }
+                                return idx;
+                            };
+
+                            const buscarPosicion = (nivel, item) => {
+                                const raw = item.posicion;
+                                if (raw === null || raw === undefined || String(raw).trim() === '') return -1;
+                                let idx = nivel.positions.findIndex(p => txt(p.name) === txt(raw));
+                                if (idx === -1) {
+                                    const k = norm(raw);
+                                    if (k) idx = nivel.positions.findIndex(p => norm(p.name) === k);
+                                }
+                                return idx;
+                            };
+
+                            // ocupacionMapa["nivel-posicion"] = [productos en ese hueco]
                             const ocupacionMapa = {};
-                            let colocados = 0;
+                            const primerHuecoLibre = (li) => {
+                                for (let j = 0; j < niveles[li].positions.length; j++) {
+                                    if (!ocupacionMapa[li + '-' + j]) return j;
+                                }
+                                return -1;
+                            };
 
                             (rackData.items ?? []).forEach(item => {
-                                const nivDig = digitos(item.nivel);
-                                let li = -1;
-
-                                if (nivDig) {
-                                    li = posicionesPorNivel.findIndex((_, idx) => {
-                                        const numReal = nivelesData[idx] ? digitos(nivelesData[idx].number) :
-                                            String(idx + 1);
-                                        return numReal === nivDig;
-                                    });
-                                    if (li === -1) {
-                                        const idx = parseInt(nivDig, 10) - 1;
-                                        if (idx >= 0 && idx < nNiveles) li = idx;
-                                    }
-                                }
-
-                                if (li === -1 && rackData.pct === null) {
-                                    for (let i = 0; i < nNiveles && li === -1; i++) {
-                                        for (let j = 0; j < posicionesPorNivel[i].length; j++) {
-                                            if (!ocupacionMapa[i + '-' + j]) {
-                                                li = i;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (li === -1) return;
-
-                                const posList = posicionesPorNivel[li];
+                                let li = buscarNivel(item);
                                 let sj = -1;
-                                const posDig = digitos(item.posicion);
 
-                                if (posDig) {
-                                    sj = posList.findIndex(p => digitos(p.name) === posDig);
-                                }
-                                if (sj === -1) {
-                                    for (let j = 0; j < posList.length; j++) {
-                                        if (!ocupacionMapa[li + '-' + j]) {
+                                if (li === -1) {
+                                    // Sin nivel válido: se ubica en el primer hueco libre de la estantería
+                                    for (let i = 0; i < niveles.length; i++) {
+                                        const j = primerHuecoLibre(i);
+                                        if (j !== -1) {
+                                            li = i;
                                             sj = j;
                                             break;
                                         }
                                     }
+                                    if (li === -1) {
+                                        li = 0;
+                                        sj = 0;
+                                    }
+                                } else {
+                                    sj = buscarPosicion(niveles[li], item);
+                                    if (sj === -1) sj = primerHuecoLibre(li);
+                                    if (sj === -1) sj = 0;
                                 }
-                                if (sj === -1) return;
 
                                 const key = li + '-' + sj;
-                                if (!ocupacionMapa[key]) {
-                                    ocupacionMapa[key] = item;
-                                    colocados++;
-                                }
+                                if (!ocupacionMapa[key]) ocupacionMapa[key] = [];
+                                ocupacionMapa[key].push(item);
                             });
 
-                            const totalSlots = posicionesPorNivel.reduce((acc, p) => acc + p.length, 0);
-                            const slotsMeta = rackData.pct !== null ? Math.round(totalSlots * rackData.pct / 100) : colocados;
-                            let extrasPorColocar = Math.max(0, slotsMeta - colocados);
+                            // Helper: placa visible por delante y por detrás de la estantería
+                            const agregarPlaca = (ancho, alto, material, x, y, z, lista) => {
+                                const frente = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), material);
+                                frente.position.set(x, y, z);
+                                grupo.add(frente);
+                                lista.push(frente);
+
+                                const atras = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), material);
+                                atras.position.set(-x, y, -z);
+                                atras.rotation.y = Math.PI;
+                                grupo.add(atras);
+                                lista.push(atras);
+                            };
+
+                            // 4. Dibujar repisas, vigas, huecos y cajas
+                            const levelMeshes = [];
+                            const levelKeys = [];
 
                             for (let i = 0; i < nNiveles; i++) {
+                                const meshesNivel = [];
                                 const yRepisa = 0.4 + i * ALTURA_NIVEL;
+                                const nivel = niveles[i];
 
-                                const repisa = new THREE.Mesh(new THREE.BoxGeometry(4, ESPESOR, 4), matRepisa);
+                                // Materiales propios de este nivel (permiten atenuarlo sin afectar a los demás)
+                                const mats = {
+                                    repisa: new THREE.MeshStandardMaterial({
+                                        color: '#cbd5e1',
+                                        roughness: 0.7
+                                    }),
+                                    viga: new THREE.MeshStandardMaterial({
+                                        color: colorPasillo,
+                                        roughness: 0.45,
+                                        metalness: 0.2
+                                    }),
+                                    ocupado: new THREE.MeshStandardMaterial({
+                                        color: '#10b981',
+                                        roughness: 0.5
+                                    }),
+                                    libre: new THREE.MeshStandardMaterial({
+                                        color: '#e2e8f0',
+                                        roughness: 0.9
+                                    }),
+                                    caja: new THREE.MeshStandardMaterial({
+                                        color: '#c9a36a',
+                                        roughness: 0.85
+                                    }),
+                                    cajaAlt: new THREE.MeshStandardMaterial({
+                                        color: '#b98f55',
+                                        roughness: 0.85
+                                    })
+                                };
+
+                                // Repisa base
+                                const repisa = new THREE.Mesh(new THREE.BoxGeometry(4, ESPESOR, 4), mats.repisa);
                                 repisa.position.set(0, yRepisa, 0);
                                 repisa.castShadow = true;
                                 repisa.receiveShadow = true;
                                 grupo.add(repisa);
+                                meshesNivel.push(repisa);
 
-                                const numNivel = nivelesData[i] ? (nivelesData[i].number ?? (i + 1)) : (i + 1);
-                                const placaNivel = new THREE.Mesh(
-                                    new THREE.PlaneGeometry(0.75, 0.3),
-                                    texturaTexto('N' + numNivel, '#334155', '#ffffff', 30)
-                                );
-                                placaNivel.position.set(-1.85, yRepisa + 0.22, 2.03);
-                                grupo.add(placaNivel);
+                                // Vigas frontal y trasera (color del pasillo)
+                                [1.92, -1.92].forEach(zz => {
+                                    const viga = new THREE.Mesh(new THREE.BoxGeometry(4, 0.18, 0.1), mats.viga);
+                                    viga.position.set(0, yRepisa - 0.12, zz);
+                                    viga.castShadow = true;
+                                    grupo.add(viga);
+                                    meshesNivel.push(viga);
+                                });
 
-                                const posList = posicionesPorNivel[i];
-                                const nSlots = posList.length;
+                                // Placa de nivel (frente y espalda)
+                                const matPlacaNivel = texturaTexto('N' + (norm(nivel.number) || nivel.number),
+                                    '#1e3a5f', '#ffffff', 30);
+                                agregarPlaca(0.8, 0.32, matPlacaNivel, -1.85, yRepisa + 0.24, 2.0, meshesNivel);
+
+                                const nSlots = nivel.positions.length;
                                 const anchoSlot = 3.7 / nSlots;
 
                                 for (let j = 0; j < nSlots; j++) {
-                                    const key = i + '-' + j;
-                                    const itemReal = ocupacionMapa[key];
-                                    let ocupado = Boolean(itemReal);
-
-                                    if (!ocupado && extrasPorColocar > 0) {
-                                        ocupado = true;
-                                        extrasPorColocar--;
-                                    }
+                                    const productosHueco = ocupacionMapa[i + '-' + j] ?? [];
+                                    const ocupado = productosHueco.length > 0;
 
                                     const slot = new THREE.Mesh(
                                         new THREE.BoxGeometry(anchoSlot - 0.25, 0.14, 3.6),
-                                        ocupado ? matOcupado.clone() : matLibre.clone()
+                                        ocupado ? mats.ocupado : mats.libre
                                     );
                                     slot.position.set(-1.85 + anchoSlot / 2 + j * anchoSlot, yRepisa + 0.12, 0);
                                     slot.castShadow = true;
+                                    slot.receiveShadow = true;
                                     grupo.add(slot);
+                                    meshesNivel.push(slot);
 
-                                    const nombrePos = posList[j].name ?? ('P' + (j + 1));
-                                    const placaPos = new THREE.Mesh(
-                                        new THREE.PlaneGeometry(Math.min(anchoSlot - 0.35, 1.1), 0.22),
-                                        texturaTexto(nombrePos, ocupado ? '#065f46' : '#64748b', '#ffffff', 22)
+                                    // Cajas sobre las posiciones con stock (más cantidad = más cajas)
+                                    if (ocupado) {
+                                        const cant = productosHueco.reduce((a, x) => a + (x.cantidad || 0), 0);
+                                        const nCajas = Math.min(3, Math.max(1, Math.ceil(cant / 100)));
+                                        const celda = 3.4 / nCajas;
+                                        const anchoCaja = Math.max(0.3, anchoSlot - 0.5);
+
+                                        for (let k = 0; k < nCajas; k++) {
+                                            const alto = 0.65 + seed(i * 31 + j * 7 + k) * 0.55;
+                                            const caja = new THREE.Mesh(
+                                                new THREE.BoxGeometry(anchoCaja, alto, celda - 0.12),
+                                                k % 2 === 0 ? mats.caja : mats.cajaAlt
+                                            );
+                                            caja.position.set(
+                                                slot.position.x,
+                                                yRepisa + 0.19 + alto / 2,
+                                                -1.7 + celda * (k + 0.5)
+                                            );
+                                            caja.castShadow = true;
+                                            caja.receiveShadow = true;
+                                            grupo.add(caja);
+                                            meshesNivel.push(caja);
+                                        }
+                                    }
+
+                                    // Placa de posición (frente y espalda)
+                                    const matPlacaPos = texturaTexto(nivel.positions[j].name, ocupado ? '#065f46' :
+                                        '#64748b', '#ffffff', 22);
+                                    agregarPlaca(
+                                        Math.min(anchoSlot - 0.3, 1.2),
+                                        0.27,
+                                        matPlacaPos,
+                                        slot.position.x,
+                                        yRepisa + 0.14,
+                                        1.83,
+                                        meshesNivel
                                     );
-                                    placaPos.position.set(slot.position.x, yRepisa + 0.12, 1.82);
-                                    grupo.add(placaPos);
                                 }
+
+                                levelMeshes.push(meshesNivel);
+                                levelKeys.push(nivel.key);
                             }
 
-                            const techo = new THREE.Mesh(new THREE.BoxGeometry(4, ESPESOR, 4), matPoste);
+                            // Techo + franja de estado (color según ocupación)
+                            const techo = new THREE.Mesh(new THREE.BoxGeometry(4, ESPESOR, 4), matTecho);
                             techo.position.set(0, alturaTotal, 0);
+                            techo.castShadow = true;
                             grupo.add(techo);
 
-                            grupo.position.set(shelf.pos_x, 0, shelf.pos_z);
+                            [2.0, -2.0].forEach(zz => {
+                                const franja = new THREE.Mesh(
+                                    new THREE.BoxGeometry(4, 0.22, 0.12),
+                                    new THREE.MeshStandardMaterial({
+                                        color: colorEstado,
+                                        emissive: colorEstado,
+                                        emissiveIntensity: 0.35,
+                                        roughness: 0.4
+                                    })
+                                );
+                                franja.position.set(0, alturaTotal, zz);
+                                grupo.add(franja);
+                            });
+
+                            // Huella en el piso con el color de ocupación
+                            const huella = new THREE.Mesh(
+                                new THREE.BoxGeometry(4.6, 0.06, 4.6),
+                                new THREE.MeshStandardMaterial({
+                                    color: colorEstado,
+                                    transparent: true,
+                                    opacity: 0.35,
+                                    roughness: 0.9,
+                                    depthWrite: false
+                                })
+                            );
+                            huella.position.set(0, 0.03, 0);
+                            grupo.add(huella);
+
+                            grupo.position.set(px, 0, pz);
+                            grupo.userData.levelMeshes = levelMeshes;
+                            grupo.userData.levelKeys = levelKeys;
                             scene.add(grupo);
+
+                            // 5. Estructura para el panel de detalle (niveles y posiciones)
+                            rackData.estructura = niveles.map((n, i) => ({
+                                label: n.label,
+                                posiciones: n.positions.map((p, j) => {
+                                    const arr = ocupacionMapa[i + '-' + j] ?? [];
+                                    return {
+                                        name: p.name,
+                                        ocupado: arr.length > 0,
+                                        producto: arr.map(x => x.producto).join(', '),
+                                        cantidad: arr.reduce((acc, x) => acc + (x.cantidad || 0), 0)
+                                    };
+                                })
+                            }));
 
                             rackData.alturaTotal = alturaTotal;
                             rackData.nNiveles = nNiveles;
@@ -886,16 +1205,23 @@
                         let capTotal = 0;
                         let ocuTotal = 0;
 
-                        dbShelves.forEach(shelf => {
-                            const items = stockByShelf[shelf.name.trim()] ?? [];
+                        dbShelves.forEach((shelf, idx) => {
+                            const nombreEstante = String(shelf.name ?? '').trim();
+                            const items = stockByShelf[nombreEstante] ?? [];
                             const totalStock = items.reduce((acc, i) => acc + (i.cantidad ?? 0), 0);
                             const capacidad = parseInt(shelf.capacidad ?? 0) || 0;
                             const pct = capacidad > 0 ? Math.min(100, Math.round((totalStock / capacidad) * 100)) :
-                            null;
+                                null;
+
+                            // Si la estantería aún no tiene posición guardada, se acomoda en una grilla
+                            const tienePos = shelf.pos_x !== null && shelf.pos_x !== undefined && shelf.pos_z !==
+                                null && shelf.pos_z !== undefined;
+                            const px = tienePos ? (Number(shelf.pos_x) || 0) : -30 + (idx % 6) * 12;
+                            const pz = tienePos ? (Number(shelf.pos_z) || 0) : -12 + Math.floor(idx / 6) * 14;
 
                             const rackData = {
                                 id: shelf.id,
-                                code: shelf.name,
+                                code: nombreEstante,
                                 status: items.length > 0 ? 'Ocupado' : 'Disponible',
                                 aisle: shelf.aisle ? shelf.aisle.name : 'Sin pasillo',
                                 aisleColor: shelf.aisle ? shelf.aisle.color : '#64748b',
@@ -909,8 +1235,8 @@
                                 items: items
                             };
 
-                            // ACÁ CONECTAMOS LA HITBOX INVISIBLE CON EL MODELO VISUAL:
-                            const visualGroup = crearEstanteriaRealista(shelf, rackData);
+                            // Modelo visual + hitbox invisible
+                            const visualGroup = crearEstanteriaRealista(shelf, rackData, px, pz);
 
                             const alturaHitbox = rackData.alturaTotal + 0.5;
                             const hitMat = new THREE.MeshStandardMaterial({
@@ -919,27 +1245,32 @@
                                 opacity: 0,
                                 roughness: 0.3,
                                 emissive: colorOcupacion(pct),
-                                emissiveIntensity: 0
+                                emissiveIntensity: 0,
+                                depthWrite: false
                             });
 
                             const mesh = new THREE.Mesh(new THREE.BoxGeometry(4.4, alturaHitbox, 4.4), hitMat);
-                            mesh.position.set(shelf.pos_x, alturaHitbox / 2, shelf.pos_z);
+                            mesh.position.set(px, alturaHitbox / 2, pz);
                             mesh.userData = rackData;
-                            mesh.userData.visualGroup = visualGroup; // <--- GUARDAMOS REFERENCIA AQUÍ
+                            // La referencia al grupo visual se guarda fuera de userData para no pasarla a Alpine
+                            mesh.visualGroup = visualGroup;
                             racks.push(mesh);
                             scene.add(mesh);
 
+                            const colorHex = '#' + colorOcupacion(pct).toString(16).padStart(6, '0');
                             const markerDiv = document.createElement('div');
-                            markerDiv.className =
-                                `rack-marker px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shadow-md`;
-                            markerDiv.style.backgroundColor = '#' + colorOcupacion(pct).toString(16).padStart(6, '0');
+                            markerDiv.className = 'rack-marker px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold';
+                            markerDiv.style.backgroundColor = colorHex;
+                            markerDiv.style.setProperty('--marker-color', colorHex);
                             markerDiv.style.color = 'white';
                             markerDiv.textContent = capacidad > 0 ? `${rackData.code} · ${pct}%` : `${rackData.code}`;
 
                             labelsContainer.appendChild(markerDiv);
                             markers.push({
                                 element: markerDiv,
-                                pos3D: new THREE.Vector3(shelf.pos_x, alturaHitbox + 1.6, shelf.pos_z)
+                                rackCode: rackData.code,
+                                // La etiqueta queda justo encima de la estantería
+                                pos3D: new THREE.Vector3(px, alturaHitbox + 0.8, pz)
                             });
 
                             // Sumar a estadísticas
@@ -953,6 +1284,39 @@
                         this.stats.capacidadTotal = capTotal;
                         this.stats.ocupadas = ocuTotal;
                         this.stats.ocupacionPct = ubiTotal > 0 ? Math.round((ocuTotal / ubiTotal) * 100) : 0;
+
+                        // Llenar el selector de niveles con los niveles reales
+                        this.levelOptions = [...nivelesGlobales.entries()]
+                            .map(([value, label]) => ({
+                                value,
+                                label
+                            }))
+                            .sort((a, b) => {
+                                const na = parseInt(a.value, 10);
+                                const nb = parseInt(b.value, 10);
+                                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                                return String(a.label).localeCompare(String(b.label));
+                            });
+
+                        // --- FILTRO POR NIVEL: atenúa los demás niveles de todas las estanterías ---
+                        function aplicarFiltroNivel(key) {
+                            const clave = String(key ?? '');
+                            racks.forEach(rack => {
+                                const g = rack.visualGroup;
+                                if (!g) return;
+                                g.userData.levelMeshes.forEach((meshes, i) => {
+                                    const atenuar = clave !== '' && g.userData.levelKeys[i] !== clave;
+                                    meshes.forEach(m => {
+                                        m.material.transparent = atenuar;
+                                        m.material.opacity = atenuar ? 0.12 : 1;
+                                        m.material.depthWrite = !atenuar;
+                                        m.material.needsUpdate = true;
+                                    });
+                                });
+                            });
+                        }
+
+                        window.addEventListener('filter-level', (e) => aplicarFiltroNivel(e.detail));
 
                         // --- RENDERIZADO DINÁMICO DE PASILLOS ---
                         let aisleMeshes = [];
@@ -999,7 +1363,8 @@
                                     color: zona.color,
                                     transparent: true,
                                     opacity: 0.22,
-                                    roughness: 0.9
+                                    roughness: 0.9,
+                                    depthWrite: false
                                 });
                                 const bordeMat = new THREE.MeshStandardMaterial({
                                     color: zona.color,
@@ -1023,21 +1388,23 @@
                                 aisleMeshes.push(zonaPiso);
 
                                 const bordeZona = new THREE.Mesh(new THREE.BoxGeometry(ancho + 0.6, 0.1, 0.5),
-                                bordeMat);
+                                    bordeMat);
                                 bordeZona.position.set(cx, 0.05, maxZ + 0.55);
                                 scene.add(bordeZona);
                                 aisleMeshes.push(bordeZona);
 
                                 const marcadorAisle = document.createElement('div');
                                 marcadorAisle.className =
-                                    'rack-marker px-2 py-0.5 rounded text-[9px] font-bold shadow-md uppercase tracking-widest';
+                                    'rack-marker aisle-marker px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest';
                                 marcadorAisle.style.backgroundColor = zona.color;
+                                marcadorAisle.style.setProperty('--marker-color', zona.color);
                                 marcadorAisle.style.color = 'white';
                                 marcadorAisle.textContent = nombre;
                                 labelsContainer.appendChild(marcadorAisle);
 
                                 const markerObj = {
                                     element: marcadorAisle,
+                                    rackCode: null,
                                     pos3D: new THREE.Vector3(cx, 1.2, maxZ + 1.6)
                                 };
                                 markers.push(markerObj);
@@ -1085,7 +1452,7 @@
                         }
 
                         window.addEventListener('search-rack', (e) => {
-                            const query = e.detail.toLowerCase();
+                            const query = String(e.detail ?? '').toLowerCase();
                             resetAllHighlights();
                             if (!query) return;
                             const found = racks.find(r =>
@@ -1098,28 +1465,34 @@
                                 window.dispatchEvent(new CustomEvent('rack-selected', {
                                     detail: found.userData
                                 }));
-                                controls.target.lerp(found.position, 1);
+                                focusPoint(found.position);
                             }
                         });
 
-                        window.addEventListener('cam-zoom-in', () => camera.position.lerp(controls.target, 0.3));
+                        // --- Zoom animado ---
+                        window.addEventListener('cam-zoom-in', () => {
+                            const offset = camera.position.clone().sub(controls.target).multiplyScalar(0.7);
+                            animateCamera(controls.target.clone().add(offset), controls.target, 400);
+                        });
                         window.addEventListener('cam-zoom-out', () => {
-                            let dir = new THREE.Vector3().subVectors(camera.position, controls.target).multiplyScalar(
-                                1.3);
-                            camera.position.copy(controls.target).add(dir);
+                            const offset = camera.position.clone().sub(controls.target).multiplyScalar(1.4);
+                            animateCamera(controls.target.clone().add(offset), controls.target, 400);
                         });
                         window.addEventListener('cam-reset', () => {
-                            camera.position.lerp(defaultCamPos, 0.1);
-                            controls.target.lerp(defaultTarget, 0.1);
+                            controls.enableRotate = true;
+                            resetAllHighlights();
+                            animateCamera(defaultCamPos, defaultTarget, 800);
                         });
 
+                        // --- Cambio 2D / 3D animado ---
                         window.addEventListener('update-camera-view', (e) => {
                             if (e.detail === '2D') {
-                                camera.position.set(0, 110, 0);
-                                controls.target.set(0, 0, 0);
+                                controls.enableRotate = false;
+                                // z = 0.01 evita la posición degenerada justo sobre el eje vertical
+                                animateCamera(new THREE.Vector3(0, 110, 0.01), new THREE.Vector3(0, 0, 0), 800);
                             } else {
-                                camera.position.copy(defaultCamPos);
-                                controls.target.copy(defaultTarget);
+                                controls.enableRotate = true;
+                                animateCamera(defaultCamPos, defaultTarget, 800);
                             }
                         });
 
@@ -1130,6 +1503,7 @@
                         window.addEventListener('start-moving', () => {
                             if (!selectedObject) return;
                             isMoving = true;
+                            camAnim = null;
                             controls.enabled = false;
                             wrapper.style.cursor = 'move';
                         });
@@ -1140,22 +1514,22 @@
 
                             if (isMoving && selectedObject) {
                                 const intersectPoint = new THREE.Vector3();
-                                raycaster.ray.intersectPlane(floorPlane, intersectPoint);
+                                const hit = raycaster.ray.intersectPlane(floorPlane, intersectPoint);
 
-                                if (intersectPoint) {
+                                if (hit) {
                                     // 1. Movemos la hitbox
                                     selectedObject.position.x = intersectPoint.x;
                                     selectedObject.position.z = intersectPoint.z;
 
                                     // 2. Movemos el MODELO VISUAL (Estantería Realista)
-                                    if (selectedObject.userData.visualGroup) {
-                                        selectedObject.userData.visualGroup.position.x = intersectPoint.x;
-                                        selectedObject.userData.visualGroup.position.z = intersectPoint.z;
+                                    if (selectedObject.visualGroup) {
+                                        selectedObject.visualGroup.position.x = intersectPoint.x;
+                                        selectedObject.visualGroup.position.z = intersectPoint.z;
                                     }
 
-                                    // 3. Movemos la etiqueta
-                                    const matchingMarker = markers.find(m => m.element.textContent.includes(
-                                        selectedObject.userData.code));
+                                    // 3. Movemos la etiqueta (se busca por código exacto, no por texto)
+                                    const matchingMarker = markers.find(m => m.rackCode === selectedObject.userData
+                                        .code);
                                     if (matchingMarker) {
                                         matchingMarker.pos3D.x = intersectPoint.x;
                                         matchingMarker.pos3D.z = intersectPoint.z;
@@ -1231,33 +1605,106 @@
                                 window.dispatchEvent(new CustomEvent('rack-selected', {
                                     detail: selectedObject.userData
                                 }));
-                                controls.target.lerp(selectedObject.position, 0.5);
+                                focusPoint(selectedObject.position);
                             } else {
                                 resetAllHighlights();
                                 window.dispatchEvent(new Event('click-empty'));
                             }
                         });
 
-                        function animate() {
-                            requestAnimationFrame(animate);
-                            controls.update();
-                            renderer.render(scene, camera);
+                        // --- ETIQUETAS: posicionamiento, escala por distancia y anti-solapamiento ---
+                        function actualizarEtiquetas() {
+                            const W = wrapper.clientWidth;
+                            const H = wrapper.clientHeight;
+                            const visibles = [];
 
                             markers.forEach(marker => {
-                                const vector = marker.pos3D.clone();
-                                vector.project(camera);
+                                const vector = marker.pos3D.clone().project(camera);
 
-                                if (vector.z > 1) {
-                                    marker.element.style.display = 'none';
+                                // Fuera del frustum (detrás de la cámara o muy lejos)
+                                if (vector.z > 1 || vector.z < -1) {
+                                    marker.element.style.visibility = 'hidden';
                                     return;
                                 }
 
-                                marker.element.style.display = 'block';
-                                const x = (vector.x * 0.5 + 0.5) * wrapper.clientWidth;
-                                const y = (vector.y * -0.5 + 0.5) * wrapper.clientHeight;
-                                marker.element.style.left = `${x}px`;
-                                marker.element.style.top = `${y}px`;
+                                const x = (vector.x * 0.5 + 0.5) * W;
+                                const y = (vector.y * -0.5 + 0.5) * H;
+
+                                // Fuera de la pantalla
+                                if (x < -80 || x > W + 80 || y < -40 || y > H + 40) {
+                                    marker.element.style.visibility = 'hidden';
+                                    return;
+                                }
+
+                                // Tamaño base (se mide una sola vez)
+                                if (!marker.w) {
+                                    marker.w = marker.element.offsetWidth || 70;
+                                    marker.h = marker.element.offsetHeight || 20;
+                                }
+
+                                const dist = camera.position.distanceTo(marker.pos3D);
+                                const scale = Math.min(1.1, Math.max(0.65, 70 / dist));
+
+                                visibles.push({
+                                    marker,
+                                    x,
+                                    y,
+                                    dist,
+                                    scale
+                                });
                             });
+
+                            // Las estanterías tienen prioridad sobre los pasillos; luego las más cercanas
+                            visibles.sort((a, b) => {
+                                const pa = a.marker.rackCode ? 0 : 1;
+                                const pb = b.marker.rackCode ? 0 : 1;
+                                return pa - pb || a.dist - b.dist;
+                            });
+
+                            const ocupados = [];
+                            const choca = (r) => ocupados.some(p => !(r.r < p.l || r.l > p.r || r.b < p.t || r.t > p.b));
+
+                            visibles.forEach(v => {
+                                const w = v.marker.w * v.scale;
+                                const h = v.marker.h * v.scale;
+                                let offset = 0;
+                                let colocado = false;
+                                let rect;
+
+                                // Si choca con otra etiqueta, se sube hasta 3 veces; si aun así choca, se oculta
+                                for (let intento = 0; intento < 4; intento++) {
+                                    rect = {
+                                        l: v.x - w / 2,
+                                        r: v.x + w / 2,
+                                        t: v.y - offset - h,
+                                        b: v.y - offset
+                                    };
+                                    if (!choca(rect)) {
+                                        ocupados.push(rect);
+                                        colocado = true;
+                                        break;
+                                    }
+                                    offset += h + 3;
+                                }
+
+                                const el = v.marker.element;
+                                if (!colocado) {
+                                    el.style.visibility = 'hidden';
+                                    return;
+                                }
+                                el.style.visibility = 'visible';
+                                el.style.left = `${v.x}px`;
+                                el.style.top = `${v.y - offset}px`;
+                                el.style.transform = `translate(-50%, -100%) scale(${v.scale})`;
+                            });
+                        }
+
+                        function animate() {
+                            requestAnimationFrame(animate);
+                            stepCameraAnimation();
+                            controls.update();
+                            renderer.render(scene, camera);
+                            actualizarEtiquetas();
                         }
                         animate();
 
