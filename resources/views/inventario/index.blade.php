@@ -243,7 +243,7 @@
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Programa</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock Físico Acumulado</th>
+                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
                             <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">QR</th>
                         </tr>
@@ -998,7 +998,7 @@
                                 @php
                                     $mObj = is_object($mItem) ? $mItem : (object) $mItem;
                                     $rawDateMerma = data_get($mObj, 'updated_at') ?? data_get($mObj, 'created_at');
-                                    
+
                                     // Para filtros en JS
                                     $fechaISO = '';
                                     if ($rawDateMerma) {
@@ -1075,7 +1075,7 @@
                     <div class="text-[13px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-3">
                         <span>Mostrando <span id="mermasCount" class="text-rose-600 font-black">0</span> res.</span>
                         <div class="h-4 w-px bg-slate-300"></div>
-                        <span>Valor Total: 
+                        <span>Valor Total:
                             <span id="mermaTotalDisplay" class="inline-flex items-center px-3 py-1.5 rounded-lg text-[13px] font-extrabold bg-rose-600 text-white font-mono-das ml-2 shadow-sm">
                                 $ 0
                             </span>
@@ -1324,7 +1324,7 @@
             if (motivoInput) motivoInput.value = motivo;
 
             toggleMotivoField(selectedVal);
-            
+
             // Si el modal de merma está abierto, lo ocultamos para que no colisionen
             closeMerma();
             document.getElementById('editLoteModal').classList.remove('hidden');
@@ -1392,7 +1392,7 @@
         // ====== LÓGICA FILTROS AVANZADOS MERMA ======
         function openMerma() {
             document.getElementById('mermaModal').classList.remove('hidden');
-            filterMermas(); 
+            filterMermas();
         }
 
         function closeMerma() {
@@ -1404,11 +1404,11 @@
             const dateFrom = document.getElementById('mermaDateFrom')?.value || '';
             const dateTo = document.getElementById('mermaDateTo')?.value || '';
             const userFilter = document.getElementById('mermaUserFilter')?.value || '';
-            
+
             const rows = document.querySelectorAll('.merma-row');
             const filteredEmptyRow = document.getElementById('filteredEmptyRow');
             const mainEmptyRow = document.getElementById('emptyMermasRow');
-            
+
             let visibleCount = 0;
             let totalValue = 0;
 
