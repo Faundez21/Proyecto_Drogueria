@@ -76,7 +76,6 @@
             transform: translateX(-50%);
             border-width: 5px 5px 0;
             border-style: solid;
-            border-color: inherit;
             border-color: var(--marker-color, #64748b) transparent transparent transparent;
         }
 
@@ -306,7 +305,7 @@
 
                         <!-- Contenido interior del Sidebar -->
                         <div x-show="sidebarOpen" x-transition
-                            class="p-3 sm:p-4 pt-0 border-t border-slate-700/50 mt-1 flex flex-col gap-3">
+                            class="p-3 sm:p-4 pt-0 border-t border-slate-700/50 mt-1 flex flex-col gap-3 max-h-[55vh] overflow-y-auto">
 
                             <!-- Selector de nivel (dinámico: se llena con los niveles reales) -->
                             <div class="relative">
@@ -358,10 +357,27 @@
                                     <span class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span>
                                     Sin capacidad definida
                                 </div>
+                            </div>
+
+                            <!-- Leyenda de vencimiento (color de la repisa bajo las cajas) -->
+                            <div
+                                class="flex flex-col gap-2.5 pt-3 border-t border-slate-700/60 text-xs sm:text-sm font-medium text-gray-300">
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Vencimiento de las
+                                    cajas</p>
                                 <div class="flex items-center gap-3">
-                                    <span class="w-3.5 h-3.5 rounded bg-[#c9a36a]"></span>
-                                    Posición con stock (cajas)
+                                    <span class="w-3.5 h-3.5 rounded bg-[#10b981]"></span>
+                                    Vigente
                                 </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#f59e0b]"></span>
+                                    Vence en &le; 90 días
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#ef4444]"></span>
+                                    Vencido o &le; 30 días
+                                </div>
+                                <p class="text-[10px] text-gray-500 leading-snug">Pasa el mouse sobre una caja para ver su
+                                    producto, lote y vencimiento.</p>
                             </div>
                         </div>
                     </aside>
@@ -424,9 +440,14 @@
                                                 <div class="flex flex-wrap gap-1 mt-1">
                                                     <template x-for="(pos, pi) in nivel.posiciones" :key="'p' + pi">
                                                         <span class="px-1.5 py-0.5 rounded text-[10px] font-mono border"
-                                                            :class="pos.ocupado ?
-                                                                'bg-emerald-900/40 text-emerald-300 border-emerald-800' :
-                                                                'bg-slate-800 text-gray-400 border-slate-700'"
+                                                            :class="!pos.ocupado ?
+                                                                'bg-slate-800 text-gray-400 border-slate-700' :
+                                                                (pos.estado === 'danger' ?
+                                                                    'bg-rose-900/40 text-rose-300 border-rose-800' :
+                                                                    (pos.estado === 'warn' ?
+                                                                        'bg-amber-900/40 text-amber-300 border-amber-800' :
+                                                                        'bg-emerald-900/40 text-emerald-300 border-emerald-800'
+                                                                    ))"
                                                             :title="pos.ocupado ? pos.producto + ' · ' + pos.cantidad + ' u' :
                                                                 'Libre'"
                                                             x-text="pos.name + (pos.ocupado ? ' · ' + pos.cantidad : '')"></span>
@@ -455,6 +476,11 @@
                                                 </p>
                                                 <p class="text-[10px] text-blue-400 font-semibold" x-show="item.programa"
                                                     x-text="item.programa"></p>
+                                                <p class="text-[10px] font-semibold" x-show="item.vence"
+                                                    :class="item.venceEstado === 'danger' ? 'text-rose-400' : (item
+                                                        .venceEstado === 'warn' ? 'text-orange-400' : 'text-emerald-400')"
+                                                    x-text="'Vence: ' + item.vence + (item.venceDias !== null ? ' (' + (item.venceDias < 0 ? 'vencido' : item.venceDias + ' d') + ')' : '')">
+                                                </p>
                                             </div>
                                             <span class="text-emerald-400 font-bold text-xs shrink-0"
                                                 x-text="item.cantidad + ' u'"></span>
@@ -654,7 +680,7 @@
                         const defaultTarget = new THREE.Vector3(0, -5, 0);
                         controls.target.copy(defaultTarget);
                         controls.maxPolarAngle = Math.PI / 2 - 0.05;
-                        controls.minDistance = 10;
+                        controls.minDistance = 8;
                         controls.maxDistance = 220;
                         controls.enableDamping = true;
                         controls.dampingFactor = 0.05;
@@ -667,7 +693,7 @@
                         dirLight.castShadow = true;
                         dirLight.shadow.mapSize.width = 2048;
                         dirLight.shadow.mapSize.height = 2048;
-                        // Área de sombras que cubre toda la bodega (antes cubría solo una zona pequeña)
+                        // Área de sombras que cubre toda la bodega
                         dirLight.shadow.camera.left = -60;
                         dirLight.shadow.camera.right = 60;
                         dirLight.shadow.camera.top = 60;
@@ -707,7 +733,7 @@
 
                         function focusPoint(point) {
                             const dir = camera.position.clone().sub(controls.target).normalize();
-                            const dist = Math.min(Math.max(camera.position.distanceTo(controls.target) * 0.7, 28), 60);
+                            const dist = Math.min(Math.max(camera.position.distanceTo(controls.target) * 0.7, 24), 60);
                             animateCamera(point.clone().add(dir.multiplyScalar(dist)), point, 700);
                         }
 
@@ -772,6 +798,96 @@
                         // --- VARIABLES GLOBALES DE THREEJS ---
                         const racks = [];
                         const markers = [];
+                        const cajasMeshes = []; // todas las cajas (para el hover con detalle)
+                        const pulsers = []; // materiales que "laten" (alertas de vencimiento, LED)
+
+                        // --- Utilidades de texto / números ---
+                        // txt: texto normalizado ("Nivel 1 " -> "nivel 1")
+                        const txt = (s) => String(s ?? '').trim().toLowerCase();
+                        // norm: último número del texto sin ceros a la izquierda ("A-01" -> "1", "Nivel 2" -> "2")
+                        const norm = (s) => {
+                            const m = String(s ?? '').match(/\d+/g);
+                            return m ? String(parseInt(m[m.length - 1], 10)) : '';
+                        };
+                        const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
+                            '&': '&amp;',
+                            '<': '&lt;',
+                            '>': '&gt;',
+                            '"': '&quot;',
+                            "'": '&#39;'
+                        } [c]));
+
+                        function rng(seed) {
+                            let s = (seed >>> 0) || 1;
+                            return () => {
+                                s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+                                return s / 4294967296;
+                            };
+                        }
+
+                        function hashStr(str) {
+                            let h = 2166136261;
+                            const s = String(str ?? '');
+                            for (let i = 0; i < s.length; i++) {
+                                h ^= s.charCodeAt(i);
+                                h = Math.imul(h, 16777619);
+                            }
+                            return h >>> 0;
+                        }
+
+                        // --- Vencimientos ---
+                        function parseFecha(f) {
+                            if (!f) return null;
+                            const s = String(f);
+                            const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                            const d = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(s);
+                            return isNaN(d.getTime()) ? null : d;
+                        }
+
+                        function estadoVence(f) {
+                            const d = parseFecha(f);
+                            if (!d) {
+                                return {
+                                    estado: 'none',
+                                    dias: null,
+                                    color: '#64748b',
+                                    texto: 'SIN VENCIMIENTO',
+                                    fecha: ''
+                                };
+                            }
+                            const hoy = new Date();
+                            hoy.setHours(0, 0, 0, 0);
+                            const dias = Math.round((d - hoy) / 86400000);
+                            const fecha = d.toLocaleDateString('es-CL');
+                            if (dias < 0) return {
+                                estado: 'danger',
+                                dias,
+                                color: '#dc2626',
+                                texto: 'VENCIDO',
+                                fecha
+                            };
+                            if (dias <= 30) return {
+                                estado: 'danger',
+                                dias,
+                                color: '#ef4444',
+                                texto: 'VENCE EN ' + dias + ' D',
+                                fecha
+                            };
+                            if (dias <= 90) return {
+                                estado: 'warn',
+                                dias,
+                                color: '#f97316',
+                                texto: 'VENCE EN ' + dias + ' D',
+                                fecha
+                            };
+                            return {
+                                estado: 'ok',
+                                dias,
+                                color: '#16a34a',
+                                texto: 'VIGENTE',
+                                fecha
+                            };
+                        }
 
                         const dbShelves = @json($shelves ?? []);
                         const stockData = @json($stock ?? []);
@@ -781,6 +897,7 @@
                             const key = String(item.estante ?? '').trim();
                             if (!key) return;
                             if (!stockByShelf[key]) stockByShelf[key] = [];
+                            const ev = estadoVence(item.fecha_vencimiento);
                             stockByShelf[key].push({
                                 producto: item.producto,
                                 lote: item.lote ?? 'S/L',
@@ -788,7 +905,11 @@
                                 posicion: item.posicion ?? '',
                                 programa: item.programa ?? '',
                                 cantidad: Number(item.cantidad ?? 0) || 0,
-                                vence: item.fecha_vencimiento ?? ''
+                                vence: ev.fecha,
+                                venceEstado: ev.estado,
+                                venceDias: ev.dias,
+                                venceTexto: ev.texto,
+                                venceColor: ev.color
                             });
                         });
 
@@ -816,17 +937,12 @@
                         const MAX_NIVELES = 8;
                         const MAX_POSICIONES = 8;
 
-                        // --- Utilidades de texto / números para comparar niveles y posiciones ---
-                        // txt: texto normalizado ("Nivel 1 " -> "nivel 1")
-                        const txt = (s) => String(s ?? '').trim().toLowerCase();
-                        // norm: último número del texto sin ceros a la izquierda ("A-01" -> "1", "Nivel 2" -> "2")
-                        const norm = (s) => {
-                            const m = String(s ?? '').match(/\d+/g);
-                            return m ? String(parseInt(m[m.length - 1], 10)) : '';
-                        };
-
                         // Opciones del selector de niveles (se llenan al dibujar las estanterías)
                         const nivelesGlobales = new Map();
+
+                        // =====================================================
+                        // TEXTURAS PROCEDURALES (cartón, cinta, madera, etiquetas, acero)
+                        // =====================================================
 
                         // Placa con texto (alta resolución para que se lea de cerca)
                         function texturaTexto(texto, colorFondo, colorTexto, tamanoFuente) {
@@ -852,12 +968,518 @@
                             });
                         }
 
+                        // --- Cartón kraft ---
+                        function dibujarKraft(ctx, w, h, tono, semilla) {
+                            const r = rng(semilla);
+                            ctx.fillStyle = tono;
+                            ctx.fillRect(0, 0, w, h);
+                            // fibras
+                            for (let i = 0; i < 900; i++) {
+                                ctx.fillStyle = r() > 0.5 ? 'rgba(120,80,30,0.07)' : 'rgba(255,235,190,0.08)';
+                                ctx.fillRect(r() * w, r() * h, r() * 3 + 1, r() * 3 + 1);
+                            }
+                            // corrugado sutil
+                            ctx.strokeStyle = 'rgba(90,60,20,0.07)';
+                            ctx.lineWidth = 1;
+                            for (let y = 0; y < h; y += 6) {
+                                ctx.beginPath();
+                                ctx.moveTo(0, y);
+                                ctx.lineTo(w, y);
+                                ctx.stroke();
+                            }
+                        }
+
+                        // Bordes oscurecidos: simulan el bisel / arista de la caja
+                        function bordeSombra(ctx, w, h) {
+                            const ancho = 20;
+                            const col0 = 'rgba(60,35,10,0.38)';
+                            const col1 = 'rgba(60,35,10,0)';
+                            let g = ctx.createLinearGradient(0, 0, ancho, 0);
+                            g.addColorStop(0, col0);
+                            g.addColorStop(1, col1);
+                            ctx.fillStyle = g;
+                            ctx.fillRect(0, 0, ancho, h);
+                            g = ctx.createLinearGradient(w, 0, w - ancho, 0);
+                            g.addColorStop(0, col0);
+                            g.addColorStop(1, col1);
+                            ctx.fillStyle = g;
+                            ctx.fillRect(w - ancho, 0, ancho, h);
+                            g = ctx.createLinearGradient(0, 0, 0, ancho);
+                            g.addColorStop(0, col0);
+                            g.addColorStop(1, col1);
+                            ctx.fillStyle = g;
+                            ctx.fillRect(0, 0, w, ancho);
+                            g = ctx.createLinearGradient(0, h, 0, h - ancho);
+                            g.addColorStop(0, col0);
+                            g.addColorStop(1, col1);
+                            ctx.fillStyle = g;
+                            ctx.fillRect(0, h - ancho, w, ancho);
+                        }
+
+                        function dibujarCinta(ctx, x, y, w, h) {
+                            ctx.fillStyle = 'rgba(236,222,188,0.92)';
+                            ctx.fillRect(x, y, w, h);
+                            ctx.fillStyle = 'rgba(255,255,255,0.28)';
+                            ctx.fillRect(x, y, w, Math.max(4, h * 0.22));
+                            ctx.strokeStyle = 'rgba(120,100,60,0.55)';
+                            ctx.lineWidth = 1.5;
+                            ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+                        }
+
+                        const kraftCache = {};
+
+                        function getKraft(t) {
+                            if (kraftCache[t]) return kraftCache[t];
+                            const tonos = ['#c9a36a', '#b98f55', '#d2ad76'];
+                            const tono = tonos[t % 3];
+                            const crear = (extra) => {
+                                const c = document.createElement('canvas');
+                                c.width = 256;
+                                c.height = 256;
+                                const ctx = c.getContext('2d');
+                                dibujarKraft(ctx, 256, 256, tono, t * 977 + 13);
+                                if (extra) extra(ctx);
+                                bordeSombra(ctx, 256, 256);
+                                const tex = new THREE.CanvasTexture(c);
+                                tex.anisotropy = 8;
+                                return tex;
+                            };
+
+                            const solapa = (ctx) => {
+                                ctx.strokeStyle = 'rgba(70,45,15,0.45)';
+                                ctx.lineWidth = 3;
+                                ctx.beginPath();
+                                ctx.moveTo(0, 30);
+                                ctx.lineTo(256, 30);
+                                ctx.stroke();
+                                dibujarCinta(ctx, 104, 0, 48, 78);
+                            };
+
+                            kraftCache[t] = {
+                                // Laterales: cinta que baja desde la tapa + símbolos de embalaje
+                                side: crear(ctx => {
+                                    dibujarCinta(ctx, 104, 0, 48, 84);
+                                    ctx.strokeStyle = 'rgba(70,45,15,0.45)';
+                                    ctx.lineWidth = 3;
+                                    ctx.beginPath();
+                                    ctx.moveTo(0, 30);
+                                    ctx.lineTo(256, 30);
+                                    ctx.stroke();
+                                    ctx.fillStyle = 'rgba(30,20,10,0.78)';
+                                    ctx.font = 'bold 54px Arial';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'middle';
+                                    ctx.fillText('↑↑', 70, 190);
+                                    ctx.strokeStyle = 'rgba(30,20,10,0.78)';
+                                    ctx.lineWidth = 4;
+                                    ctx.strokeRect(24, 150, 92, 80);
+                                    ctx.fillStyle = 'rgba(185,28,28,0.9)';
+                                    ctx.fillRect(140, 168, 96, 44);
+                                    ctx.fillStyle = '#fff';
+                                    ctx.font = 'bold 24px Arial';
+                                    ctx.fillText('FRÁGIL', 188, 191);
+                                }),
+                                // Tapa: junta de solapas + cinta de embalaje
+                                top: crear(ctx => {
+                                    ctx.strokeStyle = 'rgba(70,45,15,0.6)';
+                                    ctx.lineWidth = 3;
+                                    ctx.beginPath();
+                                    ctx.moveTo(0, 128);
+                                    ctx.lineTo(256, 128);
+                                    ctx.stroke();
+                                    dibujarCinta(ctx, 0, 106, 256, 44);
+                                    ctx.strokeStyle = 'rgba(70,45,15,0.25)';
+                                    ctx.lineWidth = 2;
+                                    ctx.strokeRect(14, 14, 228, 228);
+                                }),
+                                bottom: crear(null),
+                                front: crear(solapa),
+                                back: crear(solapa)
+                            };
+                            return kraftCache[t];
+                        }
+
+                        // --- Madera de pallet ---
+                        let woodTex = null;
+
+                        function getWood() {
+                            if (woodTex) return woodTex;
+                            const c = document.createElement('canvas');
+                            c.width = 256;
+                            c.height = 256;
+                            const ctx = c.getContext('2d');
+                            const r = rng(4242);
+                            ctx.fillStyle = '#d4b483';
+                            ctx.fillRect(0, 0, 256, 256);
+                            const tablas = 6;
+                            for (let i = 0; i < tablas; i++) {
+                                const y0 = (256 / tablas) * i;
+                                const sombra = 0.9 + r() * 0.2;
+                                ctx.fillStyle = `rgba(${Math.floor(160 * sombra)},${Math.floor(120 * sombra)},${Math.floor(70 * sombra)},0.35)`;
+                                ctx.fillRect(0, y0, 256, 256 / tablas);
+                                // vetas
+                                for (let k = 0; k < 14; k++) {
+                                    ctx.strokeStyle = 'rgba(90,60,25,0.18)';
+                                    ctx.lineWidth = 1;
+                                    const yy = y0 + r() * (256 / tablas);
+                                    ctx.beginPath();
+                                    ctx.moveTo(0, yy);
+                                    ctx.bezierCurveTo(80, yy + (r() - 0.5) * 6, 170, yy + (r() - 0.5) * 6, 256, yy);
+                                    ctx.stroke();
+                                }
+                                ctx.fillStyle = 'rgba(60,40,15,0.55)';
+                                ctx.fillRect(0, y0, 256, 3);
+                            }
+                            woodTex = new THREE.CanvasTexture(c);
+                            woodTex.anisotropy = 8;
+                            return woodTex;
+                        }
+
+                        // --- Texto en varias líneas con elipsis ---
+                        function lineasTexto(ctx, texto, maxW, maxLineas) {
+                            const palabras = String(texto ?? '').split(/\s+/).filter(Boolean);
+                            const lineas = [];
+                            let actual = '';
+                            for (let i = 0; i < palabras.length; i++) {
+                                const prueba = actual ? actual + ' ' + palabras[i] : palabras[i];
+                                if (ctx.measureText(prueba).width <= maxW || !actual) {
+                                    actual = prueba;
+                                } else {
+                                    lineas.push(actual);
+                                    actual = palabras[i];
+                                    if (lineas.length === maxLineas - 1) {
+                                        actual = palabras.slice(i).join(' ');
+                                        break;
+                                    }
+                                }
+                            }
+                            if (actual) lineas.push(actual);
+                            return lineas.slice(0, maxLineas).map(l => {
+                                let s = l;
+                                while (ctx.measureText(s).width > maxW && s.length > 1) s = s.slice(0, -1);
+                                return s !== l ? s.slice(0, -1) + '…' : s;
+                            });
+                        }
+
+                        // --- Etiqueta del producto pegada en la caja ---
+                        const labelCache = {};
+
+                        function getLabelTex(prod) {
+                            const key = [prod.producto, prod.lote, prod.cantidad, prod.vence, prod.programa].join('|');
+                            if (labelCache[key]) return {
+                                key,
+                                tex: labelCache[key]
+                            };
+
+                            const W = 384;
+                            const H = 256;
+                            const c = document.createElement('canvas');
+                            c.width = W;
+                            c.height = H;
+                            const ctx = c.getContext('2d');
+
+                            // Fondo y marco
+                            ctx.fillStyle = '#f8fafc';
+                            ctx.fillRect(0, 0, W, H);
+                            ctx.strokeStyle = '#94a3b8';
+                            ctx.lineWidth = 4;
+                            ctx.strokeRect(2, 2, W - 4, H - 4);
+
+                            // Cabecera con el estado de vencimiento
+                            ctx.fillStyle = prod.venceColor || '#64748b';
+                            ctx.fillRect(0, 0, W, 52);
+                            ctx.fillStyle = '#ffffff';
+                            ctx.font = 'bold 26px Arial';
+                            ctx.textAlign = 'left';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(String(prod.venceTexto || ''), 14, 28);
+
+                            // Programa (chip a la derecha)
+                            if (prod.programa) {
+                                ctx.font = 'bold 20px Arial';
+                                const t = String(prod.programa).slice(0, 12).toUpperCase();
+                                const w = ctx.measureText(t).width + 18;
+                                ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                                ctx.fillRect(W - w - 10, 10, w, 32);
+                                ctx.fillStyle = '#ffffff';
+                                ctx.textAlign = 'right';
+                                ctx.fillText(t, W - 19, 27);
+                            }
+
+                            // Nombre del producto (hasta 2 líneas)
+                            ctx.fillStyle = '#0f172a';
+                            ctx.font = 'bold 30px Arial';
+                            ctx.textAlign = 'left';
+                            ctx.textBaseline = 'alphabetic';
+                            lineasTexto(ctx, prod.producto, W - 28, 2).forEach((l, i) => ctx.fillText(l, 14, 92 + i *
+                                34));
+
+                            // Lote, cantidad y fecha
+                            ctx.font = 'bold 22px monospace';
+                            ctx.fillStyle = '#334155';
+                            ctx.fillText('LOTE ' + String(prod.lote ?? '').slice(0, 14), 14, 154);
+                            ctx.fillStyle = '#047857';
+                            ctx.fillText('CANT ' + Number(prod.cantidad || 0).toLocaleString('es-CL') + ' u', 14, 182);
+                            if (prod.vence) {
+                                ctx.font = '18px monospace';
+                                ctx.fillStyle = '#64748b';
+                                ctx.textAlign = 'right';
+                                ctx.fillText('VENCE ' + prod.vence, W - 14, 154);
+                            }
+
+                            // Código de barras
+                            const r = rng(hashStr(key));
+                            let x = 14;
+                            let negro = true;
+                            while (x < W - 14) {
+                                const bw = 2 + Math.floor(r() * 4);
+                                if (negro) {
+                                    ctx.fillStyle = '#0f172a';
+                                    ctx.fillRect(x, 196, Math.min(bw, W - 14 - x), 44);
+                                }
+                                x += bw;
+                                negro = !negro;
+                            }
+
+                            const tex = new THREE.CanvasTexture(c);
+                            tex.anisotropy = 8;
+                            labelCache[key] = tex;
+                            return {
+                                key,
+                                tex
+                            };
+                        }
+
+                        // --- Perilla (dial) de la caja fuerte ---
+                        let dialTex = null;
+
+                        function getDialTex() {
+                            if (dialTex) return dialTex;
+                            const S = 256;
+                            const c = document.createElement('canvas');
+                            c.width = S;
+                            c.height = S;
+                            const ctx = c.getContext('2d');
+                            const g = ctx.createRadialGradient(S / 2, S / 2, 10, S / 2, S / 2, S / 2);
+                            g.addColorStop(0, '#e2e8f0');
+                            g.addColorStop(0.7, '#94a3b8');
+                            g.addColorStop(1, '#475569');
+                            ctx.fillStyle = g;
+                            ctx.beginPath();
+                            ctx.arc(S / 2, S / 2, S / 2, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            ctx.strokeStyle = '#0f172a';
+                            ctx.fillStyle = '#0f172a';
+                            for (let i = 0; i < 100; i++) {
+                                const a = (i / 100) * Math.PI * 2 - Math.PI / 2;
+                                const largo = i % 10 === 0 ? 20 : 10;
+                                ctx.lineWidth = i % 10 === 0 ? 3 : 1.5;
+                                ctx.beginPath();
+                                ctx.moveTo(S / 2 + Math.cos(a) * (S / 2 - 8), S / 2 + Math.sin(a) * (S / 2 - 8));
+                                ctx.lineTo(S / 2 + Math.cos(a) * (S / 2 - 8 - largo), S / 2 + Math.sin(a) * (S / 2 - 8 -
+                                    largo));
+                                ctx.stroke();
+                            }
+                            ctx.font = 'bold 18px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            for (let i = 0; i < 10; i++) {
+                                const a = (i / 10) * Math.PI * 2 - Math.PI / 2;
+                                ctx.fillText(String(i * 10), S / 2 + Math.cos(a) * (S / 2 - 46), S / 2 + Math.sin(a) * (
+                                    S / 2 - 46));
+                            }
+                            // Tapa central
+                            const g2 = ctx.createRadialGradient(S / 2 - 8, S / 2 - 8, 4, S / 2, S / 2, 48);
+                            g2.addColorStop(0, '#64748b');
+                            g2.addColorStop(1, '#0f172a');
+                            ctx.fillStyle = g2;
+                            ctx.beginPath();
+                            ctx.arc(S / 2, S / 2, 46, 0, Math.PI * 2);
+                            ctx.fill();
+                            // Indicador rojo
+                            ctx.fillStyle = '#dc2626';
+                            ctx.beginPath();
+                            ctx.moveTo(S / 2, 6);
+                            ctx.lineTo(S / 2 - 11, 30);
+                            ctx.lineTo(S / 2 + 11, 30);
+                            ctx.closePath();
+                            ctx.fill();
+
+                            dialTex = new THREE.CanvasTexture(c);
+                            dialTex.anisotropy = 8;
+                            return dialTex;
+                        }
+
+                        // --- Puerta de la caja fuerte ---
+                        function texturaPuertaCajaFuerte(codigo, colorEstadoHex, w, h) {
+                            const W = 512;
+                            const H = Math.min(2048, Math.max(512, Math.round(512 * h / w)));
+                            const c = document.createElement('canvas');
+                            c.width = W;
+                            c.height = H;
+                            const ctx = c.getContext('2d');
+
+                            // Acero cepillado
+                            const g = ctx.createLinearGradient(0, 0, W, 0);
+                            g.addColorStop(0, '#5b6b80');
+                            g.addColorStop(0.5, '#8696ab');
+                            g.addColorStop(1, '#5b6b80');
+                            ctx.fillStyle = g;
+                            ctx.fillRect(0, 0, W, H);
+                            const r = rng(hashStr(codigo) + 5);
+                            for (let i = 0; i < 700; i++) {
+                                ctx.fillStyle = r() > 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+                                ctx.fillRect(0, r() * H, W, 1 + r() * 1.5);
+                            }
+
+                            // Marco biselado
+                            ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+                            ctx.lineWidth = 6;
+                            ctx.strokeRect(10, 10, W - 20, H - 20);
+                            ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+                            ctx.lineWidth = 4;
+                            ctx.strokeRect(24, 24, W - 48, H - 48);
+
+                            // Remaches
+                            [
+                                [42, 42],
+                                [W - 42, 42],
+                                [42, H - 42],
+                                [W - 42, H - 42],
+                                [42, H / 2],
+                                [W - 42, H / 2]
+                            ].forEach(([x, y]) => {
+                                const rg = ctx.createRadialGradient(x - 2, y - 2, 1, x, y, 9);
+                                rg.addColorStop(0, '#f1f5f9');
+                                rg.addColorStop(1, '#64748b');
+                                ctx.fillStyle = rg;
+                                ctx.beginPath();
+                                ctx.arc(x, y, 9, 0, Math.PI * 2);
+                                ctx.fill();
+                                ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+                                ctx.lineWidth = 1.5;
+                                ctx.stroke();
+                            });
+
+                            // Placa con el nombre
+                            const px = 56,
+                                py = 70,
+                                pw = W - 170,
+                                ph = 130;
+                            ctx.fillStyle = '#0b1220';
+                            ctx.fillRect(px, py, pw, ph);
+                            ctx.strokeStyle = '#facc15';
+                            ctx.lineWidth = 4;
+                            ctx.strokeRect(px + 2, py + 2, pw - 4, ph - 4);
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            let fs = 46;
+                            ctx.font = 'bold ' + fs + 'px Arial';
+                            while (ctx.measureText('CAJA FUERTE').width > pw - 24 && fs > 20) {
+                                fs -= 2;
+                                ctx.font = 'bold ' + fs + 'px Arial';
+                            }
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillText('CAJA FUERTE', px + pw / 2, py + 48);
+                            ctx.fillStyle = '#facc15';
+                            fs = 34;
+                            ctx.font = 'bold ' + fs + 'px Arial';
+                            const cod = String(codigo ?? '').toUpperCase();
+                            while (ctx.measureText(cod).width > pw - 24 && fs > 16) {
+                                fs -= 2;
+                                ctx.font = 'bold ' + fs + 'px Arial';
+                            }
+                            ctx.fillText(cod, px + pw / 2, py + 94);
+
+                            // Banda de acceso restringido
+                            const by = py + ph + 26;
+                            ctx.fillStyle = '#7f1d1d';
+                            ctx.fillRect(px, by, pw + 54, 56);
+                            ctx.fillStyle = '#ffffff';
+                            ctx.font = 'bold 26px Arial';
+                            ctx.fillText('ACCESO RESTRINGIDO', px + (pw + 54) / 2, by + 29);
+
+                            // Alojamiento del LED (coincide con la esfera 3D)
+                            const ledX = (3.35 / 3.7) * W;
+                            const ledY = (0.55 / h) * H;
+                            ctx.fillStyle = '#0b1220';
+                            ctx.beginPath();
+                            ctx.arc(ledX, ledY, 30, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.strokeStyle = '#94a3b8';
+                            ctx.lineWidth = 4;
+                            ctx.stroke();
+
+                            // Alojamiento de la perilla (coincide con el dial 3D)
+                            const dialX = (2.75 / 3.7) * W;
+                            const dialY = H / 2 + 0.08 * H;
+                            ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+                            ctx.lineWidth = 8;
+                            ctx.beginPath();
+                            ctx.arc(dialX, dialY, (0.66 / 3.7) * W, 0, Math.PI * 2);
+                            ctx.stroke();
+                            ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+                            ctx.lineWidth = 3;
+                            ctx.beginPath();
+                            ctx.arc(dialX, dialY, (0.66 / 3.7) * W + 6, 0, Math.PI * 2);
+                            ctx.stroke();
+
+                            // Teclado numérico grabado
+                            const kx = 92;
+                            const ky = dialY - 80;
+                            ctx.fillStyle = 'rgba(0,0,0,0.28)';
+                            ctx.fillRect(kx - 18, ky - 22, 116, 170);
+                            for (let fila = 0; fila < 4; fila++) {
+                                for (let col = 0; col < 3; col++) {
+                                    ctx.fillStyle = '#cbd5e1';
+                                    ctx.beginPath();
+                                    ctx.arc(kx + col * 38, ky + fila * 40, 12, 0, Math.PI * 2);
+                                    ctx.fill();
+                                    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+                                    ctx.lineWidth = 2;
+                                    ctx.stroke();
+                                }
+                            }
+
+                            // Franja de advertencia inferior
+                            const hy = H - 120;
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.rect(56, hy, W - 112, 42);
+                            ctx.clip();
+                            ctx.fillStyle = '#facc15';
+                            ctx.fillRect(56, hy, W - 112, 42);
+                            ctx.fillStyle = '#111827';
+                            for (let x = 30; x < W; x += 44) {
+                                ctx.beginPath();
+                                ctx.moveTo(x, hy + 42);
+                                ctx.lineTo(x + 22, hy + 42);
+                                ctx.lineTo(x + 22 + 42, hy);
+                                ctx.lineTo(x + 42, hy);
+                                ctx.closePath();
+                                ctx.fill();
+                            }
+                            ctx.restore();
+
+                            const tex = new THREE.CanvasTexture(c);
+                            tex.anisotropy = 8;
+                            return tex;
+                        }
+
+                        // =====================================================
+                        // ESTANTERÍA / CAJA FUERTE
+                        // =====================================================
                         function crearEstanteriaRealista(shelf, rackData, px, pz) {
                             const grupo = new THREE.Group();
+
+                            // Las estanterías llamadas "Caja Fuerte ..." se dibujan como cajas fuertes con puerta
+                            const esSafe = /caja\s*fuerte/i.test(String(shelf.name ?? ''));
 
                             // Color de las vigas = color del pasillo (identifica el pasillo de un vistazo)
                             const colorPasillo = (shelf.aisle && shelf.aisle.color) ? shelf.aisle.color : '#f97316';
                             const colorEstado = colorOcupacion(rackData.pct);
+                            const colorEstadoHex = '#' + colorEstado.toString(16).padStart(6, '0');
 
                             // 1. Niveles reales de la BD (acepta "levels" o "niveles"), ordenados por número
                             const ordenNivel = (l) => parseInt(norm(l.number ?? l.name) || '0', 10) || 0;
@@ -915,6 +1537,21 @@
                                 color: '#334155',
                                 roughness: 0.6
                             });
+                            const matAcero = new THREE.MeshStandardMaterial({
+                                color: '#475569',
+                                roughness: 0.5,
+                                metalness: 0.35
+                            });
+                            const matAceroOsc = new THREE.MeshStandardMaterial({
+                                color: '#1f2937',
+                                roughness: 0.55,
+                                metalness: 0.4
+                            });
+                            const matCromo = new THREE.MeshStandardMaterial({
+                                color: '#cbd5e1',
+                                roughness: 0.25,
+                                metalness: 0.6
+                            });
 
                             // Pseudo-aleatorio estable (para que las cajas no cambien en cada carga)
                             const seed = (n) => {
@@ -922,29 +1559,139 @@
                                 return x - Math.floor(x);
                             };
 
-                            // Postes
-                            const postes = [
-                                [-1.85, -1.85],
-                                [1.85, -1.85],
-                                [-1.85, 1.85],
-                                [1.85, 1.85]
-                            ];
-                            postes.forEach(([dx, dz]) => {
-                                const poste = new THREE.Mesh(new THREE.BoxGeometry(0.22, alturaTotal, 0.22), matPoste);
-                                poste.position.set(dx, alturaTotal / 2, dz);
-                                poste.castShadow = true;
-                                grupo.add(poste);
-                            });
+                            let doorPivot = null;
 
-                            // Arriostres diagonales laterales (aspecto de rack industrial)
-                            [-1.85, 1.85].forEach(dx => {
-                                const largo = Math.sqrt(alturaTotal * alturaTotal + 3.7 * 3.7);
-                                const ang = Math.atan2(alturaTotal, 3.7);
-                                const brace = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, largo), matPoste);
-                                brace.position.set(dx, alturaTotal / 2, 0);
-                                brace.rotation.x = ang;
-                                grupo.add(brace);
-                            });
+                            if (!esSafe) {
+                                // Postes
+                                const postes = [
+                                    [-1.85, -1.85],
+                                    [1.85, -1.85],
+                                    [-1.85, 1.85],
+                                    [1.85, 1.85]
+                                ];
+                                postes.forEach(([dx, dz]) => {
+                                    const poste = new THREE.Mesh(new THREE.BoxGeometry(0.22, alturaTotal, 0.22),
+                                        matPoste);
+                                    poste.position.set(dx, alturaTotal / 2, dz);
+                                    poste.castShadow = true;
+                                    grupo.add(poste);
+                                });
+
+                                // Arriostres diagonales laterales (aspecto de rack industrial)
+                                [-1.85, 1.85].forEach(dx => {
+                                    const largo = Math.sqrt(alturaTotal * alturaTotal + 3.7 * 3.7);
+                                    const ang = Math.atan2(alturaTotal, 3.7);
+                                    const brace = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, largo), matPoste);
+                                    brace.position.set(dx, alturaTotal / 2, 0);
+                                    brace.rotation.x = ang;
+                                    grupo.add(brace);
+                                });
+                            } else {
+                                // ---- CUERPO DE LA CAJA FUERTE ----
+                                const pared = (w, h, d, x, y, z, m) => {
+                                    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m || matAcero);
+                                    mesh.position.set(x, y, z);
+                                    mesh.castShadow = true;
+                                    mesh.receiveShadow = true;
+                                    grupo.add(mesh);
+                                    return mesh;
+                                };
+                                pared(0.15, alturaTotal, 4, -1.925, alturaTotal / 2, 0); // lateral izquierdo
+                                pared(0.15, alturaTotal, 4, 1.925, alturaTotal / 2, 0); // lateral derecho
+                                pared(4, alturaTotal, 0.15, 0, alturaTotal / 2, -1.925); // fondo
+                                pared(4.2, 0.22, 4.2, 0, 0.11, 0, matAceroOsc); // zócalo
+
+                                // Luz interior (tira LED bajo el techo)
+                                const luz = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.05, 0.25), new THREE
+                                    .MeshBasicMaterial({
+                                        color: '#fffbe6'
+                                    }));
+                                luz.position.set(0, alturaTotal - 0.2, 1.4);
+                                grupo.add(luz);
+
+                                // ---- PUERTA ----
+                                const doorW = 3.7;
+                                const doorH = alturaTotal - 0.45;
+                                const doorTex = texturaPuertaCajaFuerte(rackData.code, colorEstadoHex, doorW, doorH);
+
+                                doorPivot = new THREE.Group();
+                                doorPivot.position.set(-1.85, 0.25 + doorH / 2, 2.0);
+
+                                const matPuertaFrente = new THREE.MeshStandardMaterial({
+                                    map: doorTex,
+                                    roughness: 0.45,
+                                    metalness: 0.3
+                                });
+                                const puerta = new THREE.Mesh(
+                                    new THREE.BoxGeometry(doorW, doorH, 0.16),
+                                    [matAceroOsc, matAceroOsc, matAceroOsc, matAceroOsc, matPuertaFrente, matAceroOsc]
+                                );
+                                puerta.position.set(doorW / 2, 0, 0.08);
+                                puerta.castShadow = true;
+                                doorPivot.add(puerta);
+
+                                // Bisagras
+                                [-doorH * 0.38, 0, doorH * 0.38].forEach(yy => {
+                                    const bisagra = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.5, 16),
+                                        matCromo);
+                                    bisagra.position.set(0, yy, 0.08);
+                                    doorPivot.add(bisagra);
+                                });
+
+                                // Perilla giratoria
+                                const dialY = -doorH * 0.08;
+                                const dialBase = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.6, 0.14, 40),
+                                    matAceroOsc);
+                                dialBase.rotation.x = Math.PI / 2;
+                                dialBase.position.set(2.75, dialY, 0.16 + 0.07);
+                                doorPivot.add(dialBase);
+
+                                const dialCara = new THREE.Mesh(
+                                    new THREE.CircleGeometry(0.5, 48),
+                                    new THREE.MeshStandardMaterial({
+                                        map: getDialTex(),
+                                        roughness: 0.4,
+                                        metalness: 0.3
+                                    })
+                                );
+                                dialCara.position.set(2.75, dialY, 0.16 + 0.145);
+                                doorPivot.add(dialCara);
+
+                                // Manilla de cierre
+                                [-0.5, 0.5].forEach(oy => {
+                                    const soporte = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.22, 12),
+                                        matCromo);
+                                    soporte.rotation.x = Math.PI / 2;
+                                    soporte.position.set(3.3, dialY + oy, 0.16 + 0.11);
+                                    doorPivot.add(soporte);
+                                });
+                                const manilla = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.3, 0.14), matCromo);
+                                manilla.position.set(3.3, dialY, 0.16 + 0.24);
+                                manilla.castShadow = true;
+                                doorPivot.add(manilla);
+
+                                // LED de estado (color = ocupación) que late suavemente
+                                const ledMat = new THREE.MeshStandardMaterial({
+                                    color: colorEstado,
+                                    emissive: colorEstado,
+                                    emissiveIntensity: 0.8,
+                                    roughness: 0.3
+                                });
+                                const led = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 16), ledMat);
+                                led.position.set(3.35, doorH / 2 - 0.55, 0.16 + 0.03);
+                                doorPivot.add(led);
+                                pulsers.push({
+                                    mat: ledMat,
+                                    base: 0.65,
+                                    amp: 0.35,
+                                    speed: 3
+                                });
+
+                                doorPivot.rotation.y = -0.6;
+                                grupo.add(doorPivot);
+                                grupo.userData.doorPivot = doorPivot;
+                                grupo.userData.doorAngle = 0.6;
+                            }
 
                             // 3. Asignar cada producto a su nivel y posición reales
                             const buscarNivel = (item) => {
@@ -1008,12 +1755,13 @@
                                 ocupacionMapa[key].push(item);
                             });
 
-                            // Helper: placa visible por delante y por detrás de la estantería
-                            const agregarPlaca = (ancho, alto, material, x, y, z, lista) => {
+                            // Helper: placa visible por delante (y por detrás en estanterías abiertas)
+                            const agregarPlaca = (ancho, alto, material, x, y, z, lista, soloFrente) => {
                                 const frente = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), material);
                                 frente.position.set(x, y, z);
                                 grupo.add(frente);
                                 lista.push(frente);
+                                if (soloFrente) return;
 
                                 const atras = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), material);
                                 atras.position.set(-x, y, -z);
@@ -1022,7 +1770,14 @@
                                 lista.push(atras);
                             };
 
-                            // 4. Dibujar repisas, vigas, huecos y cajas
+                            const severidad = {
+                                none: 0,
+                                ok: 1,
+                                warn: 2,
+                                danger: 3
+                            };
+
+                            // 4. Dibujar repisas, vigas, huecos, pallets y cajas
                             const levelMeshes = [];
                             const levelKeys = [];
 
@@ -1032,6 +1787,13 @@
                                 const nivel = niveles[i];
 
                                 // Materiales propios de este nivel (permiten atenuarlo sin afectar a los demás)
+                                const cache = {};
+                                const obtener = (k, fabrica) => cache[k] ?? (cache[k] = fabrica());
+                                const stdTex = (map) => new THREE.MeshStandardMaterial({
+                                    map,
+                                    roughness: 0.85
+                                });
+
                                 const mats = {
                                     repisa: new THREE.MeshStandardMaterial({
                                         color: '#cbd5e1',
@@ -1042,23 +1804,64 @@
                                         roughness: 0.45,
                                         metalness: 0.2
                                     }),
-                                    ocupado: new THREE.MeshStandardMaterial({
-                                        color: '#10b981',
-                                        roughness: 0.5
-                                    }),
                                     libre: new THREE.MeshStandardMaterial({
                                         color: '#e2e8f0',
                                         roughness: 0.9
                                     }),
-                                    caja: new THREE.MeshStandardMaterial({
-                                        color: '#c9a36a',
-                                        roughness: 0.85
+                                    madera: new THREE.MeshStandardMaterial({
+                                        map: getWood(),
+                                        roughness: 0.9
                                     }),
-                                    cajaAlt: new THREE.MeshStandardMaterial({
-                                        color: '#b98f55',
-                                        roughness: 0.85
-                                    })
+                                    strap: new THREE.MeshStandardMaterial({
+                                        color: '#1e40af',
+                                        roughness: 0.4
+                                    }),
+                                    wrap: (() => {
+                                        const m = new THREE.MeshStandardMaterial({
+                                            color: '#ffffff',
+                                            transparent: true,
+                                            opacity: 0.13,
+                                            roughness: 0.1,
+                                            depthWrite: false
+                                        });
+                                        m.userData.baseOpacity = 0.13;
+                                        return m;
+                                    })()
                                 };
+
+                                // Repisa de color según el vencimiento más crítico del hueco
+                                const matSlot = (estado) => obtener('slot-' + estado, () => {
+                                    const col = estado === 'danger' ? '#ef4444' : (estado === 'warn' ?
+                                        '#f59e0b' : '#10b981');
+                                    const m = new THREE.MeshStandardMaterial({
+                                        color: col,
+                                        roughness: 0.5,
+                                        emissive: estado === 'danger' ? '#ef4444' : '#000000',
+                                        emissiveIntensity: estado === 'danger' ? 0.3 : 0
+                                    });
+                                    // Los huecos con producto vencido "laten" para llamar la atención
+                                    if (estado === 'danger') pulsers.push({
+                                        mat: m,
+                                        base: 0.25,
+                                        amp: 0.25,
+                                        speed: 3.5
+                                    });
+                                    return m;
+                                });
+
+                                // Materiales de caja por tono: [+x, -x, tapa, base, frente, fondo]
+                                const matCaja = (t) => obtener('caja-' + t, () => {
+                                    const k = getKraft(t);
+                                    const lado = stdTex(k.side);
+                                    return [lado, lado, stdTex(k.top), stdTex(k.bottom), stdTex(k.front), stdTex(k
+                                        .back)];
+                                });
+
+                                const matEtiqueta = (key, tex) => obtener('lab-' + key, () => new THREE
+                                    .MeshStandardMaterial({
+                                        map: tex,
+                                        roughness: 0.6
+                                    }));
 
                                 // Repisa base
                                 const repisa = new THREE.Mesh(new THREE.BoxGeometry(4, ESPESOR, 4), mats.repisa);
@@ -1077,10 +1880,16 @@
                                     meshesNivel.push(viga);
                                 });
 
-                                // Placa de nivel (frente y espalda)
+                                // Placa de nivel
                                 const matPlacaNivel = texturaTexto('N' + (norm(nivel.number) || nivel.number),
                                     '#1e3a5f', '#ffffff', 30);
-                                agregarPlaca(0.8, 0.32, matPlacaNivel, -1.85, yRepisa + 0.24, 2.0, meshesNivel);
+                                if (esSafe) {
+                                    agregarPlaca(0.8, 0.32, matPlacaNivel, -1.2, yRepisa + 0.24, 1.99, meshesNivel,
+                                        true);
+                                } else {
+                                    agregarPlaca(0.8, 0.32, matPlacaNivel, -1.85, yRepisa + 0.24, 2.0, meshesNivel,
+                                        false);
+                                }
 
                                 const nSlots = nivel.positions.length;
                                 const anchoSlot = 3.7 / nSlots;
@@ -1089,9 +1898,18 @@
                                     const productosHueco = ocupacionMapa[i + '-' + j] ?? [];
                                     const ocupado = productosHueco.length > 0;
 
+                                    // Estado de vencimiento más crítico dentro del hueco
+                                    let peor = 'none';
+                                    productosHueco.forEach(p => {
+                                        if ((severidad[p.venceEstado] ?? 0) > severidad[peor]) peor = p
+                                            .venceEstado;
+                                    });
+                                    const estadoHueco = peor === 'danger' ? 'danger' : (peor === 'warn' ? 'warn' :
+                                        'ok');
+
                                     const slot = new THREE.Mesh(
                                         new THREE.BoxGeometry(anchoSlot - 0.25, 0.14, 3.6),
-                                        ocupado ? mats.ocupado : mats.libre
+                                        ocupado ? matSlot(estadoHueco) : mats.libre
                                     );
                                     slot.position.set(-1.85 + anchoSlot / 2 + j * anchoSlot, yRepisa + 0.12, 0);
                                     slot.castShadow = true;
@@ -1099,32 +1917,146 @@
                                     grupo.add(slot);
                                     meshesNivel.push(slot);
 
-                                    // Cajas sobre las posiciones con stock (más cantidad = más cajas)
+                                    // ---------- CAJAS, PALLET, FILM Y ZUNCHOS ----------
                                     if (ocupado) {
-                                        const cant = productosHueco.reduce((a, x) => a + (x.cantidad || 0), 0);
-                                        const nCajas = Math.min(3, Math.max(1, Math.ceil(cant / 100)));
-                                        const celda = 3.4 / nCajas;
-                                        const anchoCaja = Math.max(0.3, anchoSlot - 0.5);
+                                        const sx = slot.position.x;
+                                        const yTopeSlot = yRepisa + 0.19; // cara superior de la repisa de color
+                                        const anchoP = Math.max(0.4, anchoSlot - 0.3);
 
-                                        for (let k = 0; k < nCajas; k++) {
-                                            const alto = 0.65 + seed(i * 31 + j * 7 + k) * 0.55;
-                                            const caja = new THREE.Mesh(
-                                                new THREE.BoxGeometry(anchoCaja, alto, celda - 0.12),
-                                                k % 2 === 0 ? mats.caja : mats.cajaAlt
-                                            );
+                                        // Pallet de madera
+                                        [-1, 0, 1].forEach(k => {
+                                            const patin = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.07, 3.5),
+                                                mats.madera);
+                                            patin.position.set(sx + k * (anchoP / 2 - 0.07), yTopeSlot + 0.035,
+                                                0);
+                                            patin.castShadow = true;
+                                            grupo.add(patin);
+                                            meshesNivel.push(patin);
+                                        });
+                                        const tablero = new THREE.Mesh(new THREE.BoxGeometry(anchoP, 0.04, 3.5),
+                                            mats.madera);
+                                        tablero.position.set(sx, yTopeSlot + 0.09, 0);
+                                        tablero.castShadow = true;
+                                        tablero.receiveShadow = true;
+                                        grupo.add(tablero);
+                                        meshesNivel.push(tablero);
+
+                                        const yCaja0 = yTopeSlot + 0.11;
+
+                                        // Cantidad de cajas: más cantidad / más productos = más cajas
+                                        const cantTotal = productosHueco.reduce((a, x) => a + (x.cantidad || 0), 0);
+                                        const totalCajas = Math.min(6, Math.max(productosHueco.length, Math.ceil(
+                                            cantTotal / 100), 1));
+                                        const cols = Math.min(3, totalCajas);
+                                        const celda = 3.4 / cols;
+                                        const prof = celda - 0.14;
+                                        const anchoCaja = Math.max(0.3, anchoSlot - 0.45);
+                                        const colH = [];
+
+                                        for (let b = 0; b < totalCajas; b++) {
+                                            const c = b % cols;
+                                            const tier = Math.floor(b / cols);
+                                            const prod = productosHueco[b % productosHueco.length];
+                                            const hCaja = 0.5 + seed(i * 53 + j * 11 + b) * 0.2;
+                                            const zc = -1.7 + celda * (c + 0.5);
+                                            const yBase = tier === 0 ? yCaja0 : yCaja0 + colH[c];
+                                            if (tier === 0) colH[c] = hCaja;
+                                            else colH[c] += hCaja;
+
+                                            const tono = hashStr(prod.producto) % 3;
+                                            const caja = new THREE.Mesh(new THREE.BoxGeometry(anchoCaja, hCaja,
+                                                prof), matCaja(tono));
                                             caja.position.set(
-                                                slot.position.x,
-                                                yRepisa + 0.19 + alto / 2,
-                                                -1.7 + celda * (k + 0.5)
+                                                sx + (seed(i * 7 + j * 13 + b * 3) - 0.5) * 0.06,
+                                                yBase + hCaja / 2,
+                                                zc
                                             );
+                                            caja.rotation.y = (seed(i * 19 + j * 5 + b * 17) - 0.5) * 0.07;
                                             caja.castShadow = true;
                                             caja.receiveShadow = true;
+
+                                            caja.userData = {
+                                                rackCode: rackData.code,
+                                                nivelKey: nivel.key,
+                                                dims: {
+                                                    w: anchoCaja,
+                                                    h: hCaja,
+                                                    d: prof
+                                                },
+                                                info: {
+                                                    rack: rackData.code,
+                                                    nivel: nivel.label,
+                                                    posicion: nivel.positions[j].name,
+                                                    producto: prod.producto,
+                                                    lote: prod.lote,
+                                                    cantidad: prod.cantidad,
+                                                    programa: prod.programa,
+                                                    vence: prod.vence,
+                                                    venceDias: prod.venceDias,
+                                                    venceEstado: prod.venceEstado,
+                                                    venceColor: prod.venceColor
+                                                }
+                                            };
                                             grupo.add(caja);
                                             meshesNivel.push(caja);
+                                            cajasMeshes.push(caja);
+
+                                            // Etiqueta del producto: adelante (columna frontal) y atrás (columna trasera)
+                                            const lt = getLabelTex(prod);
+                                            const ponerEtiqueta = (lado) => {
+                                                let lw = Math.min(anchoCaja * 0.9, 0.95);
+                                                let lh = lw * 2 / 3;
+                                                if (lh > hCaja * 0.86) {
+                                                    lh = hCaja * 0.86;
+                                                    lw = lh * 1.5;
+                                                }
+                                                const plano = new THREE.Mesh(
+                                                    new THREE.PlaneGeometry(lw, lh),
+                                                    matEtiqueta(lt.key, lt.tex)
+                                                );
+                                                plano.position.set(0, 0.02, lado * (prof / 2 + 0.004));
+                                                if (lado < 0) plano.rotation.y = Math.PI;
+                                                caja.add(plano);
+                                                meshesNivel.push(plano);
+                                            };
+                                            if (c === cols - 1) ponerEtiqueta(1);
+                                            if (c === 0) ponerEtiqueta(-1);
+                                        }
+
+                                        const alturaPila = Math.max(...colH);
+
+                                        // Film plástico transparente sobre pilas grandes
+                                        if (totalCajas >= 3) {
+                                            const film = new THREE.Mesh(
+                                                new THREE.BoxGeometry(anchoCaja + 0.08, alturaPila + 0.06, 3.46),
+                                                mats.wrap
+                                            );
+                                            film.position.set(sx, yCaja0 + alturaPila / 2, 0);
+                                            grupo.add(film);
+                                            meshesNivel.push(film);
+                                        }
+
+                                        // Zunchos (flejes) alrededor de pilas muy grandes
+                                        if (totalCajas >= 4) {
+                                            const gw = anchoCaja + 0.1;
+                                            const gh = alturaPila + 0.1;
+                                            [-0.8, 0.8].forEach(zs => {
+                                                const seg = (w, hh, x, y) => {
+                                                    const m = new THREE.Mesh(new THREE.BoxGeometry(w, hh,
+                                                        0.05), mats.strap);
+                                                    m.position.set(sx + x, yCaja0 + y, zs);
+                                                    grupo.add(m);
+                                                    meshesNivel.push(m);
+                                                };
+                                                seg(gw, 0.025, 0, alturaPila + 0.045);
+                                                seg(gw, 0.025, 0, -0.01);
+                                                seg(0.025, gh, -gw / 2, alturaPila / 2);
+                                                seg(0.025, gh, gw / 2, alturaPila / 2);
+                                            });
                                         }
                                     }
 
-                                    // Placa de posición (frente y espalda)
+                                    // Placa de posición
                                     const matPlacaPos = texturaTexto(nivel.positions[j].name, ocupado ? '#065f46' :
                                         '#64748b', '#ffffff', 22);
                                     agregarPlaca(
@@ -1134,7 +2066,8 @@
                                         slot.position.x,
                                         yRepisa + 0.14,
                                         1.83,
-                                        meshesNivel
+                                        meshesNivel,
+                                        esSafe
                                     );
                                 }
 
@@ -1143,14 +2076,19 @@
                             }
 
                             // Techo + franja de estado (color según ocupación)
-                            const techo = new THREE.Mesh(new THREE.BoxGeometry(4, ESPESOR, 4), matTecho);
-                            techo.position.set(0, alturaTotal, 0);
+                            const anchoTecho = esSafe ? 4.2 : 4;
+                            const yTecho = esSafe ? alturaTotal + 0.07 : alturaTotal;
+                            const techo = new THREE.Mesh(
+                                new THREE.BoxGeometry(anchoTecho, esSafe ? 0.22 : ESPESOR, anchoTecho),
+                                esSafe ? matAcero : matTecho
+                            );
+                            techo.position.set(0, yTecho, 0);
                             techo.castShadow = true;
                             grupo.add(techo);
 
-                            [2.0, -2.0].forEach(zz => {
+                            [esSafe ? 2.12 : 2.0, esSafe ? -2.12 : -2.0].forEach(zz => {
                                 const franja = new THREE.Mesh(
-                                    new THREE.BoxGeometry(4, 0.22, 0.12),
+                                    new THREE.BoxGeometry(anchoTecho, 0.22, 0.12),
                                     new THREE.MeshStandardMaterial({
                                         color: colorEstado,
                                         emissive: colorEstado,
@@ -1158,7 +2096,7 @@
                                         roughness: 0.4
                                     })
                                 );
-                                franja.position.set(0, alturaTotal, zz);
+                                franja.position.set(0, yTecho, zz);
                                 grupo.add(franja);
                             });
 
@@ -1186,15 +2124,23 @@
                                 label: n.label,
                                 posiciones: n.positions.map((p, j) => {
                                     const arr = ocupacionMapa[i + '-' + j] ?? [];
+                                    let peor = 'none';
+                                    arr.forEach(x => {
+                                        if ((severidad[x.venceEstado] ?? 0) > severidad[peor]) peor = x
+                                            .venceEstado;
+                                    });
                                     return {
                                         name: p.name,
                                         ocupado: arr.length > 0,
+                                        estado: peor === 'danger' ? 'danger' : (peor === 'warn' ? 'warn' :
+                                            'ok'),
                                         producto: arr.map(x => x.producto).join(', '),
                                         cantidad: arr.reduce((acc, x) => acc + (x.cantidad || 0), 0)
                                     };
                                 })
                             }));
 
+                            rackData.esCajaFuerte = esSafe;
                             rackData.alturaTotal = alturaTotal;
                             rackData.nNiveles = nNiveles;
                             return grupo;
@@ -1299,21 +2245,32 @@
                             });
 
                         // --- FILTRO POR NIVEL: atenúa los demás niveles de todas las estanterías ---
+                        let filtroNivelActual = '';
+
                         function aplicarFiltroNivel(key) {
-                            const clave = String(key ?? '');
+                            filtroNivelActual = String(key ?? '');
                             racks.forEach(rack => {
                                 const g = rack.visualGroup;
                                 if (!g) return;
                                 g.userData.levelMeshes.forEach((meshes, i) => {
-                                    const atenuar = clave !== '' && g.userData.levelKeys[i] !== clave;
+                                    const atenuar = filtroNivelActual !== '' && g.userData.levelKeys[i] !==
+                                        filtroNivelActual;
                                     meshes.forEach(m => {
-                                        m.material.transparent = atenuar;
-                                        m.material.opacity = atenuar ? 0.12 : 1;
-                                        m.material.depthWrite = !atenuar;
-                                        m.material.needsUpdate = true;
+                                        // Las cajas usan un arreglo de materiales (uno por cara)
+                                        const lista = Array.isArray(m.material) ? m.material : [m
+                                            .material
+                                        ];
+                                        lista.forEach(mt => {
+                                            const baseOp = mt.userData.baseOpacity ?? 1;
+                                            mt.transparent = atenuar || baseOp < 1;
+                                            mt.opacity = atenuar ? baseOp * 0.12 : baseOp;
+                                            mt.depthWrite = !atenuar && baseOp >= 1;
+                                            mt.needsUpdate = true;
+                                        });
                                     });
                                 });
                             });
+                            ocultarHoverCaja();
                         }
 
                         window.addEventListener('filter-level', (e) => aplicarFiltroNivel(e.detail));
@@ -1451,6 +2408,101 @@
                             mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
                         }
 
+                        // =====================================================
+                        // HOVER SOBRE CAJAS: detalle del producto + contorno
+                        // =====================================================
+                        const hoverBox = document.createElement('div');
+                        hoverBox.className = 'glass-panel';
+                        hoverBox.style.cssText =
+                            'position:absolute;z-index:40;pointer-events:none;display:none;color:#fff;border-radius:10px;padding:8px 10px;font-size:11px;min-width:170px;max-width:250px;box-shadow:0 10px 25px rgba(0,0,0,.35);line-height:1.35;';
+                        wrapper.appendChild(hoverBox);
+
+                        const outlineBox = new THREE.LineSegments(
+                            new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1)),
+                            new THREE.LineBasicMaterial({
+                                color: 0x22d3ee,
+                                depthTest: false
+                            })
+                        );
+                        outlineBox.renderOrder = 10;
+                        outlineBox.visible = false;
+                        scene.add(outlineBox);
+
+                        let hoveredCaja = null;
+
+                        function ocultarHoverCaja() {
+                            hoverBox.style.display = 'none';
+                            outlineBox.visible = false;
+                            hoveredCaja = null;
+                        }
+
+                        function actualizarHoverCaja(event) {
+                            const hits = raycaster.intersectObjects(cajasMeshes, false);
+                            let hit = null;
+                            for (const h of hits) {
+                                if (filtroNivelActual && h.object.userData.nivelKey !== filtroNivelActual) continue;
+                                hit = h;
+                                break;
+                            }
+                            if (!hit) {
+                                ocultarHoverCaja();
+                                return;
+                            }
+
+                            // Si otra estantería tapa la caja, no se muestra
+                            const hitRack = raycaster.intersectObjects(racks)[0];
+                            if (hitRack && hitRack.object.userData.code !== hit.object.userData.rackCode && hitRack
+                                .distance < hit.distance) {
+                                ocultarHoverCaja();
+                                return;
+                            }
+
+                            const caja = hit.object;
+                            if (hoveredCaja !== caja) {
+                                hoveredCaja = caja;
+                                const inf = caja.userData.info;
+                                const colVence = inf.venceColor || '#64748b';
+                                let lineaVence = '';
+                                if (inf.vence) {
+                                    const dias = inf.venceDias;
+                                    const txtDias = dias === null ? '' : (dias < 0 ? ' · vencido' : ' · ' + dias + ' d');
+                                    lineaVence =
+                                        `<div style="margin-top:2px;color:${colVence};font-weight:700">Vence: ${esc(inf.vence)}${txtDias}</div>`;
+                                }
+                                hoverBox.innerHTML =
+                                    `<div style="font-weight:700;font-size:12px;margin-bottom:2px">${esc(inf.producto)}</div>` +
+                                    `<div style="color:#94a3b8;font-family:monospace">${esc(inf.rack)} · ${esc(inf.nivel)} · Pos ${esc(inf.posicion)}</div>` +
+                                    `<div style="margin-top:4px">Lote: <b>${esc(inf.lote)}</b></div>` +
+                                    `<div>Cantidad: <b style="color:#34d399">${Number(inf.cantidad || 0).toLocaleString('es-CL')} u</b></div>` +
+                                    lineaVence +
+                                    (inf.programa ?
+                                        `<div style="margin-top:2px;color:#60a5fa;font-weight:600">${esc(inf.programa)}</div>` :
+                                        '');
+
+                                // Contorno de la caja
+                                const d = caja.userData.dims;
+                                caja.updateWorldMatrix(true, false);
+                                outlineBox.position.setFromMatrixPosition(caja.matrixWorld);
+                                caja.getWorldQuaternion(outlineBox.quaternion);
+                                outlineBox.scale.set(d.w * 1.05, d.h * 1.05, d.d * 1.05);
+                                outlineBox.visible = true;
+                            }
+
+                            // Posición del cuadro junto al mouse (dentro del visor)
+                            const rect = wrapper.getBoundingClientRect();
+                            hoverBox.style.display = 'block';
+                            let left = event.clientX - rect.left + 16;
+                            let top = event.clientY - rect.top + 16;
+                            if (left + hoverBox.offsetWidth > rect.width - 8) left = event.clientX - rect.left - hoverBox
+                                .offsetWidth - 16;
+                            if (top + hoverBox.offsetHeight > rect.height - 8) top = event.clientY - rect.top - hoverBox
+                                .offsetHeight - 16;
+                            hoverBox.style.left = Math.max(8, left) + 'px';
+                            hoverBox.style.top = Math.max(8, top) + 'px';
+                        }
+
+                        wrapper.addEventListener('pointerleave', ocultarHoverCaja);
+
                         window.addEventListener('search-rack', (e) => {
                             const query = String(e.detail ?? '').toLowerCase();
                             resetAllHighlights();
@@ -1506,6 +2558,7 @@
                             camAnim = null;
                             controls.enabled = false;
                             wrapper.style.cursor = 'move';
+                            ocultarHoverCaja();
                         });
 
                         wrapper.addEventListener('pointermove', (event) => {
@@ -1543,6 +2596,7 @@
                                 quitarBrillo(hoveredObject);
                                 hoveredObject = null;
                                 wrapper.style.cursor = 'default';
+                                ocultarHoverCaja();
                                 return;
                             }
 
@@ -1559,6 +2613,9 @@
                                 hoveredObject = null;
                                 wrapper.style.cursor = 'default';
                             }
+
+                            // Detalle de la caja bajo el mouse
+                            actualizarHoverCaja(event);
                         });
 
                         wrapper.addEventListener('click', (event) => {
@@ -1699,9 +2756,28 @@
                             });
                         }
 
+                        // --- Animaciones por frame: puertas de cajas fuertes y alertas que laten ---
+                        function actualizarAnimaciones() {
+                            racks.forEach(r => {
+                                const g = r.visualGroup;
+                                const pivot = g && g.userData.doorPivot;
+                                if (!pivot) return;
+                                // La puerta se abre al pasar el mouse o al seleccionar la caja fuerte
+                                const objetivo = (r === selectedObject || r === hoveredObject) ? 1.9 : 0.6;
+                                g.userData.doorAngle += (objetivo - g.userData.doorAngle) * 0.08;
+                                pivot.rotation.y = -g.userData.doorAngle;
+                            });
+
+                            const t = performance.now() / 1000;
+                            pulsers.forEach(p => {
+                                p.mat.emissiveIntensity = p.base + p.amp * Math.sin(t * p.speed);
+                            });
+                        }
+
                         function animate() {
                             requestAnimationFrame(animate);
                             stepCameraAnimation();
+                            actualizarAnimaciones();
                             controls.update();
                             renderer.render(scene, camera);
                             actualizarEtiquetas();
