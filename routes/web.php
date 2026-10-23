@@ -117,7 +117,9 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:ver.inventario')->name('inventario.template');
     Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])
         ->middleware('permission:ver.inventario')->name('inventario.update');
-
+    Route::get('/requests', [EstablishmentRequestController::class, 'index'])
+        ->middleware(['auth', 'permission:ver.solicitudes'])
+        ->name('requests.index');
     // modulo de recepcion
     Route::prefix('reception')->name('reception.')->middleware('permission:ver.recepcion')->group(function () {
         Route::get('/', [ReceptionController::class, 'index'])->name('index');

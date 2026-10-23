@@ -270,6 +270,7 @@
                             </a>
                         @endcan
                     </div>
+                    @canany(['ver.proveedores', 'ver.recepcion'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
                             <span
@@ -277,6 +278,7 @@
                             <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Abastecimiento</p>
                         </div>
                         <div class="flow-rail pl-[27px] space-y-0.5">
+                            @can('ver.proveedores')
                             <a href="{{ route('providers.index') }}"
                                 class="nav-row {{ request()->routeIs('providers.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,6 +288,8 @@
                                 </svg>
                                 Proveedores
                             </a>
+                            @endcan
+                            @can('ver.recepcion')
                             <a href="{{ route('reception.index') }}"
                                 class="nav-row {{ request()->routeIs('reception.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -295,10 +299,14 @@
                                 </svg>
                                 Recepción
                             </a>
+                            @endcan
                         </div>
                     </div>
 
+                    @endcanany
+
                     <!-- Paso 2: Almacenamiento -->
+                    @canany(['ver.inventario', 'ver.cuarentena'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
                             <span
@@ -306,6 +314,7 @@
                             <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Almacenamiento</p>
                         </div>
                         <div class="flow-rail pl-[27px] space-y-0.5">
+                            @can('ver.inventario')
                             <a href="{{ route('inventario.index') }}"
                                 class="nav-row {{ request()->routeIs('inventario.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,6 +324,8 @@
                                 </svg>
                                 Inventario
                             </a>
+                            @endcan
+                            @can('ver.cuarentena')
                             <a href="{{ route('quarantine.index') }}"
                                 class="nav-row {{ request()->routeIs('quarantine.*') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
                                 <div class="flex items-center gap-2.5">
@@ -326,11 +337,15 @@
                                     Cuarentena
                                 </div>
                             </a>
+                            @endcan
                         </div>
 
                     </div>
 
+                    @endcanany
+
                     <!-- Paso 3: Salida -->
+                    @canany(['ver.despacho', 'ver.despacho_controlado', 'ver.distribucion', 'ver.solicitudes'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
                             <span
@@ -339,6 +354,7 @@
                         </div>
                         <div class="flow-rail pl-[27px] space-y-0.5">
                             <div class="flex flex-col space-y-0.5">
+                                @can('ver.despacho')
                                 <a href="{{ route('dispatch.index') }}"
                                     class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
@@ -348,6 +364,7 @@
                                     </svg>
                                     Despacho Normal
                                 </a>
+                                @endcan
                                 @can('ver.despacho_controlado')
                                     <!-- Submenú Controlado -->
                                     <div class="relative pl-6">
@@ -368,6 +385,7 @@
                                 @endcan
                             </div>
 
+                            @can('ver.distribucion')
                             <a href="{{ route('distribution.index') }}"
                                 class="nav-row {{ request()->routeIs('distribution.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -376,6 +394,7 @@
                                 </svg>
                                 Distribución
                             </a>
+                            @endcan
 
                             @can('ver.solicitudes')
                                 <a href="{{ route('requests.index') }}"
@@ -390,7 +409,9 @@
                             @endcan
                         </div>
                     </div>
+                    @endcanany
                     <!-- Paso 4: Control -->
+                    @canany(['ver.trazabilidad', 'ver.reportes'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
                             <span
@@ -398,6 +419,7 @@
                             <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Control</p>
                         </div>
                         <div class="flow-rail pl-[27px] space-y-0.5">
+                            @can('ver.trazabilidad')
                             <a href="{{ route('traceability.index') }}"
                                 class="nav-row {{ request()->routeIs('traceability.*') || request()->routeIs('trazabilidad.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -407,6 +429,8 @@
                                 </svg>
                                 Trazabilidad
                             </a>
+                            @endcan
+                            @can('ver.reportes')
                             <a href="{{ route('reportes.index') }}"
                                 class="nav-row {{ request()->routeIs('reportes.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,8 +440,11 @@
                                 </svg>
                                 Reportes
                             </a>
+                            @endcan
                         </div>
                     </div>
+
+                    @endcanany
 
                     <!-- Administración -->
                     @can('ver.usuarios')
