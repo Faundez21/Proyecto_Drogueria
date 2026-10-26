@@ -2,8 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Aisle;
 use App\Models\Inventory;
+use App\Models\Level;
+use App\Models\Position;
 use App\Models\Product;
+use App\Models\Provider;
+use App\Models\Shelf;
 use Illuminate\Support\Collection;
 
 class InventoryService
@@ -90,6 +95,7 @@ class InventoryService
      */
     public static function ingresar(array $datos): Inventory
     {
+        $datos = self::resolverRelaciones($datos);
         $lote = self::normalizarLote($datos['lote'] ?? null);
 
         $batch = Inventory::where('producto', $datos['producto'])
@@ -109,7 +115,13 @@ class InventoryService
             $batch->fill([
                 'valor_neto_unitario' => $datos['valor_neto_unitario'] ?? $batch->valor_neto_unitario,
                 'fecha_vencimiento' => $datos['fecha_vencimiento'] ?? $batch->fecha_vencimiento,
-                'user_id' => $datos['user_id'] ?? null,
+                'user_id' => $datos['user_id'] ?? $batch->user_id,
+                'provider_id' => $datos['provider_id'] ?? $batch->provider_id,
+                'reception_id' => $datos['reception_id'] ?? $batch->reception_id,
+                'aisle_id' => $datos['aisle_id'] ?? $batch->aisle_id,
+                'shelf_id' => $datos['shelf_id'] ?? $batch->shelf_id,
+                'level_id' => $datos['level_id'] ?? $batch->level_id,
+                'position_id' => $datos['position_id'] ?? $batch->position_id,
             ]);
             $batch->save();
 
@@ -117,6 +129,54 @@ class InventoryService
         }
 
         return Inventory::create($datos + ['lote' => $lote]);
+    }
+
+    /**
+     * Resuelve las llaves foráneas de producto, proveedor y ubicación física a partir de los textos.
+     */
+    public static function resolverRelaciones(array $datos): array
+    {
+        if (empty($datos['product_id']) && ! empty($datos['producto'])) {
+            $datos['product_id'] = self::productoId($datos['producto']);
+        }
+
+        if (empty($datos['provider_id'])) {
+            if (! empty($datos['rut_proveedor'])) {
+                $datos['provider_id'] = Provider::where('rut', $datos['rut_proveedor'])->value('id');
+            }
+            if (empty($datos['provider_id']) && ! empty($datos['razon_social'])) {
+                $datos['provider_id'] = Provider::where('name', $datos['razon_social'])->value('id');
+            }
+        }
+
+        if (! empty($datos['estante']) && empty($datos['shelf_id'])) {
+            $shelf = Shelf::where('name', $datos['estante'])->first();
+            if ($shelf) {
+                $datos['shelf_id'] = $shelf->id;
+                $datos['aisle_id'] = $datos['aisle_id'] ?? $shelf->aisle_id;
+            }
+        }
+
+        if (empty($datos['aisle_id']) && ! empty($datos['pasillo'])) {
+            $datos['aisle_id'] = Aisle::where('name', $datos['pasillo'])->value('id');
+        }
+
+        if (! empty($datos['shelf_id']) && ! empty($datos['nivel']) && empty($datos['level_id'])) {
+            $levelNum = (int) preg_replace('/\D+/', '', (string) $datos['nivel']);
+            if ($levelNum > 0) {
+                $datos['level_id'] = Level::where('shelf_id', $datos['shelf_id'])
+                    ->where('number', $levelNum)
+                    ->value('id');
+            }
+        }
+
+        if (! empty($datos['level_id']) && ! empty($datos['posicion']) && empty($datos['position_id'])) {
+            $datos['position_id'] = Position::where('level_id', $datos['level_id'])
+                ->where('name', $datos['posicion'])
+                ->value('id');
+        }
+
+        return $datos;
     }
 
     public static function productoId(?string $nombre): ?int

@@ -15,11 +15,21 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
     private int $userId;
     private int $registro = 0;
     private int $importados = 0;
+    private bool $headersValidated = false;
+    private array $seenRows = [];
 
     private const ESTADOS = [
         'disponible' => 'Disponible',
         'cuarentena' => 'Cuarentena',
         'merma' => 'Merma',
+    ];
+
+    private const REQUIRED_COLUMNS = [
+        'producto' => 'PRODUCTO',
+        'cantidad' => 'CANTIDAD',
+        'fecha_recepcion' => 'FECHA RECEPCION',
+        'tipo_documento' => 'TIPO DOCUMENTO',
+        'numero_documento' => 'NUMERO DOCUMENTO',
     ];
 
     public function __construct(int $userId)
@@ -31,39 +41,83 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
     {
         $this->registro++;
 
+        // 1. Validar que el archivo tenga las columnas de la plantilla oficial
+        if (! $this->headersValidated) {
+            $missingColumns = [];
+            foreach (self::REQUIRED_COLUMNS as $slug => $label) {
+                if (! array_key_exists($slug, $row)) {
+                    $missingColumns[] = $label;
+                }
+            }
+
+            if (! empty($missingColumns)) {
+                $faltantes = implode(', ', $missingColumns);
+                throw new \RuntimeException(
+                    "Formato de plantilla incompatible: Faltan las siguientes columnas obligatorias en el encabezado del archivo: {$faltantes}. Por favor descargue y utilice la Plantilla Oficial de Carga Masiva."
+                );
+            }
+
+            $this->headersValidated = true;
+        }
+
         $producto = trim((string) ($row['producto'] ?? ''));
         if ($producto === '') {
-            throw new \RuntimeException("Registro N° {$this->registro}: la columna PRODUCTO es obligatoria.");
+            throw new \RuntimeException("Fila N° " . ($this->registro + 1) . ": La columna PRODUCTO es obligatoria y no puede estar vacía.");
         }
 
         $categoria = trim((string) ($row['categoria'] ?? '')) ?: 'General';
 
         $estado = strtolower(trim((string) ($row['estado'] ?? '')));
         if ($estado === '') {
-            $estado = 'cuarentena';
+            $estado = 'disponible';
         }
         if (! isset(self::ESTADOS[$estado])) {
-            throw new \RuntimeException("Registro N° {$this->registro} ({$producto}): el ESTADO '{$estado}' no es válido. Use Disponible, Cuarentena o Merma.");
+            throw new \RuntimeException("Fila N° " . ($this->registro + 1) . " ({$producto}): El ESTADO '{$estado}' no es válido. Use Disponible, Cuarentena o Merma.");
         }
 
         $cantidad = $this->entero($row['cantidad'] ?? null);
         if ($cantidad === null || $cantidad < 1) {
-            throw new \RuntimeException("Registro N° {$this->registro} ({$producto}): la CANTIDAD debe ser un número entero mayor a 0.");
+            throw new \RuntimeException("Fila N° " . ($this->registro + 1) . " ({$producto}): La CANTIDAD debe ser un número entero mayor a 0.");
         }
 
         $fechaRecepcion = $this->fecha($row['fecha_recepcion'] ?? null);
         if ($fechaRecepcion === null) {
-            throw new \RuntimeException("Registro N° {$this->registro} ({$producto}): la FECHA RECEPCION es obligatoria y debe ser una fecha válida.");
+            throw new \RuntimeException("Fila N° " . ($this->registro + 1) . " ({$producto}): La FECHA RECEPCION es obligatoria y debe tener un formato válido (DD/MM/AAAA).");
         }
 
         $tipoDocumento = trim((string) ($row['tipo_documento'] ?? ''));
         if ($tipoDocumento === '') {
-            throw new \RuntimeException("Registro N° {$this->registro} ({$producto}): la columna TIPO DOCUMENTO es obligatoria.");
+            throw new \RuntimeException("Fila N° " . ($this->registro + 1) . " ({$producto}): La columna TIPO DOCUMENTO es obligatoria.");
         }
 
         $numeroDocumento = trim((string) ($row['numero_documento'] ?? ''));
         if ($numeroDocumento === '') {
-            throw new \RuntimeException("Registro N° {$this->registro} ({$producto}): la columna NUMERO DOCUMENTO es obligatoria.");
+            throw new \RuntimeException("Fila N° " . ($this->registro + 1) . " ({$producto}): La columna NUMERO DOCUMENTO es obligatoria.");
+        }
+
+        $lote = trim((string) ($row['lote'] ?? '')) ?: 'S/L';
+
+        // 2. Detectar filas duplicadas dentro del mismo archivo Excel
+        $rowSignature = mb_strtolower("{$tipoDocumento}|{$numeroDocumento}|{$producto}|{$lote}|{$fechaRecepcion}|{$cantidad}");
+        if (isset($this->seenRows[$rowSignature])) {
+            $filaOriginal = $this->seenRows[$rowSignature];
+            throw new \RuntimeException(
+                "Registro duplicado dentro del archivo (Fila N° " . ($this->registro + 1) . "): El producto «{$producto}» (Lote: {$lote}, Doc: {$tipoDocumento} #{$numeroDocumento}) ya aparece en la Fila N° {$filaOriginal} de este mismo archivo."
+            );
+        }
+        $this->seenRows[$rowSignature] = $this->registro + 1;
+
+        // 3. Detectar si este mismo documento + lote + producto ya fue cargado previamente en la base de datos
+        $yaExisteDocumentoLote = Inventory::where('tipo_documento', $tipoDocumento)
+            ->where('numero_documento', $numeroDocumento)
+            ->where('producto', $producto)
+            ->where('lote', $lote)
+            ->exists();
+
+        if ($yaExisteDocumentoLote) {
+            throw new \RuntimeException(
+                "Carga duplicada detectada en Fila N° " . ($this->registro + 1) . ": El producto «{$producto}» (Lote: {$lote}) asociado al documento {$tipoDocumento} N° {$numeroDocumento} ya se encuentra registrado en el sistema."
+            );
         }
 
         $batch = InventoryService::ingresar([
@@ -72,14 +126,14 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             'fecha_recepcion' => $fechaRecepcion,
             'tipo_documento' => $tipoDocumento,
             'numero_documento' => $numeroDocumento,
-            'orden_compra' => trim((string) ($row['orden_de_compra'] ?? '')) ?: null,
+            'orden_compra' => trim((string) ($row['orden_de_compra'] ?? ($row['orden_compra'] ?? ''))) ?: null,
             'origen_mercaderia' => trim((string) ($row['origen_mercaderia'] ?? '')) ?: null,
             'rut_proveedor' => trim((string) ($row['rut_proveedor'] ?? '')) ?: null,
             'razon_social' => trim((string) ($row['razon_social'] ?? '')) ?: null,
             'producto' => $producto,
             'categoria' => $categoria,
             'estado' => self::ESTADOS[$estado],
-            'lote' => trim((string) ($row['lote'] ?? '')) ?: 'S/L',
+            'lote' => $lote,
             'fecha_vencimiento' => $this->fecha($row['fecha_vencimiento'] ?? null),
             'cantidad' => $cantidad,
             'valor_neto_unitario' => $this->decimal($row['valor_neto_unitario'] ?? null),
@@ -133,7 +187,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         try {
             return Carbon::parse($valor)->format('Y-m-d');
         } catch (\Throwable) {
-            throw new \RuntimeException("Registro N° {$this->registro}: la fecha '{$valor}' no es válida. Use el formato DD/MM/AAAA.");
+            throw new \RuntimeException("Fila N° " . ($this->registro + 1) . ": La fecha '{$valor}' no es válida. Use el formato DD/MM/AAAA.");
         }
     }
 
@@ -156,8 +210,17 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             return null;
         }
 
+        // Limpiar símbolos de moneda o separadores comunes si vienen formateados
+        if (is_string($valor)) {
+            $limpio = str_replace(['$', ' ', '.'], '', $valor);
+            $limpio = str_replace(',', '.', $limpio);
+            if (is_numeric($limpio)) {
+                return (float) $limpio;
+            }
+        }
+
         if (! is_numeric($valor)) {
-            throw new \RuntimeException("Registro N° {$this->registro}: el VALOR NETO UNITARIO '{$valor}' no es un número válido.");
+            throw new \RuntimeException("Fila N° " . ($this->registro + 1) . ": El VALOR NETO UNITARIO '{$valor}' no es un número válido.");
         }
 
         return (float) $valor;

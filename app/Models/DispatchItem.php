@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DispatchItem extends Model
 {
     protected $fillable = [
-        'dispatch_id', 'inventory_id', 'producto', 'lote', 'fecha_vencimiento', 'programa', 'cantidad'
+        'dispatch_id', 'inventory_id', 'product_id', 'producto', 'lote', 'fecha_vencimiento', 'programa', 'cantidad'
     ];
 
     public function dispatch()
@@ -18,5 +18,10 @@ class DispatchItem extends Model
     public function inventory()
     {
         return $this->belongsTo(Inventory::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 }

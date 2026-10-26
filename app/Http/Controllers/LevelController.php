@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Aisle;
 use App\Models\Shelf;
 use App\Models\Level;
+use App\Models\Position;
+
 class LevelController extends Controller
 {
     /**
@@ -12,11 +15,22 @@ class LevelController extends Controller
      */
     public function index()
     {
-        $levels = Level::with('shelf')->get();
+        $levels = Level::with('shelf.aisle')
+            ->withCount('positions')
+            ->orderBy('shelf_id')
+            ->orderBy('number')
+            ->get();
 
-        $shelves = Shelf::all();
+        $shelves = Shelf::with('aisle')->orderBy('name')->get();
 
-        return view('distribution.maintainers.level.index', compact('levels', 'shelves'));
+        $counts = [
+            'aisles' => Aisle::count(),
+            'shelves' => $shelves->count(),
+            'levels' => $levels->count(),
+            'positions' => Position::count(),
+        ];
+
+        return view('distribution.maintainers.level.index', compact('levels', 'shelves', 'counts'));
     }
 
     /**

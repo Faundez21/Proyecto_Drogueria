@@ -21,4 +21,9 @@ class Level extends Model
     {
         return $this->hasMany(Position::class);
     }
+
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'level_id');
+    }
 }

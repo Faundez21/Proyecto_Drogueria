@@ -73,13 +73,16 @@ Route::middleware('auth')->group(function () {
         Route::put('/roles/{role}', [UserController::class, 'updateRole'])->name('roles.update');
         Route::delete('/roles/{role}', [UserController::class, 'destroyRole'])->name('roles.destroy');
 
-        // modulo de despacho de controlados
+        // asignar solicitudes de establecimientos/cesfam a trabajadores desde Despacho
+        Route::patch('/requests/{establishmentRequest}/assign', [EstablishmentRequestController::class, 'assign'])
+            ->name('requests.assign');
+    });
+
+    // modulo de despacho de controlados (acceso por permiso ver.despacho_controlado; Administrador entra siempre vía Gate::before)
+    Route::middleware('permission:ver.despacho_controlado')->group(function () {
         Route::get('/controlled_dispatch', [ControlledDispatchController::class, 'index'])->name('controlled_dispatch.index');
         Route::post('/controlled_dispatch', [ControlledDispatchController::class, 'store'])->name('controlled_dispatch.store');
         Route::get('/controlled_dispatch/{id}/pdf', [ControlledDispatchController::class, 'pdf'])->name('controlled_dispatch.pdf');
-
-        // solicitudes de establecimientos
-        Route::resource('requests', EstablishmentRequestController::class)->only(['index', 'store']);
     });
 
     // ===== ACCESO POR PERMISO DE VISTA (definido en roles) =====
@@ -120,6 +123,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/requests', [EstablishmentRequestController::class, 'index'])
         ->middleware(['auth', 'permission:ver.solicitudes'])
         ->name('requests.index');
+    Route::get('/requests/cesfam', [EstablishmentRequestController::class, 'cesfam'])
+        ->middleware(['auth', 'permission:ver.solicitudes_cesfam'])
+        ->name('requests.cesfam');
+    Route::post('/requests', [EstablishmentRequestController::class, 'store'])
+        ->middleware(['auth', 'permission:ver.solicitudes|ver.solicitudes_cesfam'])
+        ->name('requests.store');
     // modulo de recepcion
     Route::prefix('reception')->name('reception.')->middleware('permission:ver.recepcion')->group(function () {
         Route::get('/', [ReceptionController::class, 'index'])->name('index');

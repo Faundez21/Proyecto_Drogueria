@@ -633,37 +633,150 @@
             </div>
         </div>
 
+        <!-- Pantalla de Carga Global para Procesamiento de Archivos Pesados -->
+        <div id="importLoadingOverlay" class="hidden fixed inset-0 z-[10050] bg-slate-900/85 backdrop-blur-md flex flex-col items-center justify-center p-6 transition-all">
+            <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 p-8 max-w-md w-full text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-slate-100 overflow-hidden">
+                    <div id="importProgressBarTop" class="h-full bg-gradient-to-r from-teal-500 via-emerald-400 to-teal-600 transition-all duration-300" style="width: 15%"></div>
+                </div>
+
+                <div class="relative w-20 h-20 mx-auto mb-5 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full border-4 border-teal-100"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-teal-600 border-t-transparent animate-spin"></div>
+                    <svg class="w-9 h-9 text-teal-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+
+                <h3 class="text-lg font-extrabold text-slate-800 tracking-tight mb-1">Procesando Carga Masiva</h3>
+                <p id="loadingStepText" class="text-[13px] font-semibold text-teal-700 mb-4">Analizando estructura y cabeceras del archivo...</p>
+
+                <div id="loadingFileBadge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-[12px] font-bold text-slate-700 mb-5 max-w-full truncate">
+                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span id="loadingFileName" class="truncate">planilla_inventario.xlsx</span>
+                    <span id="loadingFileSize" class="text-slate-400 font-mono text-[11px] shrink-0"></span>
+                </div>
+
+                <div class="w-full bg-slate-100 rounded-full h-3 mb-2 overflow-hidden border border-slate-200/80">
+                    <div id="importProgressBar" class="bg-gradient-to-r from-teal-600 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: 12%"></div>
+                </div>
+                <div class="flex justify-between items-center text-[11px] font-bold text-slate-400 mb-5">
+                    <span id="loadingStageLabel">Validando registros...</span>
+                    <span id="loadingPercentLabel" class="text-teal-700 font-mono">12%</span>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-3 text-left flex items-start gap-2.5">
+                    <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <p class="text-[11px] text-amber-800 font-medium leading-relaxed">
+                        <strong>Por favor no cierre ni recargue esta ventana.</strong> Archivos pesados pueden tardar algunos segundos mientras se verifican duplicados y trazabilidad.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal: Importar Carga Masiva -->
         <div id="importModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 flex flex-col w-full max-w-md overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 flex flex-col w-full max-w-lg overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
-                    <h2 class="text-lg font-bold text-white tracking-wide">Importar Carga Masiva</h2>
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-white tracking-wide">Importar Carga Masiva</h2>
+                            <p class="text-[11px] text-slate-300 font-medium">Validación inteligente de formato, lotes y duplicados</p>
+                        </div>
+                    </div>
                     <button type="button" onclick="closeImport()"
                         class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-                <div class="p-6 bg-slate-50">
-                    <p class="text-[13px] text-slate-600 mb-5 text-center leading-relaxed">Descargue la plantilla oficial, complete los datos de los productos y suba el archivo Excel para registrar el inventario masivamente.</p>
 
-                    <a href="{{ Route::has('inventario.template') ? route('inventario.template') : '#' }}"
-                        class="w-full mb-6 flex justify-center items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-100 hover:text-teal-700 transition-all font-bold text-[13px] shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        Descargar Plantilla Oficial
-                    </a>
-
-                    <form action="{{ Route::has('inventario.import') ? route('inventario.import') : '#' }}" method="POST" enctype="multipart/form-data" class="bg-white border border-dashed border-slate-300 hover:border-teal-400 transition-colors rounded-xl p-6 flex flex-col items-center gap-4 text-center shadow-sm">
-                        @csrf
-                        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-teal-600 mb-1">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <div class="p-6 bg-slate-50 space-y-4">
+                    @if(session('open_modal') === 'import' && session('error'))
+                        <div class="bg-rose-50 border-l-4 border-rose-600 border border-rose-200 rounded-xl p-4 shadow-sm">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div class="flex-1">
+                                    <h4 class="text-[13px] font-extrabold text-rose-900">{{ session('import_error_title', 'Error al Procesar el Archivo') }}</h4>
+                                    <p class="text-[12px] text-rose-700 mt-1 leading-relaxed font-medium">{{ session('error') }}</p>
+                                </div>
+                            </div>
                         </div>
-                        <input type="file" id="excel" name="excel" class="hidden" accept=".xlsx, .xls, .csv" onchange="updateFileName(this)">
-                        <label for="excel" class="w-full bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-teal-700 px-4 py-2 rounded-lg cursor-pointer inline-flex items-center justify-center gap-2 text-[13px] font-bold transition-all shadow-sm">
-                            <span id="fileNameLabel">Explorar Archivos</span>
-                        </label>
-                        <span class="text-[11px] text-slate-400 font-medium">Formatos soportados: .xlsx, .csv</span>
+                    @endif
 
-                        <button type="submit" class="w-full px-4 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all text-[13px] font-bold shadow-sm mt-3 cursor-pointer">Procesar e Importar</button>
+                    <!-- Alerta dinámica JS (Formato inválido o Archivo Duplicado detectado en cliente) -->
+                    <div id="clientImportAlert" class="hidden rounded-xl p-4 border shadow-sm">
+                        <div class="flex items-start gap-3">
+                            <svg id="clientImportAlertIcon" class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
+                            <div class="flex-1">
+                                <h4 id="clientImportAlertTitle" class="text-[13px] font-extrabold"></h4>
+                                <p id="clientImportAlertMsg" class="text-[12px] mt-1 leading-relaxed font-medium"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between gap-4 shadow-sm">
+                        <div class="text-left">
+                            <span class="text-[12px] font-extrabold text-slate-800 block">1. Plantilla Oficial de Inventario</span>
+                            <span class="text-[11px] text-slate-500">Incluye las columnas exactas requeridas por bodega.</span>
+                        </div>
+                        <a href="{{ Route::has('inventario.template') ? route('inventario.template') : '#' }}"
+                            class="shrink-0 inline-flex items-center gap-2 bg-teal-50 border border-teal-200 text-teal-700 px-3.5 py-2 rounded-lg hover:bg-teal-600 hover:text-white transition-all font-bold text-[12px] shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Descargar Plantilla
+                        </a>
+                    </div>
+
+                    <form id="importForm" action="{{ Route::has('inventario.import') ? route('inventario.import') : '#' }}" method="POST" enctype="multipart/form-data" onsubmit="return handleImportSubmit(event)" class="bg-white border-2 border-dashed border-slate-300 hover:border-teal-500 transition-all rounded-xl p-6 flex flex-col items-center gap-3 text-center shadow-sm"
+                        ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
+                        @csrf
+                        <div id="dropzoneIconWrap" class="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600 mb-1 transition-transform">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+
+                        <input type="file" id="excel" name="excel" class="hidden" accept=".xlsx,.xls,.csv" onchange="updateFileName(this)">
+
+                        <label for="excel" class="w-full bg-slate-50 border border-slate-300 text-slate-700 hover:bg-teal-50 hover:border-teal-300 hover:text-teal-700 px-4 py-2.5 rounded-xl cursor-pointer inline-flex items-center justify-center gap-2 text-[13px] font-bold transition-all shadow-sm">
+                            <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                            <span id="fileNameLabel">Seleccionar o arrastrar archivo aquí</span>
+                        </label>
+
+                        <!-- Tarjeta de vista previa del archivo seleccionado -->
+                        <div id="selectedFileCard" class="hidden w-full bg-teal-50/70 border border-teal-200 rounded-xl p-3 flex items-center justify-between gap-3 text-left">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span id="selectedFileExtBadge" class="px-2 py-1 rounded-md bg-teal-600 text-white font-mono text-[10px] font-extrabold uppercase shrink-0">XLSX</span>
+                                <div class="min-w-0">
+                                    <p id="selectedFileNameText" class="text-[12px] font-bold text-slate-800 truncate"></p>
+                                    <p id="selectedFileSizeText" class="text-[11px] text-slate-500 font-mono"></p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="clearSelectedImportFile()" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer" title="Quitar archivo">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+
+                        <!-- Opción de forzar reimportación cuando se detecta hash duplicado -->
+                        <div id="forceReimportContainer" class="hidden w-full bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-left">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" name="force_reimport" id="forceReimportCheck" value="1" class="mt-0.5 rounded border-amber-400 text-teal-600 focus:ring-teal-500">
+                                <span class="text-[11px] text-amber-900 font-semibold leading-snug">
+                                    Confirmo que deseo volver a procesar este archivo aunque haya sido subido previamente.
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-center gap-2 text-[11px] text-slate-400 font-medium">
+                            <span>Formatos permitidos: <strong class="text-slate-600">.xlsx, .xls, .csv</strong></span>
+                            <span>·</span>
+                            <span>Máx. <strong class="text-slate-600">20 MB</strong></span>
+                        </div>
+
+                        <button type="submit" id="importSubmitBtn" class="w-full px-4 py-2.5 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-all text-[13px] font-bold shadow-sm mt-2 cursor-pointer flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Validar y Procesar Carga Masiva</span>
+                        </button>
                     </form>
                 </div>
             </div>
@@ -671,11 +784,16 @@
 
         <!-- Modal: Ingreso Manual -->
         <div id="DepositModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-lg font-bold text-white tracking-wide">Ingreso Directo de Producto</h2>
-                        <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro individual directo a bodega.</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-white tracking-wide">Ingreso Manual Directo de Producto</h2>
+                            <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro individual con trazabilidad inmediata en bodega.</p>
+                        </div>
                     </div>
                     <button type="button" onclick="closeDeposit()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -683,122 +801,170 @@
                 </div>
 
                 <div class="p-6 sm:p-8 overflow-y-auto bg-slate-50/50">
+                    @if($errors->any() && session('open_modal') !== 'import')
+                        <div class="mb-6 bg-rose-50 border-l-4 border-rose-600 border border-rose-200 rounded-xl p-4 shadow-sm">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                <div>
+                                    <h4 class="text-[13px] font-extrabold text-rose-900">No se pudo completar el ingreso manual:</h4>
+                                    <ul class="mt-1 list-disc list-inside text-[12px] text-rose-700 font-medium space-y-0.5">
+                                        @foreach($errors->all() as $err)
+                                            <li>{{ $err }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <datalist id="catalogoProductosManual">
+                        @foreach($productosLista ?? [] as $prodItem)
+                            <option value="{{ $prodItem }}"></option>
+                        @endforeach
+                    </datalist>
+
                     <form action="{{ Route::has('inventario.store') ? route('inventario.store') : '#' }}" method="POST" id="manualDepositForm" novalidate onsubmit="return validateIngresoDirecto(event)">
                         @csrf
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                             <div class="sm:col-span-2">
-                                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-2">
-                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">1. Datos del Documento</h4>
+                                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-1">
+                                    <span class="w-5 h-5 rounded-full bg-teal-600 text-white text-[11px] font-bold flex items-center justify-center">1</span>
+                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Datos del Documento y Proveedor</h4>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">N° Correlativo Interno</label>
-                                <input type="number" name="correlativo_interno" placeholder="Opcional" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">N° Correlativo Interno</label>
+                                <input type="text" name="correlativo_interno" value="{{ old('correlativo_interno') }}" placeholder="Autogenerado si se deja vacío" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Fecha Recepción <span class="text-rose-500">*</span></label>
-                                <input type="date" name="fecha_recepcion" required value="{{ date('Y-m-d') }}" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Fecha Recepción <span class="text-rose-500">*</span></label>
+                                <input type="date" name="fecha_recepcion" required value="{{ old('fecha_recepcion', date('Y-m-d')) }}" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo Documento <span class="text-rose-500">*</span></label>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Tipo Documento <span class="text-rose-500">*</span></label>
                                 <select name="tipo_documento" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="" disabled selected>Seleccione...</option>
-                                    <option value="Factura">Factura</option>
-                                    <option value="Guía de Despacho">Guía de Despacho</option>
-                                    <option value="Orden de Compra">Orden de Compra</option>
+                                    <option value="" disabled {{ old('tipo_documento') ? '' : 'selected' }}>Seleccione...</option>
+                                    <option value="Factura Electrónica" {{ old('tipo_documento') == 'Factura Electrónica' ? 'selected' : '' }}>Factura Electrónica</option>
+                                    <option value="Factura" {{ old('tipo_documento') == 'Factura' ? 'selected' : '' }}>Factura</option>
+                                    <option value="Guía de Despacho" {{ old('tipo_documento') == 'Guía de Despacho' ? 'selected' : '' }}>Guía de Despacho</option>
+                                    <option value="Orden de Compra" {{ old('tipo_documento') == 'Orden de Compra' ? 'selected' : '' }}>Orden de Compra</option>
+                                    <option value="Acta de Recepción" {{ old('tipo_documento') == 'Acta de Recepción' ? 'selected' : '' }}>Acta de Recepción / Traspaso</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">N° Documento <span class="text-rose-500">*</span></label>
-                                <input type="text" name="numero_documento" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">N° Documento <span class="text-rose-500">*</span></label>
+                                <input type="text" name="numero_documento" value="{{ old('numero_documento') }}" placeholder="Ej. 104590" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">RUT Proveedor</label>
+                                <input type="text" name="rut_proveedor" value="{{ old('rut_proveedor') }}" placeholder="Ej. 61.608.700-K" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
+                            </div>
+                            <div>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Razón Social Proveedor / Origen</label>
+                                <input type="text" name="razon_social" value="{{ old('razon_social') }}" placeholder="Ej. CENABAST / Laboratorio Chile" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
 
-                            <div class="sm:col-span-2 mt-4">
-                                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-2">
-                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">2. Detalle Físico e Ubicación</h4>
+                            <div class="sm:col-span-2 mt-3">
+                                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-1">
+                                    <span class="w-5 h-5 rounded-full bg-teal-600 text-white text-[11px] font-bold flex items-center justify-center">2</span>
+                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Detalle Técnico del Producto y Ubicación</h4>
                                 </div>
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Producto <span class="text-rose-500">*</span></label>
-                                <input type="text" name="producto" placeholder="Ej. PARACETAMOL 500MG COMPRIMIDOS" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Producto / Principio Activo <span class="text-rose-500">*</span></label>
+                                <input type="text" name="producto" list="catalogoProductosManual" value="{{ old('producto') }}" placeholder="Escriba o seleccione del catálogo (Ej. PARACETAMOL 500MG COMPRIMIDOS)" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Categoría <span class="text-rose-500">*</span></label>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Categoría <span class="text-rose-500">*</span></label>
                                 <select name="categoria" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="" disabled selected>Seleccionar...</option>
-                                    <option value="Fármacos">Fármacos</option>
-                                    <option value="Insumos Clínicos">Insumos Clínicos</option>
+                                    <option value="" disabled {{ old('categoria') ? '' : 'selected' }}>Seleccionar...</option>
+                                    <option value="Medicamentos" {{ old('categoria') == 'Medicamentos' ? 'selected' : '' }}>Medicamentos</option>
+                                    <option value="Fármacos" {{ old('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
+                                    <option value="Insumos" {{ old('categoria') == 'Insumos' ? 'selected' : '' }}>Insumos</option>
+                                    <option value="Insumos Clínicos" {{ old('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
+                                    <option value="Equipamiento" {{ old('categoria') == 'Equipamiento' ? 'selected' : '' }}>Equipamiento</option>
+                                    @role('Administrador')
+                                        <option value="Fármacos Controlados" {{ old('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>Fármacos Controlados (Estupefacientes/Psicotrópicos)</option>
+                                    @endrole
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Estado de Ingreso <span class="text-rose-500">*</span></label>
-                                <select name="estado" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-medium">
-                                    <option value="Disponible">Disponible Directo</option>
-                                    <option value="Cuarentena" selected>A Cuarentena (Sugerido)</option>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Estado de Ingreso <span class="text-rose-500">*</span></label>
+                                <select name="estado" id="manualEstadoSelect" onchange="toggleManualEstadoHelp(this.value)" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-semibold text-slate-800">
+                                    <option value="Disponible" {{ old('estado', 'Disponible') == 'Disponible' ? 'selected' : '' }}>Disponible (Visible en Inventario Principal)</option>
+                                    <option value="Cuarentena" {{ old('estado') == 'Cuarentena' ? 'selected' : '' }}>En Cuarentena (Enviar a Revisión Técnica)</option>
                                 </select>
+                                <p id="manualEstadoHelpText" class="hidden text-[11px] text-amber-700 font-semibold mt-1">
+                                    Nota: Los lotes en Cuarentena se gestionan en la vista "Cuarentena" hasta su liberación.
+                                </p>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Pasillo Ubicación</label>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Pasillo Ubicación</label>
                                 <select name="pasillo" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione...</option>
+                                    <option value="">Seleccione Pasillo...</option>
                                     @foreach ($pasillosLista ?? [] as $pasillo)
                                         <option value="{{ $pasillo }}" {{ old('pasillo') == $pasillo ? 'selected' : '' }}>{{ $pasillo }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Estante Ubicación</label>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Estante Ubicación</label>
                                 <select name="estante" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione...</option>
+                                    <option value="">Seleccione Estante...</option>
                                     @foreach ($estantesLista ?? [] as $estante)
                                         <option value="{{ $estante }}" {{ old('estante') == $estante ? 'selected' : '' }}>{{ $estante }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Nivel</label>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Nivel</label>
                                 <select name="nivel" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione...</option>
+                                    <option value="">Seleccione Nivel...</option>
                                     @foreach ($nivelesLista ?? [] as $nivel)
                                         <option value="{{ $nivel }}" {{ old('nivel') == $nivel ? 'selected' : '' }}>{{ $nivel }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Posición</label>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Posición</label>
                                 <select name="posicion" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione...</option>
+                                    <option value="">Seleccione Posición...</option>
                                     @foreach ($posicionesLista ?? [] as $posicion)
                                         <option value="{{ $posicion }}" {{ old('posicion') == $posicion ? 'selected' : '' }}>{{ $posicion }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Programa</label>
-                                <select name="programa" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="" selected>Sin programa</option>
-                                    <option value="Morbilidad General">Morbilidad General</option>
-                                    <option value="Cardiovascular">Cardiovascular</option>
-                                    <option value="IRA/ERA">Respiratorio (IRA/ERA)</option>
-                                </select>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa Ministerial</label>
+                                <input type="text" name="programa" list="programasManualList" value="{{ old('programa') }}" placeholder="Ej. FOFAR / Morbilidad General" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <datalist id="programasManualList">
+                                    <option value="Morbilidad General"></option>
+                                    <option value="Fondo de Farmacia (FOFAR)"></option>
+                                    <option value="Cardiovascular"></option>
+                                    <option value="IRA/ERA"></option>
+                                    <option value="Salud Mental"></option>
+                                    @foreach($programasLista ?? [] as $progOpt)
+                                        <option value="{{ $progOpt }}"></option>
+                                    @endforeach
+                                </datalist>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Lote / Serie</label>
-                                <input type="text" name="lote" placeholder="Ej. L-4893" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono font-bold" />
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Lote / Serie</label>
+                                <input type="text" name="lote" value="{{ old('lote') }}" placeholder="Ej. L-4893 (o S/L)" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono font-bold" />
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">F. Vencimiento</label>
-                                <input type="date" name="fecha_vencimiento" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Fecha Vencimiento</label>
+                                <input type="date" name="fecha_vencimiento" value="{{ old('fecha_vencimiento') }}" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Cantidad a Ingresar <span class="text-rose-500">*</span></label>
-                                <input type="number" name="cantidad" placeholder="0" min="1" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Cantidad a Ingresar <span class="text-rose-500">*</span></label>
+                                <input type="number" name="cantidad" value="{{ old('cantidad') }}" placeholder="Ej. 500" min="1" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Valor Neto Unitario</label>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Valor Neto Unitario ($ CLP)</label>
                                 <div class="relative">
                                     <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-slate-400">$</span>
-                                    <input type="number" name="valor_neto_unitario" placeholder="0.00" min="0" step="0.01" class="w-full rounded-lg border border-slate-300 bg-white pl-8 pr-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800 font-mono-das" />
+                                    <input type="number" name="valor_neto_unitario" value="{{ old('valor_neto_unitario') ? (int) old('valor_neto_unitario') : '' }}" placeholder="0" min="0" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full rounded-lg border border-slate-300 bg-white pl-8 pr-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800 font-mono-das" />
                                 </div>
                             </div>
                         </div>
@@ -806,7 +972,10 @@
                 </div>
                 <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
                     <button type="button" onclick="closeDeposit()" class="px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar</button>
-                    <button type="submit" form="manualDepositForm" class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm text-[13px] font-bold cursor-pointer">Confirmar Ingreso</button>
+                    <button type="submit" id="manualDepositSubmitBtn" form="manualDepositForm" class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm text-[13px] font-bold cursor-pointer inline-flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span id="manualDepositSubmitText">Confirmar Ingreso</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1509,14 +1678,258 @@
             }
         });
 
+        function formatBytes(bytes) {
+            if (!bytes || bytes === 0) return '0 KB';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showClientImportAlert(type, title, message) {
+            const box = document.getElementById('clientImportAlert');
+            const titleEl = document.getElementById('clientImportAlertTitle');
+            const msgEl = document.getElementById('clientImportAlertMsg');
+            const iconEl = document.getElementById('clientImportAlertIcon');
+            if (!box) return;
+
+            box.classList.remove('hidden', 'bg-rose-50', 'border-rose-200', 'bg-amber-50', 'border-amber-200');
+            titleEl.className = 'text-[13px] font-extrabold';
+            msgEl.className = 'text-[12px] mt-1 leading-relaxed font-medium';
+
+            if (type === 'error') {
+                box.classList.add('bg-rose-50', 'border-rose-200', 'border-l-4', 'border-l-rose-600');
+                titleEl.classList.add('text-rose-900');
+                msgEl.classList.add('text-rose-700');
+                iconEl.setAttribute('class', 'w-5 h-5 text-rose-600 shrink-0 mt-0.5');
+                iconEl.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+            } else {
+                box.classList.add('bg-amber-50', 'border-amber-200', 'border-l-4', 'border-l-amber-500');
+                titleEl.classList.add('text-amber-900');
+                msgEl.classList.add('text-amber-800');
+                iconEl.setAttribute('class', 'w-5 h-5 text-amber-600 shrink-0 mt-0.5');
+                iconEl.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>';
+            }
+
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+        }
+
+        function hideClientImportAlert() {
+            const box = document.getElementById('clientImportAlert');
+            if (box) box.classList.add('hidden');
+        }
+
+        function clearSelectedImportFile() {
+            const input = document.getElementById('excel');
+            const label = document.getElementById('fileNameLabel');
+            const card = document.getElementById('selectedFileCard');
+            const forceWrap = document.getElementById('forceReimportContainer');
+            const forceCheck = document.getElementById('forceReimportCheck');
+            if (input) input.value = '';
+            if (label) {
+                label.textContent = 'Seleccionar o arrastrar archivo aquí';
+                label.classList.remove('text-teal-700');
+            }
+            if (card) card.classList.add('hidden');
+            if (forceWrap) forceWrap.classList.add('hidden');
+            if (forceCheck) forceCheck.checked = false;
+            hideClientImportAlert();
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const form = document.getElementById('importForm');
+            if (form) form.classList.add('border-teal-500', 'bg-teal-50/30');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const form = document.getElementById('importForm');
+            if (form) form.classList.remove('border-teal-500', 'bg-teal-50/30');
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const form = document.getElementById('importForm');
+            if (form) form.classList.remove('border-teal-500', 'bg-teal-50/30');
+
+            const input = document.getElementById('excel');
+            if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length > 0 && input) {
+                input.files = event.dataTransfer.files;
+                updateFileName(input);
+            }
+        }
+
         function updateFileName(input) {
             const label = document.getElementById('fileNameLabel');
-            if (input.files && input.files.length > 0) {
-                label.textContent = input.files[0].name;
-                label.classList.add('text-teal-600');
+            const card = document.getElementById('selectedFileCard');
+            const extBadge = document.getElementById('selectedFileExtBadge');
+            const nameText = document.getElementById('selectedFileNameText');
+            const sizeText = document.getElementById('selectedFileSizeText');
+            const forceWrap = document.getElementById('forceReimportContainer');
+
+            hideClientImportAlert();
+            if (forceWrap) forceWrap.classList.add('hidden');
+
+            if (!input.files || input.files.length === 0) {
+                clearSelectedImportFile();
+                return;
+            }
+
+            const file = input.files[0];
+            const parts = file.name.split('.');
+            const ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
+            const allowed = ['xlsx', 'xls', 'csv'];
+
+            // 1. Validar formato del archivo inmediatamente
+            if (!allowed.includes(ext)) {
+                input.value = '';
+                if (card) card.classList.add('hidden');
+                if (label) label.textContent = 'Seleccionar o arrastrar archivo aquí';
+
+                const extDisplay = ext ? ('.' + ext) : 'desconocido';
+                const msg = `El archivo «${file.name}» posee un formato no permitido (${extDisplay}). Por favor seleccione un archivo Excel (.xlsx, .xls) o CSV (.csv) con el formato de la Plantilla Oficial.`;
+                showClientImportAlert('error', 'Formato de Archivo No Compatible', msg);
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Formato No Compatible',
+                        text: msg,
+                        confirmButtonColor: '#0d9488'
+                    });
+                }
+                return;
+            }
+
+            // 2. Validar tamaño máximo (20 MB)
+            const maxBytes = 20 * 1024 * 1024;
+            if (file.size > maxBytes) {
+                input.value = '';
+                if (card) card.classList.add('hidden');
+                const msg = `El archivo «${file.name}» (${formatBytes(file.size)}) supera el límite máximo permitido de 20 MB.`;
+                showClientImportAlert('error', 'Archivo Demasiado Pesado', msg);
+                return;
+            }
+
+            // 3. Mostrar tarjeta del archivo seleccionado
+            if (label) {
+                label.textContent = 'Cambiar archivo seleccionado';
+                label.classList.add('text-teal-700');
+            }
+            if (card) {
+                card.classList.remove('hidden');
+                if (extBadge) extBadge.textContent = ext.toUpperCase();
+                if (nameText) nameText.textContent = file.name;
+                if (sizeText) sizeText.textContent = formatBytes(file.size);
+            }
+
+            // 4. Detectar si el usuario ya subió o seleccionó este mismo archivo recientemente (huella local)
+            try {
+                const fileFingerprint = `${file.name}|${file.size}|${file.lastModified}`;
+                const historyRaw = localStorage.getItem('das_imported_files_history') || '{}';
+                const history = JSON.parse(historyRaw);
+
+                if (history[fileFingerprint]) {
+                    showClientImportAlert(
+                        'warning',
+                        'Advertencia: Archivo Ya Utilizado Recientemente',
+                        `El archivo «${file.name}» coincide exactamente con uno subido el ${history[fileFingerprint]}. Si vuelve a importarlo sin cambios, el sistema bloqueará los lotes duplicados.`
+                    );
+                    if (forceWrap) forceWrap.classList.remove('hidden');
+                }
+            } catch (e) {}
+        }
+
+        function handleImportSubmit(event) {
+            const input = document.getElementById('excel');
+            if (!input || !input.files || input.files.length === 0) {
+                event.preventDefault();
+                showClientImportAlert(
+                    'error',
+                    'Archivo Requerido',
+                    'Debe seleccionar un archivo Excel (.xlsx, .xls) o CSV (.csv) antes de presionar Validar y Procesar.'
+                );
+                return false;
+            }
+
+            const file = input.files[0];
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['xlsx', 'xls', 'csv'].includes(ext)) {
+                event.preventDefault();
+                showClientImportAlert(
+                    'error',
+                    'Formato Inválido',
+                    'Solo se admiten archivos .xlsx, .xls o .csv.'
+                );
+                return false;
+            }
+
+            // Registrar huella local del archivo enviado
+            try {
+                const fileFingerprint = `${file.name}|${file.size}|${file.lastModified}`;
+                const historyRaw = localStorage.getItem('das_imported_files_history') || '{}';
+                const history = JSON.parse(historyRaw);
+                const nowStr = new Date().toLocaleDateString('es-CL') + ' ' + new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+                history[fileFingerprint] = nowStr;
+                localStorage.setItem('das_imported_files_history', JSON.stringify(history));
+            } catch (e) {}
+
+            // Activar Pantalla de Carga para archivos pesados
+            const overlay = document.getElementById('importLoadingOverlay');
+            const fileNameEl = document.getElementById('loadingFileName');
+            const fileSizeEl = document.getElementById('loadingFileSize');
+            const stepTextEl = document.getElementById('loadingStepText');
+            const stageLabelEl = document.getElementById('loadingStageLabel');
+            const percentLabelEl = document.getElementById('loadingPercentLabel');
+            const barEl = document.getElementById('importProgressBar');
+            const barTopEl = document.getElementById('importProgressBarTop');
+            const submitBtn = document.getElementById('importSubmitBtn');
+
+            if (fileNameEl) fileNameEl.textContent = file.name;
+            if (fileSizeEl) fileSizeEl.textContent = '(' + formatBytes(file.size) + ')';
+            if (overlay) overlay.classList.remove('hidden');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+            }
+
+            const steps = [
+                { pct: 25, text: 'Verificando estructura y columnas de la Plantilla Oficial...', stage: 'Validando encabezados...' },
+                { pct: 55, text: 'Comprobando lotes y detectando registros duplicados...', stage: 'Analizando integridad...' },
+                { pct: 82, text: 'Registrando existencias y movimientos de trazabilidad en bodega...', stage: 'Guardando en base de datos...' },
+                { pct: 95, text: 'Finalizando transacción y actualizando catálogo...', stage: 'Completando operación...' }
+            ];
+
+            let currentStep = 0;
+            const interval = setInterval(() => {
+                if (currentStep >= steps.length) {
+                    clearInterval(interval);
+                    return;
+                }
+                const st = steps[currentStep];
+                if (barEl) barEl.style.width = st.pct + '%';
+                if (barTopEl) barTopEl.style.width = st.pct + '%';
+                if (percentLabelEl) percentLabelEl.textContent = st.pct + '%';
+                if (stepTextEl) stepTextEl.textContent = st.text;
+                if (stageLabelEl) stageLabelEl.textContent = st.stage;
+                currentStep++;
+            }, 650);
+
+            return true;
+        }
+
+        function toggleManualEstadoHelp(val) {
+            const help = document.getElementById('manualEstadoHelpText');
+            if (!help) return;
+            if (val === 'Cuarentena') {
+                help.classList.remove('hidden');
             } else {
-                label.textContent = 'Explorar Archivos';
-                label.classList.remove('text-teal-600');
+                help.classList.add('hidden');
             }
         }
 
@@ -1533,13 +1946,30 @@
                 }
                 return false;
             }
+
+            const btn = document.getElementById('manualDepositSubmitBtn');
+            const txt = document.getElementById('manualDepositSubmitText');
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-70', 'cursor-wait');
+            }
+            if (txt) {
+                txt.textContent = 'Guardando Ingreso...';
+            }
             return true;
         }
 
-        @if ($errors->any())
-            document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            const selEstado = document.getElementById('manualEstadoSelect');
+            if (selEstado) {
+                toggleManualEstadoHelp(selEstado.value);
+            }
+
+            @if (session('open_modal') === 'import')
+                openImport();
+            @elseif (session('open_modal') === 'deposit' || $errors->any())
                 openDeposit();
-            });
-        @endif
+            @endif
+        });
     </script>
 @endsection

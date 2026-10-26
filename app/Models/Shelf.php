@@ -26,4 +26,9 @@ class Shelf extends Model
     {
         return $this->hasMany(Level::class);
     }
+
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'shelf_id');
+    }
 }

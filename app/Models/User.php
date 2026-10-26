@@ -31,4 +31,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function assignedRequests()
+    {
+        return $this->hasMany(EstablishmentRequest::class, 'assigned_user_id');
+    }
 }

@@ -79,6 +79,25 @@ class GlobalSearchController extends Controller
             }
         } catch (\Exception $e) {}
 
+        // 4. SOLICITUDES DE ESTABLECIMIENTOS Y CESFAM
+        try {
+            $solicitudes = DB::table('establishment_requests')
+                ->where('numero_solicitud', 'LIKE', $searchTerm)
+                ->orWhere('establecimiento', 'LIKE', $searchTerm)
+                ->orWhere('responsable', 'LIKE', $searchTerm)
+                ->limit(3)->get();
+
+            foreach ($solicitudes as $sol) {
+                $results[] = [
+                    'type' => 'Solicitud (' . $sol->estado . ')',
+                    'title' => $sol->numero_solicitud . ' — ' . $sol->establecimiento,
+                    'subtitle' => 'Responsable: ' . ($sol->responsable ?? 'S/R') . ' | Fecha: ' . $sol->fecha_solicitud,
+                    'url' => route('dispatch.index', ['solicitud_id' => $sol->id]),
+                    'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>'
+                ];
+            }
+        } catch (\Exception $e) {}
+
         return response()->json($results);
     }
 
@@ -87,6 +106,48 @@ class GlobalSearchController extends Controller
         $notifications = [];
 
         try {
+            // 0. SOLICITUDES ASIGNADAS AL USUARIO LOGUEADO (O PENDIENTES DE ASIGNAR PARA ADMIN)
+            if (auth()->check()) {
+                $misSolicitudes = DB::table('establishment_requests')
+                    ->where('assigned_user_id', auth()->id())
+                    ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
+                    ->orderBy('created_at', 'desc')
+                    ->limit(5)
+                    ->get();
+
+                foreach ($misSolicitudes as $sol) {
+                    $notifications[] = [
+                        'color' => 'text-teal-600',
+                        'bg' => 'bg-teal-100',
+                        'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>',
+                        'title' => "Solicitud {$sol->numero_solicitud} asignada a ti",
+                        'message' => "{$sol->establecimiento} ({$sol->estado}). Haz clic para despachar.",
+                        'time' => 'Despachar',
+                        'url' => route('dispatch.index', ['solicitud_id' => $sol->id]),
+                    ];
+                }
+
+                if (auth()->user()->hasRole('Administrador')) {
+                    $sinAsignar = DB::table('establishment_requests')
+                        ->whereNull('assigned_user_id')
+                        ->whereIn('estado', ['Pendiente', 'Parcial'])
+                        ->orderBy('created_at', 'desc')
+                        ->limit(3)
+                        ->get();
+
+                    foreach ($sinAsignar as $sol) {
+                        $notifications[] = [
+                            'color' => 'text-indigo-600',
+                            'bg' => 'bg-indigo-100',
+                            'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>',
+                            'title' => "Solicitud {$sol->numero_solicitud} sin asignar",
+                            'message' => "{$sol->establecimiento} requiere asignación de trabajador.",
+                            'time' => 'Asignar',
+                            'url' => route('dispatch.index'),
+                        ];
+                    }
+                }
+            }
             $vencimientos = DB::table('inventories')
                 ->where('cantidad', '>', 0)
                 ->whereNotNull('fecha_vencimiento')

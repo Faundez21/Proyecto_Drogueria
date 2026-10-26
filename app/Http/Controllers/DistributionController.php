@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aisle;
 use App\Models\Inventory;
+use App\Models\Level;
+use App\Models\Position;
 use App\Models\Shelf;
 
 class DistributionController extends Controller
@@ -25,6 +28,13 @@ class DistributionController extends Controller
                 'fecha_vencimiento',
             ]);
 
-        return view('distribution.index', compact('shelves', 'stock'));
+        $counts = [
+            'aisles' => Aisle::count(),
+            'shelves' => $shelves->count(),
+            'levels' => Level::count(),
+            'positions' => Position::count(),
+        ];
+
+        return view('distribution.index', compact('shelves', 'stock', 'counts'));
     }
 }

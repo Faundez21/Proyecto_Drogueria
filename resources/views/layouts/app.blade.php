@@ -345,7 +345,7 @@
                     @endcanany
 
                     <!-- Paso 3: Salida -->
-                    @canany(['ver.despacho', 'ver.despacho_controlado', 'ver.distribucion', 'ver.solicitudes'])
+                    @canany(['ver.despacho', 'ver.despacho_controlado', 'ver.distribucion', 'ver.solicitudes', 'ver.solicitudes_cesfam'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
                             <span
@@ -398,13 +398,25 @@
 
                             @can('ver.solicitudes')
                                 <a href="{{ route('requests.index') }}"
-                                    class="nav-row {{ request()->routeIs('requests.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                    class="nav-row {{ request()->routeIs('requests.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4">
                                         </path>
                                     </svg>
-                                    Solicitudes
+                                    Solicitudes Establecimientos
+                                </a>
+                            @endcan
+
+                            @can('ver.solicitudes_cesfam')
+                                <a href="{{ route('requests.cesfam') }}"
+                                    class="nav-row {{ request()->routeIs('requests.cesfam') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011 1h2a1 1 0 011 1v5m-4 0h4">
+                                        </path>
+                                    </svg>
+                                    Solicitudes Cesfam
                                 </a>
                             @endcan
                         </div>

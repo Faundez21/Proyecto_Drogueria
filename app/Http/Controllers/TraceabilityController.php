@@ -108,28 +108,79 @@ class TraceabilityController extends Controller
     {
         $filename = 'Reporte_Trazabilidad_Lotes_' . date('Y-m-d_H-i') . '.xls';
 
+        $totalMovimientos = count($movements);
+        $totalUnidadesMovidas = collect($movements)->sum('cantidad');
+        $totalRecepciones = collect($movements)->where('tipo_movimiento', 'Recepción')->count();
+        $totalDespachos = collect($movements)->whereIn('tipo_movimiento', ['Despacho', 'Despacho Controlado'])->count();
+
         $html = '<meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">';
-        $html .= '<table border="1" style="font-family: Arial, sans-serif; border-collapse: collapse;">';
+        $html .= '<table border="1" style="font-family: Calibri, Arial, sans-serif; border-collapse: collapse; border-color: #cbd5e1;">';
+
+        // Banner Institucional
+        $html .= '<tr>';
+        $html .= '<td colspan="8" style="background-color: #0f766e; color: #ffffff; font-size: 16px; font-weight: bold; padding: 10px; text-align: left;">';
+        $html .= 'DROGUERÍA COMUNAL DAS - I. MUNICIPALIDAD DE TALCAHUANO';
+        $html .= '</td>';
+        $html .= '</tr>';
+
+        $html .= '<tr>';
+        $html .= '<td colspan="8" style="background-color: #f0fdfa; color: #134e4a; font-size: 12px; font-weight: bold; padding: 6px 10px; text-align: left;">';
+        $html .= 'AUDITORÍA Y TRAZABILIDAD HISTÓRICA DE LOTES · Emitido el ' . date('d/m/Y H:i') . ' hrs';
+        $html .= '</td>';
+        $html .= '</tr>';
+
+        // KPI Strip en Excel
+        $html .= '<tr style="background-color: #f8fafc; font-size: 11px; text-align: center; height: 26px;">';
+        $html .= '<td colspan="2" style="padding: 6px;"><strong>Total Eventos:</strong> ' . number_format($totalMovimientos, 0, ',', '.') . '</td>';
+        $html .= '<td colspan="2" style="padding: 6px; color: #047857;"><strong>Recepciones:</strong> ' . number_format($totalRecepciones, 0, ',', '.') . '</td>';
+        $html .= '<td colspan="2" style="padding: 6px; color: #1d4ed8;"><strong>Despachos:</strong> ' . number_format($totalDespachos, 0, ',', '.') . '</td>';
+        $html .= '<td colspan="2" style="padding: 6px; color: #0f766e;"><strong>Unidades Movilizadas:</strong> ' . number_format($totalUnidadesMovidas, 0, ',', '.') . '</td>';
+        $html .= '</tr>';
+
         $html .= '<thead>';
-        $html .= '<tr style="background-color: #0f172a; color: #ffffff; text-align: center; height: 30px;">';
-        $html .= '<th>FECHA Y HORA</th><th>PRODUCTO</th><th>LOTE</th><th>VENCIMIENTO</th><th>TIPO MOVIMIENTO</th><th>CANTIDAD</th><th>ORIGEN / DESTINO</th><th>DOCUMENTO RESPALDO</th>';
+        $html .= '<tr style="background-color: #0f172a; color: #ffffff; text-align: center; height: 32px; font-size: 11px; font-weight: bold;">';
+        $html .= '<th style="padding: 8px;">FECHA Y HORA</th>';
+        $html .= '<th style="padding: 8px;">PRODUCTO / DESCRIPCIÓN</th>';
+        $html .= '<th style="padding: 8px;">N° DE LOTE</th>';
+        $html .= '<th style="padding: 8px;">VENCIMIENTO</th>';
+        $html .= '<th style="padding: 8px;">TIPO DE MOVIMIENTO</th>';
+        $html .= '<th style="padding: 8px;">CANTIDAD</th>';
+        $html .= '<th style="padding: 8px;">ORIGEN / ESTABLECIMIENTO DESTINO</th>';
+        $html .= '<th style="padding: 8px;">DOCUMENTO DE RESPALDO</th>';
         $html .= '</tr></thead><tbody>';
 
-        foreach ($movements as $mov) {
-            $colorMovimiento = $mov->tipo_movimiento == 'Recepción' ? 'color: #047857; font-weight: bold;' : 'color: #1d4ed8; font-weight: bold;';
+        foreach ($movements as $idx => $mov) {
+            $bgRow = ($idx % 2 === 1) ? 'background-color: #f8fafc;' : 'background-color: #ffffff;';
+            if ($mov->tipo_movimiento === 'Recepción') {
+                $colorMovimiento = 'color: #047857; background-color: #ecfdf5; font-weight: bold;';
+            } elseif ($mov->tipo_movimiento === 'Despacho Controlado') {
+                $colorMovimiento = 'color: #be123c; background-color: #fff1f2; font-weight: bold;';
+            } elseif ($mov->tipo_movimiento === 'Despacho') {
+                $colorMovimiento = 'color: #1d4ed8; background-color: #eff6ff; font-weight: bold;';
+            } else {
+                $colorMovimiento = 'color: #b45309; background-color: #fffbeb; font-weight: bold;';
+            }
+
             $fechaVence = $mov->fecha_vencimiento ? Carbon::parse($mov->fecha_vencimiento)->format('d/m/Y') : 'N/A';
 
-            $html .= '<tr style="text-align: center;">';
-            $html .= '<td>' . Carbon::parse($mov->fecha_hora)->format('d/m/Y H:i') . '</td>';
-            $html .= '<td style="text-align: left; font-weight: bold;">' . e($mov->producto) . '</td>';
-            $html .= '<td style="mso-number-format:\'@\';">' . e($mov->lote) . '</td>';
-            $html .= '<td>' . $fechaVence . '</td>';
-            $html .= '<td style="' . $colorMovimiento . '">' . e($mov->tipo_movimiento) . '</td>';
-            $html .= '<td style="font-weight: bold;">' . $mov->cantidad . '</td>';
-            $html .= '<td style="text-align: left;">' . e($mov->origen_destino) . '</td>';
-            $html .= '<td>' . e($mov->documento_respaldo) . '</td>';
+            $html .= '<tr style="text-align: center; font-size: 11px; ' . $bgRow . '">';
+            $html .= '<td style="padding: 6px;">' . Carbon::parse($mov->fecha_hora)->format('d/m/Y H:i') . '</td>';
+            $html .= '<td style="padding: 6px; text-align: left; font-weight: bold; color: #0f172a;">' . e($mov->producto) . '</td>';
+            $html .= '<td style="padding: 6px; mso-number-format:\'@\'; font-family: Consolas, monospace; font-weight: bold;">' . e($mov->lote) . '</td>';
+            $html .= '<td style="padding: 6px;">' . $fechaVence . '</td>';
+            $html .= '<td style="padding: 6px; ' . $colorMovimiento . '">' . e($mov->tipo_movimiento) . '</td>';
+            $html .= '<td style="padding: 6px; font-weight: bold; mso-number-format:\'#,##0\';">' . (int) $mov->cantidad . '</td>';
+            $html .= '<td style="padding: 6px; text-align: left;">' . e($mov->origen_destino) . '</td>';
+            $html .= '<td style="padding: 6px; font-weight: bold; color: #334155;">' . e($mov->documento_respaldo) . '</td>';
             $html .= '</tr>';
         }
+
+        // Fila Total al final
+        $html .= '<tr style="background-color: #ccfbf1; color: #134e4a; font-weight: bold; font-size: 11px; height: 28px;">';
+        $html .= '<td colspan="5" style="text-align: right; padding: 6px 10px;">TOTAL UNIDADES MOVILIZADAS EN EL PERIODO:</td>';
+        $html .= '<td style="text-align: center; padding: 6px; mso-number-format:\'#,##0\';">' . (int) $totalUnidadesMovidas . '</td>';
+        $html .= '<td colspan="2" style="padding: 6px;"></td>';
+        $html .= '</tr>';
 
         $html .= '</tbody></table>';
 

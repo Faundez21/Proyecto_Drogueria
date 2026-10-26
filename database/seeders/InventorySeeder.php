@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Inventory;
+use App\Services\InventoryService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
@@ -458,7 +459,7 @@ class InventorySeeder extends Seeder
         ];
 
         foreach ($inventarios as $data) {
-            Inventory::create($data);
+            Inventory::create(InventoryService::resolverRelaciones($data));
         }
     }
 }

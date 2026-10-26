@@ -1,547 +1,494 @@
 @extends('layouts.app')
 
+@section('title', 'Mantenedor de Pasillos')
+@section('subtitle', 'Administración de zonas y pasillos físicos de almacenamiento en la bodega.')
+
+@section('actions')
+    <div class="flex flex-wrap items-center gap-2.5">
+        <a href="{{ route('distribution.index') }}"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:text-teal-700 shadow-sm transition-all duration-200">
+            <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Mapa 3D
+        </a>
+        @role('Administrador')
+            <button type="button" onclick="openHistory()"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-[13px] font-semibold hover:bg-slate-50 hover:text-teal-700 transition-all duration-200 shadow-sm cursor-pointer">
+                <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Ver Historial
+            </button>
+        @endrole
+        <button type="button" onclick="openCreate()"
+            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200 text-[13px] font-bold shadow-sm cursor-pointer">
+            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Nuevo Pasillo
+        </button>
+    </div>
+@endsection
+
 @section('content')
-    <div class="w-full">
-        <!-- migas de pan -->
-        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
-            <span class="text-slate-400 font-semibold">03</span>
-            <span>Salida</span>
-            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="space-y-6">
+        <!-- Ruta de navegación -->
+        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
+            <span class="font-mono-das text-slate-400 font-semibold">02</span>
+            <span>Almacenamiento</span>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
             <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 transition-colors">Distribución</a>
-            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
-            <span class="font-semibold text-slate-800">Pasillos</span>
-            @role('Administrador')
-                <div class="flex gap-2 w-full sm:w-auto ml-auto">
-                    <button type="button" onclick="openHistory()"
-                        class="w-full sm:w-auto bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors shadow-sm">
-                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Ver Historial
-                    </button>
-                </div>
-            @endrole
+            <span class="font-medium text-slate-800">Pasillos</span>
         </div>
-        <!-- Encabezado -->
 
-        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+        <!-- Barra de Navegación Jerárquica de Bodega -->
+        @include('distribution.partials.nav_tabs', ['activeTab' => 'aisle'])
 
-            <div>
+        @if (session('success'))
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 text-emerald-800 text-[13px] font-semibold shadow-sm">
+                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
 
-                <h1 class="text-3xl font-bold text-gray-800">
-                    Pasillos
-                </h1>
+        <!-- Contenedor Principal Tabla Pasillos -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+            <!-- Cabecera y buscador -->
+            <div class="p-4 sm:px-6 border-b border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-[15px] font-bold text-slate-800">Directorio de Pasillos</h3>
+                        <p class="text-[12px] text-slate-500">Total registrados: <strong class="text-slate-700 font-mono-das">{{ $aisles->count() }}</strong></p>
+                    </div>
+                </div>
 
-                <p class="text-gray-500 mt-1">
-                    Administración de los pasillos de la bodega
-                </p>
-
+                <div class="relative w-full sm:w-72">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" id="aisleSearchInput" oninput="filtrarPasillos()" placeholder="Buscar pasillo o descripción..."
+                        class="w-full pl-9 pr-3.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                </div>
             </div>
 
-            <button onclick="openCreate()"
-                class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-lg cursor-pointer shadow-sm">
-                + Nuevo pasillo
-            </button>
-
-        </div>
-
-
-        <!-- Tabla -->
-
-        <div class="overflow-x-auto">
-
-            <table class="w-full min-w-[600px] text-left text-sm text-slate-600">
-
-                <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
-                    <tr>
-
-                        <th class="px-6 py-4">
-                            ID
-                        </th>
-
-                        <th class="px-6 py-4">
-                            Nombre
-                        </th>
-
-                        <th class="px-6 py-4">
-                            Descripción
-                        </th>
-
-                        <th class="px-6 py-4">
-                            Estanterías totales
-                        </th>
-
-                        <th class="px-6 py-4 text-center">
-                            Acciones
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody class="divide-y divide-slate-100">
-
-                    @foreach ($aisles as $aisle)
+            <!-- Tabla -->
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[700px] text-left text-[13px] text-slate-600">
+                    <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-500 uppercase text-[11px] font-bold tracking-wider">
                         <tr>
+                            <th class="px-6 py-3.5 w-20">ID</th>
+                            <th class="px-6 py-3.5">Pasillo / Identificador</th>
+                            <th class="px-6 py-3.5">Descripción Operativa</th>
+                            <th class="px-6 py-3.5 text-center">Color 3D</th>
+                            <th class="px-6 py-3.5 text-center">Estanterías</th>
+                            <th class="px-6 py-3.5 text-center">Capacidad Acumulada</th>
+                            <th class="px-6 py-3.5 text-center w-36">Acciones</th>
+                        </tr>
+                    </thead>
 
-                            <td class="px-6 py-4">
-                                {{ $aisle->id }}
-                            </td>
+                    <tbody class="divide-y divide-slate-100" id="aisleTableBody">
+                        @forelse ($aisles as $aisle)
+                            @php
+                                $colorHex = $aisle->color ?: '#3B82F6';
+                                $shelvesCount = $aisle->shelves_count ?? 0;
+                                $capTotal = (int) ($aisle->shelves_sum_capacidad ?? 0);
+                            @endphp
+                            <tr class="aisle-row hover:bg-slate-50/70 transition-colors"
+                                data-search="{{ strtolower($aisle->name . ' ' . ($aisle->description ?? '')) }}">
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 rounded-md bg-slate-100 border border-slate-200 font-mono-das text-[11.5px] font-semibold text-slate-600">
+                                        #{{ $aisle->id }}
+                                    </span>
+                                </td>
 
-                            <td class="px-6 py-4">
-                                {{ $aisle->name }}
-                            </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2.5">
+                                        <span class="w-3 h-3 rounded-full shrink-0 ring-2 ring-offset-1 ring-slate-200" style="background-color: {{ $colorHex }};"></span>
+                                        <span class="font-bold text-slate-800 text-[13.5px]">{{ $aisle->name }}</span>
+                                    </div>
+                                </td>
 
-                            <td class="px-6 py-4">
-                                {{ $aisle->description }}
-                            </td>
+                                <td class="px-6 py-4 text-slate-600">
+                                    {{ $aisle->description ?: 'Sin descripción asignada' }}
+                                </td>
 
-                            <td class="px-6 py-4">
-                                {{ $aisle->shelves_count }}
-                            </td>
-                            <td class="px-6 py-4 text-center">
+                                <td class="px-6 py-4 text-center">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 font-mono-das text-[11px] font-semibold text-slate-700">
+                                        <span class="w-2.5 h-2.5 rounded-sm" style="background-color: {{ $colorHex }};"></span>
+                                        {{ strtoupper($colorHex) }}
+                                    </span>
+                                </td>
 
-                                <div class="flex justify-center gap-2">
+                                <td class="px-6 py-4 text-center">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] font-bold {{ $shelvesCount > 0 ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100 text-slate-500 border border-slate-200' }}">
+                                        {{ $shelvesCount }} {{ $shelvesCount === 1 ? 'estantería' : 'estanterías' }}
+                                    </span>
+                                </td>
 
-                                    <!-- Ver -->
-                                    <button
-                                        onclick='openShow({{ $aisle->id }}, @json ($aisle->name), @json ($aisle->description))''
-                                        class="p-1.5 text-slate-600 hover:bg-slate-100 rounded transition-colors"
-                                        title="Ver pasillo">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </button>
+                                <td class="px-6 py-4 text-center">
+                                    @if ($capTotal > 0)
+                                        <span class="inline-flex px-2.5 py-1 rounded-lg text-[12px] font-bold bg-teal-50 text-teal-700 border border-teal-200 font-mono-das">
+                                            {{ number_format($capTotal, 0, ',', '.') }} uds.
+                                        </span>
+                                    @else
+                                        <span class="text-[12px] text-slate-400 font-medium">Sin límite</span>
+                                    @endif
+                                </td>
 
-                                    <!-- Editar -->
-                                    <button
-                                        onclick='openEdit({{ $aisle->id }}, @json ($aisle->name), @json ($aisle->description))''
-                                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                        title="Editar pasillo">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                        </svg>
-                                    </button>
-
-                                    <!-- Eliminar -->
-                                    <form action="{{ route('aisle.destroy', $aisle->id) }}" method="POST"
-                                        onsubmit="return confirm('¿Estás seguro de que deseas eliminar este pasillo?');"
-                                        class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors cursor-pointer"
-                                            title="Eliminar pasillo">
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex justify-center items-center gap-1.5">
+                                        <button type="button"
+                                            onclick='openShow({{ $aisle->id }}, @json($aisle->name), @json($aisle->description), {{ $shelvesCount }}, @json($colorHex))'
+                                            class="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                                            title="Ver detalle">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                </path>
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </button>
-                                    </form>
 
+                                        <button type="button"
+                                            onclick='openEdit({{ $aisle->id }}, @json($aisle->name), @json($aisle->description), @json($colorHex))'
+                                            class="p-1.5 text-teal-600 hover:text-teal-800 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
+                                            title="Editar pasillo">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                            </svg>
+                                        </button>
 
-
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-                    @endforeach
-                </tbody>
-
-            </table>
-
-        </div>
-
-
-        <!-- Modal para crear un nuevo pasillo -->
-        <div id="createModal"
-            class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-
-                <!-- Encabezado -->
-                <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
-
-                    <div>
-                        <h2 class="text-xl font-bold text-white">
-                            Nuevo pasillo
-                        </h2>
-
-                        <p class="text-blue-100 text-sm mt-1">
-                            Registra un nuevo pasillo de la bodega.
-                        </p>
-                    </div>
-
-                    <button type="button" onclick="closeCreate()"
-                        class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
-
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-
-                    </button>
-
-                </div>
-
-                <!-- Formulario -->
-                <form action="{{ route('aisle.store') }}" method="POST">
-
-                    @csrf
-
-                    <div class="px-6 py-6">
-
-                        <!-- Nombre -->
-                        <div class="mb-5">
-
-                            <label for="name" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Nombre
-                            </label>
-
-                            <input type="text" name="name" id="name" placeholder="Ej: Pasillo A"
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition">
-
-                        </div>
-
-                        <!-- Descripción -->
-                        <div>
-
-                            <label for="description" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Descripción
-                            </label>
-
-                            <textarea name="description" id="description" rows="4" placeholder="Descripción del pasillo..."
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition resize-none"></textarea>
-
-                        </div>
-
-                        <!--color-->
-                        <div>
-                            <label for="color" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Color
-                            </label>
-                            <input type="color" name="color" value="#3B82F6"
-                                class="w-12 h-10 rounded-lg border border-slate-300 cursor-pointer">
-                            <span class="text-xs text-slate-500">
-                                Este color se aplicará a las estanterías del pasillo.
-                            </span>
-                        </div>
-
-                    </div>
-
-
-                    <!-- Botones -->
-                    <div class="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
-
-                        <button type="button" onclick="closeCreate()"
-                            class="px-4 py-2 text-sm font-medium text-slate-700
-                    bg-white border border-slate-300 rounded-lg
-                    hover:bg-slate-100 transition-colors cursor-pointer">
-                            Cancelar
-                        </button>
-
-                        <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white
-                    bg-blue-900 rounded-lg hover:bg-blue-800
-                    transition-colors cursor-pointer">
-                            Guardar pasillo
-                        </button>
-
-                    </div>
-
-                </form>
-
+                                        <form action="{{ route('aisle.destroy', $aisle->id) }}" method="POST"
+                                            onsubmit="return confirm('¿Estás seguro de que deseas eliminar este pasillo?');"
+                                            class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                                title="Eliminar pasillo">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center text-slate-400">
+                                    <svg class="w-10 h-10 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2"></path>
+                                    </svg>
+                                    <p class="text-[13.5px] font-bold text-slate-600">No hay pasillos registrados</p>
+                                    <p class="text-[12px] text-slate-400 mt-0.5">Crea el primer pasillo para organizar tus estanterías.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-
         </div>
-
-        <!-- Modal para ver un pasillo -->
-        <div id="showModal"
-            class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-
-                <!-- Encabezado -->
-                <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
-
-                    <div>
-                        <h2 class="text-xl font-bold text-white">
-                            Información del pasillo
-                        </h2>
-
-                        <p class="text-blue-100 text-sm mt-1">
-                            Detalles del pasillo seleccionado.
-                        </p>
-                    </div>
-
-                    <button type="button" onclick="closeShow()"
-                        class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
-
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-
-                    </button>
-
-                </div>
-
-                <!-- Información -->
-                <div class="px-6 py-6 space-y-4">
-
-                    <div>
-                        <p class="text-xs font-semibold text-slate-500 uppercase mb-1">
-                            Nombre
-                        </p>
-
-                        <p id="showName" class="text-slate-800 font-medium">
-                        </p>
-                    </div>
-
-                    <div>
-                        <p class="text-xs font-semibold text-slate-500 uppercase mb-1">
-                            Descripción
-                        </p>
-
-                        <p id="showDescription" class="text-slate-700">
-                        </p>
-                    </div>
-
-                    <div>
-                        <p class="text-xs font-semibold text-slate-500 uppercase mb-1">
-                            Estanterías totales
-                        </p>
-
-                        <p class="text-slate-800 font-medium">
-                            6
-                        </p>
-                    </div>
-
-                </div>
-
-                <!-- Botones -->
-                <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200">
-
-                    <button type="button" onclick="closeShow()"
-                        class="px-4 py-2 text-sm font-medium text-slate-700
-                bg-white border border-slate-300 rounded-lg
-                hover:bg-slate-100 transition-colors cursor-pointer">
-                        Cerrar
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-        <!-- Modal para editar un pasillo -->
-        <div id="editModal"
-            class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-
-                <!-- Encabezado -->
-                <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
-
-                    <div>
-                        <h2 class="text-xl font-bold text-white">
-                            Editar pasillo
-                        </h2>
-
-                        <p class="text-blue-100 text-sm mt-1">
-                            Modifica la información del pasillo.
-                        </p>
-                    </div>
-
-                    <button type="button" onclick="closeEdit()"
-                        class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
-
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-
-                    </button>
-
-                </div>
-
-                <!-- Formulario -->
-                <form id="editForm" method="POST">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="px-6 py-6">
-
-                        <div class="mb-5">
-
-                            <label for="editName" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Nombre
-                            </label>
-
-                            <input type="text" name="name" id="editName" value="Pasillo A"
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition">
-
-                        </div>
-
-                        <div>
-
-                            <label for="editDescription" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Descripción
-                            </label>
-
-                            <textarea name="description" id="editDescription" rows="4"
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition resize-none">Medicamentos generales</textarea>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Botones -->
-                    <div class="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
-
-                        <button type="button" onclick="closeEdit()"
-                            class="px-4 py-2 text-sm font-medium text-slate-700
-                    bg-white border border-slate-300 rounded-lg
-                    hover:bg-slate-100 transition-colors cursor-pointer">
-                            Cancelar
-                        </button>
-
-                        <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white
-                    bg-blue-900 rounded-lg hover:bg-blue-800
-                    transition-colors cursor-pointer">
-                            Guardar cambios
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        </div>
-
     </div>
 
-    <!-- modal de historial -->
-    <div id="HistoryModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 w-full max-w-4xl overflow-hidden">
-
-            <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-800">Historial de Posiciones</h2>
-                    <p class="text-sm text-slate-500 mt-0.5">Registro de auditoría de creación y modificaciones de
-                        posiciones.</p>
+    <!-- Modal Crear Pasillo -->
+    <div id="createModal"
+        class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
+            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-[16px] font-bold text-white leading-tight">Nuevo Pasillo</h2>
+                        <p class="text-slate-400 text-[12px] mt-0.5">Registra un nuevo pasillo físico en la bodega.</p>
+                    </div>
                 </div>
-                <button type="button" onclick="closeHistory()"
-                    class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
+                <button type="button" onclick="closeCreate()"
+                    class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
 
-            <div class="overflow-x-auto max-h-96 border border-slate-200 rounded-xl">
-                <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
-                    <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b border-slate-200 sticky top-0">
-                        <tr>
-                            <th class="px-4 py-3 font-semibold">Fecha / Hora</th>
-                            <th class="px-4 py-3 font-semibold">Acción</th>
-                            <th class="px-4 py-3 font-semibold">Detalle de la Posición</th>
-                            <th class="px-4 py-3 font-semibold">Usuario Responsable</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="px-4 py-3 text-slate-500">16/09/2026 - 12:00</td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold">Creación</span>
-                            </td>
-                            <td class="px-4 py-3 font-medium text-slate-800">Posición A-01 (Posición de almacenamiento)
-                            </td>
-                            <td class="px-4 py-3 text-slate-600 font-medium">Juan Pérez</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <form action="{{ route('aisle.store') }}" method="POST">
+                @csrf
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="name" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                            Nombre del Pasillo <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="name" id="name" required placeholder="Ej: Pasillo A"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                    </div>
 
-            <div class="flex justify-end pt-6 border-t border-slate-100">
-                <button type="button" onclick="closeHistory()"
-                    class="px-5 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-colors text-sm font-medium shadow-sm">
-                    Cerrar
+                    <div>
+                        <label for="color" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                            Color Identificador (Visor 3D) <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="flex items-center gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                            <input type="color" name="color" id="color" value="#0D9488"
+                                class="w-10 h-9 rounded border border-slate-300 cursor-pointer bg-white p-0.5">
+                            <span class="text-[12px] text-slate-500">
+                                Este color identificará a las etiquetas del pasillo en el mapa 3D.
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="description" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                            Descripción Operativa
+                        </label>
+                        <textarea name="description" id="description" rows="3" placeholder="Ej: Pasillo de medicamentos de alta rotación..."
+                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition resize-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-200">
+                    <button type="button" onclick="closeCreate()"
+                        class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2 text-[13px] font-bold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-sm cursor-pointer">
+                        Guardar Pasillo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Ver Pasillo -->
+    <div id="showModal"
+        class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden">
+            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800">
+                <div>
+                    <h2 class="text-[16px] font-bold text-white leading-tight">Ficha del Pasillo</h2>
+                    <p class="text-slate-400 text-[12px] mt-0.5">Información registrada en la bodega.</p>
+                </div>
+                <button type="button" onclick="closeShow()"
+                    class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
 
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pasillo</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span id="showColorDot" class="w-3 h-3 rounded-full bg-teal-500"></span>
+                            <p id="showName" class="text-[14px] font-bold text-slate-800"></p>
+                        </div>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Estanterías Asociadas</p>
+                        <p id="showShelvesCount" class="text-[14px] font-bold text-teal-700 font-mono-das mt-1"></p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Descripción</p>
+                    <p id="showDescription" class="text-[13px] text-slate-700"></p>
+                </div>
+            </div>
+
+            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200">
+                <button type="button" onclick="closeShow()"
+                    class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Pasillo -->
+    <div id="editModal"
+        class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
+            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800">
+                <div>
+                    <h2 class="text-[16px] font-bold text-white leading-tight">Editar Pasillo</h2>
+                    <p class="text-slate-400 text-[12px] mt-0.5">Actualiza los datos del pasillo seleccionado.</p>
+                </div>
+                <button type="button" onclick="closeEdit()"
+                    class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="editForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="editName" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                            Nombre del Pasillo <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="name" id="editName" required
+                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                    </div>
+
+                    <div>
+                        <label for="editColor" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                            Color Identificador (Visor 3D) <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="flex items-center gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                            <input type="color" name="color" id="editColor" value="#3B82F6"
+                                class="w-10 h-9 rounded border border-slate-300 cursor-pointer bg-white p-0.5">
+                            <span class="text-[12px] text-slate-500">
+                                Color aplicado a las etiquetas del pasillo en el visor 3D.
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="editDescription" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                            Descripción Operativa
+                        </label>
+                        <textarea name="description" id="editDescription" rows="3"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition resize-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-200">
+                    <button type="button" onclick="closeEdit()"
+                        class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2 text-[13px] font-bold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-sm cursor-pointer">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Historial -->
+    <div id="HistoryModal"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden">
+            <div class="bg-slate-900 px-6 py-4.5 flex justify-between items-center border-b border-slate-800">
+                <div>
+                    <h2 class="text-[16px] font-bold text-white">Historial de Pasillos</h2>
+                    <p class="text-[12px] text-slate-400 mt-0.5">Registro de auditoría de creación y modificaciones de pasillos.</p>
+                </div>
+                <button type="button" onclick="closeHistory()"
+                    class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <div class="overflow-x-auto max-h-96 border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
+                        <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3">Pasillo</th>
+                                <th class="px-4 py-3">Acción</th>
+                                <th class="px-4 py-3">Descripción</th>
+                                <th class="px-4 py-3">Última Actualización</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @forelse ($aisles as $a)
+                                <tr class="hover:bg-slate-50/60 transition-colors">
+                                    <td class="px-4 py-3 font-bold text-slate-800">{{ $a->name }}</td>
+                                    <td class="px-4 py-3">
+                                        <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[11px] font-bold">Activo</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-slate-600">{{ $a->description ?: 'Sin descripción' }}</td>
+                                    <td class="px-4 py-3 font-mono-das text-[12px] text-slate-500">{{ optional($a->updated_at)->format('d/m/Y H:i') ?? 'Registro inicial' }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-4 py-6 text-center text-slate-400">Sin registros de historial</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200">
+                <button type="button" onclick="closeHistory()"
+                    class="px-5 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
+                    Cerrar
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        function openCreate() {
-
-            document
-                .getElementById('createModal')
-                .classList.remove('hidden');
-
+        function filtrarPasillos() {
+            const term = (document.getElementById('aisleSearchInput')?.value || '').toLowerCase().trim();
+            document.querySelectorAll('.aisle-row').forEach(row => {
+                const text = row.getAttribute('data-search') || '';
+                row.classList.toggle('hidden', term !== '' && !text.includes(term));
+            });
         }
 
+        function openCreate() {
+            document.getElementById('createModal').classList.remove('hidden');
+        }
 
         function closeCreate() {
-
-            document
-                .getElementById('createModal')
-                .classList.add('hidden');
-
+            document.getElementById('createModal').classList.add('hidden');
         }
 
-        function openShow(id, name, description) {
+        function openShow(id, name, description, shelvesCount = 0, color = '#0D9488') {
             document.getElementById('showModal').classList.remove('hidden');
-
             document.getElementById('showName').textContent = name;
             document.getElementById('showDescription').textContent = description || 'Sin descripción';
+            document.getElementById('showShelvesCount').textContent = shelvesCount + (shelvesCount === 1 ? ' estantería' : ' estanterías');
+            const dot = document.getElementById('showColorDot');
+            if (dot) dot.style.backgroundColor = color || '#0D9488';
         }
 
         function closeShow() {
-            document
-                .getElementById('showModal')
-                .classList.add('hidden');
+            document.getElementById('showModal').classList.add('hidden');
         }
 
-        function openEdit(id, name, description) {
+        function openEdit(id, name, description, color = '#3B82F6') {
             document.getElementById('editModal').classList.remove('hidden');
-
             document.getElementById('editName').value = name;
             document.getElementById('editDescription').value = description || '';
-
+            const colorInput = document.getElementById('editColor');
+            if (colorInput && color) colorInput.value = color;
             document.getElementById('editForm').action = '/aisle/' + id;
         }
 
         function closeEdit() {
-            document
-                .getElementById('editModal')
-                .classList.add('hidden');
+            document.getElementById('editModal').classList.add('hidden');
         }
 
         function openHistory() {

@@ -1,620 +1,541 @@
 @extends('layouts.app')
 
+@section('title', 'Mantenedor de Estanterías')
+@section('subtitle', 'Administración de racks, capacidad máxima de unidades y asignación por pasillo.')
+
+@section('actions')
+    <div class="flex flex-wrap items-center gap-2.5">
+        <a href="{{ route('distribution.index') }}"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:text-teal-700 shadow-sm transition-all duration-200">
+            <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Mapa 3D
+        </a>
+        @role('Administrador')
+            <button type="button" onclick="openHistory()"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-[13px] font-semibold hover:bg-slate-50 hover:text-teal-700 transition-all duration-200 shadow-sm cursor-pointer">
+                <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Ver Historial
+            </button>
+        @endrole
+        <button type="button" onclick="openCreate()"
+            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200 text-[13px] font-bold shadow-sm cursor-pointer">
+            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Nueva Estantería
+        </button>
+    </div>
+@endsection
+
 @section('content')
-    <div class="w-full">
-        <!-- migas de pan -->
-        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
-            <span class="text-slate-400 font-semibold">03</span>
-            <span>Salida</span>
-            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="space-y-6">
+        <!-- Ruta de navegación -->
+        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
+            <span class="font-mono-das text-slate-400 font-semibold">02</span>
+            <span>Almacenamiento</span>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
             <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 transition-colors">Distribución</a>
-            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
-            <span class="font-semibold text-slate-800">Estanterías</span>
-            @role('Administrador')
-                <div class="flex gap-2 w-full sm:w-auto ml-auto">
-                    <button type="button" onclick="openHistory()"
-                        class="w-full sm:w-auto bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors shadow-sm">
-                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Ver Historial
-                    </button>
-                </div>
-            @endrole
+            <span class="font-medium text-slate-800">Estanterías</span>
         </div>
 
-        <!-- Encabezado -->
+        <!-- Barra de Navegación Jerárquica de Bodega -->
+        @include('distribution.partials.nav_tabs', ['activeTab' => 'shelf'])
 
-        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+        @if (session('success'))
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 text-emerald-800 text-[13px] font-semibold shadow-sm">
+                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
 
-            <div>
+        <!-- Contenedor Principal Tabla Estanterías -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+            <!-- Cabecera y filtros -->
+            <div class="p-4 sm:px-6 border-b border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16M6 4v16M18 4v16"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-[15px] font-bold text-slate-800">Directorio de Estanterías</h3>
+                        <p class="text-[12px] text-slate-500">Total registradas: <strong class="text-slate-700 font-mono-das">{{ $shelves->count() }}</strong></p>
+                    </div>
+                </div>
 
-                <h1 class="text-3xl font-bold text-gray-800">
-                    Estanterías
-                </h1>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                    <select id="shelfAisleFilter" onchange="filtrarEstanterias()"
+                        class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] text-slate-700 font-medium focus:bg-white focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        <option value="">Todos los pasillos</option>
+                        @foreach ($aisles as $aisle)
+                            <option value="{{ $aisle->id }}">{{ $aisle->name }}</option>
+                        @endforeach
+                    </select>
 
-                <p class="text-gray-500 mt-1">
-                    Administración de las estanterías de los pasillos de la bodega
-                </p>
-
+                    <div class="relative w-full sm:w-64">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="shelfSearchInput" oninput="filtrarEstanterias()" placeholder="Buscar estantería..."
+                            class="w-full pl-9 pr-3.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
+                    </div>
+                </div>
             </div>
 
-            <button onclick="openCreate()"
-                class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-lg cursor-pointer shadow-sm">
-                + Nueva estantería
-            </button>
-
-        </div>
-
-
-        <!-- Tabla -->
-        <div class="overflow-x-auto">
-
-            <table class="w-full min-w-[600px] text-left text-sm text-slate-600">
-
-                <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs font-semibold">
-
-                    <tr>
-
-                        <th class="px-6 py-4">
-                            ID
-                        </th>
-
-                        <th class="px-6 py-4">
-                            Nombre
-                        </th>
-
-                        <th class="px-6 py-4">
-                            Descripción
-                        </th>
-                        <th class="px-6 py-4">
-                            Pasillo al que pertenece
-                        </th>
-
-                        <th class="px-6 py-4 text-center">
-                            Capacidad (uds)
-                        </th>
-
-                        <th class="px-6 py-4 text-center">
-                            Acciones
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody class="divide-y divide-slate-100">
-
-                    @foreach ($shelves as $shelf)
+            <!-- Tabla -->
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[750px] text-left text-[13px] text-slate-600">
+                    <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-500 uppercase text-[11px] font-bold tracking-wider">
                         <tr>
-                            <td class="px-6 py-4">
-                                {{ $shelf->id }}
-                            </td>
+                            <th class="px-6 py-3.5 w-20">ID</th>
+                            <th class="px-6 py-3.5">Estantería</th>
+                            <th class="px-6 py-3.5">Pasillo Asignado</th>
+                            <th class="px-6 py-3.5">Descripción</th>
+                            <th class="px-6 py-3.5 text-center">Niveles</th>
+                            <th class="px-6 py-3.5 text-center">Capacidad (uds)</th>
+                            <th class="px-6 py-3.5 text-center w-36">Acciones</th>
+                        </tr>
+                    </thead>
 
-                            <td class="px-6 py-4">
-                                {{ $shelf->name }}
-                            </td>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse ($shelves as $shelf)
+                            @php
+                                $aisleColor = optional($shelf->aisle)->color ?: '#3B82F6';
+                                $levelsCount = $shelf->levels_count ?? 0;
+                            @endphp
+                            <tr class="shelf-row hover:bg-slate-50/70 transition-colors"
+                                data-aisle="{{ $shelf->aisle_id }}"
+                                data-search="{{ strtolower($shelf->name . ' ' . ($shelf->description ?? '') . ' ' . ($shelf->aisle->name ?? '')) }}">
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 rounded-md bg-slate-100 border border-slate-200 font-mono-das text-[11.5px] font-semibold text-slate-600">
+                                        #{{ $shelf->id }}
+                                    </span>
+                                </td>
 
-                            <td class="px-6 py-4">
-                                {{ $shelf->description }}
-                            </td>
-                            <td class="px-6 py-4 text-slate-500">{{ $shelf->aisle->name ?? 'Sin pasillo' }}</td>
-                            <td class="px-6 py-4 text-center">
-                                @if ($shelf->capacidad > 0)
-                                    <span class="inline-flex px-2.5 py-1 rounded-lg text-[12px] font-bold bg-teal-50 text-teal-700 border border-teal-200">{{ number_format($shelf->capacidad, 0, ',', '.') }}</span>
-                                @else
-                                    <span class="text-[12px] text-slate-400 font-medium">Sin límite</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-center">
+                                <td class="px-6 py-4">
+                                    <span class="font-bold text-slate-800 text-[13.5px]">{{ $shelf->name }}</span>
+                                </td>
 
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-[12px] font-semibold text-slate-700">
+                                        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: {{ $aisleColor }};"></span>
+                                        {{ $shelf->aisle->name ?? 'Sin pasillo' }}
+                                    </span>
+                                </td>
 
-                                <div class="flex justify-center gap-2">
+                                <td class="px-6 py-4 text-slate-600">
+                                    {{ $shelf->description ?: 'Sin descripción' }}
+                                </td>
 
-                                    <!-- Ver -->
-                                    <button
-                                        onclick='openShow({{ $shelf->id }}, @json($shelf->name), @json($shelf->aisle->name ?? 'Sin pasillo'), @json($shelf->description))'
-                                        class="p-1.5 text-slate-600 hover:bg-slate-100 rounded transition-colors"
-                                        title="Ver estantería">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </button>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] font-bold {{ $levelsCount > 0 ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-slate-100 text-slate-500 border border-slate-200' }}">
+                                        {{ $levelsCount }} {{ $levelsCount === 1 ? 'nivel' : 'niveles' }}
+                                    </span>
+                                </td>
 
-                                    <!-- Editar -->
-                                    <button
-                                        onclick='openEdit({{ $shelf->id }}, @json($shelf->name), {{ $shelf->aisle_id }}, @json($shelf->description), {{ $shelf->capacidad ?? 0 }})'
-                                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                        title="Editar estantería">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                        </svg>
-                                    </button>
+                                <td class="px-6 py-4 text-center">
+                                    @if ($shelf->capacidad > 0)
+                                        <span class="inline-flex px-2.5 py-1 rounded-lg text-[12px] font-bold bg-teal-50 text-teal-700 border border-teal-200 font-mono-das">
+                                            {{ number_format($shelf->capacidad, 0, ',', '.') }}
+                                        </span>
+                                    @else
+                                        <span class="text-[12px] text-slate-400 font-medium">Sin límite</span>
+                                    @endif
+                                </td>
 
-                                    <!-- Eliminar -->
-                                    <form action="{{ route('shelf.destroy', $shelf->id) }}" method="POST"
-                                        onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta estantería?');"
-                                        class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors cursor-pointer"
-                                            title="Eliminar estantería">
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex justify-center items-center gap-1.5">
+                                        <button type="button"
+                                            onclick='openShow({{ $shelf->id }}, @json($shelf->name), @json($shelf->aisle->name ?? "Sin pasillo"), @json($shelf->description), {{ $shelf->capacidad ?? 0 }}, {{ $levelsCount }})'
+                                            class="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                                            title="Ver estantería">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                </path>
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </button>
-                                    </form>
 
-                                </div>
-
-                            </td>
-
-                        </tr>
-                    @endforeach
-                </tbody>
-
-            </table>
-
-        </div>
-
-
-        <!-- Modal para crear una nueva estantería -->
-        <div id="createModal"
-            class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-
-                <!-- Encabezado -->
-                <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
-
-                    <div>
-                        <h2 class="text-xl font-bold text-white">
-                            Nueva estantería
-                        </h2>
-
-                        <p class="text-blue-100 text-sm mt-1">
-                            Registra una nueva estantería de la bodega.
-                        </p>
-                    </div>
-
-                    <button type="button" onclick="closeCreate()"
-                        class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
-
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-
-                    </button>
-
-                </div>
-
-                <!-- Formulario -->
-                <form action="{{ route('shelf.store') }}" method="POST">
-
-                    @csrf
-
-                    <div class="px-6 py-6">
-
-                        <!-- Nombre -->
-                        <div class="mb-5">
-
-                            <label for="name" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Nombre
-                            </label>
-
-                            <input type="text" name="name" id="name" placeholder="Ej: Estantería A"
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition">
-
-                        </div>
-
-                        <!-- Pasillo -->
-                        <div class="mb-5">
-
-                            <label for="aisle_id" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Pasillo al que pertenece
-                            </label>
-
-                            <select name="aisle_id" id="aisle_id"
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition bg-white">
-
-                                @foreach ($aisles as $aisle)
-                                    <option value="{{ $aisle->id }}">
-                                        {{ $aisle->name }} ({{ $aisle->description }})
-                                    </option>
-                                @endforeach
-
-                            </select>
-
-                        </div>
-
-                        <!-- Capacidad -->
-                        <div class="mb-5">
-
-                            <label for="capacidad" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Capacidad (unidades de stock)
-                            </label>
-
-                            <input type="number" name="capacidad" id="capacidad" min="0" step="1" value="0"
-                                placeholder="Ej. 1500 (0 = sin límite)"
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition bg-white">
-
-                            <p class="text-[11px] text-slate-400 mt-1">Define la capacidad máxima de la estantería para calcular el % de ocupación en el visor 3D. Usa 0 si no desea límite.</p>
-
-                        </div>
-
-                        <!-- Descripción -->
-                        <div>
-
-                            <label for="description" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Descripción
-                            </label>
-
-                            <textarea name="description" id="description" rows="4" placeholder="Descripción de la estantería..."
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition resize-none"></textarea>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Botones -->
-                    <div class="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
-
-                        <button type="button" onclick="closeCreate()"
-                            class="px-4 py-2 text-sm font-medium text-slate-700
-                    bg-white border border-slate-300 rounded-lg
-                    hover:bg-slate-100 transition-colors cursor-pointer">
-                            Cancelar
-                        </button>
-
-                        <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white
-                    bg-blue-900 rounded-lg hover:bg-blue-800
-                    transition-colors cursor-pointer">
-                            Guardar estantería
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        </div>
-
-
-        <!-- Modal para ver una estantería -->
-
-        <div id="showModal"
-            class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-
-                <!-- Encabezado azul -->
-                <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
-
-                    <div>
-                        <h2 class="text-xl font-bold text-white">
-                            Información de la estantería
-                        </h2>
-
-                        <p class="text-blue-100 text-sm mt-1">
-                            Información registrada de la estantería.
-                        </p>
-                    </div>
-
-                    <button type="button" onclick="closeShow()"
-                        class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
-
-                        ✕
-
-                    </button>
-
-                </div>
-
-                <!-- Contenido blanco -->
-                <div class="px-6 py-6">
-
-                    <p class="text-sm text-slate-500 mb-1">
-                        Nombre
-                    </p>
-
-                    <p id="showName" class="text-base font-semibold text-slate-800 mb-5">
-                    </p>
-
-                    <p class="text-sm text-slate-500 mb-1">
-                        Pasillo
-                    </p>
-
-                    <p id="showAisle" class="text-base font-semibold text-slate-800 mb-5">
-                    </p>
-
-                    <p class="text-sm text-slate-500 mb-1">
-                        Descripción
-                    </p>
-
-                    <p id="showDescription" class="text-slate-700">
-                    </p>
-                </div>
-
-                <!-- Botón -->
-                <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200">
-
-                    <button type="button" onclick="closeShow()"
-                        class="px-4 py-2 text-sm font-medium text-slate-700
-                bg-white border border-slate-300 rounded-lg
-                hover:bg-slate-100 transition-colors cursor-pointer">
-                        Cerrar
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Modal para editar una estantería -->
-
-        <div id="editModal"
-            class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-
-                <!-- Encabezado -->
-                <div class="bg-blue-900 px-6 py-5 flex items-start justify-between">
-
-                    <div>
-                        <h2 class="text-xl font-bold text-white">
-                            Editar estantería
-                        </h2>
-
-                        <p class="text-blue-100 text-sm mt-1">
-                            Modifica la información de la estantería.
-                        </p>
-                    </div>
-
-                    <button type="button" onclick="closeEdit()"
-                        class="text-blue-100 hover:text-white hover:bg-blue-800 rounded-lg p-1.5 transition-colors cursor-pointer">
-
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-
-                    </button>
-
-                </div>
-
-                <!-- Formulario -->
-                <form id="editForm" method="POST">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="px-6 py-6">
-
-                        <div class="mb-5">
-
-                            <label for="editName" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Nombre
-                            </label>
-
-                            <input type="text" name="name" id="editName" value="Estantería 1"
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition">
-
-                        </div>
-
-                        <!-- Pasillo -->
-                        <div class="mb-5">
-
-                            <label for="editAisle" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Pasillo al que pertenece
-                            </label>
-
-                            <select name="aisle_id" id="editAisle"
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition bg-white">
-
-                                @foreach ($aisles as $aisle)
-                                    <option value="{{ $aisle->id }}">
-                                        {{ $aisle->name }} ({{ $aisle->description }})
-                                    </option>
-                                @endforeach
-                            </select>
-
-                        </div>
-                        <div class="mb-5">
-
-                            <label for="editCapacidad" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Capacidad (unidades de stock)
-                            </label>
-
-                            <input type="number" name="capacidad" id="editCapacidad" min="0" step="1" value="0"
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-100
-                        focus:border-blue-500 transition bg-white">
-
-                            <p class="text-[11px] text-slate-400 mt-1">0 = sin límite.</p>
-
-                        </div>
-                        <div>
-
-                            <label for="editDescription" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Descripción
-                            </label>
-
-                            <textarea name="description" id="editDescription" rows="4"
-                                class="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100
-                                focus:border-blue-500 transition resize-none"></textarea>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Botones -->
-                    <div class="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
-
-                        <button type="button" onclick="closeEdit()"
-                            class="px-4 py-2 text-sm font-medium text-slate-700
-                    bg-white border border-slate-300 rounded-lg
-                    hover:bg-slate-100 transition-colors cursor-pointer">
-                            Cancelar
-                        </button>
-
-                        <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white
-                    bg-blue-900 rounded-lg hover:bg-blue-800
-                    transition-colors cursor-pointer">
-                            Guardar cambios
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        </div>
-        <!-- Modal de Historial -->
-        <div id="HistoryModal"
-            class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 w-full max-w-4xl overflow-hidden">
-
-                <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800">Historial de Estanterías</h2>
-                        <p class="text-sm text-slate-500 mt-0.5">Registro de auditoría de creación y modificaciones de
-                            estanterías.</p>
-                    </div>
-                    <button type="button" onclick="closeHistory()"
-                        class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="overflow-x-auto max-h-96 border border-slate-200 rounded-xl">
-                    <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
-                        <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b border-slate-200 sticky top-0">
+                                        <button type="button"
+                                            onclick='openEdit({{ $shelf->id }}, @json($shelf->name), {{ $shelf->aisle_id }}, @json($shelf->description), {{ $shelf->capacidad ?? 0 }})'
+                                            class="p-1.5 text-teal-600 hover:text-teal-800 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
+                                            title="Editar estantería">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                            </svg>
+                                        </button>
+
+                                        <form action="{{ route('shelf.destroy', $shelf->id) }}" method="POST"
+                                            onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta estantería?');"
+                                            class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                                title="Eliminar estantería">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
                             <tr>
-                                <th class="px-4 py-3 font-semibold">Fecha / Hora</th>
-                                <th class="px-4 py-3 font-semibold">Acción</th>
-                                <th class="px-4 py-3 font-semibold">Detalle de la Estantería</th>
-                                <th class="px-4 py-3 font-semibold">Usuario Responsable</th>
+                                <td colspan="7" class="px-6 py-12 text-center text-slate-400">
+                                    <svg class="w-10 h-10 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16M6 4v16M18 4v16"></path>
+                                    </svg>
+                                    <p class="text-[13.5px] font-bold text-slate-600">No hay estanterías registradas</p>
+                                    <p class="text-[12px] text-slate-400 mt-0.5">Crea una nueva estantería asociada a un pasillo.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear Estantería -->
+    <div id="createModal"
+        class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
+            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-[16px] font-bold text-white leading-tight">Nueva Estantería</h2>
+                        <p class="text-slate-400 text-[12px] mt-0.5">Registra un nuevo rack dentro de un pasillo.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeCreate()"
+                    class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form action="{{ route('shelf.store') }}" method="POST">
+                @csrf
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="name" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                            Nombre de la Estantería <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="name" id="name" required placeholder="Ej: Estantería A"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="aisle_id" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                                Pasillo Asignado <span class="text-rose-500">*</span>
+                            </label>
+                            <select name="aisle_id" id="aisle_id" required
+                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                                @foreach ($aisles as $aisle)
+                                    <option value="{{ $aisle->id }}">
+                                        {{ $aisle->name }}{{ $aisle->description ? ' (' . $aisle->description . ')' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="capacidad" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                                Capacidad Máxima (uds)
+                            </label>
+                            <input type="number" name="capacidad" id="capacidad" min="0" step="1" value="0"
+                                placeholder="0 = sin límite"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 font-mono-das focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 -mt-2">Define la capacidad máxima para calcular el % de ocupación en el visor 3D (usa 0 si no tiene límite).</p>
+
+                    <div>
+                        <label for="description" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                            Descripción Operativa
+                        </label>
+                        <textarea name="description" id="description" rows="3" placeholder="Descripción de la estantería..."
+                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition resize-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-200">
+                    <button type="button" onclick="closeCreate()"
+                        class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2 text-[13px] font-bold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-sm cursor-pointer">
+                        Guardar Estantería
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Ver Estantería -->
+    <div id="showModal"
+        class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden">
+            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800">
+                <div>
+                    <h2 class="text-[16px] font-bold text-white leading-tight">Ficha de la Estantería</h2>
+                    <p class="text-slate-400 text-[12px] mt-0.5">Información registrada en la bodega.</p>
+                </div>
+                <button type="button" onclick="closeShow()"
+                    class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-3.5">
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Estantería</p>
+                        <p id="showName" class="text-[14px] font-bold text-slate-800 mt-1"></p>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pasillo</p>
+                        <p id="showAisle" class="text-[14px] font-bold text-teal-700 mt-1"></p>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Capacidad</p>
+                        <p id="showCapacidad" class="text-[13px] font-bold text-slate-800 font-mono-das mt-1"></p>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Niveles</p>
+                        <p id="showLevelsCount" class="text-[13px] font-bold text-purple-700 font-mono-das mt-1"></p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Descripción</p>
+                    <p id="showDescription" class="text-[13px] text-slate-700"></p>
+                </div>
+            </div>
+
+            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200">
+                <button type="button" onclick="closeShow()"
+                    class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Estantería -->
+    <div id="editModal"
+        class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
+            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800">
+                <div>
+                    <h2 class="text-[16px] font-bold text-white leading-tight">Editar Estantería</h2>
+                    <p class="text-slate-400 text-[12px] mt-0.5">Modifica la información de la estantería.</p>
+                </div>
+                <button type="button" onclick="closeEdit()"
+                    class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="editForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="editName" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                            Nombre de la Estantería <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="name" id="editName" required
+                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="editAisle" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                                Pasillo Asignado <span class="text-rose-500">*</span>
+                            </label>
+                            <select name="aisle_id" id="editAisle" required
+                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                                @foreach ($aisles as $aisle)
+                                    <option value="{{ $aisle->id }}">
+                                        {{ $aisle->name }}{{ $aisle->description ? ' (' . $aisle->description . ')' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="editCapacidad" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                                Capacidad Máxima (uds)
+                            </label>
+                            <input type="number" name="capacidad" id="editCapacidad" min="0" step="1" value="0"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 font-mono-das focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="editDescription" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                            Descripción Operativa
+                        </label>
+                        <textarea name="description" id="editDescription" rows="3"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition resize-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-200">
+                    <button type="button" onclick="closeEdit()"
+                        class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2 text-[13px] font-bold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-sm cursor-pointer">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Historial -->
+    <div id="HistoryModal"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden">
+            <div class="bg-slate-900 px-6 py-4.5 flex justify-between items-center border-b border-slate-800">
+                <div>
+                    <h2 class="text-[16px] font-bold text-white">Historial de Estanterías</h2>
+                    <p class="text-[12px] text-slate-400 mt-0.5">Registro de auditoría de creación y modificaciones de estanterías.</p>
+                </div>
+                <button type="button" onclick="closeHistory()"
+                    class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <div class="overflow-x-auto max-h-96 border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
+                        <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3">Estantería</th>
+                                <th class="px-4 py-3">Pasillo</th>
+                                <th class="px-4 py-3 text-center">Capacidad</th>
+                                <th class="px-4 py-3">Última Actualización</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            <tr class="hover:bg-slate-50/50 transition-colors">
-                                <td class="px-4 py-3 text-slate-500">16/09/2026 - 11:45</td>
-                                <td class="px-4 py-3">
-                                    <span
-                                        class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold">Creación</span>
-                                </td>
-                                <td class="px-4 py-3 font-medium text-slate-800">Estantería A (Pasillo A)</td>
-                                <td class="px-4 py-3 text-slate-600 font-medium">Juan Pérez</td>
-                            </tr>
+                            @forelse ($shelves as $s)
+                                <tr class="hover:bg-slate-50/60 transition-colors">
+                                    <td class="px-4 py-3 font-bold text-slate-800">{{ $s->name }}</td>
+                                    <td class="px-4 py-3 text-slate-600">{{ $s->aisle->name ?? 'Sin pasillo' }}</td>
+                                    <td class="px-4 py-3 text-center font-mono-das">{{ $s->capacidad > 0 ? number_format($s->capacidad, 0, ',', '.') . ' uds.' : 'Sin límite' }}</td>
+                                    <td class="px-4 py-3 font-mono-das text-[12px] text-slate-500">{{ optional($s->updated_at)->format('d/m/Y H:i') ?? 'Registro inicial' }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-4 py-6 text-center text-slate-400">Sin registros de historial</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
+            </div>
 
-                <div class="flex justify-end pt-6 border-t border-slate-100">
-                    <button type="button" onclick="closeHistory()"
-                        class="px-5 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-colors text-sm font-medium shadow-sm">
-                        Cerrar
-                    </button>
-                </div>
-
+            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200">
+                <button type="button" onclick="closeHistory()"
+                    class="px-5 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
+                    Cerrar
+                </button>
             </div>
         </div>
+    </div>
 
+    <script>
+        function filtrarEstanterias() {
+            const term = (document.getElementById('shelfSearchInput')?.value || '').toLowerCase().trim();
+            const aisleId = document.getElementById('shelfAisleFilter')?.value || '';
 
-        <!-- Funciones con JS para abrir y cerrar el modal -->
+            document.querySelectorAll('.shelf-row').forEach(row => {
+                const text = row.getAttribute('data-search') || '';
+                const rowAisle = row.getAttribute('data-aisle') || '';
+                const matchText = term === '' || text.includes(term);
+                const matchAisle = aisleId === '' || rowAisle === aisleId;
+                row.classList.toggle('hidden', !(matchText && matchAisle));
+            });
+        }
 
-        <script>
-            function openCreate() {
+        function openCreate() {
+            document.getElementById('createModal').classList.remove('hidden');
+        }
 
-                document
-                    .getElementById('createModal')
-                    .classList.remove('hidden');
+        function closeCreate() {
+            document.getElementById('createModal').classList.add('hidden');
+        }
 
-            }
+        function openShow(id, name, aisle, description, capacidad = 0, levelsCount = 0) {
+            document.getElementById('showModal').classList.remove('hidden');
+            document.getElementById('showName').textContent = name;
+            document.getElementById('showAisle').textContent = aisle;
+            document.getElementById('showDescription').textContent = description || 'Sin descripción';
+            document.getElementById('showCapacidad').textContent = capacidad > 0 ? Number(capacidad).toLocaleString('es-CL') + ' uds.' : 'Sin límite';
+            document.getElementById('showLevelsCount').textContent = levelsCount + (levelsCount === 1 ? ' nivel' : ' niveles');
+        }
 
+        function closeShow() {
+            document.getElementById('showModal').classList.add('hidden');
+        }
 
-            function closeCreate() {
+        function openEdit(id, name, aisleId, description, capacidad = 0) {
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editName').value = name;
+            document.getElementById('editAisle').value = aisleId;
+            document.getElementById('editDescription').value = description || '';
+            document.getElementById('editCapacidad').value = capacidad || 0;
+            document.getElementById('editForm').action = '/shelf/' + id;
+        }
 
-                document
-                    .getElementById('createModal')
-                    .classList.add('hidden');
+        function closeEdit() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
 
-            }
+        function openHistory() {
+            document.getElementById('HistoryModal').classList.remove('hidden');
+        }
 
-            function openShow(id, name, aisle, description) {
-                document.getElementById('showModal').classList.remove('hidden');
-                document.getElementById('showName').textContent = name;
-                document.getElementById('showAisle').textContent = aisle;
-                document.getElementById('showDescription').textContent = description || 'Sin descripción';
-            }
-
-            function closeShow() {
-                document
-                    .getElementById('showModal')
-                    .classList.add('hidden');
-            }
-
-            function openEdit(id, name, aisleId, description, capacidad = 0) {
-                document.getElementById('editModal').classList.remove('hidden');
-
-                document.getElementById('editName').value = name;
-                document.getElementById('editAisle').value = aisleId;
-                document.getElementById('editDescription').value = description || '';
-                document.getElementById('editCapacidad').value = capacidad || 0;
-
-                document.getElementById('editForm').action = '/shelf/' + id;
-            }
-
-            function closeEdit() {
-                document
-                    .getElementById('editModal')
-                    .classList.add('hidden');
-            }
-
-            function openDelete() {
-                if (confirm('¿Estás seguro de que deseas eliminar este pasillo?')) {
-                    alert('Pasillo eliminado');
-                }
-            }
-
-            function openHistory() {
-                document.getElementById('HistoryModal').classList.remove('hidden');
-            }
-
-            function closeHistory() {
-                document.getElementById('HistoryModal').classList.add('hidden');
-            }
-        </script>
-    @endsection
+        function closeHistory() {
+            document.getElementById('HistoryModal').classList.add('hidden');
+        }
+    </script>
+@endsection
