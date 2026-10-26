@@ -1494,6 +1494,88 @@
                             return dialTex;
                         }
 
+                        // --- Textura de acero para el cuerpo de la caja fuerte ---
+                        let aceroCuerpoTex = null;
+
+                        function getAceroCuerpoTex() {
+                            if (aceroCuerpoTex) return aceroCuerpoTex;
+                            const S = 512;
+                            const c = document.createElement('canvas');
+                            c.width = S;
+                            c.height = S;
+                            const ctx = c.getContext('2d');
+                            const g = ctx.createLinearGradient(0, 0, 0, S);
+                            g.addColorStop(0, '#74859b');
+                            g.addColorStop(0.5, '#5a6a80');
+                            g.addColorStop(1, '#74859b');
+                            ctx.fillStyle = g;
+                            ctx.fillRect(0, 0, S, S);
+                            const r = rng(77);
+                            for (let i = 0; i < 600; i++) {
+                                ctx.fillStyle = r() > 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+                                ctx.fillRect(0, r() * S, S, 1 + r() * 1.5);
+                            }
+                            // Paneles remachados
+                            ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+                            ctx.lineWidth = 4;
+                            ctx.strokeRect(16, 16, S - 32, S - 32);
+                            ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+                            ctx.lineWidth = 2;
+                            ctx.strokeRect(21, 21, S - 42, S - 42);
+                            [
+                                [34, 34],
+                                [S - 34, 34],
+                                [34, S - 34],
+                                [S - 34, S - 34],
+                                [S / 2, 34],
+                                [S / 2, S - 34],
+                                [34, S / 2],
+                                [S - 34, S / 2]
+                            ].forEach(([x, y]) => {
+                                const rg = ctx.createRadialGradient(x - 2, y - 2, 1, x, y, 8);
+                                rg.addColorStop(0, '#f1f5f9');
+                                rg.addColorStop(1, '#64748b');
+                                ctx.fillStyle = rg;
+                                ctx.beginPath();
+                                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                                ctx.fill();
+                                ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+                                ctx.lineWidth = 1.5;
+                                ctx.stroke();
+                            });
+                            aceroCuerpoTex = new THREE.CanvasTexture(c);
+                            aceroCuerpoTex.anisotropy = 8;
+                            return aceroCuerpoTex;
+                        }
+
+                        // --- Franja de advertencia (amarillo/negro) ---
+                        let hazardTex = null;
+
+                        function getHazardTex() {
+                            if (hazardTex) return hazardTex;
+                            const W = 512,
+                                H = 40;
+                            const c = document.createElement('canvas');
+                            c.width = W;
+                            c.height = H;
+                            const ctx = c.getContext('2d');
+                            ctx.fillStyle = '#facc15';
+                            ctx.fillRect(0, 0, W, H);
+                            ctx.fillStyle = '#111827';
+                            for (let x = -H; x < W + H; x += 44) {
+                                ctx.beginPath();
+                                ctx.moveTo(x, H);
+                                ctx.lineTo(x + 22, H);
+                                ctx.lineTo(x + 22 + H, 0);
+                                ctx.lineTo(x + H, 0);
+                                ctx.closePath();
+                                ctx.fill();
+                            }
+                            hazardTex = new THREE.CanvasTexture(c);
+                            hazardTex.anisotropy = 8;
+                            return hazardTex;
+                        }
+
                         // --- Puerta de la caja fuerte ---
                         function texturaPuertaCajaFuerte(codigo, colorEstadoHex, w, h) {
                             const W = 512;
@@ -1779,10 +1861,73 @@
                                     grupo.add(mesh);
                                     return mesh;
                                 };
-                                pared(0.15, alturaTotal, 4, -1.925, alturaTotal / 2, 0); // lateral izquierdo
-                                pared(0.15, alturaTotal, 4, 1.925, alturaTotal / 2, 0); // lateral derecho
-                                pared(4, alturaTotal, 0.15, 0, alturaTotal / 2, -1.925); // fondo
+                                const matCuerpo = new THREE.MeshStandardMaterial({
+                                    map: getAceroCuerpoTex(),
+                                    roughness: 0.38,
+                                    metalness: 0.55
+                                });
+                                pared(0.15, alturaTotal, 4, -1.925, alturaTotal / 2, 0, matCuerpo); // lateral izquierdo
+                                pared(0.15, alturaTotal, 4, 1.925, alturaTotal / 2, 0, matCuerpo); // lateral derecho
+                                pared(4, alturaTotal, 0.15, 0, alturaTotal / 2, -1.925, matCuerpo); // fondo
                                 pared(4.2, 0.22, 4.2, 0, 0.11, 0, matAceroOsc); // zócalo
+
+                                // Franja de advertencia en el zócalo (frente)
+                                const franjaZocalo = new THREE.Mesh(
+                                    new THREE.PlaneGeometry(4.0, 0.16),
+                                    new THREE.MeshStandardMaterial({
+                                        map: getHazardTex(),
+                                        roughness: 0.6
+                                    })
+                                );
+                                franjaZocalo.position.set(0, 0.11, 2.105);
+                                grupo.add(franjaZocalo);
+
+                                // Columnas de esquina reforzadas (las delanteras hacen de marco de la puerta)
+                                [
+                                    [-1.97, -1.97],
+                                    [1.97, -1.97],
+                                    [-1.97, 1.97],
+                                    [1.97, 1.97]
+                                ].forEach(([cx, cz]) => {
+                                    const col = new THREE.Mesh(new THREE.BoxGeometry(0.3, alturaTotal, 0.3), matAceroOsc);
+                                    col.position.set(cx, alturaTotal / 2, cz);
+                                    col.castShadow = true;
+                                    col.receiveShadow = true;
+                                    grupo.add(col);
+                                    // Tapa cromada de la columna
+                                    const tapa = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.05, 0.34), matCromo);
+                                    tapa.position.set(cx, alturaTotal + 0.02, cz);
+                                    grupo.add(tapa);
+                                });
+
+                                // Dintel superior del marco de la puerta + vivos cromados
+                                const dintel = new THREE.Mesh(new THREE.BoxGeometry(4.24, 0.26, 0.3), matAceroOsc);
+                                dintel.position.set(0, alturaTotal - 0.07, 1.97);
+                                dintel.castShadow = true;
+                                grupo.add(dintel);
+                                [-1.83, 1.83].forEach(vx => {
+                                    const vivo = new THREE.Mesh(new THREE.BoxGeometry(0.045, alturaTotal - 0.5, 0.07), matCromo);
+                                    vivo.position.set(vx, alturaTotal / 2 - 0.05, 2.02);
+                                    grupo.add(vivo);
+                                });
+
+                                // Nervaduras horizontales en los laterales (aspecto blindado)
+                                [0.33, 0.66].forEach(f => {
+                                    [-2.0, 2.0].forEach(sx => {
+                                        const nerv = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.11, 3.5), matAceroOsc);
+                                        nerv.position.set(sx, alturaTotal * f, 0);
+                                        grupo.add(nerv);
+                                    });
+                                });
+
+                                // Placas identificatorias en ambos laterales
+                                const matPlacaLateral = texturaTexto(String(rackData.code ?? '').toUpperCase(), '#0b1220', '#facc15', 26);
+                                [1, -1].forEach(lado => {
+                                    const placaLat = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 0.5), matPlacaLateral);
+                                    placaLat.position.set(2.035 * lado, alturaTotal * 0.82, 0);
+                                    placaLat.rotation.y = lado * Math.PI / 2;
+                                    grupo.add(placaLat);
+                                });
 
                                 // Luz interior (tira LED bajo el techo)
                                 const luz = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.05, 0.25), new THREE
@@ -1840,6 +1985,45 @@
                                 dialCara.position.set(2.75, dialY, 0.16 + 0.145);
                                 doorPivot.add(dialCara);
 
+                                // Marco cromado alrededor de la perilla + bulones de cierre
+                                const aroDial = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.05, 12, 48), matCromo);
+                                aroDial.position.set(2.75, dialY, 0.16 + 0.06);
+                                doorPivot.add(aroDial);
+                                [-0.38, -0.13, 0.13, 0.38].forEach(f => {
+                                    const bulon = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.3, 14), matCromo);
+                                    bulon.rotation.z = Math.PI / 2;
+                                    bulon.position.set(doorW + 0.04, doorH * f, 0.08);
+                                    doorPivot.add(bulon);
+                                });
+
+                                // Teclado físico (coincide con el grabado de la textura)
+                                {
+                                    const texW = 512;
+                                    const texH = Math.min(2048, Math.max(512, Math.round(512 * doorH / doorW)));
+                                    const kx0 = 92;
+                                    const ky0 = (texH / 2 + 0.08 * texH) - 80;
+                                    for (let fila = 0; fila < 4; fila++) {
+                                        for (let col = 0; col < 3; col++) {
+                                            const tx = kx0 + col * 38;
+                                            const ty = ky0 + fila * 40;
+                                            const tecla = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.13, 0.05), matCromo);
+                                            tecla.position.set((tx / texW) * doorW, ((texH / 2 - ty) / texH) * doorH, 0.16 + 0.025);
+                                            doorPivot.add(tecla);
+                                        }
+                                    }
+                                    const pantalla = new THREE.Mesh(
+                                        new THREE.BoxGeometry(0.62, 0.2, 0.04),
+                                        new THREE.MeshStandardMaterial({
+                                            color: '#16a34a',
+                                            emissive: '#22c55e',
+                                            emissiveIntensity: 0.55,
+                                            roughness: 0.3
+                                        })
+                                    );
+                                    pantalla.position.set(((kx0 + 38) / texW) * doorW, ((texH / 2 - (ky0 - 44)) / texH) * doorH, 0.16 + 0.02);
+                                    doorPivot.add(pantalla);
+                                }
+
                                 // Manilla de cierre
                                 [-0.5, 0.5].forEach(oy => {
                                     const soporte = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.22, 12),
@@ -1848,10 +2032,15 @@
                                     soporte.position.set(3.3, dialY + oy, 0.16 + 0.11);
                                     doorPivot.add(soporte);
                                 });
-                                const manilla = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.3, 0.14), matCromo);
+                                const manilla = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 1.3, 20), matCromo);
                                 manilla.position.set(3.3, dialY, 0.16 + 0.24);
                                 manilla.castShadow = true;
                                 doorPivot.add(manilla);
+                                [-0.65, 0.65].forEach(oy => {
+                                    const remate = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 12), matCromo);
+                                    remate.position.set(3.3, dialY + oy, 0.16 + 0.24);
+                                    doorPivot.add(remate);
+                                });
 
                                 // LED de estado (color = ocupación) que late suavemente
                                 const ledMat = new THREE.MeshStandardMaterial({
@@ -2268,6 +2457,22 @@
                             techo.position.set(0, yTecho, 0);
                             techo.castShadow = true;
                             grupo.add(techo);
+
+                            if (esSafe) {
+                                // Remate cromado y rejillas de ventilación sobre el techo
+                                const remateTecho = new THREE.Mesh(new THREE.BoxGeometry(4.34, 0.06, 4.34), matAceroOsc);
+                                remateTecho.position.set(0, yTecho + 0.14, 0);
+                                remateTecho.castShadow = true;
+                                grupo.add(remateTecho);
+                                const cantoTecho = new THREE.Mesh(new THREE.BoxGeometry(4.36, 0.025, 4.36), matCromo);
+                                cantoTecho.position.set(0, yTecho + 0.175, 0);
+                                grupo.add(cantoTecho);
+                                for (let v = 0; v < 6; v++) {
+                                    const rejilla = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.04, 0.1), matAceroOsc);
+                                    rejilla.position.set(0, yTecho + 0.21, -1.0 + v * 0.4);
+                                    grupo.add(rejilla);
+                                }
+                            }
 
                             [esSafe ? 2.12 : 2.0, esSafe ? -2.12 : -2.0].forEach(zz => {
                                 const franja = new THREE.Mesh(
