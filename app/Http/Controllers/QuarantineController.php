@@ -65,8 +65,10 @@ class QuarantineController extends Controller
 
         // 2. Consulta para el Historial Avanzado (Sin Paginación)
         $historial = StockMovement::with('user')
-            ->where('estado_lote', 'Cuarentena')
-            ->orWhere('origen_destino', 'LIKE', '%Cuarentena%')
+            ->where(function ($q) {
+                $q->where('estado_lote', 'Cuarentena')
+                    ->orWhere('origen_destino', 'LIKE', '%Cuarentena%');
+            })
             ->orderBy('fecha_hora', 'desc')
             ->limit(200)
             ->get();

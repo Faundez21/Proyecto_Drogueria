@@ -124,11 +124,11 @@
                             <option value="">Todas</option>
                             <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
                             <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
-                            @role('Administrador')
+                            @if(auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado'))
                                 <option value="Fármacos Controlados" {{ request('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>
                                     Fármacos Controlados
                                 </option>
-                            @endrole
+                            @endif
                         </select>
                     </div>
 
@@ -425,7 +425,18 @@
                                                                     <td class="px-4 py-3">
                                                                         <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
                                                                             <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">P:</span> <b class="text-slate-800">{{ $pasilloVal }}</b></span>
-                                                                            <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">E:</span> <b class="text-slate-800">{{ $estanteVal }}</b></span>
+                                                                            @can('ver.distribucion')
+                                                                                @if (!empty($estanteVal) && $estanteVal !== 'P.A')
+                                                                                    <a href="{{ route('distribution.index', ['estante' => $estanteVal]) }}" title="Ver estante {{ $estanteVal }} en el Mapa 3D" class="inline-flex items-center gap-1 bg-white hover:bg-teal-50 text-slate-600 hover:text-teal-700 px-2 py-1 rounded shadow-sm border border-slate-200 hover:border-teal-300 transition-colors">
+                                                                                        <span class="text-slate-400">E:</span> <b class="text-slate-800 group-hover:text-teal-700">{{ $estanteVal }}</b>
+                                                                                        <svg class="w-3 h-3 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                                                    </a>
+                                                                                @else
+                                                                                    <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">E:</span> <b class="text-slate-800">{{ $estanteVal }}</b></span>
+                                                                                @endif
+                                                                            @else
+                                                                                <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">E:</span> <b class="text-slate-800">{{ $estanteVal }}</b></span>
+                                                                            @endcan
                                                                             @if ($nivelVal = data_get($loteData, 'nivel'))
                                                                                 <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">N:</span> <b class="text-slate-800">{{ $nivelVal }}</b></span>
                                                                             @endif

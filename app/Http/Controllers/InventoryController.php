@@ -35,8 +35,10 @@ class InventoryController extends Controller
         // El directorio principal SOLO muestra productos Disponibles
         $query->where('estado', 'Disponible');
 
-        // Solo el rol Administrador puede ver los productos de la categoría "Fármacos Controlados"
-        if (! auth()->user()->hasRole('Administrador')) {
+        // Solo el rol Administrador o quien tenga ver.despacho_controlado puede ver los productos de la categoría "Fármacos Controlados"
+        $puedeVerControlados = auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado');
+
+        if (! $puedeVerControlados) {
             $query->where('categoria', '!=', 'Fármacos Controlados');
         } else {
             if ($request->input('categoria') === 'Fármacos Controlados') {
@@ -101,8 +103,16 @@ class InventoryController extends Controller
         $inventories = $query->paginate(15)->withQueryString();
 
         // --- CONSULTAS INDEPENDIENTES PARA LOS MODALES ---
-        $mermas = Inventory::with('user')->where('estado', 'Merma')->orderBy('updated_at', 'desc')->get();
-        $historial = Inventory::with('user')->orderBy('created_at', 'desc')->limit(150)->get();
+        $mermas = Inventory::with('user')
+            ->where('estado', 'Merma')
+            ->when(! $puedeVerControlados, fn ($q) => $q->where('categoria', '!=', 'Fármacos Controlados'))
+            ->orderBy('updated_at', 'desc')
+            ->get();
+        $historial = Inventory::with('user')
+            ->when(! $puedeVerControlados, fn ($q) => $q->where('categoria', '!=', 'Fármacos Controlados'))
+            ->orderBy('created_at', 'desc')
+            ->limit(150)
+            ->get();
 
         // 5. Generar lista de productos únicos combinando Catálogo Maestro + Inventario
         $productosInv = Inventory::select('producto')
