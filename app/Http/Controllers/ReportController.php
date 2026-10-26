@@ -17,11 +17,19 @@ class ReportController extends Controller
     {
         $query = Inventory::where('estado', 'Disponible');
 
+        // Restricción de Fármacos Controlados según rol/permiso
+        $user = auth()->user();
+        $puedeVerControlados = $user && ($user->hasRole('Administrador') || $user->can('ver.despacho_controlado'));
+
+        if (! $puedeVerControlados) {
+            $query->where('categoria', '!=', 'Fármacos Controlados');
+        }
+
         // 1. Filtro de Búsqueda (Texto general)
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->orWhere('producto', 'like', "%{$search}%")
+                $q->where('producto', 'like', "%{$search}%")
                     ->orWhere('lote', 'like', "%{$search}%")
                     ->orWhere('categoria', 'like', "%{$search}%")
                     ->orWhere('rut_proveedor', 'like', "%{$search}%");
@@ -30,7 +38,9 @@ class ReportController extends Controller
 
         // 2. Filtro de Categoría
         if ($request->filled('categoria')) {
-            $query->where('categoria', $request->input('categoria'));
+            if ($request->input('categoria') !== 'Fármacos Controlados' || $puedeVerControlados) {
+                $query->where('categoria', $request->input('categoria'));
+            }
         }
 
         // 3. Filtro de Pasillo

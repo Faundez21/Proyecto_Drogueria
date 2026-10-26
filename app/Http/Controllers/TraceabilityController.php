@@ -11,7 +11,7 @@ class TraceabilityController extends Controller
 {
     public function index(Request $request)
     {
-        $query = StockMovement::query();
+        $query = StockMovement::with('user');
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -66,7 +66,8 @@ class TraceabilityController extends Controller
         }
 
         // Filtramos por lote y por producto para evitar colisiones
-        $timeline = StockMovement::where('lote', $lote)
+        $timeline = StockMovement::with('user')
+            ->where('lote', $lote)
             ->where('producto', $producto)
             ->orderBy('fecha_hora')
             ->orderBy('id')
@@ -77,6 +78,7 @@ class TraceabilityController extends Controller
                 'documento' => $mov->documento_respaldo,
                 'fecha' => Carbon::parse($mov->fecha_hora)->format('d/m/Y - H:i'),
                 'cantidad' => $mov->cantidad,
+                'responsable' => $mov->user ? trim($mov->user->name . ' ' . ($mov->user->last_name ?? '')) : null,
             ]);
 
         // Buscamos la ficha exacta del inventario cruzando lote y producto

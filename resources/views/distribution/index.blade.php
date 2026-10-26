@@ -69,13 +69,21 @@
                 position: absolute;
                 transform: translate(-50%, -100%);
                 transform-origin: 50% 100%;
-                pointer-events: none;
+                pointer-events: auto;
+                cursor: pointer;
                 z-index: 10;
                 white-space: nowrap;
                 letter-spacing: 0.02em;
                 box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
                 border: 1px solid rgba(255, 255, 255, 0.35);
                 will-change: left, top, transform;
+                transition: filter 0.15s ease, box-shadow 0.15s ease;
+            }
+
+            .rack-marker:hover {
+                filter: brightness(1.12);
+                box-shadow: 0 4px 12px rgba(15, 23, 42, 0.45);
+                z-index: 15;
             }
 
             .rack-marker::after {
@@ -93,6 +101,8 @@
             .rack-marker.aisle-marker {
                 opacity: 0.92;
                 border-style: dashed;
+                pointer-events: none;
+                cursor: default;
             }
 
             /* Colores exactos */
@@ -167,19 +177,30 @@
 
                     <!-- Botonera Superior -->
                     <header
-                        class="absolute top-0 left-0 w-full z-20 p-3 sm:p-5 pointer-events-none flex justify-between items-start">
-                        <div class="pointer-events-auto">
+                        class="absolute top-0 left-0 w-full z-20 p-3 sm:p-5 pointer-events-none flex justify-between items-start gap-2">
+                        <div class="pointer-events-auto flex flex-wrap items-center gap-2">
                             <div
                                 class="inline-flex bg-white/95 backdrop-blur p-1 rounded-xl border border-slate-200 shadow-sm">
                                 <button @click="changeView('2D')"
                                     :class="viewMode === '2D' ? 'bg-teal-600 text-white shadow-sm' :
                                         'text-slate-600 hover:text-slate-900'"
-                                    class="px-3.5 sm:px-5 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer">Vista 2D</button>
+                                    class="px-3 sm:px-4 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer"
+                                    title="Plano superior 2D (arrastra con clic izquierdo)">Planta 2D</button>
                                 <button @click="changeView('3D')"
                                     :class="viewMode === '3D' ? 'bg-teal-600 text-white shadow-sm' :
                                         'text-slate-600 hover:text-slate-900'"
-                                    class="px-3.5 sm:px-5 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer">Vista 3D</button>
+                                    class="px-3 sm:px-4 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer"
+                                    title="Vista isométrica 3D">Isométrica 3D</button>
+                                <button @click="changeView('FRONT')"
+                                    :class="viewMode === 'FRONT' ? 'bg-teal-600 text-white shadow-sm' :
+                                        'text-slate-600 hover:text-slate-900'"
+                                    class="px-3 sm:px-4 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer"
+                                    title="Vista frontal a nivel de pasillo">Frontal</button>
                             </div>
+                            <span class="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 text-slate-200 text-[11px] font-medium backdrop-blur border border-slate-700/60">
+                                <span x-show="viewMode === '2D'">🖱️ Clic izq: Arrastrar plano · Rueda: Zoom</span>
+                                <span x-show="viewMode !== '2D'">🖱️ Clic izq: Girar · Clic der / Teclas WASD: Desplazar · Rueda: Zoom</span>
+                            </span>
                         </div>
 
                         <div class="pointer-events-auto flex gap-1.5 sm:gap-2">
@@ -219,9 +240,38 @@
                         </div>
                     </header>
 
+                    <!-- Banner Flotante: Modo Mover Estantería -->
+                    <div x-show="isMovingMode" x-transition
+                        style="display: none;"
+                        class="absolute top-16 sm:top-5 left-1/2 -translate-x-1/2 z-30 pointer-events-auto bg-slate-900/95 text-white border border-blue-500/60 rounded-xl px-4 py-2.5 shadow-2xl flex flex-wrap items-center gap-3 text-xs">
+                        <span class="inline-flex items-center gap-2 font-bold text-blue-300">
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-ping"></span>
+                            Moviendo <span class="text-white underline" x-text="movingRackCode"></span>
+                        </span>
+                        <span class="hidden md:inline text-slate-300">Haz clic en el piso para guardar</span>
+                        <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-200 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 cursor-pointer select-none">
+                            <input type="checkbox" x-model="snapToGrid" @change="toggleSnapGrid()" class="rounded border-slate-600 text-blue-500 focus:ring-0 w-3.5 h-3.5">
+                            <span>Ajustar a cuadrícula</span>
+                        </label>
+                        <button type="button" @click="cancelarMovimiento()"
+                            class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition cursor-pointer">
+                            Cancelar (Esc)
+                        </button>
+                    </div>
+
+                    <!-- Toast de confirmación de guardado -->
+                    <div x-show="toastMessage !== ''" x-transition
+                        style="display: none;"
+                        class="absolute top-16 sm:top-5 left-1/2 -translate-x-1/2 z-30 pointer-events-none bg-emerald-900/95 text-emerald-100 border border-emerald-500/50 rounded-xl px-4 py-2 shadow-xl flex items-center gap-2 text-xs font-bold">
+                        <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span x-text="toastMessage"></span>
+                    </div>
+
                     <!-- Sidebar Colapsable (Selector, Búsqueda y Leyenda) -->
                     <aside
-                        class="absolute top-16 sm:top-24 left-3 sm:left-6 w-48 sm:w-56 glass-panel text-white rounded-xl shadow-2xl z-20 flex flex-col pointer-events-auto transition-all duration-300">
+                        class="absolute top-16 sm:top-24 left-3 sm:left-6 w-52 sm:w-64 glass-panel text-white rounded-xl shadow-2xl z-20 flex flex-col pointer-events-auto transition-all duration-300">
                         <div @click="sidebarOpen = !sidebarOpen"
                             class="flex justify-between items-center p-3 cursor-pointer hover:bg-slate-800/50 rounded-t-xl"
                             :class="{ 'rounded-b-xl': !sidebarOpen }">
@@ -244,12 +294,86 @@
 
                         <!-- Contenido interior del Sidebar -->
                         <div x-show="sidebarOpen" x-transition
-                            class="p-3 sm:p-4 pt-0 border-t border-slate-700/50 mt-1 flex flex-col gap-3 max-h-[55vh] overflow-y-auto">
+                            class="p-3 sm:p-4 pt-0 border-t border-slate-700/50 mt-1 flex flex-col gap-2.5 max-h-[60vh] overflow-y-auto">
+
+                            <!-- Buscador Inteligente (Estante, Producto, Lote, Pasillo) -->
+                            <div class="relative mt-2">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                                <input type="text" x-model="searchQuery" @input="handleSearch"
+                                    placeholder="Estante, producto o lote..."
+                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg py-2 pl-9 pr-7 text-xs sm:text-[13px] text-gray-200 focus:outline-none focus:border-blue-500 placeholder-gray-500 transition">
+                                <button x-show="searchQuery.length > 0" @click="searchQuery = ''; handleSearch()"
+                                    type="button"
+                                    class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-gray-400 hover:text-white cursor-pointer">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Navegador de resultados de búsqueda -->
+                            <div x-show="searchQuery.trim().length > 0" style="display: none;"
+                                class="flex items-center justify-between bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px]">
+                                <span class="text-slate-300 font-semibold"
+                                    x-text="searchMatchesCount > 0 ? (searchMatchIdx + 1) + ' de ' + searchMatchesCount + ' estante(s)' : 'Sin coincidencias'"></span>
+                                <div x-show="searchMatchesCount > 1" class="flex items-center gap-1">
+                                    <button type="button" @click="stepSearchMatch(-1)"
+                                        class="px-1.5 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold cursor-pointer"
+                                        title="Estante anterior">&lsaquo;</button>
+                                    <button type="button" @click="stepSearchMatch(1)"
+                                        class="px-1.5 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold cursor-pointer"
+                                        title="Siguiente estante">&rsaquo;</button>
+                                </div>
+                            </div>
+
+                            <!-- Selector directo: Ir a Estantería -->
+                            <div class="relative">
+                                <select style="background-image: none;" x-model="selectedRackJump" @change="jumpToRack()"
+                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2 text-xs sm:text-[13px] text-teal-300 font-semibold focus:outline-none focus:border-teal-500 cursor-pointer appearance-none">
+                                    <option value="">Ir directo a estante...</option>
+                                    <template x-for="rk in rackOptions" :key="rk.code">
+                                        <option :value="rk.code" x-text="rk.label"></option>
+                                    </template>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                    <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7">
+                                        </path>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Selector de Pasillo -->
+                            <div class="relative">
+                                <select style="background-image: none;" x-model="selectedAisle" @change="changeAisle()"
+                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2 text-xs sm:text-[13px] text-white font-medium focus:outline-none focus:border-blue-500 cursor-pointer appearance-none">
+                                    <option value="">Todos los pasillos</option>
+                                    <template x-for="aisle in aisleOptions" :key="aisle">
+                                        <option :value="aisle" x-text="'Pasillo: ' + aisle"></option>
+                                    </template>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7">
+                                        </path>
+                                    </svg>
+                                </div>
+                            </div>
 
                             <!-- Selector de nivel (dinámico: se llena con los niveles reales) -->
                             <div class="relative">
                                 <select style="background-image: none;" x-model="selectedLevel" @change="changeLevel()"
-                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2.5 text-xs sm:text-sm text-white font-medium focus:outline-none focus:border-blue-500 cursor-pointer appearance-none">
+                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2 text-xs sm:text-[13px] text-white font-medium focus:outline-none focus:border-blue-500 cursor-pointer appearance-none">
                                     <option value="">Todos los niveles</option>
                                     <template x-for="lvl in levelOptions" :key="lvl.value">
                                         <option :value="lvl.value" x-text="lvl.label"></option>
@@ -265,18 +389,18 @@
                                 </div>
                             </div>
 
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </div>
-                                <input type="text" x-model="searchQuery" @input="handleSearch"
-                                    placeholder="Buscar ubicación... (Ej: A-01)"
-                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg py-2.5 pl-9 pr-3 text-xs sm:text-sm text-gray-300 focus:outline-none focus:border-blue-500 placeholder-gray-500 transition">
-                            </div>
+                            <!-- Botón Filtro Rápido FEFO (Vencimientos) -->
+                            <button type="button" @click="toggleFefoFilter()"
+                                :class="fefoOnly ? 'bg-rose-600/90 border-rose-400 text-white shadow-md' : 'bg-[#1e293b] border-slate-700 text-gray-300 hover:border-rose-500/60'"
+                                class="w-full flex items-center justify-between px-3 py-2 rounded-lg border text-xs font-semibold transition cursor-pointer">
+                                <span class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full" :class="fefoOnly ? 'bg-white animate-pulse' : 'bg-rose-500'"></span>
+                                    Alertas FEFO (&le; 90d)
+                                </span>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold"
+                                    :class="fefoOnly ? 'bg-rose-900/80 text-rose-100' : 'bg-slate-800 text-rose-400'"
+                                    x-text="stats.conAlertaFefo"></span>
+                            </button>
 
                             <!-- Leyenda de ocupación -->
                             <div class="flex flex-col gap-3 mt-2 text-xs sm:text-sm font-medium text-gray-300">
@@ -459,9 +583,9 @@
 
                     <!-- Bottom Stats Bar (Dinámica con Alpine.js) -->
                     <div
-                        class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] max-w-4xl glass-panel text-white rounded-xl p-4 shadow-2xl z-20 hidden lg:flex justify-between items-center px-8 divide-x divide-gray-700">
+                        class="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] max-w-5xl glass-panel text-white rounded-xl p-3 sm:p-4 shadow-2xl z-20 hidden md:flex justify-between items-center px-4 xl:px-8 divide-x divide-gray-700">
                         <div
-                            class="flex-1 px-4 flex items-center gap-4 hover:scale-105 transition-transform cursor-default">
+                            class="flex-1 px-3 xl:px-4 flex items-center gap-3 hover:scale-105 transition-transform cursor-default">
                             <div class="p-2 bg-[#1e293b] rounded-lg text-gray-400">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -470,12 +594,12 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-[10px] xl:text-xs text-gray-400">Ubicaciones</p>
-                                <p class="text-base xl:text-lg font-bold" x-text="stats.ubicaciones"></p>
+                                <p class="text-[10px] xl:text-xs text-gray-400">Estanterías</p>
+                                <p class="text-sm xl:text-lg font-bold" x-text="stats.ubicaciones"></p>
                             </div>
                         </div>
                         <div
-                            class="flex-1 px-4 flex items-center gap-4 hover:scale-105 transition-transform cursor-default">
+                            class="flex-1 px-3 xl:px-4 flex items-center gap-3 hover:scale-105 transition-transform cursor-default">
                             <div class="p-2 bg-[#1e293b] rounded-lg text-blue-400 border border-blue-900/50">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -483,17 +607,31 @@
                                     </path>
                                 </svg>
                             </div>
-                            <div class="flex-1 flex justify-between items-center">
+                            <div class="flex-1 flex justify-between items-center gap-2">
                                 <div>
                                     <p class="text-[10px] xl:text-xs text-gray-400">Ocupación</p>
-                                    <p class="text-base xl:text-lg font-bold" x-text="stats.ocupacionPct + '%'"></p>
+                                    <p class="text-sm xl:text-lg font-bold" x-text="stats.ocupacionPct + '%'"></p>
                                 </div>
-                                <span class="text-xs text-gray-400"
+                                <span class="text-xs text-gray-400 font-mono"
                                     x-text="stats.ocupadas + '/' + stats.ubicaciones"></span>
                             </div>
                         </div>
                         <div
-                            class="flex-1 px-4 flex items-center gap-4 hover:scale-105 transition-transform cursor-default">
+                            class="flex-1 px-3 xl:px-4 flex items-center gap-3 hover:scale-105 transition-transform cursor-default">
+                            <div class="p-2 bg-[#1e293b] rounded-lg text-emerald-400 border border-emerald-900/50">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-[10px] xl:text-xs text-gray-400">Stock Almacenado</p>
+                                <p class="text-sm xl:text-lg font-bold text-emerald-400"
+                                    x-text="stats.stockTotal.toLocaleString('es-CL') + ' u'"></p>
+                            </div>
+                        </div>
+                        <div
+                            class="flex-1 px-3 xl:px-4 flex items-center gap-3 hover:scale-105 transition-transform cursor-default">
                             <div class="p-2 bg-[#1e293b] rounded-lg text-purple-400">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -502,7 +640,7 @@
                             </div>
                             <div>
                                 <p class="text-[10px] xl:text-xs text-gray-400">Cap. Total</p>
-                                <p class="text-base xl:text-lg font-bold"
+                                <p class="text-sm xl:text-lg font-bold"
                                     x-text="stats.capacidadTotal.toLocaleString('es-CL') + ' u'"></p>
                             </div>
                         </div>
@@ -520,13 +658,26 @@
                     tooltipVisible: false,
                     rackData: {},
                     searchQuery: '',
+                    searchMatchesCount: 0,
+                    searchMatchIdx: 0,
+                    selectedRackJump: '',
+                    rackOptions: [],
+                    selectedAisle: '',
+                    aisleOptions: [],
                     selectedLevel: '',
                     levelOptions: [],
+                    fefoOnly: false,
+                    isMovingMode: false,
+                    movingRackCode: '',
+                    snapToGrid: true,
+                    toastMessage: '',
                     stats: {
                         ubicaciones: 0,
                         ocupacionPct: 0,
                         ocupadas: 0,
-                        capacidadTotal: 0
+                        stockTotal: 0,
+                        capacidadTotal: 0,
+                        conAlertaFefo: 0
                     },
                     init() {
                         this.initThreeJS();
@@ -538,9 +689,29 @@
                         window.addEventListener('click-empty', () => {
                             this.tooltipVisible = false;
                         });
-                        // Escape cierra el panel de detalle
+                        window.addEventListener('moving-state', (e) => {
+                            this.isMovingMode = Boolean(e.detail?.active);
+                            this.movingRackCode = e.detail?.code || '';
+                        });
+                        window.addEventListener('search-results-updated', (e) => {
+                            this.searchMatchesCount = e.detail?.count || 0;
+                            this.searchMatchIdx = e.detail?.index || 0;
+                        });
+                        window.addEventListener('rack-saved-toast', (e) => {
+                            this.toastMessage = e.detail?.message || 'Posición actualizada';
+                            setTimeout(() => {
+                                this.toastMessage = '';
+                            }, 2600);
+                        });
+                        // Escape cancela movimiento o cierra el panel de detalle
                         window.addEventListener('keydown', (e) => {
-                            if (e.key === 'Escape') this.tooltipVisible = false;
+                            if (e.key === 'Escape') {
+                                if (this.isMovingMode) {
+                                    this.cancelarMovimiento();
+                                } else {
+                                    this.tooltipVisible = false;
+                                }
+                            }
                         });
                     },
                     changeView(mode) {
@@ -549,16 +720,42 @@
                             detail: mode
                         }));
                     },
+                    changeAisle() {
+                        window.dispatchEvent(new CustomEvent('filter-aisle', {
+                            detail: this.selectedAisle
+                        }));
+                    },
+                    jumpToRack() {
+                        if (!this.selectedRackJump) return;
+                        window.dispatchEvent(new CustomEvent('jump-to-rack', {
+                            detail: this.selectedRackJump
+                        }));
+                    },
                     changeLevel() {
                         window.dispatchEvent(new CustomEvent('filter-level', {
                             detail: this.selectedLevel
                         }));
                     },
+                    toggleFefoFilter() {
+                        this.fefoOnly = !this.fefoOnly;
+                        window.dispatchEvent(new CustomEvent('filter-fefo', {
+                            detail: this.fefoOnly
+                        }));
+                    },
                     resetView() {
                         this.viewMode = '3D';
+                        this.selectedRackJump = '';
+                        this.selectedAisle = '';
                         this.selectedLevel = '';
+                        this.fefoOnly = false;
                         this.searchQuery = '';
+                        this.searchMatchesCount = 0;
+                        this.searchMatchIdx = 0;
+                        this.changeAisle();
                         this.changeLevel();
+                        window.dispatchEvent(new CustomEvent('filter-fefo', {
+                            detail: false
+                        }));
                         window.dispatchEvent(new CustomEvent('search-rack', {
                             detail: ''
                         }));
@@ -583,6 +780,11 @@
                             detail: this.searchQuery
                         }));
                     },
+                    stepSearchMatch(dir) {
+                        window.dispatchEvent(new CustomEvent('step-search-rack', {
+                            detail: dir
+                        }));
+                    },
                     verDetalle() {
                         window.location.href = "{{ route('inventory.index') }}?estante=" + encodeURIComponent(this.rackData
                             .code);
@@ -590,6 +792,14 @@
                     habilitarMovimiento() {
                         this.tooltipVisible = false; // Ocultamos el panel
                         window.dispatchEvent(new Event('start-moving')); // Avisamos a Three.js
+                    },
+                    cancelarMovimiento() {
+                        window.dispatchEvent(new Event('cancel-moving'));
+                    },
+                    toggleSnapGrid() {
+                        window.dispatchEvent(new CustomEvent('toggle-snap-grid', {
+                            detail: this.snapToGrid
+                        }));
                     },
 
                     // LÓGICA THREE.JS
@@ -616,13 +826,16 @@
                         container.appendChild(renderer.domElement);
 
                         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-                        const defaultTarget = new THREE.Vector3(0, -5, 0);
+                        const defaultTarget = new THREE.Vector3(0, 2, 0);
                         controls.target.copy(defaultTarget);
-                        controls.maxPolarAngle = Math.PI / 2 - 0.05;
+                        controls.maxPolarAngle = Math.PI / 2 - 0.04;
                         controls.minDistance = 8;
                         controls.maxDistance = 220;
                         controls.enableDamping = true;
-                        controls.dampingFactor = 0.05;
+                        controls.dampingFactor = 0.07;
+                        controls.screenSpacePanning = true;
+                        controls.panSpeed = 1.1;
+                        controls.rotateSpeed = 0.85;
 
                         // --- Iluminación ---
                         scene.add(new THREE.AmbientLight(0xffffff, 0.45));
@@ -670,10 +883,22 @@
                             camAnim = null;
                         });
 
-                        function focusPoint(point) {
-                            const dir = camera.position.clone().sub(controls.target).normalize();
-                            const dist = Math.min(Math.max(camera.position.distanceTo(controls.target) * 0.7, 24), 60);
-                            animateCamera(point.clone().add(dir.multiplyScalar(dist)), point, 700);
+                        let currentViewMode = '3D';
+
+                        function focusPoint(point, rackMesh = null) {
+                            const targetY = rackMesh ? Math.min(4.2, (rackMesh.userData?.alturaTotal || 6) * 0.45) : 2.5;
+                            const target = new THREE.Vector3(point.x, targetY, point.z);
+
+                            if (currentViewMode === '2D') {
+                                animateCamera(new THREE.Vector3(point.x, 65, point.z + 0.01), new THREE.Vector3(point.x, 0, point.z), 650);
+                                return;
+                            }
+
+                            // Ángulo frontal-isométrico despejado para ver bien las cajas y etiquetas del estante
+                            const offset = currentViewMode === 'FRONT'
+                                ? new THREE.Vector3(0, 5.5, 19)
+                                : new THREE.Vector3(9, 11, 20);
+                            animateCamera(target.clone().add(offset), target, 650);
                         }
 
                         // --- ESTRUCTURA BASE (Suelo con cuadrícula y Paredes) ---
@@ -2089,6 +2314,9 @@
                         let ubiTotal = 0;
                         let capTotal = 0;
                         let ocuTotal = 0;
+                        let stockTotalGlobal = 0;
+                        let fefoRacksCount = 0;
+                        const pasillosSet = new Set();
 
                         dbShelves.forEach((shelf, idx) => {
                             const nombreEstante = String(shelf.name ?? '').trim();
@@ -2097,6 +2325,7 @@
                             const capacidad = parseInt(shelf.capacidad ?? 0) || 0;
                             const pct = capacidad > 0 ? Math.min(100, Math.round((totalStock / capacidad) * 100)) :
                                 null;
+                            const tieneAlertaFefo = items.some(i => i.venceEstado === 'danger' || i.venceEstado === 'warn');
 
                             // Si la estantería aún no tiene posición guardada, se acomoda en una grilla
                             const tienePos = shelf.pos_x !== null && shelf.pos_x !== undefined && shelf.pos_z !==
@@ -2104,16 +2333,22 @@
                             const px = tienePos ? (Number(shelf.pos_x) || 0) : -30 + (idx % 6) * 12;
                             const pz = tienePos ? (Number(shelf.pos_z) || 0) : -12 + Math.floor(idx / 6) * 14;
 
+                            const nombrePasillo = shelf.aisle ? shelf.aisle.name : 'Sin pasillo';
+                            if (shelf.aisle && shelf.aisle.name) {
+                                pasillosSet.add(shelf.aisle.name);
+                            }
+
                             const rackData = {
                                 id: shelf.id,
                                 code: nombreEstante,
                                 status: items.length > 0 ? 'Ocupado' : 'Disponible',
-                                aisle: shelf.aisle ? shelf.aisle.name : 'Sin pasillo',
+                                aisle: nombrePasillo,
                                 aisleColor: shelf.aisle ? shelf.aisle.color : '#64748b',
                                 stock: totalStock,
                                 capacidad: capacidad,
                                 pct: pct,
                                 ocupacionLabel: etiquetaOcupacion(pct),
+                                hasFefoAlert: tieneAlertaFefo,
                                 product: items.length > 0 ? items[0].producto : 'Sin stock asignado',
                                 lot: items.length > 0 ? items[0].lote : '-',
                                 venc: items.length > 0 ? items[0].vence : '-',
@@ -2149,6 +2384,11 @@
                             markerDiv.style.setProperty('--marker-color', colorHex);
                             markerDiv.style.color = 'white';
                             markerDiv.textContent = capacidad > 0 ? `${rackData.code} · ${pct}%` : `${rackData.code}`;
+                            markerDiv.title = `Ir a ${rackData.code}`;
+                            markerDiv.addEventListener('click', (ev) => {
+                                ev.stopPropagation();
+                                seleccionarEstanteria(mesh);
+                            });
 
                             labelsContainer.appendChild(markerDiv);
                             markers.push({
@@ -2161,14 +2401,31 @@
                             // Sumar a estadísticas
                             ubiTotal++;
                             capTotal += capacidad;
+                            stockTotalGlobal += totalStock;
                             if (items.length > 0) ocuTotal++;
+                            if (tieneAlertaFefo) fefoRacksCount++;
                         });
 
                         // Actualizar Alpine Stats
                         this.stats.ubicaciones = ubiTotal;
                         this.stats.capacidadTotal = capTotal;
                         this.stats.ocupadas = ocuTotal;
+                        this.stats.stockTotal = stockTotalGlobal;
+                        this.stats.conAlertaFefo = fefoRacksCount;
                         this.stats.ocupacionPct = ubiTotal > 0 ? Math.round((ocuTotal / ubiTotal) * 100) : 0;
+
+                        // Llenar opciones de pasillos ordenadas naturalmente
+                        this.aisleOptions = [...pasillosSet].sort((a, b) =>
+                            String(a).localeCompare(String(b), 'es', { numeric: true })
+                        );
+
+                        // Llenar opciones del selector directo de estanterías
+                        this.rackOptions = racks
+                            .map(r => ({
+                                code: r.userData.code,
+                                label: `${r.userData.code} (${r.userData.aisle}) · ${r.userData.stock} u`
+                            }))
+                            .sort((a, b) => String(a.code).localeCompare(String(b.code), 'es', { numeric: true }));
 
                         // Llenar el selector de niveles con los niveles reales
                         this.levelOptions = [...nivelesGlobales.entries()]
@@ -2183,19 +2440,34 @@
                                 return String(a.label).localeCompare(String(b.label));
                             });
 
-                        // --- FILTRO POR NIVEL: atenúa los demás niveles de todas las estanterías ---
+                        // --- FILTROS COMBINADOS (NIVEL, PASILLO, ALERTA FEFO y BÚSQUEDA) ---
                         let filtroNivelActual = '';
+                        let filtroPasilloActual = '';
+                        let filtroFefoActual = false;
+                        let codigosBusquedaActiva = null; // Set de códigos cuando hay búsqueda activa
 
-                        function aplicarFiltroNivel(key) {
-                            filtroNivelActual = String(key ?? '');
+                        function actualizarVisibilidadRacks() {
                             racks.forEach(rack => {
                                 const g = rack.visualGroup;
                                 if (!g) return;
+                                const data = rack.userData;
+
+                                const pasaPasillo = !filtroPasilloActual || data.aisle === filtroPasilloActual;
+                                const pasaFefo = !filtroFefoActual || Boolean(data.hasFefoAlert);
+                                const pasaBusqueda = !codigosBusquedaActiva || codigosBusquedaActiva.has(data.code);
+                                const estanteActivo = pasaPasillo && pasaFefo && pasaBusqueda;
+
+                                // Atenuar marcador HTML si el estante está filtrado
+                                const matchingMarker = markers.find(m => m.rackCode === data.code);
+                                if (matchingMarker && matchingMarker.element) {
+                                    matchingMarker.element.style.opacity = estanteActivo ? '1' : '0.18';
+                                }
+
                                 g.userData.levelMeshes.forEach((meshes, i) => {
-                                    const atenuar = filtroNivelActual !== '' && g.userData.levelKeys[i] !==
+                                    const pasaNivel = filtroNivelActual === '' || g.userData.levelKeys[i] ===
                                         filtroNivelActual;
+                                    const atenuar = !(estanteActivo && pasaNivel);
                                     meshes.forEach(m => {
-                                        // Las cajas usan un arreglo de materiales (uno por cara)
                                         const lista = Array.isArray(m.material) ? m.material : [m
                                             .material
                                         ];
@@ -2212,7 +2484,28 @@
                             ocultarHoverCaja();
                         }
 
-                        window.addEventListener('filter-level', (e) => aplicarFiltroNivel(e.detail));
+                        window.addEventListener('filter-level', (e) => {
+                            filtroNivelActual = String(e.detail ?? '');
+                            actualizarVisibilidadRacks();
+                        });
+
+                        window.addEventListener('filter-aisle', (e) => {
+                            filtroPasilloActual = String(e.detail ?? '');
+                            actualizarVisibilidadRacks();
+                            if (filtroPasilloActual) {
+                                const delPasillo = racks.filter(r => r.userData.aisle === filtroPasilloActual);
+                                if (delPasillo.length > 0) {
+                                    const cx = delPasillo.reduce((a, r) => a + r.position.x, 0) / delPasillo.length;
+                                    const cz = delPasillo.reduce((a, r) => a + r.position.z, 0) / delPasillo.length;
+                                    focusPoint(new THREE.Vector3(cx, 0, cz));
+                                }
+                            }
+                        });
+
+                        window.addEventListener('filter-fefo', (e) => {
+                            filtroFefoActual = Boolean(e.detail);
+                            actualizarVisibilidadRacks();
+                        });
 
                         // --- RENDERIZADO DINÁMICO DE PASILLOS ---
                         let aisleMeshes = [];
@@ -2331,6 +2624,17 @@
                             mesh.material.emissiveIntensity = 0;
                         }
 
+                        function seleccionarEstanteria(mesh) {
+                            if (!mesh) return;
+                            resetAllHighlights();
+                            selectedObject = mesh;
+                            highlightRack(mesh, false);
+                            window.dispatchEvent(new CustomEvent('rack-selected', {
+                                detail: mesh.userData
+                            }));
+                            focusPoint(mesh.position, mesh);
+                        }
+
                         function resetAllHighlights() {
                             racks.forEach(r => {
                                 r.material.opacity = 0;
@@ -2338,6 +2642,12 @@
                             });
                             selectedObject = null;
                         }
+
+                        window.addEventListener('jump-to-rack', (e) => {
+                            const code = String(e.detail ?? '');
+                            const target = racks.find(r => r.userData.code === code);
+                            if (target) seleccionarEstanteria(target);
+                        });
 
                         function getMousePos(event) {
                             const rect = renderer.domElement.getBoundingClientRect();
@@ -2442,22 +2752,74 @@
 
                         wrapper.addEventListener('pointerleave', ocultarHoverCaja);
 
-                        window.addEventListener('search-rack', (e) => {
-                            const query = String(e.detail ?? '').toLowerCase();
+                        // --- BÚSQUEDA INTELIGENTE (ESTANTE, PASILLO, PRODUCTO, LOTE, PROGRAMA) ---
+                        let searchMatches = [];
+                        let searchCurrentIdx = 0;
+
+                        function enfocarResultadoBusqueda(idx) {
+                            if (searchMatches.length === 0) return;
+                            searchCurrentIdx = ((idx % searchMatches.length) + searchMatches.length) % searchMatches.length;
                             resetAllHighlights();
-                            if (!query) return;
-                            const found = racks.find(r =>
-                                r.userData.code.toLowerCase().includes(query) ||
-                                (r.userData.items ?? []).some(i => (i.producto ?? '').toLowerCase().includes(query))
-                            );
-                            if (found) {
-                                selectedObject = found;
-                                highlightRack(found, false);
-                                window.dispatchEvent(new CustomEvent('rack-selected', {
-                                    detail: found.userData
+                            searchMatches.forEach(r => {
+                                r.material.opacity = 0.18;
+                                r.material.emissiveIntensity = 0.45;
+                            });
+                            const targetRack = searchMatches[searchCurrentIdx];
+                            selectedObject = targetRack;
+                            highlightRack(targetRack, false);
+                            window.dispatchEvent(new CustomEvent('rack-selected', {
+                                detail: targetRack.userData
+                            }));
+                            window.dispatchEvent(new CustomEvent('search-results-updated', {
+                                detail: {
+                                    count: searchMatches.length,
+                                    index: searchCurrentIdx
+                                }
+                            }));
+                            focusPoint(targetRack.position, targetRack);
+                        }
+
+                        window.addEventListener('search-rack', (e) => {
+                            const query = String(e.detail ?? '').trim().toLowerCase();
+                            resetAllHighlights();
+                            searchMatches = [];
+                            searchCurrentIdx = 0;
+
+                            if (!query) {
+                                codigosBusquedaActiva = null;
+                                actualizarVisibilidadRacks();
+                                window.dispatchEvent(new CustomEvent('search-results-updated', {
+                                    detail: { count: 0, index: 0 }
                                 }));
-                                focusPoint(found.position);
+                                return;
                             }
+
+                            searchMatches = racks.filter(r => {
+                                const d = r.userData;
+                                if ((d.code ?? '').toLowerCase().includes(query)) return true;
+                                if ((d.aisle ?? '').toLowerCase().includes(query)) return true;
+                                return (d.items ?? []).some(i =>
+                                    (i.producto ?? '').toLowerCase().includes(query) ||
+                                    (i.lote ?? '').toLowerCase().includes(query) ||
+                                    (i.programa ?? '').toLowerCase().includes(query)
+                                );
+                            });
+
+                            codigosBusquedaActiva = new Set(searchMatches.map(r => r.userData.code));
+                            actualizarVisibilidadRacks();
+
+                            if (searchMatches.length > 0) {
+                                enfocarResultadoBusqueda(0);
+                            } else {
+                                window.dispatchEvent(new CustomEvent('search-results-updated', {
+                                    detail: { count: 0, index: 0 }
+                                }));
+                            }
+                        });
+
+                        window.addEventListener('step-search-rack', (e) => {
+                            const dir = Number(e.detail) || 1;
+                            enfocarResultadoBusqueda(searchCurrentIdx + dir);
                         });
 
                         // --- Zoom animado ---
@@ -2470,34 +2832,130 @@
                             animateCamera(controls.target.clone().add(offset), controls.target, 400);
                         });
                         window.addEventListener('cam-reset', () => {
+                            currentViewMode = '3D';
                             controls.enableRotate = true;
+                            controls.mouseButtons = {
+                                LEFT: THREE.MOUSE.ROTATE,
+                                MIDDLE: THREE.MOUSE.DOLLY,
+                                RIGHT: THREE.MOUSE.PAN
+                            };
                             resetAllHighlights();
                             animateCamera(defaultCamPos, defaultTarget, 800);
                         });
 
-                        // --- Cambio 2D / 3D animado ---
+                        // --- Cambio 2D / 3D / FRONTAL animado ---
                         window.addEventListener('update-camera-view', (e) => {
-                            if (e.detail === '2D') {
+                            currentViewMode = e.detail || '3D';
+                            if (currentViewMode === '2D') {
                                 controls.enableRotate = false;
-                                // z = 0.01 evita la posición degenerada justo sobre el eje vertical
-                                animateCamera(new THREE.Vector3(0, 110, 0.01), new THREE.Vector3(0, 0, 0), 800);
+                                // En Vista 2D el clic izquierdo arrastra el plano como en Google Maps
+                                controls.mouseButtons = {
+                                    LEFT: THREE.MOUSE.PAN,
+                                    MIDDLE: THREE.MOUSE.DOLLY,
+                                    RIGHT: THREE.MOUSE.PAN
+                                };
+                                animateCamera(new THREE.Vector3(0, 105, 0.01), new THREE.Vector3(0, 0, 0), 750);
+                            } else if (currentViewMode === 'FRONT') {
+                                controls.enableRotate = true;
+                                controls.mouseButtons = {
+                                    LEFT: THREE.MOUSE.ROTATE,
+                                    MIDDLE: THREE.MOUSE.DOLLY,
+                                    RIGHT: THREE.MOUSE.PAN
+                                };
+                                animateCamera(new THREE.Vector3(0, 26, 68), new THREE.Vector3(0, 3, 0), 750);
                             } else {
                                 controls.enableRotate = true;
-                                animateCamera(defaultCamPos, defaultTarget, 800);
+                                controls.mouseButtons = {
+                                    LEFT: THREE.MOUSE.ROTATE,
+                                    MIDDLE: THREE.MOUSE.DOLLY,
+                                    RIGHT: THREE.MOUSE.PAN
+                                };
+                                animateCamera(defaultCamPos, defaultTarget, 750);
                             }
                         });
 
-                        // --- LÓGICA DE MOVIMIENTO POR CLIC ---
+                        // --- Navegación suave con teclado (WASD o Flechas) ---
+                        window.addEventListener('keydown', (e) => {
+                            const tag = (document.activeElement?.tagName || '').toLowerCase();
+                            if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+                            const step = 4.5;
+                            let dx = 0;
+                            let dz = 0;
+                            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dz = -step;
+                            else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dz = step;
+                            else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dx = -step;
+                            else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') dx = step;
+                            else return;
+
+                            e.preventDefault();
+                            camAnim = null;
+                            camera.position.x += dx;
+                            camera.position.z += dz;
+                            controls.target.x += dx;
+                            controls.target.z += dz;
+                        });
+
+                        // --- LÓGICA DE MOVIMIENTO POR CLIC (CON LÍMITES DE PAREDES, SNAP Y CANCELAR) ---
                         let isMoving = false;
+                        let snapGridEnabled = true;
+                        let moveOriginPos = null;
                         const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -1.5);
+                        const WALL_LIMIT_X = 36;
+                        const WALL_LIMIT_Z = 21;
+
+                        function actualizarPosicionEstante(mesh, x, z) {
+                            mesh.position.x = x;
+                            mesh.position.z = z;
+                            if (mesh.visualGroup) {
+                                mesh.visualGroup.position.x = x;
+                                mesh.visualGroup.position.z = z;
+                            }
+                            const matchingMarker = markers.find(m => m.rackCode === mesh.userData.code);
+                            if (matchingMarker) {
+                                matchingMarker.pos3D.x = x;
+                                matchingMarker.pos3D.z = z;
+                            }
+                        }
+
+                        window.addEventListener('toggle-snap-grid', (e) => {
+                            snapGridEnabled = Boolean(e.detail);
+                        });
 
                         window.addEventListener('start-moving', () => {
                             if (!selectedObject) return;
                             isMoving = true;
+                            moveOriginPos = {
+                                x: selectedObject.position.x,
+                                z: selectedObject.position.z
+                            };
                             camAnim = null;
                             controls.enabled = false;
                             wrapper.style.cursor = 'move';
                             ocultarHoverCaja();
+                            window.dispatchEvent(new CustomEvent('moving-state', {
+                                detail: {
+                                    active: true,
+                                    code: selectedObject.userData.code
+                                }
+                            }));
+                        });
+
+                        window.addEventListener('cancel-moving', () => {
+                            if (!isMoving || !selectedObject) return;
+                            if (moveOriginPos) {
+                                actualizarPosicionEstante(selectedObject, moveOriginPos.x, moveOriginPos.z);
+                                renderAisles();
+                            }
+                            isMoving = false;
+                            moveOriginPos = null;
+                            controls.enabled = true;
+                            wrapper.style.cursor = 'default';
+                            window.dispatchEvent(new CustomEvent('moving-state', {
+                                detail: { active: false, code: '' }
+                            }));
+                            window.dispatchEvent(new CustomEvent('rack-selected', {
+                                detail: selectedObject.userData
+                            }));
                         });
 
                         wrapper.addEventListener('pointermove', (event) => {
@@ -2509,29 +2967,22 @@
                                 const hit = raycaster.ray.intersectPlane(floorPlane, intersectPoint);
 
                                 if (hit) {
-                                    // 1. Movemos la hitbox
-                                    selectedObject.position.x = intersectPoint.x;
-                                    selectedObject.position.z = intersectPoint.z;
-
-                                    // 2. Movemos el MODELO VISUAL (Estantería Realista)
-                                    if (selectedObject.visualGroup) {
-                                        selectedObject.visualGroup.position.x = intersectPoint.x;
-                                        selectedObject.visualGroup.position.z = intersectPoint.z;
+                                    let nx = Math.max(-WALL_LIMIT_X, Math.min(WALL_LIMIT_X, intersectPoint.x));
+                                    let nz = Math.max(-WALL_LIMIT_Z, Math.min(WALL_LIMIT_Z, intersectPoint.z));
+                                    if (snapGridEnabled) {
+                                        nx = Math.round(nx);
+                                        nz = Math.round(nz);
+                                    } else {
+                                        nx = Math.round(nx * 10) / 10;
+                                        nz = Math.round(nz * 10) / 10;
                                     }
-
-                                    // 3. Movemos la etiqueta (se busca por código exacto, no por texto)
-                                    const matchingMarker = markers.find(m => m.rackCode === selectedObject.userData
-                                        .code);
-                                    if (matchingMarker) {
-                                        matchingMarker.pos3D.x = intersectPoint.x;
-                                        matchingMarker.pos3D.z = intersectPoint.z;
-                                    }
+                                    actualizarPosicionEstante(selectedObject, nx, nz);
                                 }
                                 return;
                             }
 
                             if (event.target.closest('header') || event.target.closest('aside') || event.target.closest(
-                                    '.z-30') || event.target.closest('.bottom-6')) {
+                                    '.z-30') || event.target.closest('.bottom-6') || event.target.closest('.bottom-4')) {
                                 quitarBrillo(hoveredObject);
                                 hoveredObject = null;
                                 wrapper.style.cursor = 'default';
@@ -2557,11 +3008,38 @@
                             actualizarHoverCaja(event);
                         });
 
+                        // Detectar si el usuario arrastró el mouse (rotación/paneo) para no disparar clic accidental
+                        let pointerDownCoords = null;
+                        wrapper.addEventListener('pointerdown', (event) => {
+                            pointerDownCoords = {
+                                x: event.clientX,
+                                y: event.clientY
+                            };
+                        });
+
                         wrapper.addEventListener('click', (event) => {
+                            if (event.target.closest('header') || event.target.closest('aside') || event.target.closest(
+                                    '.z-30') || event.target.closest('.bottom-6') || event.target.closest('.bottom-4')) return;
+
+                            // Si el usuario arrastró el mouse (> 5px) para girar o mover la cámara, ignoramos el click
+                            if (!isMoving && pointerDownCoords) {
+                                const distMoved = Math.hypot(
+                                    event.clientX - pointerDownCoords.x,
+                                    event.clientY - pointerDownCoords.y
+                                );
+                                if (distMoved > 5) return;
+                            }
+
                             if (isMoving && selectedObject) {
                                 isMoving = false;
+                                moveOriginPos = null;
                                 controls.enabled = true;
                                 wrapper.style.cursor = 'default';
+                                const movedCode = selectedObject.userData.code;
+
+                                window.dispatchEvent(new CustomEvent('moving-state', {
+                                    detail: { active: false, code: '' }
+                                }));
 
                                 fetch(`/shelf/${selectedObject.userData.id}/update-position`, {
                                         method: 'POST',
@@ -2575,7 +3053,11 @@
                                         })
                                     })
                                     .then(response => response.json())
-                                    .then(data => console.log('Posición guardada exitosamente'))
+                                    .then(() => {
+                                        window.dispatchEvent(new CustomEvent('rack-saved-toast', {
+                                            detail: { message: `Posición de ${movedCode} guardada` }
+                                        }));
+                                    })
                                     .catch(error => console.error('Error guardando posición:', error));
 
                                 // Recreamos los rectángulos del pasillo para que se ajusten a la nueva posición
@@ -2587,26 +3069,29 @@
                                 return;
                             }
 
-                            if (event.target.closest('header') || event.target.closest('aside') || event.target.closest(
-                                    '.z-30') || event.target.closest('.bottom-6')) return;
-
                             getMousePos(event);
                             raycaster.setFromCamera(mouse, camera);
                             const intersects = raycaster.intersectObjects(racks);
 
                             if (intersects.length > 0) {
-                                resetAllHighlights();
-                                selectedObject = intersects[0].object;
-                                highlightRack(selectedObject, false);
-                                window.dispatchEvent(new CustomEvent('rack-selected', {
-                                    detail: selectedObject.userData
-                                }));
-                                focusPoint(selectedObject.position);
+                                seleccionarEstanteria(intersects[0].object);
                             } else {
                                 resetAllHighlights();
                                 window.dispatchEvent(new Event('click-empty'));
                             }
                         });
+
+                        // Auto-enfoque inicial si la URL trae ?estante=... o ?search=...
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const initialRackQuery = (urlParams.get('estante') || urlParams.get('search') || '').trim();
+                        if (initialRackQuery) {
+                            this.searchQuery = initialRackQuery;
+                            setTimeout(() => {
+                                window.dispatchEvent(new CustomEvent('search-rack', {
+                                    detail: initialRackQuery
+                                }));
+                            }, 250);
+                        }
 
                         // --- ETIQUETAS: posicionamiento, escala por distancia y anti-solapamiento ---
                         function actualizarEtiquetas() {

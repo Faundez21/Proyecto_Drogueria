@@ -54,8 +54,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/global-search', [GlobalSearchController::class, 'search'])->name('global.search');
     Route::get('/api/notifications', [GlobalSearchController::class, 'notifications'])->name('global.notifications');
 
-    // ===== SOLO ADMINISTRADOR =====
-    Route::middleware('role:Administrador')->group(function () {
+    // ===== GESTIÓN DE USUARIOS Y ROLES (acceso por permiso ver.usuarios; Administrador entra siempre vía Gate::before) =====
+    Route::middleware('permission:ver.usuarios')->group(function () {
 
         // asignar contraseña por el administrador
         Route::post('/users/reset-password/{email}', [PasswordResetRequestController::class, 'resetPassword'])
@@ -69,7 +69,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/roles', [UserController::class, 'storeRole'])->name('roles.store');
         Route::put('/roles/{role}', [UserController::class, 'updateRole'])->name('roles.update');
         Route::delete('/roles/{role}', [UserController::class, 'destroyRole'])->name('roles.destroy');
+    });
 
+    // ===== SOLO ADMINISTRADOR =====
+    Route::middleware('role:Administrador')->group(function () {
         // asignar solicitudes de establecimientos/cesfam a trabajadores desde Despacho
         Route::patch('/requests/{establishmentRequest}/assign', [EstablishmentRequestController::class, 'assign'])
             ->name('requests.assign');

@@ -255,6 +255,37 @@
                     </button>
                 </div>
 
+                @php
+                    $sidebarCuarentenaCount = 0;
+                    $sidebarDespachosPendCount = 0;
+                    $sidebarClavesPendCount = 0;
+                    $rolUsuarioActual = 'Operador';
+                    try {
+                        if (auth()->check()) {
+                            $rolUsuarioActual = auth()->user()->roles->first()?->name
+                                ?? (method_exists(auth()->user(), 'hasRole') && auth()->user()->hasRole('Administrador') ? 'Administrador' : 'Operador');
+
+                            if (auth()->user()->can('ver.cuarentena')) {
+                                $sidebarCuarentenaCount = \Illuminate\Support\Facades\DB::table('inventories')
+                                    ->where('estado', 'Cuarentena')
+                                    ->where('cantidad', '>', 0)
+                                    ->count();
+                            }
+                            if (auth()->user()->can('ver.despacho')) {
+                                $sidebarDespachosPendCount = \Illuminate\Support\Facades\DB::table('establishment_requests')
+                                    ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
+                                    ->count();
+                            }
+                            if (auth()->user()->can('ver.usuarios')) {
+                                $sidebarClavesPendCount = \Illuminate\Support\Facades\DB::table('password_reset_tokens')
+                                    ->where('status', 'pending')
+                                    ->count();
+                            }
+                        }
+                    } catch (\Throwable $e) {
+                    }
+                @endphp
+
                 <nav class="flex-1 px-3 py-5 space-y-6 overflow-y-auto sidebar-scroll">
                     <div>
                         @can('ver.dashboard')
@@ -336,6 +367,11 @@
                                     </svg>
                                     Cuarentena
                                 </div>
+                                @if ($sidebarCuarentenaCount > 0)
+                                    <span class="font-mono-das text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30" title="Lotes retenidos en cuarentena">
+                                        {{ $sidebarCuarentenaCount }}
+                                    </span>
+                                @endif
                             </a>
                             @endcan
                         </div>
@@ -356,13 +392,20 @@
                             <div class="flex flex-col space-y-0.5">
                                 @can('ver.despacho')
                                 <a href="{{ route('dispatch.index') }}"
-                                    class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                            d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
-                                    </svg>
-                                    Despacho Normal
+                                    class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
+                                    <div class="flex items-center gap-2.5">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                                d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                                        </svg>
+                                        Despacho Normal
+                                    </div>
+                                    @if ($sidebarDespachosPendCount > 0)
+                                        <span class="font-mono-das text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30" title="Solicitudes pendientes o parciales por despachar">
+                                            {{ $sidebarDespachosPendCount }}
+                                        </span>
+                                    @endif
                                 </a>
                                 @endcan
                                 @can('ver.despacho_controlado')
@@ -465,13 +508,20 @@
                                 Configuración</p>
                             <div class="space-y-0.5">
                                 <a href="{{ route('users.index') }}"
-                                    class="nav-row {{ request()->routeIs('users.*') || request()->routeIs('roles.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                                        </path>
-                                    </svg>
-                                    Usuarios y Permisos
+                                    class="nav-row {{ request()->routeIs('users.*') || request()->routeIs('roles.*') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
+                                    <div class="flex items-center gap-2.5">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                            </path>
+                                        </svg>
+                                        Usuarios y Permisos
+                                    </div>
+                                    @if ($sidebarClavesPendCount > 0)
+                                        <span class="font-mono-das text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/25 text-purple-300 border border-purple-400/30 animate-pulse" title="Solicitudes de recuperación de contraseña pendientes">
+                                            {{ $sidebarClavesPendCount }}
+                                        </span>
+                                    @endif
                                 </a>
                             </div>
                         </div>
@@ -519,6 +569,16 @@
                     </div>
 
                     <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                        <!-- Botón de búsqueda móvil (< sm) -->
+                        <button onclick="openSearchModal()" type="button"
+                            class="sm:hidden p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer"
+                            title="Buscar en el sistema">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </button>
+
                         <div class="hidden xl:flex items-center gap-2.5 pr-4 border-r border-slate-200">
                             <svg class="w-[18px] h-[18px]" style="color: var(--accent);" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -574,11 +634,7 @@
                                     <span
                                         class="text-[12.5px] font-medium text-slate-700">{{ auth()->user()->name ?? 'Usuario' }}</span>
                                     <span class="text-[10.5px] mt-0.5 text-slate-400">
-                                        @if (method_exists(auth()->user(), 'hasRole') && auth()->user()->hasRole('Administrador'))
-                                            Administrador
-                                        @else
-                                            Operador
-                                        @endif
+                                        {{ $rolUsuarioActual }}
                                     </span>
                                 </div>
                                 <svg class="w-3.5 h-3.5 hidden md:block text-slate-400" fill="none"
@@ -590,12 +646,16 @@
                             </button>
 
                             <div id="user-menu"
-                                class="hidden absolute right-0 mt-2 w-[240px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
+                                class="hidden absolute right-0 mt-2 w-[250px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
                                 <div class="p-4 border-b border-slate-100 bg-slate-50">
                                     <p class="text-[13px] font-semibold text-slate-800">
-                                        {{ auth()->user()->name ?? 'Usuario' }}</p>
+                                        {{ trim((auth()->user()->name ?? 'Usuario') . ' ' . (auth()->user()->last_name ?? '')) }}</p>
                                     <p class="text-[12px] truncate mt-0.5 text-slate-500">
                                         {{ auth()->user()->email ?? 'usuario@ejemplo.com' }}</p>
+                                    <span class="inline-flex items-center gap-1.5 mt-2 px-2 py-0.5 rounded-md text-[10.5px] font-semibold bg-teal-50 text-teal-700 border border-teal-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                                        {{ $rolUsuarioActual }}
+                                    </span>
                                 </div>
                                 <div class="p-1.5">
                                     <form id="logout-form" method="POST" action="{{ route('logout') }}"
