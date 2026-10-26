@@ -3,28 +3,6 @@
 @section('subtitle', 'Directorio y gestion de guias de despacho emitidas.')
 
 @section('actions')
-    @php
-        $totalActivas = collect($solicitudes)->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])->count();
-        $totalMias = isset($misSolicitudesAsignadas) ? count($misSolicitudesAsignadas) : 0;
-    @endphp
-    <button type="button" onclick="openSolicitudes()"
-        class="px-4 py-2 bg-white text-teal-700 border border-teal-200 rounded-lg text-[12px] font-bold hover:bg-teal-50 transition-colors flex items-center gap-2 shadow-sm cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2z"></path>
-        </svg>
-        Ver Solicitudes
-        @if ($totalActivas > 0)
-            <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold bg-teal-600 text-white">
-                {{ $totalActivas }}
-            </span>
-        @endif
-        @if ($totalMias > 0)
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
-                {{ $totalMias }} asignada(s) a ti
-            </span>
-        @endif
-    </button>
     <button type="button" onclick="openBandeja()"
         class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,6 +15,10 @@
 @endsection
 
 @section('content')
+    @php
+        $totalActivas = collect($solicitudes)->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])->count();
+        $totalMias = isset($misSolicitudesAsignadas) ? count($misSolicitudesAsignadas) : 0;
+    @endphp
     <!-- migas de pan -->
     <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
         <span class="text-slate-400 font-semibold">03</span>
@@ -178,11 +160,29 @@
                     </path>
                 </svg>
             </div>
-            <div>
+            <div class="flex-1">
                 <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Registro de Despacho</h2>
                 <p class="text-[12px] text-slate-500 mt-0.5">Complete los datos del documento, cliente, productos a
                     despachar y firmas.</p>
             </div>
+            <button type="button" onclick="openSolicitudes()"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4"></path>
+                </svg>
+                Ver Solicitudes
+                @if ($totalActivas > 0)
+                    <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold bg-white/20 text-white">
+                        {{ $totalActivas }}
+                    </span>
+                @endif
+                @if ($totalMias > 0)
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
+                        {{ $totalMias }} asignada(s) a ti
+                    </span>
+                @endif
+            </button>
         </div>
 
         <form action="{{ route('dispatch.store') }}" method="POST" id="despachoForm">

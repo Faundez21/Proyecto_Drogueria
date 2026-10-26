@@ -528,17 +528,17 @@
                             <div class="text-[13px] font-mono-das tracking-tight" id="live-clock"></div>
                         </div>
                         <!-- Notificaciones Dinámicas -->
-                        <div class="relative" id="notifications-container">
+                        <div class="relative" id="notifications-menu-container">
                             <button onclick="toggleNotifications()" type="button"
-                                class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors">
+                                class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                                         d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
                                     </path>
                                 </svg>
                                 <span id="notif-badge"
-                                    class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full pulse-dot border-2 border-white"
-                                    style="background-color: var(--alert);"></span>
+                                    class="hidden absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center border-2 border-white shadow-xs"
+                                    style="background-color: var(--alert);">0</span>
                             </button>
 
                             <div id="notifications-menu"
@@ -965,6 +965,7 @@
 
                     if (data.count > 0) {
                         badge.classList.remove('hidden');
+                        badge.textContent = data.count > 9 ? '9+' : data.count;
                         count.textContent = data.count;
                         count.style.backgroundColor = 'var(--alert)';
 
@@ -985,15 +986,20 @@
                         list.innerHTML = html;
                     } else {
                         badge.classList.add('hidden');
+                        badge.textContent = '0';
                         count.textContent = '0';
                         count.style.backgroundColor = 'var(--text-muted)';
                         list.innerHTML =
                             '<div class="p-4 text-center text-slate-400 text-[12px] font-medium">No hay alertas clínicas pendientes.</div>';
                     }
-                });
+                })
+                .catch(() => {});
         }
 
-        document.addEventListener('DOMContentLoaded', loadNotifications);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNotifications();
+            setInterval(loadNotifications, 45000);
+        });
 
 
         /* --- Control del Sidebar --- */

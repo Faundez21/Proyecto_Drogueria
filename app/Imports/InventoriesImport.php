@@ -144,6 +144,16 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             'programa' => trim((string) ($row['programa'] ?? '')) ?: null,
         ]);
 
+        InventoryService::registrarMovimiento($batch, [
+            'user_id' => $this->userId,
+            'tipo_movimiento' => 'Recepción',
+            'cantidad' => $cantidad,
+            'fecha_hora' => now(),
+            'origen_destino' => 'Desde: ' . (trim((string) ($row['razon_social'] ?? '')) ?: (trim((string) ($row['origen_mercaderia'] ?? '')) ?: 'Carga Masiva Excel')),
+            'documento_respaldo' => "{$tipoDocumento} #{$numeroDocumento}",
+            'estado_lote' => self::ESTADOS[$estado],
+        ]);
+
         $this->importados++;
 
         return $batch;
