@@ -2,221 +2,160 @@
 
 @section('title', 'Distribución de la Droguería')
 
-@section('subtitle', 'Distribución física y organización de la bodega')
+@section('subtitle', 'Mapa interactivo 2D / 3D y administración jerárquica de pasillos, estanterías, niveles y posiciones.')
 
 @section('actions')
-    <a href="{{ route('shelf.index') }}"
-        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200">
-        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20h16M4 4h16M4 12h16">
-            </path>
-        </svg>
-        Gestionar Estanterías
-    </a>
+    <div class="flex flex-wrap items-center gap-2.5">
+        <a href="{{ route('inventario.index') }}"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:text-teal-700 shadow-sm transition-all duration-200">
+            <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            Ver Inventario
+        </a>
+        <a href="{{ route('shelf.index') }}"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all duration-200">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16M6 4v16M18 4v16">
+                </path>
+            </svg>
+            Gestionar Estanterías
+        </a>
+    </div>
 @endsection
 
 @section('content')
-    <!-- migas de pan -->
-    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
-        <span class="text-slate-400 font-semibold">03</span>
-        <span>Salida</span>
-        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-        </svg>
-        <span class="font-semibold text-slate-800">Distribución</span>
-    </div>
+    <div class="space-y-6">
+        <!-- Ruta de navegación -->
+        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
+            <span class="font-mono-das text-slate-400 font-semibold">02</span>
+            <span>Almacenamiento</span>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <span class="font-medium text-slate-800">Distribución</span>
+        </div>
 
-    <!-- Scripts requeridos -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <!--nueva libreria para mover el layout-->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/DragControls.js"></script>
+        <!-- Scripts requeridos -->
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/DragControls.js"></script>
 
-    <style>
-        #warehouse-wrapper {
-            position: relative;
-            width: 100%;
-        }
+        <style>
+            #warehouse-wrapper {
+                position: relative;
+                width: 100%;
+            }
 
-        #warehouse-3d-container {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
+            #warehouse-3d-container {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 1;
+            }
 
-        .glass-panel {
-            background-color: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(8px);
-            border: 1px solid #1e293b;
-        }
+            .glass-panel {
+                background-color: rgba(15, 23, 42, 0.95);
+                backdrop-filter: blur(8px);
+                border: 1px solid #1e293b;
+            }
 
-        /* Etiquetas flotantes (se reposicionan solas para no solaparse) */
-        .rack-marker {
-            position: absolute;
-            transform: translate(-50%, -100%);
-            transform-origin: 50% 100%;
-            pointer-events: none;
-            z-index: 10;
-            white-space: nowrap;
-            letter-spacing: 0.02em;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            will-change: left, top, transform;
-        }
+            /* Etiquetas flotantes (se reposicionan solas para no solaparse) */
+            .rack-marker {
+                position: absolute;
+                transform: translate(-50%, -100%);
+                transform-origin: 50% 100%;
+                pointer-events: none;
+                z-index: 10;
+                white-space: nowrap;
+                letter-spacing: 0.02em;
+                box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+                border: 1px solid rgba(255, 255, 255, 0.35);
+                will-change: left, top, transform;
+            }
 
-        .rack-marker::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 5px 5px 0;
-            border-style: solid;
-            border-color: var(--marker-color, #64748b) transparent transparent transparent;
-        }
+            .rack-marker::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-width: 5px 5px 0;
+                border-style: solid;
+                border-color: var(--marker-color, #64748b) transparent transparent transparent;
+            }
 
-        /* Etiqueta de pasillo: estilo distinto al de las estanterías */
-        .rack-marker.aisle-marker {
-            opacity: 0.92;
-            border-style: dashed;
-        }
+            /* Etiqueta de pasillo: estilo distinto al de las estanterías */
+            .rack-marker.aisle-marker {
+                opacity: 0.92;
+                border-style: dashed;
+            }
 
-        /* Colores exactos */
-        .marker-green {
-            background-color: #22c55e;
-            color: white;
-        }
+            /* Colores exactos */
+            .marker-green {
+                background-color: #22c55e;
+                color: white;
+            }
 
-        .marker-blue {
-            background-color: #3b82f6;
-            color: white;
-        }
+            .marker-blue {
+                background-color: #3b82f6;
+                color: white;
+            }
 
-        .marker-orange {
-            background-color: #f97316;
-            color: white;
-        }
+            .marker-orange {
+                background-color: #f97316;
+                color: white;
+            }
 
-        .marker-purple {
-            background-color: #a855f7;
-            color: white;
-        }
+            .marker-purple {
+                background-color: #a855f7;
+                color: white;
+            }
 
-        .marker-gray {
-            background-color: #64748b;
-            color: white;
-        }
-    </style>
+            .marker-gray {
+                background-color: #64748b;
+                color: white;
+            }
+        </style>
 
-    <div class="w-full">
-        <!-- Sección de Mantenedores (Enlaces Rápidos) -->
-        <div class="mb-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Barra de Navegación Jerárquica de Bodega -->
+        @include('distribution.partials.nav_tabs', ['activeTab' => 'distribution'])
 
-                <!-- BOTÓN PASILLO -->
-                <a href="{{ route('aisle.index') }}"
-                    class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="w-16 h-16 bg-orange-100 border border-orange-200 rounded-full flex items-center justify-center shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 403 403" fill="none"
-                                stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"
-                                class="w-10 h-10 text-orange-600">
-                                <path d="M64 115 H116 L153 153 V323 H64 Z" />
-                                <path d="M116 115 V323" />
-                                <path d="M116 183 L153 201" />
-                                <path d="M116 248 L153 267" />
-                                <path d="M80 180 H99" />
-                                <path d="M80 256 H99" />
-                                <path d="M339 115 H287 L250 153 V323 H339 Z" />
-                                <path d="M287 115 V323" />
-                                <path d="M287 183 L250 201" />
-                                <path d="M287 248 L250 267" />
-                                <path d="M304 180 H323" />
-                                <path d="M304 256 H323" />
-                                <path d="M155 71 H229 V117 H155 Z" />
-                                <path d="M183 117 V101 H201 V117" />
-                                <path d="M183 117 L192 132 L201 117" />
-                            </svg>
-                        </div>
-                        <div class="w-[70%]">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800">Pasillos</h3>
-                            <p class="text-gray-500 text-sm mt-1">Administración de pasillos</p>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- BOTÓN ESTANTERÍA -->
-                <a href="{{ route('shelf.index') }}"
-                    class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
-                    <div class="flex items-center gap-3">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="w-16 h-16 bg-blue-200 border border-blue-300 rounded-full p-3 text-blue-600">
-                            <path d="M12 12V9a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3" />
-                            <path d="M16 20v-3a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v3" />
-                            <path d="M20 22V2" />
-                            <path d="M4 12h16" />
-                            <path d="M4 20h16" />
-                            <path d="M4 2v20" />
-                            <path d="M4 4h16" />
+        <!-- Visor 3D Interactivo -->
+        <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                         </svg>
-                        <div class="w-[70%]">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800">Estanterías</h3>
-                            <p class="text-gray-500 text-sm mt-1">Administración de estanterías</p>
-                        </div>
                     </div>
-                </a>
-
-                <!-- BOTÓN NIVEL -->
-                <a href="{{ route('level.index') }}"
-                    class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
-                    <div class="flex items-center gap-3">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="w-16 h-16 bg-purple-200 border border-purple-300 rounded-full p-3 text-purple-600">
-                            <path d="M2 8h20" />
-                            <rect width="20" height="16" x="2" y="4" rx="2" />
-                            <path d="M6 16h12" />
-                        </svg>
-                        <div class="w-[70%]">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800">Niveles</h3>
-                            <p class="text-gray-500 text-sm mt-1">Administración de niveles</p>
-                        </div>
+                    <div>
+                        <h2 class="text-[15px] font-bold text-slate-800 leading-tight">Plano Interactivo de Almacenamiento</h2>
+                        <p class="text-[12px] text-slate-500">Haz clic sobre una estantería o caja para inspeccionar su ocupación, lotes y vencimientos</p>
                     </div>
-                </a>
-
-                <!-- BOTÓN POSICIÓN -->
-                <a href="{{ route('position.index') }}"
-                    class="w-full bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:border-blue-300 transition-colors">
-                    <div class="flex items-center gap-3">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="w-16 h-16 bg-orange-200 border border-orange-300 rounded-full p-3 text-orange-600">
-                            <path
-                                d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
-                            <circle cx="12" cy="10" r="3" />
-                        </svg>
-                        <div class="w-[70%]">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800">Posiciones</h3>
-                            <p class="text-gray-500 text-sm mt-1">Administración de posiciones</p>
-                        </div>
-                    </div>
-                </a>
-
+                </div>
+                <div class="hidden md:flex items-center gap-2 text-[11px] font-semibold text-slate-600">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> &lt; 50% Ocupación
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span> 50-79% Media
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span> &ge; 80% Crítica
+                    </span>
+                </div>
             </div>
 
-            <!-- Visor 3D Interactivo -->
-            <div class="w-full bg-white border border-gray-200 rounded-lg p-3 sm:p-6 shadow-sm mt-3">
-                <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 hidden sm:block">Vista de almacenamiento</h2>
-
+            <div class="p-3 sm:p-5 bg-slate-50/50">
                 <!-- Contenedor Wrapper para Three.js y Alpine.js -->
                 <div id="warehouse-wrapper" x-data="warehouseApp()"
-                    class="h-[500px] sm:h-[600px] lg:h-[750px] rounded-xl overflow-hidden border border-gray-300 bg-[#eef2f6] select-none">
+                    class="h-[520px] sm:h-[620px] lg:h-[750px] rounded-xl overflow-hidden border border-slate-200/90 bg-[#eef2f6] select-none shadow-inner">
 
                     <!-- Capa HTML para etiquetas (Markers) -->
                     <div id="labels-container"
@@ -231,15 +170,15 @@
                         class="absolute top-0 left-0 w-full z-20 p-3 sm:p-5 pointer-events-none flex justify-between items-start">
                         <div class="pointer-events-auto">
                             <div
-                                class="inline-flex bg-white/90 backdrop-blur p-1 rounded-lg sm:rounded-full border border-gray-200 shadow-sm">
+                                class="inline-flex bg-white/95 backdrop-blur p-1 rounded-xl border border-slate-200 shadow-sm">
                                 <button @click="changeView('2D')"
-                                    :class="viewMode === '2D' ? 'bg-blue-500 text-white shadow' :
-                                        'text-gray-500 hover:text-gray-700'"
-                                    class="px-3 sm:px-5 py-1.5 text-xs sm:text-sm font-semibold rounded-md sm:rounded-full transition">2D</button>
+                                    :class="viewMode === '2D' ? 'bg-teal-600 text-white shadow-sm' :
+                                        'text-slate-600 hover:text-slate-900'"
+                                    class="px-3.5 sm:px-5 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer">Vista 2D</button>
                                 <button @click="changeView('3D')"
-                                    :class="viewMode === '3D' ? 'bg-blue-500 text-white shadow' :
-                                        'text-gray-500 hover:text-gray-700'"
-                                    class="px-3 sm:px-5 py-1.5 text-xs sm:text-sm font-semibold rounded-md sm:rounded-full transition">3D</button>
+                                    :class="viewMode === '3D' ? 'bg-teal-600 text-white shadow-sm' :
+                                        'text-slate-600 hover:text-slate-900'"
+                                    class="px-3.5 sm:px-5 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer">Vista 3D</button>
                             </div>
                         </div>
 

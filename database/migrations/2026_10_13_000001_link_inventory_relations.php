@@ -32,9 +32,6 @@ return new class extends Migration
             DB::table('inventories')->where('id', $inv->id)->update(['product_id' => $productId]);
         }
 
-        DB::table('inventories')->join('products', 'products.id', '=', 'inventories.product_id')
-            ->update(['inventories.producto' => DB::raw('products.nombre')]);
-
         Schema::table('inventories', function (Blueprint $table) {
             $table->foreign('product_id')->references('id')->on('products')->nullOnDelete();
         });

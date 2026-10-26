@@ -105,6 +105,8 @@ class ReceptionController extends Controller
                 $batch = InventoryService::ingresar([
                     'user_id' => Auth::id(),
                     'product_id' => $prodId,
+                    'provider_id' => $provider->id,
+                    'reception_id' => $reception->id,
                     'correlativo_interno' => $correlativo,
                     'fecha_recepcion' => $validated['fecha_recepcion'],
                     'tipo_documento' => $validated['tipo_documento'],

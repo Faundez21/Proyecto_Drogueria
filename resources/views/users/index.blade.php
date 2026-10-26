@@ -62,7 +62,8 @@
                     <tr
                         class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
                         <th class="px-6 py-4 whitespace-nowrap">Usuario</th>
-                        <th class="px-6 py-4 whitespace-nowrap">Rol Asignado</th>
+                        <th class="px-6 py-4 whitespace-nowrap">Rol y Vistas de Solicitudes</th>
+                        <th class="px-6 py-4 text-center whitespace-nowrap">Solicitudes Asignadas (Despacho)</th>
                         <th class="px-6 py-4 text-center whitespace-nowrap">Estado</th>
                         <th class="px-6 py-4 text-center whitespace-nowrap">Acciones</th>
                     </tr>
@@ -87,20 +88,66 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                @if ($user->roles->count() > 0)
-                                    <div class="flex flex-wrap gap-1.5">
+                                @php
+                                    $userSolPermisos = $user->getAllPermissions()
+                                        ->pluck('name')
+                                        ->intersect(['ver.solicitudes', 'ver.solicitudes_cesfam'])
+                                        ->map(fn ($p) => str_replace('ver.', '', $p))
+                                        ->values()
+                                        ->all();
+                                @endphp
+                                <div class="flex flex-wrap gap-1.5 items-center">
+                                    @if ($user->roles->count() > 0)
                                         @foreach ($user->roles as $rol)
                                             <span
                                                 class="px-2.5 py-1 bg-indigo-50 text-indigo-700 font-bold rounded-full text-[11px] border border-indigo-100 whitespace-nowrap">
                                                 {{ $rol->name }}
                                             </span>
                                         @endforeach
-                                    </div>
-                                @else
-                                    <span
-                                        class="px-2.5 py-1 bg-slate-100 text-slate-600 font-bold rounded-full text-[11px] border border-slate-200">Sin
-                                        Rol</span>
-                                @endif
+                                    @else
+                                        <span
+                                            class="px-2.5 py-1 bg-slate-100 text-slate-600 font-bold rounded-full text-[11px] border border-slate-200">Sin
+                                            Rol</span>
+                                    @endif
+
+                                    @if ($user->hasRole('Administrador'))
+                                        <span class="px-2 py-0.5 bg-teal-50 text-teal-700 font-semibold rounded-md text-[10.5px] border border-teal-200 whitespace-nowrap">
+                                            Todas las vistas
+                                        </span>
+                                    @else
+                                        @if (in_array('solicitudes', $userSolPermisos))
+                                            <span class="px-2 py-0.5 bg-teal-50 text-teal-700 font-semibold rounded-md text-[10.5px] border border-teal-200 whitespace-nowrap">
+                                                Solicitudes Establecimientos
+                                            </span>
+                                        @endif
+                                        @if (in_array('solicitudes_cesfam', $userSolPermisos))
+                                            <span class="px-2 py-0.5 bg-purple-50 text-purple-700 font-semibold rounded-md text-[10.5px] border border-purple-200 whitespace-nowrap">
+                                                Solicitudes Cesfam
+                                            </span>
+                                        @endif
+                                    @endif
+                                </div>
+                            </td>
+
+                            <td class="px-6 py-4 text-center">
+                                <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
+                                    @if (($user->solicitudes_activas_count ?? 0) > 0)
+                                        <a href="{{ route('dispatch.index') }}"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition-colors"
+                                            title="Ver solicitudes asignadas en Despacho">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                            {{ $user->solicitudes_activas_count }} por despachar
+                                        </a>
+                                    @else
+                                        <span class="text-[11px] text-slate-400 font-medium">Sin pendientes</span>
+                                    @endif
+
+                                    @if (($user->solicitudes_despachadas_count ?? 0) > 0)
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            {{ $user->solicitudes_despachadas_count }} despachada(s)
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
 
                             <td class="px-6 py-4 text-center">
@@ -124,7 +171,8 @@
 
                                     <button type="button" data-id="{{ $user->id }}" data-name="{{ $user->name }}"
                                         data-last="{{ $user->last_name }}" data-email="{{ $user->email }}"
-                                        data-role="{{ $user->roles->first()->name ?? '' }}" onclick="openEdit(this)"
+                                        data-role="{{ $user->roles->first()->name ?? '' }}"
+                                        data-solicitudes="{{ implode(',', $userSolPermisos) }}" onclick="openEdit(this)"
                                         class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                                         title="Editar usuario">
                                         <svg class="w-4.5 h-4.5 w-[18px] h-[18px]" fill="none" stroke="currentColor"
@@ -183,7 +231,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-12 text-center text-slate-400 font-medium">
+                            <td colspan="5" class="px-6 py-12 text-center text-slate-400 font-medium">
                                 No hay usuarios registrados.
                             </td>
                         </tr>
@@ -200,12 +248,14 @@
 
     <!-- Modal Roles y Accesos -->
     <div id="RolesModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
         <div
-            class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-indigo-100 rounded-xl text-indigo-600">
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
+
+            <!-- Cabecera del Modal -->
+            <div class="px-6 py-5 bg-slate-900 text-white flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 bg-indigo-500/20 border border-indigo-400/30 rounded-xl flex items-center justify-center text-indigo-300 shadow-sm shrink-0">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
@@ -213,13 +263,17 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-xl font-bold text-slate-800">Roles y Accesos por Vista</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Define qué vistas puede ver cada rol. El rol Administrador
-                            siempre tiene acceso total.</p>
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <h2 class="text-lg font-extrabold tracking-tight text-white">Roles y Accesos por Vista</h2>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
+                                {{ $roles->count() }} Roles · {{ count($modulos) }} Vistas
+                            </span>
+                        </div>
+                        <p class="text-[12px] text-slate-300 mt-0.5">Configura qué módulos y vistas (incluyendo Solicitudes Establecimientos y Solicitudes Cesfam) puede visualizar cada rol.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeRoles()"
-                    class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                    class="text-slate-400 hover:text-white p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                         </path>
@@ -227,108 +281,201 @@
                 </button>
             </div>
 
-            <!-- Listado de roles -->
-            <div class="space-y-3 mb-6">
-                @foreach ($roles as $rol)
-                    <div
-                        class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div class="min-w-0">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <p class="text-sm font-bold text-slate-800">{{ $rol->name }}</p>
-                                <span
-                                    class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $rol->name === 'Administrador' ? 'bg-teal-100 text-teal-700' : 'bg-slate-200 text-slate-600' }}">
-                                    {{ $rol->name === 'Administrador' ? 'Acceso total' : $rol->permissions->count() . ' vista(s)' }}
-                                </span>
-                            </div>
-                            <div class="flex flex-wrap gap-1 mt-2">
-                                @forelse ($rol->permissions as $perm)
-                                    <span
-                                        class="text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
-                                        {{ str_replace('ver.', '', $perm->name) }}
-                                    </span>
-                                @empty
-                                    <span class="text-[10px] text-slate-400 italic">Sin accesos definidos</span>
-                                @endforelse
-                            </div>
-                        </div>
+            <!-- Cuerpo scrolleable -->
+            <div class="p-6 overflow-y-auto space-y-6 flex-1 bg-slate-50/50">
 
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <button type="button"
-                                onclick='openRoleForm({{ json_encode(['id' => $rol->id, 'name' => $rol->name, 'modulos' => $rol->permissions->map(fn($p) => str_replace('ver.', '', $p->name))->values()->all()]) }})'
-                                class="px-3 py-1.5 text-[11.5px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors cursor-pointer">
-                                Editar accesos
-                            </button>
-                            @if (!in_array($rol->name, ['Administrador', 'Usuario']))
-                                <form action="{{ route('roles.destroy', $rol->id) }}" method="POST"
-                                    onsubmit="return confirm('¿Eliminar este rol?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="px-3 py-1.5 text-[11.5px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors cursor-pointer">
-                                        Eliminar
+                <!-- Listado de roles -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest">Roles Configurados en el Sistema</h3>
+                        <button type="button" id="btnNewRoleTop" onclick="openRoleForm(null)"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Nuevo Rol
+                        </button>
+                    </div>
+
+                    <div class="space-y-3">
+                        @foreach ($roles as $rol)
+                            @php
+                                $esAdminRol = $rol->name === 'Administrador';
+                                $permisosSlugs = $esAdminRol
+                                    ? array_keys($modulos)
+                                    : $rol->permissions->map(fn ($p) => str_replace('ver.', '', $p->name))->values()->all();
+                            @endphp
+                            <div
+                                class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 bg-white border {{ $esAdminRol ? 'border-teal-200 ring-1 ring-teal-500/10' : 'border-slate-200' }} rounded-xl shadow-sm hover:border-indigo-200 transition-all">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="w-2.5 h-2.5 rounded-full {{ $esAdminRol ? 'bg-teal-500' : 'bg-indigo-500' }}"></span>
+                                        <p class="text-[14px] font-extrabold text-slate-800">{{ $rol->name }}</p>
+                                        <span
+                                            class="text-[10.5px] font-extrabold px-2.5 py-0.5 rounded-full border {{ $esAdminRol ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200' }}">
+                                            {{ $esAdminRol ? 'Acceso Total (' . count($modulos) . ' vistas)' : count($permisosSlugs) . ' de ' . count($modulos) . ' vista(s)' }}
+                                        </span>
+                                        <span class="text-[10.5px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                            {{ $rol->users_count ?? 0 }} usuario(s)
+                                        </span>
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-1.5 mt-3">
+                                        @forelse ($permisosSlugs as $slug)
+                                            @php
+                                                $nombreVista = $modulos[$slug] ?? ucfirst(str_replace('_', ' ', $slug));
+                                                $esVistaSolicitud = in_array($slug, ['solicitudes', 'solicitudes_cesfam']);
+                                                $badgeClasses = match($slug) {
+                                                    'solicitudes' => 'bg-teal-50 text-teal-800 border-teal-200',
+                                                    'solicitudes_cesfam' => 'bg-purple-50 text-purple-800 border-purple-200',
+                                                    'despacho_controlado' => 'bg-rose-50 text-rose-800 border-rose-200',
+                                                    default => 'bg-slate-50 text-slate-700 border-slate-200',
+                                                };
+                                            @endphp
+                                            <span
+                                                class="inline-flex items-center gap-1 text-[10.5px] font-bold px-2.5 py-1 rounded-md border {{ $badgeClasses }}">
+                                                @if ($esVistaSolicitud)
+                                                    <span class="w-1.5 h-1.5 rounded-full {{ $slug === 'solicitudes_cesfam' ? 'bg-purple-500' : 'bg-teal-500' }}"></span>
+                                                @endif
+                                                {{ $nombreVista }}
+                                            </span>
+                                        @empty
+                                            <span class="text-[11px] text-slate-400 italic">Sin vistas habilitadas para este rol</span>
+                                        @endforelse
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+                                    <button type="button"
+                                        onclick='openRoleForm({{ json_encode(['id' => $rol->id, 'name' => $rol->name, 'modulos' => $permisosSlugs]) }})'
+                                        class="px-3.5 py-2 text-[12px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                            </path>
+                                        </svg>
+                                        Configurar Vistas
                                     </button>
-                                </form>
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Formulario de rol (crear/editar) -->
-            <div id="roleFormBox" class="hidden border-t border-slate-200 pt-5">
-                <h3 id="roleFormTitle" class="text-sm font-bold text-slate-800 mb-3">Nuevo Rol</h3>
-                <form id="roleForm" method="POST" action="{{ route('roles.store') }}">
-                    @csrf
-                    <div id="roleMethod"></div>
-
-                    <div class="mb-4">
-                        <label for="role_name"
-                            class="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Nombre del
-                            Rol <span class="text-rose-500">*</span></label>
-                        <input type="text" id="role_name" name="name" required
-                            placeholder="Ej. Bodeguero, Auditor..."
-                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-[13px]">
-                    </div>
-
-                    <label class="block text-[12px] font-bold text-slate-700 mb-2 uppercase tracking-wider">Acceso a
-                        Vistas</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
-                        @foreach ($modulos as $key => $label)
-                            <label
-                                class="flex items-center gap-2.5 bg-white border border-slate-200 rounded-lg px-3 py-2.5 cursor-pointer hover:border-indigo-300 transition-colors shadow-sm">
-                                <input type="checkbox" name="modulos[]" value="{{ $key }}"
-                                    data-modulo="{{ $key }}"
-                                    class="w-4 h-4 accent-indigo-600 rounded role-modulo">
-                                <span class="text-[12px] font-semibold text-slate-700">{{ $label }}</span>
-                            </label>
+                                    @if (!in_array($rol->name, ['Administrador', 'Usuario']))
+                                        <form action="{{ route('roles.destroy', $rol->id) }}" method="POST"
+                                            onsubmit="return confirm('¿Eliminar el rol {{ addslashes($rol->name) }}?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="px-3 py-2 text-[12px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors cursor-pointer">
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
                         @endforeach
                     </div>
+                </div>
 
-                    <div class="flex justify-end gap-2 border-t border-slate-100 pt-4">
-                        <button type="button" onclick="cancelRoleForm()"
-                            class="px-4 py-2 text-[12.5px] font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                            class="px-5 py-2 text-[12.5px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors cursor-pointer">
-                            <span id="roleSubmitText">Crear Rol</span>
-                        </button>
+                <!-- Formulario de rol (crear/editar) -->
+                <div id="roleFormBox" class="hidden bg-white border-2 border-indigo-200 rounded-2xl p-5 shadow-md">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-100">
+                        <div>
+                            <h3 id="roleFormTitle" class="text-[15px] font-extrabold text-slate-800">Nuevo Rol</h3>
+                            <p class="text-[11.5px] text-slate-500">Marca las vistas a las que tendrán acceso los usuarios con este rol.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 text-[11px] font-extrabold">
+                                <span id="roleSelectedCount">0</span> / {{ count($modulos) }} vistas seleccionadas
+                            </span>
+                            <button type="button" onclick="toggleAllRoleModules(true)"
+                                class="px-2.5 py-1 text-[11px] font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg transition-colors cursor-pointer">
+                                Marcar todas
+                            </button>
+                            <button type="button" onclick="toggleAllRoleModules(false)"
+                                class="px-2.5 py-1 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg transition-colors cursor-pointer">
+                                Desmarcar
+                            </button>
+                        </div>
                     </div>
-                </form>
+
+                    <form id="roleForm" method="POST" action="{{ route('roles.store') }}">
+                        @csrf
+                        <div id="roleMethod"></div>
+
+                        <div class="mb-5">
+                            <label for="role_name"
+                                class="block text-[11.5px] font-extrabold text-slate-700 mb-1.5 uppercase tracking-wider">Nombre del
+                                Rol <span class="text-rose-500">*</span></label>
+                            <input type="text" id="role_name" name="name" required
+                                placeholder="Ej. Bodeguero, Encargado CESFAM, Químico Farmacéutico..."
+                                class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-[13px] font-semibold">
+                        </div>
+
+                        <div class="space-y-4 mb-5">
+                            @foreach ($modulosGrupos as $grupoNombre => $grupoData)
+                                <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-4" data-role-group="{{ $loop->index }}">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $grupoData['icono'] }}"></path>
+                                            </svg>
+                                            <span class="text-[11.5px] font-extrabold text-slate-700 uppercase tracking-wider">{{ $grupoNombre }}</span>
+                                        </div>
+                                        <button type="button" onclick="toggleGroupRoleModules({{ $loop->index }})"
+                                            class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 cursor-pointer">
+                                            Alternar sección
+                                        </button>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                        @foreach ($grupoData['items'] as $key => $info)
+                                            <label
+                                                class="role-card-label flex items-start gap-3 bg-white border border-slate-200 rounded-xl p-3 cursor-pointer hover:border-indigo-400 transition-all shadow-sm">
+                                                <input type="checkbox" name="modulos[]" value="{{ $key }}"
+                                                    data-modulo="{{ $key }}"
+                                                    onchange="updateRoleSelectedCount()"
+                                                    class="w-4 h-4 mt-0.5 accent-indigo-600 rounded role-modulo shrink-0">
+                                                <div class="min-w-0">
+                                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                                        <span class="text-[12.5px] font-bold text-slate-800">{{ $info['label'] }}</span>
+                                                        @if (in_array($key, ['solicitudes', 'solicitudes_cesfam']))
+                                                            <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase {{ $key === 'solicitudes_cesfam' ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700' }}">
+                                                                {{ $key === 'solicitudes_cesfam' ? 'CESFAM' : 'Establecimientos' }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                    <span class="block text-[11px] text-slate-500 leading-snug mt-0.5">{{ $info['desc'] }}</span>
+                                                </div>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="flex justify-end gap-2.5 border-t border-slate-100 pt-4">
+                            <button type="button" onclick="cancelRoleForm()"
+                                class="px-4 py-2.5 text-[12.5px] font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                class="px-5 py-2.5 text-[12.5px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition-colors cursor-pointer">
+                                <span id="roleSubmitText">Crear Rol</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Botón para crear rol nuevo -->
+                <button type="button" id="btnNewRole" onclick="openRoleForm(null)"
+                    class="w-full py-3.5 border-2 border-dashed border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50/40 text-indigo-600 font-bold text-[13px] rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-2 bg-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Crear nuevo rol personalizado
+                </button>
             </div>
 
-            <!-- Botón para crear rol nuevo -->
-            <button type="button" id="btnNewRole" onclick="openRoleForm(null)"
-                class="w-full py-3 border-2 border-dashed border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50/40 text-indigo-600 font-bold text-[13px] rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Crear nuevo rol
-            </button>
-
-            <div class="flex justify-end pt-4 mt-2 border-t border-slate-100">
+            <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end shrink-0">
                 <button type="button" onclick="closeRoles()"
-                    class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+                    class="px-6 py-2.5 text-[13px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors cursor-pointer">
                     Cerrar
                 </button>
             </div>
@@ -550,6 +697,44 @@
             document.getElementById('UserModal').classList.add('hidden');
         }
 
+        function updateRoleSelectedCount() {
+            const checkboxes = document.querySelectorAll('.role-modulo');
+            let count = 0;
+            checkboxes.forEach(cb => {
+                const label = cb.closest('.role-card-label');
+                if (cb.checked) {
+                    count++;
+                    if (label) {
+                        label.classList.add('border-indigo-400', 'bg-indigo-50/40', 'ring-1', 'ring-indigo-500/20');
+                        label.classList.remove('border-slate-200', 'bg-white');
+                    }
+                } else if (label) {
+                    label.classList.remove('border-indigo-400', 'bg-indigo-50/40', 'ring-1', 'ring-indigo-500/20');
+                    label.classList.add('border-slate-200', 'bg-white');
+                }
+            });
+            const countEl = document.getElementById('roleSelectedCount');
+            if (countEl) countEl.textContent = count;
+        }
+
+        function toggleAllRoleModules(state) {
+            document.querySelectorAll('.role-modulo').forEach(cb => {
+                cb.checked = !!state;
+            });
+            updateRoleSelectedCount();
+        }
+
+        function toggleGroupRoleModules(groupIdx) {
+            const group = document.querySelector(`[data-role-group="${groupIdx}"]`);
+            if (!group) return;
+            const boxes = Array.from(group.querySelectorAll('.role-modulo'));
+            const allChecked = boxes.every(cb => cb.checked);
+            boxes.forEach(cb => {
+                cb.checked = !allChecked;
+            });
+            updateRoleSelectedCount();
+        }
+
         function openRoleForm(rol) {
             const box = document.getElementById('roleFormBox');
             const form = document.getElementById('roleForm');
@@ -574,6 +759,7 @@
                 document.getElementById('roleMethod').innerHTML = '';
             }
 
+            updateRoleSelectedCount();
             document.getElementById('btnNewRole').classList.add('hidden');
             box.classList.remove('hidden');
             box.scrollIntoView({

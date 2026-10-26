@@ -3,6 +3,10 @@
 @section('subtitle', 'Directorio y gestion de guias de despacho emitidas.')
 
 @section('actions')
+    @php
+        $totalActivas = collect($solicitudes)->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])->count();
+        $totalMias = isset($misSolicitudesAsignadas) ? count($misSolicitudesAsignadas) : 0;
+    @endphp
     <button type="button" onclick="openSolicitudes()"
         class="px-4 py-2 bg-white text-teal-700 border border-teal-200 rounded-lg text-[12px] font-bold hover:bg-teal-50 transition-colors flex items-center gap-2 shadow-sm cursor-pointer">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -10,6 +14,16 @@
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2z"></path>
         </svg>
         Ver Solicitudes
+        @if ($totalActivas > 0)
+            <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold bg-teal-600 text-white">
+                {{ $totalActivas }}
+            </span>
+        @endif
+        @if ($totalMias > 0)
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
+                {{ $totalMias }} asignada(s) a ti
+            </span>
+        @endif
     </button>
     <button type="button" onclick="openBandeja()"
         class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200">
@@ -53,8 +67,67 @@
         </div>
     @endif
 
+    <!-- Solicitudes asignadas al usuario logueado -->
+    @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
+        <div class="mb-6 bg-gradient-to-r from-teal-50 via-white to-indigo-50 border border-teal-200 rounded-2xl p-4 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3 class="text-[13.5px] font-extrabold text-slate-800">
+                            Tienes {{ count($misSolicitudesAsignadas) }} solicitud(es) asignada(s) para despachar
+                        </h3>
+                        <p class="text-[11.5px] text-slate-500">
+                            Haz clic en "Cargar en Formulario" para preparar el despacho automáticamente o revisa el detalle en "Ver Solicitudes".
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="openSolicitudes('mias')"
+                    class="px-3.5 py-2 rounded-xl text-[12px] font-bold bg-white hover:bg-teal-50 text-teal-700 border border-teal-200 shadow-sm transition-colors cursor-pointer shrink-0">
+                    Ver mis asignadas
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                @foreach ($misSolicitudesAsignadas as $miSol)
+                    @php
+                        $esCesfamMiSol = \App\Services\InventoryService::esCesfam($miSol->establecimiento);
+                    @endphp
+                    <div class="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-mono font-extrabold text-[12px] text-slate-800">{{ $miSol->numero_solicitud }}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $esCesfamMiSol ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700' }}">
+                                    {{ $esCesfamMiSol ? 'CESFAM' : 'Establecimiento' }}
+                                </span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-indigo-100 text-indigo-700">
+                                    {{ $miSol->estado }}
+                                </span>
+                            </div>
+                            <p class="text-[12.5px] font-bold text-slate-800 truncate mt-0.5" title="{{ $miSol->establecimiento }}">
+                                {{ $miSol->establecimiento }}
+                            </p>
+                            <p class="text-[11px] text-slate-500">
+                                {{ $miSol->items->count() }} producto(s) · {{ \Carbon\Carbon::parse($miSol->fecha_solicitud)->format('d/m/Y') }}
+                            </p>
+                        </div>
+                        <button type="button" onclick="usarSolicitud({{ $miSol->id }})"
+                            class="px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-sm transition-colors cursor-pointer shrink-0">
+                            Cargar
+                        </button>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <!-- indicadores de rendimiento -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
             <div>
                 <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Despachos Hoy</p>
@@ -65,6 +138,18 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Solicitudes por Despachar</p>
+                <h3 class="text-2xl font-black text-amber-600 mt-1">{{ $totalActivas }}</h3>
+            </div>
+            <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
             </div>
         </div>
@@ -103,6 +188,23 @@
         <form action="{{ route('dispatch.store') }}" method="POST" id="despachoForm">
             @csrf
             <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
+
+            <!-- Banner informativo cuando se carga una solicitud -->
+            <div id="banner_solicitud_activa" class="hidden mx-6 mt-5 p-4 bg-teal-50 border border-teal-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        SOL
+                    </div>
+                    <div>
+                        <p id="banner_solicitud_titulo" class="text-[13px] font-extrabold text-teal-900"></p>
+                        <p id="banner_solicitud_subtitulo" class="text-[11.5px] text-teal-700"></p>
+                    </div>
+                </div>
+                <button type="button" onclick="desvincularSolicitudActiva()"
+                    class="text-[11.5px] font-bold text-teal-800 hover:text-rose-600 bg-white px-3 py-1.5 rounded-lg border border-teal-200 transition-colors cursor-pointer shrink-0">
+                    Desvincular solicitud
+                </button>
+            </div>
 
             <!-- seccion de datos del remitente y correlativo -->
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
@@ -421,14 +523,14 @@
     <div id="SolicitudesModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
         <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-7xl flex flex-col overflow-hidden">
 
             <!-- cabecera del modal -->
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-bold text-white tracking-wide">Solicitudes de Establecimientos</h2>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Solicitudes de Establecimientos y CESFAM</h2>
                     <p class="text-[12px] text-slate-300 mt-1 uppercase tracking-wider font-semibold">
-                        Solicitudes pendientes de despacho
+                        Gestión, asignación a trabajadores y despacho de solicitudes
                     </p>
                 </div>
 
@@ -441,28 +543,55 @@
                 </button>
             </div>
 
-            <!-- buscador de solicitudes -->
+            <!-- buscador y filtros avanzados de solicitudes -->
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <div class="flex-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+                    <div class="lg:col-span-2">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                             Buscar solicitud
                         </label>
-
-                        <input type="text" placeholder="Establecimiento, solicitud o producto..."
-                            class="w-full py-2.5 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                        <input type="text" id="filtroSolicitudTexto" oninput="filtrarSolicitudesModal()"
+                            placeholder="Establecimiento, N° solicitud, responsable o producto..."
+                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
                     </div>
 
-                    <div class="sm:w-48">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                            Tipo Origen
+                        </label>
+                        <select id="filtroSolicitudTipo" onchange="filtrarSolicitudesModal()"
+                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            <option value="">Todos (CESFAM y Establec.)</option>
+                            <option value="cesfam">Solo CESFAM</option>
+                            <option value="establecimiento">Solo Establecimientos</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                             Estado
                         </label>
+                        <select id="filtroSolicitudEstado" onchange="filtrarSolicitudesModal()"
+                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            <option value="activas" selected>Activas (Por despachar)</option>
+                            <option value="">Todas (Incluye Despachadas)</option>
+                            <option value="pendiente">Pendiente (Sin asignar)</option>
+                            <option value="asignada">Asignada</option>
+                            <option value="parcial">Parcial</option>
+                            <option value="despachado">Despachado</option>
+                        </select>
+                    </div>
 
-                        <select
-                            class="w-full py-2.5 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                            Asignación
+                        </label>
+                        <select id="filtroSolicitudAsignacion" onchange="filtrarSolicitudesModal()"
+                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
                             <option value="">Todas</option>
-                            <option value="pendiente">Pendientes</option>
-                            <option value="parcial">Parciales</option>
+                            <option value="mias">Asignadas a mí ({{ $totalMias }})</option>
+                            <option value="sin_asignar">Sin asignar</option>
+                            <option value="asignadas">Con trabajador asignado</option>
                         </select>
                     </div>
                 </div>
@@ -474,79 +603,133 @@
                     <thead
                         class="bg-white text-slate-500 uppercase text-[11px] font-extrabold border-b border-slate-200 sticky top-0 shadow-sm z-10">
                         <tr>
-                            <th class="px-6 py-4 w-12">Detalle</th>
-                            <th class="px-6 py-4">Solicitud</th>
-                            <th class="px-6 py-4">Establecimiento</th>
-                            <th class="px-6 py-4">Fecha</th>
-                            <th class="px-6 py-4 text-center">Productos</th>
-                            <th class="px-6 py-4 text-center">Estado</th>
+                            <th class="px-4 py-4 w-12 text-center">Detalle</th>
+                            <th class="px-4 py-4">Solicitud</th>
+                            <th class="px-4 py-4">Establecimiento / Origen</th>
+                            <th class="px-4 py-4">Fecha</th>
+                            <th class="px-4 py-4 text-center">Productos</th>
+                            <th class="px-4 py-4 text-center">Estado</th>
+                            <th class="px-4 py-4">Asignar Trabajador (Despacho)</th>
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100" id="tablaSolicitudesBody">
 
                         @forelse($solicitudes as $solicitud)
 
                             @php
                                 $solicitudKey = 'solicitud-' . $solicitud->id;
+                                $esCesfamSol = \App\Services\InventoryService::esCesfam($solicitud->establecimiento);
+                                $esMia = (int) ($solicitud->assigned_user_id ?? 0) === (int) auth()->id();
+                                $nombresProdSol = $solicitud->items->map(fn($i) => $i->product->nombre ?? '')->implode(' ');
+                                $textoBusqueda = mb_strtolower(
+                                    $solicitud->numero_solicitud . ' ' .
+                                    $solicitud->establecimiento . ' ' .
+                                    ($solicitud->responsable ?? '') . ' ' .
+                                    ($solicitud->assignedUser->name ?? '') . ' ' .
+                                    $nombresProdSol
+                                );
+                                $totalItemsSol = $solicitud->items->count();
+                                $completadosItemsSol = $solicitud->items->filter(fn($i) => $i->cantidad_despachada >= $i->cantidad_solicitada)->count();
                             @endphp
 
                             <!-- solicitud -->
-                            <tr class="bg-white hover:bg-slate-50 transition-colors cursor-pointer group"
+                            <tr class="fila-solicitud-modal bg-white hover:bg-slate-50 transition-colors cursor-pointer group {{ $esMia ? 'bg-teal-50/30' : '' }}"
+                                data-key="{{ $solicitudKey }}"
+                                data-search="{{ $textoBusqueda }}"
+                                data-tipo="{{ $esCesfamSol ? 'cesfam' : 'establecimiento' }}"
+                                data-estado="{{ mb_strtolower($solicitud->estado) }}"
+                                data-assigned-id="{{ $solicitud->assigned_user_id ?? '' }}"
+                                data-es-mia="{{ $esMia ? '1' : '0' }}"
                                 onclick="toggleSolicitud('{{ $solicitudKey }}')">
 
-                                <td class="px-6 py-4 text-center">
+                                <td class="px-4 py-4 text-center">
                                     <button type="button"
                                         class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200">
-
                                         <svg class="w-4 h-4 transform transition-transform duration-300"
                                             id="arrow-{{ $solicitudKey }}" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
-
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 9l-7 7-7-7">
                                             </path>
-
                                         </svg>
-
                                     </button>
                                 </td>
 
-                                <td class="px-6 py-4 font-mono font-extrabold text-slate-800">
+                                <td class="px-4 py-4 font-mono font-extrabold text-slate-800">
                                     {{ $solicitud->numero_solicitud }}
                                 </td>
 
-                                <td class="px-6 py-4 font-bold text-slate-800">
-                                    {{ $solicitud->establecimiento }}
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-slate-800">{{ $solicitud->establecimiento }}</span>
+                                        <span class="px-2 py-0.5 rounded text-[9.5px] font-extrabold uppercase {{ $esCesfamSol ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-teal-50 text-teal-700 border border-teal-200' }}">
+                                            {{ $esCesfamSol ? 'CESFAM' : 'Establecimiento' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">
+                                        Solicita: {{ $solicitud->responsable }} {{ $solicitud->cargo ? '('.$solicitud->cargo.')' : '' }}
+                                    </p>
                                 </td>
 
-                                <td class="px-6 py-4 font-medium text-slate-600">
+                                <td class="px-4 py-4 font-medium text-slate-600">
                                     {{ \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d-m-Y') }}
                                 </td>
 
-                                <td class="px-6 py-4 text-center font-bold text-slate-700">
-                                    {{ $solicitud->items->count() }}
+                                <td class="px-4 py-4 text-center">
+                                    <span class="font-extrabold text-slate-800">{{ $totalItemsSol }}</span>
+                                    <span class="block text-[10px] text-slate-400 font-semibold">
+                                        {{ $completadosItemsSol }}/{{ $totalItemsSol }} compl.
+                                    </span>
                                 </td>
 
-                                <td class="px-6 py-4 text-center">
+                                <td class="px-4 py-4 text-center">
+                                    @php
+                                        $estadoClase = match($solicitud->estado) {
+                                            'Pendiente' => 'bg-amber-100 text-amber-800 border-amber-200',
+                                            'Asignada' => 'bg-indigo-100 text-indigo-800 border-indigo-200',
+                                            'Parcial' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                            'Despachado' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                                            default => 'bg-slate-100 text-slate-700 border-slate-200',
+                                        };
+                                    @endphp
+                                    <span id="badge-estado-solicitud-{{ $solicitud->id }}"
+                                        class="{{ $estadoClase }} border px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase inline-block">
+                                        {{ $solicitud->estado }}
+                                    </span>
+                                </td>
 
-                                    @if ($solicitud->estado === 'Pendiente')
-                                        <span
-                                            class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
-                                            Pendiente
-                                        </span>
-                                    @elseif ($solicitud->estado === 'Parcial')
-                                        <span
-                                            class="bg-blue-100 text-blue-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
-                                            Parcial
-                                        </span>
+                                <td class="px-4 py-4" onclick="event.stopPropagation()">
+                                    @role('Administrador')
+                                        <div class="flex items-center gap-2">
+                                            <select
+                                                onchange="asignarSolicitudUsuario({{ $solicitud->id }}, this.value, this)"
+                                                class="bg-slate-50 hover:bg-white border border-slate-300 text-slate-800 text-[12px] font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 cursor-pointer min-w-[185px]">
+                                                <option value="">— Sin asignar —</option>
+                                                @foreach ($usuariosAsignables ?? [] as $usr)
+                                                    <option value="{{ $usr->id }}" {{ (int) $solicitud->assigned_user_id === (int) $usr->id ? 'selected' : '' }}>
+                                                        {{ $usr->name }} {{ $usr->last_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <span id="assign-spinner-{{ $solicitud->id }}" class="hidden text-[11px] font-bold text-teal-600">
+                                                Guardando...
+                                            </span>
+                                        </div>
                                     @else
-                                        <span
-                                            class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
-                                            {{ $solicitud->estado }}
-                                        </span>
-                                    @endif
-
+                                        @if ($esMia)
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
+                                                Asignada a ti
+                                            </span>
+                                        @elseif ($solicitud->assignedUser)
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                                {{ $solicitud->assignedUser->name }} {{ $solicitud->assignedUser->last_name }}
+                                            </span>
+                                        @else
+                                            <span class="text-[11px] text-slate-400 italic">Sin asignar</span>
+                                        @endif
+                                    @endrole
                                 </td>
 
                             </tr>
@@ -555,7 +738,7 @@
                             <!-- detalle de la solicitud -->
                             <tr id="{{ $solicitudKey }}" class="hidden bg-slate-100/50 shadow-inner">
 
-                                <td colspan="6" class="p-0 border-b border-slate-300">
+                                <td colspan="7" class="p-0 border-b border-slate-300">
 
                                     <div class="py-4 pr-6 pl-14">
 
@@ -563,24 +746,31 @@
 
                                             <!-- cabecera del detalle -->
                                             <div
-                                                class="px-4 py-3 bg-slate-700 text-white flex justify-between items-center">
+                                                class="px-4 py-3 bg-slate-700 text-white flex flex-col sm:flex-row justify-between sm:items-center gap-2">
 
                                                 <div>
-
-                                                    <span class="text-[10px] font-bold uppercase tracking-widest">
+                                                    <span class="text-[10px] font-bold uppercase tracking-widest text-teal-300">
                                                         Detalle de Solicitud {{ $solicitud->numero_solicitud }}
                                                     </span>
 
-                                                    <p class="text-[11px] text-slate-300 mt-0.5">
+                                                    <p class="text-[12px] font-bold text-white mt-0.5">
                                                         {{ $solicitud->establecimiento }}
+                                                        @if ($solicitud->observaciones)
+                                                            <span class="font-normal text-slate-300"> · Obs: {{ $solicitud->observaciones }}</span>
+                                                        @endif
                                                     </p>
-
                                                 </div>
 
-                                                <button type="button" onclick="usarSolicitud({{ $solicitud->id }})"
-                                                    class="px-3 py-1.5 bg-[#0f968c] hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-colors">
-                                                    Usar Solicitud
-                                                </button>
+                                                @if ($solicitud->estado !== 'Despachado')
+                                                    <button type="button" onclick="usarSolicitud({{ $solicitud->id }})"
+                                                        class="px-3.5 py-1.5 bg-[#0f968c] hover:bg-teal-700 text-white rounded-lg text-[11.5px] font-bold transition-colors cursor-pointer shrink-0">
+                                                        Usar Solicitud para Despacho
+                                                    </button>
+                                                @else
+                                                    <span class="px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 rounded-lg text-[11px] font-bold">
+                                                        Solicitud Despachada Completamente
+                                                    </span>
+                                                @endif
 
                                             </div>
 
@@ -592,23 +782,11 @@
                                                     class="bg-slate-50 text-slate-500 uppercase font-extrabold border-b border-slate-200 text-[10px]">
 
                                                     <tr>
-
-                                                        <th class="px-4 py-3">
-                                                            Producto
-                                                        </th>
-
-                                                        <th class="px-4 py-3 text-center">
-                                                            Consumo mensual anterior
-                                                        </th>
-
-                                                        <th class="px-4 py-3 text-center">
-                                                            Stock Actual del establecimiento
-                                                        </th>
-
-                                                        <th class="px-4 py-3 text-center">
-                                                            Solicitado
-                                                        </th>
-
+                                                        <th class="px-4 py-3">Producto / Programa</th>
+                                                        <th class="px-4 py-3 text-center">Consumo mensual anterior</th>
+                                                        <th class="px-4 py-3 text-center">Stock Actual del establecimiento</th>
+                                                        <th class="px-4 py-3 text-center">Solicitado</th>
+                                                        <th class="px-4 py-3 text-center">Despachado / Pendiente</th>
                                                     </tr>
 
                                                 </thead>
@@ -617,22 +795,52 @@
                                                 <tbody class="divide-y divide-slate-100 text-slate-700">
 
                                                     @foreach ($solicitud->items as $item)
+                                                        @php
+                                                            $nombreProdItem = $item->product->nombre ?? ('Producto #' . $item->product_id);
+                                                            $esItemControlado = in_array($nombreProdItem, $controlados);
+                                                            $pendienteItem = max(0, (int) $item->cantidad_solicitada - (int) ($item->cantidad_despachada ?? 0));
+                                                        @endphp
                                                         <tr class="hover:bg-slate-50">
 
-                                                            <td class="px-4 py-3 font-bold">
-                                                                {{ $item->product->nombre }}
+                                                            <td class="px-4 py-3">
+                                                                <div class="flex items-center gap-2">
+                                                                    <span class="font-bold text-slate-800">{{ $nombreProdItem }}</span>
+                                                                    @if ($item->programa)
+                                                                        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold border border-slate-200">
+                                                                            {{ $item->programa }}
+                                                                        </span>
+                                                                    @endif
+                                                                    @if ($esItemControlado)
+                                                                        <span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 text-[10px] font-extrabold border border-rose-200">
+                                                                            Estupefaciente (Despacho Controlado)
+                                                                        </span>
+                                                                    @endif
+                                                                </div>
                                                             </td>
 
-                                                            <td class="px-4 py-3 text-center">
-                                                                {{ $item->consumo_anterior ?? '—' }}
+                                                            <td class="px-4 py-3 text-center font-bold text-slate-700">
+                                                                {{ number_format((int) ($item->consumo_anterior ?? 0), 0, ',', '.') }} uds.
                                                             </td>
 
                                                             <td class="px-4 py-3 text-center font-extrabold text-blue-700">
-                                                                {{ $item->stock_actual }}
+                                                                {{ number_format((int) ($item->stock_actual ?? 0), 0, ',', '.') }} uds.
                                                             </td>
 
                                                             <td class="px-4 py-3 text-center font-extrabold text-teal-700">
-                                                                {{ $item->cantidad_solicitada }}
+                                                                {{ number_format((int) $item->cantidad_solicitada, 0, ',', '.') }} uds.
+                                                            </td>
+
+                                                            <td class="px-4 py-3 text-center">
+                                                                @if ($pendienteItem === 0)
+                                                                    <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-extrabold text-[11px] border border-emerald-200">
+                                                                        {{ number_format((int) $item->cantidad_despachada, 0, ',', '.') }} desp. (Completo)
+                                                                    </span>
+                                                                @else
+                                                                    <span class="font-bold text-slate-600">{{ number_format((int) $item->cantidad_despachada, 0, ',', '.') }} desp.</span>
+                                                                    <span class="ml-1 px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-extrabold text-[11px] border border-amber-200">
+                                                                        Faltan {{ number_format($pendienteItem, 0, ',', '.') }} uds.
+                                                                    </span>
+                                                                @endif
                                                             </td>
 
                                                         </tr>
@@ -654,7 +862,7 @@
 
                             <tr>
 
-                                <td colspan="6" class="px-6 py-16 text-center">
+                                <td colspan="7" class="px-6 py-16 text-center">
 
                                     <div class="flex flex-col items-center justify-center text-slate-400">
 
@@ -1469,12 +1677,139 @@
         }
 
         // funciones para mostrar u ocultar las solicitudes
-        function openSolicitudes() {
+        function openSolicitudes(filtroAsignacion = null) {
+            if (filtroAsignacion) {
+                const selAsig = document.getElementById('filtroSolicitudAsignacion');
+                if (selAsig) selAsig.value = filtroAsignacion;
+            }
+            filtrarSolicitudesModal();
             document.getElementById('SolicitudesModal').classList.remove('hidden');
         }
 
         function closeSolicitudes() {
             document.getElementById('SolicitudesModal').classList.add('hidden');
+        }
+
+        function filtrarSolicitudesModal() {
+            const texto = (document.getElementById('filtroSolicitudTexto')?.value || '').trim().toLowerCase();
+            const tipo = (document.getElementById('filtroSolicitudTipo')?.value || '').toLowerCase();
+            const estado = (document.getElementById('filtroSolicitudEstado')?.value || '').toLowerCase();
+            const asignacion = (document.getElementById('filtroSolicitudAsignacion')?.value || '').toLowerCase();
+
+            document.querySelectorAll('.fila-solicitud-modal').forEach(fila => {
+                const rowSearch = (fila.dataset.search || '').toLowerCase();
+                const rowTipo = (fila.dataset.tipo || '').toLowerCase();
+                const rowEstado = (fila.dataset.estado || '').toLowerCase();
+                const rowAssignedId = fila.dataset.assignedId || '';
+                const rowEsMia = fila.dataset.esMia === '1';
+                const key = fila.dataset.key;
+                const detailRow = key ? document.getElementById(key) : null;
+
+                let matchTexto = !texto || rowSearch.includes(texto);
+                let matchTipo = !tipo || rowTipo === tipo;
+                let matchEstado = true;
+                if (estado === 'activas') {
+                    matchEstado = ['pendiente', 'asignada', 'parcial'].includes(rowEstado);
+                } else if (estado) {
+                    matchEstado = rowEstado === estado;
+                }
+
+                let matchAsignacion = true;
+                if (asignacion === 'mias') {
+                    matchAsignacion = rowEsMia;
+                } else if (asignacion === 'sin_asignar') {
+                    matchAsignacion = !rowAssignedId;
+                } else if (asignacion === 'asignadas') {
+                    matchAsignacion = !!rowAssignedId;
+                }
+
+                if (matchTexto && matchTipo && matchEstado && matchAsignacion) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                    if (detailRow) detailRow.classList.add('hidden');
+                }
+            });
+        }
+
+        async function asignarSolicitudUsuario(solicitudId, userId, selectElem) {
+            const spinner = document.getElementById('assign-spinner-' + solicitudId);
+            if (spinner) spinner.classList.remove('hidden');
+            if (selectElem) selectElem.disabled = true;
+
+            try {
+                const res = await fetch(`{{ url('requests') }}/${solicitudId}/assign`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        assigned_user_id: userId ? parseInt(userId) : null
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    throw new Error(data.message || 'No se pudo asignar la solicitud');
+                }
+
+                // Actualizar estado visual del badge y atributos de la fila
+                const badge = document.getElementById('badge-estado-solicitud-' + solicitudId);
+                if (badge && data.estado) {
+                    badge.textContent = data.estado;
+                    badge.className = 'border px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase inline-block ';
+                    if (data.estado === 'Pendiente') {
+                        badge.className += 'bg-amber-100 text-amber-800 border-amber-200';
+                    } else if (data.estado === 'Asignada') {
+                        badge.className += 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                    } else if (data.estado === 'Parcial') {
+                        badge.className += 'bg-blue-100 text-blue-800 border-blue-200';
+                    } else {
+                        badge.className += 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                    }
+                }
+
+                const fila = selectElem ? selectElem.closest('.fila-solicitud-modal') : null;
+                if (fila) {
+                    fila.dataset.estado = (data.estado || '').toLowerCase();
+                    fila.dataset.assignedId = data.assigned_user_id ? String(data.assigned_user_id) : '';
+                    fila.dataset.esMia = (parseInt(data.assigned_user_id || 0) === {{ (int) auth()->id() }}) ? '1' : '0';
+                }
+
+                const solObj = solicitudes.find(s => s.id === solicitudId);
+                if (solObj) {
+                    solObj.estado = data.estado;
+                    solObj.assigned_user_id = data.assigned_user_id;
+                }
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: data.message,
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al asignar',
+                    text: err.message || 'Ocurrió un error al asignar la solicitud.',
+                    confirmButtonColor: '#0f968c'
+                });
+            } finally {
+                if (spinner) spinner.classList.add('hidden');
+                if (selectElem) selectElem.disabled = false;
+            }
+        }
+
+        function desvincularSolicitudActiva() {
+            const requestInput = document.getElementById('establishment_request_id');
+            if (requestInput) requestInput.value = '';
+            const banner = document.getElementById('banner_solicitud_activa');
+            if (banner) banner.classList.add('hidden');
         }
 
         // despliegue de detalles de una solicitud
@@ -1502,6 +1837,16 @@
             // marcar la solicitud de origen para que el servidor la actualice al despachar
             const requestInput = document.getElementById('establishment_request_id');
             if (requestInput) requestInput.value = solicitud.id;
+
+            // Mostrar banner de solicitud activa
+            const banner = document.getElementById('banner_solicitud_activa');
+            const bannerTitulo = document.getElementById('banner_solicitud_titulo');
+            const bannerSubtitulo = document.getElementById('banner_solicitud_subtitulo');
+            if (banner && bannerTitulo && bannerSubtitulo) {
+                bannerTitulo.textContent = `Atendiendo Solicitud ${solicitud.numero_solicitud} — ${solicitud.establecimiento}`;
+                bannerSubtitulo.textContent = `Solicitante: ${solicitud.responsable || 'N/A'} · Estado actual: ${solicitud.estado} · Al confirmar el despacho se actualizará el estado automáticamente.`;
+                banner.classList.remove('hidden');
+            }
 
             // seleccionar clasificacion interna
             const clasificacion = document.getElementById('clasificacion_select');
@@ -1541,13 +1886,17 @@
             let productosFaltantes = [];
             let productosControlados = [];
 
-            // agregar los productos de la solicitud (los estupefacientes van al módulo controlado)
+            // agregar los productos pendientes de la solicitud (los estupefacientes van al módulo controlado)
             solicitud.items.forEach(item => {
-                const nombreItem = item.product.nombre ?? ('Producto #' + item.product_id);
+                const nombreItem = item.product?.nombre ?? ('Producto #' + item.product_id);
+                const pendiente = Math.max(0, (parseInt(item.cantidad_solicitada) || 0) - (parseInt(item.cantidad_despachada) || 0));
+
+                if (pendiente <= 0) {
+                    return;
+                }
 
                 if (esControladoJS(nombreItem)) {
-                    productosControlados.push(nombreItem + ' (x' + Math.max(0, item.cantidad_solicitada - (item
-                        .cantidad_despachada ?? 0)) + ')');
+                    productosControlados.push(nombreItem + ' (x' + pendiente + ')');
                     return;
                 }
 
@@ -1570,10 +1919,17 @@
                     // Llena la fila con lotes y límites
                     llenarDatosFila(selectProducto);
 
+                    // Seleccionar programa si viene en la solicitud
+                    const selectPrograma = tr.querySelector('select[name="programas[]"]');
+                    if (selectPrograma && item.programa) {
+                        const optProg = Array.from(selectPrograma.options).find(o => o.value.trim().toLowerCase() === String(item.programa).trim().toLowerCase());
+                        if (optProg) selectPrograma.value = optProg.value;
+                    }
+
                     const cantidad = tr.querySelector(
                         'input[name="cantidades[]"]'
                     );
-                    cantidad.value = item.cantidad_solicitada;
+                    cantidad.value = pendiente;
 
                     // Forzar que la cantidad no exceda el stock real que tienes actualmente
                     validarStock(cantidad);
@@ -1630,6 +1986,15 @@
             // cerrar modal de solicitudes
             closeSolicitudes();
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            filtrarSolicitudesModal();
+            const params = new URLSearchParams(window.location.search);
+            const solIdParam = parseInt(params.get('solicitud_id'));
+            if (solIdParam) {
+                setTimeout(() => usarSolicitud(solIdParam), 150);
+            }
+        });
 
         function onScanFailure(error) {}
     </script>

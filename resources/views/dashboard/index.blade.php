@@ -18,36 +18,139 @@
             </button>
         </div>
 
-        <!-- FILTROS GLOBALES AVANZADOS -->
-        <form method="GET" action="{{ route('dashboard.index') }}" class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col xl:flex-row gap-3 items-end xl:items-center w-full">
-            <div class="flex items-center gap-2 border-r border-slate-100 pr-3">
-                <div class="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+        <!-- SOLICITUDES ASIGNADAS AL TRABAJADOR LOGUEADO -->
+        @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
+            <div class="bg-gradient-to-r from-teal-50 via-white to-indigo-50 border border-teal-200 rounded-2xl p-4 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-[14px] font-extrabold text-slate-800">
+                                Tienes {{ count($misSolicitudesAsignadas) }} solicitud(es) asignada(s) para despachar
+                            </h2>
+                            <p class="text-[12px] text-slate-500">
+                                Fueron asignadas a tu usuario por Administración. Haz clic en "Despachar Ahora" para cargarlas automáticamente.
+                            </p>
+                        </div>
+                    </div>
+                    <a href="{{ route('dispatch.index') }}"
+                        class="px-4 py-2 rounded-xl text-[12px] font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-sm transition-colors text-center shrink-0">
+                        Ir al Módulo de Despacho &rarr;
+                    </a>
                 </div>
-                <span class="text-[12px] font-extrabold text-slate-700 uppercase tracking-wide">Filtros</span>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    @foreach ($misSolicitudesAsignadas as $miSol)
+                        @php
+                            $esCesfamMiSol = in_array($miSol->establecimiento, $nombresCesfam ?? []);
+                        @endphp
+                        <div class="bg-white border border-slate-200 rounded-xl p-3.5 flex items-center justify-between gap-3 shadow-xs">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="font-mono font-extrabold text-[12px] text-slate-900">{{ $miSol->numero_solicitud }}</span>
+                                    <span class="px-2 py-0.5 rounded text-[9.5px] font-extrabold uppercase {{ $esCesfamMiSol ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700' }}">
+                                        {{ $esCesfamMiSol ? 'CESFAM' : 'Establecimiento' }}
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded text-[9.5px] font-extrabold uppercase bg-indigo-100 text-indigo-700">
+                                        {{ $miSol->estado }}
+                                    </span>
+                                </div>
+                                <p class="text-[13px] font-bold text-slate-800 truncate mt-1" title="{{ $miSol->establecimiento }}">
+                                    {{ $miSol->establecimiento }}
+                                </p>
+                                <p class="text-[11px] text-slate-500">
+                                    {{ $miSol->items->count() }} producto(s) · {{ \Carbon\Carbon::parse($miSol->fecha_solicitud)->format('d/m/Y') }}
+                                </p>
+                            </div>
+                            <a href="{{ route('dispatch.index', ['solicitud_id' => $miSol->id]) }}"
+                                class="px-3 py-2 rounded-lg text-[11.5px] font-bold bg-slate-800 hover:bg-teal-600 text-white transition-colors shrink-0">
+                                Despachar Ahora
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        <!-- FILTROS GLOBALES AVANZADOS (BODEGA + ESTABLECIMIENTOS Y CESFAM) -->
+        <form method="GET" action="{{ route('dashboard.index') }}" id="dashboardFilterForm"
+            class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3 w-full">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    </div>
+                    <span class="text-[12px] font-extrabold text-slate-700 uppercase tracking-wide">Filtros Operativos Globales (Droguería, Establecimientos y CESFAM)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('dashboard.index') }}" class="px-3.5 py-1.5 rounded-lg text-[11.5px] font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors">Limpiar Filtros</a>
+                    <button type="submit" class="px-4 py-1.5 rounded-lg text-[11.5px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-colors cursor-pointer">Aplicar Filtros</button>
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 flex-1 w-full">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3 w-full">
                 <!-- Periodo Rápido -->
                 <div class="flex flex-col">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Período Movimientos</label>
-                    <select name="periodo" class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-lg text-[12px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer w-full">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Período</label>
+                    <select name="periodo" id="dash_periodo" onchange="onDashboardPeriodoChange(this.value)"
+                        class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-lg text-[12px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer w-full">
                         <option value="hoy" {{ $periodo == 'hoy' ? 'selected' : '' }}>Hoy</option>
                         <option value="semana" {{ $periodo == 'semana' ? 'selected' : '' }}>Esta Semana</option>
                         <option value="mes" {{ $periodo == 'mes' ? 'selected' : '' }}>Este Mes</option>
                         <option value="anio" {{ $periodo == 'anio' ? 'selected' : '' }}>Este Año</option>
-                        <option value="custom" {{ $periodo == 'custom' ? 'selected' : '' }}>Fechas Personalizadas</option>
+                        <option value="historico" {{ $periodo == 'historico' ? 'selected' : '' }}>Histórico Total</option>
+                        <option value="custom" {{ $periodo == 'custom' ? 'selected' : '' }}>Rango Personalizado</option>
                     </select>
                 </div>
 
-                <!-- Categoría -->
+                <!-- Tipo de Establecimiento -->
                 <div class="flex flex-col">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Categoría</label>
-                    <select name="categoria" class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-lg text-[12px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer w-full">
-                        <option value="">Todas</option>
-                        @foreach ($categoriasLista as $cat)
-                            <option value="{{ $cat }}" {{ $categoria == $cat ? 'selected' : '' }}>{{ $cat }}</option>
-                        @endforeach
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tipo Centro</label>
+                    <select name="tipo_establecimiento" id="dash_tipo_est" onchange="filtrarOpcionesEstablecimientoDash()"
+                        class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-lg text-[12px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer w-full">
+                        <option value="" {{ empty($tipo_establecimiento) ? 'selected' : '' }}>Todos (Red Comunal)</option>
+                        <option value="cesfam" {{ ($tipo_establecimiento ?? '') === 'cesfam' ? 'selected' : '' }}>Solo CESFAM</option>
+                        <option value="establecimiento" {{ ($tipo_establecimiento ?? '') === 'establecimiento' ? 'selected' : '' }}>Solo Establecimientos</option>
+                    </select>
+                </div>
+
+                <!-- Establecimiento / CESFAM Específico -->
+                <div class="flex flex-col xl:col-span-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Establecimiento / CESFAM</label>
+                    <select name="establecimiento" id="dash_establecimiento"
+                        class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-lg text-[12px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer w-full">
+                        <option value="">Todos los Centros</option>
+                        <optgroup label="CESFAM" id="optgroup_dash_cesfam">
+                            @foreach ($nombresCesfam ?? [] as $nomCesfam)
+                                <option value="{{ $nomCesfam }}" data-tipo-centro="cesfam" {{ ($establecimiento ?? '') === $nomCesfam ? 'selected' : '' }}>
+                                    {{ $nomCesfam }}
+                                </option>
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="Establecimientos (CECOSF / SAR / Otros)" id="optgroup_dash_estab">
+                            @foreach ($nombresNoCesfam ?? [] as $nomEst)
+                                <option value="{{ $nomEst }}" data-tipo-centro="establecimiento" {{ ($establecimiento ?? '') === $nomEst ? 'selected' : '' }}>
+                                    {{ $nomEst }}
+                                </option>
+                            @endforeach
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- Estado Solicitud -->
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estado Solicitud</label>
+                    <select name="estado_solicitud" class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-lg text-[12px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer w-full">
+                        <option value="">Todos</option>
+                        <option value="Pendiente" {{ ($estado_solicitud ?? '') === 'Pendiente' ? 'selected' : '' }}>Pendiente</option>
+                        <option value="Asignada" {{ ($estado_solicitud ?? '') === 'Asignada' ? 'selected' : '' }}>Asignada</option>
+                        <option value="Parcial" {{ ($estado_solicitud ?? '') === 'Parcial' ? 'selected' : '' }}>Parcial</option>
+                        <option value="Despachado" {{ ($estado_solicitud ?? '') === 'Despachado' ? 'selected' : '' }}>Despachado</option>
                     </select>
                 </div>
 
@@ -62,96 +165,318 @@
                     </select>
                 </div>
 
-                <!-- Fechas -->
+                <!-- Categoría Bodega -->
                 <div class="flex flex-col">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Desde</label>
-                    <input type="date" name="fecha_desde" value="{{ $fecha_desde }}" class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-[12px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 w-full">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Categoría</label>
+                    <select name="categoria" class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-lg text-[12px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer w-full">
+                        <option value="">Todas</option>
+                        @foreach ($categoriasLista as $cat)
+                            <option value="{{ $cat }}" {{ $categoria == $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                        @endforeach
+                    </select>
                 </div>
-                <div class="flex flex-col">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Hasta</label>
-                    <input type="date" name="fecha_hasta" value="{{ $fecha_hasta }}" class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-[12px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 w-full">
-                </div>
-            </div>
 
-            <div class="flex items-center gap-2 w-full xl:w-auto mt-2 xl:mt-0">
-                <a href="{{ route('dashboard.index') }}" class="px-4 py-2 rounded-lg text-[12px] font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors text-center w-full xl:w-auto">Limpiar</a>
-                <button type="submit" class="px-5 py-2 rounded-lg text-[12px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-colors text-center w-full xl:w-auto cursor-pointer">Aplicar</button>
+                <!-- Fechas Personalizadas -->
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Desde / Hasta</label>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <input type="date" name="fecha_desde" id="dash_fecha_desde" value="{{ $fecha_desde }}"
+                            onchange="document.getElementById('dash_periodo').value='custom'"
+                            title="Fecha Desde"
+                            class="bg-slate-50 border border-slate-200 text-slate-700 px-2 py-1.5 rounded-lg text-[11px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 w-full">
+                        <input type="date" name="fecha_hasta" id="dash_fecha_hasta" value="{{ $fecha_hasta }}"
+                            onchange="document.getElementById('dash_periodo').value='custom'"
+                            title="Fecha Hasta"
+                            class="bg-slate-50 border border-slate-200 text-slate-700 px-2 py-1.5 rounded-lg text-[11px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20 w-full">
+                    </div>
+                </div>
             </div>
         </form>
 
         @php
-            $periodoTexto = ['hoy' => 'Hoy', 'semana' => 'Semana', 'mes' => 'Mes', 'anio' => 'Año', 'custom' => 'Fechas'][$periodo] ?? 'Mes';
+            $periodoTexto = ['hoy' => 'Hoy', 'semana' => 'Semana', 'mes' => 'Mes', 'anio' => 'Año', 'historico' => 'Histórico', 'custom' => 'Fechas'][$periodo] ?? 'Mes';
         @endphp
 
-        <!-- 1. GRID DE KPIs (MÉTRICAS CLAVES) -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <!-- 1. GRID DE KPIs BODEGA CENTRAL (DROGUERÍA) -->
+        <div>
+            <div class="flex items-center justify-between mb-2.5 px-1">
+                <h2 class="text-[11.5px] font-extrabold text-slate-500 uppercase tracking-widest">1. Indicadores de Bodega Central (Droguería)</h2>
+                @if ($establecimiento || $tipo_establecimiento || $programa || $categoria)
+                    <span class="text-[11px] font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
+                        Vista filtrada activa
+                    </span>
+                @endif
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
 
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="p-2 bg-blue-50 rounded-lg text-blue-600 border border-blue-100">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="p-2 bg-blue-50 rounded-lg text-blue-600 border border-blue-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Valor Capital</p>
                     </div>
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Valor Capital</p>
+                    <h3 class="text-xl font-black text-slate-800">${{ number_format($valorInventario, 0, ',', '.') }}</h3>
+                    <p class="text-[9px] text-emerald-600 font-extrabold mt-1 tracking-wider uppercase">En Bodega Activa</p>
                 </div>
-                <h3 class="text-xl font-black text-slate-800">${{ number_format($valorInventario, 0, ',', '.') }}</h3>
-                <p class="text-[9px] text-emerald-600 font-extrabold mt-1 tracking-wider uppercase">En Bodega Activa</p>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="p-2 bg-teal-50 rounded-lg text-teal-600 border border-teal-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Unidades Físicas</p>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($unidadesTotales, 0, ',', '.') }}</h3>
+                    <p class="text-[9px] text-slate-400 font-extrabold mt-1 tracking-wider uppercase">Stock Disponible</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Ingresos ({{ $periodoTexto }})</p>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($recepcionesPeriodo, 0, ',', '.') }}</h3>
+                    <p class="text-[9px] text-slate-400 font-extrabold mt-1 tracking-wider uppercase">{{ number_format($totalRecepciones, 0, ',', '.') }} Históricas</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600 border border-indigo-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Despachos ({{ $periodoTexto }})</p>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($despachosPeriodo, 0, ',', '.') }}</h3>
+                    <p class="text-[9px] text-slate-400 font-extrabold mt-1 tracking-wider uppercase">{{ number_format($totalDespachos, 0, ',', '.') }} Históricos</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between border-l-[3px] border-l-rose-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="p-2 bg-rose-50 rounded-lg text-rose-600 border border-rose-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Próx. a Vencer</p>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($proximosVencer, 0, ',', '.') }}</h3>
+                    <p class="text-[9px] text-rose-500 font-extrabold mt-1 tracking-wider uppercase">Próximos 30 Días</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between border-l-[3px] border-l-amber-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="p-2 bg-amber-50 rounded-lg text-amber-600 border border-amber-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">En Cuarentena</p>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($cantidadCuarentena, 0, ',', '.') }}</h3>
+                    <p class="text-[9px] text-amber-600 font-extrabold mt-1 tracking-wider uppercase">Lotes Bloqueados</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 2. NUEVO GRID DE KPIs DE ESTABLECIMIENTOS Y CESFAM -->
+        <div>
+            <div class="flex items-center justify-between mb-2.5 px-1">
+                <h2 class="text-[11.5px] font-extrabold text-slate-500 uppercase tracking-widest">2. Indicadores de Solicitudes, Stock y Despachos por Establecimientos y CESFAM ({{ $periodoTexto }})</h2>
+                <div class="flex items-center gap-2">
+                    @can('ver.solicitudes_cesfam')
+                        <a href="{{ route('requests.cesfam') }}" class="text-[11px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-200 transition-colors">
+                            + Solicitud CESFAM
+                        </a>
+                    @endcan
+                    @can('ver.solicitudes')
+                        <a href="{{ route('requests.index') }}" class="text-[11px] font-bold text-teal-700 hover:text-teal-900 bg-teal-50 px-2.5 py-1 rounded-md border border-teal-200 transition-colors">
+                            + Solicitud Establecimiento
+                        </a>
+                    @endcan
+                </div>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="p-2 bg-teal-50 rounded-lg text-teal-600 border border-teal-100">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <!-- KPI 1: Solicitudes CESFAM -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between border-t-[3px] border-t-purple-500">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 bg-purple-50 rounded-lg text-purple-600 border border-purple-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Solicitudes CESFAM</p>
                     </div>
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Unidades Físicas</p>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($solicitudesCesfamCount ?? 0, 0, ',', '.') }}</h3>
+                    <p class="text-[9.5px] font-extrabold mt-1 tracking-wide uppercase text-purple-600">
+                        {{ $cesfamActivasCount ?? 0 }} activas · {{ $cesfamDespachadasCount ?? 0 }} desp.
+                    </p>
                 </div>
-                <h3 class="text-xl font-black text-slate-800">{{ number_format($unidadesTotales, 0, ',', '.') }}</h3>
-                <p class="text-[9px] text-slate-400 font-extrabold mt-1 tracking-wider uppercase">Stock Disponible</p>
+
+                <!-- KPI 2: Solicitudes Establecimientos -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between border-t-[3px] border-t-teal-500">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 bg-teal-50 rounded-lg text-teal-600 border border-teal-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Solic. Establecim.</p>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($solicitudesEstablecimientosCount ?? 0, 0, ',', '.') }}</h3>
+                    <p class="text-[9.5px] font-extrabold mt-1 tracking-wide uppercase text-teal-600">
+                        {{ $estabActivasCount ?? 0 }} activas · {{ $estabDespachadasCount ?? 0 }} desp.
+                    </p>
+                </div>
+
+                <!-- KPI 3: Por Despachar / Asignadas -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between border-t-[3px] border-t-indigo-500">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600 border border-indigo-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Por Despachar</p>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($solicitudesPorDespacharCount ?? 0, 0, ',', '.') }}</h3>
+                    <p class="text-[9.5px] font-extrabold mt-1 tracking-wide uppercase text-indigo-600">
+                        {{ $solicitudesAsignadasCount ?? 0 }} asignadas · {{ $solicitudesSinAsignarCount ?? 0 }} sin asignar
+                    </p>
+                </div>
+
+                <!-- KPI 4: Unidades Despachadas a CESFAM -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between border-t-[3px] border-t-blue-500">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 bg-blue-50 rounded-lg text-blue-600 border border-blue-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Uds. a CESFAM</p>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($unidadesDespachadasCesfam ?? 0, 0, ',', '.') }}</h3>
+                    <p class="text-[9.5px] text-blue-600 font-extrabold mt-1 tracking-wide uppercase">Despachadas ({{ $periodoTexto }})</p>
+                </div>
+
+                <!-- KPI 5: Unidades Despachadas a Establecimientos -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between border-t-[3px] border-t-cyan-500">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 bg-cyan-50 rounded-lg text-cyan-600 border border-cyan-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Uds. a Establecim.</p>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($unidadesDespachadasEstablecimientos ?? 0, 0, ',', '.') }}</h3>
+                    <p class="text-[9.5px] text-cyan-600 font-extrabold mt-1 tracking-wide uppercase">Despachadas ({{ $periodoTexto }})</p>
+                </div>
+
+                <!-- KPI 6: Stock Declarado y Cumplimiento -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between border-t-[3px] border-t-emerald-500">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Stock Red / Cumpl.</p>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">{{ number_format($stockDeclaradoRed ?? 0, 0, ',', '.') }} <span class="text-xs font-bold text-slate-400">uds</span></h3>
+                    <p class="text-[9.5px] text-emerald-600 font-extrabold mt-1 tracking-wide uppercase">
+                        {{ $porcentajeCumplimientoRed ?? 0 }}% Entregado vs Solicitado
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLA COMPARATIVA: ESTADO OPERATIVO POR ESTABLECIMIENTO Y CESFAM -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 pb-3">
+                <div>
+                    <h2 class="text-[13px] font-extrabold text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        Resumen Operativo por Establecimiento y CESFAM
+                    </h2>
+                    <p class="text-[11.5px] text-slate-500 mt-0.5">
+                        Monitoreo de solicitudes, consumo mensual anterior, stock actual declarado y unidades despachadas por centro.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="buscadorTablaCentros" oninput="filtrarTablaCentrosDash()"
+                        placeholder="Filtrar centro en tabla..."
+                        class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-[12px] font-medium outline-none focus:ring-2 focus:ring-teal-500/20">
+                    <a href="{{ route('dispatch.index') }}" class="text-[12px] font-bold text-teal-700 hover:text-teal-900 bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200 transition-colors whitespace-nowrap">
+                        Gestionar Despachos &rarr;
+                    </a>
+                </div>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600 border border-emerald-100">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    </div>
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Ingresos ({{ $periodoTexto }})</p>
-                </div>
-                <h3 class="text-xl font-black text-slate-800">{{ number_format($recepcionesPeriodo, 0, ',', '.') }}</h3>
-                <p class="text-[9px] text-slate-400 font-extrabold mt-1 tracking-wider uppercase">{{ number_format($totalRecepciones, 0, ',', '.') }} Históricas</p>
+            <div class="overflow-x-auto max-h-[340px]">
+                <table class="w-full text-left text-[12px] text-slate-600 whitespace-nowrap">
+                    <thead class="text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-200 bg-slate-50 sticky top-0 z-10">
+                        <tr>
+                            <th class="px-4 py-3">Establecimiento / CESFAM</th>
+                            <th class="px-4 py-3 text-center">Tipo</th>
+                            <th class="px-4 py-3 text-center">Solicitudes</th>
+                            <th class="px-4 py-3 text-center">Consumo Mes Ant.</th>
+                            <th class="px-4 py-3 text-center">Stock Actual Declarado</th>
+                            <th class="px-4 py-3 text-center">Solicitado / Despachado</th>
+                            <th class="px-4 py-3 text-center">Cumplimiento</th>
+                            <th class="px-4 py-3 text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100" id="tbodyResumenCentros">
+                        @forelse ($resumenEstablecimientos ?? [] as $rowCentro)
+                            <tr class="fila-centro-dash hover:bg-slate-50/80 transition-colors"
+                                data-nombre="{{ mb_strtolower($rowCentro->nombre . ' ' . $rowCentro->tipo) }}">
+                                <td class="px-4 py-3 font-bold text-slate-800">
+                                    {{ $rowCentro->nombre }}
+                                    @if ($rowCentro->ultima_solicitud)
+                                        <span class="block text-[10px] font-normal text-slate-400">
+                                            Últ. solicitud: {{ \Carbon\Carbon::parse($rowCentro->ultima_solicitud)->format('d/m/Y') }}
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase {{ $rowCentro->es_cesfam ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-teal-50 text-teal-700 border border-teal-200' }}">
+                                        {{ $rowCentro->es_cesfam ? 'CESFAM' : $rowCentro->tipo }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="font-extrabold text-slate-800">{{ $rowCentro->total_solicitudes }}</span>
+                                    @if ($rowCentro->activas > 0)
+                                        <span class="ml-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[9.5px] font-extrabold">
+                                            {{ $rowCentro->activas }} act.
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-center font-bold text-slate-700">
+                                    {{ number_format($rowCentro->consumo_anterior, 0, ',', '.') }} uds.
+                                </td>
+                                <td class="px-4 py-3 text-center font-extrabold text-blue-700">
+                                    {{ number_format($rowCentro->stock_declarado, 0, ',', '.') }} uds.
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="font-extrabold text-teal-700">{{ number_format($rowCentro->unidades_solicitadas, 0, ',', '.') }}</span>
+                                    <span class="text-slate-400 mx-0.5">/</span>
+                                    <span class="font-extrabold text-indigo-700">{{ number_format($rowCentro->unidades_despachadas, 0, ',', '.') }} uds.</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <div class="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div class="h-full {{ $rowCentro->cumplimiento >= 80 ? 'bg-emerald-500' : ($rowCentro->cumplimiento >= 40 ? 'bg-amber-500' : 'bg-slate-300') }}"
+                                                style="width: {{ $rowCentro->cumplimiento }}%"></div>
+                                        </div>
+                                        <span class="text-[11px] font-extrabold text-slate-700">{{ $rowCentro->cumplimiento }}%</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <a href="{{ route('dashboard.index', ['establecimiento' => $rowCentro->nombre, 'periodo' => $periodo]) }}"
+                                        class="text-[11px] font-bold text-teal-600 hover:text-teal-800 underline">
+                                        Filtrar KPI
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="px-4 py-8 text-center text-slate-400 font-medium">
+                                    No hay establecimientos que coincidan con el filtro seleccionado.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600 border border-indigo-100">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                    </div>
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Despachos ({{ $periodoTexto }})</p>
-                </div>
-                <h3 class="text-xl font-black text-slate-800">{{ number_format($despachosPeriodo, 0, ',', '.') }}</h3>
-                <p class="text-[9px] text-slate-400 font-extrabold mt-1 tracking-wider uppercase">{{ number_format($totalDespachos, 0, ',', '.') }} Históricos</p>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between border-l-[3px] border-l-rose-500">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="p-2 bg-rose-50 rounded-lg text-rose-600 border border-rose-100">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Próx. a Vencer</p>
-                </div>
-                <h3 class="text-xl font-black text-slate-800">{{ number_format($proximosVencer, 0, ',', '.') }}</h3>
-                <p class="text-[9px] text-rose-500 font-extrabold mt-1 tracking-wider uppercase">Próximos 30 Días</p>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between border-l-[3px] border-l-amber-500">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="p-2 bg-amber-50 rounded-lg text-amber-600 border border-amber-100">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                    </div>
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">En Cuarentena</p>
-                </div>
-                <h3 class="text-xl font-black text-slate-800">{{ number_format($cantidadCuarentena, 0, ',', '.') }}</h3>
-                <p class="text-[9px] text-amber-600 font-extrabold mt-1 tracking-wider uppercase">Lotes Bloqueados</p>
-            </div>
-
         </div>
 
         <!-- 2. SECCIÓN PRINCIPAL: Trazabilidad y QR -->
@@ -237,6 +562,18 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             </div>
                             <span class="text-[12px] font-bold text-slate-700">Inventario</span>
+                        </a>
+                        <a href="{{ route('requests.index') }}" class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 transition-colors group">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"></path></svg>
+                            </div>
+                            <span class="text-[11px] font-bold text-slate-700 leading-tight">Solicitudes Estab.</span>
+                        </a>
+                        <a href="{{ route('requests.cesfam') }}" class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-purple-50 hover:border-purple-200 transition-colors group">
+                            <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"></path></svg>
+                            </div>
+                            <span class="text-[11px] font-bold text-slate-700 leading-tight">Solicitudes Cesfam</span>
                         </a>
                     </div>
                 </div>
@@ -464,5 +801,54 @@
             `);
             printWindow.document.close();
         }
+
+        function onDashboardPeriodoChange(selectEl) {
+            const box = document.getElementById('dashFechasPersonalizadas');
+            if (!box) return;
+            if (selectEl.value === 'personalizado') {
+                box.classList.remove('hidden');
+                box.classList.add('grid');
+            } else {
+                box.classList.add('hidden');
+                box.classList.remove('grid');
+                document.getElementById('dashboardFilterForm')?.submit();
+            }
+        }
+
+        function filtrarOpcionesEstablecimientoDash() {
+            const tipoSel = document.getElementById('dashTipoEstablecimiento')?.value || 'todos';
+            const estSelect = document.getElementById('dashEstablecimientoSelect');
+            if (!estSelect) return;
+
+            Array.from(estSelect.options).forEach(opt => {
+                if (!opt.value) return;
+                const tipoOpt = opt.getAttribute('data-tipo');
+                const visible = (tipoSel === 'todos') || (tipoSel === tipoOpt);
+                opt.hidden = !visible;
+            });
+
+            if (estSelect.selectedOptions[0] && estSelect.selectedOptions[0].hidden) {
+                estSelect.value = '';
+            }
+        }
+
+        function filtrarTablaCentrosDash(tipo) {
+            document.querySelectorAll('.btn-tab-centro').forEach(btn => {
+                const active = btn.getAttribute('data-tab') === tipo;
+                btn.className = active
+                    ? 'btn-tab-centro px-3 py-1 rounded-md text-[11px] font-extrabold bg-white text-slate-800 shadow-sm cursor-pointer'
+                    : 'btn-tab-centro px-3 py-1 rounded-md text-[11px] font-bold text-slate-500 hover:text-slate-700 cursor-pointer';
+            });
+
+            document.querySelectorAll('.fila-resumen-centro').forEach(row => {
+                const rowTipo = row.getAttribute('data-tipo-centro');
+                const visible = (tipo === 'todos') || (rowTipo === tipo);
+                row.classList.toggle('hidden', !visible);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            filtrarOpcionesEstablecimientoDash();
+        });
     </script>
 @endsection

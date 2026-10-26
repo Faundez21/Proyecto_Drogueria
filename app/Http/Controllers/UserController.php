@@ -16,30 +16,87 @@ class UserController extends Controller
         'recepcion' => 'Recepción',
         'inventario' => 'Inventario',
         'cuarentena' => 'Cuarentena',
+        'distribucion' => 'Distribución',
+        'solicitudes' => 'Solicitudes Establecimientos',
+        'solicitudes_cesfam' => 'Solicitudes Cesfam',
         'despacho' => 'Despacho Normal',
         'despacho_controlado' => 'Despacho Controlado',
-        'distribucion' => 'Distribución',
-        'solicitudes' => 'Solicitudes',
         'trazabilidad' => 'Trazabilidad',
         'reportes' => 'Reportes',
         'usuarios' => 'Usuarios y Roles',
     ];
 
+    public const MODULOS_GRUPOS = [
+        'General' => [
+            'icono' => 'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM14 11a1 1 0 011-1h4a1 1 0 011 1v8a1 1 0 01-1 1h-4a1 1 0 01-1-1v-8z',
+            'color' => 'slate',
+            'items' => [
+                'dashboard' => ['label' => 'Panel Principal (Dashboard)', 'desc' => 'KPIs operativos, establecimientos, CESFAM y escáner QR'],
+            ],
+        ],
+        '01 · Abastecimiento' => [
+            'icono' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
+            'color' => 'emerald',
+            'items' => [
+                'proveedores' => ['label' => 'Proveedores', 'desc' => 'Directorio y estado de laboratorios y distribuidores'],
+                'recepcion' => ['label' => 'Recepción', 'desc' => 'Ingreso de lotes, actas de recepción y precios netos'],
+            ],
+        ],
+        '02 · Almacenamiento' => [
+            'icono' => 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
+            'color' => 'amber',
+            'items' => [
+                'inventario' => ['label' => 'Inventario de Droguería', 'desc' => 'Control físico de lotes, stock mínimo y vencimientos'],
+                'cuarentena' => ['label' => 'Cuarentena', 'desc' => 'Gestión de lotes retenidos, liberación o baja sanitaria'],
+                'distribucion' => ['label' => 'Distribución', 'desc' => 'Mapa de bodega, pasillos, estantes, niveles y posiciones'],
+            ],
+        ],
+        '03 · Salida (Solicitudes y Despachos)' => [
+            'icono' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+            'color' => 'teal',
+            'items' => [
+                'solicitudes' => ['label' => 'Solicitudes Establecimientos', 'desc' => 'Pedidos de medicamentos e insumos (no estupefacientes)'],
+                'solicitudes_cesfam' => ['label' => 'Solicitudes Cesfam', 'desc' => 'Pedidos de medicamentos, insumos y estupefacientes para CESFAM'],
+                'despacho' => ['label' => 'Despacho Normal', 'desc' => 'Emisión de guías de despacho FEFO y atención de solicitudes'],
+                'despacho_controlado' => ['label' => 'Despacho Controlado', 'desc' => 'Despacho exclusivo de fármacos controlados y estupefacientes'],
+            ],
+        ],
+        '04 · Control y Configuración' => [
+            'icono' => 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+            'color' => 'indigo',
+            'items' => [
+                'trazabilidad' => ['label' => 'Trazabilidad', 'desc' => 'Kardex histórico y línea de tiempo por lote'],
+                'reportes' => ['label' => 'Reportes', 'desc' => 'Exportación de informes en Excel y PDF'],
+                'usuarios' => ['label' => 'Usuarios y Roles', 'desc' => 'Administración de cuentas, roles y permisos por vista'],
+            ],
+        ],
+    ];
+
     public function index()
     {
-        $users = User::with('roles')->get();
+        foreach (array_keys(self::MODULOS) as $modKey) {
+            Permission::firstOrCreate(['name' => 'ver.' . $modKey]);
+        }
+
+        $users = User::with(['roles.permissions', 'permissions'])
+            ->withCount([
+                'assignedRequests as solicitudes_activas_count' => fn ($q) => $q->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial']),
+                'assignedRequests as solicitudes_despachadas_count' => fn ($q) => $q->where('estado', 'Despachado'),
+            ])
+            ->get();
 
         $passwordRequests = PasswordResetToken::where('status', 'pending')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $roles = Role::with('permissions')->orderBy('name')->get();
+        $roles = Role::with('permissions')->withCount('users')->orderBy('name')->get();
 
         return view('users.index', [
             'users' => $users,
             'passwordRequests' => $passwordRequests,
             'roles' => $roles,
             'modulos' => self::MODULOS,
+            'modulosGrupos' => self::MODULOS_GRUPOS,
         ]);
     }
 

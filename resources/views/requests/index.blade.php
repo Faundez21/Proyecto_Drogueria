@@ -1,9 +1,21 @@
 @extends('layouts.app')
 
-@section('title', 'Solicitudes')
-@section('subtitle', 'Registro y gestión de solicitudes de establecimientos.')
+@section('title', 'Solicitudes Establecimientos')
+@section('subtitle', 'Registro y gestión de solicitudes de medicamentos e insumos para establecimientos.')
 
-
+@section('actions')
+    @role('Administrador')
+        <button type="button" onclick="openRequestInventoryModal()"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
+            <svg class="w-4 h-4 text-teal-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                </path>
+            </svg>
+            Ver Inventario Establecimientos
+        </button>
+    @endrole
+@endsection
 
 @section('content')
     <!-- migas de pan -->
@@ -13,7 +25,7 @@
         <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
         </svg>
-        <span class="font-semibold text-slate-800">Solicitudes</span>
+        <span class="font-semibold text-slate-800">Solicitudes Establecimientos</span>
     </div>
 
     <div class="space-y-6">
@@ -33,10 +45,10 @@
                 class="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h2 class="text-[15px] font-bold text-slate-800">
-                        Registro de Solicitud
+                        Registro de Solicitud de Establecimiento
                     </h2>
                     <p class="text-[12px] text-slate-500 mt-0.5">
-                        Complete los datos del establecimiento y los productos requeridos.
+                        Complete los datos del establecimiento y los medicamentos o insumos requeridos.
                     </p>
                 </div>
             </div>
@@ -44,6 +56,7 @@
             <!-- formulario principal -->
             <form action="{{ route('requests.store') }}" method="POST" class="divide-y divide-slate-100" id="requestForm">
                 @csrf
+                <input type="hidden" name="tipo_vista" value="establecimientos">
 
                 <!-- seccion 1: establecimiento -->
                 <div class="p-6">
@@ -61,31 +74,18 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-                        <div class="lg:col-span-2">
+                        <div class="lg:col-span-3">
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                 Establecimiento <span class="text-rose-500">*</span>
                             </label>
 
                             <select name="establecimiento" id="establecimiento_select" required
-                                onchange="actualizarProductosDisponibles()"
                                 class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione establecimiento...</option>
-                                <optgroup label="CESFAM (pueden solicitar estupefacientes)">
-                                    @foreach ($establecimientos as $est)
-                                        @if ($est['tipo'] === 'CESFAM')
-                                            <option value="{{ $est['nombre'] }}">{{ $est['nombre'] }}</option>
-                                        @endif
-                                    @endforeach
-                                </optgroup>
-                                <optgroup label="Otros establecimientos (solo medicamentos e insumos)">
-                                    @foreach ($establecimientos as $est)
-                                        @if ($est['tipo'] === 'Otros')
-                                            <option value="{{ $est['nombre'] }}">{{ $est['nombre'] }}</option>
-                                        @endif
-                                    @endforeach
-                                </optgroup>
+                                @foreach ($establecimientos as $est)
+                                    <option value="{{ $est['nombre'] }}">{{ $est['nombre'] }}</option>
+                                @endforeach
                             </select>
-                            <p id="establecimientoAviso" class="text-[11px] text-slate-400 mt-1 font-medium"></p>
                         </div>
 
                         <div>
@@ -97,12 +97,13 @@
                                 class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                         </div>
 
-                        <div>
+                        <!-- N° Solicitud oculto pero funcional -->
+                        <div class="hidden">
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                 N° Solicitud
                             </label>
 
-                            <input type="text" value="#00001" readonly
+                            <input type="text" name="numero_solicitud" value="#00001" readonly
                                 class="w-full bg-slate-100 border border-slate-200 text-teal-700 font-bold rounded-lg block py-2.5 px-3.5 text-[13px] cursor-not-allowed">
                         </div>
 
@@ -138,12 +139,12 @@
                             </svg>
 
                             <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">
-                                2. Productos Solicitados
+                                2. Productos Solicitados (Medicamentos e Insumos)
                             </h3>
                         </div>
 
                         <button type="button" id="btn_add_product"
-                            class="text-xs font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md transition-colors border border-teal-200">
+                            class="text-xs font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md transition-colors border border-teal-200 cursor-pointer">
                             + Agregar Producto
                         </button>
                     </div>
@@ -154,7 +155,7 @@
                         <div class="producto-item relative border border-slate-200 bg-white p-4 rounded-xl shadow-sm">
 
                             <button type="button"
-                                class="btn-remove-product hidden absolute top-3 right-3 text-slate-400 hover:text-rose-600 transition-colors"
+                                class="btn-remove-product hidden absolute top-3 right-3 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                                 title="Eliminar fila">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -163,7 +164,7 @@
                                 </svg>
                             </button>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Programa <span class="text-rose-500">*</span>
@@ -194,41 +195,30 @@
                                         class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-producto">
 
                                         <option value="" disabled selected>
-                                            Buscar producto...
+                                            Buscar medicamento o insumo...
                                         </option>
 
-                                        <optgroup label="Medicamentos e Insumos" class="optgroup-normal">
+                                        <optgroup label="Medicamentos e Insumos">
                                             @foreach ($products as $product)
-                                                @if (!in_array($product->nombre, $controlados))
-                                                    <option value="{{ $product->id }}">
-                                                        {{ $product->nombre }}
-                                                    </option>
-                                                @endif
-                                            @endforeach
-                                        </optgroup>
-
-                                        <optgroup label="Estupefacientes (solo CESFAM)" class="optgroup-controlado"
-                                            disabled>
-                                            @foreach ($products as $product)
-                                                @if (in_array($product->nombre, $controlados))
-                                                    <option value="{{ $product->id }}">
-                                                        {{ $product->nombre }}
-                                                    </option>
-                                                @endif
+                                                <option value="{{ $product->id }}">
+                                                    {{ $product->nombre }}
+                                                </option>
                                             @endforeach
                                         </optgroup>
 
                                     </select>
                                 </div>
 
-                                <div>
+                                <div class="hidden">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Consumo mensual del mes anterior <span class="text-rose-500">*</span>
                                     </label>
 
                                     <input type="number" name="consumo_anterior[]" min="0" readonly
+                                        value="0"
                                         placeholder="Se calculará automáticamente"
-                                        class="w-full bg-slate-100 border border-slate-200 text-slate-500 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold cursor-not-allowed">
+                                        class="w-full bg-slate-100 border border-slate-200 text-slate-700 rounded-lg py-2.5 px-3.5 text-[13px] font-bold cursor-not-allowed input-consumo-anterior">
+                                    <span class="block text-[10.5px] text-slate-400 mt-1 info-consumo-anterior">Calculado según despachos del mes anterior</span>
                                 </div>
 
                                 <div>
@@ -236,9 +226,10 @@
                                         Cantidad en stock actualmente <span class="text-rose-500">*</span>
                                     </label>
 
-                                    <input type="number" name="stock_actual[]" min="1" required
+                                    <input type="number" name="stock_actual[]" min="0" required
                                         placeholder="Ej: 20"
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold">
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold input-stock-actual">
+                                    <span class="block text-[10.5px] text-teal-600 font-medium mt-1 hidden info-ultimo-stock"></span>
                                 </div>
 
                                 <div>
@@ -313,7 +304,7 @@
                         </div>
 
                         <button type="button" onclick="signatureRecibe.clear()"
-                            class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500 transition-colors">
+                            class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500 transition-colors cursor-pointer">
                             Limpiar Firma
                         </button>
                     </div>
@@ -366,12 +357,12 @@
                     class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3">
 
                     <button type="reset" id="btn_limpiar"
-                        class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-100 transition-colors shadow-sm">
+                        class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-100 transition-colors shadow-sm cursor-pointer">
                         Limpiar Formulario
                     </button>
 
                     <button type="submit"
-                        class="w-full sm:w-auto px-5 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 flex items-center justify-center gap-2 transition-all shadow-sm">
+                        class="w-full sm:w-auto px-5 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer">
 
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M5 13l4 4L19 7">
@@ -386,16 +377,21 @@
         </div>
     </div>
 
+    @include('requests.partials.inventory_modal', [
+        'modalTitle' => 'Inventario de Establecimientos (Solicitudes)',
+        'modalSubtitle' => 'Directorio de medicamentos e insumos declarados por los establecimientos en sus solicitudes.',
+        'esVistaCesfam' => false,
+    ])
+
     <!-- libreria para las firmas -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 
     <script>
-        // instancias de firmas para que sean globales en la vista
         let signatureRecibe = null;
+        const consumoMapa = @json($consumoMapa ?? []);
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            // inicializar firma
             const padRecibeElem = document.getElementById('pad_recibe');
 
             const padOptions = {
@@ -405,45 +401,65 @@
 
             signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
 
-            // Habilitar/Deshabilitar estupefacientes según el tipo de establecimiento
-            window.actualizarProductosDisponibles = function() {
-                const seleccion = document.getElementById('establecimiento_select').value;
-                const esCesfam = seleccion.trim().toLowerCase().startsWith('cesfam ');
+            const container = document.getElementById('productos_container');
+            const establecimientoSelect = document.getElementById('establecimiento_select');
 
-                const aviso = document.getElementById('establecimientoAviso');
-                if (aviso) {
-                    aviso.textContent = esCesfam ?
-                        'CESFAM: puede solicitar medicamentos, insumos y estupefacientes (estos últimos se despachan por el módulo de Despacho Controlado).' :
-                        (seleccion ?
-                            'Solo puede solicitar medicamentos e insumos. Los estupefacientes están restringidos a los CESFAM.' :
-                            '');
-                    aviso.className = esCesfam ?
-                        'text-[11px] text-teal-600 mt-1 font-semibold' :
-                        'text-[11px] text-slate-400 mt-1 font-medium';
+            function actualizarConsumoFila(itemRow) {
+                const est = (establecimientoSelect?.value || '').trim();
+                const prodSelect = itemRow.querySelector('.select-producto');
+                const prodId = prodSelect ? prodSelect.value : '';
+                const inputConsumo = itemRow.querySelector('input[name="consumo_anterior[]"]');
+                const infoConsumo = itemRow.querySelector('.info-consumo-anterior');
+                const infoStock = itemRow.querySelector('.info-ultimo-stock');
+
+                if (!inputConsumo) return;
+
+                if (!est || !prodId) {
+                    inputConsumo.value = 0;
+                    if (infoConsumo) infoConsumo.textContent = 'Seleccione establecimiento y producto';
+                    if (infoStock) {
+                        infoStock.classList.add('hidden');
+                        infoStock.textContent = '';
+                    }
+                    return;
                 }
 
-                document.querySelectorAll('.select-producto').forEach(select => {
-                    const grupo = select.querySelector('.optgroup-controlado');
-                    if (!grupo) return;
+                const datos = (consumoMapa[est] && consumoMapa[est][prodId]) ? consumoMapa[est][prodId] : null;
+                const consumo = datos ? (parseInt(datos.consumo_anterior) || 0) : 0;
+                inputConsumo.value = consumo;
 
-                    grupo.disabled = !esCesfam;
-                    grupo.style.display = esCesfam ? '' : 'none';
+                if (infoConsumo) {
+                    infoConsumo.textContent = consumo > 0
+                        ? `Consumo anterior registrado: ${consumo} uds.`
+                        : 'Sin despachos el mes anterior (0 uds.)';
+                }
 
-                    if (!esCesfam && grupo.selected) {
-                        select.selectedIndex = 0;
+                if (infoStock) {
+                    if (datos && datos.ultimo_stock !== null && datos.ultimo_stock !== undefined) {
+                        infoStock.textContent = `Último stock declarado: ${datos.ultimo_stock} uds.`;
+                        infoStock.classList.remove('hidden');
+                    } else {
+                        infoStock.classList.add('hidden');
+                        infoStock.textContent = '';
                     }
-                    if (!esCesfam) {
-                        grupo.querySelectorAll('option').forEach(op => op.selected = false);
-                    }
+                }
+            }
+
+            function actualizarTodosLosConsumos() {
+                container.querySelectorAll('.producto-item').forEach(item => actualizarConsumoFila(item));
+            }
+
+            if (establecimientoSelect) {
+                establecimientoSelect.addEventListener('change', actualizarTodosLosConsumos);
+            }
+
+            container.querySelectorAll('.select-producto').forEach(sel => {
+                sel.addEventListener('change', function() {
+                    const row = sel.closest('.producto-item');
+                    if (row) actualizarConsumoFila(row);
                 });
-            };
+            });
 
-            window.actualizarProductosDisponibles();
-
-            // contenedor de productos
-            const container = document.getElementById('productos_container');
-
-            // actualizar resumen
             function actualizarResumen() {
                 const items = container.querySelectorAll('.producto-item');
                 let totalUnidades = 0;
@@ -460,24 +476,28 @@
                 document.getElementById('total_unidades').innerText = totalUnidades;
             }
 
-            // actualizar resumen al cambiar cantidades
             document.querySelectorAll('input[name="cantidad_solicitada[]"]').forEach(input => {
                 input.addEventListener('input', actualizarResumen);
             });
 
-            // agregar producto
             document.getElementById('btn_add_product').addEventListener('click', function() {
 
                 const firstItem = container.querySelector('.producto-item');
                 const clone = firstItem.cloneNode(true);
 
                 clone.querySelectorAll('input').forEach(input => {
-                    input.value = '';
+                    input.value = input.name === 'consumo_anterior[]' ? '0' : '';
                 });
 
                 clone.querySelectorAll('select').forEach(select => {
                     select.selectedIndex = 0;
                 });
+
+                const infoStock = clone.querySelector('.info-ultimo-stock');
+                if (infoStock) {
+                    infoStock.classList.add('hidden');
+                    infoStock.textContent = '';
+                }
 
                 const btnRemove = clone.querySelector('.btn-remove-product');
 
@@ -488,15 +508,23 @@
                     actualizarResumen();
                 });
 
-                clone.querySelector('input[name="cantidad[]"]')
-                    .addEventListener('input', actualizarResumen);
+                const inputCant = clone.querySelector('input[name="cantidad_solicitada[]"]');
+                if (inputCant) {
+                    inputCant.addEventListener('input', actualizarResumen);
+                }
+
+                const selectProd = clone.querySelector('.select-producto');
+                if (selectProd) {
+                    selectProd.addEventListener('change', function() {
+                        actualizarConsumoFila(clone);
+                    });
+                }
 
                 container.appendChild(clone);
-
+                actualizarConsumoFila(clone);
                 actualizarResumen();
             });
 
-            // limpiar formulario
             document.getElementById('btn_limpiar').addEventListener('click', function() {
 
                 const items = container.querySelectorAll('.producto-item');
@@ -507,10 +535,12 @@
 
                 signatureRecibe.clear();
 
-                actualizarResumen();
+                setTimeout(() => {
+                    actualizarTodosLosConsumos();
+                    actualizarResumen();
+                }, 10);
             });
 
-            // validar firma antes de enviar
             document.getElementById('requestForm').addEventListener('submit', function(e) {
                 if (signatureRecibe.isEmpty()) {
                     e.preventDefault();

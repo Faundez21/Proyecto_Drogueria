@@ -6,6 +6,7 @@ use App\Models\ControlledDispatch;
 use App\Models\ControlledDispatchItem;
 use App\Models\EstablishmentRequest;
 use App\Models\Inventory;
+use App\Models\User;
 use App\Services\InventoryService;
 use App\Services\SolicitudService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -30,15 +31,40 @@ class ControlledDispatchController extends Controller
             ->orderByRaw('CASE WHEN fecha_vencimiento IS NULL THEN 1 ELSE 0 END ASC, fecha_vencimiento ASC, id ASC')
             ->get();
 
-        $solicitudes = EstablishmentRequest::with('items.product')
-            ->whereIn('estado', ['Pendiente', 'Parcial'])
+        $solicitudes = EstablishmentRequest::with(['items.product', 'assignedUser'])
+            ->orderByRaw("CASE WHEN estado IN ('Asignada', 'Pendiente', 'Parcial') THEN 0 ELSE 1 END ASC")
             ->orderBy('created_at', 'desc')
             ->get();
+
+        $consumoMapa = SolicitudService::mapaConsumoYStock();
+        foreach ($solicitudes as $sol) {
+            $est = trim((string) $sol->establecimiento);
+            foreach ($sol->items as $item) {
+                if ($item->consumo_anterior === null) {
+                    $item->consumo_anterior = (int) ($consumoMapa[$est][$item->product_id]['consumo_anterior'] ?? 0);
+                }
+            }
+        }
+
+        $usuariosAsignables = User::where('status', 'activo')->orderBy('name')->get();
+        $misSolicitudesAsignadas = $solicitudes
+            ->where('assigned_user_id', Auth::id())
+            ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
+            ->values();
 
         $controlados = InventoryService::controlados();
         $establecimientos = InventoryService::establecimientos();
 
-        return view('controlled_dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible', 'solicitudes', 'controlados', 'establecimientos'));
+        return view('controlled_dispatch.index', compact(
+            'correlativo',
+            'dispatches',
+            'inventarioDisponible',
+            'solicitudes',
+            'usuariosAsignables',
+            'misSolicitudesAsignadas',
+            'controlados',
+            'establecimientos'
+        ));
     }
 
     public function store(Request $request)
@@ -85,6 +111,8 @@ class ControlledDispatchController extends Controller
             $correlativo = 'GDC-' . date('Y') . '-' . str_pad((string) $nextId, 4, '0', STR_PAD_LEFT);
 
             $dispatch = ControlledDispatch::create([
+                'establishment_request_id' => $validated['establishment_request_id'] ?? null,
+                'user_id' => Auth::id(),
                 'correlativo' => $correlativo,
                 'fecha_despacho' => $validated['fecha_despacho'],
                 'clasificacion' => $validated['clasificacion'],
@@ -113,6 +141,7 @@ class ControlledDispatchController extends Controller
                     ControlledDispatchItem::create([
                         'controlled_dispatch_id' => $dispatch->id,
                         'inventory_id' => $batch->id,
+                        'product_id' => $batch->product_id ?? InventoryService::productoId($nombreProducto),
                         'producto' => $nombreProducto,
                         'lote' => $batch->lote ?? 'S/L',
                         'fecha_vencimiento' => $batch->fecha_vencimiento,

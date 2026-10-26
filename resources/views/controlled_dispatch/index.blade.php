@@ -679,12 +679,11 @@
     <div id="SolicitudesControladoModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl flex flex-col max-h-[90vh] overflow-hidden">
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl flex flex-col max-h-[90vh] overflow-hidden">
             <div class="px-6 py-5 bg-rose-700 flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-bold text-white tracking-wide">Solicitudes con Estupefacientes</h2>
-                    <p class="text-[12px] text-rose-100 mt-0.5">Solo solicitudes CESFAM. Los medicamentos no controlados se
-                        despachan por el módulo normal.</p>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Solicitudes CESFAM con Estupefacientes</h2>
+                    <p class="text-[12px] text-rose-100 mt-0.5">Asigna solicitudes a los trabajadores y despacha los fármacos controlados solicitados por los CESFAM.</p>
                 </div>
                 <button type="button" onclick="closeSolicitudesControlado()"
                     class="text-rose-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-lg cursor-pointer">
@@ -695,12 +694,34 @@
                 </button>
             </div>
 
-            <div class="overflow-y-auto p-5 space-y-3">
-                @forelse ($solicitudes as $solicitud)
+            <!-- Filtros del modal controlado -->
+            <div class="px-6 py-3.5 bg-slate-50 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="sm:col-span-2">
+                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Buscar solicitud CESFAM</label>
+                    <input type="text" id="filtroControladoTexto" oninput="filtrarSolicitudesControladoModal()"
+                        placeholder="CESFAM, N° solicitud, responsable o estupefaciente..."
+                        class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500">
+                </div>
+                <div>
+                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estado</label>
+                    <select id="filtroControladoEstado" onchange="filtrarSolicitudesControladoModal()"
+                        class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 cursor-pointer">
+                        <option value="activas" selected>Activas (Por despachar)</option>
+                        <option value="">Todas (Incluye Despachadas)</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="asignada">Asignada</option>
+                        <option value="parcial">Parcial</option>
+                        <option value="despachado">Despachado</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="overflow-y-auto p-5 space-y-4">
+                @php $haySolicitudesControladas = false; @endphp
+                @foreach ($solicitudes as $solicitud)
                     @php
-                        $itemsControlado = $solicitud->items->filter(
-                            fn($i) => in_array($i->product->nombre ?? '', $controlados) &&
-                                $i->cantidad_solicitada - $i->cantidad_despachada > 0,
+                        $todosControlados = $solicitud->items->filter(
+                            fn($i) => in_array($i->product->nombre ?? '', $controlados)
                         );
                         $itemsNormal = $solicitud->items->filter(
                             fn($i) => !in_array($i->product->nombre ?? '', $controlados) &&
@@ -708,48 +729,142 @@
                         );
                     @endphp
 
-                    @if ($itemsControlado->isNotEmpty())
-                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    @if ($todosControlados->isNotEmpty())
+                        @php
+                            $haySolicitudesControladas = true;
+                            $estadoClaseCtrl = match($solicitud->estado) {
+                                'Pendiente' => 'bg-amber-100 text-amber-800 border-amber-200',
+                                'Asignada' => 'bg-indigo-100 text-indigo-800 border-indigo-200',
+                                'Parcial' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                'Despachado' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                                default => 'bg-slate-100 text-slate-700 border-slate-200',
+                            };
+                            $searchCtrl = mb_strtolower(
+                                $solicitud->numero_solicitud . ' ' .
+                                $solicitud->establecimiento . ' ' .
+                                ($solicitud->responsable ?? '') . ' ' .
+                                $todosControlados->map(fn($i) => $i->product->nombre ?? '')->implode(' ')
+                            );
+                        @endphp
+                        <div class="card-solicitud-controlado border border-slate-200 rounded-xl overflow-hidden shadow-xs"
+                            data-search="{{ $searchCtrl }}"
+                            data-estado="{{ mb_strtolower($solicitud->estado) }}">
                             <div
-                                class="px-4 py-3 bg-slate-50 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                                class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex flex-col lg:flex-row justify-between lg:items-center gap-3">
                                 <div>
-                                    <p class="text-[13px] font-bold text-slate-800">{{ $solicitud->numero_solicitud }} —
-                                        {{ $solicitud->establecimiento }}</p>
-                                    <p class="text-[11px] text-slate-500">
-                                        {{ \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d-m-Y') }} ·
-                                        Responsable: {{ $solicitud->responsable }} · Estado: {{ $solicitud->estado }}</p>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-mono font-extrabold text-[13px] text-slate-900">{{ $solicitud->numero_solicitud }}</span>
+                                        <span class="text-[13.5px] font-extrabold text-slate-800">{{ $solicitud->establecimiento }}</span>
+                                        <span id="badge-ctrl-estado-{{ $solicitud->id }}"
+                                            class="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase border {{ $estadoClaseCtrl }}">
+                                            {{ $solicitud->estado }}
+                                        </span>
+                                    </div>
+                                    <p class="text-[11.5px] text-slate-500 mt-0.5">
+                                        Fecha: {{ \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d-m-Y') }} ·
+                                        Responsable: {{ $solicitud->responsable }}
+                                    </p>
                                 </div>
-                                <button type="button" onclick="usarSolicitudControlado({{ $solicitud->id }})"
-                                    class="px-4 py-2 text-[12px] font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition-colors cursor-pointer shrink-0">
-                                    Usar Solicitud
-                                </button>
+
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    @role('Administrador')
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-[11px] font-bold text-slate-500">Asignar a:</span>
+                                            <select
+                                                onchange="asignarSolicitudControladoUsuario({{ $solicitud->id }}, this.value, this)"
+                                                class="bg-white border border-slate-300 text-slate-800 text-[12px] font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 cursor-pointer">
+                                                <option value="">— Sin asignar —</option>
+                                                @foreach ($usuariosAsignables ?? [] as $usr)
+                                                    <option value="{{ $usr->id }}" {{ (int) $solicitud->assigned_user_id === (int) $usr->id ? 'selected' : '' }}>
+                                                        {{ $usr->name }} {{ $usr->last_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @else
+                                        @if ($solicitud->assignedUser)
+                                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                Asignado a: {{ $solicitud->assignedUser->name }} {{ $solicitud->assignedUser->last_name }}
+                                            </span>
+                                        @endif
+                                    @endrole
+
+                                    @if ($solicitud->estado !== 'Despachado')
+                                        <button type="button" onclick="usarSolicitudControlado({{ $solicitud->id }})"
+                                            class="px-4 py-1.5 text-[12px] font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition-colors cursor-pointer shrink-0">
+                                            Usar Solicitud
+                                        </button>
+                                    @endif
+                                </div>
                             </div>
-                            <div class="px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                @foreach ($itemsControlado as $item)
-                                    <div
-                                        class="flex justify-between items-center bg-rose-50 border border-rose-100 rounded-lg px-3 py-2 text-[12px]">
-                                        <span
-                                            class="font-semibold text-slate-800 truncate">{{ $item->product->nombre }}</span>
-                                        <span
-                                            class="font-bold text-rose-700 ml-2 shrink-0">x{{ $item->cantidad_solicitada - $item->cantidad_despachada }}</span>
-                                    </div>
-                                @endforeach
-                                @if ($itemsNormal->isNotEmpty())
-                                    <div class="sm:col-span-2 text-[11px] text-slate-500 italic">
-                                        + {{ $itemsNormal->count() }} producto(s) no controlado(s) en esta solicitud (van
-                                        por Despacho Normal)
-                                    </div>
-                                @endif
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-[12px] whitespace-nowrap">
+                                    <thead class="bg-white text-slate-500 uppercase font-extrabold border-b border-slate-200 text-[10px]">
+                                        <tr>
+                                            <th class="px-4 py-2.5">Estupefaciente / Programa</th>
+                                            <th class="px-4 py-2.5 text-center">Consumo mensual anterior</th>
+                                            <th class="px-4 py-2.5 text-center">Stock Actual del establecimiento</th>
+                                            <th class="px-4 py-2.5 text-center">Solicitado</th>
+                                            <th class="px-4 py-2.5 text-center">Despachado / Pendiente</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        @foreach ($todosControlados as $item)
+                                            @php
+                                                $pendCtrl = max(0, (int) $item->cantidad_solicitada - (int) ($item->cantidad_despachada ?? 0));
+                                            @endphp
+                                            <tr class="hover:bg-rose-50/30">
+                                                <td class="px-4 py-2.5 font-bold text-slate-800">
+                                                    {{ $item->product->nombre }}
+                                                    @if ($item->programa)
+                                                        <span class="ml-1.5 px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-semibold border border-slate-200">
+                                                            {{ $item->programa }}
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-4 py-2.5 text-center font-bold text-slate-700">
+                                                    {{ number_format((int) ($item->consumo_anterior ?? 0), 0, ',', '.') }} uds.
+                                                </td>
+                                                <td class="px-4 py-2.5 text-center font-extrabold text-blue-700">
+                                                    {{ number_format((int) ($item->stock_actual ?? 0), 0, ',', '.') }} uds.
+                                                </td>
+                                                <td class="px-4 py-2.5 text-center font-extrabold text-rose-700">
+                                                    {{ number_format((int) $item->cantidad_solicitada, 0, ',', '.') }} uds.
+                                                </td>
+                                                <td class="px-4 py-2.5 text-center">
+                                                    @if ($pendCtrl === 0)
+                                                        <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-extrabold text-[10.5px] border border-emerald-200">
+                                                            {{ $item->cantidad_despachada }} desp. (Completo)
+                                                        </span>
+                                                    @else
+                                                        <span class="font-bold text-slate-600">{{ $item->cantidad_despachada }} desp.</span>
+                                                        <span class="ml-1 px-2 py-0.5 rounded bg-rose-50 text-rose-700 font-extrabold text-[10.5px] border border-rose-200">
+                                                            Pendiente: {{ $pendCtrl }} uds.
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
+
+                            @if ($itemsNormal->isNotEmpty())
+                                <div class="px-4 py-2 bg-slate-50 border-t border-slate-100 text-[11px] text-slate-500 italic">
+                                    + {{ $itemsNormal->count() }} producto(s) no controlado(s) en esta solicitud (se despachan por el módulo Despacho Normal).
+                                </div>
+                            @endif
                         </div>
                     @endif
-                @empty
+                @endforeach
+
+                @if (!$haySolicitudesControladas)
                     <div class="text-center py-12 text-slate-400">
-                        <p class="text-sm font-medium">No hay solicitudes pendientes con estupefacientes.</p>
-                        <p class="text-[12px] mt-1">Solo las solicitudes de establecimientos CESFAM pueden contener
-                            estupefacientes.</p>
+                        <p class="text-sm font-medium">No hay solicitudes con estupefacientes registradas.</p>
+                        <p class="text-[12px] mt-1">Solo las solicitudes de establecimientos CESFAM pueden contener estupefacientes.</p>
                     </div>
-                @endforelse
+                @endif
             </div>
         </div>
     </div>
@@ -770,11 +885,91 @@
 
         // ===== SOLICITUDES (ESTUPEFACIENTES) =====
         function openSolicitudesControlado() {
+            filtrarSolicitudesControladoModal();
             document.getElementById('SolicitudesControladoModal').classList.remove('hidden');
         }
 
         function closeSolicitudesControlado() {
             document.getElementById('SolicitudesControladoModal').classList.add('hidden');
+        }
+
+        function filtrarSolicitudesControladoModal() {
+            const texto = (document.getElementById('filtroControladoTexto')?.value || '').trim().toLowerCase();
+            const estado = (document.getElementById('filtroControladoEstado')?.value || '').toLowerCase();
+
+            document.querySelectorAll('.card-solicitud-controlado').forEach(card => {
+                const rowSearch = (card.dataset.search || '').toLowerCase();
+                const rowEstado = (card.dataset.estado || '').toLowerCase();
+
+                const matchTexto = !texto || rowSearch.includes(texto);
+                let matchEstado = true;
+                if (estado === 'activas') {
+                    matchEstado = ['pendiente', 'asignada', 'parcial'].includes(rowEstado);
+                } else if (estado) {
+                    matchEstado = rowEstado === estado;
+                }
+
+                card.style.display = (matchTexto && matchEstado) ? '' : 'none';
+            });
+        }
+
+        async function asignarSolicitudControladoUsuario(solicitudId, userId, selectElem) {
+            if (selectElem) selectElem.disabled = true;
+            try {
+                const res = await fetch(`{{ url('requests') }}/${solicitudId}/assign`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        assigned_user_id: userId ? parseInt(userId) : null
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    throw new Error(data.message || 'No se pudo asignar la solicitud');
+                }
+
+                const badge = document.getElementById('badge-ctrl-estado-' + solicitudId);
+                if (badge && data.estado) {
+                    badge.textContent = data.estado;
+                    badge.className = 'px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase border ';
+                    if (data.estado === 'Pendiente') {
+                        badge.className += 'bg-amber-100 text-amber-800 border-amber-200';
+                    } else if (data.estado === 'Asignada') {
+                        badge.className += 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                    } else if (data.estado === 'Parcial') {
+                        badge.className += 'bg-blue-100 text-blue-800 border-blue-200';
+                    } else {
+                        badge.className += 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                    }
+                }
+
+                const card = selectElem ? selectElem.closest('.card-solicitud-controlado') : null;
+                if (card && data.estado) {
+                    card.dataset.estado = data.estado.toLowerCase();
+                }
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: data.message,
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: err.message || 'Ocurrió un error al asignar.',
+                    confirmButtonColor: '#be123c'
+                });
+            } finally {
+                if (selectElem) selectElem.disabled = false;
+            }
         }
 
         function usarSolicitudControlado(id) {
@@ -827,6 +1022,11 @@
                 if (opcion) {
                     selectProducto.value = opcion.value;
                     llenarDatosFila(selectProducto);
+                    const selectPrograma = tr.querySelector('select[name="programas[]"]');
+                    if (selectPrograma && item.programa) {
+                        const optProg = Array.from(selectPrograma.options).find(o => o.value.trim().toLowerCase() === String(item.programa).trim().toLowerCase());
+                        if (optProg) selectPrograma.value = optProg.value;
+                    }
                     const cantInput = tr.querySelector('input[name="cantidades[]"]');
                     cantInput.value = pendiente;
                     validarStock(cantInput);
@@ -1072,6 +1272,12 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             addRow();
+            filtrarSolicitudesControladoModal();
+            const params = new URLSearchParams(window.location.search);
+            const solIdParam = parseInt(params.get('solicitud_id'));
+            if (solIdParam) {
+                setTimeout(() => usarSolicitudControlado(solIdParam), 150);
+            }
         });
 
         function addNewRowFromTemplate() {
