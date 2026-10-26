@@ -165,27 +165,50 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($reception->items as $idx => $item)
             @php
-                $prog = \App\Models\Inventory::where('product_id', $item->product_id)
-                    ->where('lote', $item->lote)
-                    ->where('correlativo_interno', $reception->correlativo)
-                    ->value('programa') ?: 'General DAS';
+                $gruposPdf = [
+                    'Medicamentos' => ['titulo' => 'MEDICAMENTOS (FÁRMACOS)', 'bg' => '#f0fdfa', 'color' => '#0f766e', 'items' => []],
+                    'Insumos' => ['titulo' => 'INSUMOS CLÍNICOS Y EQUIPAMIENTO', 'bg' => '#eef2ff', 'color' => '#3730a3', 'items' => []],
+                    'Estupefacientes' => ['titulo' => 'ESTUPEFACIENTES Y CONTROLADOS', 'bg' => '#fff1f2', 'color' => '#be123c', 'items' => []],
+                ];
+                foreach ($reception->items as $it) {
+                    $nomIt = $it->product->nombre ?? $it->producto ?? '';
+                    $grpIt = \App\Services\InventoryService::clasificarGrupoProducto($nomIt, $it->tipo_producto ?? $it->categoria);
+                    $gruposPdf[$grpIt]['items'][] = $it;
+                }
+                $correlativoFila = 1;
             @endphp
-            <tr>
-                <td style="color: #64748b; font-weight: bold;">{{ $idx + 1 }}</td>
-                <td class="text-left">
-                    <strong style="font-size: 10px; color: #0f172a;">{{ $item->product->nombre ?? $item->producto ?? 'N/A' }}</strong>
-                </td>
-                <td><span class="badge">{{ $item->tipo_producto ?? $item->categoria ?? 'Insumos' }}</span></td>
-                <td><span class="badge badge-teal">{{ $prog }}</span></td>
-                <td>
-                    <strong style="font-family: 'Courier New', monospace; font-size: 9.5px;">{{ $item->lote ?: 'S/L' }}</strong><br>
-                    <span style="font-size: 8px; color: #64748b;">Vence: {{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</span>
-                </td>
-                <td><strong style="font-size: 10.5px; color: #0f172a;">{{ number_format($item->cantidad, 0, ',', '.') }}</strong></td>
-                <td class="text-right" style="font-weight: 700;">${{ number_format($item->valor_total_item, 0, ',', '.') }}</td>
-            </tr>
+
+            @foreach($gruposPdf as $grpKey => $grpData)
+                @if(count($grpData['items']) > 0)
+                    <tr>
+                        <td colspan="7" style="background-color: {{ $grpData['bg'] }} !important; color: {{ $grpData['color'] }}; font-weight: 800; font-size: 9px; text-align: left; padding: 5px 8px; letter-spacing: 0.5px;">
+                            {{ $grpData['titulo'] }} ({{ count($grpData['items']) }} ítem(s))
+                        </td>
+                    </tr>
+                    @foreach($grpData['items'] as $item)
+                    @php
+                        $prog = \App\Models\Inventory::where('product_id', $item->product_id)
+                            ->where('lote', $item->lote)
+                            ->where('correlativo_interno', $reception->correlativo)
+                            ->value('programa') ?: 'General DAS';
+                    @endphp
+                    <tr>
+                        <td style="color: #64748b; font-weight: bold;">{{ $correlativoFila++ }}</td>
+                        <td class="text-left">
+                            <strong style="font-size: 10px; color: #0f172a;">{{ $item->product->nombre ?? $item->producto ?? 'N/A' }}</strong>
+                        </td>
+                        <td><span class="badge">{{ $item->tipo_producto ?? $item->categoria ?? $grpKey }}</span></td>
+                        <td><span class="badge badge-teal">{{ $prog }}</span></td>
+                        <td>
+                            <strong style="font-family: 'Courier New', monospace; font-size: 9.5px;">{{ $item->lote ?: 'S/L' }}</strong><br>
+                            <span style="font-size: 8px; color: #64748b;">Vence: {{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</span>
+                        </td>
+                        <td><strong style="font-size: 10.5px; color: #0f172a;">{{ number_format($item->cantidad, 0, ',', '.') }}</strong></td>
+                        <td class="text-right" style="font-weight: 700;">${{ number_format($item->valor_total_item, 0, ',', '.') }}</td>
+                    </tr>
+                    @endforeach
+                @endif
             @endforeach
 
             <tr class="subtotal-row">

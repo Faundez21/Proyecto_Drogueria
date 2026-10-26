@@ -18,13 +18,44 @@ class ReceptionController extends Controller
 {
     public function index()
     {
+        // Asegurar que todos los estupefacientes/controlados del catálogo existan en products
+        foreach (InventoryService::controlados() as $ctrlNombre) {
+            Product::firstOrCreate(['nombre' => $ctrlNombre]);
+        }
+
         $providers = Provider::orderBy('name')->get();
         $products = Product::orderBy('nombre')->get();
+
+        // Mapa de categorías históricas desde inventario para clasificar con precisión
+        $categoriasInv = Inventory::select('producto', 'categoria')
+            ->whereNotNull('categoria')
+            ->where('categoria', '!=', '')
+            ->get()
+            ->pluck('categoria', 'producto');
+
+        foreach ($products as $prod) {
+            $catHist = $categoriasInv[$prod->nombre] ?? null;
+            $prod->grupo_recepcion = InventoryService::clasificarGrupoProducto($prod->nombre, $catHist);
+        }
+
+        $productosAgrupados = [
+            'Medicamentos' => $products->where('grupo_recepcion', 'Medicamentos')->values(),
+            'Insumos' => $products->where('grupo_recepcion', 'Insumos')->values(),
+            'Estupefacientes' => $products->where('grupo_recepcion', 'Estupefacientes')->values(),
+        ];
+
         $receptions = Reception::with(['provider', 'items.product'])->orderBy('created_at', 'desc')->get();
         $nextCorrelativo = (int) Reception::max('correlativo') + 1;
         $controlados = InventoryService::controlados();
 
-        return view('reception.index', compact('providers', 'receptions', 'products', 'nextCorrelativo', 'controlados'));
+        return view('reception.index', compact(
+            'providers',
+            'receptions',
+            'products',
+            'productosAgrupados',
+            'nextCorrelativo',
+            'controlados'
+        ));
     }
 
     public function store(Request $request)
@@ -85,16 +116,23 @@ class ReceptionController extends Controller
                 $subtotal = $cantidad * $valorU;
                 $fechaVence = $validated['fecha_vencimiento'][$index] ?? null;
 
-                $categoria = InventoryService::esControlado($nombreProducto)
-                    ? 'Controlado'
-                    : ($validated['tipo_producto'][$index] ?? 'General');
+                $tipoSolicitado = $validated['tipo_producto'][$index] ?? null;
+                $grupoProducto = InventoryService::clasificarGrupoProducto($nombreProducto, $tipoSolicitado);
+
+                $categoriaRecepcion = $grupoProducto === 'Estupefacientes'
+                    ? 'Estupefacientes'
+                    : ($tipoSolicitado ?: $grupoProducto);
+
+                $categoriaInventario = $grupoProducto === 'Estupefacientes'
+                    ? 'Fármacos Controlados'
+                    : ($tipoSolicitado ?: ($grupoProducto === 'Insumos' ? 'Insumos Clínicos' : 'Fármacos'));
 
                 $total_neto_recepcion += $subtotal;
 
                 ReceptionItem::create([
                     'reception_id' => $reception->id,
                     'product_id' => $prodId,
-                    'tipo_producto' => $categoria,
+                    'tipo_producto' => $categoriaRecepcion,
                     'lote' => $validated['lote'][$index] ?? null,
                     'fecha_vencimiento' => $fechaVence,
                     'cantidad' => $cantidad,
@@ -116,7 +154,7 @@ class ReceptionController extends Controller
                     'rut_proveedor' => $provider->rut,
                     'razon_social' => $provider->name,
                     'producto' => $nombreProducto,
-                    'categoria' => $categoria,
+                    'categoria' => $categoriaInventario,
                     'estado' => 'Disponible',
                     'lote' => $validated['lote'][$index] ?? 'S/L',
                     'fecha_vencimiento' => $fechaVence,

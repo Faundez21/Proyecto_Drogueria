@@ -768,7 +768,7 @@
         // Modales (Edición Lote)
         function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0) {
             const form = document.getElementById('editLoteForm');
-            if (form) form.action = "/inventario/" + id;
+            if (form) form.action = "/inventory/" + id;
 
             setText('modal_producto_nombre', producto);
             setText('modal_lote_nombre', "LOTE: " + lote);

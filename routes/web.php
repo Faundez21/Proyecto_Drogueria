@@ -33,7 +33,7 @@ Route::redirect('/', '/login');
 
 // 2. rutas de login
 Route::get('/login', [LoginController::class, 'show'])->name('login');
-Route::post('/login', [LoginController::class, 'authenticate']);
+Route::post('/login', [LoginController::class, 'authenticate'])->middleware('throttle:10,1');
 
 // Enviar solicitud desde el Login (con throttle anti-abuso)
 Route::post('/password-reset-request', [PasswordResetRequestController::class, 'store'])
@@ -100,23 +100,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/traceability/timeline', [TraceabilityController::class, 'getTimeline'])
         ->middleware('permission:ver.trazabilidad')->name('traceability.timeline');
 
-    Route::get('/reportes', [ReportController::class, 'index'])
-        ->middleware('permission:ver.reportes')->name('reportes.index');
-    Route::get('/reportes/exportar/excel', [ReportController::class, 'exportExcel'])
-        ->middleware('permission:ver.reportes')->name('reportes.excel');
-    Route::get('/reportes/exportar/pdf', [ReportController::class, 'exportPdf'])
-        ->middleware('permission:ver.reportes')->name('reportes.pdf');
+    Route::get('/reports', [ReportController::class, 'index'])
+        ->middleware('permission:ver.reportes')->name('reports.index');
+    Route::get('/reports/export/excel', [ReportController::class, 'exportExcel'])
+        ->middleware('permission:ver.reportes')->name('reports.excel');
+    Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])
+        ->middleware('permission:ver.reportes')->name('reports.pdf');
 
-    Route::get('/inventario', [InventoryController::class, 'index'])
-        ->middleware('permission:ver.inventario')->name('inventario.index');
-    Route::post('/inventario', [InventoryController::class, 'store'])
-        ->middleware('permission:ver.inventario')->name('inventario.store');
-    Route::post('/inventario/subir-excel', [InventoryController::class, 'import'])
-        ->middleware('permission:ver.inventario')->name('inventario.import');
-    Route::get('/inventario/plantilla', [InventoryController::class, 'template'])
-        ->middleware('permission:ver.inventario')->name('inventario.template');
-    Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])
-        ->middleware('permission:ver.inventario|ver.cuarentena')->name('inventario.update');
+    Route::get('/inventory', [InventoryController::class, 'index'])
+        ->middleware('permission:ver.inventario')->name('inventory.index');
+    Route::post('/inventory', [InventoryController::class, 'store'])
+        ->middleware('permission:ver.inventario')->name('inventory.store');
+    Route::post('/inventory/import', [InventoryController::class, 'import'])
+        ->middleware('permission:ver.inventario')->name('inventory.import');
+    Route::get('/inventory/template', [InventoryController::class, 'template'])
+        ->middleware('permission:ver.inventario')->name('inventory.template');
+    Route::put('/inventory/{inventory}', [InventoryController::class, 'update'])
+        ->middleware('permission:ver.inventario|ver.cuarentena')->name('inventory.update');
     Route::get('/requests', [EstablishmentRequestController::class, 'index'])
         ->middleware(['auth', 'permission:ver.solicitudes'])
         ->name('requests.index');

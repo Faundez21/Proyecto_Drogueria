@@ -50,7 +50,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     if ($user->can('ver.recepcion')) return redirect()->route('reception.index');
-    if ($user->can('ver.inventario')) return redirect()->route('inventario.index');
+    if ($user->can('ver.inventario')) return redirect()->route('inventory.index');
 
     return redirect()->route('requests.index');
 }

@@ -6,7 +6,7 @@
 
 @section('actions')
     <div class="flex flex-wrap items-center gap-2.5">
-        <a href="{{ route('inventario.index') }}"
+        <a href="{{ route('inventory.index') }}"
             class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:text-teal-700 shadow-sm transition-all duration-200">
             <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -584,7 +584,7 @@
                         }));
                     },
                     verDetalle() {
-                        window.location.href = "{{ route('inventario.index') }}?estante=" + encodeURIComponent(this.rackData
+                        window.location.href = "{{ route('inventory.index') }}?estante=" + encodeURIComponent(this.rackData
                             .code);
                     },
                     habilitarMovimiento() {

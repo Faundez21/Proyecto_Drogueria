@@ -136,7 +136,7 @@ class InventoryController extends Controller
         $posicionesMant = Position::orderBy('name')->pluck('name');
         $posicionesLista = $posicionesMant->merge($posicionesInv)->unique()->sort(SORT_NATURAL)->values();
 
-        return view('inventario.index', compact(
+        return view('inventory.index', compact(
             'inventories',
             'mermas',
             'historial',

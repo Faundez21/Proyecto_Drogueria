@@ -190,7 +190,7 @@
         <!-- FILA 1: 4 KPIs PRINCIPALES DE BODEGA CENTRAL -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- 1. Valor y Stock Bodega -->
-            <a href="{{ route('inventario.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-teal-300 transition-all flex items-center justify-between gap-3">
+            <a href="{{ route('inventory.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:border-teal-300 transition-all flex items-center justify-between gap-3">
                 <div>
                     <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Inventario en Bodega</p>
                     <h3 class="text-xl font-black text-slate-900 mt-1">${{ number_format($valorInventario, 0, ',', '.') }}</h3>
@@ -214,7 +214,7 @@
             </a>
 
             <!-- 3. Alertas de Vencimiento FEFO -->
-            <a href="{{ route('inventario.index', ['order_by' => 'vencimiento']) }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-l-4 border-l-rose-500 shadow-sm hover:border-rose-300 transition-all flex items-center justify-between gap-3">
+            <a href="{{ route('inventory.index', ['order_by' => 'vencimiento']) }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-l-4 border-l-rose-500 shadow-sm hover:border-rose-300 transition-all flex items-center justify-between gap-3">
                 <div>
                     <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Alerta FEFO (&le; 30 Días)</p>
                     <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($proximosVencer, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">lotes</span></h3>
@@ -539,13 +539,13 @@
                             </div>
                             <span class="text-[12px] font-bold text-slate-700">Despacho</span>
                         </a>
-                        <a href="{{ route('inventario.index') }}" class="flex items-center gap-2.5 p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl hover:bg-teal-50 hover:border-teal-200 transition-colors">
+                        <a href="{{ route('inventory.index') }}" class="flex items-center gap-2.5 p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl hover:bg-teal-50 hover:border-teal-200 transition-colors">
                             <div class="w-7 h-7 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                             </div>
                             <span class="text-[12px] font-bold text-slate-700">Inventario</span>
                         </a>
-                        <a href="{{ route('reportes.index') }}" class="flex items-center gap-2.5 p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 transition-colors">
+                        <a href="{{ route('reports.index') }}" class="flex items-center gap-2.5 p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 transition-colors">
                             <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             </div>

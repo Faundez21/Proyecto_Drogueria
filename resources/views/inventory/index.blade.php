@@ -87,7 +87,7 @@
             @endphp
 
             <!-- Formulario de Filtros -->
-            <form method="GET" action="{{ Route::has('inventario.index') ? route('inventario.index') : '#' }}"
+            <form method="GET" action="{{ Route::has('inventory.index') ? route('inventory.index') : '#' }}"
                 id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
 
@@ -175,7 +175,7 @@
                 </div>
 
                 <div class="mt-5 flex items-center justify-end gap-3 border-t border-slate-200/60 pt-4">
-                    <a href="{{ Route::has('inventario.index') ? route('inventario.index') : '#' }}"
+                    <a href="{{ Route::has('inventory.index') ? route('inventory.index') : '#' }}"
                         class="px-4 py-2 rounded-lg text-[12.5px] font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors">
                         Limpiar Filtros
                     </a>
@@ -201,7 +201,7 @@
                             ])) }}
                         </span>
                     </span>
-                    <a href="{{ Route::has('inventario.index') ? route('inventario.index') : '#' }}" class="px-3 py-1 bg-white border border-teal-300 rounded-lg text-teal-700 hover:bg-teal-100 transition-colors shadow-sm cursor-pointer text-[11px]">
+                    <a href="{{ Route::has('inventory.index') ? route('inventory.index') : '#' }}" class="px-3 py-1 bg-white border border-teal-300 rounded-lg text-teal-700 hover:bg-teal-100 transition-colors shadow-sm cursor-pointer text-[11px]">
                         Limpiar Filtros
                     </a>
                 </div>
@@ -722,14 +722,14 @@
                             <span class="text-[12px] font-extrabold text-slate-800 block">1. Plantilla Oficial de Inventario</span>
                             <span class="text-[11px] text-slate-500">Incluye las columnas exactas requeridas por bodega.</span>
                         </div>
-                        <a href="{{ Route::has('inventario.template') ? route('inventario.template') : '#' }}"
+                        <a href="{{ Route::has('inventory.template') ? route('inventory.template') : '#' }}"
                             class="shrink-0 inline-flex items-center gap-2 bg-teal-50 border border-teal-200 text-teal-700 px-3.5 py-2 rounded-lg hover:bg-teal-600 hover:text-white transition-all font-bold text-[12px] shadow-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             Descargar Plantilla
                         </a>
                     </div>
 
-                    <form id="importForm" action="{{ Route::has('inventario.import') ? route('inventario.import') : '#' }}" method="POST" enctype="multipart/form-data" onsubmit="return handleImportSubmit(event)" class="bg-white border-2 border-dashed border-slate-300 hover:border-teal-500 transition-all rounded-xl p-6 flex flex-col items-center gap-3 text-center shadow-sm"
+                    <form id="importForm" action="{{ Route::has('inventory.import') ? route('inventory.import') : '#' }}" method="POST" enctype="multipart/form-data" onsubmit="return handleImportSubmit(event)" class="bg-white border-2 border-dashed border-slate-300 hover:border-teal-500 transition-all rounded-xl p-6 flex flex-col items-center gap-3 text-center shadow-sm"
                         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
                         @csrf
                         <div id="dropzoneIconWrap" class="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600 mb-1 transition-transform">
@@ -823,7 +823,7 @@
                         @endforeach
                     </datalist>
 
-                    <form action="{{ Route::has('inventario.store') ? route('inventario.store') : '#' }}" method="POST" id="manualDepositForm" novalidate onsubmit="return validateIngresoDirecto(event)">
+                    <form action="{{ Route::has('inventory.store') ? route('inventory.store') : '#' }}" method="POST" id="manualDepositForm" novalidate onsubmit="return validateIngresoDirecto(event)">
                         @csrf
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                             <div class="sm:col-span-2">
@@ -1452,7 +1452,7 @@
 
         function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0) {
             const form = document.getElementById('editLoteForm');
-            if (form) form.action = "/inventario/" + id;
+            if (form) form.action = "/inventory/" + id;
 
             document.getElementById('modal_producto_nombre').textContent = producto;
             document.getElementById('modal_lote_nombre').textContent = "LOTE: " + lote;

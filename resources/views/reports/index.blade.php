@@ -81,7 +81,7 @@
             @endphp
 
             <!-- Formulario de Filtros -->
-            <form method="GET" action="{{ route('reportes.index') }}" id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
+            <form method="GET" action="{{ route('reports.index') }}" id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                     <div class="xl:col-span-2">
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Buscar</label>
@@ -146,7 +146,7 @@
                 </div>
 
                 <div class="mt-5 flex items-center justify-end gap-3 border-t border-slate-200/60 pt-4">
-                    <a href="{{ route('reportes.index') }}" class="px-4 py-2 rounded-lg text-[12.5px] font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors">
+                    <a href="{{ route('reports.index') }}" class="px-4 py-2 rounded-lg text-[12.5px] font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors">
                         Limpiar Filtros
                     </a>
                     <button type="submit" class="px-4 py-2 rounded-lg text-[12.5px] font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-md transition-all">
@@ -495,8 +495,8 @@
 
         // Función que atrapa los filtros actuales para enviarlos a Excel/PDF
         function exportarReporte(tipo) {
-            const urlExcel = "{{ route('reportes.excel') }}";
-            const urlPdf = "{{ route('reportes.pdf') }}";
+            const urlExcel = "{{ route('reports.excel') }}";
+            const urlPdf = "{{ route('reports.pdf') }}";
 
             let targetUrl = new URL(tipo === 'excel' ? urlExcel : urlPdf, window.location.origin);
             const form = document.getElementById('filters-panel');

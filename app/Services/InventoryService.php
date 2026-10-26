@@ -15,12 +15,71 @@ class InventoryService
 {
     public static function esControlado(string $producto): bool
     {
-        return in_array($producto, config('drogueria.controlados'), true);
+        $nombreNorm = mb_strtolower(trim($producto));
+        foreach (config('drogueria.controlados', []) as $ctrl) {
+            if (mb_strtolower(trim($ctrl)) === $nombreNorm) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static function controlados(): array
     {
         return config('drogueria.controlados');
+    }
+
+    /**
+     * Clasifica un producto en uno de los 3 grandes grupos:
+     * 'Estupefacientes', 'Insumos' o 'Medicamentos'.
+     */
+    public static function clasificarGrupoProducto(string $producto, ?string $categoria = null): string
+    {
+        if (self::esControlado($producto)) {
+            return 'Estupefacientes';
+        }
+
+        $catLower = mb_strtolower(trim((string) $categoria));
+        if ($catLower !== '') {
+            if (str_contains($catLower, 'controlado') || str_contains($catLower, 'estupefaciente') || str_contains($catLower, 'psicotr')) {
+                return 'Estupefacientes';
+            }
+            if (
+                str_contains($catLower, 'insumo') ||
+                str_contains($catLower, 'equipamiento') ||
+                str_starts_with($catLower, 'i-') ||
+                str_starts_with($catLower, 'e-')
+            ) {
+                return 'Insumos';
+            }
+            if (
+                str_contains($catLower, 'medicamento') ||
+                str_contains($catLower, 'fármaco') ||
+                str_contains($catLower, 'farmaco') ||
+                str_starts_with($catLower, 'f-')
+            ) {
+                return 'Medicamentos';
+            }
+        }
+
+        $nombreLower = mb_strtolower(trim($producto));
+        $keywordsInsumos = [
+            'jeringa', 'gasa', 'aguja', 'guante', 'mascarilla', 'apósito', 'aposito',
+            'venda', 'sonda', 'catéter', 'cateter', 'bajada', 'algodón', 'algodon',
+            'tela ', 'bisturí', 'bisturi', 'sutura', 'desfibrilador', 'termómetro',
+            'termometro', 'oxímetro', 'oximetro', 'tensiómetro', 'tensiometro',
+            'cánula', 'canula', 'espéculo', 'especulo', 'branula', 'bránula',
+            'alcohol pad', 'torula', 'tórula', 'llave 3 pasos', 'papel camilla',
+        ];
+
+        foreach ($keywordsInsumos as $kw) {
+            if (str_contains($nombreLower, $kw)) {
+                return 'Insumos';
+            }
+        }
+
+        return 'Medicamentos';
     }
 
     public static function esCesfam(string $establecimiento): bool
