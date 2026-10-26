@@ -98,7 +98,21 @@ class ReportController extends Controller
             ->orderBy('programa')
             ->pluck('programa');
 
-        return view('reports.index', compact('inventories', 'valorTotal', 'programasUnicos'));
+        $pasillosUnicos = Inventory::where('estado', 'Disponible')
+            ->whereNotNull('pasillo')
+            ->where('pasillo', '!=', '')
+            ->distinct()
+            ->orderBy('pasillo')
+            ->pluck('pasillo');
+
+        $estantesUnicos = Inventory::where('estado', 'Disponible')
+            ->whereNotNull('estante')
+            ->where('estante', '!=', '')
+            ->distinct()
+            ->orderBy('estante')
+            ->pluck('estante');
+
+        return view('reports.index', compact('inventories', 'valorTotal', 'programasUnicos', 'pasillosUnicos', 'estantesUnicos'));
     }
 
     public function exportExcel(Request $request)

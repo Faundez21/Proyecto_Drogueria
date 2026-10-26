@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Inventory;
 use App\Models\StockMovement;
+use App\Services\InventoryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -12,6 +13,15 @@ class TraceabilityController extends Controller
     public function index(Request $request)
     {
         $query = StockMovement::with('user');
+
+        $user = auth()->user();
+        $puedeVerControlados = $user && ($user->hasRole('Administrador') || $user->can('ver.despacho_controlado'));
+        $controladosLista = InventoryService::controlados();
+
+        if (! $puedeVerControlados) {
+            $query->whereNotIn('producto', $controladosLista)
+                ->where('tipo_movimiento', '!=', 'Despacho Controlado');
+        }
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -34,21 +44,26 @@ class TraceabilityController extends Controller
             $query->whereDate('fecha_hora', '<=', $request->input('fecha_hasta'));
         }
 
-        $movements = $query->orderBy('fecha_hora', 'desc')->orderBy('id', 'desc')->paginate(15)->withQueryString();
-
         if ($request->has('export') && $request->export == 'excel') {
-            return $this->exportExcelStyled($query->orderBy('fecha_hora', 'desc')->get());
+            return $this->exportExcelStyled((clone $query)->orderBy('fecha_hora', 'desc')->get());
         }
+
+        $movements = $query->orderBy('fecha_hora', 'desc')->orderBy('id', 'desc')->paginate(15)->withQueryString();
 
         $mesesAlerta = config('drogueria.meses_alerta_vencimiento');
 
         $totalMovimientos = StockMovement::whereMonth('fecha_hora', now()->month)
             ->whereYear('fecha_hora', now()->year)
+            ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('producto', $controladosLista))
             ->count();
 
-        $lotesActivos = Inventory::where('cantidad', '>', 0)->distinct('lote')->count('lote');
+        $lotesActivos = Inventory::where('cantidad', '>', 0)
+            ->when(! $puedeVerControlados, fn ($q) => $q->where('categoria', '!=', 'Fármacos Controlados'))
+            ->distinct('lote')
+            ->count('lote');
 
         $alertas = Inventory::where('cantidad', '>', 0)
+            ->when(! $puedeVerControlados, fn ($q) => $q->where('categoria', '!=', 'Fármacos Controlados'))
             ->whereNotNull('fecha_vencimiento')
             ->where('fecha_vencimiento', '<=', Carbon::now()->addMonths($mesesAlerta))
             ->count();
@@ -63,6 +78,12 @@ class TraceabilityController extends Controller
 
         if (! $lote || ! $producto) {
             return response()->json([]);
+        }
+
+        $user = auth()->user();
+        $puedeVerControlados = $user && ($user->hasRole('Administrador') || $user->can('ver.despacho_controlado'));
+        if (! $puedeVerControlados && InventoryService::esControlado($producto)) {
+            return response()->json(['timeline' => [], 'details' => null]);
         }
 
         // Filtramos por lote y por producto para evitar colisiones

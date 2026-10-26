@@ -146,6 +146,10 @@ class InventoryController extends Controller
         $posicionesMant = Position::orderBy('name')->pluck('name');
         $posicionesLista = $posicionesMant->merge($posicionesInv)->unique()->sort(SORT_NATURAL)->values();
 
+        $proveedoresActivos = \App\Models\Provider::where('status', 'activo')
+            ->orderBy('name')
+            ->get(['id', 'name', 'rut']);
+
         return view('inventory.index', compact(
             'inventories',
             'mermas',
@@ -155,7 +159,8 @@ class InventoryController extends Controller
             'pasillosLista',
             'estantesLista',
             'nivelesLista',
-            'posicionesLista'
+            'posicionesLista',
+            'proveedoresActivos'
         ));
     }
 

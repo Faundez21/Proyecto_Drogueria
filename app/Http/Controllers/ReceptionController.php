@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class ReceptionController extends Controller
 {
@@ -23,7 +24,7 @@ class ReceptionController extends Controller
             Product::firstOrCreate(['nombre' => $ctrlNombre]);
         }
 
-        $providers = Provider::orderBy('name')->get();
+        $providers = Provider::where('status', 'activo')->orderBy('name')->get();
         $products = Product::orderBy('nombre')->get();
 
         // Mapa de categorías históricas desde inventario para clasificar con precisión
@@ -66,7 +67,7 @@ class ReceptionController extends Controller
             'numero_documento' => 'required|string|max:255',
             'orden_compra' => 'nullable|string|max:255',
             'origen' => 'required|string|max:255',
-            'provider_id' => 'required|exists:providers,id',
+            'provider_id' => ['required', Rule::exists('providers', 'id')->where('status', 'activo')],
             'firma_receptor' => 'nullable|string',
             'action' => 'nullable|string|in:save,save_only,save_and_download',
             'product_id' => 'required|array|min:1',
