@@ -838,8 +838,10 @@
                         controls.rotateSpeed = 0.85;
 
                         // --- Iluminación ---
-                        scene.add(new THREE.AmbientLight(0xffffff, 0.45));
-                        scene.add(new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 0.4));
+                        const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
+                        const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 0.4);
+                        scene.add(ambientLight);
+                        scene.add(hemiLight);
                         const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
                         dirLight.position.set(40, 70, 30);
                         dirLight.castShadow = true;
@@ -928,6 +930,23 @@
                         floor.position.set(0, -0.5, 0);
                         floor.receiveShadow = true;
                         buildGroup.add(floor);
+
+                        // --- Tema claro / oscuro del plano 3D ---
+                        const applyMapTheme = (dark) => {
+                            scene.background = new THREE.Color(dark ? '#1A2332' : '#f1f5f9');
+                            gctx.fillStyle = dark ? '#2A3649' : '#dbe3ec';
+                            gctx.fillRect(0, 0, 64, 64);
+                            gctx.strokeStyle = dark ? '#3A485E' : '#c3cfdb';
+                            gctx.lineWidth = 2;
+                            gctx.strokeRect(0, 0, 64, 64);
+                            gridTex.needsUpdate = true;
+                            ambientLight.intensity = dark ? 0.62 : 0.45;
+                            hemiLight.color.set(dark ? 0xdbe5f5 : 0xffffff);
+                            hemiLight.groundColor.set(dark ? 0x64748b : 0xcbd5e1);
+                            hemiLight.intensity = dark ? 0.55 : 0.4;
+                        };
+                        applyMapTheme(document.documentElement.classList.contains('dark'));
+                        window.addEventListener('das-theme-change', (e) => applyMapTheme(!!(e.detail && e.detail.dark)));
 
                         const wallMat = new THREE.MeshPhysicalMaterial({
                             color: '#94a3b8',

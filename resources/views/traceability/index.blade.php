@@ -62,24 +62,33 @@
     </div>
 
     <!-- contenedor de tabla de movimientos -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+
+        <!-- Cabecera de la tabla y botón de filtros -->
+        <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
+            <h3 class="text-[15px] font-bold text-slate-800">Historial de Movimientos de Lotes</h3>
+            <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-xs cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                Filtros Avanzados
+            </button>
+        </div>
 
         <!-- barra de busqueda y filtros -->
-        <form method="GET" action="{{ route('traceability.index') }}" id="filterForm" class="p-5 border-b border-slate-200 bg-slate-50/50">
+        <form method="GET" action="{{ route('traceability.index') }}" id="filterForm" class="{{ request()->hasAny(['search', 'tipo_movimiento', 'fecha_desde', 'fecha_hasta']) ? '' : 'hidden' }} bg-white border-b border-slate-200 p-5">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                 
                 <div class="lg:col-span-2 relative">
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Busqueda Libre</label>
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 pt-5">
+                    <label class="block text-[11.5px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Búsqueda Libre</label>
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 pt-6">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar Lote, Producto o Doc..."
-                        class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-[13px] font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar Lote, Producto o Documento..."
+                        class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Movimiento</label>
-                    <select name="tipo_movimiento" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
+                    <label class="block text-[11.5px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Movimiento</label>
+                    <select name="tipo_movimiento" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all cursor-pointer">
                         <option value="">Todos</option>
                         <option value="Recepción" {{ request('tipo_movimiento') == 'Recepción' ? 'selected' : '' }}>Recepción</option>
                         <option value="Despacho" {{ request('tipo_movimiento') == 'Despacho' ? 'selected' : '' }}>Despacho Normal</option>
@@ -91,22 +100,22 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Desde</label>
-                    <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm">
+                    <label class="block text-[11.5px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Desde</label>
+                    <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Hasta</label>
-                    <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm">
+                    <label class="block text-[11.5px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Hasta</label>
+                    <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
                 </div>
                 
             </div>
             
-            <div class="mt-4 flex justify-end gap-3">
-                @if(request()->hasAny(['search', 'tipo_movimiento', 'fecha_desde', 'fecha_hasta']))
-                    <a href="{{ route('traceability.index') }}" class="py-2 px-4 bg-slate-100 text-slate-600 border border-slate-300 rounded-xl text-[13px] font-bold hover:bg-slate-200 transition-colors">Limpiar</a>
-                @endif
-                <button type="submit" class="py-2 px-5 bg-slate-800 text-white rounded-xl text-[13px] font-bold hover:bg-slate-900 transition-colors shadow-sm cursor-pointer">
+            <div class="mt-5 flex items-center justify-end gap-3 border-t border-slate-200/60 pt-4">
+                <a href="{{ route('traceability.index') }}" class="px-4 py-2 rounded-lg text-[12.5px] font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors">
+                    Limpiar Filtros
+                </a>
+                <button type="submit" class="px-4 py-2 rounded-lg text-[12.5px] font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-md transition-all cursor-pointer">
                     Aplicar Filtros
                 </button>
             </div>
@@ -210,9 +219,54 @@
             </table>
         </div>
         <!-- paginacion -->
-        <div class="px-6 py-4 border-t border-slate-200 bg-white">
-            {{ $movements->links() }}
+        @if ($movements->hasPages())
+        <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 bg-white rounded-b-2xl">
+            <div class="text-[13px] text-slate-500 text-center sm:text-left font-medium">
+                Mostrando del <span class="font-bold text-slate-800">{{ $movements->firstItem() ?? 0 }}</span> al <span class="font-bold text-slate-800">{{ $movements->lastItem() ?? 0 }}</span> de <span class="font-bold text-slate-800">{{ $movements->total() }}</span> registros
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                @if ($movements->onFirstPage())
+                    <span class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed">Anterior</span>
+                @else
+                    <a href="{{ $movements->previousPageUrl() }}" class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors">Anterior</a>
+                @endif
+
+                @php
+                    $start = max($movements->currentPage() - 2, 1);
+                    $end = min($movements->currentPage() + 2, $movements->lastPage());
+                @endphp
+
+                @if ($start > 1)
+                    <a href="{{ $movements->url(1) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">1</a>
+                    @if ($start > 2)
+                        <span class="px-1 text-slate-400">...</span>
+                    @endif
+                @endif
+
+                @for ($i = $start; $i <= $end; $i++)
+                    @if ($i == $movements->currentPage())
+                        <span class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-bold bg-blue-50 text-blue-600 border border-blue-100 shadow-sm">{{ $i }}</span>
+                    @else
+                        <a href="{{ $movements->url($i) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">{{ $i }}</a>
+                    @endif
+                @endfor
+
+                @if ($end < $movements->lastPage())
+                    @if ($end < $movements->lastPage() - 1)
+                        <span class="px-1 text-slate-400">...</span>
+                    @endif
+                    <a href="{{ $movements->url($movements->lastPage()) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">{{ $movements->lastPage() }}</a>
+                @endif
+
+                @if ($movements->hasMorePages())
+                    <a href="{{ $movements->nextPageUrl() }}" class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors">Siguiente</a>
+                @else
+                    <span class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed">Siguiente</span>
+                @endif
+            </div>
         </div>
+        @endif
     </div>
 
     <!-- ventana modal para visualizar la ficha clinica del lote -->
@@ -274,6 +328,14 @@
 
     <!-- script de manejo de peticiones ajax para cargar informacion en modal -->
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnToggleFilters = document.getElementById('toggle-filters-btn');
+            const filtersPanel = document.getElementById('filterForm');
+            if (btnToggleFilters && filtersPanel) {
+                btnToggleFilters.addEventListener('click', () => filtersPanel.classList.toggle('hidden'));
+            }
+        });
+
         function openLotDetails(lote, producto) {
             document.getElementById('modal-lot-details').classList.remove('hidden');
             document.getElementById('modal-subtitle').textContent = `Lote ID: ${lote} · ${producto}`;

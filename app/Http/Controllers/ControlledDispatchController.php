@@ -25,13 +25,18 @@ class ControlledDispatchController extends Controller
 
         $dispatches = ControlledDispatch::with('items')->orderBy('created_at', 'desc')->get();
 
-        $inventarioDisponible = Inventory::whereIn('producto', InventoryService::controlados())
+        $controlados = InventoryService::controlados();
+
+        $inventarioDisponible = Inventory::whereIn('producto', $controlados)
             ->where('estado', 'Disponible')
             ->where('cantidad', '>', 0)
             ->orderByRaw('CASE WHEN fecha_vencimiento IS NULL THEN 1 ELSE 0 END ASC, fecha_vencimiento ASC, id ASC')
             ->get();
 
         $solicitudes = EstablishmentRequest::with(['items.product', 'assignedUser'])
+            ->whereHas('items.product', function ($q) use ($controlados) {
+                $q->whereIn('nombre', $controlados);
+            })
             ->orderByRaw("CASE WHEN estado IN ('Asignada', 'Pendiente', 'Parcial') THEN 0 ELSE 1 END ASC")
             ->orderBy('created_at', 'desc')
             ->get();
@@ -52,7 +57,6 @@ class ControlledDispatchController extends Controller
             ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
             ->values();
 
-        $controlados = InventoryService::controlados();
         $establecimientos = InventoryService::establecimientos();
 
         return view('controlled_dispatch.index', compact(
