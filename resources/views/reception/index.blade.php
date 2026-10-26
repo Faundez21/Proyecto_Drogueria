@@ -115,49 +115,149 @@
                     </div>
                 </div>
 
-                <!-- seccion 3: multiples productos -->
+                <!-- seccion 3: multiples productos separados por Medicamentos, Insumos y Estupefacientes -->
                 <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                         <div class="flex items-center gap-2">
                             <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                            <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">3. Detalle de Producto(s)</h3>
+                            <div>
+                                <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">3. Detalle de Producto(s) (Medicamentos, Insumos y Estupefacientes)</h3>
+                                <p class="text-[11.5px] text-slate-500">Seleccione el grupo o agregue filas directamente clasificadas por tipo de producto.</p>
+                            </div>
                         </div>
-                        <button type="button" id="btn_add_product" class="text-xs font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md transition-colors border border-teal-200">
-                            + Agregar Producto
-                        </button>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="agregarFilaPorGrupo('Medicamentos')" class="text-xs font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-lg transition-colors border border-teal-200 cursor-pointer inline-flex items-center gap-1.5 shadow-2xs">
+                                <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                                + Medicamento
+                            </button>
+                            <button type="button" onclick="agregarFilaPorGrupo('Insumos')" class="text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors border border-indigo-200 cursor-pointer inline-flex items-center gap-1.5 shadow-2xs">
+                                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                + Insumo
+                            </button>
+                            <button type="button" onclick="agregarFilaPorGrupo('Estupefacientes')" class="text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-colors border border-rose-200 cursor-pointer inline-flex items-center gap-1.5 shadow-2xs">
+                                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                + Estupefaciente
+                            </button>
+                            <button type="button" id="btn_add_product" class="text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors border border-slate-300 cursor-pointer shadow-2xs">
+                                + Agregar Producto
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Resumen visual por grupo de productos en recepción -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                        <div class="bg-teal-50/60 border border-teal-200 rounded-xl px-4 py-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">MED</span>
+                                <div>
+                                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-teal-800">Medicamentos</p>
+                                    <p class="text-[11px] text-teal-600">{{ isset($productosAgrupados['Medicamentos']) ? $productosAgrupados['Medicamentos']->count() : 0 }} en catálogo</p>
+                                </div>
+                            </div>
+                            <span id="count_grupo_medicamentos" class="px-2.5 py-1 rounded-full text-[12px] font-black bg-white text-teal-700 border border-teal-200 shadow-2xs">0 ítem(s)</span>
+                        </div>
+
+                        <div class="bg-indigo-50/60 border border-indigo-200 rounded-xl px-4 py-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">INS</span>
+                                <div>
+                                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-800">Insumos</p>
+                                    <p class="text-[11px] text-indigo-600">{{ isset($productosAgrupados['Insumos']) ? $productosAgrupados['Insumos']->count() : 0 }} en catálogo</p>
+                                </div>
+                            </div>
+                            <span id="count_grupo_insumos" class="px-2.5 py-1 rounded-full text-[12px] font-black bg-white text-indigo-700 border border-indigo-200 shadow-2xs">0 ítem(s)</span>
+                        </div>
+
+                        <div class="bg-rose-50/60 border border-rose-200 rounded-xl px-4 py-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">EST</span>
+                                <div>
+                                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-800">Estupefacientes</p>
+                                    <p class="text-[11px] text-rose-600">{{ isset($productosAgrupados['Estupefacientes']) ? $productosAgrupados['Estupefacientes']->count() : 0 }} en catálogo</p>
+                                </div>
+                            </div>
+                            <span id="count_grupo_estupefacientes" class="px-2.5 py-1 rounded-full text-[12px] font-black bg-white text-rose-700 border border-rose-200 shadow-2xs">0 ítem(s)</span>
+                        </div>
                     </div>
 
                     <!-- contenedor dinamico -->
                     <div id="productos_container" class="space-y-4">
                         <!-- molde de producto -->
-                        <div class="producto-item relative border border-slate-200 bg-slate-50/50 p-4 rounded-xl shadow-sm">
-                            <button type="button" class="btn-remove-product hidden absolute top-3 right-3 text-slate-400 hover:text-rose-600 transition-colors" title="Eliminar fila">
+                        <div class="producto-item relative border border-slate-200 bg-slate-50/50 p-4 rounded-xl shadow-sm transition-colors duration-200" data-grupo-actual="Todos">
+                            <!-- Barra superior de clasificación visual por fila -->
+                            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-200/80 pr-8">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Filtrar catálogo:</span>
+                                    <button type="button" onclick="filtrarGrupoFila(this, 'Todos')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-800 text-white transition-all cursor-pointer" data-grupo="Todos">
+                                        Todos
+                                    </button>
+                                    <button type="button" onclick="filtrarGrupoFila(this, 'Medicamentos')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-white text-teal-700 border border-teal-200 hover:bg-teal-50 transition-all cursor-pointer" data-grupo="Medicamentos">
+                                        Medicamentos
+                                    </button>
+                                    <button type="button" onclick="filtrarGrupoFila(this, 'Insumos')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50 transition-all cursor-pointer" data-grupo="Insumos">
+                                        Insumos
+                                    </button>
+                                    <button type="button" onclick="filtrarGrupoFila(this, 'Estupefacientes')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-white text-rose-700 border border-rose-200 hover:bg-rose-50 transition-all cursor-pointer" data-grupo="Estupefacientes">
+                                        Estupefacientes
+                                    </button>
+                                </div>
+
+                                <span class="badge-grupo-producto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold uppercase tracking-wider bg-slate-200 text-slate-600">
+                                    Sin clasificar
+                                </span>
+                            </div>
+
+                            <button type="button" class="btn-remove-product hidden absolute top-3.5 right-3.5 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer" title="Eliminar fila">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div class="lg:col-span-2">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Producto <span class="text-rose-500">*</span></label>
-                                    <select name="product_id[]" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
-                                        <option value="" disabled selected>Buscar producto...</option>
-                                        @foreach($products as $product)
-                                            <option value="{{ $product->id }}">
-                                                {{ $product->nombre }}
-                                                @if(in_array($product->nombre, $controlados ?? [])) 🔴 (Controlado) @endif
-                                            </option>
-                                        @endforeach
+                                    <select name="product_id[]" required onchange="onProductoReceptionChange(this)" class="select-producto-recepcion w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        <option value="" disabled selected>Buscar producto por grupo...</option>
+                                        <optgroup label="Medicamentos (Fármacos)" data-optgroup="Medicamentos">
+                                            @foreach($productosAgrupados['Medicamentos'] ?? [] as $product)
+                                                <option value="{{ $product->id }}" data-grupo="Medicamentos">
+                                                    {{ $product->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                        <optgroup label="Insumos y Equipamiento" data-optgroup="Insumos">
+                                            @foreach($productosAgrupados['Insumos'] ?? [] as $product)
+                                                <option value="{{ $product->id }}" data-grupo="Insumos">
+                                                    {{ $product->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                        <optgroup label="Estupefacientes y Controlados" data-optgroup="Estupefacientes">
+                                            @foreach($productosAgrupados['Estupefacientes'] ?? [] as $product)
+                                                <option value="{{ $product->id }}" data-grupo="Estupefacientes">
+                                                    {{ $product->nombre }} (Controlado)
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
                                     </select>
                                 </div>
                                 <div class="lg:col-span-2">
-                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoria (Si no es controlado) <span class="text-rose-500">*</span></label>
-                                    <select name="tipo_producto[]" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
-                                        <option value="" disabled selected>Seleccione...</option>
-                                        <option value="F-PALIATIVOS">CUIDADOS PALIATIVOS</option>
-                                        <option value="F-FOFAR">FOFAR</option>
-                                        <option value="F-PARO">CARRO DE PARO</option>
-                                        <option value="I-CIRUGIA">CIRUGIA MENOR</option>
-                                        <option value="I-URGENCIA">URGENCIA CIRUGIA</option>
-                                        <option value="E-COMUNAL">EQUIPAMIENTO COMUNAL</option>
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoría / Clasificación <span class="text-rose-500">*</span></label>
+                                    <select name="tipo_producto[]" required onchange="onCategoriaReceptionChange(this)" class="select-categoria-recepcion w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        <option value="" disabled selected>Seleccione categoría...</option>
+                                        <optgroup label="Medicamentos (Fármacos)">
+                                            <option value="Medicamentos" data-grupo="Medicamentos">MEDICAMENTOS GENERALES</option>
+                                            <option value="F-FOFAR" data-grupo="Medicamentos">FOFAR (FARMACIA)</option>
+                                            <option value="F-PALIATIVOS" data-grupo="Medicamentos">CUIDADOS PALIATIVOS</option>
+                                            <option value="F-PARO" data-grupo="Medicamentos">CARRO DE PARO</option>
+                                        </optgroup>
+                                        <optgroup label="Insumos Clínicos y Equipamiento">
+                                            <option value="Insumos" data-grupo="Insumos">INSUMOS CLÍNICOS GENERALES</option>
+                                            <option value="I-CIRUGIA" data-grupo="Insumos">CIRUGÍA MENOR (INSUMOS)</option>
+                                            <option value="I-URGENCIA" data-grupo="Insumos">URGENCIA CIRUGÍA (INSUMOS)</option>
+                                            <option value="E-COMUNAL" data-grupo="Insumos">EQUIPAMIENTO COMUNAL</option>
+                                        </optgroup>
+                                        <optgroup label="Estupefacientes y Psicotrópicos">
+                                            <option value="Estupefacientes" data-grupo="Estupefacientes">ESTUPEFACIENTES / CONTROLADOS</option>
+                                        </optgroup>
                                     </select>
                                 </div>
                                 <div>
@@ -180,11 +280,11 @@
                                 </div>
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Cantidad <span class="text-rose-500">*</span></label>
-                                    <input type="number" name="cantidad_unitaria[]" min="1" required class="calc-qty w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-mono-das font-semibold">
+                                    <input type="number" name="cantidad_unitaria[]" min="1" step="1" required class="calc-qty w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-mono-das font-semibold">
                                 </div>
                                 <div>
-                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Valor Neto Unit. ($)</label>
-                                    <input type="number" name="valor_unitario[]" step="0.01" min="0" class="calc-price w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-mono-das font-semibold">
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Valor Neto Unit. ($ CLP)</label>
+                                    <input type="number" name="valor_unitario[]" step="1" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="calc-price w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-mono-das font-semibold">
                                 </div>
                             </div>
                         </div>
@@ -296,14 +396,38 @@
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-[13px] text-slate-700">
                             @forelse($receptions ?? [] as $rec)
+                            @php
+                                $countMed = 0;
+                                $countIns = 0;
+                                $countEst = 0;
+                                foreach ($rec->items as $rItem) {
+                                    $grp = \App\Services\InventoryService::clasificarGrupoProducto($rItem->product->nombre ?? '', $rItem->tipo_producto);
+                                    if ($grp === 'Estupefacientes') $countEst++;
+                                    elseif ($grp === 'Insumos') $countIns++;
+                                    else $countMed++;
+                                }
+                            @endphp
                             <!-- clase identificadora para filtrado -->
                             <tr class="hover:bg-slate-50 fila-recepcion">
                                 <td class="px-6 py-4 font-bold text-slate-800">#{{ $rec->correlativo }}</td>
                                 <td class="px-6 py-4">{{ \Carbon\Carbon::parse($rec->fecha_recepcion)->format('d-m-Y') }}</td>
                                 <td class="px-6 py-4">{{ $rec->provider->name ?? $rec->provider->nombre ?? $rec->provider->razon_social ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 font-semibold text-teal-600">{{ $rec->items->count() }} producto(s)</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-wrap items-center gap-1.5">
+                                        <span class="font-bold text-slate-700 mr-1">{{ $rec->items->count() }} total:</span>
+                                        @if($countMed > 0)
+                                            <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-teal-50 text-teal-700 border border-teal-200">{{ $countMed }} Med.</span>
+                                        @endif
+                                        @if($countIns > 0)
+                                            <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">{{ $countIns }} Ins.</span>
+                                        @endif
+                                        @if($countEst > 0)
+                                            <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">{{ $countEst }} Estup.</span>
+                                        @endif
+                                    </div>
+                                </td>
                                 <td class="px-6 py-4 text-center">
-                                    <button onclick="openDetailModal({{ json_encode($rec) }}, '{{ addslashes($rec->provider->name ?? $rec->provider->nombre ?? 'N/A') }}', '{{ $rec->provider->rut ?? 'N/A' }}', '{{ route('reception.pdf', $rec->id) }}')" class="text-teal-600 hover:text-teal-800 font-medium bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md text-xs">
+                                    <button onclick="openDetailModal({{ json_encode($rec) }}, '{{ addslashes($rec->provider->name ?? $rec->provider->nombre ?? 'N/A') }}', '{{ $rec->provider->rut ?? 'N/A' }}', '{{ route('reception.pdf', $rec->id) }}')" class="text-teal-600 hover:text-teal-800 font-medium bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md text-xs cursor-pointer">
                                         Ver Detalle
                                     </button>
                                 </td>
@@ -359,7 +483,7 @@
                         <table class="w-full text-left text-[12px]">
                             <thead class="bg-slate-100 border-b border-slate-200 text-slate-600 uppercase font-semibold">
                                 <tr>
-                                    <th class="px-4 py-2">Producto</th>
+                                    <th class="px-4 py-2">Producto / Clasificación</th>
                                     <th class="px-4 py-2">Lote/Vence</th>
                                     <th class="px-4 py-2 text-center">Cant.</th>
                                     <th class="px-4 py-2 text-right">Subtotal</th>
@@ -397,6 +521,229 @@
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 
     <script>
+        const CONTROLADOS_LIST = @json($controlados ?? []);
+
+        function clasificarItemJs(nombreProducto, tipoProducto) {
+            const nom = (nombreProducto || '').trim().toLowerCase();
+            const tipo = (tipoProducto || '').trim().toLowerCase();
+
+            if (CONTROLADOS_LIST.some(c => c.trim().toLowerCase() === nom)) {
+                return 'Estupefacientes';
+            }
+            if (tipo.includes('controlado') || tipo.includes('estupefaciente')) {
+                return 'Estupefacientes';
+            }
+            if (tipo.includes('insumo') || tipo.includes('equipamiento') || tipo.startsWith('i-') || tipo.startsWith('e-')) {
+                return 'Insumos';
+            }
+            if (tipo.includes('medicamento') || tipo.includes('farmaco') || tipo.includes('fármaco') || tipo.startsWith('f-')) {
+                return 'Medicamentos';
+            }
+
+            const kwInsumos = ['jeringa', 'gasa', 'aguja', 'guante', 'mascarilla', 'apósito', 'aposito', 'venda', 'sonda', 'catéter', 'cateter', 'bajada', 'algodón', 'algodon', 'bisturí', 'bisturi', 'sutura', 'desfibrilador', 'termómetro', 'termometro', 'oxímetro', 'oximetro'];
+            if (kwInsumos.some(k => nom.includes(k))) {
+                return 'Insumos';
+            }
+            return 'Medicamentos';
+        }
+
+        function actualizarEstiloCardGrupo(card, grupo) {
+            const badge = card.querySelector('.badge-grupo-producto');
+            card.classList.remove(
+                'border-slate-200', 'bg-slate-50/50',
+                'border-teal-300', 'bg-teal-50/30',
+                'border-indigo-300', 'bg-indigo-50/30',
+                'border-rose-300', 'bg-rose-50/30'
+            );
+
+            badge.className = 'badge-grupo-producto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold uppercase tracking-wider';
+
+            if (grupo === 'Medicamentos') {
+                card.classList.add('border-teal-300', 'bg-teal-50/30');
+                badge.classList.add('bg-teal-100', 'text-teal-800', 'border', 'border-teal-200');
+                badge.textContent = 'Medicamento';
+            } else if (grupo === 'Insumos') {
+                card.classList.add('border-indigo-300', 'bg-indigo-50/30');
+                badge.classList.add('bg-indigo-100', 'text-indigo-800', 'border', 'border-indigo-200');
+                badge.textContent = 'Insumo Clínico';
+            } else if (grupo === 'Estupefacientes') {
+                card.classList.add('border-rose-300', 'bg-rose-50/30');
+                badge.classList.add('bg-rose-100', 'text-rose-800', 'border', 'border-rose-200');
+                badge.textContent = 'Estupefaciente / Controlado';
+            } else {
+                card.classList.add('border-slate-200', 'bg-slate-50/50');
+                badge.classList.add('bg-slate-200', 'text-slate-600');
+                badge.textContent = 'Sin clasificar';
+            }
+
+            actualizarContadoresGrupos();
+        }
+
+        function filtrarGrupoFila(btn, grupo) {
+            const card = btn.closest('.producto-item');
+            card.setAttribute('data-grupo-actual', grupo);
+
+            // Actualizar estado activo de los botones de filtro en esta tarjeta
+            card.querySelectorAll('.btn-filtro-grupo').forEach(b => {
+                const bGrupo = b.getAttribute('data-grupo');
+                b.className = 'btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ';
+                if (bGrupo === grupo) {
+                    if (grupo === 'Medicamentos') b.className += 'bg-teal-600 text-white shadow-xs';
+                    else if (grupo === 'Insumos') b.className += 'bg-indigo-600 text-white shadow-xs';
+                    else if (grupo === 'Estupefacientes') b.className += 'bg-rose-600 text-white shadow-xs';
+                    else b.className += 'bg-slate-800 text-white shadow-xs';
+                } else {
+                    if (bGrupo === 'Medicamentos') b.className += 'bg-white text-teal-700 border border-teal-200 hover:bg-teal-50';
+                    else if (bGrupo === 'Insumos') b.className += 'bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50';
+                    else if (bGrupo === 'Estupefacientes') b.className += 'bg-white text-rose-700 border border-rose-200 hover:bg-rose-50';
+                    else b.className += 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100';
+                }
+            });
+
+            // Mostrar/ocultar optgroups del select de producto según el grupo elegido
+            const selectProd = card.querySelector('.select-producto-recepcion');
+            selectProd.querySelectorAll('optgroup').forEach(og => {
+                const ogGrupo = og.getAttribute('data-optgroup');
+                const visible = (grupo === 'Todos' || ogGrupo === grupo);
+                og.disabled = !visible;
+                og.hidden = !visible;
+                og.querySelectorAll('option').forEach(opt => {
+                    opt.disabled = !visible;
+                    opt.hidden = !visible;
+                });
+            });
+
+            // Si el producto actualmente seleccionado no pertenece al grupo filtrado, limpiar selección y pre-asignar categoría
+            const selectedOpt = selectProd.options[selectProd.selectedIndex];
+            if (grupo !== 'Todos') {
+                if (!selectedOpt || !selectedOpt.value || selectedOpt.getAttribute('data-grupo') !== grupo) {
+                    selectProd.selectedIndex = 0;
+                    const selectCat = card.querySelector('.select-categoria-recepcion');
+                    if (grupo === 'Estupefacientes') {
+                        selectCat.value = 'Estupefacientes';
+                    } else if (grupo === 'Insumos') {
+                        selectCat.value = 'Insumos';
+                    } else if (grupo === 'Medicamentos') {
+                        selectCat.value = 'Medicamentos';
+                    }
+                }
+                actualizarEstiloCardGrupo(card, grupo);
+            } else if (!selectedOpt || !selectedOpt.value) {
+                actualizarEstiloCardGrupo(card, 'Todos');
+            }
+        }
+
+        function onProductoReceptionChange(selectProd) {
+            const card = selectProd.closest('.producto-item');
+            const opt = selectProd.options[selectProd.selectedIndex];
+            if (!opt || !opt.value) {
+                actualizarEstiloCardGrupo(card, 'Todos');
+                return;
+            }
+
+            const grupo = opt.getAttribute('data-grupo') || 'Medicamentos';
+            const selectCat = card.querySelector('.select-categoria-recepcion');
+
+            if (grupo === 'Estupefacientes') {
+                selectCat.value = 'Estupefacientes';
+            } else {
+                const catOpt = selectCat.options[selectCat.selectedIndex];
+                const catGrupoActual = catOpt ? catOpt.getAttribute('data-grupo') : null;
+                if (!catGrupoActual || catGrupoActual !== grupo) {
+                    selectCat.value = (grupo === 'Insumos') ? 'Insumos' : 'Medicamentos';
+                }
+            }
+
+            actualizarEstiloCardGrupo(card, grupo);
+        }
+
+        function onCategoriaReceptionChange(selectCat) {
+            const card = selectCat.closest('.producto-item');
+            const opt = selectCat.options[selectCat.selectedIndex];
+            if (!opt || !opt.value) return;
+            const grupo = opt.getAttribute('data-grupo') || 'Medicamentos';
+            actualizarEstiloCardGrupo(card, grupo);
+        }
+
+        function actualizarContadoresGrupos() {
+            let med = 0, ins = 0, est = 0;
+            document.querySelectorAll('.producto-item').forEach(card => {
+                const selProd = card.querySelector('.select-producto-recepcion');
+                const selCat = card.querySelector('.select-categoria-recepcion');
+                const optProd = selProd ? selProd.options[selProd.selectedIndex] : null;
+                const optCat = selCat ? selCat.options[selCat.selectedIndex] : null;
+
+                let grp = null;
+                if (optProd && optProd.value) {
+                    grp = optProd.getAttribute('data-grupo');
+                } else if (optCat && optCat.value) {
+                    grp = optCat.getAttribute('data-grupo');
+                } else {
+                    const filtroActivo = card.getAttribute('data-grupo-actual');
+                    if (filtroActivo && filtroActivo !== 'Todos') grp = filtroActivo;
+                }
+
+                if (grp === 'Medicamentos') med++;
+                else if (grp === 'Insumos') ins++;
+                else if (grp === 'Estupefacientes') est++;
+            });
+
+            const elMed = document.getElementById('count_grupo_medicamentos');
+            const elIns = document.getElementById('count_grupo_insumos');
+            const elEst = document.getElementById('count_grupo_estupefacientes');
+            if (elMed) elMed.textContent = `${med} ítem(s)`;
+            if (elIns) elIns.textContent = `${ins} ítem(s)`;
+            if (elEst) elEst.textContent = `${est} ítem(s)`;
+        }
+
+        function crearNuevaFilaProducto(grupoInicial = 'Todos') {
+            const container = document.getElementById('productos_container');
+            const firstItem = container.querySelector('.producto-item');
+            const clone = firstItem.cloneNode(true);
+
+            clone.querySelectorAll('input').forEach(inp => inp.value = '');
+            clone.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
+
+            const btnRemove = clone.querySelector('.btn-remove-product');
+            btnRemove.classList.remove('hidden');
+            btnRemove.addEventListener('click', function() {
+                clone.remove();
+                if (typeof window.calcularTotalGeneralRecepcion === 'function') {
+                    window.calcularTotalGeneralRecepcion();
+                }
+                actualizarContadoresGrupos();
+            });
+
+            clone.querySelector('.calc-qty').addEventListener('input', window.calcularTotalGeneralRecepcion);
+            clone.querySelector('.calc-price').addEventListener('input', window.calcularTotalGeneralRecepcion);
+
+            container.appendChild(clone);
+
+            const targetBtn = clone.querySelector(`.btn-filtro-grupo[data-grupo="${grupoInicial}"]`) || clone.querySelector('.btn-filtro-grupo[data-grupo="Todos"]');
+            if (targetBtn) {
+                filtrarGrupoFila(targetBtn, grupoInicial);
+            }
+            return clone;
+        }
+
+        function agregarFilaPorGrupo(grupo) {
+            const container = document.getElementById('productos_container');
+            const items = container.querySelectorAll('.producto-item');
+            // Si la primera fila está completamente vacía, usarla directamente
+            if (items.length === 1) {
+                const firstSel = items[0].querySelector('.select-producto-recepcion');
+                if (firstSel && !firstSel.value) {
+                    const btn = items[0].querySelector(`.btn-filtro-grupo[data-grupo="${grupo}"]`);
+                    if (btn) filtrarGrupoFila(btn, grupo);
+                    firstSel.focus();
+                    return;
+                }
+            }
+            const nueva = crearNuevaFilaProducto(grupo);
+            const sel = nueva.querySelector('.select-producto-recepcion');
+            if (sel) sel.focus();
+        }
+
         // limpia los filtros de la bandeja de recepciones
         function limpiarFiltrosRecepcion() {
             document.getElementById('filtroCorrelativoRec').value = '';
@@ -449,7 +796,7 @@
             // 2. logica dinamica de productos y totales
             const container = document.getElementById('productos_container');
 
-            function calcularTotalGeneral() {
+            window.calcularTotalGeneralRecepcion = function() {
                 let totalNeto = 0;
                 document.querySelectorAll('.producto-item').forEach(item => {
                     const qty = parseFloat(item.querySelector('.calc-qty').value) || 0;
@@ -463,35 +810,16 @@
                 } else {
                     inputFinal.value = '';
                 }
-            }
+            };
 
             // asignar eventos de suma a la primera fila original
             document.querySelectorAll('.calc-qty, .calc-price').forEach(inp => {
-                inp.addEventListener('input', calcularTotalGeneral);
+                inp.addEventListener('input', window.calcularTotalGeneralRecepcion);
             });
 
             // agregar nueva fila de producto
             document.getElementById('btn_add_product').addEventListener('click', function() {
-                const firstItem = container.querySelector('.producto-item');
-                const clone = firstItem.cloneNode(true);
-
-                // limpiar valores clonados
-                clone.querySelectorAll('input').forEach(inp => inp.value = '');
-                clone.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
-
-                // mostrar boton de eliminar (que en la fila 1 esta oculto)
-                const btnRemove = clone.querySelector('.btn-remove-product');
-                btnRemove.classList.remove('hidden');
-                btnRemove.addEventListener('click', function() {
-                    clone.remove();
-                    calcularTotalGeneral(); // recalcular al borrar
-                });
-
-                // asignar eventos de suma a los nuevos inputs
-                clone.querySelector('.calc-qty').addEventListener('input', calcularTotalGeneral);
-                clone.querySelector('.calc-price').addEventListener('input', calcularTotalGeneral);
-
-                container.appendChild(clone);
+                crearNuevaFilaProducto('Todos');
             });
 
             // 3. funcionalidad de firma digital
@@ -508,6 +836,9 @@
                 for(let i = 1; i < items.length; i++) {
                     items[i].remove();
                 }
+                const firstBtn = items[0].querySelector('.btn-filtro-grupo[data-grupo="Todos"]');
+                if (firstBtn) filtrarGrupoFila(firstBtn, 'Todos');
+                actualizarContadoresGrupos();
             });
 
             // 5. antes de enviar, inyectar firmas base64
@@ -529,22 +860,51 @@
             document.getElementById('m_proveedor').innerText = providerName;
             document.getElementById('m_rut_proveedor').innerText = providerRut;
 
-            // llenar tabla de items
+            // llenar tabla de items agrupados por Medicamentos, Insumos y Estupefacientes
             const tbody = document.getElementById('m_items_table');
             tbody.innerHTML = '';
 
-            data.items.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="px-4 py-3"><strong>${item.product ? item.product.nombre : 'Prod Eliminado'}</strong><br><span class="text-[10px] text-slate-500">${item.tipo_producto}</span></td>
-                    <td class="px-4 py-3">${item.lote || 'S/L'}<br><span class="text-[10px] text-slate-500">${item.fecha_vencimiento || 'N/A'}</span></td>
-                    <td class="px-4 py-3 text-center font-bold">${item.cantidad}</td>
-                    <td class="px-4 py-3 text-right">$${parseFloat(item.valor_total_item).toLocaleString('es-CL')}</td>
-                `;
-                tbody.appendChild(tr);
+            const grupos = {
+                'Medicamentos': { titulo: 'Medicamentos (Fármacos)', badgeClass: 'bg-teal-50 text-teal-800 border-teal-200', headerBg: 'bg-teal-50/70 text-teal-900', items: [] },
+                'Insumos': { titulo: 'Insumos Clínicos y Equipamiento', badgeClass: 'bg-indigo-50 text-indigo-800 border-indigo-200', headerBg: 'bg-indigo-50/70 text-indigo-900', items: [] },
+                'Estupefacientes': { titulo: 'Estupefacientes y Controlados', badgeClass: 'bg-rose-50 text-rose-800 border-rose-200', headerBg: 'bg-rose-50/70 text-rose-900', items: [] }
+            };
+
+            (data.items || []).forEach(item => {
+                const nom = item.product ? item.product.nombre : 'Producto Eliminado';
+                const grp = clasificarItemJs(nom, item.tipo_producto);
+                grupos[grp].items.push(item);
             });
 
-            document.getElementById('m_total').innerText = '$' + parseFloat(data.valor_total_recepcion).toLocaleString('es-CL');
+            Object.keys(grupos).forEach(key => {
+                const g = grupos[key];
+                if (g.items.length === 0) return;
+
+                const trHeader = document.createElement('tr');
+                trHeader.className = g.headerBg;
+                trHeader.innerHTML = `
+                    <td colspan="4" class="px-4 py-2 text-[11px] font-extrabold uppercase tracking-wider border-y border-slate-200">
+                        ${g.titulo} (${g.items.length})
+                    </td>
+                `;
+                tbody.appendChild(trHeader);
+
+                g.items.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-4 py-3">
+                            <strong>${item.product ? item.product.nombre : 'Prod Eliminado'}</strong><br>
+                            <span class="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-bold border ${g.badgeClass}">${item.tipo_producto || key}</span>
+                        </td>
+                        <td class="px-4 py-3">${item.lote || 'S/L'}<br><span class="text-[10px] text-slate-500">${item.fecha_vencimiento || 'N/A'}</span></td>
+                        <td class="px-4 py-3 text-center font-bold">${item.cantidad}</td>
+                        <td class="px-4 py-3 text-right font-mono-das font-bold">$${Math.round(parseFloat(item.valor_total_item || 0)).toLocaleString('es-CL')}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+
+            document.getElementById('m_total').innerText = '$' + Math.round(parseFloat(data.valor_total_recepcion || 0)).toLocaleString('es-CL');
 
             // firma receptor
             const imgRec = document.getElementById('m_img_receptor');

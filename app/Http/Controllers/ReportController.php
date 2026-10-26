@@ -88,7 +88,7 @@ class ReportController extends Controller
             ->orderBy('programa')
             ->pluck('programa');
 
-        return view('reportes.index', compact('inventories', 'valorTotal', 'programasUnicos'));
+        return view('reports.index', compact('inventories', 'valorTotal', 'programasUnicos'));
     }
 
     public function exportExcel(Request $request)
@@ -102,7 +102,7 @@ class ReportController extends Controller
         $query = $this->buildInventoryQuery($request);
         $inventories = $query->get(); // Extrae todos los resultados sin paginar
 
-        $pdf = Pdf::loadView('reportes.pdf', compact('inventories'));
+        $pdf = Pdf::loadView('reports.pdf', compact('inventories'));
         $pdf->setPaper('A4', 'landscape'); // Formato horizontal para que quepan las columnas
 
         return $pdf->download('reporte_inventario_'.date('Ymd_His').'.pdf');
