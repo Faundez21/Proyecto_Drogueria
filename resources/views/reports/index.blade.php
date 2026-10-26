@@ -68,18 +68,6 @@
                 </button>
             </div>
 
-            @php
-                // Generamos listas dinámicas de Pasillos y Estantes
-                $invTodos = \App\Models\Inventory::all();
-                $pasillosUnicos = $invTodos->map(function($item) {
-                    return $item->pasillo_nombre ?? (is_object($item->aisle ?? null) ? $item->aisle->nombre ?? ($item->aisle->name ?? null) : $item->pasillo ?? null);
-                })->filter()->unique()->sort();
-
-                $estantesUnicos = $invTodos->map(function($item) {
-                    return $item->estanteria_nombre ?? (is_object($item->shelf ?? null) ? $item->shelf->nombre ?? ($item->shelf->name ?? null) : $item->estante ?? ($item->estanteria ?? null));
-                })->filter()->unique()->sort();
-            @endphp
-
             <!-- Formulario de Filtros -->
             <form method="GET" action="{{ route('reports.index') }}" id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">

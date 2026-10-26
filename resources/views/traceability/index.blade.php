@@ -81,8 +81,12 @@
                     <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Movimiento</label>
                     <select name="tipo_movimiento" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
                         <option value="">Todos</option>
-                        <option value="Recepción" {{ request('tipo_movimiento') == 'Recepción' ? 'selected' : '' }}>Recepcion</option>
-                        <option value="Despacho" {{ request('tipo_movimiento') == 'Despacho' ? 'selected' : '' }}>Despacho</option>
+                        <option value="Recepción" {{ request('tipo_movimiento') == 'Recepción' ? 'selected' : '' }}>Recepción</option>
+                        <option value="Despacho" {{ request('tipo_movimiento') == 'Despacho' ? 'selected' : '' }}>Despacho Normal</option>
+                        @if(auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado'))
+                            <option value="Despacho Controlado" {{ request('tipo_movimiento') == 'Despacho Controlado' ? 'selected' : '' }}>Despacho Controlado</option>
+                        @endif
+                        <option value="Cambio de estado" {{ request('tipo_movimiento') == 'Cambio de estado' ? 'selected' : '' }}>Cambio de Estado (Cuarentena / Merma)</option>
                     </select>
                 </div>
 
@@ -125,12 +129,15 @@
                     @if(count($movements) > 0)
                         @foreach($movements as $mov)
                             @php
-                                $badgeBg = 'bg-slate-50'; $badgeText = 'text-slate-700'; $badgeBorder = 'border-slate-200';
+                                $badgeBg = 'bg-amber-50'; $badgeText = 'text-amber-700'; $badgeBorder = 'border-amber-200';
                                 if($mov->tipo_movimiento == 'Recepción') {
                                     $badgeBg = 'bg-emerald-50'; $badgeText = 'text-emerald-700'; $badgeBorder = 'border-emerald-200';
                                 } elseif($mov->tipo_movimiento == 'Despacho') {
                                     $badgeBg = 'bg-blue-50'; $badgeText = 'text-blue-700'; $badgeBorder = 'border-blue-200';
+                                } elseif($mov->tipo_movimiento == 'Despacho Controlado') {
+                                    $badgeBg = 'bg-rose-50'; $badgeText = 'text-rose-700'; $badgeBorder = 'border-rose-200';
                                 }
+                                $responsableMov = $mov->user ? trim($mov->user->name . ' ' . ($mov->user->last_name ?? '')) : null;
                             @endphp
                             <tr class="hover:bg-slate-50 transition-colors">
                                 <td class="px-6 py-4">
@@ -152,7 +159,12 @@
                                 <td class="px-6 py-4">
                                     <div class="flex flex-col">
                                         <span class="text-slate-800 font-bold text-[13px]">{{ $mov->origen_destino }}</span>
-                                        <span class="text-[11px] font-medium text-slate-500">{{ $mov->documento_respaldo }}</span>
+                                        <span class="text-[11px] font-medium text-slate-500">
+                                            {{ $mov->documento_respaldo }}
+                                            @if($responsableMov)
+                                                · <span class="text-teal-700 font-semibold">Resp: {{ $responsableMov }}</span>
+                                            @endif
+                                        </span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 font-mono text-[12px] font-semibold text-slate-600">
@@ -333,8 +345,18 @@
                     let html = '<div class="relative pl-6 border-l-2 border-slate-200 space-y-7">';
                     
                     data.timeline.forEach((mov) => {
-                        let badgeBg = mov.tipo === 'Recepción' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200';
-                        let dotColor = mov.tipo === 'Recepción' ? 'bg-emerald-500 ring-emerald-50' : 'bg-blue-500 ring-blue-50';
+                        let badgeBg = 'bg-amber-50 text-amber-700 border-amber-200';
+                        let dotColor = 'bg-amber-500 ring-amber-50';
+                        if (mov.tipo === 'Recepción') {
+                            badgeBg = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                            dotColor = 'bg-emerald-500 ring-emerald-50';
+                        } else if (mov.tipo === 'Despacho') {
+                            badgeBg = 'bg-blue-50 text-blue-700 border-blue-200';
+                            dotColor = 'bg-blue-500 ring-blue-50';
+                        } else if (mov.tipo === 'Despacho Controlado') {
+                            badgeBg = 'bg-rose-50 text-rose-700 border-rose-200';
+                            dotColor = 'bg-rose-500 ring-rose-50';
+                        }
                         
                         html += `
                         <div class="relative">
@@ -347,7 +369,7 @@
                                     <p class="font-mono text-[11px] font-bold text-slate-400">${mov.fecha}</p>
                                 </div>
                                 <h4 class="text-[13px] font-black text-slate-800 leading-tight">${mov.origen_destino}</h4>
-                                <p class="text-[11.5px] font-medium text-slate-500 mt-1">Ref: <span class="text-slate-700 font-bold">${mov.documento}</span></p>
+                                <p class="text-[11.5px] font-medium text-slate-500 mt-1">Ref: <span class="text-slate-700 font-bold">${mov.documento}</span>${mov.responsable ? ` · <span class="text-teal-700 font-semibold">Resp: ${mov.responsable}</span>` : ''}</p>
                             </div>
                         </div>`;
                     });

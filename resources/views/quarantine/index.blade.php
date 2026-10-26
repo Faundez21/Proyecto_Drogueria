@@ -29,22 +29,24 @@
         </div>
 
         @php
-            $totalLotes = $inventories->total();
-            $totalUnidades = collect(isset($inventories) ? (method_exists($inventories, 'items') ? $inventories->items() : $inventories) : [])->sum('cantidad');
+            $totalLotes = $totalLotesGlobal ?? $inventories->total();
+            $totalUnidades = $totalUnidadesGlobal ?? collect(isset($inventories) ? (method_exists($inventories, 'items') ? $inventories->items() : $inventories) : [])->sum('cantidad');
+            $valorRetenido = $valorTotalRetenido ?? 0;
         @endphp
 
         <!-- Tarjetas de Resumen -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
             <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
                 <div class="absolute right-0 top-0 w-24 h-24 bg-amber-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
                 <div class="relative flex items-start justify-between">
                     <div>
-                        <p class="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-1">Lotes en Página Actual</p>
-                        <h4 class="text-3xl font-extrabold text-slate-800">
-                            {{ collect(isset($inventories) ? (method_exists($inventories, 'items') ? $inventories->items() : $inventories) : [])->count() }}
+                        <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">Total Lotes Retenidos</p>
+                        <h4 class="text-3xl font-extrabold text-slate-800 font-mono-das">
+                            {{ number_format($totalLotes, 0, ',', '.') }}
                         </h4>
+                        <p class="text-[11px] text-slate-400 mt-1.5 font-medium">Lotes activos en cuarentena (según filtros)</p>
                     </div>
-                    <div class="p-3 bg-amber-500 text-white rounded-xl shadow-md shadow-amber-200">
+                    <div class="p-3 bg-amber-500 text-white rounded-xl shadow-md shadow-amber-200 shrink-0">
                         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
                         </svg>
@@ -56,14 +58,33 @@
                 <div class="absolute right-0 top-0 w-24 h-24 bg-slate-100 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
                 <div class="relative flex items-start justify-between">
                     <div>
-                        <p class="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-1">Unidades Retenidas (Pág)</p>
-                        <h4 class="text-3xl font-extrabold text-slate-800">
+                        <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">Unidades Inmovilizadas</p>
+                        <h4 class="text-3xl font-extrabold text-slate-800 font-mono-das">
                             {{ number_format($totalUnidades, 0, ',', '.') }}
                         </h4>
+                        <p class="text-[11px] text-slate-400 mt-1.5 font-medium">Total acumulado de unidades retenidas</p>
                     </div>
-                    <div class="p-3 bg-slate-700 text-white rounded-xl shadow-md shadow-slate-200">
+                    <div class="p-3 bg-slate-700 text-white rounded-xl shadow-md shadow-slate-200 shrink-0">
                         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
+                <div class="absolute right-0 top-0 w-24 h-24 bg-rose-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                <div class="relative flex items-start justify-between">
+                    <div>
+                        <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">Valor Total Retenido</p>
+                        <h4 class="text-3xl font-extrabold text-slate-800 font-mono-das">
+                            $ {{ number_format($valorRetenido, 0, ',', '.') }}
+                        </h4>
+                        <p class="text-[11px] text-slate-400 mt-1.5 font-medium">Valorización neta de stock en revisión</p>
+                    </div>
+                    <div class="p-3 bg-rose-600 text-white rounded-xl shadow-md shadow-rose-200 shrink-0">
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                     </div>
                 </div>
@@ -113,6 +134,9 @@
                             <option value="">Todas</option>
                             <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
                             <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
+                            @if(auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado'))
+                                <option value="Fármacos Controlados" {{ request('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>Fármacos Controlados</option>
+                            @endif
                         </select>
                     </div>
 
@@ -375,16 +399,47 @@
         </div>
 
         <!-- MODAL: Etiqueta QR -->
+        <style>
+            @media print {
+                body * {
+                    visibility: hidden !important;
+                }
+                #qrModal,
+                #qrPrintableCard,
+                #qrPrintableCard * {
+                    visibility: visible !important;
+                }
+                #qrModal {
+                    position: fixed !important;
+                    inset: 0 !important;
+                    background: #ffffff !important;
+                    backdrop-filter: none !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    padding: 0 !important;
+                }
+                #qrPrintableCard {
+                    box-shadow: none !important;
+                    max-width: 340px !important;
+                    width: 100% !important;
+                    margin: 0 auto !important;
+                }
+                .no-print-qr {
+                    display: none !important;
+                }
+            }
+        </style>
         <div id="qrModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="relative w-full max-w-sm flex flex-col items-center">
-                <div class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
+                <div id="qrPrintableCard" class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
                     <div class="w-full flex flex-col items-center mb-4 z-10 border-b-2 border-black pb-3">
                         <h2 class="text-[17px] text-black font-black tracking-widest uppercase">DROGUERÍA DAS</h2>
                         <span class="text-[11px] text-black font-bold font-mono tracking-widest uppercase mt-0.5">Control de Trazabilidad</span>
                     </div>
                     <div class="bg-white p-2 mb-4 z-10 flex justify-center w-full">
-                        <div id="qrcode" class="w-[140px] h-[140px]"></div>
+                        <img id="qrcode" alt="Código QR del lote" class="w-[140px] h-[140px]">
                     </div>
                     <div class="w-full z-10 space-y-2.5 px-2">
                         <div class="text-center mb-4"><span id="qrProducto" class="text-[14px] font-black text-black block leading-tight uppercase">PRODUCTO</span></div>
@@ -398,7 +453,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-6 flex justify-center gap-4 w-full">
+                <div class="no-print-qr mt-6 flex justify-center gap-4 w-full">
                     <button type="button" onclick="closeQRModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md cursor-pointer">Cerrar Vista</button>
                     <button type="button" onclick="window.print()" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>Imprimir Etiqueta</button>
                 </div>
@@ -841,11 +896,10 @@
             setText('qrStock', stock + " UNID.");
             setText('qrProveedor', proveedor);
 
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = '';
-            setTimeout(() => {
-                new QRCode(qrContainer, { text: `LOTE:${lote}|PROD:${producto}|VENCE:${vencimiento}|STOCK:${stock}`, width: 140, height: 140 });
-            }, 150);
+            const qrImg = document.getElementById('qrcode');
+            if (qrImg) {
+                qrImg.src = "{{ url('qr') }}/" + id + "/image";
+            }
         }
         function closeQRModal() { document.getElementById('qrModal').classList.add('hidden'); }
 

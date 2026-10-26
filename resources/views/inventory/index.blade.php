@@ -478,10 +478,15 @@
                                                                     <td class="px-4 py-3 text-center">
                                                                         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[12px] font-bold bg-teal-50 text-teal-800 border border-teal-200 font-mono-das">$ {{ number_format($valorTotalLote, 0, ',', '.') }}</span>
                                                                     </td>
-                                                                    <td class="px-4 py-3 text-center ">
-                                                                        <button type="button" onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}', '{{ e($loteCategoria) }}', '{{ e($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}')" class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Cambiar Estado">
-                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                                                        </button>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        <div class="inline-flex items-center justify-center gap-1.5">
+                                                                            <button type="button" onclick="openQRModal('{{ e($loteId) }}', '{{ e($nombreProducto) }}', '{{ e($loteCodigo) }}', '{{ e($textoVencimiento) }}', '{{ $stockLote }}', '{{ e(data_get($loteData, 'razon_social') ?? 'Droguería DAS') }}')" class="p-1.5 text-slate-600 bg-slate-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-slate-200 hover:border-teal-600 shadow-sm cursor-pointer" title="Generar Etiqueta QR de este lote">
+                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                                                                            </button>
+                                                                            <button type="button" onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}', '{{ e($loteCategoria) }}', '{{ e($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}')" class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Cambiar Estado">
+                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                                            </button>
+                                                                        </div>
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
@@ -834,6 +839,18 @@
                         @endforeach
                     </datalist>
 
+                    <datalist id="catalogoProveedoresRutManual">
+                        @foreach($proveedoresActivos ?? [] as $provItem)
+                            <option value="{{ $provItem->rut }}">{{ $provItem->name }}</option>
+                        @endforeach
+                    </datalist>
+
+                    <datalist id="catalogoProveedoresNombreManual">
+                        @foreach($proveedoresActivos ?? [] as $provItem)
+                            <option value="{{ $provItem->name }}">{{ $provItem->rut }}</option>
+                        @endforeach
+                    </datalist>
+
                     <form action="{{ Route::has('inventory.store') ? route('inventory.store') : '#' }}" method="POST" id="manualDepositForm" novalidate onsubmit="return validateIngresoDirecto(event)">
                         @csrf
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
@@ -868,11 +885,11 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">RUT Proveedor</label>
-                                <input type="text" name="rut_proveedor" value="{{ old('rut_proveedor') }}" placeholder="Ej. 61.608.700-K" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
+                                <input type="text" id="manualRutProveedor" name="rut_proveedor" list="catalogoProveedoresRutManual" oninput="syncManualProvider('rut', this.value)" value="{{ old('rut_proveedor') }}" placeholder="Ej. 61.608.700-K" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Razón Social Proveedor / Origen</label>
-                                <input type="text" name="razon_social" value="{{ old('razon_social') }}" placeholder="Ej. CENABAST / Laboratorio Chile" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <input type="text" id="manualRazonSocial" name="razon_social" list="catalogoProveedoresNombreManual" oninput="syncManualProvider('name', this.value)" value="{{ old('razon_social') }}" placeholder="Ej. CENABAST / Laboratorio Chile" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                             </div>
 
                             <div class="sm:col-span-2 mt-3">
@@ -992,9 +1009,40 @@
         </div>
 
         <!-- Modal: Etiqueta QR -->
+        <style>
+            @media print {
+                body * {
+                    visibility: hidden !important;
+                }
+                #qrModal,
+                #qrPrintableCard,
+                #qrPrintableCard * {
+                    visibility: visible !important;
+                }
+                #qrModal {
+                    position: fixed !important;
+                    inset: 0 !important;
+                    background: #ffffff !important;
+                    backdrop-filter: none !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    padding: 0 !important;
+                }
+                #qrPrintableCard {
+                    box-shadow: none !important;
+                    max-width: 340px !important;
+                    width: 100% !important;
+                    margin: 0 auto !important;
+                }
+                .no-print-qr {
+                    display: none !important;
+                }
+            }
+        </style>
         <div id="qrModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="relative w-full max-w-sm flex flex-col items-center">
-                <div class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
+                <div id="qrPrintableCard" class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
                     <div class="w-full flex flex-col items-center mb-4 z-10 border-b-2 border-black pb-3">
                         <h2 class="text-[17px] text-black font-black tracking-widest uppercase">DROGUERÍA DAS</h2>
@@ -1029,7 +1077,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-6 flex justify-center gap-4 w-full">
+                <div class="no-print-qr mt-6 flex justify-center gap-4 w-full">
                     <button type="button" onclick="closeQRModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md cursor-pointer">Cerrar Vista</button>
                     <button type="button" onclick="window.print()" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
@@ -1559,6 +1607,22 @@
 
         function closeImport() {
             document.getElementById('importModal').classList.add('hidden');
+        }
+
+        const manualProvidersCatalog = @json($proveedoresActivos ?? []);
+
+        function syncManualProvider(by, val) {
+            const clean = (val || '').trim().toLowerCase();
+            if (!clean) return;
+            const rutInput = document.getElementById('manualRutProveedor');
+            const nameInput = document.getElementById('manualRazonSocial');
+            if (by === 'rut') {
+                const found = manualProvidersCatalog.find(p => (p.rut || '').trim().toLowerCase() === clean);
+                if (found && nameInput) nameInput.value = found.name;
+            } else if (by === 'name') {
+                const found = manualProvidersCatalog.find(p => (p.name || '').trim().toLowerCase() === clean);
+                if (found && rutInput) rutInput.value = found.rut;
+            }
         }
 
         function openDeposit() {
