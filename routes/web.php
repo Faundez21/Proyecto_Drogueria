@@ -50,9 +50,6 @@ Route::middleware('auth')->group(function () {
     // cierre de sesion
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    // vistas generales y dashboards
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
-
     // rutas para la barra de busqueda global y notificaciones
     Route::get('/api/global-search', [GlobalSearchController::class, 'search'])->name('global.search');
     Route::get('/api/notifications', [GlobalSearchController::class, 'notifications'])->name('global.notifications');
@@ -119,7 +116,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/inventario/plantilla', [InventoryController::class, 'template'])
         ->middleware('permission:ver.inventario')->name('inventario.template');
     Route::put('/inventario/{inventory}', [InventoryController::class, 'update'])
-        ->middleware('permission:ver.inventario')->name('inventario.update');
+        ->middleware('permission:ver.inventario|ver.cuarentena')->name('inventario.update');
     Route::get('/requests', [EstablishmentRequestController::class, 'index'])
         ->middleware(['auth', 'permission:ver.solicitudes'])
         ->name('requests.index');

@@ -801,7 +801,7 @@
                 </div>
 
                 <div class="p-6 sm:p-8 overflow-y-auto bg-slate-50/50">
-                    @if($errors->any() && session('open_modal') !== 'import')
+                    @if(isset($errors) && $errors->any() && session('open_modal') !== 'import')
                         <div class="mb-6 bg-rose-50 border-l-4 border-rose-600 border border-rose-200 rounded-xl p-4 shadow-sm">
                             <div class="flex items-start gap-3">
                                 <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -834,7 +834,7 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">N° Correlativo Interno</label>
-                                <input type="text" name="correlativo_interno" value="{{ old('correlativo_interno') }}" placeholder="Autogenerado si se deja vacío" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
+                                <input type="number" min="1" step="1" name="correlativo_interno" value="{{ old('correlativo_interno') }}" placeholder="Autogenerado si se deja vacío" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Fecha Recepción <span class="text-rose-500">*</span></label>
@@ -1967,7 +1967,7 @@
 
             @if (session('open_modal') === 'import')
                 openImport();
-            @elseif (session('open_modal') === 'deposit' || $errors->any())
+            @elseif (session('open_modal') === 'deposit' || (isset($errors) && $errors->any()))
                 openDeposit();
             @endif
         });

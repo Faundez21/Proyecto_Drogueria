@@ -155,7 +155,7 @@ class InventoryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'correlativo_interno' => 'nullable|string|max:100',
+            'correlativo_interno' => 'nullable|integer|min:1',
             'fecha_recepcion' => 'required|date',
             'tipo_documento' => 'required|string|max:255',
             'numero_documento' => 'required|string|max:255',
@@ -210,8 +210,8 @@ class InventoryController extends Controller
                     ? trim((string) $validated['lote'])
                     : 'S/L';
                 $validated['correlativo_interno'] = isset($validated['correlativo_interno']) && trim((string) $validated['correlativo_interno']) !== ''
-                    ? trim((string) $validated['correlativo_interno'])
-                    : ('ING-' . date('Ymd-His'));
+                    ? (int) $validated['correlativo_interno']
+                    : (((int) Inventory::max('correlativo_interno')) + 1);
                 $validated['product_id'] = InventoryService::productoId($validated['producto']);
 
                 if (! isset($validated['valor_neto_unitario']) || $validated['valor_neto_unitario'] === '' || $validated['valor_neto_unitario'] === null) {

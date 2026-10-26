@@ -63,17 +63,17 @@ class GlobalSearchController extends Controller
         try {
             $proveedores = DB::table('providers')
                 ->where('name', 'LIKE', $searchTerm)
-                ->orWhere('nombre', 'LIKE', $searchTerm)
-                ->orWhere('razon_social', 'LIKE', $searchTerm)
+                ->orWhere('business_line', 'LIKE', $searchTerm)
                 ->orWhere('rut', 'LIKE', $searchTerm)
-                ->limit(2)->get();
+                ->orWhere('email', 'LIKE', $searchTerm)
+                ->limit(3)->get();
                 
             foreach ($proveedores as $prov) {
                 $results[] = [
                     'type' => 'Proveedores',
-                    'title' => $prov->name ?? $prov->nombre ?? $prov->razon_social ?? 'Proveedor Externo',
-                    'subtitle' => 'RUT: ' . ($prov->rut ?? 'S/R'),
-                    'url' => route('providers.index') . '?search=' . urlencode($prov->rut ?? ''),
+                    'title' => $prov->name ?? 'Proveedor Externo',
+                    'subtitle' => 'RUT: ' . ($prov->rut ?? 'S/R') . ($prov->category ? ' | ' . $prov->category : ''),
+                    'url' => route('providers.index') . '?search=' . urlencode($prov->rut ?? $prov->name ?? ''),
                     'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>'
                 ];
             }
@@ -142,13 +142,31 @@ class GlobalSearchController extends Controller
                             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>',
                             'title' => "Solicitud {$sol->numero_solicitud} sin asignar",
                             'message' => "{$sol->establecimiento} requiere asignación de trabajador.",
-                            'time' => 'Asignar',
+                            'time' => 'Asignar en Despacho',
                             'url' => route('dispatch.index'),
+                        ];
+                    }
+
+                    // Solicitudes pendientes de recuperación de clave para Administrador
+                    $clavesPendientes = DB::table('password_reset_tokens')
+                        ->where('status', 'pending')
+                        ->count();
+
+                    if ($clavesPendientes > 0) {
+                        $notifications[] = [
+                            'color' => 'text-purple-600',
+                            'bg' => 'bg-purple-100',
+                            'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>',
+                            'title' => 'Recuperación de Contraseña',
+                            'message' => "Hay {$clavesPendientes} usuario(s) solicitando restablecer su clave.",
+                            'time' => 'Gestionar Claves',
+                            'url' => route('users.index'),
                         ];
                     }
                 }
             }
             $vencimientos = DB::table('inventories')
+                ->where('Estado', 'Disponible')
                 ->where('cantidad', '>', 0)
                 ->whereNotNull('fecha_vencimiento')
                 ->where('fecha_vencimiento', '<=', Carbon::now()->addDays(60))
@@ -157,8 +175,10 @@ class GlobalSearchController extends Controller
                 ->get();
 
             foreach($vencimientos as $vence) {
-                $dias = intval(Carbon::parse($vence->fecha_vencimiento)->diffInDays(Carbon::now()));
-                $estado = Carbon::parse($vence->fecha_vencimiento)->isPast() ? 'Vencido hace' : 'Vence en';
+                $fechaVencCarbon = Carbon::parse($vence->fecha_vencimiento)->startOfDay();
+                $hoyCarbon = Carbon::now()->startOfDay();
+                $dias = (int) abs($hoyCarbon->diffInDays($fechaVencCarbon, false));
+                $estado = $fechaVencCarbon->isPast() ? 'Vencido hace' : 'Vence en';
 
                 $notifications[] = [
                     'color' => 'text-rose-600',
