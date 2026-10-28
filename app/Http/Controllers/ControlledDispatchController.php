@@ -128,6 +128,7 @@ class ControlledDispatchController extends Controller
                 'firma_recibe' => $firmaRecibe,
             ]);
 
+            $itemsControlados = [];
             foreach ($validated['productos'] as $index => $nombreProducto) {
                 if (! InventoryService::esControlado($nombreProducto)) {
                     throw new \RuntimeException("El producto '{$nombreProducto}' no es un fármaco controlado válido en este sistema.");
@@ -161,6 +162,14 @@ class ControlledDispatchController extends Controller
                         'origen_destino' => 'Hacia: ' . $destino,
                         'documento_respaldo' => 'Guia Controlada N° ' . $correlativo,
                     ]);
+
+                    $itemsControlados[] = [
+                        'producto' => $nombreProducto,
+                        'lote' => $batch->lote ?? 'S/L',
+                        'cantidad' => (int) $asignacion['cantidad'],
+                        'vencimiento' => $batch->fecha_vencimiento ? date('d/m/Y', strtotime($batch->fecha_vencimiento)) : 'N/A',
+                        'programa' => $validated['programas'][$index] ?? 'General',
+                    ];
                 }
             }
 
@@ -174,7 +183,21 @@ class ControlledDispatchController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', "Despacho Controlado N° {$correlativo} generado con FEFO y stock descontado con éxito.");
+            $controlledDetail = [
+                'correlativo' => $correlativo,
+                'destino' => $destino,
+                'clasificacion' => $validated['clasificacion'],
+                'fecha' => !empty($validated['fecha_despacho']) ? date('d/m/Y', strtotime($validated['fecha_despacho'])) : date('d/m/Y'),
+                'series_recetas' => $validated['series_recetas'] ?? null,
+                'total_items' => count($itemsControlados),
+                'total_unidades' => array_sum(array_column($itemsControlados, 'cantidad')),
+                'items' => $itemsControlados,
+                'pdf_url' => route('controlled_dispatch.pdf', $dispatch->id),
+            ];
+
+            return redirect()->back()
+                ->with('success', "Despacho Controlado N° {$correlativo} generado con FEFO y stock descontado con éxito.")
+                ->with('controlled_dispatch_success_detail', $controlledDetail);
         } catch (\RuntimeException $e) {
             DB::rollBack();
 

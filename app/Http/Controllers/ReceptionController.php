@@ -175,19 +175,35 @@ class ReceptionController extends Controller
                     'documento_respaldo' => $validated['tipo_documento'] . ' ' . $validated['numero_documento'],
                     'estado_lote' => 'Disponible',
                 ]);
+                $itemsResumen[] = [
+                    'producto' => $nombreProducto,
+                    'lote' => $validated['lote'][$index] ?? 'S/L',
+                    'vencimiento' => !empty($fechaVence) ? date('d/m/Y', strtotime($fechaVence)) : 'N/A',
+                    'cantidad' => (int) $cantidad,
+                    'tipo' => $categoriaInventario,
+                ];
             }
 
             $reception->update(['valor_total_recepcion' => $total_neto_recepcion * $factorIva]);
 
             DB::commit();
 
-            if (($validated['action'] ?? '') === 'save_and_download') {
-                return redirect()->route('reception.pdf', $reception->id);
-            }
+            $receptionDetail = [
+                'correlativo' => $correlativo,
+                'proveedor' => $provider->name,
+                'documento' => $validated['tipo_documento'] . ' N° ' . $validated['numero_documento'],
+                'total_items' => count($itemsResumen),
+                'total_unidades' => array_sum(array_column($itemsResumen, 'cantidad')),
+                'valor_total' => $total_neto_recepcion * $factorIva,
+                'items' => $itemsResumen,
+                'pdf_url' => route('reception.pdf', $reception->id),
+                'auto_download' => ($validated['action'] ?? '') === 'save_and_download',
+            ];
 
             return redirect()
                 ->route('reception.index')
-                ->with('success', "Recepción guardada y registrada en trazabilidad. N°: {$correlativo}");
+                ->with('success', "Recepción guardada y registrada en trazabilidad. N°: {$correlativo}")
+                ->with('reception_success_detail', $receptionDetail);
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Error al guardar recepción: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
