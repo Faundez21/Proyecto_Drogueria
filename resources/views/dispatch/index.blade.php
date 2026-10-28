@@ -281,31 +281,31 @@
                             <option value="CESFAM LOS CERROS"
                                 data-direccion="Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano">CESFAM
                                 LOS CERROS</option>
-                            <option value="CECOSF CENTINELA"
-                                data-direccion="Calle Punta Peñablanca 1301, poblacion Centinela, Talcahuano">CECOSF
-                                CENTINELA</option>
-                            <option value="CECOSF LOS LOBOS - LA GLORIA"
-                                data-direccion="Calle Los Lobos 1960, poblacion Los Lobos, Talcahuano">CECOSF LOS LOBOS -
-                                LA GLORIA</option>
-                            <option value="POSTA TUMBE" data-direccion="Maryland s/n, Caleta Tumbes, Talcahuano">POSTA
-                                TUMBE</option>
-                            <option value="CESFAM PAULINA AVENDAÑO"
+                            <option value="CESFAM PAULINA AVENDAÑO PEREDA"
                                 data-direccion="Calle Carlos Dittborn 4100, Villa San Martin, Talcahuano">CESFAM PAULINA
-                                AVENDAÑO</option>
+                                AVENDAÑO PEREDA</option>
                             <option value="CESFAM SAN VICENTE" data-direccion="Calle Brasil 360, San Vicente, Talcahuano">
                                 CESFAM SAN VICENTE</option>
-                            <option value="CECOSF LIBERTAD GAETE"
-                                data-direccion="Calle Isla San Ambrosio 509, poblacion Libertad, Talcahuano">CECOSF
-                                LIBERTAD GAETE</option>
-                            <option value="CECOSF 8 DE MAYO"
-                                data-direccion="Calle Aysen 7370, poblacion Diego Portales, Talcahuano">CECOSF 8 DE MAYO
-                            </option>
+                            <option value="CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN"
+                                data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM ALCALDE
+                                LEOCÁN PORTUS GOVINDEN</option>
                             <option value="CECOSF ESMERALDA"
                                 data-direccion="Calle San Miguel 546, Poblacion Patricio Lynch, Talcahuano">CECOSF
                                 ESMERALDA</option>
-                            <option value="CESFAM LEOCAN PORTUS"
-                                data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM LEOCAN
-                                PORTUS</option>
+                            <option value="CECOSF 8 DE MAYO"
+                                data-direccion="Calle Aysen 7370, poblacion Diego Portales, Talcahuano">CECOSF 8 DE MAYO
+                            </option>
+                            <option value="CECOSF LIBERTAD-GAETE"
+                                data-direccion="Calle Isla San Ambrosio 509, poblacion Libertad, Talcahuano">CECOSF
+                                LIBERTAD-GAETE</option>
+                            <option value="CECOSF LOS LOBOS-LA GLORIA"
+                                data-direccion="Calle Los Lobos 1960, poblacion Los Lobos, Talcahuano">CECOSF LOS LOBOS-LA
+                                GLORIA</option>
+                            <option value="CECOSF VILLA CENTINELA"
+                                data-direccion="Calle Punta Peñablanca 1301, poblacion Centinela, Talcahuano">CECOSF
+                                VILLA CENTINELA</option>
+                            <option value="POSTA RURAL TUMBES" data-direccion="Maryland s/n, Caleta Tumbes, Talcahuano">POSTA
+                                RURAL TUMBES</option>
                             <option value="SAR SAN VICENTE" data-direccion="Juan de la Cruz Tapia s/n, Talcahuano">SAR SAN
                                 VICENTE</option>
                             <option value="SAR LOS CERROS" data-direccion="Calle Coliumo S/N Nueva los Lobos, Talcahuano">
@@ -315,6 +315,14 @@
                                 CESFAM SAN VICENTE</option>
                             <option value="Laboratorio - CESFAM SAN VICENTE" data-direccion="Brasil 360, Talcahuano">
                                 Laboratorio - CESFAM SAN VICENTE</option>
+                            <option value="MÓDULO DENTAL JUNAEB" data-direccion="Calle Blanco Encalada 455, Talcahuano">
+                                MÓDULO DENTAL JUNAEB</option>
+                            <option value="MÓVIL: LICEO POLIVALENTE Y LICEO COMERCIAL" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">
+                                MÓVIL: LICEO POLIVALENTE Y LICEO COMERCIAL</option>
+                            <option value="MÓVIL: LICEO INDUSTRIAL Y LICEO ASUNCIÓN" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">
+                                MÓVIL: LICEO INDUSTRIAL Y LICEO ASUNCIÓN</option>
+                            <option value="MÓVIL: LICEO A-21" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">
+                                MÓVIL: LICEO A-21</option>
                         </select>
                     </div>
 
@@ -993,20 +1001,24 @@
                             class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
                         <datalist id="sugerencias-destinos">
                             <option value="CESFAM LOS CERROS">
-                            <option value="CECOSF CENTINELA">
-                            <option value="CECOSF LOS LOBOS - LA GLORIA">
-                            <option value="POSTA TUMBE">
-                            <option value="CESFAM PAULINA AVENDAÑO">
+                            <option value="CESFAM PAULINA AVENDAÑO PEREDA">
                             <option value="CESFAM SAN VICENTE">
-                            <option value="CECOSF LIBERTAD GAETE">
-                            <option value="CECOSF 8 DE MAYO">
+                            <option value="CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN">
                             <option value="CECOSF ESMERALDA">
-                            <option value="CESFAM LEOCAN PORTUS">
+                            <option value="CECOSF 8 DE MAYO">
+                            <option value="CECOSF LIBERTAD-GAETE">
+                            <option value="CECOSF LOS LOBOS-LA GLORIA">
+                            <option value="CECOSF VILLA CENTINELA">
+                            <option value="POSTA RURAL TUMBES">
                             <option value="SAR SAN VICENTE">
                             <option value="SAR LOS CERROS">
                             <option value="UAPO">
                             <option value="Dental - CESFAM SAN VICENTE">
                             <option value="Laboratorio - CESFAM SAN VICENTE">
+                            <option value="MÓDULO DENTAL JUNAEB">
+                            <option value="MÓVIL: LICEO POLIVALENTE Y LICEO COMERCIAL">
+                            <option value="MÓVIL: LICEO INDUSTRIAL Y LICEO ASUNCIÓN">
+                            <option value="MÓVIL: LICEO A-21">
                         </datalist>
                     </div>
 
@@ -2080,9 +2092,11 @@
                 .trim()
                 .toLowerCase();
 
-            const opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option =>
-                option.value.trim().toLowerCase() === establecimientoSolicitud
-            );
+            const opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option => {
+                const optVal = option.value.trim().toLowerCase();
+                return optVal === establecimientoSolicitud || 
+                    (establecimientoSolicitud && (optVal.includes(establecimientoSolicitud) || establecimientoSolicitud.includes(optVal)));
+            });
 
             if (opcionEstablecimiento) {
                 selectEstablecimiento.value = opcionEstablecimiento.value;

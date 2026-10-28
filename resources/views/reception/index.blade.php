@@ -294,6 +294,58 @@
                                     <input type="number" name="valor_unitario[]" step="1" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="calc-price w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-mono-das font-semibold">
                                 </div>
                             </div>
+
+                            <!-- Distribución Física en Bodega -->
+                            <div class="mt-3.5 pt-3 border-t border-slate-200/80 bg-slate-50/80 rounded-xl p-3 sm:p-3.5 border border-dashed border-slate-300">
+                                <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                                    <span class="text-[11.5px] font-bold text-slate-700 flex items-center gap-1.5 uppercase tracking-wide">
+                                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        Distribución Física en Bodega (Ubicación)
+                                    </span>
+                                    <span class="text-[11px] text-slate-500 font-medium">Asigna pasillo, estante y nivel para ordenar el stock de inmediato</span>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Pasillo</label>
+                                        <select name="pasillo[]" onchange="onPasilloChange(this)" class="select-pasillo-recepcion w-full bg-white border border-slate-300 text-slate-800 rounded-lg py-2 px-2.5 text-[12.5px] focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs outline-none">
+                                            <option value="">Seleccione Pasillo...</option>
+                                            @foreach($pasillosLista ?? [] as $pasillo)
+                                                <option value="{{ $pasillo }}">{{ $pasillo }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Estante</label>
+                                        <select name="estante[]" onchange="onEstanteChange(this)" class="select-estante-recepcion w-full bg-white border border-slate-300 text-slate-800 rounded-lg py-2 px-2.5 text-[12.5px] focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs outline-none">
+                                            <option value="">Seleccione Estante...</option>
+                                            @foreach($estantesLista ?? [] as $estante)
+                                                <option value="{{ $estante }}">{{ $estante }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Nivel</label>
+                                        <select name="nivel[]" onchange="onNivelChange(this)" class="select-nivel-recepcion w-full bg-white border border-slate-300 text-slate-800 rounded-lg py-2 px-2.5 text-[12.5px] focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs outline-none">
+                                            <option value="">Seleccione Nivel...</option>
+                                            @foreach($nivelesLista ?? [] as $nivel)
+                                                <option value="{{ $nivel }}">Nivel {{ $nivel }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Posición</label>
+                                        <select name="posicion[]" class="select-posicion-recepcion w-full bg-white border border-slate-300 text-slate-800 rounded-lg py-2 px-2.5 text-[12.5px] focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs outline-none">
+                                            <option value="">Seleccione Posición...</option>
+                                            @foreach($posicionesLista ?? [] as $posicion)
+                                                <option value="{{ $posicion }}">Posición {{ $posicion }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -726,6 +778,106 @@
             return clone;
         }
 
+        window.distribucionJerarquia = @json($distribucionJerarquia ?? []);
+        window.todosLosPasillos = @json($pasillosLista ?? []);
+        window.todosLosEstantes = @json($estantesLista ?? []);
+        window.todosLosNiveles = @json($nivelesLista ?? []);
+        window.todosLasPosiciones = @json($posicionesLista ?? []);
+
+        function onPasilloChange(selectPasillo) {
+            const card = selectPasillo.closest('.producto-item');
+            if (!card) return;
+            const pasillo = selectPasillo.value.trim().toLowerCase();
+            const selectEstante = card.querySelector('.select-estante-recepcion');
+            if (!selectEstante) return;
+
+            const estanteActual = selectEstante.value;
+            selectEstante.innerHTML = '<option value="">Seleccione Estante...</option>';
+
+            const jerarquia = window.distribucionJerarquia || [];
+            let estantesFiltrados = jerarquia.filter(item => !pasillo || (item.pasillo || '').toLowerCase() === pasillo).map(i => i.estante);
+
+            if (estantesFiltrados.length === 0) {
+                estantesFiltrados = window.todosLosEstantes || [];
+            }
+
+            estantesFiltrados.forEach(est => {
+                const opt = document.createElement('option');
+                opt.value = est;
+                opt.textContent = est;
+                if (est === estanteActual) opt.selected = true;
+                selectEstante.appendChild(opt);
+            });
+        }
+
+        function onEstanteChange(selectEstante) {
+            const card = selectEstante.closest('.producto-item');
+            if (!card) return;
+            const estanteNombre = selectEstante.value.trim();
+            const jerarquia = window.distribucionJerarquia || [];
+            const infoEstante = jerarquia.find(item => (item.estante || '').toLowerCase() === estanteNombre.toLowerCase());
+
+            const selectPasillo = card.querySelector('.select-pasillo-recepcion');
+            if (selectPasillo && infoEstante && infoEstante.pasillo) {
+                selectPasillo.value = infoEstante.pasillo;
+            }
+
+            const selectNivel = card.querySelector('.select-nivel-recepcion');
+            if (selectNivel) {
+                const nivelActual = selectNivel.value;
+                selectNivel.innerHTML = '<option value="">Seleccione Nivel...</option>';
+                const niveles = (infoEstante && infoEstante.niveles && infoEstante.niveles.length > 0)
+                    ? infoEstante.niveles.map(n => n.nivel)
+                    : (window.todosLosNiveles || []);
+
+                niveles.forEach(niv => {
+                    const opt = document.createElement('option');
+                    opt.value = niv;
+                    opt.textContent = 'Nivel ' + niv;
+                    if (niv === nivelActual) opt.selected = true;
+                    selectNivel.appendChild(opt);
+                });
+            }
+
+            onNivelChange(selectNivel);
+        }
+
+        function onNivelChange(selectNivel) {
+            if (!selectNivel) return;
+            const card = selectNivel.closest('.producto-item');
+            if (!card) return;
+            const selectEstante = card.querySelector('.select-estante-recepcion');
+            const selectPosicion = card.querySelector('.select-posicion-recepcion');
+            if (!selectPosicion) return;
+
+            const estanteNombre = (selectEstante?.value || '').trim().toLowerCase();
+            const nivelNum = (selectNivel.value || '').trim();
+            const jerarquia = window.distribucionJerarquia || [];
+            const infoEstante = jerarquia.find(item => (item.estante || '').toLowerCase() === estanteNombre);
+
+            let posiciones = [];
+            if (infoEstante && infoEstante.niveles) {
+                const infoNivel = infoEstante.niveles.find(n => (n.nivel || '').toString() === nivelNum.toString());
+                if (infoNivel && infoNivel.posiciones) {
+                    posiciones = infoNivel.posiciones;
+                }
+            }
+
+            if (posiciones.length === 0) {
+                posiciones = window.todosLasPosiciones || [];
+            }
+
+            const posActual = selectPosicion.value;
+            selectPosicion.innerHTML = '<option value="">Seleccione Posición...</option>';
+            posiciones.forEach(pos => {
+                const opt = document.createElement('option');
+                opt.value = pos;
+                opt.textContent = 'Posición ' + pos;
+                if (pos === posActual) opt.selected = true;
+                selectPosicion.appendChild(opt);
+            });
+        }
+
         function agregarFilaPorGrupo(grupo) {
             const container = document.getElementById('productos_container');
             const items = container.querySelectorAll('.producto-item');
@@ -823,6 +975,7 @@
                                     <th class="p-2">Producto</th>
                                     <th class="p-2 text-center">Lote</th>
                                     <th class="p-2 text-center">Vencimiento</th>
+                                    <th class="p-2 text-center">Ubicación</th>
                                     <th class="p-2 text-right">Cant.</th>
                                 </tr>
                             </thead>
@@ -835,6 +988,11 @@
                                         </td>
                                         <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote || 'S/L'}</td>
                                         <td class="p-2 text-center text-slate-600">${it.vencimiento || 'N/A'}</td>
+                                        <td class="p-2 text-center">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10.5px] font-bold ${it.ubicacion && it.ubicacion !== 'P.A' ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-slate-100 text-slate-500'}">
+                                                ${it.ubicacion || 'P.A'}
+                                            </span>
+                                        </td>
                                         <td class="p-2 text-right font-bold text-teal-700">${Number(it.cantidad || 0).toLocaleString('es-CL')} u.</td>
                                     </tr>
                                 `).join('')}

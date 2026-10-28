@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aisle;
 use App\Models\Inventory;
+use App\Models\Level;
+use App\Models\Position;
 use App\Models\Product;
 use App\Models\Provider;
 use App\Models\Reception;
 use App\Models\ReceptionItem;
+use App\Models\Shelf;
 use App\Services\InventoryService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -47,13 +51,50 @@ class ReceptionController extends Controller
         $nextCorrelativo = (int) Reception::max('correlativo') + 1;
         $controlados = InventoryService::controlados();
 
+        // Extraer campos de distribución física
+        $shelves = Shelf::with(['aisle', 'levels.positions'])->orderBy('name')->get();
+
+        $pasillosInv = Inventory::whereNotNull('pasillo')->where('pasillo', '!=', '')->where('pasillo', '!=', 'P.A')->distinct()->pluck('pasillo');
+        $pasillosMant = Aisle::orderBy('name')->pluck('name');
+        $pasillosLista = $pasillosMant->merge($pasillosInv)->unique()->sort(SORT_NATURAL)->values();
+
+        $estantesInv = Inventory::whereNotNull('estante')->where('estante', '!=', '')->where('estante', '!=', 'P.A')->distinct()->pluck('estante');
+        $estantesMant = Shelf::orderBy('name')->pluck('name');
+        $estantesLista = $estantesMant->merge($estantesInv)->unique()->sort(SORT_NATURAL)->values();
+
+        $nivelesInv = Inventory::whereNotNull('nivel')->where('nivel', '!=', '')->distinct()->pluck('nivel')->map(fn ($v) => (string) $v);
+        $nivelesMant = Level::distinct()->orderBy('number')->pluck('number')->map(fn ($v) => (string) $v);
+        $nivelesLista = $nivelesMant->merge($nivelesInv)->unique()->sort(SORT_NATURAL)->values();
+
+        $posicionesInv = Inventory::whereNotNull('posicion')->where('posicion', '!=', '')->distinct()->pluck('posicion');
+        $posicionesMant = Position::distinct()->orderBy('name')->pluck('name');
+        $posicionesLista = $posicionesMant->merge($posicionesInv)->unique()->sort(SORT_NATURAL)->values();
+
+        $distribucionJerarquia = $shelves->map(function ($s) {
+            return [
+                'estante' => $s->name,
+                'pasillo' => $s->aisle?->name ?? '',
+                'niveles' => $s->levels->map(function ($lvl) {
+                    return [
+                        'nivel' => (string) $lvl->number,
+                        'posiciones' => $lvl->positions->pluck('name')->values()->all(),
+                    ];
+                })->values()->all(),
+            ];
+        })->values();
+
         return view('reception.index', compact(
             'providers',
             'receptions',
             'products',
             'productosAgrupados',
             'nextCorrelativo',
-            'controlados'
+            'controlados',
+            'pasillosLista',
+            'estantesLista',
+            'nivelesLista',
+            'posicionesLista',
+            'distribucionJerarquia'
         ));
     }
 
@@ -82,6 +123,14 @@ class ReceptionController extends Controller
             'tipo_producto.*' => ['nullable', 'string', 'max:255'],
             'programa' => ['nullable', 'array'],
             'programa.*' => ['nullable', 'string', 'max:255'],
+            'pasillo' => ['nullable', 'array'],
+            'pasillo.*' => ['nullable', 'string', 'max:50'],
+            'estante' => ['nullable', 'array'],
+            'estante.*' => ['nullable', 'string', 'max:50'],
+            'nivel' => ['nullable', 'array'],
+            'nivel.*' => ['nullable', 'string', 'max:100'],
+            'posicion' => ['nullable', 'array'],
+            'posicion.*' => ['nullable', 'string', 'max:100'],
         ]);
 
         $provider = Provider::findOrFail($validated['provider_id']);
@@ -165,8 +214,10 @@ class ReceptionController extends Controller
                     'cantidad' => $cantidad,
                     'valor_neto_unitario' => $valorU,
                     'programa' => $validated['programa'][$index] ?? null,
-                    'pasillo' => 'P.A',
-                    'estante' => 'P.A',
+                    'pasillo' => !empty($validated['pasillo'][$index]) ? trim($validated['pasillo'][$index]) : 'P.A',
+                    'estante' => !empty($validated['estante'][$index]) ? trim($validated['estante'][$index]) : 'P.A',
+                    'nivel' => !empty($validated['nivel'][$index]) ? trim($validated['nivel'][$index]) : null,
+                    'posicion' => !empty($validated['posicion'][$index]) ? trim($validated['posicion'][$index]) : null,
                 ]);
 
                 InventoryService::registrarMovimiento($batch, [
@@ -179,6 +230,18 @@ class ReceptionController extends Controller
                     'estado_lote' => 'Disponible',
                 ]);
 
+                $pasVal = !empty($validated['pasillo'][$index]) ? trim($validated['pasillo'][$index]) : '';
+                $estVal = !empty($validated['estante'][$index]) ? trim($validated['estante'][$index]) : '';
+                $nivVal = !empty($validated['nivel'][$index]) ? trim($validated['nivel'][$index]) : '';
+
+                $ubicacionTexto = 'P.A';
+                if ($estVal && $estVal !== 'P.A') {
+                    $ubicacionTexto = ($pasVal && $pasVal !== 'P.A') ? "{$pasVal} / {$estVal}" : $estVal;
+                    if ($nivVal) $ubicacionTexto .= " (N: {$nivVal})";
+                } elseif ($pasVal && $pasVal !== 'P.A') {
+                    $ubicacionTexto = $pasVal;
+                }
+
                 $itemsResumen[] = [
                     'producto' => $nombreProducto,
                     'lote' => $loteItem,
@@ -186,6 +249,7 @@ class ReceptionController extends Controller
                     'cantidad' => (int) $cantidad,
                     'tipo' => $categoriaInventario,
                     'subtotal_iva' => $subtotalIva,
+                    'ubicacion' => $ubicacionTexto,
                 ];
             }
 
