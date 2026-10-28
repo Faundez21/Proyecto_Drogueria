@@ -126,7 +126,14 @@ class LoginController extends Controller
             return redirect()->route('reports.index');
         }
 
-        return redirect()->intended(route('dashboard.index'));
+        // Si el usuario no tiene ninguna vista asignada, cerramos la sesión para evitar el bucle infinito
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect()->route('login')->withErrors([
+            'email' => 'Tu usuario no tiene ninguna vista asignada en el sistema. Contacta a un administrador para que configure tus accesos.',
+        ]);
     }
 
     public function logout(Request $request)

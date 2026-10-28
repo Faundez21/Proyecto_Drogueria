@@ -113,11 +113,20 @@ class UserController extends Controller
                 'unique:users,email',
             ],
             'password' => 'required|string|min:8|max:64',
-            'role' => 'nullable|string|exists:roles,name',
+            'role' => 'required|string|exists:roles,name',
             'status' => 'nullable|in:activo,inactivo',
         ], [
             'email.regex' => 'El correo debe tener una extensión válida (ej. .com, .cl).',
+            'role.required' => 'Debes seleccionar un rol para el usuario.',
+            'role.exists' => 'El rol seleccionado no es válido.',
         ]);
+
+        $role = Role::where('name', $validated['role'])->first();
+        if ($role && $role->name !== 'Administrador' && $role->permissions()->count() === 0) {
+            return back()->withInput()->withErrors([
+                'role' => "El rol '{$role->name}' no tiene ninguna vista asignada. Asigna al menos 1 vista a este rol antes de asignarlo a un usuario."
+            ]);
+        }
 
         $user = User::create([
             'name' => $validated['name'],
@@ -127,7 +136,7 @@ class UserController extends Controller
             'status' => $validated['status'] ?? 'activo',
         ]);
 
-        $user->assignRole($validated['role'] ?? 'Usuario');
+        $user->assignRole($validated['role']);
 
         return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
     }
@@ -144,11 +153,20 @@ class UserController extends Controller
                 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
                 'unique:users,email,'.$user->id,
             ],
-            'role' => 'nullable|string|exists:roles,name',
+            'role' => 'required|string|exists:roles,name',
             'status' => 'nullable|in:activo,inactivo',
         ], [
             'email.regex' => 'El correo debe tener una extensión válida (ej. .com, .cl).',
+            'role.required' => 'Debes seleccionar un rol para el usuario.',
+            'role.exists' => 'El rol seleccionado no es válido.',
         ]);
+
+        $role = Role::where('name', $validated['role'])->first();
+        if ($role && $role->name !== 'Administrador' && $role->permissions()->count() === 0) {
+            return back()->withInput()->withErrors([
+                'role' => "El rol '{$role->name}' no tiene ninguna vista asignada. Asigna al menos 1 vista a este rol antes de asignarlo a un usuario."
+            ]);
+        }
 
         $userData = [
             'name' => $validated['name'],
@@ -162,9 +180,7 @@ class UserController extends Controller
 
         $user->update($userData);
 
-        if (! empty($validated['role'])) {
-            $user->syncRoles([$validated['role']]);
-        }
+        $user->syncRoles([$validated['role']]);
 
         return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
     }
@@ -190,26 +206,50 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:roles,name',
-            'modulos' => 'nullable|array',
+            'modulos' => 'required|array|min:1',
             'modulos.*' => 'string|in:'.implode(',', array_keys(self::MODULOS)),
+        ], [
+            'name.required' => 'El nombre del rol es obligatorio.',
+            'name.unique' => 'Ya existe un rol con este nombre.',
+            'modulos.required' => 'Debes asignar al menos 1 vista al rol.',
+            'modulos.min' => 'Debes asignar al menos 1 vista al rol.',
+            'modulos.*.in' => 'Una de las vistas seleccionadas no es válida.',
         ]);
 
         $rol = Role::create(['name' => $validated['name']]);
-        $this->sincronizarAccesos($rol, $validated['modulos'] ?? []);
+        $this->sincronizarAccesos($rol, $validated['modulos']);
 
         return redirect()->route('users.index')->with('success', "Rol '{$rol->name}' creado con sus accesos.");
     }
 
     public function updateRole(Request $request, Role $role)
     {
-        $validated = $request->validate([
+        $rules = [
             'name' => 'required|string|max:255|unique:roles,name,'.$role->id,
-            'modulos' => 'nullable|array',
+            'modulos' => 'required|array|min:1',
             'modulos.*' => 'string|in:'.implode(',', array_keys(self::MODULOS)),
+        ];
+
+        // Si es el rol Administrador, siempre tiene todas las vistas
+        if ($role->name === 'Administrador') {
+            $rules['modulos'] = 'nullable|array';
+        }
+
+        $validated = $request->validate($rules, [
+            'name.required' => 'El nombre del rol es obligatorio.',
+            'name.unique' => 'Ya existe un rol con este nombre.',
+            'modulos.required' => 'Debes asignar al menos 1 vista al rol.',
+            'modulos.min' => 'Debes asignar al menos 1 vista al rol.',
+            'modulos.*.in' => 'Una de las vistas seleccionadas no es válida.',
         ]);
 
         $role->update(['name' => $validated['name']]);
-        $this->sincronizarAccesos($role, $validated['modulos'] ?? []);
+        
+        $modulos = $role->name === 'Administrador'
+            ? array_keys(self::MODULOS)
+            : ($validated['modulos'] ?? []);
+
+        $this->sincronizarAccesos($role, $modulos);
 
         return redirect()->route('users.index')->with('success', "Rol '{$role->name}' actualizado correctamente.");
     }
