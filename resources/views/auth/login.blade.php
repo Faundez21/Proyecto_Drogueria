@@ -609,6 +609,41 @@
                 if (submitArrow) submitArrow.classList.add('hidden');
                 if (submitSpinner) submitSpinner.classList.remove('hidden');
             }
+
+            // Fallback de seguridad: si no se redirige en 10s, restaurar el botón
+            setTimeout(resetLoginButton, 10000);
+        });
+
+        // Restaurar estado del botón de inicio de sesión
+        function resetLoginButton() {
+            const submitBtn = document.getElementById('btn_submit_login');
+            const submitText = document.getElementById('btn_submit_text');
+            const submitArrow = document.getElementById('btn_submit_arrow');
+            const submitSpinner = document.getElementById('btn_submit_spinner');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                if (submitText) submitText.textContent = 'Iniciar sesión';
+                if (submitArrow) submitArrow.classList.remove('hidden');
+                if (submitSpinner) submitSpinner.classList.add('hidden');
+            }
+        }
+
+        // Manejar retroceso en el navegador (bfcache / back button)
+        window.addEventListener('pageshow', function(event) {
+            resetLoginButton();
+
+            // Si la página fue restaurada desde el historial o bfcache tras iniciar sesión
+            const navEntries = (window.performance && typeof performance.getEntriesByType === 'function')
+                ? performance.getEntriesByType('navigation')
+                : [];
+            const isBackForward = event.persisted ||
+                (navEntries.length > 0 && navEntries[0].type === 'back_forward') ||
+                (window.performance && window.performance.navigation && window.performance.navigation.type === 2);
+
+            if (isBackForward) {
+                // Forzar recarga limpia para que el backend valide Auth::check() y redirija automáticamente al usuario a su módulo
+                window.location.reload();
+            }
         });
 
         // ==========================================
