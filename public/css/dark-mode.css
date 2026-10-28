@@ -176,6 +176,9 @@ html.dark .loader { border-color: #364560; border-top-color: #14B8A6; }
 html.dark .sidebar-scroll::-webkit-scrollbar-thumb { background: #45577A; }
 
 /* ---------- SweetAlert2 ---------- */
+.swal2-container {
+    z-index: 9999999 !important;
+}
 html.dark .swal2-popup { background: #243044; color: #E2E8F0; border: 1px solid #364560; }
 html.dark .swal2-title, html.dark .swal2-html-container, html.dark .swal2-content { color: #E2E8F0; }
 html.dark .swal2-input, html.dark .swal2-textarea, html.dark .swal2-select { background: #202B3D; color: #E2E8F0; border-color: #45577A; }
