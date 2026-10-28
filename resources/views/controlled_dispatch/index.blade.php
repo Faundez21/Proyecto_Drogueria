@@ -258,44 +258,49 @@
             </div>
 
             <!-- seccion de tabla de productos y stock -->
-            <div class="p-6 bg-slate-50/30 border-b border-slate-100">
+            <div class="p-6 bg-rose-50/20 border-b border-rose-100/60">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                    <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide">2. Detalle de Extraccion
-                        Controlada</h3>
+                    <div>
+                        <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                            2. Detalle de Extracción Controlada
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200 lowercase">receta / libro oficial</span>
+                        </h3>
+                        <p class="text-[11.5px] text-slate-500 mt-0.5">Fármacos controlados, psicotrópicos y estupefacientes bajo custodia y registro reglamentario.</p>
+                    </div>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2.5">
                         <button type="button" onclick="openScanner()"
-                            class="px-4 py-2 bg-rose-600 text-white rounded-lg text-[12px] font-bold hover:bg-rose-700 transition-all flex items-center gap-2 shadow-sm cursor-pointer">
+                            class="px-3.5 py-2 bg-gradient-to-r from-rose-600 to-rose-700 text-white rounded-xl text-[12px] font-bold hover:from-rose-700 hover:to-rose-800 transition-all flex items-center gap-2 shadow-sm hover:shadow cursor-pointer">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2"
                                     d="M3 5a2 2 0 012-2h2m4 0h2m4 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-4 0h-2m-4 0H5a2 2 0 01-2-2v-2m4-10h2v2H7V7zm8 0h2v2h-2V7zM7 15h2v2H7v-2zm8-2h2v4h-2v-4zm-4-2h2v2h-2v-2z">
                                 </path>
                             </svg>
-                            Escanear Etiqueta QR
+                            Escanear QR
                         </button>
                         <button type="button" onclick="addRow()"
-                            class="px-4 py-2 bg-white text-rose-600 border border-rose-200 rounded-lg text-[12px] font-bold hover:bg-rose-50 transition-colors flex items-center gap-2 shadow-sm cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="px-3.5 py-2 bg-white text-slate-700 hover:text-rose-700 border border-slate-300 hover:border-rose-400 rounded-xl text-[12px] font-bold hover:bg-rose-50/40 transition-colors flex items-center gap-2 shadow-xs cursor-pointer">
+                            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
                                 </path>
                             </svg>
-                            Añadir Fila Manual
+                            Añadir Fila
                         </button>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white">
+                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-xs bg-white">
                     <table class="w-full text-left text-[13px] whitespace-nowrap" id="productsTable">
                         <thead
-                            class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-extrabold text-[10px]">
+                            class="bg-slate-100/80 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10.5px]">
                             <tr>
-                                <th class="px-4 py-3.5 w-[35%]">Seleccionar Producto Controlado</th>
-                                <th class="px-4 py-3.5 w-[15%]">Lote Extraido</th>
+                                <th class="px-4 py-3.5 w-[36%]">Fármaco Controlado en Stock</th>
+                                <th class="px-4 py-3.5 w-[14%]">Lote</th>
                                 <th class="px-4 py-3.5 w-[15%]">Vencimiento (FEFO)</th>
                                 <th class="px-4 py-3.5 w-[15%]">Programa</th>
-                                <th class="px-4 py-3.5 w-[15%] text-center">Cantidad Rebajar</th>
-                                <th class="px-4 py-3.5 w-[5%] text-center"></th>
+                                <th class="px-4 py-3.5 w-[15%] text-center">Cantidad a Despachar</th>
+                                <th class="px-3 py-3.5 w-[5%] text-center"></th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100" id="productsBody">
@@ -375,9 +380,9 @@
     <!-- plantilla oculta para generar nuevas filas de productos -->
     <template id="rowTemplate">
         <tr class="bg-white hover:bg-slate-50/80 transition-colors group">
-            <td class="px-3 py-2 border-r border-slate-100">
+            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="productos[]" required onchange="llenarDatosFila(this)"
-                    class="w-full bg-white border border-slate-300 focus:border-rose-500 rounded-lg px-2.5 py-2 text-[12px] font-bold text-slate-800 outline-none shadow-sm cursor-pointer transition-colors">
+                    class="w-full bg-white border border-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 rounded-lg px-2.5 py-2 text-[12.5px] font-bold text-slate-800 outline-none shadow-xs cursor-pointer transition-colors">
                     <option value="" disabled selected>Seleccione estupefaciente...</option>
                     @foreach ($inventarioDisponible as $inv)
                         <option value="{{ $inv->producto }}" data-lote="{{ $inv->lote ?? 'S/L' }}"
@@ -387,35 +392,38 @@
                     @endforeach
                 </select>
             </td>
-            <td class="px-3 py-2 border-r border-slate-100">
+            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <input type="text" name="lotes[]" readonly placeholder="Auto..."
-                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] font-mono font-bold text-slate-500 outline-none shadow-inner cursor-not-allowed">
+                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] font-mono font-bold text-slate-600 outline-none shadow-inner cursor-not-allowed text-center">
             </td>
-            <td class="px-3 py-2 border-r border-slate-100 relative">
+            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle relative">
                 <input type="date" name="vencimientos[]" readonly
-                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] text-slate-500 outline-none shadow-inner cursor-not-allowed">
+                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] text-slate-600 outline-none shadow-inner cursor-not-allowed">
                 <div class="fefo-container"></div>
             </td>
-            <td class="px-3 py-2 border-r border-slate-100">
+            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="programas[]" required
-                    class="w-full bg-white border border-slate-300 focus:border-rose-500 rounded-lg px-2.5 py-2 text-[12px] font-medium text-slate-700 outline-none shadow-sm cursor-pointer transition-colors">
+                    class="w-full bg-white border border-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
                     <option value="Morbilidad General" selected>Morbilidad General</option>
                     <option value="Cardiovascular">Cardiovascular</option>
                     <option value="Salud Mental">Salud Mental</option>
                     <option value="Paliativos">Cuidados Paliativos</option>
                 </select>
             </td>
-            <td class="px-3 py-2 border-r border-slate-100 relative pb-6">
-                <input type="number" name="cantidades[]" placeholder="0" min="1" oninput="validarStock(this)"
-                    required
-                    class="w-full bg-white border border-slate-300 focus:border-rose-500 rounded-lg px-2.5 py-2 text-[14px] font-black text-center text-slate-800 outline-none shadow-sm transition-colors">
-                <div
-                    class="stock-container absolute bottom-1 left-0 w-full text-center text-[10px] font-extrabold text-blue-600 hidden">
-                    Max: <span class="stock-max-badge">0</span></div>
+            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
+                <div class="space-y-1">
+                    <input type="number" name="cantidades[]" placeholder="0" min="1" oninput="validarStock(this)"
+                        required
+                        class="w-full bg-white border border-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 rounded-lg px-2.5 py-2 text-[14px] font-black text-center text-slate-900 outline-none shadow-xs transition-colors">
+                    <div
+                        class="stock-container text-center text-[10px] font-bold text-rose-700 hidden leading-tight">
+                        Disp: <span class="stock-max-badge font-mono font-black">0</span> uds.
+                    </div>
+                </div>
             </td>
-            <td class="px-3 py-2 text-center">
+            <td class="px-3.5 py-2.5 text-center align-middle">
                 <button type="button" onclick="removeRow(this)"
-                    class="p-2 bg-white text-slate-400 hover:text-white hover:bg-rose-600 rounded-lg transition-colors cursor-pointer shadow-sm border border-slate-200"
+                    class="p-2 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-lg transition-colors cursor-pointer shadow-xs"
                     title="Quitar Fila">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -788,6 +796,12 @@
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <span class="font-mono font-extrabold text-[13px] text-slate-900">{{ $solicitud->numero_solicitud }}</span>
                                         <span class="text-[13.5px] font-extrabold text-slate-800">{{ $solicitud->establecimiento }}</span>
+                                        @if ($itemsNormal->isNotEmpty())
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-gradient-to-r from-teal-50 to-rose-50 text-rose-800 border border-rose-200" title="Contiene también productos normales">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                Mixta (+{{ $itemsNormal->count() }} normales)
+                                            </span>
+                                        @endif
                                         <span id="badge-ctrl-estado-{{ $solicitud->id }}"
                                             class="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase border {{ $estadoClaseCtrl }}">
                                             {{ $solicitud->estado }}

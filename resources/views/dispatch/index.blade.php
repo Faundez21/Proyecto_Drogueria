@@ -365,44 +365,49 @@
             </div>
 
             <!-- seccion de tabla de productos y stock -->
-            <div class="p-6 bg-slate-50/30 border-b border-slate-100">
+            <div class="p-6 bg-slate-50/40 border-b border-slate-200">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                    <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide">2. Detalle de Extraccion
-                        (Lotes en Stock)</h3>
+                    <div>
+                        <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                            2. Detalle de Extracción (Lotes en Stock)
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200 lowercase">criterio fefo</span>
+                        </h3>
+                        <p class="text-[11.5px] text-slate-500 mt-0.5">Selecciona el producto o escanea el QR del lote para rebajar stock de bodega central.</p>
+                    </div>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2.5">
                         <button type="button" onclick="openScanner()"
-                            class="px-4 py-2 bg-[#0f968c] text-white rounded-lg text-[12px] font-bold hover:bg-teal-700 transition-all flex items-center gap-2 shadow-sm cursor-pointer">
+                            class="px-3.5 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-xl text-[12px] font-bold hover:from-teal-700 hover:to-teal-800 transition-all flex items-center gap-2 shadow-sm hover:shadow cursor-pointer">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2"
                                     d="M3 5a2 2 0 012-2h2m4 0h2m4 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-4 0h-2m-4 0H5a2 2 0 01-2-2v-2m4-10h2v2H7V7zm8 0h2v2h-2V7zM7 15h2v2H7v-2zm8-2h2v4h-2v-4zm-4-2h2v2h-2v-2z">
                                 </path>
                             </svg>
-                            Escanear Etiqueta QR
+                            Escanear QR
                         </button>
                         <button type="button" onclick="addRow()"
-                            class="px-4 py-2 bg-white text-blue-600 border border-blue-200 rounded-lg text-[12px] font-bold hover:bg-blue-50 transition-colors flex items-center gap-2 shadow-sm cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="px-3.5 py-2 bg-white text-slate-700 hover:text-teal-700 border border-slate-300 hover:border-teal-400 rounded-xl text-[12px] font-bold hover:bg-teal-50/40 transition-colors flex items-center gap-2 shadow-xs cursor-pointer">
+                            <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
                                 </path>
                             </svg>
-                            Añadir Fila Manual
+                            Añadir Fila
                         </button>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white">
+                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-xs bg-white">
                     <table class="w-full text-left text-[13px] whitespace-nowrap" id="productsTable">
                         <thead
-                            class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-extrabold text-[10px]">
+                            class="bg-slate-100/80 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10.5px]">
                             <tr>
-                                <th class="px-4 py-3.5 w-[35%]">Seleccionar Producto en Stock</th>
-                                <th class="px-4 py-3.5 w-[15%]">Lote Extraido</th>
+                                <th class="px-4 py-3.5 w-[36%]">Producto en Stock</th>
+                                <th class="px-4 py-3.5 w-[14%]">Lote</th>
                                 <th class="px-4 py-3.5 w-[15%]">Vencimiento (FEFO)</th>
                                 <th class="px-4 py-3.5 w-[15%]">Programa</th>
-                                <th class="px-4 py-3.5 w-[15%] text-center">Cantidad Rebajar</th>
-                                <th class="px-4 py-3.5 w-[5%] text-center"></th>
+                                <th class="px-4 py-3.5 w-[15%] text-center">Cantidad a Despachar</th>
+                                <th class="px-3 py-3.5 w-[5%] text-center"></th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100" id="productsBody">
@@ -483,9 +488,9 @@
     <!-- plantilla oculta para generar nuevas filas de productos -->
     <template id="rowTemplate">
         <tr class="bg-white hover:bg-slate-50/80 transition-colors group">
-            <td class="px-3 py-2 border-r border-slate-100">
+            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="productos[]" required onchange="llenarDatosFila(this)"
-                    class="w-full bg-white border border-slate-300 focus:border-teal-500 rounded-lg px-2.5 py-2 text-[12px] font-bold text-slate-800 outline-none shadow-sm cursor-pointer transition-colors">
+                    class="w-full bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12.5px] font-bold text-slate-800 outline-none shadow-xs cursor-pointer transition-colors">
                     <option value="" disabled selected>Seleccione producto del inventario...</option>
                     @foreach ($inventarioDisponible as $inv)
                         <option value="{{ $inv->producto }}" data-lote="{{ $inv->lote ?? 'S/L' }}"
@@ -495,34 +500,37 @@
                     @endforeach
                 </select>
             </td>
-            <td class="px-3 py-2 border-r border-slate-100">
+            <td class="px-3 py-2.5 border-r border-slate-100 align-middle">
                 <input type="text" name="lotes[]" readonly placeholder="Auto..."
-                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] font-mono font-bold text-slate-500 outline-none shadow-inner cursor-not-allowed">
+                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] font-mono font-bold text-slate-600 outline-none shadow-inner cursor-not-allowed text-center">
             </td>
-            <td class="px-3 py-2 border-r border-slate-100 relative">
+            <td class="px-3 py-2.5 border-r border-slate-100 align-middle relative">
                 <input type="date" name="vencimientos[]" readonly
-                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] text-slate-500 outline-none shadow-inner cursor-not-allowed">
+                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] text-slate-600 outline-none shadow-inner cursor-not-allowed">
                 <div class="fefo-container"></div>
             </td>
-            <td class="px-3 py-2 border-r border-slate-100">
+            <td class="px-3 py-2.5 border-r border-slate-100 align-middle">
                 <select name="programas[]" required
-                    class="w-full bg-white border border-slate-300 focus:border-teal-500 rounded-lg px-2.5 py-2 text-[12px] font-medium text-slate-700 outline-none shadow-sm cursor-pointer transition-colors">
+                    class="w-full bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
                     <option value="Morbilidad General" selected>Morbilidad General</option>
                     <option value="Cardiovascular">Cardiovascular</option>
                     <option value="IRA/ERA">Respiratorio (IRA/ERA)</option>
                 </select>
             </td>
-            <td class="px-3 py-2 border-r border-slate-100 relative pb-6">
-                <input type="number" name="cantidades[]" placeholder="0" min="1" oninput="validarStock(this)"
-                    required
-                    class="w-full bg-white border border-slate-300 focus:border-teal-500 rounded-lg px-2.5 py-2 text-[14px] font-black text-center text-slate-800 outline-none shadow-sm transition-colors">
-                <div
-                    class="stock-container absolute bottom-1 left-0 w-full text-center text-[10px] font-extrabold text-blue-600 hidden">
-                    Max: <span class="stock-max-badge">0</span></div>
+            <td class="px-3 py-2.5 border-r border-slate-100 align-middle">
+                <div class="space-y-1">
+                    <input type="number" name="cantidades[]" placeholder="0" min="1" oninput="validarStock(this)"
+                        required
+                        class="w-full bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 rounded-lg px-2.5 py-2 text-[14px] font-black text-center text-slate-900 outline-none shadow-xs transition-colors">
+                    <div
+                        class="stock-container text-center text-[10px] font-bold text-teal-700 hidden leading-tight">
+                        Disp: <span class="stock-max-badge font-mono font-black">0</span> uds.
+                    </div>
+                </div>
             </td>
-            <td class="px-3 py-2 text-center">
+            <td class="px-3 py-2.5 text-center align-middle">
                 <button type="button" onclick="removeRow(this)"
-                    class="p-2 bg-white text-slate-400 hover:text-white hover:bg-rose-600 rounded-lg transition-colors cursor-pointer shadow-sm border border-slate-200"
+                    class="p-2 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-lg transition-colors cursor-pointer shadow-xs"
                     title="Quitar Fila">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -646,6 +654,9 @@
                                 );
                                 $totalItemsSol = $solicitud->items->count();
                                 $completadosItemsSol = $solicitud->items->filter(fn($i) => $i->cantidad_despachada >= $i->cantidad_solicitada)->count();
+                                $tieneItemsControlados = $solicitud->items->contains(fn($i) => \App\Services\InventoryService::esControlado($i->product->nombre ?? ''));
+                                $tieneItemsNormales = $solicitud->items->contains(fn($i) => !\App\Services\InventoryService::esControlado($i->product->nombre ?? ''));
+                                $esMixta = $tieneItemsControlados && $tieneItemsNormales;
                             @endphp
 
                             <!-- solicitud -->
@@ -673,6 +684,14 @@
 
                                 <td class="px-4 py-4 font-mono font-extrabold text-slate-800">
                                     {{ $solicitud->numero_solicitud }}
+                                    @if ($esMixta)
+                                        <span class="block mt-1">
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-gradient-to-r from-teal-50 to-amber-50 text-amber-800 border border-amber-200" title="Contiene productos normales y fármacos controlados">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                Mixta
+                                            </span>
+                                        </span>
+                                    @endif
                                 </td>
 
                                 <td class="px-4 py-4">
@@ -1334,6 +1353,50 @@
 
                 if (dispData.auto_download && dispData.pdf_url) {
                     triggerSilentDownload(dispData.pdf_url);
+                }
+
+                if (dispData.tiene_controlados_pendientes && dispData.url_despacho_controlado) {
+                    Swal.fire({
+                        title: '¡Despacho Normal Emitido!',
+                        html: `
+                            <div class="text-left text-xs text-slate-700">
+                                ${htmlDetail}
+                                <div class="mt-4 p-3.5 bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-300 rounded-xl flex items-start gap-3 shadow-xs">
+                                    <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-sm">!</div>
+                                    <div>
+                                        <p class="font-bold text-amber-950 text-[13px]">Solicitud Mixta: Fármacos Controlados Pendientes</p>
+                                        <p class="text-slate-600 text-[11.5px] mt-0.5">
+                                            Esta solicitud aún tiene <strong>${dispData.cant_controlados_pendientes} fármaco(s) controlado(s)</strong> pendiente(s) por despachar.
+                                        </p>
+                                        <p class="text-amber-900 font-semibold text-[11.5px] mt-1.5">
+                                            ¿Deseas emitir el Despacho Controlado ahora mismo?
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        icon: 'info',
+                        showCancelButton: true,
+                        showDenyButton: Boolean(dispData.pdf_url),
+                        confirmButtonColor: '#e11d48',
+                        confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg> Ir a Despacho Controlado',
+                        denyButtonColor: '#0f172a',
+                        denyButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Ver Guía PDF',
+                        cancelButtonColor: '#64748b',
+                        cancelButtonText: 'Dejar para después',
+                        allowOutsideClick: false,
+                        width: '660px'
+                    }).then((res) => {
+                        if (res.isConfirmed) {
+                            window.location.href = dispData.url_despacho_controlado;
+                        } else if (res.isDenied && dispData.pdf_url) {
+                            window.open(dispData.pdf_url, '_blank');
+                            window.location.reload();
+                        } else {
+                            window.location.reload();
+                        }
+                    });
+                    return;
                 }
 
                 Swal.fire({
