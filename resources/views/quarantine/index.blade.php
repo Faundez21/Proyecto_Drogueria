@@ -430,7 +430,7 @@
                 }
             }
         </style>
-        <div id="qrModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="qrModal" class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="relative w-full max-w-sm flex flex-col items-center">
                 <div id="qrPrintableCard" class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
@@ -461,7 +461,7 @@
         </div>
 
         <!-- MODAL: Editar Estado de Lote -->
-        <div id="editLoteModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[10000] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md flex flex-col overflow-hidden">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                     <h2 class="text-[16px] font-bold text-white tracking-wide">Gestionar Cuarentena</h2>
@@ -523,66 +523,89 @@
         </div>
 
         <!-- MODAL: Historial Avanzado -->
-        <div id="HistoryModal" class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-lg font-bold text-white tracking-wide">Registro de Control de Cuarentena</h2>
-                        <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Historial detallado de ingresos, retenciones y liberaciones.</p>
+        <div id="HistoryModal" class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6 transition-all">
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] sm:max-h-[88vh] flex flex-col overflow-hidden my-auto">
+                <div class="px-4 py-3 sm:px-6 sm:py-4 bg-slate-800 flex justify-between items-center shrink-0 border-b border-slate-700">
+                    <div class="min-w-0 pr-2">
+                        <h2 class="text-base sm:text-lg font-bold text-white tracking-wide truncate">Registro de Control de Cuarentena</h2>
+                        <p class="text-[11px] sm:text-[12px] text-slate-300 mt-0.5 font-medium truncate sm:whitespace-normal">Historial detallado de ingresos, retenciones y liberaciones.</p>
                     </div>
-                    <button type="button" onclick="closeHistory()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
+                    <button type="button" onclick="closeHistory()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer shrink-0" aria-label="Cerrar modal">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
                 <!-- FILTROS AVANZADOS DEL HISTORIAL -->
-                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end z-20 shadow-inner">
-                    <div class="flex-1 min-w-[200px]">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Buscar Texto</label>
-                        <input type="text" id="historialSearchInput" onkeyup="filterHistorial()" placeholder="Producto, lote o motivo..." class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all shadow-sm">
-                    </div>
-                    <div class="w-full sm:w-auto">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Desde</label>
-                        <input type="date" id="historialDateFrom" onchange="filterHistorial()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all shadow-sm">
-                    </div>
-                    <div class="w-full sm:w-auto">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Hasta</label>
-                        <input type="date" id="historialDateTo" onchange="filterHistorial()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all shadow-sm">
-                    </div>
-                    <div class="w-full sm:w-[200px]">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Responsable</label>
-                        <select id="historialUserFilter" onchange="filterHistorial()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all shadow-sm">
-                            <option value="">Todos los usuarios</option>
-                            @php
-                                $usuariosHistorial = collect($historial ?? [])->map(function($m) {
-                                    $mObj = is_object($m) ? $m : (object) $m;
-                                    $uName = data_get($mObj, 'user.name') ?? data_get($mObj, 'causer.name') ?? data_get($mObj, 'usuario_nombre');
-                                    $uLast = data_get($mObj, 'user.last_name') ?? data_get($mObj, 'causer.last_name') ?? '';
-                                    return !empty($uName) ? trim($uName . ' ' . $uLast) : 'No registrado';
-                                })->unique()->filter()->values();
-                            @endphp
-                            @foreach($usuariosHistorial as $uh)
-                                <option value="{{ $uh }}">{{ $uh }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <button type="button" onclick="clearHistorialFilters()" class="px-4 py-2 bg-white border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors text-[13px] font-bold shadow-sm">
-                            Limpiar
-                        </button>
+                <div class="p-3 sm:px-6 sm:py-3.5 bg-slate-50 border-b border-slate-200 shrink-0">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-3 items-end">
+                        <div class="sm:col-span-2 lg:col-span-4">
+                            <label class="block text-[10.5px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Buscar Texto</label>
+                            <div class="relative">
+                                <input type="text" id="historialSearchInput" onkeyup="filterHistorial()" placeholder="Producto, lote o motivo..." class="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-[12px] sm:text-[13px] outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all shadow-sm">
+                                <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 sm:col-span-2 lg:col-span-4">
+                            <div>
+                                <label class="block text-[10.5px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Desde</label>
+                                <input type="date" id="historialDateFrom" onchange="filterHistorial()" class="w-full px-2 sm:px-3 py-2 bg-white border border-slate-300 rounded-lg text-[12px] sm:text-[13px] outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-[10.5px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Hasta</label>
+                                <input type="date" id="historialDateTo" onchange="filterHistorial()" class="w-full px-2 sm:px-3 py-2 bg-white border border-slate-300 rounded-lg text-[12px] sm:text-[13px] outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all shadow-sm">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 sm:flex sm:col-span-2 lg:col-span-4 gap-2 items-end">
+                            <div class="col-span-2 sm:flex-1">
+                                <label class="block text-[10.5px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Responsable</label>
+                                <select id="historialUserFilter" onchange="filterHistorial()" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-[12px] sm:text-[13px] outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all shadow-sm">
+                                    <option value="">Todos los usuarios</option>
+                                    @php
+                                        $usuariosHistorial = collect($historial ?? [])->map(function($m) {
+                                            $mObj = is_object($m) ? $m : (object) $m;
+                                            $uName = data_get($mObj, 'user.name') ?? data_get($mObj, 'causer.name') ?? data_get($mObj, 'usuario_nombre');
+                                            $uLast = data_get($mObj, 'user.last_name') ?? data_get($mObj, 'causer.last_name') ?? '';
+                                            return !empty($uName) ? trim($uName . ' ' . $uLast) : 'No registrado';
+                                        })->unique()->filter()->values();
+                                    @endphp
+                                    @foreach($usuariosHistorial as $uh)
+                                        <option value="{{ $uh }}">{{ $uh }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-span-1 sm:w-auto">
+                                <button type="button" onclick="clearHistorialFilters()" class="w-full py-2 px-3 bg-white border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors text-[12px] sm:text-[13px] font-bold shadow-sm flex items-center justify-center gap-1 cursor-pointer" title="Limpiar filtros">
+                                    <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    <span>Limpiar</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto max-h-[50vh] bg-white">
-                    <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
-                        <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm z-10">
+                <!-- AVISO DESLIZAMIENTO MÓVIL -->
+                <div class="sm:hidden px-3 py-1.5 bg-amber-50/70 border-b border-amber-200/60 text-[11px] text-amber-800 font-medium flex items-center justify-between shrink-0">
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                        Desliza horizontalmente para ver más columnas
+                    </span>
+                    <span class="text-[10px] text-amber-600 font-semibold font-mono">6 cols</span>
+                </div>
+
+                <div class="overflow-x-auto flex-1 min-h-[180px] bg-white">
+                    <table class="w-full text-left text-[12px] sm:text-[13px] text-slate-600 whitespace-nowrap min-w-[720px] lg:min-w-full">
+                        <thead class="bg-slate-50 text-slate-600 uppercase text-[10.5px] sm:text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm z-10">
                             <tr>
-                                <th class="px-6 py-4">Fecha Movimiento</th>
-                                <th class="px-6 py-4">Producto Afectado</th>
-                                <th class="px-6 py-4 text-center">Lote Físico</th>
-                                <th class="px-6 py-4 text-center">Acción / Estado</th>
-                                <th class="px-6 py-4">Usuario Responsable</th>
-                                <th class="px-6 py-4">Motivo Documentado</th>
+                                <th class="px-3.5 py-3 sm:px-6 sm:py-3.5">Fecha Movimiento</th>
+                                <th class="px-3.5 py-3 sm:px-6 sm:py-3.5">Producto Afectado</th>
+                                <th class="px-3.5 py-3 sm:px-6 sm:py-3.5 text-center">Lote Físico</th>
+                                <th class="px-3.5 py-3 sm:px-6 sm:py-3.5 text-center">Acción / Estado</th>
+                                <th class="px-3.5 py-3 sm:px-6 sm:py-3.5">Usuario Responsable</th>
+                                <th class="px-3.5 py-3 sm:px-6 sm:py-3.5">Motivo Documentado</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100" id="historialTableBody">
@@ -629,19 +652,21 @@
                                     }
                                 @endphp
                                 <tr class="historial-row hover:bg-slate-100/70 transition-colors" data-date="{{ $fechaISO }}" data-user="{{ $usuarioResp }}">
-                                    <td class="px-6 py-3.5 text-slate-500 font-medium">{{ $fechaMovFormateada }}</td>
-                                    <td class="px-6 py-3.5 font-bold text-slate-800 h-searchable">{{ $prodNom }}</td>
-                                    <td class="px-6 py-3.5 text-center h-searchable">
-                                        <span class="px-2.5 py-1 rounded bg-slate-200 text-slate-800 font-mono font-extrabold text-[12px] border border-slate-300">{{ $loteCod }}</span>
+                                    <td class="px-3.5 py-3 sm:px-6 sm:py-3.5 text-slate-500 font-medium text-[11.5px] sm:text-[12.5px]">{{ $fechaMovFormateada }}</td>
+                                    <td class="px-3.5 py-3 sm:px-6 sm:py-3.5 font-bold text-slate-800 h-searchable max-w-[200px] sm:max-w-xs truncate" title="{{ $prodNom }}">{{ $prodNom }}</td>
+                                    <td class="px-3.5 py-3 sm:px-6 sm:py-3.5 text-center h-searchable">
+                                        <span class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded bg-slate-200 text-slate-800 font-mono font-extrabold text-[11px] sm:text-[12px] border border-slate-300">{{ $loteCod }}</span>
                                     </td>
-                                    <td class="px-6 py-3.5 text-center">
-                                        <span class="px-2.5 py-1 rounded text-[10px] font-extrabold border {{ $badgeColor }} uppercase tracking-wider">{{ $badgeText }}</span>
+                                    <td class="px-3.5 py-3 sm:px-6 sm:py-3.5 text-center">
+                                        <span class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded text-[9.5px] sm:text-[10px] font-extrabold border {{ $badgeColor }} uppercase tracking-wider">{{ $badgeText }}</span>
                                     </td>
-                                    <td class="px-6 py-3.5 text-slate-700 font-semibold flex items-center gap-2 h-searchable">
-                                        <div class="w-6 h-6 rounded-md bg-slate-200 text-slate-600 flex items-center justify-center text-[9px] font-bold">{{ strtoupper(substr($usuarioResp, 0, 1)) }}</div>
-                                        {{ $usuarioResp }}
+                                    <td class="px-3.5 py-3 sm:px-6 sm:py-3.5 text-slate-700 font-semibold h-searchable">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-slate-200 text-slate-600 flex items-center justify-center text-[9px] font-bold shrink-0">{{ strtoupper(substr($usuarioResp, 0, 1)) }}</div>
+                                            <span class="truncate max-w-[130px] sm:max-w-[180px]">{{ $usuarioResp }}</span>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-3.5 italic text-slate-500 max-w-xs truncate h-searchable" title="{{ $motivoMov }}">{{ $motivoMov }}</td>
+                                    <td class="px-3.5 py-3 sm:px-6 sm:py-3.5 italic text-slate-500 max-w-[160px] sm:max-w-xs truncate h-searchable" title="{{ $motivoMov }}">{{ $motivoMov }}</td>
                                 </tr>
                             @empty
                                 <tr id="emptyHistorialRowMain">
@@ -660,11 +685,11 @@
                     </table>
                 </div>
 
-                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
-                    <span class="text-[13px] font-extrabold text-slate-500 uppercase tracking-wider">
+                <div class="px-4 py-3 sm:px-6 sm:py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-4 sm:justify-between sm:items-center shrink-0">
+                    <span class="text-[12px] sm:text-[13px] font-extrabold text-slate-500 uppercase tracking-wider text-center sm:text-left">
                         Mostrando <span id="historialCount" class="text-amber-600 font-black">{{ count($historial ?? []) }}</span> movimientos
                     </span>
-                    <button type="button" onclick="closeHistory()" class="px-6 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
+                    <button type="button" onclick="closeHistory()" class="w-full sm:w-auto px-6 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg transition-colors text-[13px] font-bold shadow-sm cursor-pointer text-center">
                         Cerrar Historial
                     </button>
                 </div>
@@ -905,10 +930,47 @@
 
         // Modal Historial y Filtros JS
         function openHistory() {
-            document.getElementById('HistoryModal').classList.remove('hidden');
+            const modal = document.getElementById('HistoryModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }
             filterHistorial(); 
         }
-        function closeHistory() { document.getElementById('HistoryModal').classList.add('hidden'); }
+        function closeHistory() { 
+            const modal = document.getElementById('HistoryModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+
+        // Cerrar modal al hacer clic en el backdrop exterior o tecla Escape
+        document.getElementById('HistoryModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeHistory();
+            }
+        });
+
+        document.getElementById('editLoteModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditLote();
+            }
+        });
+
+        document.getElementById('qrModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeQRModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeHistory();
+                closeEditLote();
+                closeQRModal();
+            }
+        });
 
         function filterHistorial() {
             const search = normalizeText(document.getElementById('historialSearchInput')?.value || '');
