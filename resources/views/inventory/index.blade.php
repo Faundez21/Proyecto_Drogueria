@@ -1097,7 +1097,7 @@
                     </button>
                 </div>
 
-                <form id="editLoteForm" method="POST" action="" class="bg-white" onsubmit="return confirmEditLoteInventario(event)">
+                <form id="editLoteForm" method="POST" action="" class="bg-white" novalidate onsubmit="return confirmEditLoteInventario(event)">
                     @csrf
                     @method('PUT')
                     <div class="p-6 space-y-4">
@@ -2087,7 +2087,8 @@
             const estado = document.getElementById('modal_estado')?.value;
             const motivo = (document.getElementById('modal_motivo')?.value || '').trim();
             const prod = document.getElementById('modal_producto_nombre')?.textContent || 'Producto';
-            const lote = document.getElementById('modal_lote_nombre')?.textContent || '';
+            const loteRaw = document.getElementById('modal_lote_nombre')?.textContent || '';
+            const lote = loteRaw.replace(/^LOTE:\s*/i, '').trim();
 
             if ((estado === 'Cuarentena' || estado === 'Merma') && !motivo) {
                 Swal.fire({
@@ -2112,7 +2113,10 @@
                     cancelButtonText: 'Cancelar',
                     reverseButtons: true
                 }).then((result) => {
-                    if (result.isConfirmed) form.submit();
+                    if (result.isConfirmed) {
+                        closeEditLote();
+                        form.submit();
+                    }
                 });
             } else if (estado === 'Merma') {
                 Swal.fire({
@@ -2126,21 +2130,27 @@
                     cancelButtonText: 'Cancelar',
                     reverseButtons: true
                 }).then((result) => {
-                    if (result.isConfirmed) form.submit();
+                    if (result.isConfirmed) {
+                        closeEditLote();
+                        form.submit();
+                    }
                 });
             } else {
                 Swal.fire({
-                    title: '¿Cambiar estado a Disponible?',
-                    html: `El lote <strong>${lote}</strong> de <strong>${prod}</strong> quedará liberado para entrega y despacho.`,
+                    title: '¿Mover lote a Disponible?',
+                    html: `El lote <strong>${lote}</strong> de <strong>${prod}</strong> quedará liberado y pasará a estar <strong>Disponible</strong> para entrega y despacho.`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#059669',
                     cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, guardar cambio',
+                    confirmButtonText: 'Sí, mover a disponible',
                     cancelButtonText: 'Cancelar',
                     reverseButtons: true
                 }).then((result) => {
-                    if (result.isConfirmed) form.submit();
+                    if (result.isConfirmed) {
+                        closeEditLote();
+                        form.submit();
+                    }
                 });
             }
 

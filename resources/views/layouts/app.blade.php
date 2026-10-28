@@ -825,32 +825,42 @@
             }
         });
 
-        // 2. Interceptor de Flash Messages de Laravel
+        // 2. Interceptor de Flash Messages de Laravel con SweetAlert2 Modal
         @if (session('success'))
-            Toast.fire({
+            Swal.fire({
                 icon: 'success',
-                title: @json(session('success'))
+                title: '¡Operación Exitosa!',
+                text: @json(session('success')),
+                confirmButtonColor: '#0f766e',
+                timer: 3500,
+                timerProgressBar: true
             });
         @endif
 
         @if (session('error'))
-            Toast.fire({
+            Swal.fire({
                 icon: 'error',
-                title: @json(session('error'))
+                title: 'Error',
+                text: @json(session('error')),
+                confirmButtonColor: '#e11d48'
             });
         @endif
 
         @if (session('warning'))
-            Toast.fire({
+            Swal.fire({
                 icon: 'warning',
-                title: @json(session('warning'))
+                title: 'Atención',
+                text: @json(session('warning')),
+                confirmButtonColor: '#d97706'
             });
         @endif
 
         @if (session('info'))
-            Toast.fire({
+            Swal.fire({
                 icon: 'info',
-                title: @json(session('info'))
+                title: 'Información',
+                text: @json(session('info')),
+                confirmButtonColor: '#3b82f6'
             });
         @endif
 

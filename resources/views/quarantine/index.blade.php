@@ -470,7 +470,7 @@
                     </button>
                 </div>
 
-                <form id="editLoteForm" method="POST" action="" class="bg-white" onsubmit="return confirmDecisionCuarentena(event)">
+                <form id="editLoteForm" method="POST" action="" class="bg-white" novalidate onsubmit="return confirmDecisionCuarentena(event)">
                     @csrf
                     @method('PUT')
                     <div class="p-6 space-y-4">
@@ -918,7 +918,8 @@
             const estado = document.getElementById('modal_estado')?.value;
             const motivo = (document.getElementById('modal_motivo')?.value || '').trim();
             const prod = document.getElementById('modal_producto_nombre')?.textContent || 'Producto';
-            const lote = document.getElementById('modal_lote_nombre')?.textContent || '';
+            const loteRaw = document.getElementById('modal_lote_nombre')?.textContent || '';
+            const lote = loteRaw.replace(/^LOTE:\s*/i, '').trim();
 
             if (!motivo) {
                 Swal.fire({
@@ -933,8 +934,8 @@
 
             if (estado === 'Disponible') {
                 Swal.fire({
-                    title: '¿Liberar lote de Cuarentena?',
-                    html: `El producto <strong>${prod}</strong> (${lote}) será aprobado y reincorporado al inventario <strong>Disponible</strong> para despacho.`,
+                    title: '¿Liberar lote a Disponible?',
+                    html: `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) será aprobado y reincorporado al inventario <strong>Disponible</strong> para despacho.`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#059669',
@@ -944,13 +945,14 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        closeEditLote();
                         form.submit();
                     }
                 });
             } else if (estado === 'Merma') {
                 Swal.fire({
                     title: '¿Declarar Merma sanitaria?',
-                    html: `El producto <strong>${prod}</strong> (${lote}) será declarado como <strong>Merma</strong> y dado de baja definitiva del inventario. Esta acción no se puede deshacer.`,
+                    html: `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) será declarado como <strong>Merma</strong> y dado de baja definitiva del inventario. Esta acción no se puede deshacer.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#e11d48',
@@ -960,13 +962,14 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        closeEditLote();
                         form.submit();
                     }
                 });
             } else {
                 Swal.fire({
                     title: '¿Mantener en Cuarentena?',
-                    html: `Se actualizará la justificación del lote <strong>${prod}</strong> (${lote}) manteniéndolo inmovilizado en Cuarentena.`,
+                    html: `Se actualizará la justificación del lote <strong>${lote}</strong> de <strong>${prod}</strong> manteniéndolo inmovilizado en Cuarentena.`,
                     icon: 'info',
                     showCancelButton: true,
                     confirmButtonColor: '#d97706',
@@ -976,6 +979,7 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        closeEditLote();
                         form.submit();
                     }
                 });
