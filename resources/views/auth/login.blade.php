@@ -25,6 +25,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+    .swal2-container {
+        z-index: 9999999 !important;
+    }
     body {
         font-family: 'Inter', sans-serif;
     }

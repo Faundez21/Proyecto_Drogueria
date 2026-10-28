@@ -30,6 +30,11 @@
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}?v={{ @filemtime(public_path('css/dark-mode.css')) }}">
 
     <style>
+        /* Asegurar que SweetAlert2 siempre esté por encima de cualquier modal, drawer o backdrop */
+        .swal2-container {
+            z-index: 9999999 !important;
+        }
+
         :root {
             --sidebar-bg: #0F172A;
             --sidebar-hover: #1E293B;
