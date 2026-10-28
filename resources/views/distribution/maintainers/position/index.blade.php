@@ -234,7 +234,7 @@
                 </button>
             </div>
 
-            <form action="{{ route('position.store') }}" method="POST">
+            <form id="createPositionForm" action="{{ route('position.store') }}" method="POST" onsubmit="confirmCreatePosition(event)">
                 @csrf
                 <div class="p-6 space-y-4">
                     <div>
@@ -348,7 +348,7 @@
                 </button>
             </div>
 
-            <form id="editForm" method="POST">
+            <form id="editForm" method="POST" onsubmit="confirmEditPosition(event)">
                 @csrf
                 @method('PUT')
                 <div class="p-6 space-y-4">
@@ -506,6 +506,49 @@
 
         function closeHistory() {
             document.getElementById('HistoryModal').classList.add('hidden');
+        }
+
+        function confirmCreatePosition(e) {
+            e.preventDefault();
+            const form = e.target;
+            const name = document.getElementById('name')?.value.trim();
+            if (!name) return;
+            Swal.fire({
+                title: '¿Crear Posición?',
+                html: `¿Confirmas registrar la posición <strong>${name}</strong> en el nivel seleccionado?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, crear posición',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+
+        function confirmEditPosition(e) {
+            e.preventDefault();
+            const form = e.target;
+            const name = document.getElementById('editName')?.value.trim();
+            Swal.fire({
+                title: '¿Guardar Cambios?',
+                html: `¿Confirmas actualizar los datos de la posición <strong>${name}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, guardar cambios',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
         }
 
         function confirmDeletePosition(id, name) {

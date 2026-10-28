@@ -237,7 +237,7 @@
                 </button>
             </div>
 
-            <form action="{{ route('shelf.store') }}" method="POST">
+            <form id="createShelfForm" action="{{ route('shelf.store') }}" method="POST" onsubmit="confirmCreateShelf(event)">
                 @csrf
                 <div class="p-6 space-y-4">
                     <div>
@@ -366,7 +366,7 @@
                 </button>
             </div>
 
-            <form id="editForm" method="POST">
+            <form id="editForm" method="POST" onsubmit="confirmEditShelf(event)">
                 @csrf
                 @method('PUT')
                 <div class="p-6 space-y-4">
@@ -534,6 +534,49 @@
 
         function closeHistory() {
             document.getElementById('HistoryModal').classList.add('hidden');
+        }
+
+        function confirmCreateShelf(e) {
+            e.preventDefault();
+            const form = e.target;
+            const name = document.getElementById('name')?.value.trim();
+            if (!name) return;
+            Swal.fire({
+                title: '¿Crear Estantería?',
+                html: `¿Confirmas registrar la estantería <strong>${name}</strong> en el pasillo seleccionado?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, crear estantería',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+
+        function confirmEditShelf(e) {
+            e.preventDefault();
+            const form = e.target;
+            const name = document.getElementById('editName')?.value.trim();
+            Swal.fire({
+                title: '¿Guardar Cambios?',
+                html: `¿Confirmas actualizar los datos de la estantería <strong>${name}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, guardar cambios',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
         }
 
         function confirmDeleteShelf(id, name) {

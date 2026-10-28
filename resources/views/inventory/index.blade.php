@@ -2048,15 +2048,19 @@
             const lote = document.getElementById('manualLoteInput')?.value || '';
             const cantidad = document.getElementById('manualCantidadInput')?.value || '0';
             const estado = document.getElementById('manualEstadoSelect')?.value || 'Disponible';
+            const isCuar = estado === 'Cuarentena';
+            const htmlMessage = isCuar
+                ? `Se registrará el producto <strong>${prodName}</strong> (Lote: <strong>${lote}</strong>) con <strong>${cantidad}</strong> unidades.<br><span class="inline-block mt-2 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded">Atención: El lote ingresará inmovilizado preventivamente en Cuarentena para revisión técnica.</span>`
+                : `Se registrará el producto <strong>${prodName}</strong> (Lote: <strong>${lote}</strong>) con <strong>${cantidad}</strong> unidades en estado <strong>${estado}</strong>.`;
 
             Swal.fire({
-                title: '¿Confirmar Ingreso Manual?',
-                html: `Se registrará el producto <strong>${prodName}</strong> (Lote: <strong>${lote}</strong>) con <strong>${cantidad}</strong> unidades en estado <strong>${estado}</strong>.`,
-                icon: 'question',
+                title: isCuar ? '¿Ingresar Lote a Cuarentena?' : '¿Confirmar Ingreso Manual?',
+                html: htmlMessage,
+                icon: isCuar ? 'warning' : 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#0d9488',
+                confirmButtonColor: isCuar ? '#d97706' : '#0d9488',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: 'Sí, registrar ingreso',
+                confirmButtonText: isCuar ? 'Sí, ingresar a cuarentena' : 'Sí, registrar ingreso',
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true
             }).then((result) => {

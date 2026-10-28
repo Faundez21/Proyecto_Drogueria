@@ -792,9 +792,33 @@
                     habilitarMovimiento() {
                         this.tooltipVisible = false; // Ocultamos el panel
                         window.dispatchEvent(new Event('start-moving')); // Avisamos a Three.js
+                        if (typeof Swal !== 'undefined') {
+                            const cod = this.rackData?.code || 'la estantería';
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'info',
+                                title: `Modo Reubicación: ${cod}`,
+                                text: 'Haz clic en el piso de la bodega para colocarla (Esc para cancelar).',
+                                showConfirmButton: false,
+                                timer: 3500,
+                                timerProgressBar: true
+                            });
+                        }
                     },
                     cancelarMovimiento() {
                         window.dispatchEvent(new Event('cancel-moving'));
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'info',
+                                title: 'Reubicación cancelada',
+                                text: 'La estantería volvió a su ubicación original.',
+                                showConfirmButton: false,
+                                timer: 2500
+                            });
+                        }
                     },
                     toggleSnapGrid() {
                         window.dispatchEvent(new CustomEvent('toggle-snap-grid', {
@@ -3276,13 +3300,36 @@
                                             pos_z: selectedObject.position.z
                                         })
                                     })
-                                    .then(response => response.json())
+                                    .then(response => {
+                                        if (!response.ok) throw new Error('Error al actualizar posición');
+                                        return response.json();
+                                    })
                                     .then(() => {
                                         window.dispatchEvent(new CustomEvent('rack-saved-toast', {
                                             detail: { message: `Posición de ${movedCode} guardada` }
                                         }));
+                                        if (typeof Swal !== 'undefined') {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: '¡Ubicación Actualizada!',
+                                                html: `La estantería <strong>${movedCode}</strong> y sus productos asociados se han movido correctamente.`,
+                                                confirmButtonColor: '#0f766e',
+                                                timer: 3000,
+                                                timerProgressBar: true
+                                            });
+                                        }
                                     })
-                                    .catch(error => console.error('Error guardando posición:', error));
+                                    .catch(error => {
+                                        console.error('Error guardando posición:', error);
+                                        if (typeof Swal !== 'undefined') {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error de reubicación',
+                                                text: 'No se pudo guardar la nueva posición en la base de datos.',
+                                                confirmButtonColor: '#0f766e'
+                                            });
+                                        }
+                                    });
 
                                 // Recreamos los rectángulos del pasillo para que se ajusten a la nueva posición
                                 renderAisles();

@@ -232,7 +232,7 @@
                 </button>
             </div>
 
-            <form action="{{ route('level.store') }}" method="POST">
+            <form id="createLevelForm" action="{{ route('level.store') }}" method="POST" onsubmit="confirmCreateLevel(event)">
                 @csrf
                 <div class="p-6 space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -348,7 +348,7 @@
                 </button>
             </div>
 
-            <form id="editForm" method="POST">
+            <form id="editForm" method="POST" onsubmit="confirmEditLevel(event)">
                 @csrf
                 @method('PUT')
                 <div class="p-6 space-y-4">
@@ -506,6 +506,49 @@
 
         function closeHistory() {
             document.getElementById('HistoryModal').classList.add('hidden');
+        }
+
+        function confirmCreateLevel(e) {
+            e.preventDefault();
+            const form = e.target;
+            const number = document.getElementById('number')?.value.trim();
+            if (!number) return;
+            Swal.fire({
+                title: '¿Crear Nivel?',
+                html: `¿Confirmas registrar el <strong>Nivel ${number}</strong> en la estantería seleccionada?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, crear nivel',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+
+        function confirmEditLevel(e) {
+            e.preventDefault();
+            const form = e.target;
+            const number = document.getElementById('editNumber')?.value.trim();
+            Swal.fire({
+                title: '¿Guardar Cambios?',
+                html: `¿Confirmas actualizar los datos del <strong>Nivel ${number}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, guardar cambios',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
         }
 
         function confirmDeleteLevel(id, name) {
