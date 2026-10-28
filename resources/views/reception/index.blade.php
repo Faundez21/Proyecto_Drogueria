@@ -988,5 +988,69 @@
             document.getElementById('detailModal').classList.remove('hidden');
         }
         function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
+
+        @if (session('reception_success_detail'))
+            document.addEventListener('DOMContentLoaded', function() {
+                const recData = @json(session('reception_success_detail'));
+                const htmlDetail = `
+                    <div class="text-left text-xs text-slate-700">
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl mb-3 space-y-1">
+                            <p><strong>Proveedor:</strong> ${recData.proveedor}</p>
+                            <p><strong>Documento:</strong> ${recData.documento}</p>
+                            <p><strong>Total Unidades:</strong> ${Number(recData.total_unidades || 0).toLocaleString('es-CL')} uds. (${recData.total_items} producto${recData.total_items === 1 ? '' : 's'})</p>
+                            ${recData.valor_total ? `<p><strong>Valor Total c/IVA:</strong> $ ${Math.round(recData.valor_total).toLocaleString('es-CL')}</p>` : ''}
+                        </div>
+                        <div class="max-h-52 overflow-y-auto border border-slate-200 rounded-lg">
+                            <table class="w-full text-[11.5px] text-left">
+                                <thead class="bg-slate-100 text-slate-600 font-bold sticky top-0">
+                                    <tr>
+                                        <th class="p-2">Producto</th>
+                                        <th class="p-2 text-center">Lote</th>
+                                        <th class="p-2 text-center">Vence</th>
+                                        <th class="p-2 text-right">Cant.</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${(recData.items || []).map(it => `
+                                        <tr>
+                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
+                                            <td class="p-2 text-center font-mono text-[11px]">${it.lote}</td>
+                                            <td class="p-2 text-center text-slate-500">${it.vencimiento}</td>
+                                            <td class="p-2 text-right font-bold text-teal-700">${Number(it.cantidad).toLocaleString('es-CL')}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                Swal.fire({
+                    title: `¡Recepción N° ${recData.correlativo} Registrada!`,
+                    html: htmlDetail,
+                    icon: 'success',
+                    confirmButtonColor: '#0d9488',
+                    confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar',
+                    showCancelButton: Boolean(recData.pdf_url),
+                    cancelButtonColor: '#2563eb',
+                    cancelButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Descargar Acta PDF',
+                    reverseButtons: true,
+                    width: '600px'
+                }).then((res) => {
+                    if (res.dismiss === Swal.DismissReason.cancel && recData.pdf_url) {
+                        window.open(recData.pdf_url, '_blank');
+                    }
+                });
+
+                if (recData.auto_download && recData.pdf_url) {
+                    const dlLink = document.createElement('a');
+                    dlLink.href = recData.pdf_url;
+                    dlLink.download = '';
+                    document.body.appendChild(dlLink);
+                    dlLink.click();
+                    document.body.removeChild(dlLink);
+                }
+            });
+        @endif
     </script>
 @endsection

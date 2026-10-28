@@ -137,6 +137,7 @@ class DispatchController extends Controller
                 'firma_recibe' => $firmaRecibe,
             ]);
 
+            $itemsDespachados = [];
             foreach ($validated['productos'] as $index => $nombreProducto) {
                 if (InventoryService::esControlado($nombreProducto)) {
                     throw new \RuntimeException("El producto '{$nombreProducto}' es controlado y no puede procesarse por esta vía.");
@@ -170,6 +171,14 @@ class DispatchController extends Controller
                         'origen_destino' => 'Hacia: ' . $destino,
                         'documento_respaldo' => 'Guia N° ' . $correlativo,
                     ]);
+
+                    $itemsDespachados[] = [
+                        'producto' => $nombreProducto,
+                        'lote' => $batch->lote ?? 'S/L',
+                        'cantidad' => (int) $asignacion['cantidad'],
+                        'vencimiento' => $batch->fecha_vencimiento ? date('d/m/Y', strtotime($batch->fecha_vencimiento)) : 'N/A',
+                        'programa' => $validated['programas'][$index] ?? 'General',
+                    ];
                 }
             }
 
@@ -183,7 +192,20 @@ class DispatchController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.");
+            $dispatchDetail = [
+                'correlativo' => $correlativo,
+                'destino' => $destino,
+                'clasificacion' => $validated['clasificacion'],
+                'fecha' => !empty($validated['fecha_despacho']) ? date('d/m/Y', strtotime($validated['fecha_despacho'])) : date('d/m/Y'),
+                'total_items' => count($itemsDespachados),
+                'total_unidades' => array_sum(array_column($itemsDespachados, 'cantidad')),
+                'items' => $itemsDespachados,
+                'pdf_url' => route('dispatch.pdf', $dispatch->id),
+            ];
+
+            return redirect()->back()
+                ->with('success', "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.")
+                ->with('dispatch_success_detail', $dispatchDetail);
         } catch (\RuntimeException $e) {
             DB::rollBack();
 
