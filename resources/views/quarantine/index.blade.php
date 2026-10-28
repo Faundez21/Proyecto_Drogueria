@@ -470,7 +470,7 @@
                     </button>
                 </div>
 
-                <form id="editLoteForm" method="POST" action="" class="bg-white">
+                <form id="editLoteForm" method="POST" action="" class="bg-white" onsubmit="return confirmDecisionCuarentena(event)">
                     @csrf
                     @method('PUT')
                     <div class="p-6 space-y-4">
@@ -910,6 +910,77 @@
             if (estado === 'Disponible') motivoInput.placeholder = "Indique motivo de la liberación...";
             else if (estado === 'Merma') motivoInput.placeholder = "Indique motivo del desecho...";
             else motivoInput.placeholder = "Justificación para mantener inmovilizado...";
+        }
+
+        function confirmDecisionCuarentena(event) {
+            event.preventDefault();
+            const form = document.getElementById('editLoteForm');
+            const estado = document.getElementById('modal_estado')?.value;
+            const motivo = (document.getElementById('modal_motivo')?.value || '').trim();
+            const prod = document.getElementById('modal_producto_nombre')?.textContent || 'Producto';
+            const lote = document.getElementById('modal_lote_nombre')?.textContent || '';
+
+            if (!motivo) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Motivo requerido',
+                    text: 'Debes indicar la justificación u observación correspondiente.',
+                    confirmButtonColor: '#f59e0b'
+                });
+                document.getElementById('modal_motivo')?.focus();
+                return false;
+            }
+
+            if (estado === 'Disponible') {
+                Swal.fire({
+                    title: '¿Liberar lote de Cuarentena?',
+                    html: `El producto <strong>${prod}</strong> (${lote}) será aprobado y reincorporado al inventario <strong>Disponible</strong> para despacho.`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#059669',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, liberar lote',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            } else if (estado === 'Merma') {
+                Swal.fire({
+                    title: '¿Declarar Merma sanitaria?',
+                    html: `El producto <strong>${prod}</strong> (${lote}) será declarado como <strong>Merma</strong> y dado de baja definitiva del inventario. Esta acción no se puede deshacer.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e11d48',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, declarar merma',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: '¿Mantener en Cuarentena?',
+                    html: `Se actualizará la justificación del lote <strong>${prod}</strong> (${lote}) manteniéndolo inmovilizado en Cuarentena.`,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d97706',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, guardar estado',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            }
+            return false;
         }
 
         // Modal QR

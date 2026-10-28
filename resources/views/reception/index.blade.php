@@ -841,9 +841,60 @@
                 actualizarContadoresGrupos();
             });
 
-            // 5. antes de enviar, inyectar firmas base64
-            document.getElementById('receptionForm').addEventListener('submit', function() {
-                if (!signatureRec.isEmpty()) document.getElementById('firma_receptor_input').value = signatureRec.toDataURL('image/png');
+            // 5. confirmación SweetAlert2 y antes de enviar, inyectar firmas base64
+            let receptionSubmitConfirmed = false;
+            let receptionSubmitAction = 'save_only';
+
+            document.querySelectorAll('#receptionForm button[type="submit"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    receptionSubmitAction = this.value || 'save_only';
+                });
+            });
+
+            document.getElementById('receptionForm').addEventListener('submit', function(e) {
+                if (receptionSubmitConfirmed) return;
+
+                const form = this;
+                if (!form.checkValidity()) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                const docTipo = form.querySelector('[name="tipo_documento"]')?.value || 'Documento';
+                const docNum = form.querySelector('[name="numero_documento"]')?.value || '';
+                const provSelect = document.getElementById('provider_select');
+                const provName = provSelect && provSelect.selectedIndex >= 0 ? provSelect.options[provSelect.selectedIndex]?.text.trim() : '';
+                const itemsCount = form.querySelectorAll('.item-row').length;
+
+                Swal.fire({
+                    title: '¿Confirmar Acta de Recepción?',
+                    html: `Se registrará la recepción de <strong>${itemsCount}</strong> producto(s) del proveedor <strong>${provName}</strong> (${docTipo} N° ${docNum}).`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0d9488',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, confirmar recepción',
+                    cancelButtonText: 'Revisar datos',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (!signatureRec.isEmpty()) {
+                            document.getElementById('firma_receptor_input').value = signatureRec.toDataURL('image/png');
+                        }
+                        let actionInput = document.getElementById('reception_action_input');
+                        if (!actionInput) {
+                            actionInput = document.createElement('input');
+                            actionInput.type = 'hidden';
+                            actionInput.id = 'reception_action_input';
+                            actionInput.name = 'action';
+                            form.appendChild(actionInput);
+                        }
+                        actionInput.value = receptionSubmitAction;
+                        receptionSubmitConfirmed = true;
+                        form.submit();
+                    }
+                });
             });
         });
 

@@ -176,12 +176,10 @@
                                             </svg>
                                         </button>
 
-                                        <form action="{{ route('level.destroy', $level->id) }}" method="POST"
-                                            onsubmit="return confirm('¿Estás seguro de que deseas eliminar este nivel?');"
-                                            class="inline">
+                                        <form id="delete-level-{{ $level->id }}" action="{{ route('level.destroy', $level->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
+                                            <button type="button" onclick="confirmDeleteLevel('{{ $level->id }}', 'Nivel {{ $level->number }}')"
                                                 class="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                                                 title="Eliminar nivel">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -508,6 +506,24 @@
 
         function closeHistory() {
             document.getElementById('HistoryModal').classList.add('hidden');
+        }
+
+        function confirmDeleteLevel(id, name) {
+            Swal.fire({
+                title: '¿Eliminar Nivel?',
+                html: `¿Estás seguro de que deseas eliminar el <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará el nivel y sus posiciones asociadas.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-level-' + id).submit();
+                }
+            });
         }
     </script>
 @endsection

@@ -541,7 +541,10 @@
                 }, 10);
             });
 
+            let requestSubmitConfirmed = false;
             document.getElementById('requestForm').addEventListener('submit', function(e) {
+                if (requestSubmitConfirmed) return;
+
                 if (signatureRecibe.isEmpty()) {
                     e.preventDefault();
 
@@ -555,8 +558,34 @@
                     return;
                 }
 
-                document.getElementById('firma_recibe_input').value =
-                    signatureRecibe.toDataURL('image/png');
+                if (!this.checkValidity()) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                const estSelect = document.getElementById('establecimiento_select');
+                const estNombre = estSelect && estSelect.selectedIndex >= 0 ? estSelect.options[estSelect.selectedIndex]?.text.trim() : 'Establecimiento';
+                const totalProds = document.getElementById('total_productos')?.textContent.trim() || '0';
+                const totalUnits = document.getElementById('total_unidades')?.textContent.trim() || '0';
+
+                Swal.fire({
+                    title: '¿Confirmar Envío de Solicitud?',
+                    html: `Se emitirá la solicitud para <strong>${estNombre}</strong> con <strong>${totalProds}</strong> producto(s) y un total de <strong>${totalUnits}</strong> unidad(es).`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0d9488',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, enviar solicitud',
+                    cancelButtonText: 'Revisar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL('image/png');
+                        requestSubmitConfirmed = true;
+                        document.getElementById('requestForm').submit();
+                    }
+                });
             });
 
             actualizarResumen();

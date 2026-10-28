@@ -797,6 +797,7 @@
                                         <div class="flex items-center gap-1.5">
                                             <span class="text-[11px] font-bold text-slate-500">Asignar a:</span>
                                             <select
+                                                onfocus="this.dataset.prevVal = this.value"
                                                 onchange="asignarSolicitudControladoUsuario({{ $solicitud->id }}, this.value, this)"
                                                 class="bg-white border border-slate-300 text-slate-800 text-[12px] font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 cursor-pointer">
                                                 <option value="">— Sin asignar —</option>
@@ -940,6 +941,33 @@
         }
 
         async function asignarSolicitudControladoUsuario(solicitudId, userId, selectElem) {
+            const userName = selectElem && selectElem.selectedIndex >= 0 ? selectElem.options[selectElem.selectedIndex].text.trim() : '';
+            const prevVal = selectElem ? (selectElem.dataset.prevVal ?? '') : '';
+
+            const confirmTitle = userId ? '¿Asignar Solicitud Controlada?' : '¿Desasignar Solicitud?';
+            const confirmHtml = userId
+                ? `¿Deseas asignar la atención de esta solicitud controlada a <strong>${userName}</strong>?`
+                : 'La solicitud volverá al estado <strong>Pendiente</strong> sin responsable asignado.';
+            const confirmBtnText = userId ? 'Sí, asignar' : 'Sí, desasignar';
+
+            const result = await Swal.fire({
+                title: confirmTitle,
+                html: confirmHtml,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#be123c',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: confirmBtnText,
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            });
+
+            if (!result.isConfirmed) {
+                if (selectElem) selectElem.value = prevVal;
+                return;
+            }
+
+            if (selectElem) selectElem.dataset.prevVal = userId;
             if (selectElem) selectElem.disabled = true;
             try {
                 const res = await fetch(`{{ url('requests') }}/${solicitudId}/assign`, {
@@ -1111,16 +1139,43 @@
             if (padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
 
             const form = document.getElementById('despachoControladoForm');
+            let despachoControladoSubmitConfirmed = false;
             if (form) {
-                form.addEventListener('submit', function() {
-                    if (signatureDespacha && !signatureDespacha.isEmpty()) {
-                        document.getElementById('firma_despacha_input').value = signatureDespacha.toDataURL(
-                            'image/png');
+                form.addEventListener('submit', function(e) {
+                    if (despachoControladoSubmitConfirmed) return;
+
+                    if (!form.checkValidity()) {
+                        return;
                     }
-                    if (signatureRecibe && !signatureRecibe.isEmpty()) {
-                        document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL(
-                            'image/png');
-                    }
+
+                    e.preventDefault();
+
+                    const destSelect = document.getElementById('destinatario_select');
+                    const destinatario = destSelect && destSelect.selectedIndex >= 0 ? destSelect.options[destSelect.selectedIndex].text.trim() : 'Establecimiento';
+                    const itemsCount = document.querySelectorAll('.producto-item').length;
+
+                    Swal.fire({
+                        title: '¿Emitir Despacho de Fármacos Controlados?',
+                        html: `Se emitirá la guía de despacho de estupefacientes/psicotrópicos para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s).<br><span class="text-[12px] text-rose-600 font-bold mt-1 block">Esta acción descuenta existencias controladas y genera registro legal de trazabilidad.</span>`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#be123c',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Sí, emitir despacho controlado',
+                        cancelButtonText: 'Revisar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (signatureDespacha && !signatureDespacha.isEmpty()) {
+                                document.getElementById('firma_despacha_input').value = signatureDespacha.toDataURL('image/png');
+                            }
+                            if (signatureRecibe && !signatureRecibe.isEmpty()) {
+                                document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL('image/png');
+                            }
+                            despachoControladoSubmitConfirmed = true;
+                            form.submit();
+                        }
+                    });
                 });
             }
 
