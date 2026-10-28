@@ -187,12 +187,26 @@ class DispatchController extends Controller
                 }
             }
 
+            $controladosPendientesCount = 0;
+            $solicitudOrigenId = null;
+
             if (! empty($validated['establishment_request_id'] ?? null)) {
+                $solicitudOrigenId = (int) $validated['establishment_request_id'];
                 SolicitudService::registrarDespacho(
-                    (int) $validated['establishment_request_id'],
+                    $solicitudOrigenId,
                     $validated['productos'],
                     $validated['cantidades']
                 );
+
+                // Comprobar si la solicitud aún tiene fármacos controlados con cantidad pendiente
+                $reqModel = EstablishmentRequest::with('items.product')->find($solicitudOrigenId);
+                if ($reqModel) {
+                    $controladosPendientesCount = $reqModel->items->filter(function ($it) {
+                        $nom = $it->product->nombre ?? '';
+                        $falta = ($it->cantidad_solicitada - $it->cantidad_despachada);
+                        return InventoryService::esControlado($nom) && $falta > 0;
+                    })->count();
+                }
             }
 
             DB::commit();
@@ -207,6 +221,10 @@ class DispatchController extends Controller
                 'items' => $itemsDespachados,
                 'pdf_url' => route('dispatch.pdf', $dispatch->id),
                 'auto_download' => ($validated['action'] ?? '') === 'save_and_download',
+                'tiene_controlados_pendientes' => $controladosPendientesCount > 0,
+                'cant_controlados_pendientes' => $controladosPendientesCount,
+                'solicitud_id' => $solicitudOrigenId,
+                'url_despacho_controlado' => $solicitudOrigenId ? route('controlled_dispatch.index', ['solicitud_id' => $solicitudOrigenId]) : null,
             ];
 
             if ($request->expectsJson() || $request->ajax()) {
