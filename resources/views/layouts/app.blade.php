@@ -276,6 +276,7 @@
                 @php
                     $sidebarCuarentenaCount = 0;
                     $sidebarDespachosPendCount = 0;
+                    $sidebarDespachosControladosPendCount = 0;
                     $sidebarClavesPendCount = 0;
                     $rolUsuarioActual = 'Operador';
                     try {
@@ -289,9 +290,15 @@
                                     ->where('cantidad', '>', 0)
                                     ->count();
                             }
+                            $controladosList = \App\Services\InventoryService::controlados();
                             if (auth()->user()->can('ver.despacho')) {
-                                $sidebarDespachosPendCount = \Illuminate\Support\Facades\DB::table('establishment_requests')
-                                    ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
+                                $sidebarDespachosPendCount = \App\Models\EstablishmentRequest::whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
+                                    ->whereHas('items.product', fn ($q) => $q->whereNotIn('nombre', $controladosList))
+                                    ->count();
+                            }
+                            if (auth()->user()->can('ver.despacho_controlado')) {
+                                $sidebarDespachosControladosPendCount = \App\Models\EstablishmentRequest::whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
+                                    ->whereHas('items.product', fn ($q) => $q->whereIn('nombre', $controladosList))
                                     ->count();
                             }
                             if (auth()->user()->can('ver.usuarios')) {
@@ -443,14 +450,21 @@
                                         <div class="absolute left-3.5 top-1/2 w-2.5 h-px bg-slate-700/60"></div>
 
                                         <a href="{{ route('controlled_dispatch.index') }}"
-                                            class="nav-row {{ request()->routeIs('controlled_dispatch.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[12px]">
-                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                                </path>
-                                            </svg>
-                                            Despacho Controlado
+                                            class="nav-row {{ request()->routeIs('controlled_dispatch.*') ? 'is-active' : '' }} flex items-center justify-between px-3 py-1.5 rounded-md text-[12px]">
+                                            <div class="flex items-center gap-2.5">
+                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                                    </path>
+                                                </svg>
+                                                Despacho Controlado
+                                            </div>
+                                            @if ($sidebarDespachosControladosPendCount > 0)
+                                                <span class="font-mono-das text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30" title="Solicitudes con fármacos controlados por despachar">
+                                                    {{ $sidebarDespachosControladosPendCount }}
+                                                </span>
+                                            @endif
                                         </a>
                                     </div>
                                 @endcan
