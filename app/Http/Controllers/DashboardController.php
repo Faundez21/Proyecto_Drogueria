@@ -92,12 +92,17 @@ class DashboardController extends Controller
             $invQuery->where('programa', $programa);
         }
 
-        // KPIs PRINCIPALES (Stock actual filtrado en Bodega Central)
-        $valorInventario = (clone $invQuery)->where('cantidad', '>', 0)
+        // KPIs PRINCIPALES (Stock actual filtrado y disponible en Bodega Central)
+        $valorInventario = (clone $invQuery)
+            ->where('estado', 'Disponible')
+            ->where('cantidad', '>', 0)
             ->select(DB::raw('SUM(cantidad * valor_neto_unitario) as total'))
             ->first()->total ?? 0;
 
-        $unidadesTotales = (clone $invQuery)->where('cantidad', '>', 0)->sum('cantidad');
+        $unidadesTotales = (clone $invQuery)
+            ->where('estado', 'Disponible')
+            ->where('cantidad', '>', 0)
+            ->sum('cantidad');
         $productosCatalogo = Product::count();
 
         // IDs de productos que coinciden con los filtros (null = sin filtro de producto)
@@ -327,7 +332,9 @@ class DashboardController extends Controller
             ->get();
 
         // 6. ALERTAS (Vencimientos y Cuarentenas - Respetando Filtros Base)
-        $proximosVencer = (clone $invQuery)->where('cantidad', '>', 0)
+        $proximosVencer = (clone $invQuery)
+            ->where('estado', 'Disponible')
+            ->where('cantidad', '>', 0)
             ->whereNotNull('fecha_vencimiento')
             ->where('fecha_vencimiento', '<=', Carbon::now()->addDays(30))
             ->count();

@@ -242,6 +242,16 @@ class EstablishmentRequestController extends Controller
 
         $userId = $validated['assigned_user_id'] ?? null;
 
+        if ($userId) {
+            $candidateUser = User::find($userId);
+            if (!$candidateUser || (!$candidateUser->hasRole('Administrador') && !$candidateUser->can('ver.despacho') && !$candidateUser->can('ver.despacho_controlado'))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El usuario seleccionado no cuenta con permisos para operar en los módulos de Despacho.',
+                ], 422);
+            }
+        }
+
         $establishmentRequest->update([
             'assigned_user_id' => $userId,
             'assigned_at' => $userId ? now() : null,

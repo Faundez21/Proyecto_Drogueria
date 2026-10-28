@@ -51,7 +51,11 @@ class ControlledDispatchController extends Controller
             }
         }
 
-        $usuariosAsignables = User::where('status', 'activo')->orderBy('name')->get();
+        $usuariosAsignables = User::where('status', 'activo')
+            ->get()
+            ->filter(fn ($u) => $u->hasRole('Administrador') || $u->can('ver.despacho_controlado'))
+            ->sortBy('name')
+            ->values();
         $misSolicitudesAsignadas = $solicitudes
             ->where('assigned_user_id', Auth::id())
             ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
