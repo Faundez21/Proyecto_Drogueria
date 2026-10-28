@@ -295,3 +295,10 @@ html.dark #qrPrintableCard .text-slate-500 {
 html.dark #qrPrintableCard .border-slate-300 {
     border-color: #CBD5E1 !important;
 }
+
+/* ---------- Blindaje de modales fijos contra márgenes no deseados (space-y-*) ---------- */
+div[id$="Modal"], div[id*="modal"], div[id*="Modal"] {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
