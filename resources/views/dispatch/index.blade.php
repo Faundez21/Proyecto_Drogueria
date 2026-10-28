@@ -2088,29 +2088,34 @@
                 const dispData = @json(session('dispatch_success_detail'));
                 const htmlDetail = `
                     <div class="text-left text-xs text-slate-700">
-                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl mb-3 space-y-1">
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl mb-3 space-y-1.5">
+                            <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200">
+                                <span class="font-bold text-slate-900 text-sm">Guía N° ${dispData.correlativo}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">DESPACHO CONFORME</span>
+                            </div>
                             <p><strong>Destino:</strong> ${dispData.destino}</p>
                             <p><strong>Clasificación:</strong> ${dispData.clasificacion}</p>
-                            <p><strong>Fecha Despacho:</strong> ${dispData.fecha}</p>
+                            <p><strong>Fecha de Emisión:</strong> ${dispData.fecha}</p>
                             <p><strong>Total Unidades Despachadas:</strong> ${Number(dispData.total_unidades || 0).toLocaleString('es-CL')} uds. (${dispData.total_items} producto${dispData.total_items === 1 ? '' : 's'})</p>
                         </div>
-                        <div class="max-h-52 overflow-y-auto border border-slate-200 rounded-lg">
+                        <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Productos Despachados:</p>
+                        <div class="max-h-56 overflow-y-auto border border-slate-200 rounded-lg shadow-inner">
                             <table class="w-full text-[11.5px] text-left">
-                                <thead class="bg-slate-100 text-slate-600 font-bold sticky top-0">
+                                <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
                                     <tr>
                                         <th class="p-2">Producto</th>
                                         <th class="p-2 text-center">Lote FEFO</th>
-                                        <th class="p-2 text-center">Vence</th>
-                                        <th class="p-2 text-right">Cant.</th>
+                                        <th class="p-2 text-center">Vencimiento</th>
+                                        <th class="p-2 text-right">Cantidad</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100">
+                                <tbody class="divide-y divide-slate-100 bg-white">
                                     ${(dispData.items || []).map(it => `
-                                        <tr>
+                                        <tr class="hover:bg-slate-50">
                                             <td class="p-2 font-medium text-slate-800">${it.producto}</td>
-                                            <td class="p-2 text-center font-mono text-[11px]">${it.lote}</td>
-                                            <td class="p-2 text-center text-slate-500">${it.vencimiento}</td>
-                                            <td class="p-2 text-right font-bold text-slate-900">${Number(it.cantidad).toLocaleString('es-CL')}</td>
+                                            <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
+                                            <td class="p-2 text-center text-slate-600">${it.vencimiento}</td>
+                                            <td class="p-2 text-right font-bold text-slate-900">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -2120,7 +2125,7 @@
                 `;
 
                 Swal.fire({
-                    title: `¡Despacho N° ${dispData.correlativo} Generado!`,
+                    title: '¡Despacho Normal Realizado con Éxito!',
                     html: htmlDetail,
                     icon: 'success',
                     confirmButtonColor: '#0f766e',
@@ -2129,7 +2134,7 @@
                     cancelButtonColor: '#0f172a',
                     cancelButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Ver Guía PDF',
                     reverseButtons: true,
-                    width: '600px'
+                    width: '640px'
                 }).then((res) => {
                     if (res.dismiss === Swal.DismissReason.cancel && dispData.pdf_url) {
                         window.open(dispData.pdf_url, '_blank');
