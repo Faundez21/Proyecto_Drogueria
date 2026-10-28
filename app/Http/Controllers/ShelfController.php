@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Aisle;
+use App\Models\Level;
+use App\Models\Position;
 use App\Models\Shelf;
+
 class ShelfController extends Controller
 {
     /**
@@ -12,13 +15,22 @@ class ShelfController extends Controller
      */
     public function index()
     {
-        $shelves = Shelf::with('aisle')->get();
+        $shelves = Shelf::with('aisle')
+            ->withCount('levels')
+            ->orderBy('id')
+            ->get();
 
         // traer todos los pasillos para el select del formulario
-        $aisles = Aisle::all();
+        $aisles = Aisle::orderBy('name')->get();
 
-        return view('distribution.maintainers.shelf.index', compact('shelves', 'aisles'));
+        $counts = [
+            'aisles' => $aisles->count(),
+            'shelves' => $shelves->count(),
+            'levels' => Level::count(),
+            'positions' => Position::count(),
+        ];
 
+        return view('distribution.maintainers.shelf.index', compact('shelves', 'aisles', 'counts'));
     }
 
     /**
@@ -83,6 +95,11 @@ class ShelfController extends Controller
         $datos['capacidad'] = (int) ($datos['capacidad'] ?? 0);
 
         $shelf->update($datos);
+
+        $shelf->inventories()->update([
+            'estante' => $shelf->name,
+            'aisle_id' => $shelf->aisle_id,
+        ]);
 
         return redirect()->route('shelf.index')->with('success', 'Estantería actualizada exitosamente.');
 

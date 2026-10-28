@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Inventory;
+use App\Services\InventoryService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 class InventorySeeder extends Seeder
@@ -14,7 +16,9 @@ class InventorySeeder extends Seeder
      */
     public function run(): void
     {
+        Schema::disableForeignKeyConstraints();
         DB::table('inventories')->truncate();
+        Schema::enableForeignKeyConstraints();
 
         $inventarios = [
             // PARACETAMOL 500MG (Lote 1 - FármacosChile Mayorista)
@@ -147,7 +151,7 @@ class InventorySeeder extends Seeder
             /* ----------------------------------------------------------------------
                FÁRMACOS CONTROLADOS (PSICOTRÓPICOS Y ESTUPEFACIENTES)
                ---------------------------------------------------------------------- */
-            
+
             [
                 'correlativo_interno' => 1007,
                 'fecha_recepcion'     => Carbon::now()->subDays(12)->format('Y-m-d'),
@@ -455,7 +459,7 @@ class InventorySeeder extends Seeder
         ];
 
         foreach ($inventarios as $data) {
-            Inventory::create($data);
+            Inventory::create(InventoryService::resolverRelaciones($data));
         }
     }
 }

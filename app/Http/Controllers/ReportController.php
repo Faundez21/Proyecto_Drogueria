@@ -17,11 +17,19 @@ class ReportController extends Controller
     {
         $query = Inventory::where('estado', 'Disponible');
 
+        // Restricción de Fármacos Controlados según rol/permiso
+        $user = auth()->user();
+        $puedeVerControlados = $user && ($user->hasRole('Administrador') || $user->can('ver.despacho_controlado'));
+
+        if (! $puedeVerControlados) {
+            $query->where('categoria', '!=', 'Fármacos Controlados');
+        }
+
         // 1. Filtro de Búsqueda (Texto general)
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->orWhere('producto', 'like', "%{$search}%")
+                $q->where('producto', 'like', "%{$search}%")
                     ->orWhere('lote', 'like', "%{$search}%")
                     ->orWhere('categoria', 'like', "%{$search}%")
                     ->orWhere('rut_proveedor', 'like', "%{$search}%");
@@ -30,7 +38,9 @@ class ReportController extends Controller
 
         // 2. Filtro de Categoría
         if ($request->filled('categoria')) {
-            $query->where('categoria', $request->input('categoria'));
+            if ($request->input('categoria') !== 'Fármacos Controlados' || $puedeVerControlados) {
+                $query->where('categoria', $request->input('categoria'));
+            }
         }
 
         // 3. Filtro de Pasillo
@@ -88,7 +98,21 @@ class ReportController extends Controller
             ->orderBy('programa')
             ->pluck('programa');
 
-        return view('reportes.index', compact('inventories', 'valorTotal', 'programasUnicos'));
+        $pasillosUnicos = Inventory::where('estado', 'Disponible')
+            ->whereNotNull('pasillo')
+            ->where('pasillo', '!=', '')
+            ->distinct()
+            ->orderBy('pasillo')
+            ->pluck('pasillo');
+
+        $estantesUnicos = Inventory::where('estado', 'Disponible')
+            ->whereNotNull('estante')
+            ->where('estante', '!=', '')
+            ->distinct()
+            ->orderBy('estante')
+            ->pluck('estante');
+
+        return view('reports.index', compact('inventories', 'valorTotal', 'programasUnicos', 'pasillosUnicos', 'estantesUnicos'));
     }
 
     public function exportExcel(Request $request)
@@ -102,7 +126,7 @@ class ReportController extends Controller
         $query = $this->buildInventoryQuery($request);
         $inventories = $query->get(); // Extrae todos los resultados sin paginar
 
-        $pdf = Pdf::loadView('reportes.pdf', compact('inventories'));
+        $pdf = Pdf::loadView('reports.pdf', compact('inventories'));
         $pdf->setPaper('A4', 'landscape'); // Formato horizontal para que quepan las columnas
 
         return $pdf->download('reporte_inventario_'.date('Ymd_His').'.pdf');

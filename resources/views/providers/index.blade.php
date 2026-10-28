@@ -7,7 +7,9 @@
     <!-- Botón Principal: Registrar -->
     <button type="button" id="btn-new-provider"
         class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto">
-        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
         Registrar Proveedor
     </button>
 @endsection
@@ -19,7 +21,9 @@
         <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
             <span class="font-mono-das text-slate-400 font-semibold">01</span>
             <span>Abastecimiento</span>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
             <span class="font-medium text-slate-800">Proveedores</span>
         </div>
 
@@ -30,10 +34,15 @@
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-[12.5px] font-medium text-slate-500">Total (Según filtros)</p>
-                        <p class="font-mono-das text-[32px] font-bold text-slate-800 mt-1 leading-none">{{ $total ?? 0 }}</p>
+                        <p class="font-mono-das text-[32px] font-bold text-slate-800 mt-1 leading-none">{{ $total ?? 0 }}
+                        </p>
                     </div>
                     <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-teal-50 text-teal-600 shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -43,27 +52,39 @@
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-[12.5px] font-medium text-slate-500">Activos (Según filtros)</p>
-                        <p class="font-mono-das text-[32px] font-bold text-slate-800 mt-1 leading-none">{{ $activos ?? 0 }}</p>
+                        <p class="font-mono-das text-[32px] font-bold text-slate-800 mt-1 leading-none">{{ $activos ?? 0 }}
+                        </p>
                     </div>
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600 shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div
+                        class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                     </div>
                 </div>
-                <p class="text-[11.5px] text-slate-400 mt-4 pt-3 border-t border-slate-100"><span class="text-emerald-600 font-bold">{{ $porcentajeActivos ?? 0 }}%</span> del total filtrado</p>
+                <p class="text-[11.5px] text-slate-400 mt-4 pt-3 border-t border-slate-100"><span
+                        class="text-emerald-600 font-bold">{{ $porcentajeActivos ?? 0 }}%</span> del total filtrado</p>
             </div>
 
             <!-- KPI: Mes -->
-            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm sm:col-span-2 lg:col-span-1 transition-all hover:shadow-md">
+            <div
+                class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm sm:col-span-2 lg:col-span-1 transition-all hover:shadow-md">
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-[12.5px] font-medium text-slate-500">Agregados este mes</p>
-                        <p class="font-mono-das text-[32px] font-bold text-slate-800 mt-1 leading-none">{{ $agregadosMes ?? 0 }}</p>
+                        <p class="font-mono-das text-[32px] font-bold text-slate-800 mt-1 leading-none">
+                            {{ $agregadosMes ?? 0 }}</p>
                     </div>
                     <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-50 text-amber-600 shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4v16m8-8H4"></path></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
                     </div>
                 </div>
-                <p class="text-[11.5px] text-slate-400 mt-4 pt-3 border-t border-slate-100"><span class="font-medium text-slate-600">{{ $nombreMesActual ?? '' }}</span></p>
+                <p class="text-[11.5px] text-slate-400 mt-4 pt-3 border-t border-slate-100"><span
+                        class="font-medium text-slate-600">{{ $nombreMesActual ?? '' }}</span></p>
             </div>
         </div>
 
@@ -73,49 +94,71 @@
             <!-- Cabecera de la tabla y botón de filtros -->
             <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
                 <h3 class="text-[15px] font-bold text-slate-800">Directorio de Proveedores</h3>
-                <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                <button type="button" id="toggle-filters-btn"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                        </path>
+                    </svg>
                     Filtros Avanzados
                 </button>
             </div>
 
             <!-- Formulario de Filtros -->
-            <form method="GET" action="{{ route('providers.index') }}" id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
+            <form method="GET" action="{{ route('providers.index') }}" id="filters-panel"
+                class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                     <div class="xl:col-span-2">
-                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Buscar</label>
-                        <input type="text" name="search" value="{{ request('search') }}" list="provider-suggestions" placeholder="Nombre, RUT o Correo..."
+                        <label
+                            class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Buscar</label>
+                        <input type="text" name="search" value="{{ request('search') }}" list="provider-suggestions"
+                            placeholder="Nombre, RUT o Correo..."
                             class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                         <datalist id="provider-suggestions">
-                            @foreach($allProviders ?? [] as $prov)
+                            @foreach ($allProviders ?? [] as $prov)
                                 <option value="{{ $prov->name }}">RUT: {{ $prov->rut }}</option>
                             @endforeach
                         </datalist>
                     </div>
 
                     <div>
-                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
-                        <select name="category" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        <label
+                            class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
+                        <select name="category"
+                            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todas</option>
-                            <option value="Fármacos y medicamentos" {{ request('category') == 'Fármacos y medicamentos' ? 'selected' : '' }}>Fármacos y medicamentos</option>
-                            <option value="Insumos clínicos" {{ request('category') == 'Insumos clínicos' ? 'selected' : '' }}>Insumos clínicos</option>
-                            <option value="Equipamiento mayor" {{ request('category') == 'Equipamiento mayor' ? 'selected' : '' }}>Equipamiento mayor</option>
-                            <option value="Dispositivos médicos" {{ request('category') == 'Dispositivos médicos' ? 'selected' : '' }}>Dispositivos médicos</option>
+                            <option value="Fármacos y medicamentos"
+                                {{ request('category') == 'Fármacos y medicamentos' ? 'selected' : '' }}>Fármacos y
+                                medicamentos</option>
+                            <option value="Insumos clínicos"
+                                {{ request('category') == 'Insumos clínicos' ? 'selected' : '' }}>Insumos clínicos</option>
+                            <option value="Equipamiento mayor"
+                                {{ request('category') == 'Equipamiento mayor' ? 'selected' : '' }}>Equipamiento mayor
+                            </option>
+                            <option value="Dispositivos médicos"
+                                {{ request('category') == 'Dispositivos médicos' ? 'selected' : '' }}>Dispositivos médicos
+                            </option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Estado</label>
-                        <select name="status" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        <label
+                            class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Estado</label>
+                        <select name="status"
+                            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todos</option>
                             <option value="activo" {{ request('status') == 'activo' ? 'selected' : '' }}>Activos</option>
-                            <option value="inactivo" {{ request('status') == 'inactivo' ? 'selected' : '' }}>Inactivos</option>
+                            <option value="inactivo" {{ request('status') == 'inactivo' ? 'selected' : '' }}>Inactivos
+                            </option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Mostrar</label>
-                        <select name="per_page" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        <label
+                            class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Mostrar</label>
+                        <select name="per_page"
+                            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="10" {{ ($perPage ?? 10) == 10 ? 'selected' : '' }}>10 registros</option>
                             <option value="25" {{ ($perPage ?? 10) == 25 ? 'selected' : '' }}>25 registros</option>
                             <option value="50" {{ ($perPage ?? 10) == 50 ? 'selected' : '' }}>50 registros</option>
@@ -124,10 +167,14 @@
                     </div>
 
                     <div>
-                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Ordenar por</label>
-                        <select name="sort" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
-                            <option value="recent" {{ request('sort') == 'recent' ? 'selected' : '' }}>Más recientes</option>
-                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Más antiguos</option>
+                        <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Ordenar
+                            por</label>
+                        <select name="sort"
+                            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                            <option value="recent" {{ request('sort') == 'recent' ? 'selected' : '' }}>Más recientes
+                            </option>
+                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Más antiguos
+                            </option>
                             <option value="az" {{ request('sort') == 'az' ? 'selected' : '' }}>A-Z</option>
                             <option value="za" {{ request('sort') == 'za' ? 'selected' : '' }}>Z-A</option>
                         </select>
@@ -135,10 +182,12 @@
                 </div>
 
                 <div class="mt-5 flex items-center justify-end gap-3 border-t border-slate-200/60 pt-4">
-                    <a href="{{ route('providers.index') }}" class="px-4 py-2 rounded-lg text-[12.5px] font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors">
+                    <a href="{{ route('providers.index') }}"
+                        class="px-4 py-2 rounded-lg text-[12.5px] font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors">
                         Limpiar Filtros
                     </a>
-                    <button type="submit" class="px-4 py-2 rounded-lg text-[12.5px] font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-md transition-all">
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg text-[12.5px] font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-md transition-all">
                         Aplicar Filtros
                     </button>
                 </div>
@@ -148,7 +197,8 @@
             <div class="overflow-x-auto w-full">
                 <table class="w-full text-left border-collapse min-w-[900px]">
                     <thead>
-                        <tr class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
+                        <tr
+                            class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
                             <th class="px-6 py-4 whitespace-nowrap">Proveedor</th>
                             <th class="px-6 py-4 whitespace-nowrap">Contacto</th>
                             <th class="px-6 py-4 whitespace-nowrap">Categoría</th>
@@ -158,161 +208,220 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-[13px]">
                         @forelse ($providers ?? [] as $provider)
-                        <!-- IMPORTANTE: Todos los campos añadidos a los data-attributes -->
-                        <tr class="provider-row hover:bg-slate-50 transition-colors group"
-                            data-id="{{ $provider->id }}"
-                            data-name="{{ $provider->name }}"
-                            data-rut="{{ $provider->rut }}"
-                            data-business-line="{{ $provider->business_line }}"
-                            data-email="{{ $provider->email }}"
-                            data-phone="{{ $provider->phone }}"
-                            data-address="{{ $provider->address }}"
-                            data-category="{{ $provider->category }}"
-                            data-status="{{ $provider->status }}">
+                            <!-- IMPORTANTE: Todos los campos añadidos a los data-attributes -->
+                            <tr class="provider-row hover:bg-slate-50 transition-colors group"
+                                data-id="{{ $provider->id }}" data-name="{{ $provider->name }}"
+                                data-rut="{{ $provider->rut }}" data-business-line="{{ $provider->business_line }}"
+                                data-email="{{ $provider->email }}" data-phone="{{ $provider->phone }}"
+                                data-address="{{ $provider->address }}" data-category="{{ $provider->category }}"
+                                data-status="{{ $provider->status }}">
 
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-mono-das font-bold text-[13px] {{ $provider->status == 'activo' ? 'text-teal-700 bg-teal-50' : 'text-slate-500 bg-slate-100' }} shrink-0 border border-slate-200/60">
-                                        {{ strtoupper(substr($provider->name, 0, 2)) }}
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="w-10 h-10 rounded-xl flex items-center justify-center font-mono-das font-bold text-[13px] {{ $provider->status == 'activo' ? 'text-teal-700 bg-teal-50' : 'text-slate-500 bg-slate-100' }} shrink-0 border border-slate-200/60">
+                                            {{ strtoupper(substr($provider->name, 0, 2)) }}
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="font-bold text-slate-800 truncate">{{ $provider->name }}</p>
+                                            <p class="font-mono-das text-[11.5px] text-slate-500 mt-0.5">
+                                                {{ $provider->rut }}</p>
+                                        </div>
                                     </div>
-                                    <div class="min-w-0">
-                                        <p class="font-bold text-slate-800 truncate">{{ $provider->name }}</p>
-                                        <p class="font-mono-das text-[11.5px] text-slate-500 mt-0.5">{{ $provider->rut }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-slate-800 font-medium">{{ $provider->email }}</span>
+                                        <span
+                                            class="font-mono-das text-[11.5px] text-slate-500">{{ $provider->phone ?: 'Sin teléfono' }}</span>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex flex-col">
-                                    <span class="text-slate-800 font-medium">{{ $provider->email }}</span>
-                                    <span class="font-mono-das text-[11.5px] text-slate-500">{{ $provider->phone ?: 'Sin teléfono' }}</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white text-slate-600 border border-slate-200 shadow-sm whitespace-nowrap">
-                                    {{ $provider->category }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                @if($provider->status == 'activo')
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Activo
-                                </span>
-                                @else
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Inactivo
-                                </span>
-                                @endif
-                            </td>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span
+                                        class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white text-slate-600 border border-slate-200 shadow-sm whitespace-nowrap">
+                                        {{ $provider->category }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    @if ($provider->status == 'activo')
+                                        <span
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Activo
+                                        </span>
+                                    @else
+                                        <span
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Inactivo
+                                        </span>
+                                    @endif
+                                </td>
 
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex items-center justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-                                    <button type="button" class="js-view-detail p-2 text-teal-600 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors border border-transparent hover:border-teal-200" title="Ver Ficha">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                    </button>
-                                    <button type="button" class="js-edit-provider p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-transparent hover:border-blue-200" title="Editar">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                    </button>
-                                    <button type="button" class="js-toggle-status p-2 {{ $provider->status == 'activo' ? 'text-rose-600 bg-rose-50 hover:bg-rose-100 hover:border-rose-200' : 'text-slate-600 bg-slate-100 hover:bg-slate-200 hover:border-slate-300' }} rounded-lg transition-colors border border-transparent" title="{{ $provider->status == 'activo' ? 'Desactivar' : 'Reactivar' }}">
-                                        @if($provider->status == 'activo')
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
-                                        @else
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        @endif
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                <td class="px-6 py-4 text-center">
+                                    <div
+                                        class="flex items-center justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                                        <button type="button"
+                                            class="js-view-detail p-2 text-teal-600 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors border border-transparent hover:border-teal-200"
+                                            title="Ver Ficha">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                        <button type="button"
+                                            class="js-edit-provider p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-transparent hover:border-blue-200"
+                                            title="Editar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                        <button type="button"
+                                            class="js-toggle-status p-2 {{ $provider->status == 'activo' ? 'text-rose-600 bg-rose-50 hover:bg-rose-100 hover:border-rose-200' : 'text-slate-600 bg-slate-100 hover:bg-slate-200 hover:border-slate-300' }} rounded-lg transition-colors border border-transparent"
+                                            title="{{ $provider->status == 'activo' ? 'Desactivar' : 'Reactivar' }}">
+                                            @if ($provider->status == 'activo')
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                                                    </path>
+                                                </svg>
+                                            @else
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                            @endif
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="5" class="px-6 py-12 text-center">
-                                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-400 mb-3">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                                </div>
-                                <p class="text-[14px] font-medium text-slate-600">No se encontraron proveedores.</p>
-                                <p class="text-[13px] text-slate-400 mt-1">Intenta ajustando los filtros de búsqueda.</p>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center">
+                                    <div
+                                        class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-400 mb-3">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <p class="text-[14px] font-medium text-slate-600">No se encontraron proveedores.</p>
+                                    <p class="text-[13px] text-slate-400 mt-1">Intenta ajustando los filtros de búsqueda.
+                                    </p>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
             <!-- Paginación -->
-            @if(isset($providers) && $providers->hasPages())
-            <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 bg-white rounded-b-2xl">
-                <div class="text-[13px] text-slate-500 text-center sm:text-left font-medium">
-                    Mostrando del <span class="font-bold text-slate-800">{{ $providers->firstItem() ?? 0 }}</span> al <span class="font-bold text-slate-800">{{ $providers->lastItem() ?? 0 }}</span> de <span class="font-bold text-slate-800">{{ $providers->total() }}</span> proveedores
-                </div>
+            @if (isset($providers) && $providers->hasPages())
+                <div
+                    class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 bg-white rounded-b-2xl">
+                    <div class="text-[13px] text-slate-500 text-center sm:text-left font-medium">
+                        Mostrando del <span class="font-bold text-slate-800">{{ $providers->firstItem() ?? 0 }}</span> al
+                        <span class="font-bold text-slate-800">{{ $providers->lastItem() ?? 0 }}</span> de <span
+                            class="font-bold text-slate-800">{{ $providers->total() }}</span> proveedores
+                    </div>
 
-                <div class="flex items-center gap-1.5">
-                    @if ($providers->onFirstPage())
-                        <span class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed">Anterior</span>
-                    @else
-                        <a href="{{ $providers->previousPageUrl() }}" class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors">Anterior</a>
-                    @endif
-
-                    @php
-                        $start = max($providers->currentPage() - 2, 1);
-                        $end = min($providers->currentPage() + 2, $providers->lastPage());
-                    @endphp
-
-                    @if($start > 1)
-                        <a href="{{ $providers->url(1) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">1</a>
-                        @if($start > 2)
-                            <span class="px-1 text-slate-400">...</span>
-                        @endif
-                    @endif
-
-                    @for ($i = $start; $i <= $end; $i++)
-                        @if ($i == $providers->currentPage())
-                            <span class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-bold bg-blue-50 text-blue-600 border border-blue-100 shadow-sm">{{ $i }}</span>
+                    <div class="flex items-center gap-1.5">
+                        @if ($providers->onFirstPage())
+                            <span
+                                class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed">Anterior</span>
                         @else
-                            <a href="{{ $providers->url($i) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">{{ $i }}</a>
+                            <a href="{{ $providers->previousPageUrl() }}"
+                                class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors">Anterior</a>
                         @endif
-                    @endfor
 
-                    @if($end < $providers->lastPage())
-                        @if($end < $providers->lastPage() - 1)
-                            <span class="px-1 text-slate-400">...</span>
+                        @php
+                            $start = max($providers->currentPage() - 2, 1);
+                            $end = min($providers->currentPage() + 2, $providers->lastPage());
+                        @endphp
+
+                        @if ($start > 1)
+                            <a href="{{ $providers->url(1) }}"
+                                class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">1</a>
+                            @if ($start > 2)
+                                <span class="px-1 text-slate-400">...</span>
+                            @endif
                         @endif
-                        <a href="{{ $providers->url($providers->lastPage()) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">{{ $providers->lastPage() }}</a>
-                    @endif
 
-                    @if ($providers->hasMorePages())
-                        <a href="{{ $providers->nextPageUrl() }}" class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors">Siguiente</a>
-                    @else
-                        <span class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed">Siguiente</span>
-                    @endif
+                        @for ($i = $start; $i <= $end; $i++)
+                            @if ($i == $providers->currentPage())
+                                <span
+                                    class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-bold bg-blue-50 text-blue-600 border border-blue-100 shadow-sm">{{ $i }}</span>
+                            @else
+                                <a href="{{ $providers->url($i) }}"
+                                    class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">{{ $i }}</a>
+                            @endif
+                        @endfor
+
+                        @if ($end < $providers->lastPage())
+                            @if ($end < $providers->lastPage() - 1)
+                                <span class="px-1 text-slate-400">...</span>
+                            @endif
+                            <a href="{{ $providers->url($providers->lastPage()) }}"
+                                class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">{{ $providers->lastPage() }}</a>
+                        @endif
+
+                        @if ($providers->hasMorePages())
+                            <a href="{{ $providers->nextPageUrl() }}"
+                                class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors">Siguiente</a>
+                        @else
+                            <span
+                                class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed">Siguiente</span>
+                        @endif
+                    </div>
                 </div>
-            </div>
             @endif
         </div>
     </div>
 
     <!-- Modal 1: Ficha técnica -->
-    <div id="modal-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity" data-close="modal-detail"></div>
-        <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 bg-white shadow-2xl border border-slate-200" id="modal-detail-panel">
-            <div class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+    <div id="modal-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
+            data-close="modal-detail"></div>
+        <div class="relative w-full max-w-2xl max-h-[92vh] flex flex-col my-auto rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 bg-white shadow-2xl border border-slate-200"
+            id="modal-detail-panel">
+            <div
+                class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white shrink-0">
                 <div class="flex items-center gap-3.5">
-                    <div id="detail-initials" class="w-12 h-12 rounded-xl flex items-center justify-center font-mono-das font-bold text-[14px] text-teal-700 bg-teal-50 border border-teal-100 shadow-sm shrink-0">PR</div>
+                    <div id="detail-initials"
+                        class="w-12 h-12 rounded-xl flex items-center justify-center font-mono-das font-bold text-[14px] text-teal-700 bg-teal-50 border border-teal-100 shadow-sm shrink-0">
+                        PR</div>
                     <div>
                         <h3 id="detail-name" class="text-[16px] font-bold text-slate-800 leading-tight">Nombre</h3>
                         <p id="detail-rut" class="font-mono-das text-[12.5px] font-medium text-slate-500 mt-0.5">RUT</p>
                     </div>
                 </div>
-                <button type="button" class="js-modal-close p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors" data-close="modal-detail">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button type="button"
+                    class="js-modal-close p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                    data-close="modal-detail">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
                 </button>
             </div>
 
             <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
                 <!-- Sección: Información Comercial -->
                 <div>
-                    <h4 class="text-[13px] font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">Información Comercial y Contacto</h4>
+                    <h4 class="text-[13px] font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">Información
+                        Comercial y Contacto</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Giro Comercial</p>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Giro Comercial
+                            </p>
                             <p id="detail-business-line" class="text-[13.5px] font-semibold text-slate-700"></p>
                         </div>
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -320,7 +429,8 @@
                             <p id="detail-category" class="text-[13.5px] font-semibold text-slate-700"></p>
                         </div>
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Correo Electrónico</p>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Correo
+                                Electrónico</p>
                             <p id="detail-email" class="text-[13.5px] font-semibold text-slate-700 break-all"></p>
                         </div>
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -332,18 +442,23 @@
                             <p id="detail-address" class="text-[13.5px] font-semibold text-slate-700"></p>
                         </div>
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 sm:col-span-2">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Estado en Sistema</p>
-                            <span id="detail-status" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[12px] font-bold mt-0.5"></span>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Estado en Sistema
+                            </p>
+                            <span id="detail-status"
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[12px] font-bold mt-0.5"></span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50">
-                <button type="button" class="js-modal-close px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 w-full sm:w-auto transition-colors" data-close="modal-detail">
+            <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50 shrink-0">
+                <button type="button"
+                    class="js-modal-close px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 w-full sm:w-auto transition-colors"
+                    data-close="modal-detail">
                     Cerrar
                 </button>
-                <button type="button" id="modal-detail-edit-btn" class="px-5 py-2.5 rounded-xl text-[13px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-md w-full sm:w-auto transition-all">
+                <button type="button" id="modal-detail-edit-btn"
+                    class="px-5 py-2.5 rounded-xl text-[13px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-md w-full sm:w-auto transition-all">
                     Editar Proveedor
                 </button>
             </div>
@@ -351,42 +466,64 @@
     </div>
 
     <!-- Modal 2: Formulario (Registrar/Editar) -->
-    <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity" data-close="modal-edit"></div>
-        <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 max-h-[95vh] flex flex-col bg-white shadow-2xl border border-slate-200" id="modal-edit-panel">
+    <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
+            data-close="modal-edit"></div>
+        <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 max-h-[92vh] flex flex-col bg-white shadow-2xl border border-slate-200 my-auto"
+            id="modal-edit-panel">
 
-            <div class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white shrink-0">
+            <div
+                class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white shrink-0">
                 <div>
                     <h3 id="modal-edit-title" class="text-[18px] font-bold text-slate-800">Proveedor</h3>
                     <p class="text-[12.5px] font-medium text-slate-500 mt-1">Completa la información del proveedor.</p>
                 </div>
-                <button type="button" class="js-modal-close p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors" data-close="modal-edit">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button type="button"
+                    class="js-modal-close p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                    data-close="modal-edit">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
                 </button>
             </div>
 
-            <form class="p-6 space-y-6 overflow-y-auto" onsubmit="return false;">
+            <form class="p-6 space-y-6 overflow-y-auto" onsubmit="return false;" novalidate>
                 <input type="hidden" id="provider-id" value="">
 
                 <!-- SECCIÓN 1: DATOS GENERALES -->
                 <div>
-                    <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Datos Generales</h4>
+                    <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Datos Generales
+                    </h4>
 
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="sm:col-span-2">
-                                <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Razón Social / Nombre <span class="text-red-500">*</span></label>
-                                <input type="text" id="provider-name" required placeholder="Ej: Laboratorios Andinos S.A." class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                                <label
+                                    class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Razón
+                                    Social / Nombre <span class="text-red-500">*</span></label>
+                                <input type="text" id="provider-name" required
+                                    placeholder="Ej: Laboratorios Andinos S.A."
+                                    class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
                             </div>
 
                             <div>
-                                <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">RUT <span class="text-red-500">*</span></label>
-                                <input type="text" id="provider-rut" required placeholder="76.543.210-K" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                                <label
+                                    class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">RUT
+                                    <span class="text-red-500">*</span></label>
+                                <input type="text" id="provider-rut" required placeholder="76.543.210-K"
+                                    maxlength="12" autocomplete="off" inputmode="text"
+                                    class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                                <p id="provider-rut-error" class="hidden text-[11.5px] font-medium text-red-600 mt-1.5">
+                                </p>
                             </div>
 
                             <div>
-                                <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría <span class="text-red-500">*</span></label>
-                                <select id="provider-category" required class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                                <label
+                                    class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría
+                                    <span class="text-red-500">*</span></label>
+                                <select id="provider-category" required
+                                    class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
                                     <option value="" disabled selected>Seleccione...</option>
                                     <option value="Fármacos y medicamentos">Fármacos y medicamentos</option>
                                     <option value="Insumos clínicos">Insumos clínicos</option>
@@ -396,8 +533,12 @@
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Giro Comercial</label>
-                                <input type="text" id="provider-business-line" placeholder="Ej: Venta al por mayor de productos farmacéuticos" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                                <label
+                                    class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Giro
+                                    Comercial</label>
+                                <input type="text" id="provider-business-line"
+                                    placeholder="Ej: Venta al por mayor de productos farmacéuticos"
+                                    class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
                             </div>
                         </div>
                     </div>
@@ -405,33 +546,51 @@
 
                 <!-- SECCIÓN 2: CONTACTO Y DIRECCIÓN -->
                 <div>
-                    <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Contacto y Ubicación</h4>
+                    <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Contacto y
+                        Ubicación</h4>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Correo Electrónico <span class="text-red-500">*</span></label>
-                            <input type="email" id="provider-email" required placeholder="contacto@empresa.cl" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                            <label
+                                class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Correo
+                                Electrónico <span class="text-red-500">*</span></label>
+                            <input type="email" id="provider-email" required placeholder="contacto@empresa.cl"
+                                class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                            <p id="provider-email-error" class="hidden text-[11.5px] font-medium text-red-600 mt-1.5">
+                            </p>
                         </div>
                         <div>
-                            <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Teléfono</label>
-                            <input type="text" id="provider-phone" placeholder="+56 9 1234 5678" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                            <label
+                                class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Teléfono</label>
+                            <input type="text" id="provider-phone" placeholder="+56 9 1234 5678" maxlength="16"
+                                autocomplete="off" inputmode="tel"
+                                class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                            <p id="provider-phone-error" class="hidden text-[11.5px] font-medium text-red-600 mt-1.5">
+                            </p>
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Dirección Completa</label>
-                            <input type="text" id="provider-address" placeholder="Ej: Av. Providencia 1234, Santiago" class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                            <label
+                                class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Dirección
+                                Completa</label>
+                            <input type="text" id="provider-address" placeholder="Ej: Av. Providencia 1234, Santiago"
+                                class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
                         </div>
                     </div>
                 </div>
 
                 <!-- ESTADO (Sólo visible al editar) -->
                 <div id="status-container">
-                    <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Estado del Proveedor</h4>
+                    <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Estado del
+                        Proveedor</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <label class="flex items-center gap-3 rounded-xl p-3.5 border border-slate-200 cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-colors">
-                            <input type="radio" name="edit-status" value="activo" checked class="w-4 h-4 accent-teal-600">
+                        <label
+                            class="flex items-center gap-3 rounded-xl p-3.5 border border-slate-200 cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-colors">
+                            <input type="radio" name="edit-status" value="activo" checked
+                                class="w-4 h-4 accent-teal-600">
                             <span class="text-[13.5px] font-bold text-slate-700">Activo</span>
                         </label>
-                        <label class="flex items-center gap-3 rounded-xl p-3.5 border border-slate-200 cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-colors">
+                        <label
+                            class="flex items-center gap-3 rounded-xl p-3.5 border border-slate-200 cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-colors">
                             <input type="radio" name="edit-status" value="inactivo" class="w-4 h-4 accent-rose-600">
                             <span class="text-[13.5px] font-bold text-slate-700">Inactivo</span>
                         </label>
@@ -440,10 +599,13 @@
             </form>
 
             <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50 shrink-0">
-                <button type="button" class="js-modal-close px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 w-full sm:w-auto transition-colors" data-close="modal-edit">
+                <button type="button"
+                    class="js-modal-close px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 w-full sm:w-auto transition-colors"
+                    data-close="modal-edit">
                     Cancelar
                 </button>
-                <button type="button" id="modal-edit-action" class="px-5 py-2.5 rounded-xl text-[13px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-md w-full sm:w-auto transition-all">
+                <button type="button" id="modal-edit-action"
+                    class="px-5 py-2.5 rounded-xl text-[13px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-md w-full sm:w-auto transition-all">
                     Guardar Proveedor
                 </button>
             </div>
@@ -457,11 +619,178 @@
             const csrfToken = '{{ csrf_token() }}';
             let selectedRow = null;
 
+            // =====================================================
+            // VALIDACIONES: RUT CHILENO (módulo 11) Y TELÉFONO
+            // =====================================================
+
+            // Deja sólo dígitos y K, en mayúscula
+            function cleanRut(value) {
+                return String(value || '').replace(/[^0-9kK]/g, '').toUpperCase();
+            }
+
+            // Formatea mientras se escribe: 12.345.678-5
+            function formatRut(value) {
+                let clean = cleanRut(value).slice(0, 9);
+                if (clean.length <= 1) return clean;
+
+                let body = clean.slice(0, -1).replace(/\D/g, ''); // la K sólo es válida al final
+                const dv = clean.slice(-1);
+                body = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                return `${body}-${dv}`;
+            }
+
+            // Valida largo, formato y dígito verificador
+            function validateRut(value) {
+                const clean = cleanRut(value);
+                if (clean.length < 8 || clean.length > 9) return false; // cuerpo de 7 u 8 dígitos + DV
+
+                const body = clean.slice(0, -1);
+                const dv = clean.slice(-1);
+                if (!/^\d+$/.test(body)) return false;
+                if (parseInt(body, 10) < 1000000) return false;
+
+                let sum = 0;
+                let multiplier = 2;
+                for (let i = body.length - 1; i >= 0; i--) {
+                    sum += parseInt(body[i], 10) * multiplier;
+                    multiplier = multiplier === 7 ? 2 : multiplier + 1;
+                }
+                const result = 11 - (sum % 11);
+                const expected = result === 11 ? '0' : result === 10 ? 'K' : String(result);
+
+                return dv === expected;
+            }
+
+            // Extrae los 9 dígitos nacionales (sin +56)
+            function getPhoneDigits(value) {
+                let v = String(value || '').trim();
+                let digits;
+
+                if (v.startsWith('+56')) {
+                    digits = v.slice(3).replace(/\D/g, '');
+                } else {
+                    digits = v.replace(/\D/g, '');
+                    if (digits.length > 9 && digits.startsWith('56')) digits = digits.slice(2);
+                }
+                return digits.slice(0, 9);
+            }
+
+            // Formatea: +56 9 1234 5678
+            function formatPhone(value) {
+                const d = getPhoneDigits(value);
+                if (!d) return '+56 ';
+                let out = `+56 ${d[0]}`;
+                if (d.length > 1) out += ` ${d.slice(1, 5)}`;
+                if (d.length > 5) out += ` ${d.slice(5, 9)}`;
+                return out;
+            }
+
+            // El teléfono es opcional; si se ingresa, debe tener 9 dígitos y comenzar en 2-9
+            function validatePhone(value) {
+                const d = getPhoneDigits(value);
+                if (d.length === 0) return true;
+                return /^[2-9]\d{8}$/.test(d);
+            }
+
+            function validateEmail(value) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+            }
+
+            // --- Helpers de error en campos ---
+            const rutInput = document.getElementById('provider-rut');
+            const phoneInput = document.getElementById('provider-phone');
+            const emailInput = document.getElementById('provider-email');
+
+            function setFieldError(input, errorId, message) {
+                const errorEl = document.getElementById(errorId);
+                if (message) {
+                    input.classList.remove('border-slate-300', 'focus:border-teal-500', 'focus:ring-teal-500/20');
+                    input.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500/20');
+                    errorEl.textContent = message;
+                    errorEl.classList.remove('hidden');
+                } else {
+                    input.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500/20');
+                    input.classList.add('border-slate-300', 'focus:border-teal-500', 'focus:ring-teal-500/20');
+                    errorEl.textContent = '';
+                    errorEl.classList.add('hidden');
+                }
+            }
+
+            function checkRutField() {
+                if (!rutInput.value.trim()) {
+                    setFieldError(rutInput, 'provider-rut-error', 'El RUT es obligatorio.');
+                    return false;
+                }
+                if (!validateRut(rutInput.value)) {
+                    setFieldError(rutInput, 'provider-rut-error', 'RUT inválido. Revisa el número y el dígito verificador.');
+                    return false;
+                }
+                setFieldError(rutInput, 'provider-rut-error', '');
+                return true;
+            }
+
+            function checkPhoneField() {
+                if (!validatePhone(phoneInput.value)) {
+                    setFieldError(phoneInput, 'provider-phone-error',
+                        'Teléfono inválido. Debe tener 9 dígitos, ej: +56 9 1234 5678.');
+                    return false;
+                }
+                setFieldError(phoneInput, 'provider-phone-error', '');
+                return true;
+            }
+
+            function checkEmailField() {
+                if (!emailInput.value.trim() || !validateEmail(emailInput.value.trim())) {
+                    setFieldError(emailInput, 'provider-email-error', 'Ingresa un correo electrónico válido.');
+                    return false;
+                }
+                setFieldError(emailInput, 'provider-email-error', '');
+                return true;
+            }
+
+            function clearFieldErrors() {
+                setFieldError(rutInput, 'provider-rut-error', '');
+                setFieldError(phoneInput, 'provider-phone-error', '');
+                setFieldError(emailInput, 'provider-email-error', '');
+            }
+
+            // --- Eventos de los campos ---
+            rutInput.addEventListener('input', () => {
+                rutInput.value = formatRut(rutInput.value);
+                if (document.getElementById('provider-rut-error').textContent) checkRutField();
+            });
+            rutInput.addEventListener('blur', () => {
+                if (rutInput.value.trim()) checkRutField();
+            });
+
+            phoneInput.addEventListener('input', () => {
+                phoneInput.value = formatPhone(phoneInput.value);
+                if (document.getElementById('provider-phone-error').textContent) checkPhoneField();
+            });
+            phoneInput.addEventListener('focus', () => {
+                if (!phoneInput.value.trim()) phoneInput.value = '+56 ';
+            });
+            phoneInput.addEventListener('keydown', (e) => {
+                // Evita borrar el prefijo +56
+                if ((e.key === 'Backspace' || e.key === 'Delete') && getPhoneDigits(phoneInput.value).length === 0) {
+                    e.preventDefault();
+                }
+            });
+            phoneInput.addEventListener('blur', () => checkPhoneField());
+
+            emailInput.addEventListener('blur', () => {
+                if (emailInput.value.trim()) checkEmailField();
+            });
+
+            // =====================================================
             // --- Control del Panel de Filtros ---
+            // =====================================================
             const btnToggleFilters = document.getElementById('toggle-filters-btn');
             const filtersPanel = document.getElementById('filters-panel');
 
-            if(window.location.search.includes('category') || window.location.search.includes('status') || window.location.search.includes('month') || window.location.search.includes('sort') || window.location.search.includes('search') || window.location.search.includes('per_page')) {
+            if (window.location.search.includes('category') || window.location.search.includes('status') || window
+                .location.search.includes('month') || window.location.search.includes('sort') || window.location
+                .search.includes('search') || window.location.search.includes('per_page')) {
                 filtersPanel.classList.remove('hidden');
             }
 
@@ -511,28 +840,34 @@
             // --- 1. Ver Ficha Técnica ---
             document.querySelectorAll('.js-view-detail').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const row = e.target.closest('.provider-row');
+                    const row = e.currentTarget.closest('.provider-row');
                     if (!row) return;
                     selectedRow = row;
                     const p = getProviderFromRow(row);
 
                     document.getElementById('detail-name').textContent = p.name;
                     document.getElementById('detail-rut').textContent = `RUT: ${p.rut}`;
-                    document.getElementById('detail-email').textContent = p.email || 'No registrado';
-                    document.getElementById('detail-phone').textContent = p.phone || 'No registrado';
+                    document.getElementById('detail-email').textContent = p.email ||
+                        'No registrado';
+                    document.getElementById('detail-phone').textContent = p.phone ||
+                        'No registrado';
                     document.getElementById('detail-category').textContent = p.category;
 
-                    const initials = p.name.split(' ').filter(n => n).map(n => n[0]).slice(0, 2).join('').toUpperCase();
+                    const initials = p.name.split(' ').filter(n => n).map(n => n[0]).slice(0, 2)
+                        .join('').toUpperCase();
                     document.getElementById('detail-initials').textContent = initials;
 
-                    document.getElementById('detail-business-line').textContent = p.business_line || 'No registrado';
-                    document.getElementById('detail-address').textContent = p.address || 'No registrada';
+                    document.getElementById('detail-business-line').textContent = p.business_line ||
+                        'No registrado';
+                    document.getElementById('detail-address').textContent = p.address ||
+                        'No registrada';
 
                     const statusBadge = document.getElementById('detail-status');
-                    statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${p.status === 'activo' ? 'bg-emerald-500' : 'bg-slate-400'}"></span> ${p.status === 'activo' ? 'Activo' : 'Inactivo'}`;
-                    statusBadge.className = p.status === 'activo'
-                        ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-0.5'
-                        : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-slate-100 text-slate-600 border border-slate-200 mt-0.5';
+                    statusBadge.innerHTML =
+                        `<span class="w-1.5 h-1.5 rounded-full ${p.status === 'activo' ? 'bg-emerald-500' : 'bg-slate-400'}"></span> ${p.status === 'activo' ? 'Activo' : 'Inactivo'}`;
+                    statusBadge.className = p.status === 'activo' ?
+                        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-0.5' :
+                        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-slate-100 text-slate-600 border border-slate-200 mt-0.5';
 
                     openModal('modal-detail');
                 });
@@ -540,18 +875,20 @@
 
             // --- 2. Formulario de Guardado ---
             function openEditForm(row = null) {
+                clearFieldErrors();
+
                 if (row) {
                     const p = getProviderFromRow(row);
                     document.getElementById('modal-edit-title').textContent = 'Editar Proveedor';
                     document.getElementById('provider-id').value = p.id;
 
                     document.getElementById('provider-name').value = p.name;
-                    document.getElementById('provider-rut').value = p.rut;
+                    rutInput.value = formatRut(p.rut);
                     document.getElementById('provider-category').value = p.category;
                     document.getElementById('provider-business-line').value = p.business_line;
 
-                    document.getElementById('provider-email').value = p.email;
-                    document.getElementById('provider-phone').value = p.phone || '+56 ';
+                    emailInput.value = p.email;
+                    phoneInput.value = p.phone ? formatPhone(p.phone) : '+56 ';
                     document.getElementById('provider-address').value = p.address;
 
                     document.querySelector(`input[name="edit-status"][value="${p.status}"]`).checked = true;
@@ -561,12 +898,12 @@
                     document.getElementById('provider-id').value = '';
 
                     document.getElementById('provider-name').value = '';
-                    document.getElementById('provider-rut').value = '';
+                    rutInput.value = '';
                     document.getElementById('provider-category').value = '';
                     document.getElementById('provider-business-line').value = '';
 
-                    document.getElementById('provider-email').value = '';
-                    document.getElementById('provider-phone').value = '+56 ';
+                    emailInput.value = '';
+                    phoneInput.value = '+56 ';
                     document.getElementById('provider-address').value = '';
 
                     document.querySelector('input[name="edit-status"][value="activo"]').checked = true;
@@ -578,7 +915,7 @@
             document.getElementById('btn-new-provider').addEventListener('click', () => openEditForm());
 
             document.querySelectorAll('.js-edit-provider').forEach(btn => {
-                btn.addEventListener('click', (e) => openEditForm(e.target.closest('.provider-row')));
+                btn.addEventListener('click', (e) => openEditForm(e.currentTarget.closest('.provider-row')));
             });
 
             document.getElementById('modal-detail-edit-btn').addEventListener('click', () => {
@@ -588,27 +925,49 @@
 
             document.getElementById('modal-edit-action').addEventListener('click', async () => {
                 const id = document.getElementById('provider-id').value;
+                const phoneDigits = getPhoneDigits(phoneInput.value);
+
                 const data = {
                     name: document.getElementById('provider-name').value.trim(),
-                    rut: document.getElementById('provider-rut').value.trim(),
+                    rut: rutInput.value.trim(),
                     category: document.getElementById('provider-category').value,
                     business_line: document.getElementById('provider-business-line').value.trim(),
-                    email: document.getElementById('provider-email').value.trim(),
-                    phone: document.getElementById('provider-phone').value.trim(),
+                    email: emailInput.value.trim(),
+                    // Si no hay dígitos, se envía vacío; si no, formato estándar
+                    phone: phoneDigits ? formatPhone(phoneInput.value) : '',
                     address: document.getElementById('provider-address').value.trim(),
                     status: document.querySelector('input[name="edit-status"]:checked').value
                 };
 
-                // Limpiar prefijo de teléfono si está vacío
-                if (data.phone === '+56' || data.phone === '+56 ') {
-                    data.phone = '';
-                }
-
+                // Campos obligatorios
                 if (!data.name || !data.rut || !data.category || !data.email) {
+                    // Marca los errores de RUT y correo si corresponde
+                    if (!data.rut) checkRutField();
+                    if (!data.email) checkEmailField();
                     Swal.fire({
                         icon: 'warning',
                         title: 'Faltan datos',
-                        text: 'Completa los campos obligatorios (*).',
+                        text: 'Completa los campos obligatorios.',
+                        confirmButtonColor: '#0d9488'
+                    });
+                    return;
+                }
+
+                // Validaciones de formato (RUT, correo y teléfono)
+                const rutOk = checkRutField();
+                const emailOk = checkEmailField();
+                const phoneOk = checkPhoneField();
+
+                if (!rutOk || !emailOk || !phoneOk) {
+                    const problemas = [];
+                    if (!rutOk) problemas.push('El RUT no es válido.');
+                    if (!emailOk) problemas.push('El correo electrónico no es válido.');
+                    if (!phoneOk) problemas.push('El teléfono no es válido (9 dígitos, ej: +56 9 1234 5678).');
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Datos inválidos',
+                        html: problemas.join('<br>'),
                         confirmButtonColor: '#0d9488'
                     });
                     return;
@@ -625,7 +984,11 @@
                 try {
                     const response = await fetch(url, {
                         method: method,
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
                         body: JSON.stringify(data)
                     });
 
@@ -641,10 +1004,22 @@
                         });
                     } else {
                         const result = await response.json();
+
+                        // Muestra errores del servidor junto a los campos si existen
+                        if (result.errors) {
+                            if (result.errors.rut) setFieldError(rutInput, 'provider-rut-error', result.errors.rut[0]);
+                            if (result.errors.phone) setFieldError(phoneInput, 'provider-phone-error', result.errors.phone[0]);
+                            if (result.errors.email) setFieldError(emailInput, 'provider-email-error', result.errors.email[0]);
+                        }
+
+                        const errores = result.errors ?
+                            Object.values(result.errors).flat().join('\n') :
+                            result.message || 'Verifica los datos ingresados.';
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Error al guardar',
-                            text: result.message || 'Verifica que el RUT o correo no estén duplicados.',
+                            text: errores,
                             confirmButtonColor: '#0d9488'
                         });
                     }
@@ -664,11 +1039,11 @@
             // --- 3. Botón Activar/Desactivar con SweetAlert2 ---
             document.querySelectorAll('.js-toggle-status').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const row = e.target.closest('.provider-row');
+                    const row = e.currentTarget.closest('.provider-row');
                     if (!row) return;
                     const p = getProviderFromRow(row);
                     const isActivo = p.status === 'activo';
-                    
+
                     const actionText = isActivo ? 'desactivar' : 'reactivar';
                     const confirmColor = isActivo ? '#e11d48' : '#0d9488'; // Rose o Teal
                     const confirmText = isActivo ? 'Sí, Desactivar' : 'Sí, Reactivar';
@@ -686,11 +1061,16 @@
                         if (result.isConfirmed) {
                             try {
                                 // Aquí usamos /suppliers como prefijo para coincidir con web.php
-                                const response = await fetch(`/suppliers/${p.id}/toggle-status`, {
-                                    method: 'PATCH',
-                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
-                                });
-                                
+                                const response = await fetch(
+                                    `/suppliers/${p.id}/toggle-status`, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': csrfToken,
+                                            'Accept': 'application/json'
+                                        }
+                                    });
+
                                 if (response.ok) {
                                     Swal.fire({
                                         icon: 'success',
@@ -699,10 +1079,12 @@
                                         timer: 1500
                                     }).then(() => window.location.reload());
                                 } else {
-                                    Swal.fire('Error', 'No se pudo actualizar el estado.', 'error');
+                                    Swal.fire('Error',
+                                        'No se pudo actualizar el estado.', 'error');
                                 }
                             } catch (e) {
-                                Swal.fire('Error de red', 'No se pudo conectar con el servidor.', 'error');
+                                Swal.fire('Error de red',
+                                    'No se pudo conectar con el servidor.', 'error');
                             }
                         }
                     });

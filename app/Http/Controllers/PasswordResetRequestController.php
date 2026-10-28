@@ -35,7 +35,7 @@ class PasswordResetRequestController extends Controller
     public function resetPassword(Request $request, $email)
     {
         $request->validate([
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8|max:64',
         ]);
 
         $user = User::where('email', $email)->firstOrFail();

@@ -62,5 +62,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('reception_items');
         Schema::dropIfExists('receptions');
+        Schema::dropIfExists('products');
     }
 };
