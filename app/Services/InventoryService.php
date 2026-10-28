@@ -177,6 +177,11 @@ class InventoryService
                 'user_id' => $datos['user_id'] ?? $batch->user_id,
                 'provider_id' => $datos['provider_id'] ?? $batch->provider_id,
                 'reception_id' => $datos['reception_id'] ?? $batch->reception_id,
+                'pasillo' => (!empty($datos['pasillo']) && $datos['pasillo'] !== 'P.A') ? $datos['pasillo'] : ($batch->pasillo ?: ($datos['pasillo'] ?? null)),
+                'estante' => (!empty($datos['estante']) && $datos['estante'] !== 'P.A') ? $datos['estante'] : ($batch->estante ?: ($datos['estante'] ?? null)),
+                'nivel' => !empty($datos['nivel']) ? $datos['nivel'] : $batch->nivel,
+                'posicion' => !empty($datos['posicion']) ? $datos['posicion'] : $batch->posicion,
+                'programa' => !empty($datos['programa']) ? $datos['programa'] : $batch->programa,
                 'aisle_id' => $datos['aisle_id'] ?? $batch->aisle_id,
                 'shelf_id' => $datos['shelf_id'] ?? $batch->shelf_id,
                 'level_id' => $datos['level_id'] ?? $batch->level_id,
@@ -209,10 +214,13 @@ class InventoryService
         }
 
         if (! empty($datos['estante']) && empty($datos['shelf_id'])) {
-            $shelf = Shelf::where('name', $datos['estante'])->first();
+            $shelf = Shelf::with('aisle')->where('name', $datos['estante'])->first();
             if ($shelf) {
                 $datos['shelf_id'] = $shelf->id;
                 $datos['aisle_id'] = $datos['aisle_id'] ?? $shelf->aisle_id;
+                if ((empty($datos['pasillo']) || $datos['pasillo'] === 'P.A') && $shelf->aisle) {
+                    $datos['pasillo'] = $shelf->aisle->name;
+                }
             }
         }
 

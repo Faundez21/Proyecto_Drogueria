@@ -29,10 +29,29 @@ class EstablishmentRequestController extends Controller
         ));
 
         $nombresEstablecimientos = array_column($establecimientos, 'nombre');
+        $nombresHistoricos = [
+            'CECOSF Centinela',
+            'CECOSF CENTINELA',
+            'CECOSF Villa Centinela',
+            'CECOSF VILLA CENTINELA',
+            'CECOSF Los Lobos - La Gloria',
+            'CECOSF LOS LOBOS - LA GLORIA',
+            'CECOSF Los Lobos-La Gloria',
+            'CECOSF LOS LOBOS-LA GLORIA',
+            'Posta Tumbe',
+            'POSTA TUMBE',
+            'Posta Rural Tumbes',
+            'POSTA RURAL TUMBES',
+            'CECOSF Libertad Gaete',
+            'CECOSF LIBERTAD GAETE',
+            'CECOSF Libertad-Gaete',
+            'CECOSF LIBERTAD-GAETE',
+        ];
+        $nombresEstablecimientosQuery = array_values(array_unique(array_merge($nombresEstablecimientos, $nombresHistoricos)));
 
         // Inventario propio de los Establecimientos registrado en las solicitudes (independiente del Inventario de Droguería)
         $inventarioSolicitudes = EstablishmentItem::with(['request', 'product'])
-            ->whereHas('request', fn ($q) => $q->whereIn('establecimiento', $nombresEstablecimientos))
+            ->whereHas('request', fn ($q) => $q->whereIn('establecimiento', $nombresEstablecimientosQuery))
             ->whereHas('product', fn ($q) => $q->whereNotIn('nombre', $controlados))
             ->orderByDesc('id')
             ->get();
@@ -51,7 +70,7 @@ class EstablishmentRequestController extends Controller
             ->sort()
             ->values();
 
-        $consumoMapa = SolicitudService::mapaConsumoYStock($nombresEstablecimientos);
+        $consumoMapa = SolicitudService::mapaConsumoYStock($nombresEstablecimientosQuery);
 
         return view('requests.index', compact(
             'products',
@@ -78,10 +97,25 @@ class EstablishmentRequestController extends Controller
         ));
 
         $nombresCesfam = array_column($establecimientos, 'nombre');
+        $nombresCesfamHistoricos = [
+            'CESFAM Los Cerros',
+            'CESFAM LOS CERROS',
+            'CESFAM Paulina Avendaño',
+            'CESFAM PAULINA AVENDAÑO',
+            'CESFAM Paulina Avendaño Pereda',
+            'CESFAM PAULINA AVENDAÑO PEREDA',
+            'CESFAM San Vicente',
+            'CESFAM SAN VICENTE',
+            'CESFAM Leocan Portus',
+            'CESFAM LEOCAN PORTUS',
+            'CESFAM Alcalde Leocán Portus Govinden',
+            'CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN',
+        ];
+        $nombresCesfamQuery = array_values(array_unique(array_merge($nombresCesfam, $nombresCesfamHistoricos)));
 
         // Inventario propio de los CESFAM registrado en las solicitudes (independiente del Inventario de Droguería)
         $inventarioSolicitudes = EstablishmentItem::with(['request', 'product'])
-            ->whereHas('request', fn ($q) => $q->whereIn('establecimiento', $nombresCesfam))
+            ->whereHas('request', fn ($q) => $q->whereIn('establecimiento', $nombresCesfamQuery))
             ->orderByDesc('id')
             ->get();
 
@@ -99,7 +133,7 @@ class EstablishmentRequestController extends Controller
             ->sort()
             ->values();
 
-        $consumoMapa = SolicitudService::mapaConsumoYStock($nombresCesfam);
+        $consumoMapa = SolicitudService::mapaConsumoYStock($nombresCesfamQuery);
 
         return view('requests.cesfam', compact(
             'products',

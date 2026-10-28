@@ -204,14 +204,14 @@
                             <option value="CESFAM LOS CERROS"
                                 data-direccion="Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano">CESFAM
                                 LOS CERROS</option>
-                            <option value="CESFAM PAULINA AVENDAÑO"
+                            <option value="CESFAM PAULINA AVENDAÑO PEREDA"
                                 data-direccion="Calle Carlos Dittborn 4100, Villa San Martin, Talcahuano">CESFAM PAULINA
-                                AVENDAÑO</option>
+                                AVENDAÑO PEREDA</option>
                             <option value="CESFAM SAN VICENTE" data-direccion="Calle Brasil 360, San Vicente, Talcahuano">
                                 CESFAM SAN VICENTE</option>
-                            <option value="CESFAM LEOCAN PORTUS"
-                                data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM LEOCAN
-                                PORTUS</option>
+                            <option value="CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN"
+                                data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM ALCALDE
+                                LEOCÁN PORTUS GOVINDEN</option>
                         </select>
                     </div>
 
@@ -1048,7 +1048,10 @@
 
             const selectEst = document.getElementById('establecimiento_interno');
             const objetivo = (solicitud.establecimiento ?? '').trim().toLowerCase();
-            const opcionEst = Array.from(selectEst.options).find(op => op.value.trim().toLowerCase() === objetivo);
+            const opcionEst = Array.from(selectEst.options).find(op => {
+                const val = op.value.trim().toLowerCase();
+                return val === objetivo || (objetivo && (val.includes(objetivo) || objetivo.includes(val)));
+            });
             if (opcionEst) {
                 selectEst.value = opcionEst.value;
                 actualizarDireccionInterna();

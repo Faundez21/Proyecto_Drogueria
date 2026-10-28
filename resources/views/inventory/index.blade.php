@@ -483,7 +483,7 @@
                                                                             <button type="button" onclick="openQRModal('{{ e($loteId) }}', '{{ e($nombreProducto) }}', '{{ e($loteCodigo) }}', '{{ e($textoVencimiento) }}', '{{ $stockLote }}', '{{ e(data_get($loteData, 'razon_social') ?? 'Droguería DAS') }}')" class="p-1.5 text-slate-600 bg-slate-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-slate-200 hover:border-teal-600 shadow-sm cursor-pointer" title="Generar Etiqueta QR de este lote">
                                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                                                             </button>
-                                                                            <button type="button" onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}', '{{ e($loteCategoria) }}', '{{ e($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}')" class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Cambiar Estado">
+                                                                            <button type="button" onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}', '{{ e($loteCategoria) }}', '{{ e($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}', '{{ e($pasilloVal ?? '') }}', '{{ e($estanteVal ?? '') }}', '{{ e(data_get($loteData, 'nivel') ?? '') }}', '{{ e(data_get($loteData, 'posicion') ?? '') }}')" class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Editar Estado y Ubicación">
                                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                                             </button>
                                                                         </div>
@@ -1092,7 +1092,7 @@
         <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
-                    <h2 class="text-[16px] font-bold text-white tracking-wide">Actualizar Estado de Lote</h2>
+                    <h2 class="text-[16px] font-bold text-white tracking-wide">Actualizar Estado y Ubicación de Lote</h2>
                     <button type="button" onclick="closeEditLote()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
@@ -1126,6 +1126,52 @@
                             <div class="bg-teal-50 border border-teal-200 rounded-xl p-2.5 text-center shadow-sm">
                                 <span class="text-[10px] font-bold text-teal-500 uppercase block">Valor Total</span>
                                 <p id="modal_valor_total" class="text-[13px] font-extrabold text-teal-800 font-mono-das">$ 0</p>
+                            </div>
+                        </div>
+
+                        <!-- Ubicación Física en Bodega (Distribución) -->
+                        <div class="bg-slate-50/80 p-3.5 rounded-xl border border-slate-200">
+                            <label class="block text-[12px] font-bold text-slate-700 mb-2 flex items-center gap-1.5 uppercase tracking-wide">
+                                <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                Ubicación Física en Bodega (Distribución)
+                            </label>
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <div>
+                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pasillo</label>
+                                    <select id="modal_edit_pasillo" name="pasillo" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                        <option value="">(Sin asignar / P.A)</option>
+                                        @foreach ($pasillosLista ?? [] as $pas)
+                                            <option value="{{ $pas }}">{{ $pas }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estante</label>
+                                    <select id="modal_edit_estante" name="estante" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                        <option value="">(Sin asignar / P.A)</option>
+                                        @foreach ($estantesLista ?? [] as $est)
+                                            <option value="{{ $est }}">{{ $est }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nivel</label>
+                                    <select id="modal_edit_nivel" name="nivel" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                        <option value="">(Sin nivel)</option>
+                                        @foreach ($nivelesLista ?? [] as $niv)
+                                            <option value="{{ $niv }}">Nivel {{ $niv }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Posición</label>
+                                    <select id="modal_edit_posicion" name="posicion" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                        <option value="">(Sin posición)</option>
+                                        @foreach ($posicionesLista ?? [] as $pos)
+                                            <option value="{{ $pos }}">Posición {{ $pos }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -1509,7 +1555,7 @@
             }
         }
 
-        function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0) {
+        function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0, pasillo = '', estante = '', nivel = '', posicion = '') {
             const form = document.getElementById('editLoteForm');
             if (form) form.action = "/inventory/" + id;
 
@@ -1538,6 +1584,19 @@
                     chipProg.style.display = 'none';
                 }
             }
+
+            // Precargar campos de ubicación física
+            const selPas = document.getElementById('modal_edit_pasillo');
+            if (selPas) selPas.value = (pasillo && pasillo !== 'P.A') ? pasillo : '';
+
+            const selEst = document.getElementById('modal_edit_estante');
+            if (selEst) selEst.value = (estante && estante !== 'P.A') ? estante : '';
+
+            const selNiv = document.getElementById('modal_edit_nivel');
+            if (selNiv) selNiv.value = nivel || '';
+
+            const selPos = document.getElementById('modal_edit_posicion');
+            if (selPos) selPos.value = posicion || '';
 
             let estadoSelect = document.getElementById('modal_estado');
             let estadoFormat = (estado || '').toLowerCase();

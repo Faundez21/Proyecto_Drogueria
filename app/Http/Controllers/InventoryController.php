@@ -309,24 +309,48 @@ class InventoryController extends Controller
     }
 
     /**
-     * Actualiza el estado (Mandar a Cuarentena, Merma o Disponible) desde el Modal.
+     * Actualiza el estado (Mandar a Cuarentena, Merma o Disponible) o reasigna ubicación física desde el Modal.
      */
     public function update(Request $request, string $id)
     {
         $request->validate([
             'estado' => 'required|in:Cuarentena,Disponible,Merma',
             'motivo' => 'nullable|string|max:1000',
+            'pasillo' => 'nullable|string|max:50',
+            'estante' => 'nullable|string|max:50',
+            'nivel' => 'nullable|string|max:100',
+            'posicion' => 'nullable|string|max:100',
         ]);
 
         $inventory = Inventory::findOrFail($id);
         $estadoAnterior = $inventory->estado;
+        $estanteAnterior = $inventory->estante;
         $data = $request->only(['estado', 'motivo']);
+
+        if ($request->has('pasillo')) {
+            $data['pasillo'] = $request->filled('pasillo') ? trim($request->pasillo) : 'P.A';
+        }
+        if ($request->has('estante')) {
+            $data['estante'] = $request->filled('estante') ? trim($request->estante) : 'P.A';
+        }
+        if ($request->has('nivel')) {
+            $data['nivel'] = $request->filled('nivel') ? trim($request->nivel) : null;
+        }
+        if ($request->has('posicion')) {
+            $data['posicion'] = $request->filled('posicion') ? trim($request->posicion) : null;
+        }
 
         $data['user_id'] = Auth::id();
 
+        // Resolver relaciones foráneas de ubicación física
+        $data = InventoryService::resolverRelaciones($data);
+
         $inventory->update($data);
 
-        if ($estadoAnterior !== $inventory->estado) {
+        $cambioUbicacion = isset($data['estante']) && $data['estante'] !== $estanteAnterior;
+        $cambioEstado = $estadoAnterior !== $inventory->estado;
+
+        if ($cambioEstado) {
             StockMovement::create([
                 'inventory_id' => $inventory->id,
                 'user_id' => Auth::id(),
@@ -340,14 +364,30 @@ class InventoryController extends Controller
                 'documento_respaldo' => $request->filled('motivo') ? $request->input('motivo') : 'Gestión de inventario',
                 'estado_lote' => $inventory->estado,
             ]);
+        } elseif ($cambioUbicacion) {
+            StockMovement::create([
+                'inventory_id' => $inventory->id,
+                'user_id' => Auth::id(),
+                'producto' => $inventory->producto,
+                'lote' => $inventory->lote,
+                'fecha_vencimiento' => $inventory->fecha_vencimiento,
+                'tipo_movimiento' => 'Reubicación',
+                'cantidad' => $inventory->cantidad,
+                'fecha_hora' => now(),
+                'origen_destino' => 'Ubicación asignada: ' . ($inventory->estante ?: 'P.A'),
+                'documento_respaldo' => 'Ordenamiento en bodega',
+                'estado_lote' => $inventory->estado,
+            ]);
         }
 
-        if ($data['estado'] == 'Cuarentena') {
+        if ($cambioUbicacion && !$cambioEstado) {
+            $mensaje = "Ubicación del lote actualizada exitosamente a «{$inventory->estante}» (ordenado en distribución).";
+        } elseif ($data['estado'] == 'Cuarentena') {
             $mensaje = 'El lote ha sido bloqueado y enviado a cuarentena.';
         } elseif ($data['estado'] == 'Merma') {
             $mensaje = 'El lote ha sido declarado como Merma.';
         } else {
-            $mensaje = 'El lote ha sido liberado exitosamente.';
+            $mensaje = 'El lote ha sido actualizado exitosamente.';
         }
 
         return redirect()->back()->with('success', $mensaje);

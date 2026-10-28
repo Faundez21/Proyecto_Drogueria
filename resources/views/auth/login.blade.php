@@ -517,7 +517,7 @@
                         <label for="contact_unit" class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
                             Establecimiento / Unidad <span class="text-slate-400 font-normal normal-case">(opcional)</span>
                         </label>
-                        <input type="text" id="contact_unit" placeholder="Ej. CESFAM Paulina Avendaño / Bodega"
+                        <input type="text" id="contact_unit" placeholder="Ej. CESFAM Paulina Avendaño Pereda / Bodega"
                             class="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
                     </div>
                 </div>
