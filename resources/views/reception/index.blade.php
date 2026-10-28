@@ -864,12 +864,33 @@
                 const docTipo = form.querySelector('[name="tipo_documento"]')?.value || 'Documento';
                 const docNum = form.querySelector('[name="numero_documento"]')?.value || '';
                 const provSelect = document.getElementById('provider_select');
-                const provName = provSelect && provSelect.selectedIndex >= 0 ? provSelect.options[provSelect.selectedIndex]?.text.trim() : '';
-                const itemsCount = form.querySelectorAll('.item-row').length;
+                const provName = provSelect && provSelect.selectedIndex >= 0 ? provSelect.options[provSelect.selectedIndex]?.text.trim() : 'Proveedor';
+
+                // Contabilizar productos ingresados en el formulario
+                const productCards = form.querySelectorAll('.producto-item');
+                let itemsCount = 0;
+                let totalUnidades = 0;
+
+                productCards.forEach(card => {
+                    const prodSelect = card.querySelector('.select-producto-recepcion') || card.querySelector('select[name="product_id[]"]');
+                    const qtyInput = card.querySelector('.calc-qty') || card.querySelector('input[name="cantidad[]"]');
+                    const qty = parseInt(qtyInput?.value) || 0;
+
+                    if (prodSelect && prodSelect.value) {
+                        itemsCount++;
+                        totalUnidades += qty;
+                    }
+                });
+
+                if (itemsCount === 0) {
+                    itemsCount = productCards.length;
+                }
+
+                const textoUnidades = totalUnidades > 0 ? ` (${totalUnidades.toLocaleString('es-CL')} unidades en total)` : '';
 
                 Swal.fire({
                     title: '¿Confirmar Acta de Recepción?',
-                    html: `Se registrará la recepción de <strong>${itemsCount}</strong> producto(s) del proveedor <strong>${provName}</strong> (${docTipo} N° ${docNum}).`,
+                    html: `Se registrará la recepción de <strong>${itemsCount}</strong> producto(s)${textoUnidades} del proveedor <strong>${provName}</strong> (${docTipo} N° ${docNum}).`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#0d9488',
