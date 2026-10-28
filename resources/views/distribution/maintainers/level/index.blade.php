@@ -210,9 +210,9 @@
 
     <!-- Modal Crear Nivel -->
     <div id="createModal"
-        class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
-            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
+            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,9 +232,9 @@
                 </button>
             </div>
 
-            <form id="createLevelForm" action="{{ route('level.store') }}" method="POST" onsubmit="confirmCreateLevel(event)">
+            <form id="createLevelForm" action="{{ route('level.store') }}" method="POST" onsubmit="confirmCreateLevel(event)" class="flex flex-col flex-1 overflow-hidden">
                 @csrf
-                <div class="p-6 space-y-4">
+                <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="number" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
@@ -269,7 +269,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-200">
+                <div class="flex justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-200 shrink-0">
                     <button type="button" onclick="closeCreate()"
                         class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                         Cancelar
@@ -285,9 +285,9 @@
 
     <!-- Modal Ver Nivel -->
     <div id="showModal"
-        class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden">
-            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
+            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800 shrink-0">
                 <div>
                     <h2 class="text-[16px] font-bold text-white leading-tight">Ficha del Nivel</h2>
                     <p class="text-slate-400 text-[12px] mt-0.5">Detalles del nivel seleccionado.</p>
@@ -300,7 +300,7 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-4">
+            <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
                 <div class="grid grid-cols-3 gap-3">
                     <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nivel</p>
@@ -322,7 +322,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200">
+            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200 shrink-0">
                 <button type="button" onclick="closeShow()"
                     class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                     Cerrar
@@ -333,9 +333,9 @@
 
     <!-- Modal Editar Nivel -->
     <div id="editModal"
-        class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
-            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
+            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800 shrink-0">
                 <div>
                     <h2 class="text-[16px] font-bold text-white leading-tight">Editar Nivel</h2>
                     <p class="text-slate-400 text-[12px] mt-0.5">Modifica la información del nivel.</p>
@@ -348,10 +348,10 @@
                 </button>
             </div>
 
-            <form id="editForm" method="POST" onsubmit="confirmEditLevel(event)">
+            <form id="editForm" method="POST" onsubmit="confirmEditLevel(event)" class="flex flex-col flex-1 overflow-hidden">
                 @csrf
                 @method('PUT')
-                <div class="p-6 space-y-4">
+                <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="editNumber" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
@@ -385,7 +385,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-200">
+                <div class="flex justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-200 shrink-0">
                     <button type="button" onclick="closeEdit()"
                         class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                         Cancelar
@@ -401,9 +401,9 @@
 
     <!-- Modal de Historial -->
     <div id="HistoryModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden">
-            <div class="bg-slate-900 px-6 py-4.5 flex justify-between items-center border-b border-slate-800">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
+            <div class="bg-slate-900 px-6 py-4.5 flex justify-between items-center border-b border-slate-800 shrink-0">
                 <div>
                     <h2 class="text-[16px] font-bold text-white">Historial de Niveles</h2>
                     <p class="text-[12px] text-slate-400 mt-0.5">Registro de auditoría de creación y modificaciones de niveles.</p>
@@ -416,7 +416,7 @@
                 </button>
             </div>
 
-            <div class="p-6">
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1">
                 <div class="overflow-x-auto max-h-96 border border-slate-200 rounded-xl">
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
                         <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0">
@@ -445,7 +445,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200">
+            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200 shrink-0">
                 <button type="button" onclick="closeHistory()"
                     class="px-5 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
                     Cerrar

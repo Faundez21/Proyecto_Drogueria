@@ -416,9 +416,9 @@
 
     <!-- Modal Roles y Accesos -->
     <div id="RolesModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
 
             <!-- Cabecera del Modal -->
             <div class="px-6 py-5 bg-slate-900 text-white flex justify-between items-center shrink-0">
@@ -657,8 +657,8 @@
 
     <!-- Modal Solicitudes de Recuperación -->
     <div id="RecoveryModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
             <div class="px-6 py-5 bg-slate-900 text-white flex justify-between items-center">
                 <div class="flex items-center gap-3.5">
                     <div class="w-10 h-10 bg-amber-500/20 border border-amber-400/30 rounded-xl flex items-center justify-center text-amber-300">
@@ -722,9 +722,9 @@
 
     <!-- Modal Crear / Editar Usuario -->
     <div id="UserModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden">
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
             <div class="px-6 py-5 bg-slate-900 text-white flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-3.5">
                     <div class="w-10 h-10 bg-teal-500/20 border border-teal-400/30 rounded-xl flex items-center justify-center text-teal-300 shrink-0">

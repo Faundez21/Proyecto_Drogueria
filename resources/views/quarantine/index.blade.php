@@ -430,8 +430,8 @@
                 }
             }
         </style>
-        <div id="qrModal" class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div class="relative w-full max-w-sm flex flex-col items-center">
+        <div id="qrModal" class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+            <div class="relative w-full max-w-sm flex flex-col items-center my-auto">
                 <div id="qrPrintableCard" class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
                     <div class="w-full flex flex-col items-center mb-4 z-10 border-b-2 border-black pb-3">
@@ -461,19 +461,19 @@
         </div>
 
         <!-- MODAL: Editar Estado de Lote -->
-        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md flex flex-col overflow-hidden">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
+        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
+                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
                     <h2 class="text-[16px] font-bold text-white tracking-wide">Gestionar Cuarentena</h2>
                     <button type="button" onclick="closeEditLote()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
-                <form id="editLoteForm" method="POST" action="" class="bg-white" novalidate onsubmit="return confirmDecisionCuarentena(event)">
+                <form id="editLoteForm" method="POST" action="" class="bg-white flex flex-col overflow-hidden flex-1" novalidate onsubmit="return confirmDecisionCuarentena(event)">
                     @csrf
                     @method('PUT')
-                    <div class="p-6 space-y-4">
+                    <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
                             <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Producto Seleccionado:</span>
                             <p id="modal_producto_nombre" class="text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
@@ -514,7 +514,7 @@
                         </div>
                     </div>
 
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl shrink-0">
                         <button type="button" onclick="closeEditLote()" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 text-[13px] font-bold transition-colors shadow-sm cursor-pointer">Cancelar</button>
                         <button type="submit" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[13px] font-bold transition-all shadow-sm cursor-pointer">Confirmar Decisión</button>
                     </div>

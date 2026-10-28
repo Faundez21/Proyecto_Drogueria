@@ -270,9 +270,9 @@
     </div>
 
     <!-- ventana modal para visualizar la ficha clinica del lote -->
-    <div id="modal-lot-details" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all">
+    <div id="modal-lot-details" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeLotDetails()"></div>
-        <div class="relative w-full max-w-5xl rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="relative w-full max-w-5xl rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[92vh] my-auto">
 
             <!-- cabecera del modal -->
             <div class="flex items-center justify-between p-6 bg-slate-800 shrink-0">

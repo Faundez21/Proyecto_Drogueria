@@ -104,6 +104,7 @@ class DispatchController extends Controller
             'programas.*' => 'nullable|string|max:255',
             'cantidades' => 'required|array|min:1',
             'cantidades.*' => 'required|integer|min:1',
+            'action' => 'nullable|string|in:save,save_only,save_and_download',
         ]);
 
         $destino = $validated['establecimiento_destino'];
@@ -201,18 +202,51 @@ class DispatchController extends Controller
                 'total_unidades' => array_sum(array_column($itemsDespachados, 'cantidad')),
                 'items' => $itemsDespachados,
                 'pdf_url' => route('dispatch.pdf', $dispatch->id),
+                'auto_download' => ($validated['action'] ?? '') === 'save_and_download',
             ];
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.",
+                    'detail' => $dispatchDetail,
+                ]);
+            }
 
             return redirect()->back()
                 ->with('success', "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.")
                 ->with('dispatch_success_detail', $dispatchDetail);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Por favor verifique los datos ingresados en el formulario.',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+            throw $e;
         } catch (\RuntimeException $e) {
             DB::rollBack();
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 422);
+            }
 
             return redirect()->back()->with('error', $e->getMessage())->withInput();
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Error en despacho: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ocurrió un error al generar el despacho. Intente nuevamente.',
+                ], 500);
+            }
 
             return redirect()->back()->with('error', 'Ocurrió un error al generar el despacho. Intente nuevamente.');
         }

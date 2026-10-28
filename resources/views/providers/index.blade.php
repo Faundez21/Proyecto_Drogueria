@@ -387,13 +387,13 @@
     </div>
 
     <!-- Modal 1: Ficha técnica -->
-    <div id="modal-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div id="modal-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
             data-close="modal-detail"></div>
-        <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 bg-white shadow-2xl border border-slate-200"
+        <div class="relative w-full max-w-2xl max-h-[92vh] flex flex-col my-auto rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 bg-white shadow-2xl border border-slate-200"
             id="modal-detail-panel">
             <div
-                class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+                class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white shrink-0">
                 <div class="flex items-center gap-3.5">
                     <div id="detail-initials"
                         class="w-12 h-12 rounded-xl flex items-center justify-center font-mono-das font-bold text-[14px] text-teal-700 bg-teal-50 border border-teal-100 shadow-sm shrink-0">
@@ -451,7 +451,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50">
+            <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50 shrink-0">
                 <button type="button"
                     class="js-modal-close px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 w-full sm:w-auto transition-colors"
                     data-close="modal-detail">
@@ -466,10 +466,10 @@
     </div>
 
     <!-- Modal 2: Formulario (Registrar/Editar) -->
-    <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
             data-close="modal-edit"></div>
-        <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 max-h-[95vh] flex flex-col bg-white shadow-2xl border border-slate-200"
+        <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 max-h-[92vh] flex flex-col bg-white shadow-2xl border border-slate-200 my-auto"
             id="modal-edit-panel">
 
             <div
