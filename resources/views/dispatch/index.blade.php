@@ -1266,13 +1266,42 @@
 
                     e.preventDefault();
 
-                    const destSelect = document.getElementById('destinatario_select');
-                    const destinatario = destSelect && destSelect.selectedIndex >= 0 ? destSelect.options[destSelect.selectedIndex].text.trim() : 'Destinatario';
-                    const itemsCount = document.querySelectorAll('.producto-item').length;
+                    const clasif = document.getElementById('clasificacion_select')?.value || 'Interno';
+                    let destinatario = '';
+                    if (clasif === 'Externo') {
+                        const ext = (document.getElementById('establecimiento_externo')?.value || '').trim();
+                        const tipoExt = (document.getElementById('tipo_externo')?.value || '').trim();
+                        destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Externo');
+                    } else {
+                        const selInt = document.getElementById('establecimiento_interno');
+                        destinatario = selInt && selInt.selectedIndex >= 0 && selInt.value
+                            ? selInt.options[selInt.selectedIndex].text.trim()
+                            : 'Establecimiento Interno';
+                    }
+
+                    const rows = document.querySelectorAll('#productsBody tr');
+                    let itemsCount = 0;
+                    let totalUnidades = 0;
+
+                    rows.forEach(tr => {
+                        const selProd = tr.querySelector('select[name="productos[]"]');
+                        const inpCant = tr.querySelector('input[name="cantidades[]"]');
+                        const cant = parseInt(inpCant?.value) || 0;
+                        if (selProd && selProd.value) {
+                            itemsCount++;
+                            totalUnidades += cant;
+                        }
+                    });
+
+                    if (itemsCount === 0 && rows.length > 0) {
+                        itemsCount = rows.length;
+                    }
+
+                    const textoUnidades = totalUnidades > 0 ? ` (${totalUnidades.toLocaleString('es-CL')} unidades en total)` : '';
 
                     Swal.fire({
                         title: '¿Confirmar Emisión de Despacho?',
-                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s).<br><span class="text-[12px] text-slate-500 mt-1 block">El stock de los lotes asignados se rebajará según orden FEFO.</span>`,
+                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s)${textoUnidades}.<br><span class="text-[12px] text-slate-500 mt-1 block">El stock de los lotes asignados se rebajará según orden FEFO.</span>`,
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#0f766e',
@@ -1302,7 +1331,7 @@
                     if (signatureDespacha) signatureDespacha.clear();
                     if (signatureRecibe) signatureRecibe.clear();
                     // eliminar filas extra de productos
-                    const items = document.querySelectorAll('.producto-item');
+                    const items = document.querySelectorAll('#productsBody tr');
                     for (let i = 1; i < items.length; i++) {
                         items[i].remove();
                     }
