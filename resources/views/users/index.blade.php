@@ -508,7 +508,12 @@
                                                 {{ $nombreVista }}
                                             </span>
                                         @empty
-                                            <span class="text-[11px] text-slate-400 italic">Sin vistas habilitadas para este rol</span>
+                                            <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-md">
+                                                <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                                </svg>
+                                                Sin vistas asignadas — Debe tener al menos 1 vista
+                                            </span>
                                         @endforelse
                                     </div>
                                 </div>
@@ -549,8 +554,8 @@
                             <p class="text-[11.5px] text-slate-500">Marca las vistas a las que tendrán acceso los usuarios con este rol.</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 text-[11px] font-extrabold">
-                                <span id="roleSelectedCount">0</span> / {{ count($modulos) }} vistas seleccionadas
+                            <span id="roleCountBadge" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 text-[11px] font-extrabold transition-colors">
+                                <span id="roleSelectedCount">0</span> / {{ count($modulos) }} vistas <span class="text-rose-500 font-black">(Mínimo 1)</span>
                             </span>
                             <button type="button" onclick="toggleAllRoleModules(true)"
                                 class="px-2.5 py-1 text-[11px] font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg transition-colors cursor-pointer">
@@ -563,7 +568,7 @@
                         </div>
                     </div>
 
-                    <form id="roleForm" method="POST" action="{{ route('roles.store') }}">
+                    <form id="roleForm" method="POST" action="{{ route('roles.store') }}" onsubmit="return validateRoleForm(event)">
                         @csrf
                         <div id="roleMethod"></div>
 
@@ -742,7 +747,7 @@
             </div>
 
             <form id="userModalForm" method="POST" action="{{ route('users.store') }}" class="p-6 space-y-5 overflow-y-auto bg-slate-50/40" novalidate
-                onsubmit="return validateUserEmail(event)">
+                onsubmit="return validateUserModal(event)">
                 @csrf
                 <div id="userModalMethod"></div>
 
@@ -797,14 +802,24 @@
                     <div class="sm:col-span-2">
                         <label for="role"
                             class="block text-[11.5px] font-extrabold text-slate-700 mb-1.5 uppercase tracking-wider">
-                            Rol del Usuario <span class="font-normal normal-case text-slate-400">(define sus permisos de acceso)</span>
+                            Rol del Usuario <span class="text-rose-500">*</span> <span class="font-normal normal-case text-slate-400">(debe incluir al menos 1 vista asignada)</span>
                         </label>
-                        <select id="role" name="role" onchange="actualizarPreviewRolModal(this.value)"
+                        <select id="role" name="role" required onchange="actualizarPreviewRolModal(this.value)"
                             class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-[13px] font-bold text-slate-800 cursor-pointer">
                             @foreach ($roles as $rol)
-                                <option value="{{ $rol->name }}">
+                                @php
+                                    $cantVistas = $rol->name === 'Administrador' ? count($modulos) : $rol->permissions->count();
+                                    $sinVistas = $rol->name !== 'Administrador' && $cantVistas === 0;
+                                @endphp
+                                <option value="{{ $rol->name }}" class="{{ $sinVistas ? 'text-rose-600' : '' }}" {{ $sinVistas ? 'data-sin-vistas="true"' : '' }}>
                                     {{ $rol->name }} —
-                                    {{ $rol->name === 'Administrador' ? 'Acceso total (' . count($modulos) . ' vistas)' : $rol->permissions->count() . ' vista(s) habilitada(s)' }}
+                                    @if ($rol->name === 'Administrador')
+                                        Acceso total ({{ count($modulos) }} vistas)
+                                    @elseif ($cantVistas > 0)
+                                        {{ $cantVistas }} vista(s) habilitada(s)
+                                    @else
+                                        ⚠️ Sin vistas asignadas (No asignable)
+                                    @endif
                                 </option>
                             @endforeach
                         </select>
@@ -847,8 +862,15 @@
             container.innerHTML = '';
 
             const vistas = MAPA_ROLES_VISTAS[roleName] || [];
-            if (vistas.length === 0) {
-                container.innerHTML = '<span class="text-[11.5px] text-slate-400 italic">Este rol no tiene vistas asignadas actualmente.</span>';
+            if (roleName !== 'Administrador' && vistas.length === 0) {
+                container.innerHTML = `
+                    <div class="w-full p-2.5 bg-rose-50 border border-rose-200 rounded-lg flex items-center gap-2 text-rose-700">
+                        <svg class="w-4 h-4 shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span class="text-[11.5px] font-bold">Este rol no tiene vistas asignadas. Debes asignarle al menos 1 vista antes de poder asignarlo a un usuario.</span>
+                    </div>
+                `;
                 return;
             }
 
@@ -975,6 +997,46 @@
             });
             const countEl = document.getElementById('roleSelectedCount');
             if (countEl) countEl.textContent = count;
+
+            const badge = document.getElementById('roleCountBadge');
+            if (badge) {
+                if (count === 0) {
+                    badge.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-100');
+                    badge.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
+                } else {
+                    badge.classList.remove('bg-rose-50', 'text-rose-700', 'border-rose-200');
+                    badge.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-100');
+                }
+            }
+        }
+
+        function validateRoleForm(event) {
+            const nameInput = document.getElementById('role_name');
+            if (!nameInput || !nameInput.value.trim()) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nombre obligatorio',
+                    text: 'Debes ingresar un nombre para el rol.',
+                    confirmButtonColor: '#4f46e5'
+                });
+                if (nameInput) nameInput.focus();
+                return false;
+            }
+
+            const checkedCount = document.querySelectorAll('.role-modulo:checked').length;
+            if (checkedCount === 0) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Vista obligatoria',
+                    text: 'Debes asignar al menos 1 vista a este rol para que los usuarios puedan utilizarlo.',
+                    confirmButtonColor: '#4f46e5'
+                });
+                return false;
+            }
+
+            return true;
         }
 
         function toggleAllRoleModules(state) {
@@ -1106,24 +1168,45 @@
             });
         }
 
-        function validateUserEmail(event) {
+        function validateUserModal(event) {
+            const nameInput = document.getElementById('name');
+            const lastNameInput = document.getElementById('last_name');
+
+            if (nameInput && !nameInput.value.trim()) {
+                event.preventDefault();
+                nameInput.setCustomValidity('Completa este campo');
+                nameInput.reportValidity();
+                nameInput.focus();
+                return false;
+            }
+            if (nameInput) nameInput.setCustomValidity('');
+
+            if (lastNameInput && !lastNameInput.value.trim()) {
+                event.preventDefault();
+                lastNameInput.setCustomValidity('Completa este campo');
+                lastNameInput.reportValidity();
+                lastNameInput.focus();
+                return false;
+            }
+            if (lastNameInput) lastNameInput.setCustomValidity('');
+
             const emailInput = document.getElementById('email');
-            const emailValue = emailInput.value.trim();
+            const emailValue = emailInput ? emailInput.value.trim() : '';
             const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-            if (!emailRegex.test(emailValue)) {
+            if (emailInput && !emailRegex.test(emailValue)) {
                 event.preventDefault();
                 emailInput.setCustomValidity('Ingresa un correo válido con su dominio (ej. usuario@ejemplo.com o .cl)');
                 emailInput.reportValidity();
                 emailInput.focus();
                 return false;
             }
-            emailInput.setCustomValidity('');
+            if (emailInput) emailInput.setCustomValidity('');
 
             const passwordField = document.getElementById('passwordField');
             const passwordInput = document.getElementById('password');
 
-            if (passwordField && passwordField.style.display !== 'none') {
+            if (passwordField && passwordField.style.display !== 'none' && passwordInput) {
                 const passValue = passwordInput.value;
 
                 if (passValue.length < 8) {
@@ -1145,8 +1228,40 @@
                 passwordInput.setCustomValidity('');
             }
 
+            // Validar que el rol tenga al menos 1 vista asignada
+            const roleSelect = document.getElementById('role');
+            const selectedRole = roleSelect ? roleSelect.value : '';
+
+            if (!selectedRole) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Rol obligatorio',
+                    text: 'Debes seleccionar un rol para el usuario.',
+                    confirmButtonColor: '#0f968c'
+                });
+                return false;
+            }
+
+            if (selectedRole !== 'Administrador') {
+                const vistas = MAPA_ROLES_VISTAS[selectedRole] || [];
+                if (vistas.length === 0) {
+                    event.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Rol sin vistas asignadas',
+                        text: `El rol "${selectedRole}" no tiene ninguna vista asignada. Asigna al menos 1 vista al rol en "Roles y Accesos" antes de asignarlo a un usuario.`,
+                        confirmButtonColor: '#0f968c'
+                    });
+                    return false;
+                }
+            }
+
             return true;
         }
+
+        // Compatibilidad por si se llama con el nombre anterior
+        const validateUserEmail = validateUserModal;
 
         document.addEventListener('DOMContentLoaded', function() {
             const emailInput = document.getElementById('email');
