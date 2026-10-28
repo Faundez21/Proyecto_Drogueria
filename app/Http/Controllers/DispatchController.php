@@ -6,6 +6,7 @@ use App\Models\Dispatch;
 use App\Models\DispatchItem;
 use App\Models\EstablishmentRequest;
 use App\Models\Inventory;
+use App\Models\User;
 use App\Services\InventoryService;
 use App\Services\SolicitudService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -24,27 +25,60 @@ class DispatchController extends Controller
 
         $dispatches = Dispatch::with('items')->orderBy('created_at', 'desc')->get();
 
-        $inventarioDisponible = Inventory::whereNotIn('producto', InventoryService::controlados())
+        $controlados = InventoryService::controlados();
+
+        $inventarioDisponible = Inventory::whereNotIn('producto', $controlados)
             ->where('estado', 'Disponible')
             ->where('cantidad', '>', 0)
             ->orderByRaw('CASE WHEN fecha_vencimiento IS NULL THEN 1 ELSE 0 END ASC, fecha_vencimiento ASC, id ASC')
             ->get();
 
-        $solicitudes = EstablishmentRequest::with('items.product')
-            ->whereIn('estado', ['Pendiente', 'Parcial'])
+        $solicitudes = EstablishmentRequest::with(['items.product', 'assignedUser'])
+            ->whereHas('items.product', function ($q) use ($controlados) {
+                $q->whereNotIn('nombre', $controlados);
+            })
+            ->orderByRaw("CASE WHEN estado IN ('Asignada', 'Pendiente', 'Parcial') THEN 0 ELSE 1 END ASC")
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $controlados = InventoryService::controlados();
+        // Asegurar que cada item tenga su consumo_anterior calculado incluso si fue creado antes
+        $consumoMapa = SolicitudService::mapaConsumoYStock();
+        foreach ($solicitudes as $sol) {
+            $est = trim((string) $sol->establecimiento);
+            foreach ($sol->items as $item) {
+                if ($item->consumo_anterior === null) {
+                    $item->consumo_anterior = (int) ($consumoMapa[$est][$item->product_id]['consumo_anterior'] ?? 0);
+                }
+            }
+        }
+
+        $usuariosAsignables = User::where('status', 'activo')
+            ->get()
+            ->filter(fn ($u) => $u->hasRole('Administrador') || $u->can('ver.despacho'))
+            ->sortBy('name')
+            ->values();
+        $misSolicitudesAsignadas = $solicitudes
+            ->where('assigned_user_id', Auth::id())
+            ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
+            ->values();
+
         $establecimientos = InventoryService::establecimientos();
 
-        return view('dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible', 'solicitudes', 'controlados', 'establecimientos'));
+        return view('dispatch.index', compact(
+            'correlativo',
+            'dispatches',
+            'inventarioDisponible',
+            'solicitudes',
+            'usuariosAsignables',
+            'misSolicitudesAsignadas',
+            'controlados',
+            'establecimientos'
+        ));
     }
 
     public function solicitudes()
     {
-        $solicitudes = EstablishmentRequest::with('items.product')
-            ->whereIn('estado', ['Pendiente', 'Parcial'])
+        $solicitudes = EstablishmentRequest::with(['items.product', 'assignedUser'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -74,6 +108,7 @@ class DispatchController extends Controller
             'programas.*' => 'nullable|string|max:255',
             'cantidades' => 'required|array|min:1',
             'cantidades.*' => 'required|integer|min:1',
+            'action' => 'nullable|string|in:save,save_only,save_and_download',
         ]);
 
         $destino = $validated['establecimiento_destino'];
@@ -94,6 +129,8 @@ class DispatchController extends Controller
             $correlativo = $this->generarCorrelativo();
 
             $dispatch = Dispatch::create([
+                'establishment_request_id' => $validated['establishment_request_id'] ?? null,
+                'user_id' => Auth::id(),
                 'correlativo' => $correlativo,
                 'fecha_despacho' => $validated['fecha_despacho'],
                 'clasificacion' => $validated['clasificacion'],
@@ -105,6 +142,7 @@ class DispatchController extends Controller
                 'firma_recibe' => $firmaRecibe,
             ]);
 
+            $itemsDespachados = [];
             foreach ($validated['productos'] as $index => $nombreProducto) {
                 if (InventoryService::esControlado($nombreProducto)) {
                     throw new \RuntimeException("El producto '{$nombreProducto}' es controlado y no puede procesarse por esta vía.");
@@ -122,6 +160,7 @@ class DispatchController extends Controller
                     DispatchItem::create([
                         'dispatch_id' => $dispatch->id,
                         'inventory_id' => $batch->id,
+                        'product_id' => $batch->product_id ?? InventoryService::productoId($nombreProducto),
                         'producto' => $nombreProducto,
                         'lote' => $batch->lote ?? 'S/L',
                         'fecha_vencimiento' => $batch->fecha_vencimiento,
@@ -137,27 +176,99 @@ class DispatchController extends Controller
                         'origen_destino' => 'Hacia: ' . $destino,
                         'documento_respaldo' => 'Guia N° ' . $correlativo,
                     ]);
+
+                    $itemsDespachados[] = [
+                        'producto' => $nombreProducto,
+                        'lote' => $batch->lote ?? 'S/L',
+                        'cantidad' => (int) $asignacion['cantidad'],
+                        'vencimiento' => $batch->fecha_vencimiento ? date('d/m/Y', strtotime($batch->fecha_vencimiento)) : 'N/A',
+                        'programa' => $validated['programas'][$index] ?? 'General',
+                    ];
                 }
             }
 
+            $controladosPendientesCount = 0;
+            $solicitudOrigenId = null;
+
             if (! empty($validated['establishment_request_id'] ?? null)) {
+                $solicitudOrigenId = (int) $validated['establishment_request_id'];
                 SolicitudService::registrarDespacho(
-                    (int) $validated['establishment_request_id'],
+                    $solicitudOrigenId,
                     $validated['productos'],
                     $validated['cantidades']
                 );
+
+                // Comprobar si la solicitud aún tiene fármacos controlados con cantidad pendiente
+                $reqModel = EstablishmentRequest::with('items.product')->find($solicitudOrigenId);
+                if ($reqModel) {
+                    $controladosPendientesCount = $reqModel->items->filter(function ($it) {
+                        $nom = $it->product->nombre ?? '';
+                        $falta = ($it->cantidad_solicitada - $it->cantidad_despachada);
+                        return InventoryService::esControlado($nom) && $falta > 0;
+                    })->count();
+                }
             }
 
             DB::commit();
 
-            return redirect()->back()->with('success', "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.");
+            $dispatchDetail = [
+                'correlativo' => $correlativo,
+                'destino' => $destino,
+                'clasificacion' => $validated['clasificacion'],
+                'fecha' => !empty($validated['fecha_despacho']) ? date('d/m/Y', strtotime($validated['fecha_despacho'])) : date('d/m/Y'),
+                'total_items' => count($itemsDespachados),
+                'total_unidades' => array_sum(array_column($itemsDespachados, 'cantidad')),
+                'items' => $itemsDespachados,
+                'pdf_url' => route('dispatch.pdf', $dispatch->id),
+                'auto_download' => ($validated['action'] ?? '') === 'save_and_download',
+                'tiene_controlados_pendientes' => $controladosPendientesCount > 0,
+                'cant_controlados_pendientes' => $controladosPendientesCount,
+                'solicitud_id' => $solicitudOrigenId,
+                'url_despacho_controlado' => $solicitudOrigenId ? route('controlled_dispatch.index', ['solicitud_id' => $solicitudOrigenId]) : null,
+            ];
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.",
+                    'detail' => $dispatchDetail,
+                ]);
+            }
+
+            return redirect()->back()
+                ->with('success', "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.")
+                ->with('dispatch_success_detail', $dispatchDetail);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Por favor verifique los datos ingresados en el formulario.',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+            throw $e;
         } catch (\RuntimeException $e) {
             DB::rollBack();
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 422);
+            }
 
             return redirect()->back()->with('error', $e->getMessage())->withInput();
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Error en despacho: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ocurrió un error al generar el despacho. Intente nuevamente.',
+                ], 500);
+            }
 
             return redirect()->back()->with('error', 'Ocurrió un error al generar el despacho. Intente nuevamente.');
         }

@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
 
-#[Fillable(['name','last_name', 'email', 'password'])]
+#[Fillable(['name','last_name', 'email', 'password','status'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -30,5 +30,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function assignedRequests()
+    {
+        return $this->hasMany(EstablishmentRequest::class, 'assigned_user_id');
     }
 }

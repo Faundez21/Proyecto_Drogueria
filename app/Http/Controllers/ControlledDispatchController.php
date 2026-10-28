@@ -6,6 +6,7 @@ use App\Models\ControlledDispatch;
 use App\Models\ControlledDispatchItem;
 use App\Models\EstablishmentRequest;
 use App\Models\Inventory;
+use App\Models\User;
 use App\Services\InventoryService;
 use App\Services\SolicitudService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -24,21 +25,54 @@ class ControlledDispatchController extends Controller
 
         $dispatches = ControlledDispatch::with('items')->orderBy('created_at', 'desc')->get();
 
-        $inventarioDisponible = Inventory::whereIn('producto', InventoryService::controlados())
+        $controlados = InventoryService::controlados();
+
+        $inventarioDisponible = Inventory::whereIn('producto', $controlados)
             ->where('estado', 'Disponible')
             ->where('cantidad', '>', 0)
             ->orderByRaw('CASE WHEN fecha_vencimiento IS NULL THEN 1 ELSE 0 END ASC, fecha_vencimiento ASC, id ASC')
             ->get();
 
-        $solicitudes = EstablishmentRequest::with('items.product')
-            ->whereIn('estado', ['Pendiente', 'Parcial'])
+        $solicitudes = EstablishmentRequest::with(['items.product', 'assignedUser'])
+            ->whereHas('items.product', function ($q) use ($controlados) {
+                $q->whereIn('nombre', $controlados);
+            })
+            ->orderByRaw("CASE WHEN estado IN ('Asignada', 'Pendiente', 'Parcial') THEN 0 ELSE 1 END ASC")
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $controlados = InventoryService::controlados();
+        $consumoMapa = SolicitudService::mapaConsumoYStock();
+        foreach ($solicitudes as $sol) {
+            $est = trim((string) $sol->establecimiento);
+            foreach ($sol->items as $item) {
+                if ($item->consumo_anterior === null) {
+                    $item->consumo_anterior = (int) ($consumoMapa[$est][$item->product_id]['consumo_anterior'] ?? 0);
+                }
+            }
+        }
+
+        $usuariosAsignables = User::where('status', 'activo')
+            ->get()
+            ->filter(fn ($u) => $u->hasRole('Administrador') || $u->can('ver.despacho_controlado'))
+            ->sortBy('name')
+            ->values();
+        $misSolicitudesAsignadas = $solicitudes
+            ->where('assigned_user_id', Auth::id())
+            ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
+            ->values();
+
         $establecimientos = InventoryService::establecimientos();
 
-        return view('controlled_dispatch.index', compact('correlativo', 'dispatches', 'inventarioDisponible', 'solicitudes', 'controlados', 'establecimientos'));
+        return view('controlled_dispatch.index', compact(
+            'correlativo',
+            'dispatches',
+            'inventarioDisponible',
+            'solicitudes',
+            'usuariosAsignables',
+            'misSolicitudesAsignadas',
+            'controlados',
+            'establecimientos'
+        ));
     }
 
     public function store(Request $request)
@@ -64,6 +98,7 @@ class ControlledDispatchController extends Controller
             'cantidades' => 'required|array|min:1',
             'cantidades.*' => 'required|integer|min:1',
             'establishment_request_id' => 'nullable|integer|exists:establishment_requests,id',
+            'action' => 'nullable|string|in:save,save_only,save_and_download',
         ]);
 
         $destino = $validated['establecimiento_destino'];
@@ -85,6 +120,8 @@ class ControlledDispatchController extends Controller
             $correlativo = 'GDC-' . date('Y') . '-' . str_pad((string) $nextId, 4, '0', STR_PAD_LEFT);
 
             $dispatch = ControlledDispatch::create([
+                'establishment_request_id' => $validated['establishment_request_id'] ?? null,
+                'user_id' => Auth::id(),
                 'correlativo' => $correlativo,
                 'fecha_despacho' => $validated['fecha_despacho'],
                 'clasificacion' => $validated['clasificacion'],
@@ -96,6 +133,7 @@ class ControlledDispatchController extends Controller
                 'firma_recibe' => $firmaRecibe,
             ]);
 
+            $itemsControlados = [];
             foreach ($validated['productos'] as $index => $nombreProducto) {
                 if (! InventoryService::esControlado($nombreProducto)) {
                     throw new \RuntimeException("El producto '{$nombreProducto}' no es un fármaco controlado válido en este sistema.");
@@ -113,6 +151,7 @@ class ControlledDispatchController extends Controller
                     ControlledDispatchItem::create([
                         'controlled_dispatch_id' => $dispatch->id,
                         'inventory_id' => $batch->id,
+                        'product_id' => $batch->product_id ?? InventoryService::productoId($nombreProducto),
                         'producto' => $nombreProducto,
                         'lote' => $batch->lote ?? 'S/L',
                         'fecha_vencimiento' => $batch->fecha_vencimiento,
@@ -128,6 +167,14 @@ class ControlledDispatchController extends Controller
                         'origen_destino' => 'Hacia: ' . $destino,
                         'documento_respaldo' => 'Guia Controlada N° ' . $correlativo,
                     ]);
+
+                    $itemsControlados[] = [
+                        'producto' => $nombreProducto,
+                        'lote' => $batch->lote ?? 'S/L',
+                        'cantidad' => (int) $asignacion['cantidad'],
+                        'vencimiento' => $batch->fecha_vencimiento ? date('d/m/Y', strtotime($batch->fecha_vencimiento)) : 'N/A',
+                        'programa' => $validated['programas'][$index] ?? 'General',
+                    ];
                 }
             }
 
@@ -141,14 +188,61 @@ class ControlledDispatchController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', "Despacho Controlado N° {$correlativo} generado con FEFO y stock descontado con éxito.");
+            $controlledDetail = [
+                'correlativo' => $correlativo,
+                'destino' => $destino,
+                'clasificacion' => $validated['clasificacion'],
+                'fecha' => !empty($validated['fecha_despacho']) ? date('d/m/Y', strtotime($validated['fecha_despacho'])) : date('d/m/Y'),
+                'series_recetas' => $validated['series_recetas'] ?? null,
+                'total_items' => count($itemsControlados),
+                'total_unidades' => array_sum(array_column($itemsControlados, 'cantidad')),
+                'items' => $itemsControlados,
+                'pdf_url' => route('controlled_dispatch.pdf', $dispatch->id),
+                'auto_download' => ($validated['action'] ?? '') === 'save_and_download',
+            ];
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Despacho Controlado N° {$correlativo} generado con FEFO y stock descontado con éxito.",
+                    'detail' => $controlledDetail,
+                ]);
+            }
+
+            return redirect()->back()
+                ->with('success', "Despacho Controlado N° {$correlativo} generado con FEFO y stock descontado con éxito.")
+                ->with('controlled_dispatch_success_detail', $controlledDetail);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Por favor verifique los datos ingresados en el formulario.',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+            throw $e;
         } catch (\RuntimeException $e) {
             DB::rollBack();
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 422);
+            }
 
             return redirect()->back()->with('error', $e->getMessage())->withInput();
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Error en despacho controlado: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ocurrió un error al generar el despacho controlado. Intente nuevamente.',
+                ], 500);
+            }
 
             return redirect()->back()->with('error', 'Ocurrió un error al generar el despacho controlado. Intente nuevamente.');
         }

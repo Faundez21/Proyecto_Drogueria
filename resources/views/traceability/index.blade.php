@@ -62,47 +62,60 @@
     </div>
 
     <!-- contenedor de tabla de movimientos -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+
+        <!-- Cabecera de la tabla y botón de filtros -->
+        <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
+            <h3 class="text-[15px] font-bold text-slate-800">Historial de Movimientos de Lotes</h3>
+            <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-xs cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                Filtros Avanzados
+            </button>
+        </div>
 
         <!-- barra de busqueda y filtros -->
-        <form method="GET" action="{{ route('traceability.index') }}" id="filterForm" class="p-5 border-b border-slate-200 bg-slate-50/50">
+        <form method="GET" action="{{ route('traceability.index') }}" id="filterForm" class="{{ request()->hasAny(['search', 'tipo_movimiento', 'fecha_desde', 'fecha_hasta']) ? '' : 'hidden' }} bg-white border-b border-slate-200 p-5">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                 
                 <div class="lg:col-span-2 relative">
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Busqueda Libre</label>
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 pt-5">
+                    <label class="block text-[11.5px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Búsqueda Libre</label>
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 pt-6">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar Lote, Producto o Doc..."
-                        class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-[13px] font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar Lote, Producto o Documento..."
+                        class="block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Movimiento</label>
-                    <select name="tipo_movimiento" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm cursor-pointer">
+                    <label class="block text-[11.5px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Movimiento</label>
+                    <select name="tipo_movimiento" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all cursor-pointer">
                         <option value="">Todos</option>
-                        <option value="Recepción" {{ request('tipo_movimiento') == 'Recepción' ? 'selected' : '' }}>Recepcion</option>
-                        <option value="Despacho" {{ request('tipo_movimiento') == 'Despacho' ? 'selected' : '' }}>Despacho</option>
+                        <option value="Recepción" {{ request('tipo_movimiento') == 'Recepción' ? 'selected' : '' }}>Recepción</option>
+                        <option value="Despacho" {{ request('tipo_movimiento') == 'Despacho' ? 'selected' : '' }}>Despacho Normal</option>
+                        @if(auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado'))
+                            <option value="Despacho Controlado" {{ request('tipo_movimiento') == 'Despacho Controlado' ? 'selected' : '' }}>Despacho Controlado</option>
+                        @endif
+                        <option value="Cambio de estado" {{ request('tipo_movimiento') == 'Cambio de estado' ? 'selected' : '' }}>Cambio de Estado (Cuarentena / Merma)</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Desde</label>
-                    <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm">
+                    <label class="block text-[11.5px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Desde</label>
+                    <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Hasta</label>
-                    <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-sm">
+                    <label class="block text-[11.5px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Hasta</label>
+                    <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
                 </div>
                 
             </div>
             
-            <div class="mt-4 flex justify-end gap-3">
-                <?php if(request()->hasAny(['search', 'tipo_movimiento', 'fecha_desde', 'fecha_hasta'])): ?>
-                    <a href="{{ route('traceability.index') }}" class="py-2 px-4 bg-slate-100 text-slate-600 border border-slate-300 rounded-xl text-[13px] font-bold hover:bg-slate-200 transition-colors">Limpiar</a>
-                <?php endif; ?>
-                <button type="submit" class="py-2 px-5 bg-slate-800 text-white rounded-xl text-[13px] font-bold hover:bg-slate-900 transition-colors shadow-sm cursor-pointer">
+            <div class="mt-5 flex items-center justify-end gap-3 border-t border-slate-200/60 pt-4">
+                <a href="{{ route('traceability.index') }}" class="px-4 py-2 rounded-lg text-[12.5px] font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition-colors">
+                    Limpiar Filtros
+                </a>
+                <button type="submit" class="px-4 py-2 rounded-lg text-[12.5px] font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-md transition-all cursor-pointer">
                     Aplicar Filtros
                 </button>
             </div>
@@ -122,16 +135,19 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-[13px]">
-                    
-                    <?php if(count($movements) > 0): ?>
-                        <?php foreach($movements as$mov): ?>
-                            <?php
-                                $badgeBg = 'bg-slate-50'; $badgeText = 'text-slate-700';$badgeBorder = 'border-slate-200';
+                    @if(count($movements) > 0)
+                        @foreach($movements as $mov)
+                            @php
+                                $badgeBg = 'bg-amber-50'; $badgeText = 'text-amber-700'; $badgeBorder = 'border-amber-200';
                                 if($mov->tipo_movimiento == 'Recepción') {
-                                    $badgeBg = 'bg-emerald-50'; $badgeText = 'text-emerald-700';$badgeBorder = 'border-emerald-200';
-                                } elseif($mov->tipo_movimiento == 'Despacho') {$badgeBg = 'bg-blue-50'; $badgeText = 'text-blue-700';$badgeBorder = 'border-blue-200';
+                                    $badgeBg = 'bg-emerald-50'; $badgeText = 'text-emerald-700'; $badgeBorder = 'border-emerald-200';
+                                } elseif($mov->tipo_movimiento == 'Despacho') {
+                                    $badgeBg = 'bg-blue-50'; $badgeText = 'text-blue-700'; $badgeBorder = 'border-blue-200';
+                                } elseif($mov->tipo_movimiento == 'Despacho Controlado') {
+                                    $badgeBg = 'bg-rose-50'; $badgeText = 'text-rose-700'; $badgeBorder = 'border-rose-200';
                                 }
-                            ?>
+                                $responsableMov = $mov->user ? trim($mov->user->name . ' ' . ($mov->user->last_name ?? '')) : null;
+                            @endphp
                             <tr class="hover:bg-slate-50 transition-colors">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
@@ -145,44 +161,48 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="inline-flex px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wide {{ $badgeBg }} {{ $badgeText }} {{$badgeBorder }} border whitespace-nowrap">
-                                        {{ $mov->tipo_movimiento }} ({{$mov->cantidad > 0 ? '+'.$mov->cantidad :$mov->cantidad }})
+                                    <span class="inline-flex px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wide {{ $badgeBg }} {{ $badgeText }} {{ $badgeBorder }} border whitespace-nowrap">
+                                        {{ $mov->tipo_movimiento }} ({{ $mov->cantidad > 0 ? '+'.$mov->cantidad : $mov->cantidad }})
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex flex-col">
                                         <span class="text-slate-800 font-bold text-[13px]">{{ $mov->origen_destino }}</span>
-                                        <span class="text-[11px] font-medium text-slate-500">{{ $mov->documento_respaldo }}</span>
+                                        <span class="text-[11px] font-medium text-slate-500">
+                                            {{ $mov->documento_respaldo }}
+                                            @if($responsableMov)
+                                                · <span class="text-teal-700 font-semibold">Resp: {{ $responsableMov }}</span>
+                                            @endif
+                                        </span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 font-mono text-[12px] font-semibold text-slate-600">
                                     {{ \Carbon\Carbon::parse($mov->fecha_hora)->format('d/m/Y - H:i') }}
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <?php if(strtolower($mov->estado_lote) == 'cuarentena'): ?>
+                                    @if(strtolower($mov->estado_lote) == 'cuarentena')
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-200">
                                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Cuarentena
                                         </span>
-                                    <?php elseif(strtolower($mov->estado_lote) == 'merma'): ?>
+                                    @elseif(strtolower($mov->estado_lote) == 'merma')
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-rose-100 text-rose-800 border border-rose-200">
                                             <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Merma
                                         </span>
-                                    <?php else: ?>
+                                    @else
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Vigente
                                         </span>
-                                    <?php endif; ?>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    <!-- boton que abre la ficha de lote con peticion ajax -->
                                     <button type="button" onclick="openLotDetails('{{ $mov->lote }}', '{{ addslashes($mov->producto) }}')" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-teal-700 text-white rounded-xl text-[12px] font-bold transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer shadow-sm">
                                         <svg class="w-4 h-4 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                         Ver Ficha Maestra
                                     </button>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
+                        @endforeach
+                    @else
                         <tr>
                             <td colspan="6" class="px-6 py-16 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
@@ -190,25 +210,69 @@
                                         <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                     </div>
                                     <p class="text-[15px] font-bold text-slate-600">Sin movimientos trazados</p>
-                                    <p class="text-[13px] text-slate-500 mt-1 max-w-sm">No existen recepciones ni despachos registrados que coincidan con la busqueda actual.</p>
+                                    <p class="text-[13px] text-slate-500 mt-1 max-w-sm">No existen recepciones ni despachos registrados que coincidan con la búsqueda actual.</p>
                                 </div>
                             </td>
                         </tr>
-                    <?php endif; ?>
+                    @endif
                 </tbody>
             </table>
         </div>
-
         <!-- paginacion -->
-        <div class="px-6 py-4 border-t border-slate-200 bg-white">
-            {{ $movements->links() }}
+        @if ($movements->hasPages())
+        <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 bg-white rounded-b-2xl">
+            <div class="text-[13px] text-slate-500 text-center sm:text-left font-medium">
+                Mostrando del <span class="font-bold text-slate-800">{{ $movements->firstItem() ?? 0 }}</span> al <span class="font-bold text-slate-800">{{ $movements->lastItem() ?? 0 }}</span> de <span class="font-bold text-slate-800">{{ $movements->total() }}</span> registros
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                @if ($movements->onFirstPage())
+                    <span class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed">Anterior</span>
+                @else
+                    <a href="{{ $movements->previousPageUrl() }}" class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors">Anterior</a>
+                @endif
+
+                @php
+                    $start = max($movements->currentPage() - 2, 1);
+                    $end = min($movements->currentPage() + 2, $movements->lastPage());
+                @endphp
+
+                @if ($start > 1)
+                    <a href="{{ $movements->url(1) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">1</a>
+                    @if ($start > 2)
+                        <span class="px-1 text-slate-400">...</span>
+                    @endif
+                @endif
+
+                @for ($i = $start; $i <= $end; $i++)
+                    @if ($i == $movements->currentPage())
+                        <span class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-bold bg-blue-50 text-blue-600 border border-blue-100 shadow-sm">{{ $i }}</span>
+                    @else
+                        <a href="{{ $movements->url($i) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">{{ $i }}</a>
+                    @endif
+                @endfor
+
+                @if ($end < $movements->lastPage())
+                    @if ($end < $movements->lastPage() - 1)
+                        <span class="px-1 text-slate-400">...</span>
+                    @endif
+                    <a href="{{ $movements->url($movements->lastPage()) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium text-slate-600 hover:bg-slate-100 transition-colors">{{ $movements->lastPage() }}</a>
+                @endif
+
+                @if ($movements->hasMorePages())
+                    <a href="{{ $movements->nextPageUrl() }}" class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors">Siguiente</a>
+                @else
+                    <span class="px-3 py-1.5 rounded-lg text-[13px] font-medium border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed">Siguiente</span>
+                @endif
+            </div>
         </div>
+        @endif
     </div>
 
     <!-- ventana modal para visualizar la ficha clinica del lote -->
-    <div id="modal-lot-details" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all">
+    <div id="modal-lot-details" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeLotDetails()"></div>
-        <div class="relative w-full max-w-5xl rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="relative w-full max-w-5xl rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-2xl flex flex-col max-h-[92vh] my-auto">
 
             <!-- cabecera del modal -->
             <div class="flex items-center justify-between p-6 bg-slate-800 shrink-0">
@@ -264,6 +328,14 @@
 
     <!-- script de manejo de peticiones ajax para cargar informacion en modal -->
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnToggleFilters = document.getElementById('toggle-filters-btn');
+            const filtersPanel = document.getElementById('filterForm');
+            if (btnToggleFilters && filtersPanel) {
+                btnToggleFilters.addEventListener('click', () => filtersPanel.classList.toggle('hidden'));
+            }
+        });
+
         function openLotDetails(lote, producto) {
             document.getElementById('modal-lot-details').classList.remove('hidden');
             document.getElementById('modal-subtitle').textContent = `Lote ID: ${lote} · ${producto}`;
@@ -275,7 +347,7 @@
             detailsContainer.innerHTML = `<div class="text-center text-slate-500 py-10">Consultando base de datos...</div>`;
 
             const currentPath = window.location.pathname.replace(/\/$/, '');
-            const fetchUrl = `${currentPath}/timeline?lote=${encodeURIComponent(lote)}`;
+            const fetchUrl = `${currentPath}/timeline?lote=${encodeURIComponent(lote)}&producto=${encodeURIComponent(producto)}`;
 
             fetch(fetchUrl)
                 .then(async response => {
@@ -335,8 +407,18 @@
                     let html = '<div class="relative pl-6 border-l-2 border-slate-200 space-y-7">';
                     
                     data.timeline.forEach((mov) => {
-                        let badgeBg = mov.tipo === 'Recepción' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200';
-                        let dotColor = mov.tipo === 'Recepción' ? 'bg-emerald-500 ring-emerald-50' : 'bg-blue-500 ring-blue-50';
+                        let badgeBg = 'bg-amber-50 text-amber-700 border-amber-200';
+                        let dotColor = 'bg-amber-500 ring-amber-50';
+                        if (mov.tipo === 'Recepción') {
+                            badgeBg = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                            dotColor = 'bg-emerald-500 ring-emerald-50';
+                        } else if (mov.tipo === 'Despacho') {
+                            badgeBg = 'bg-blue-50 text-blue-700 border-blue-200';
+                            dotColor = 'bg-blue-500 ring-blue-50';
+                        } else if (mov.tipo === 'Despacho Controlado') {
+                            badgeBg = 'bg-rose-50 text-rose-700 border-rose-200';
+                            dotColor = 'bg-rose-500 ring-rose-50';
+                        }
                         
                         html += `
                         <div class="relative">
@@ -349,7 +431,7 @@
                                     <p class="font-mono text-[11px] font-bold text-slate-400">${mov.fecha}</p>
                                 </div>
                                 <h4 class="text-[13px] font-black text-slate-800 leading-tight">${mov.origen_destino}</h4>
-                                <p class="text-[11.5px] font-medium text-slate-500 mt-1">Ref: <span class="text-slate-700 font-bold">${mov.documento}</span></p>
+                                <p class="text-[11.5px] font-medium text-slate-500 mt-1">Ref: <span class="text-slate-700 font-bold">${mov.documento}</span>${mov.responsable ? ` · <span class="text-teal-700 font-semibold">Resp: ${mov.responsable}</span>` : ''}</p>
                             </div>
                         </div>`;
                     });

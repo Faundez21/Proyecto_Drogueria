@@ -15,4 +15,9 @@ class Aisle extends Model
     {
         return $this->hasMany(Shelf::class);
     }
+
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'aisle_id');
+    }
 }
