@@ -94,6 +94,7 @@ class ControlledDispatchController extends Controller
             'cantidades' => 'required|array|min:1',
             'cantidades.*' => 'required|integer|min:1',
             'establishment_request_id' => 'nullable|integer|exists:establishment_requests,id',
+            'action' => 'nullable|string|in:save,save_only,save_and_download',
         ]);
 
         $destino = $validated['establecimiento_destino'];
@@ -193,18 +194,51 @@ class ControlledDispatchController extends Controller
                 'total_unidades' => array_sum(array_column($itemsControlados, 'cantidad')),
                 'items' => $itemsControlados,
                 'pdf_url' => route('controlled_dispatch.pdf', $dispatch->id),
+                'auto_download' => ($validated['action'] ?? '') === 'save_and_download',
             ];
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Despacho Controlado N° {$correlativo} generado con FEFO y stock descontado con éxito.",
+                    'detail' => $controlledDetail,
+                ]);
+            }
 
             return redirect()->back()
                 ->with('success', "Despacho Controlado N° {$correlativo} generado con FEFO y stock descontado con éxito.")
                 ->with('controlled_dispatch_success_detail', $controlledDetail);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Por favor verifique los datos ingresados en el formulario.',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+            throw $e;
         } catch (\RuntimeException $e) {
             DB::rollBack();
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 422);
+            }
 
             return redirect()->back()->with('error', $e->getMessage())->withInput();
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Error en despacho controlado: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ocurrió un error al generar el despacho controlado. Intente nuevamente.',
+                ], 500);
+            }
 
             return redirect()->back()->with('error', 'Ocurrió un error al generar el despacho controlado. Intente nuevamente.');
         }

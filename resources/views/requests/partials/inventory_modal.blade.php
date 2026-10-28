@@ -1,9 +1,9 @@
 {{-- Modal: Inventario de Solicitudes (Establecimientos o CESFAM), independiente del Inventario de Droguería --}}
 @role('Administrador')
     <div id="RequestInventoryModal"
-        class="hidden fixed -inset-x-[100vw] -inset-y-[100vh] z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all"
+        class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all"
         onclick="if(event.target === this) closeRequestInventoryModal()">
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-7xl max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-7xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
 
             <!-- Cabecera Oscura del Modal -->
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">

@@ -19,7 +19,6 @@ class ReceptionController extends Controller
 {
     public function index()
     {
-        // Asegurar que todos los estupefacientes/controlados del catálogo existan en products
         foreach (InventoryService::controlados() as $ctrlNombre) {
             Product::firstOrCreate(['nombre' => $ctrlNombre]);
         }
@@ -27,7 +26,6 @@ class ReceptionController extends Controller
         $providers = Provider::where('status', 'activo')->orderBy('name')->get();
         $products = Product::orderBy('nombre')->get();
 
-        // Mapa de categorías históricas desde inventario para clasificar con precisión
         $categoriasInv = Inventory::select('producto', 'categoria')
             ->whereNotNull('categoria')
             ->where('categoria', '!=', '')
@@ -62,31 +60,32 @@ class ReceptionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'fecha_recepcion' => 'required|date',
-            'tipo_documento' => 'required|string|max:255',
-            'numero_documento' => 'required|string|max:255',
-            'orden_compra' => 'nullable|string|max:255',
-            'origen' => 'required|string|max:255',
+            'fecha_recepcion' => ['required', 'date'],
+            'tipo_documento' => ['required', 'string', 'max:255'],
+            'numero_documento' => ['required', 'string', 'max:255'],
+            'orden_compra' => ['nullable', 'string', 'max:255'],
+            'origen' => ['required', 'string', 'max:255'],
             'provider_id' => ['required', Rule::exists('providers', 'id')->where('status', 'activo')],
-            'firma_receptor' => 'nullable|string',
-            'action' => 'nullable|string|in:save,save_only,save_and_download',
-            'product_id' => 'required|array|min:1',
-            'product_id.*' => 'required|integer|exists:products,id',
-            'cantidad_unitaria' => 'required|array|min:1',
-            'cantidad_unitaria.*' => 'required|integer|min:1',
-            'valor_unitario' => 'nullable|array',
-            'valor_unitario.*' => 'nullable|numeric|min:0',
-            'lote' => 'nullable|array',
-            'lote.*' => 'nullable|string|max:255',
-            'fecha_vencimiento' => 'nullable|array',
-            'fecha_vencimiento.*' => 'nullable|date',
-            'tipo_producto' => 'nullable|array',
-            'tipo_producto.*' => 'nullable|string|max:255',
-            'programa' => 'nullable|array',
-            'programa.*' => 'nullable|string|max:255',
+            'firma_receptor' => ['nullable', 'string'],
+            'action' => ['nullable', 'string', 'in:save,save_only,save_and_download'],
+            'product_id' => ['required', 'array', 'min:1'],
+            'product_id.*' => ['required', 'integer', 'exists:products,id'],
+            'cantidad_unitaria' => ['required', 'array', 'min:1'],
+            'cantidad_unitaria.*' => ['required', 'integer', 'min:1'],
+            'valor_unitario' => ['nullable', 'array'],
+            'valor_unitario.*' => ['nullable', 'numeric', 'min:0'],
+            'lote' => ['nullable', 'array'],
+            'lote.*' => ['nullable', 'string', 'max:255'],
+            'fecha_vencimiento' => ['nullable', 'array'],
+            'fecha_vencimiento.*' => ['nullable', 'date'],
+            'tipo_producto' => ['nullable', 'array'],
+            'tipo_producto.*' => ['nullable', 'string', 'max:255'],
+            'programa' => ['nullable', 'array'],
+            'programa.*' => ['nullable', 'string', 'max:255'],
         ]);
 
         $provider = Provider::findOrFail($validated['provider_id']);
+        $nombreProveedor = $provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor';
 
         DB::beginTransaction();
 
@@ -105,8 +104,10 @@ class ReceptionController extends Controller
                 'firma_receptor' => $validated['firma_receptor'] ?? null,
             ]);
 
-            $factorIva = 1 + config('drogueria.iva');
+            $ivaConfig = (float) config('drogueria.iva', 0.19);
+            $factorIva = 1 + ($ivaConfig > 1 ? ($ivaConfig / 100) : $ivaConfig);
             $total_neto_recepcion = 0;
+            $itemsResumen = [];
 
             foreach ($validated['product_id'] as $index => $prodId) {
                 $product = Product::find($prodId);
@@ -115,7 +116,9 @@ class ReceptionController extends Controller
                 $cantidad = (int) $validated['cantidad_unitaria'][$index];
                 $valorU = (float) ($validated['valor_unitario'][$index] ?? 0);
                 $subtotal = $cantidad * $valorU;
+                $subtotalIva = round($subtotal * $factorIva);
                 $fechaVence = $validated['fecha_vencimiento'][$index] ?? null;
+                $loteItem = !empty($validated['lote'][$index]) ? trim($validated['lote'][$index]) : 'S/L';
 
                 $tipoSolicitado = $validated['tipo_producto'][$index] ?? null;
                 $grupoProducto = InventoryService::clasificarGrupoProducto($nombreProducto, $tipoSolicitado);
@@ -134,11 +137,11 @@ class ReceptionController extends Controller
                     'reception_id' => $reception->id,
                     'product_id' => $prodId,
                     'tipo_producto' => $categoriaRecepcion,
-                    'lote' => $validated['lote'][$index] ?? null,
+                    'lote' => $loteItem,
                     'fecha_vencimiento' => $fechaVence,
                     'cantidad' => $cantidad,
                     'valor_unitario' => $valorU,
-                    'valor_total_item' => $subtotal * $factorIva,
+                    'valor_total_item' => $subtotalIva,
                 ]);
 
                 $batch = InventoryService::ingresar([
@@ -152,12 +155,12 @@ class ReceptionController extends Controller
                     'numero_documento' => $validated['numero_documento'],
                     'orden_compra' => $validated['orden_compra'] ?? null,
                     'origen_mercaderia' => $validated['origen'],
-                    'rut_proveedor' => $provider->rut,
-                    'razon_social' => $provider->name,
+                    'rut_proveedor' => $provider->rut ?? null,
+                    'razon_social' => $nombreProveedor,
                     'producto' => $nombreProducto,
                     'categoria' => $categoriaInventario,
                     'estado' => 'Disponible',
-                    'lote' => $validated['lote'][$index] ?? 'S/L',
+                    'lote' => $loteItem,
                     'fecha_vencimiento' => $fechaVence,
                     'cantidad' => $cantidad,
                     'valor_neto_unitario' => $valorU,
@@ -171,34 +174,49 @@ class ReceptionController extends Controller
                     'tipo_movimiento' => 'Recepción',
                     'cantidad' => $cantidad,
                     'fecha_hora' => now(),
-                    'origen_destino' => 'Desde: ' . $provider->name,
+                    'origen_destino' => 'Desde: ' . $nombreProveedor,
                     'documento_respaldo' => $validated['tipo_documento'] . ' ' . $validated['numero_documento'],
                     'estado_lote' => 'Disponible',
                 ]);
+
                 $itemsResumen[] = [
                     'producto' => $nombreProducto,
-                    'lote' => $validated['lote'][$index] ?? 'S/L',
+                    'lote' => $loteItem,
                     'vencimiento' => !empty($fechaVence) ? date('d/m/Y', strtotime($fechaVence)) : 'N/A',
                     'cantidad' => (int) $cantidad,
                     'tipo' => $categoriaInventario,
+                    'subtotal_iva' => $subtotalIva,
                 ];
             }
 
-            $reception->update(['valor_total_recepcion' => $total_neto_recepcion * $factorIva]);
+            $valorTotalConIva = round($total_neto_recepcion * $factorIva);
+            $reception->update(['valor_total_recepcion' => $valorTotalConIva]);
 
             DB::commit();
 
             $receptionDetail = [
                 'correlativo' => $correlativo,
-                'proveedor' => $provider->name,
+                'fecha_recepcion' => date('d/m/Y', strtotime($validated['fecha_recepcion'])),
+                'origen' => $validated['origen'],
+                'orden_compra' => !empty($validated['orden_compra']) ? $validated['orden_compra'] : 'N/A',
+                'proveedor' => $nombreProveedor,
+                'rut_proveedor' => $provider->rut ?? 'N/A',
                 'documento' => $validated['tipo_documento'] . ' N° ' . $validated['numero_documento'],
                 'total_items' => count($itemsResumen),
                 'total_unidades' => array_sum(array_column($itemsResumen, 'cantidad')),
-                'valor_total' => $total_neto_recepcion * $factorIva,
+                'valor_total' => $valorTotalConIva,
                 'items' => $itemsResumen,
                 'pdf_url' => route('reception.pdf', $reception->id),
                 'auto_download' => ($validated['action'] ?? '') === 'save_and_download',
             ];
+
+            if ($request->expectsJson() or $request->ajax()) {
+                return response()->json([
+                    'ok' => true,
+                    'message' => "Recepción guardada y registrada en trazabilidad. N°: {$correlativo}",
+                    'detail' => $receptionDetail,
+                ]);
+            }
 
             return redirect()
                 ->route('reception.index')
@@ -208,7 +226,17 @@ class ReceptionController extends Controller
             DB::rollBack();
             Log::error('Error al guardar recepción: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
-            return redirect()->back()->with('error', 'Ocurrió un error al guardar la recepción. Intente nuevamente.')->withInput();
+            if ($request->expectsJson() or $request->ajax()) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'Ocurrió un error al guardar la recepción: ' . $e->getMessage(),
+                ], 500);
+            }
+
+            return redirect()
+                ->back()
+                ->with('error', 'Ocurrió un error al guardar la recepción. Intente nuevamente.')
+                ->withInput();
         }
     }
 

@@ -184,6 +184,15 @@ html.dark .swal2-title, html.dark .swal2-html-container, html.dark .swal2-conten
 html.dark .swal2-input, html.dark .swal2-textarea, html.dark .swal2-select { background: #202B3D; color: #E2E8F0; border-color: #45577A; }
 html.dark .swal2-footer { border-top-color: #364560; color: #94A3B8; }
 html.dark .swal2-timer-progress-bar { background: rgba(255, 255, 255, .25); }
+html.dark .swal2-html-container table { color: #CBD5E1; }
+html.dark .swal2-html-container thead { background-color: #202B3D; }
+html.dark .swal2-html-container th { color: #94A3B8; }
+html.dark .swal2-html-container td { color: #E2E8F0; border-color: #2F3D55; }
+html.dark .swal2-html-container .bg-slate-50,
+html.dark .swal2-html-container .bg-slate-100 { background-color: #202B3D; }
+html.dark .swal2-html-container .text-slate-800 { color: #F1F5F9; }
+html.dark .swal2-html-container .text-slate-600 { color: #CBD5E1; }
+html.dark .swal2-html-container .text-slate-500 { color: #A8B6CA; }
 
 /* ---------- Barras de desplazamiento ---------- */
 html.dark ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -269,3 +278,20 @@ html.dark .text-gray-300, html.dark .text-gray-200 { color: #CBD5E1; }
 html.dark .hover\:text-gray-700:hover { color: #F8FAFC; }
 html.dark .bg-gray-200 { background-color: #364763; }
 html.dark .bg-blue-900 { background-color: #1E3A5F; }
+html.dark .bg-slate-900:not(button):not(a) { background-color: #1E293B; }
+
+/* ---------- Tarjetas de etiquetas QR físicas (siempre claras para legibilidad óptica) ---------- */
+html.dark #qrPrintableCard {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border-color: #CBD5E1 !important;
+}
+html.dark #qrPrintableCard * {
+    color: #000000 !important;
+}
+html.dark #qrPrintableCard .text-slate-500 {
+    color: #475569 !important;
+}
+html.dark #qrPrintableCard .border-slate-300 {
+    border-color: #CBD5E1 !important;
+}

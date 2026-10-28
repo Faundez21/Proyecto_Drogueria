@@ -339,11 +339,11 @@
 
     <!-- MODAL 1: ¿OLVIDASTE TU CONTRASEÑA? -->
     <div id="forgotPasswordModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all"
         onclick="if(event.target === this) cerrarModalRecuperacion()">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden transform transition-all">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto transform transition-all">
             <!-- Cabecera -->
-            <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-blue-950 text-white flex items-center justify-between">
+            <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-blue-950 text-white flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3.5">
                     <div class="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 shrink-0">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -366,7 +366,7 @@
             </div>
 
             <!-- Cuerpo del Modal (Formulario) -->
-            <div id="forgotFormView" class="p-6 space-y-5">
+            <div id="forgotFormView" class="p-6 space-y-5 overflow-y-auto flex-1">
                 <!-- Flujo explicativo en 3 pasos -->
                 <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 space-y-2">
                     <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">¿Cómo funciona?</p>
@@ -452,11 +452,11 @@
 
     <!-- MODAL 2: CONTACTAR AL ADMINISTRADOR -->
     <div id="contactAdminModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all"
         onclick="if(event.target === this) cerrarModalContacto()">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden transform transition-all">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto transform transition-all">
             <!-- Cabecera -->
-            <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-blue-950 text-white flex items-center justify-between">
+            <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-blue-950 text-white flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3.5">
                     <div class="w-11 h-11 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300 shrink-0">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -479,7 +479,7 @@
             </div>
 
             <!-- Cuerpo -->
-            <div class="p-6 space-y-4">
+            <div class="p-6 space-y-4 overflow-y-auto flex-1">
                 <p class="text-xs text-slate-600 leading-relaxed">
                     El acceso a la plataforma es exclusivo para personal autorizado de Droguería y establecimientos de salud (CESFAM / Postas). Comunícate con el administrador para habilitar tu perfil:
                 </p>
@@ -523,7 +523,7 @@
                 </div>
 
                 <!-- Botones de Acción -->
-                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 shrink-0">
                     <button type="button" onclick="cerrarModalContacto()"
                         class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer">
                         Cerrar

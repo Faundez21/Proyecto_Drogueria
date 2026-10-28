@@ -10,7 +10,7 @@
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         Ver Historial
     </button>
-    @endrole
+@endrole
 @endsection
 
 @section('content')
@@ -30,6 +30,12 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="p-4 mb-4 text-sm text-rose-800 rounded-xl bg-rose-50 border border-rose-200 font-medium shadow-sm" role="alert">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
             <!-- cabecera del formulario -->
             <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -42,6 +48,7 @@
             <!-- formulario principal -->
             <form action="{{ route('reception.store') }}" method="POST" class="divide-y divide-slate-100" id="receptionForm">
                 @csrf
+                <input type="hidden" name="action" id="reception_action_input" value="save_only">
 
                 <!-- seccion 1: documento -->
                 <div class="p-6">
@@ -52,7 +59,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">N° Correlativo Interno</label>
-                            <input type="text" value="{{ $nextCorrelativo ?? '1' }}" readonly class="w-full bg-slate-100 border border-slate-200 text-teal-700 font-bold rounded-lg block py-2.5 px-3.5 text-[13px] cursor-not-allowed">
+                            <input type="text" id="correlativo_interno_display" value="{{ $nextCorrelativo ?? '1' }}" readonly class="w-full bg-slate-100 border border-slate-200 text-teal-700 font-bold rounded-lg block py-2.5 px-3.5 text-[13px] cursor-not-allowed">
                         </div>
                         <div>
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Fecha de Recepcion <span class="text-rose-500">*</span></label>
@@ -322,11 +329,11 @@
 
                 <!-- botones finales -->
                 <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3">
-                    <button type="reset" id="btn_limpiar" class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-100 transition-colors shadow-sm">Limpiar Formulario</button>
-                    <button type="submit" name="action" value="save_and_download" class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-lg text-[13px] font-semibold hover:bg-blue-700 flex items-center justify-center gap-2 transition-all shadow-sm">
+                    <button type="reset" id="btn_limpiar" class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-100 transition-colors shadow-sm cursor-pointer">Limpiar Formulario</button>
+                    <button type="submit" data-action="save_and_download" class="btn-submit-reception w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-lg text-[13px] font-semibold hover:bg-blue-700 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Guardar y Descargar PDF
                     </button>
-                    <button type="submit" name="action" value="save_only" class="w-full sm:w-auto px-5 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 flex items-center justify-center gap-2 transition-all shadow-sm">
+                    <button type="submit" data-action="save_only" class="btn-submit-reception w-full sm:w-auto px-5 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Confirmar Recepcion
                     </button>
                 </div>
@@ -335,9 +342,8 @@
     </div>
 
     <!-- modal 1: historial -->
-    <div id="historyModal" class="fixed inset-0 z-40 hidden bg-slate-900/50 backdrop-blur-sm transition-opacity" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-            <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 max-w-5xl w-full">
+    <div id="historyModal" class="fixed inset-0 z-40 hidden bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-3 sm:p-4 transition-opacity" role="dialog" aria-modal="true">
+        <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col my-auto">
 
                 <!-- cabecera historial -->
                 <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
@@ -407,7 +413,6 @@
                                     else $countMed++;
                                 }
                             @endphp
-                            <!-- clase identificadora para filtrado -->
                             <tr class="hover:bg-slate-50 fila-recepcion">
                                 <td class="px-6 py-4 font-bold text-slate-800">#{{ $rec->correlativo }}</td>
                                 <td class="px-6 py-4">{{ \Carbon\Carbon::parse($rec->fecha_recepcion)->format('d-m-Y') }}</td>
@@ -442,13 +447,11 @@
                     <button onclick="closeHistoryModal()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50">Cerrar Historial</button>
                 </div>
             </div>
-        </div>
     </div>
 
     <!-- modal 2: detalle -->
-    <div id="detailModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm transition-opacity" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-            <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 max-w-4xl w-full flex flex-col max-h-[90vh]">
+    <div id="detailModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-3 sm:p-4 transition-opacity" role="dialog" aria-modal="true">
+        <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col my-auto">
                 <div class="px-6 py-4 border-b border-slate-200 bg-slate-800 flex justify-between items-center">
                     <div>
                         <h3 class="text-lg font-bold text-white">Resumen de Recepcion</h3>
@@ -509,16 +512,16 @@
                     </div>
 
                 </div>
-                <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-xl">
+                <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
                     <button onclick="closeDetailModal()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50">Cerrar</button>
                     <a href="#" id="m_btn_pdf" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Descargar PDF</a>
                 </div>
             </div>
-        </div>
     </div>
 
-    <!-- importar cdn de signature pad -->
+    <!-- importar cdn de signature pad y sweetalert2 -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         const CONTROLADOS_LIST = @json($controlados ?? []);
@@ -583,7 +586,6 @@
             const card = btn.closest('.producto-item');
             card.setAttribute('data-grupo-actual', grupo);
 
-            // Actualizar estado activo de los botones de filtro en esta tarjeta
             card.querySelectorAll('.btn-filtro-grupo').forEach(b => {
                 const bGrupo = b.getAttribute('data-grupo');
                 b.className = 'btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ';
@@ -600,7 +602,6 @@
                 }
             });
 
-            // Mostrar/ocultar optgroups del select de producto según el grupo elegido
             const selectProd = card.querySelector('.select-producto-recepcion');
             selectProd.querySelectorAll('optgroup').forEach(og => {
                 const ogGrupo = og.getAttribute('data-optgroup');
@@ -613,7 +614,6 @@
                 });
             });
 
-            // Si el producto actualmente seleccionado no pertenece al grupo filtrado, limpiar selección y pre-asignar categoría
             const selectedOpt = selectProd.options[selectProd.selectedIndex];
             if (grupo !== 'Todos') {
                 if (!selectedOpt || !selectedOpt.value || selectedOpt.getAttribute('data-grupo') !== grupo) {
@@ -729,7 +729,6 @@
         function agregarFilaPorGrupo(grupo) {
             const container = document.getElementById('productos_container');
             const items = container.querySelectorAll('.producto-item');
-            // Si la primera fila está completamente vacía, usarla directamente
             if (items.length === 1) {
                 const firstSel = items[0].querySelector('.select-producto-recepcion');
                 if (firstSel && !firstSel.value) {
@@ -744,7 +743,6 @@
             if (sel) sel.focus();
         }
 
-        // limpia los filtros de la bandeja de recepciones
         function limpiarFiltrosRecepcion() {
             document.getElementById('filtroCorrelativoRec').value = '';
             document.getElementById('filtroFechaRec').value = '';
@@ -752,7 +750,6 @@
             filtrarRecepciones();
         }
 
-        // filtrado dinamico multi-criterio de la tabla de recepciones
         function filtrarRecepciones() {
             let inputCorrelativo = document.getElementById('filtroCorrelativoRec').value.toLowerCase();
             let inputFecha = document.getElementById('filtroFechaRec').value;
@@ -785,6 +782,96 @@
             });
         }
 
+        function descargarPdfSilencioso(url) {
+            if (!url) return;
+            let iframe = document.getElementById('hidden_pdf_download_iframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'hidden_pdf_download_iframe';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+            iframe.src = url;
+        }
+
+        // SweetAlert de Éxito con Resumen Completo de la Recepción
+        function mostrarSweetAlertRecepcionExitosa(recData, recargarAlCerrar = false) {
+            if (!recData) return;
+
+            const htmlDetail = `
+                <div class="text-left text-xs text-slate-700">
+                    <div class="p-3.5 bg-teal-50/70 border border-teal-200 rounded-xl mb-3 space-y-1.5">
+                        <div class="flex items-center justify-between pb-2 mb-1.5 border-b border-teal-200/80">
+                            <span class="font-extrabold text-teal-900 text-sm">Acta de Recepción N° ${recData.correlativo || ''}</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">RECEPCIÓN CONFORME</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
+                            <p><strong>Proveedor:</strong> ${recData.proveedor || 'N/A'}</p>
+                            <p><strong>Documento:</strong> ${recData.documento || 'N/A'}</p>
+                            ${recData.fecha_recepcion ? `<p><strong>Fecha:</strong> ${recData.fecha_recepcion}</p>` : ''}
+                            ${recData.origen ? `<p><strong>Origen:</strong> ${recData.origen}</p>` : ''}
+                            <p><strong>Total Recepcionado:</strong> ${Number(recData.total_unidades || 0).toLocaleString('es-CL')} uds. (${recData.total_items || 0} producto${recData.total_items === 1 ? '' : 's'})</p>
+                            <p><strong>Total c/IVA:</strong> <span class="font-bold text-teal-800">$ ${Math.round(recData.valor_total || 0).toLocaleString('es-CL')}</span></p>
+                        </div>
+                    </div>
+
+                    <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Resumen de Productos Recepcionados:</p>
+                    <div class="max-h-56 overflow-y-auto border border-slate-200 rounded-lg shadow-inner">
+                        <table class="w-full text-[11.5px] text-left">
+                            <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="p-2">Producto</th>
+                                    <th class="p-2 text-center">Lote</th>
+                                    <th class="p-2 text-center">Vencimiento</th>
+                                    <th class="p-2 text-right">Cant.</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white">
+                                ${(recData.items || []).map(it => `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-2 font-medium text-slate-800">
+                                            ${it.producto}
+                                            ${it.tipo ? `<span class="block text-[10px] text-slate-500 font-normal">${it.tipo}</span>` : ''}
+                                        </td>
+                                        <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote || 'S/L'}</td>
+                                        <td class="p-2 text-center text-slate-600">${it.vencimiento || 'N/A'}</td>
+                                        <td class="p-2 text-right font-bold text-teal-700">${Number(it.cantidad || 0).toLocaleString('es-CL')} u.</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            if (recData.auto_download && recData.pdf_url) {
+                setTimeout(() => {
+                    descargarPdfSilencioso(recData.pdf_url);
+                }, 300);
+            }
+
+            Swal.fire({
+                title: '¡Recepción Realizada con Éxito!',
+                html: htmlDetail,
+                icon: 'success',
+                confirmButtonColor: '#0d9488',
+                confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar y Finalizar',
+                showCancelButton: Boolean(recData.pdf_url),
+                cancelButtonColor: '#2563eb',
+                cancelButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Descargar Acta PDF',
+                reverseButtons: true,
+                width: '660px',
+                allowOutsideClick: false
+            }).then((res) => {
+                if (res.dismiss === Swal.DismissReason.cancel && recData.pdf_url) {
+                    window.open(recData.pdf_url, '_blank');
+                }
+                if (recargarAlCerrar) {
+                    window.location.href = "{{ route('reception.index') }}";
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // 1. logica autocompletar proveedor
             const providerSelect = document.getElementById('provider_select');
@@ -812,12 +899,10 @@
                 }
             };
 
-            // asignar eventos de suma a la primera fila original
             document.querySelectorAll('.calc-qty, .calc-price').forEach(inp => {
                 inp.addEventListener('input', window.calcularTotalGeneralRecepcion);
             });
 
-            // agregar nueva fila de producto
             document.getElementById('btn_add_product').addEventListener('click', function() {
                 crearNuevaFilaProducto('Todos');
             });
@@ -826,12 +911,11 @@
             const padOptions = { penColor: 'rgb(15, 23, 42)', backgroundColor: 'rgba(255, 255, 255, 1)' };
             const signatureRec = new SignaturePad(document.getElementById('pad_receptor'), padOptions);
 
-            // 4. limpieza del formulario completo (incluye firma)
+            // 4. limpieza del formulario completo
             document.getElementById('btn_limpiar').addEventListener('click', function(e) {
                 signatureRec.clear();
                 document.getElementById('valor_final_iva').value = '';
 
-                // borra los productos extra y deja solo el primero
                 const items = container.querySelectorAll('.producto-item');
                 for(let i = 1; i < items.length; i++) {
                     items[i].remove();
@@ -841,19 +925,20 @@
                 actualizarContadoresGrupos();
             });
 
-            // 5. confirmación SweetAlert2 y antes de enviar, inyectar firmas base64
-            let receptionSubmitConfirmed = false;
+            // 5. Confirmación y envío con SweetAlert inmediato de Resumen de Recepción
             let receptionSubmitAction = 'save_only';
 
-            document.querySelectorAll('#receptionForm button[type="submit"]').forEach(btn => {
+            document.querySelectorAll('.btn-submit-reception').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    receptionSubmitAction = this.value || 'save_only';
+                    receptionSubmitAction = this.getAttribute('data-action') || 'save_only';
+                    const actionInput = document.getElementById('reception_action_input');
+                    if (actionInput) {
+                        actionInput.value = receptionSubmitAction;
+                    }
                 });
             });
 
             document.getElementById('receptionForm').addEventListener('submit', function(e) {
-                if (receptionSubmitConfirmed) return;
-
                 const form = this;
                 if (!form.checkValidity()) {
                     return;
@@ -861,24 +946,47 @@
 
                 e.preventDefault();
 
+                const correlativoVal = document.getElementById('correlativo_interno_display')?.value || '{{ $nextCorrelativo ?? "1" }}';
+                const fechaRecVal = form.querySelector('[name="fecha_recepcion"]')?.value || '';
+                const origenVal = form.querySelector('[name="origen"]')?.value || '';
                 const docTipo = form.querySelector('[name="tipo_documento"]')?.value || 'Documento';
                 const docNum = form.querySelector('[name="numero_documento"]')?.value || '';
                 const provSelect = document.getElementById('provider_select');
                 const provName = provSelect && provSelect.selectedIndex >= 0 ? provSelect.options[provSelect.selectedIndex]?.text.trim() : 'Proveedor';
 
-                // Contabilizar productos ingresados en el formulario
                 const productCards = form.querySelectorAll('.producto-item');
                 let itemsCount = 0;
                 let totalUnidades = 0;
+                let totalNeto = 0;
+                const itemsPayload = [];
 
                 productCards.forEach(card => {
                     const prodSelect = card.querySelector('.select-producto-recepcion') || card.querySelector('select[name="product_id[]"]');
-                    const qtyInput = card.querySelector('.calc-qty') || card.querySelector('input[name="cantidad[]"]');
+                    const catSelect = card.querySelector('.select-categoria-recepcion') || card.querySelector('select[name="tipo_producto[]"]');
+                    const qtyInput = card.querySelector('.calc-qty') || card.querySelector('input[name="cantidad_unitaria[]"]');
+                    const priceInput = card.querySelector('.calc-price') || card.querySelector('input[name="valor_unitario[]"]');
+                    const loteInput = card.querySelector('input[name="lote[]"]');
+                    const vencInput = card.querySelector('input[name="fecha_vencimiento[]"]');
+
                     const qty = parseInt(qtyInput?.value) || 0;
+                    const price = parseFloat(priceInput?.value) || 0;
 
                     if (prodSelect && prodSelect.value) {
                         itemsCount++;
                         totalUnidades += qty;
+                        totalNeto += (qty * price);
+
+                        const rawNombre = prodSelect.options[prodSelect.selectedIndex]?.text.trim() || 'Producto';
+                        const rawCat = catSelect && catSelect.selectedIndex >= 0 ? catSelect.options[catSelect.selectedIndex]?.text.trim() : '';
+                        const rawVence = vencInput?.value ? vencInput.value.split('-').reverse().join('/') : 'N/A';
+
+                        itemsPayload.push({
+                            producto: rawNombre,
+                            tipo: rawCat,
+                            lote: loteInput?.value?.trim() || 'S/L',
+                            vencimiento: rawVence,
+                            cantidad: qty
+                        });
                     }
                 });
 
@@ -887,6 +995,20 @@
                 }
 
                 const textoUnidades = totalUnidades > 0 ? ` (${totalUnidades.toLocaleString('es-CL')} unidades en total)` : '';
+
+                // Resumen armado desde el formulario como respaldo inmediato
+                const fallbackSummary = {
+                    correlativo: correlativoVal,
+                    fecha_recepcion: fechaRecVal ? fechaRecVal.split('-').reverse().join('/') : '',
+                    origen: origenVal,
+                    proveedor: provName,
+                    documento: `${docTipo} N° ${docNum}`,
+                    total_unidades: totalUnidades,
+                    total_items: itemsCount,
+                    valor_total: totalNeto > 0 ? Math.round(totalNeto * 1.19) : 0,
+                    items: itemsPayload,
+                    auto_download: receptionSubmitAction === 'save_and_download'
+                };
 
                 Swal.fire({
                     title: '¿Confirmar Acta de Recepción?',
@@ -898,22 +1020,80 @@
                     confirmButtonText: 'Sí, confirmar recepción',
                     cancelButtonText: 'Revisar datos',
                     reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        if (!signatureRec.isEmpty()) {
-                            document.getElementById('firma_receptor_input').value = signatureRec.toDataURL('image/png');
-                        }
-                        let actionInput = document.getElementById('reception_action_input');
-                        if (!actionInput) {
-                            actionInput = document.createElement('input');
-                            actionInput.type = 'hidden';
-                            actionInput.id = 'reception_action_input';
-                            actionInput.name = 'action';
-                            form.appendChild(actionInput);
-                        }
+                }).then(async (result) => {
+                    if (!result.isConfirmed) return;
+
+                    if (!signatureRec.isEmpty()) {
+                        document.getElementById('firma_receptor_input').value = signatureRec.toDataURL('image/png');
+                    }
+
+                    const actionInput = document.getElementById('reception_action_input');
+                    if (actionInput) {
                         actionInput.value = receptionSubmitAction;
-                        receptionSubmitConfirmed = true;
-                        form.submit();
+                    }
+
+                    // Mostrar estado de carga mientras se guarda
+                    Swal.fire({
+                        title: 'Registrando Recepción...',
+                        text: 'Guardando productos en inventario y trazabilidad.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    try {
+                        const formData = new FormData(form);
+                        const response = await fetch(form.getAttribute('action'), {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        const contentType = response.headers.get('content-type') || '';
+
+                        if (contentType.includes('application/json')) {
+                            const data = await response.json();
+
+                            if (response.ok && data.ok) {
+                                // Muestra inmediatamente el SweetAlert de Recepción Realizada con Éxito + su Resumen
+                                mostrarSweetAlertRecepcionExitosa(data.detail || fallbackSummary, true);
+                                return;
+                            }
+
+                            // Manejo de errores de validación o servidor
+                            let errorMsg = data.message || 'Verifica los datos ingresados.';
+                            if (data.errors) {
+                                const firstKey = Object.keys(data.errors)[0];
+                                if (firstKey && data.errors[firstKey][0]) {
+                                    errorMsg = data.errors[firstKey][0];
+                                }
+                            }
+                            Swal.fire({
+                                title: 'No se pudo completar la recepción',
+                                text: errorMsg,
+                                icon: 'error',
+                                confirmButtonColor: '#e11d48',
+                                confirmButtonText: 'Revisar formulario'
+                            });
+                        } else if (response.ok) {
+                            // Si el controlador respondió con redirección tradicional
+                            mostrarSweetAlertRecepcionExitosa(fallbackSummary, true);
+                        } else {
+                            throw new Error('Error en la respuesta del servidor.');
+                        }
+                    } catch (err) {
+                        Swal.fire({
+                            title: 'Error al guardar recepción',
+                            text: 'Ocurrió un problema de conexión o validación. Por favor intenta nuevamente.',
+                            icon: 'error',
+                            confirmButtonColor: '#e11d48',
+                            confirmButtonText: 'Entendido'
+                        });
                     }
                 });
             });
@@ -932,7 +1112,6 @@
             document.getElementById('m_proveedor').innerText = providerName;
             document.getElementById('m_rut_proveedor').innerText = providerRut;
 
-            // llenar tabla de items agrupados por Medicamentos, Insumos y Estupefacientes
             const tbody = document.getElementById('m_items_table');
             tbody.innerHTML = '';
 
@@ -978,7 +1157,6 @@
 
             document.getElementById('m_total').innerText = '$' + Math.round(parseFloat(data.valor_total_recepcion || 0)).toLocaleString('es-CL');
 
-            // firma receptor
             const imgRec = document.getElementById('m_img_receptor');
             const noFirmaRec = document.getElementById('m_no_firma_receptor');
             if(data.firma_receptor) { imgRec.src = data.firma_receptor; imgRec.classList.remove('hidden'); noFirmaRec.classList.add('hidden'); }
@@ -989,72 +1167,11 @@
         }
         function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
 
+        // Respaldo adicional si se accede por redirección de sesión
         @if (session('reception_success_detail'))
             document.addEventListener('DOMContentLoaded', function() {
                 const recData = @json(session('reception_success_detail'));
-                const htmlDetail = `
-                    <div class="text-left text-xs text-slate-700">
-                        <div class="p-3 bg-teal-50/70 border border-teal-200 rounded-xl mb-3 space-y-1.5">
-                            <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-teal-200/80">
-                                <span class="font-bold text-teal-900 text-sm">Acta N° ${recData.correlativo}</span>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">RECEPCIÓN CONFORME</span>
-                            </div>
-                            <p><strong>Proveedor:</strong> ${recData.proveedor}</p>
-                            <p><strong>Documento de Respaldo:</strong> ${recData.documento}</p>
-                            <p><strong>Total Unidades:</strong> ${Number(recData.total_unidades || 0).toLocaleString('es-CL')} uds. (${recData.total_items} producto${recData.total_items === 1 ? '' : 's'})</p>
-                            ${recData.valor_total ? `<p><strong>Valor Total c/IVA:</strong> $ ${Math.round(recData.valor_total).toLocaleString('es-CL')}</p>` : ''}
-                        </div>
-                        <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Productos Recepcionados:</p>
-                        <div class="max-h-56 overflow-y-auto border border-slate-200 rounded-lg shadow-inner">
-                            <table class="w-full text-[11.5px] text-left">
-                                <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
-                                    <tr>
-                                        <th class="p-2">Producto</th>
-                                        <th class="p-2 text-center">Lote</th>
-                                        <th class="p-2 text-center">Vencimiento</th>
-                                        <th class="p-2 text-right">Cantidad</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100 bg-white">
-                                    ${(recData.items || []).map(it => `
-                                        <tr class="hover:bg-slate-50">
-                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
-                                            <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
-                                            <td class="p-2 text-center text-slate-600">${it.vencimiento}</td>
-                                            <td class="p-2 text-right font-bold text-teal-700">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
-
-                Swal.fire({
-                    title: '¡Recepción Realizada con Éxito!',
-                    html: htmlDetail,
-                    icon: 'success',
-                    confirmButtonColor: '#0d9488',
-                    confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar',
-                    showCancelButton: Boolean(recData.pdf_url),
-                    cancelButtonColor: '#2563eb',
-                    cancelButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Descargar Acta PDF',
-                    reverseButtons: true,
-                    width: '640px'
-                }).then((res) => {
-                    if (res.dismiss === Swal.DismissReason.cancel && recData.pdf_url) {
-                        window.open(recData.pdf_url, '_blank');
-                    }
-                });
-
-                if (recData.auto_download && recData.pdf_url) {
-                    const dlLink = document.createElement('a');
-                    dlLink.href = recData.pdf_url;
-                    dlLink.download = '';
-                    document.body.appendChild(dlLink);
-                    dlLink.click();
-                    document.body.removeChild(dlLink);
-                }
+                mostrarSweetAlertRecepcionExitosa(recData, false);
             });
         @endif
     </script>

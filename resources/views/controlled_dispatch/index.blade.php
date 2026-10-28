@@ -353,7 +353,14 @@
                     class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 transition-colors text-center shadow-sm cursor-pointer">
                     Limpiar Formulario
                 </button>
-                <button type="submit"
+                <button type="submit" name="action" value="save_and_download"
+                    class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-xl text-[13px] font-bold hover:bg-blue-700 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Guardar y Descargar PDF
+                </button>
+                <button type="submit" name="action" value="save_only"
                     class="w-full sm:w-auto px-6 py-2.5 bg-rose-600 text-white rounded-xl text-[13px] font-bold hover:bg-rose-700 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
                     <svg class="w-4 h-4 text-rose-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -422,9 +429,9 @@
 
     <!-- ventana modal para el historial de despachos controlados -->
     <div id="BandejaModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
 
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                 <div>
@@ -672,8 +679,8 @@
 
     <!-- AQUÍ ESTÁ LA SOLUCIÓN: VENTANA MODAL PARA EL ESCÁNER QR -->
     <div id="scannerModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg flex flex-col overflow-hidden">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-bold text-white tracking-wide">Escanear Etiqueta QR</h2>
@@ -703,9 +710,9 @@
 
     <!-- modal de solicitudes con estupefacientes -->
     <div id="SolicitudesControladoModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl flex flex-col max-h-[90vh] overflow-hidden">
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl flex flex-col max-h-[92vh] overflow-hidden my-auto">
             <div class="px-6 py-5 bg-rose-700 flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-bold text-white tracking-wide">Solicitudes CESFAM con Estupefacientes</h2>
@@ -1139,16 +1146,97 @@
             if (padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
 
             const form = document.getElementById('despachoControladoForm');
-            let despachoControladoSubmitConfirmed = false;
+            let despachoControladoSubmitAction = 'save_only';
+
+            document.querySelectorAll('#despachoControladoForm button[type="submit"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    despachoControladoSubmitAction = this.value || 'save_only';
+                });
+            });
+
+            function triggerSilentDownloadControlado(pdfUrl) {
+                if (!pdfUrl) return;
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = pdfUrl;
+                document.body.appendChild(iframe);
+                setTimeout(() => {
+                    if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+                }, 60000);
+            }
+
+            function showControlledDispatchSuccessModal(ctrlData) {
+                const htmlDetail = `
+                    <div class="text-left text-xs text-slate-700">
+                        <div class="p-3 bg-rose-50/80 border border-rose-200 rounded-xl mb-3 space-y-1.5">
+                            <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-rose-200">
+                                <span class="font-bold text-rose-950 text-sm">Guía Controlada N° ${ctrlData.correlativo}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300">FÁRMACOS CONTROLADOS</span>
+                            </div>
+                            <p><strong>Destino:</strong> ${ctrlData.destino}</p>
+                            <p><strong>Clasificación:</strong> ${ctrlData.clasificacion}</p>
+                            <p><strong>Fecha de Emisión:</strong> ${ctrlData.fecha}</p>
+                            ${ctrlData.series_recetas ? `<p><strong>Series Recetas:</strong> ${ctrlData.series_recetas}</p>` : ''}
+                            <p><strong>Total Fármacos Controlados:</strong> ${Number(ctrlData.total_unidades || 0).toLocaleString('es-CL')} uds. (${ctrlData.total_items} producto${ctrlData.total_items === 1 ? '' : 's'})</p>
+                        </div>
+                        <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Fármacos Despachados:</p>
+                        <div class="max-h-56 overflow-y-auto border border-rose-200 rounded-lg shadow-inner">
+                            <table class="w-full text-[11.5px] text-left">
+                                <thead class="bg-rose-50 text-rose-900 font-bold sticky top-0 border-b border-rose-100">
+                                    <tr>
+                                        <th class="p-2">Fármaco Controlado</th>
+                                        <th class="p-2 text-center">Lote FEFO</th>
+                                        <th class="p-2 text-center">Vencimiento</th>
+                                        <th class="p-2 text-right">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-rose-100 bg-white">
+                                    ${(ctrlData.items || []).map(it => `
+                                        <tr class="hover:bg-rose-50/40">
+                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
+                                            <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
+                                            <td class="p-2 text-center text-slate-600">${it.vencimiento}</td>
+                                            <td class="p-2 text-right font-bold text-rose-700">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                if (ctrlData.auto_download && ctrlData.pdf_url) {
+                    triggerSilentDownloadControlado(ctrlData.pdf_url);
+                }
+
+                Swal.fire({
+                    title: '¡Despacho Realizado con Éxito!',
+                    html: htmlDetail,
+                    icon: 'success',
+                    confirmButtonColor: '#0f766e',
+                    confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar',
+                    showCancelButton: Boolean(ctrlData.pdf_url),
+                    cancelButtonColor: '#881337',
+                    cancelButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Ver Guía Controlada PDF',
+                    reverseButtons: true,
+                    allowOutsideClick: false,
+                    width: '640px'
+                }).then((res) => {
+                    if (res.dismiss === Swal.DismissReason.cancel && ctrlData.pdf_url) {
+                        window.open(ctrlData.pdf_url, '_blank');
+                    }
+                    window.location.reload();
+                });
+            }
+
             if (form) {
                 form.addEventListener('submit', function(e) {
-                    if (despachoControladoSubmitConfirmed) return;
+                    e.preventDefault();
 
                     if (!form.checkValidity()) {
+                        form.reportValidity();
                         return;
                     }
-
-                    e.preventDefault();
 
                     const clasif = document.getElementById('clasificacion_select')?.value || 'Interno';
                     let destinatario = '';
@@ -1201,8 +1289,56 @@
                             if (signatureRecibe && !signatureRecibe.isEmpty()) {
                                 document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL('image/png');
                             }
-                            despachoControladoSubmitConfirmed = true;
-                            form.submit();
+
+                            const formData = new FormData(form);
+                            formData.set('action', despachoControladoSubmitAction);
+
+                            Swal.fire({
+                                title: 'Procesando Despacho Controlado...',
+                                html: '<span class="text-xs text-slate-500">Descontando existencias controladas y actualizando trazabilidad legal...</span>',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            fetch(form.getAttribute('action'), {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form.querySelector('input[name="_token"]')?.value
+                                },
+                                body: formData
+                            })
+                            .then(async response => {
+                                const data = await response.json().catch(() => ({}));
+                                if (!response.ok) {
+                                    let errorMsg = data.message || 'Error al procesar el despacho controlado.';
+                                    if (data.errors) {
+                                        errorMsg = Object.values(data.errors).flat().join('<br>');
+                                    }
+                                    throw new Error(errorMsg);
+                                }
+                                return data;
+                            })
+                            .then(data => {
+                                if (data.success && data.detail) {
+                                    showControlledDispatchSuccessModal(data.detail);
+                                } else {
+                                    throw new Error(data.message || 'Error inesperado al emitir el despacho controlado.');
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'No se pudo emitir el despacho',
+                                    html: `<div class="text-xs text-rose-700 bg-rose-50 p-3 rounded-lg border border-rose-200">${error.message}</div>`,
+                                    confirmButtonColor: '#be123c',
+                                    confirmButtonText: 'Entendido'
+                                });
+                            });
                         }
                     });
                 });
@@ -1585,61 +1721,9 @@
         @if (session('controlled_dispatch_success_detail'))
             document.addEventListener('DOMContentLoaded', function() {
                 const ctrlData = @json(session('controlled_dispatch_success_detail'));
-                const htmlDetail = `
-                    <div class="text-left text-xs text-slate-700">
-                        <div class="p-3 bg-rose-50/80 border border-rose-200 rounded-xl mb-3 space-y-1.5">
-                            <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-rose-200">
-                                <span class="font-bold text-rose-950 text-sm">Guía Controlada N° ${ctrlData.correlativo}</span>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300">FÁRMACOS CONTROLADOS</span>
-                            </div>
-                            <p><strong>Destino:</strong> ${ctrlData.destino}</p>
-                            <p><strong>Clasificación:</strong> ${ctrlData.clasificacion}</p>
-                            <p><strong>Fecha de Emisión:</strong> ${ctrlData.fecha}</p>
-                            ${ctrlData.series_recetas ? `<p><strong>Series Recetas:</strong> ${ctrlData.series_recetas}</p>` : ''}
-                            <p><strong>Total Fármacos Controlados:</strong> ${Number(ctrlData.total_unidades || 0).toLocaleString('es-CL')} uds. (${ctrlData.total_items} producto${ctrlData.total_items === 1 ? '' : 's'})</p>
-                        </div>
-                        <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Fármacos Despachados:</p>
-                        <div class="max-h-56 overflow-y-auto border border-rose-200 rounded-lg shadow-inner">
-                            <table class="w-full text-[11.5px] text-left">
-                                <thead class="bg-rose-50 text-rose-900 font-bold sticky top-0 border-b border-rose-100">
-                                    <tr>
-                                        <th class="p-2">Fármaco Controlado</th>
-                                        <th class="p-2 text-center">Lote FEFO</th>
-                                        <th class="p-2 text-center">Vencimiento</th>
-                                        <th class="p-2 text-right">Cantidad</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-rose-100 bg-white">
-                                    ${(ctrlData.items || []).map(it => `
-                                        <tr class="hover:bg-rose-50/40">
-                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
-                                            <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
-                                            <td class="p-2 text-center text-slate-600">${it.vencimiento}</td>
-                                            <td class="p-2 text-right font-bold text-rose-700">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
-
-                Swal.fire({
-                    title: '¡Despacho Controlado Realizado con Éxito!',
-                    html: htmlDetail,
-                    icon: 'success',
-                    confirmButtonColor: '#0f766e',
-                    confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar',
-                    showCancelButton: Boolean(ctrlData.pdf_url),
-                    cancelButtonColor: '#881337',
-                    cancelButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Ver Guía Controlada PDF',
-                    reverseButtons: true,
-                    width: '640px'
-                }).then((res) => {
-                    if (res.dismiss === Swal.DismissReason.cancel && ctrlData.pdf_url) {
-                        window.open(ctrlData.pdf_url, '_blank');
-                    }
-                });
+                if (typeof showControlledDispatchSuccessModal === 'function') {
+                    showControlledDispatchSuccessModal(ctrlData);
+                }
             });
         @endif
     </script>
