@@ -397,6 +397,7 @@
                 @endif
             </div>
         </div>
+    </div>
 
         <!-- MODAL: Etiqueta QR -->
         <style>
@@ -430,7 +431,7 @@
                 }
             }
         </style>
-        <div id="qrModal" class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+        <div id="qrModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="relative w-full max-w-sm flex flex-col items-center my-auto">
                 <div id="qrPrintableCard" class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
@@ -461,7 +462,7 @@
         </div>
 
         <!-- MODAL: Editar Estado de Lote -->
-        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
                     <h2 class="text-[16px] font-bold text-white tracking-wide">Gestionar Cuarentena</h2>
@@ -523,8 +524,8 @@
         </div>
 
         <!-- MODAL: Historial Avanzado -->
-        <div id="HistoryModal" class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6 transition-all">
-            <div class="bg-white rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] sm:max-h-[88vh] flex flex-col overflow-hidden my-auto">
+        <div id="HistoryModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
                 <div class="px-4 py-3 sm:px-6 sm:py-4 bg-slate-800 flex justify-between items-center shrink-0 border-b border-slate-700">
                     <div class="min-w-0 pr-2">
                         <h2 class="text-base sm:text-lg font-bold text-white tracking-wide truncate">Registro de Control de Cuarentena</h2>
@@ -695,8 +696,6 @@
                 </div>
             </div>
         </div>
-
-    </div>
 
     <!-- Scripts de interactividad -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>

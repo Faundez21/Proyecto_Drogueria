@@ -554,12 +554,13 @@
                 </div>
             @endif
         </div>
+    </div>
 
         <!-- Modal: Historial de Movimientos -->
         <div id="HistoryModal"
-            class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-7xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
+            class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-7xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
+                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
                     <div>
                         <h2 class="text-lg font-bold text-white tracking-wide">Historial General de Inventario</h2>
                         <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro de auditoría de recepciones y movimientos (Últimos 150).</p>
@@ -570,7 +571,7 @@
                     </button>
                 </div>
 
-                <div class="overflow-x-auto max-h-[60vh] bg-slate-50">
+                <div class="overflow-x-auto flex-1 max-h-[60vh] bg-slate-50">
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
                         <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm">
                             <tr>
@@ -640,7 +641,7 @@
                     </table>
                 </div>
 
-                <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end">
+                <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end shrink-0">
                     <button type="button" onclick="closeHistory()"
                         class="px-6 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
                         Cerrar Historial
@@ -691,9 +692,9 @@
         </div>
 
         <!-- Modal: Importar Carga Masiva -->
-        <div id="importModal" class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 flex flex-col w-full max-w-lg max-h-[92vh] overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
+        <div id="importModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-0 flex flex-col w-full max-w-lg max-h-[92vh] overflow-hidden my-auto">
+                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
@@ -709,7 +710,7 @@
                     </button>
                 </div>
 
-                <div class="p-6 bg-slate-50 space-y-4">
+                <div class="p-4 sm:p-6 bg-slate-50 space-y-4 overflow-y-auto flex-1">
                     @if(session('open_modal') === 'import' && session('error'))
                         <div class="bg-rose-50 border-l-4 border-rose-600 border border-rose-200 rounded-xl p-4 shadow-sm">
                             <div class="flex items-start gap-3">
@@ -799,9 +800,9 @@
         </div>
 
         <!-- Modal: Ingreso Manual -->
-        <div id="DepositModal" class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
+        <div id="DepositModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-0 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
+                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -816,7 +817,7 @@
                     </button>
                 </div>
 
-                <div class="p-6 sm:p-8 overflow-y-auto bg-slate-50/50">
+                <div class="p-4 sm:p-6 sm:p-8 overflow-y-auto bg-slate-50/50 flex-1">
                     @if(isset($errors) && $errors->any() && session('open_modal') !== 'import')
                         <div class="mb-6 bg-rose-50 border-l-4 border-rose-600 border border-rose-200 rounded-xl p-4 shadow-sm">
                             <div class="flex items-start gap-3">
@@ -998,7 +999,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
+                <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl shrink-0">
                     <button type="button" onclick="closeDeposit()" class="px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar</button>
                     <button type="submit" id="manualDepositSubmitBtn" form="manualDepositForm" class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm text-[13px] font-bold cursor-pointer inline-flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -1040,7 +1041,7 @@
                 }
             }
         </style>
-        <div id="qrModal" class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+        <div id="qrModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="relative w-full max-w-sm flex flex-col items-center my-auto">
                 <div id="qrPrintableCard" class="bg-white rounded-2xl shadow-2xl p-6 w-full flex flex-col items-center relative overflow-hidden ring-1 ring-slate-900/5">
                     <div class="absolute inset-2 border-2 border-dashed border-slate-300 rounded-xl pointer-events-none"></div>
@@ -1088,9 +1089,9 @@
         </div>
 
         <!-- Modal: Editar Lote -->
-        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
+                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
                     <h2 class="text-[16px] font-bold text-white tracking-wide">Actualizar Estado de Lote</h2>
                     <button type="button" onclick="closeEditLote()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -1143,7 +1144,7 @@
                         </div>
                     </div>
 
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl shrink-0">
                         <button type="button" onclick="closeEditLote()" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 text-[13px] font-bold transition-colors shadow-sm cursor-pointer">Cancelar</button>
                         <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[13px] font-bold transition-all shadow-sm cursor-pointer">Confirmar Cambio</button>
                     </div>
@@ -1152,9 +1153,9 @@
         </div>
 
         <!-- Modal: Ver Mermas -->
-        <div id="mermaModal" class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-rose-800 flex justify-between items-center">
+        <div id="mermaModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
+                <div class="px-6 py-5 bg-rose-800 flex justify-between items-center shrink-0">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-xl bg-rose-700 border border-rose-600 flex items-center justify-center text-white">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -1170,7 +1171,7 @@
                 </div>
 
                 <!-- NUEVO: FILTROS AVANZADOS DE MERMAS -->
-                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end z-20 shadow-inner">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end z-20 shadow-inner shrink-0">
                     <div class="flex-1 min-w-[200px]">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Buscar Texto</label>
                         <input type="text" id="mermaSearchInput" onkeyup="filterMermas()" placeholder="Producto, lote o motivo..." class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
@@ -1207,7 +1208,7 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto max-h-[50vh] bg-white">
+                <div class="overflow-x-auto flex-1 max-h-[55vh] bg-white">
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
                         <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm z-10">
                             <tr>
@@ -1299,7 +1300,7 @@
                     </table>
                 </div>
 
-                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center shrink-0">
                     <div class="text-[13px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-3">
                         <span>Mostrando <span id="mermasCount" class="text-rose-600 font-black">0</span> res.</span>
                         <div class="h-4 w-px bg-slate-300"></div>
@@ -1315,7 +1316,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
