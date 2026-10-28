@@ -350,7 +350,7 @@
                     @endcanany
 
                     <!-- Paso 2: Almacenamiento -->
-                    @canany(['ver.inventario', 'ver.cuarentena'])
+                    @canany(['ver.inventario', 'ver.distribucion', 'ver.cuarentena'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
                             <span
@@ -367,6 +367,16 @@
                                     </path>
                                 </svg>
                                 Inventario
+                            </a>
+                            @endcan
+                            @can('ver.distribucion')
+                            <a href="{{ route('distribution.index') }}"
+                                class="nav-row {{ request()->routeIs('distribution.*') || request()->routeIs('shelf.*') || request()->routeIs('aisle.*') || request()->routeIs('level.*') || request()->routeIs('position.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                </svg>
+                                Distribución
                             </a>
                             @endcan
                             @can('ver.cuarentena')
@@ -394,7 +404,7 @@
                     @endcanany
 
                     <!-- Paso 3: Salida -->
-                    @canany(['ver.despacho', 'ver.despacho_controlado', 'ver.distribucion', 'ver.solicitudes', 'ver.solicitudes_cesfam'])
+                    @canany(['ver.despacho', 'ver.despacho_controlado', 'ver.solicitudes', 'ver.solicitudes_cesfam'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
                             <span
@@ -440,17 +450,6 @@
                                     </div>
                                 @endcan
                             </div>
-
-                            @can('ver.distribucion')
-                            <a href="{{ route('distribution.index') }}"
-                                class="nav-row {{ request()->routeIs('distribution.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                                </svg>
-                                Distribución
-                            </a>
-                            @endcan
 
                             @can('ver.solicitudes')
                                 <a href="{{ route('requests.index') }}"
