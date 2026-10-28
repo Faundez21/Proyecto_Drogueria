@@ -530,11 +530,11 @@
                                         Configurar Vistas
                                     </button>
                                     @if (!in_array($rol->name, ['Administrador', 'Usuario']))
-                                        <form action="{{ route('roles.destroy', $rol->id) }}" method="POST"
-                                            onsubmit="return confirm('¿Eliminar el rol {{ addslashes($rol->name) }}?')">
+                                        <form id="delete-role-form-{{ $rol->id }}" action="{{ route('roles.destroy', $rol->id) }}" method="POST"
+                                            class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
+                                            <button type="button" onclick="confirmDeleteRole('{{ $rol->id }}', '{{ addslashes($rol->name) }}')"
                                                 class="px-3 py-2 text-[12px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors cursor-pointer">
                                                 Eliminar
                                             </button>
@@ -941,7 +941,10 @@
             document.getElementById('RolesModal').classList.add('hidden');
         }
 
+        let userModalSubmitConfirmed = false;
+
         function openCreate() {
+            userModalSubmitConfirmed = false;
             const form = document.getElementById('userModalForm');
             form.action = "{{ route('users.store') }}";
             form.reset();
@@ -955,6 +958,7 @@
         }
 
         function openEdit(button) {
+            userModalSubmitConfirmed = false;
             const d = button.dataset;
             const form = document.getElementById('userModalForm');
             form.action = "{{ url('users') }}/" + d.id;
@@ -1010,7 +1014,11 @@
             }
         }
 
+        let roleSubmitConfirmed = false;
+
         function validateRoleForm(event) {
+            if (roleSubmitConfirmed) return true;
+
             const nameInput = document.getElementById('role_name');
             if (!nameInput || !nameInput.value.trim()) {
                 event.preventDefault();
@@ -1036,7 +1044,46 @@
                 return false;
             }
 
-            return true;
+            event.preventDefault();
+            const roleName = nameInput.value.trim();
+            const isEditing = document.getElementById('roleMethod')?.innerHTML.includes('PUT');
+
+            Swal.fire({
+                title: isEditing ? '¿Guardar cambios del Rol?' : '¿Crear nuevo Rol?',
+                html: `Se procederá a ${isEditing ? 'actualizar' : 'crear'} el rol <strong>${roleName}</strong> con <strong>${checkedCount}</strong> vista(s) asignada(s).`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4f46e5',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: isEditing ? 'Sí, guardar cambios' : 'Sí, crear rol',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    roleSubmitConfirmed = true;
+                    document.getElementById('roleForm').submit();
+                }
+            });
+
+            return false;
+        }
+
+        function confirmDeleteRole(roleId, roleName) {
+            Swal.fire({
+                title: '¿Eliminar Rol?',
+                html: `¿Estás seguro de que deseas eliminar el rol <strong>${roleName}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción no se puede deshacer.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, eliminar rol',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`delete-role-form-${roleId}`).submit();
+                }
+            });
         }
 
         function toggleAllRoleModules(state) {
@@ -1058,6 +1105,7 @@
         }
 
         function openRoleForm(rol) {
+            roleSubmitConfirmed = false;
             const box = document.getElementById('roleFormBox');
             const form = document.getElementById('roleForm');
             form.reset();
@@ -1095,12 +1143,28 @@
             document.getElementById('btnNewRole').classList.remove('hidden');
         }
 
-        function confirmDelete(event, nombre) {
-            if (!confirm('¿Eliminar al usuario ' + nombre + '? Esta acción no se puede deshacer.')) {
-                event.preventDefault();
-                return false;
-            }
-            return true;
+        function confirmDelete(event, nombre, formId) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Eliminar Usuario?',
+                html: `¿Estás seguro de que deseas eliminar al usuario <strong>${nombre}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción no se puede deshacer.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (formId) {
+                        document.getElementById(formId).submit();
+                    } else if (event.target && event.target.closest('form')) {
+                        event.target.closest('form').submit();
+                    }
+                }
+            });
+            return false;
         }
 
         function promptNewPassword(email) {
@@ -1257,7 +1321,30 @@
                 }
             }
 
-            return true;
+            if (userModalSubmitConfirmed) return true;
+
+            event.preventDefault();
+            const fullName = `${nameInput.value.trim()} ${lastNameInput.value.trim()}`;
+            const isEditing = document.getElementById('userModalMethod')?.innerHTML.includes('PUT');
+
+            Swal.fire({
+                title: isEditing ? '¿Guardar cambios de Usuario?' : '¿Crear nuevo Usuario?',
+                html: `Se procederá a ${isEditing ? 'actualizar' : 'registrar'} al usuario <strong>${fullName}</strong> con el rol <strong>${selectedRole}</strong>.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f968c',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: isEditing ? 'Sí, guardar cambios' : 'Sí, crear usuario',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    userModalSubmitConfirmed = true;
+                    document.getElementById('userModalForm').submit();
+                }
+            });
+
+            return false;
         }
 
         // Compatibilidad por si se llama con el nombre anterior

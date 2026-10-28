@@ -1097,7 +1097,7 @@
                     </button>
                 </div>
 
-                <form id="editLoteForm" method="POST" action="" class="bg-white">
+                <form id="editLoteForm" method="POST" action="" class="bg-white" onsubmit="return confirmEditLoteInventario(event)">
                     @csrf
                     @method('PUT')
                     <div class="p-6 space-y-4">
@@ -1924,11 +1924,12 @@
             const input = document.getElementById('excel');
             if (!input || !input.files || input.files.length === 0) {
                 event.preventDefault();
-                showClientImportAlert(
-                    'error',
-                    'Archivo Requerido',
-                    'Debe seleccionar un archivo Excel (.xlsx, .xls) o CSV (.csv) antes de presionar Validar y Procesar.'
-                );
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Archivo Requerido',
+                    text: 'Debes seleccionar un archivo Excel (.xlsx, .xls) o CSV (.csv) antes de presionar Validar y Procesar.',
+                    confirmButtonColor: '#0d9488'
+                });
                 return false;
             }
 
@@ -1936,66 +1937,85 @@
             const ext = file.name.split('.').pop().toLowerCase();
             if (!['xlsx', 'xls', 'csv'].includes(ext)) {
                 event.preventDefault();
-                showClientImportAlert(
-                    'error',
-                    'Formato Inválido',
-                    'Solo se admiten archivos .xlsx, .xls o .csv.'
-                );
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Formato Inválido',
+                    text: 'Solo se admiten archivos .xlsx, .xls o .csv.',
+                    confirmButtonColor: '#0d9488'
+                });
                 return false;
             }
 
-            // Registrar huella local del archivo enviado
-            try {
-                const fileFingerprint = `${file.name}|${file.size}|${file.lastModified}`;
-                const historyRaw = localStorage.getItem('das_imported_files_history') || '{}';
-                const history = JSON.parse(historyRaw);
-                const nowStr = new Date().toLocaleDateString('es-CL') + ' ' + new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
-                history[fileFingerprint] = nowStr;
-                localStorage.setItem('das_imported_files_history', JSON.stringify(history));
-            } catch (e) {}
+            event.preventDefault();
 
-            // Activar Pantalla de Carga para archivos pesados
-            const overlay = document.getElementById('importLoadingOverlay');
-            const fileNameEl = document.getElementById('loadingFileName');
-            const fileSizeEl = document.getElementById('loadingFileSize');
-            const stepTextEl = document.getElementById('loadingStepText');
-            const stageLabelEl = document.getElementById('loadingStageLabel');
-            const percentLabelEl = document.getElementById('loadingPercentLabel');
-            const barEl = document.getElementById('importProgressBar');
-            const barTopEl = document.getElementById('importProgressBarTop');
-            const submitBtn = document.getElementById('importSubmitBtn');
+            Swal.fire({
+                title: '¿Iniciar Carga Masiva?',
+                html: `Se procesará el archivo <strong>${file.name}</strong> (${formatBytes(file.size)}).<br><span class="text-[12px] text-slate-500 mt-1 block">Esta operación actualizará las existencias en bodega y generará registros de trazabilidad.</span>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d9488',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, procesar archivo',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Registrar huella local del archivo enviado
+                    try {
+                        const fileFingerprint = `${file.name}|${file.size}|${file.lastModified}`;
+                        const historyRaw = localStorage.getItem('das_imported_files_history') || '{}';
+                        const history = JSON.parse(historyRaw);
+                        const nowStr = new Date().toLocaleDateString('es-CL') + ' ' + new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+                        history[fileFingerprint] = nowStr;
+                        localStorage.setItem('das_imported_files_history', JSON.stringify(history));
+                    } catch (e) {}
 
-            if (fileNameEl) fileNameEl.textContent = file.name;
-            if (fileSizeEl) fileSizeEl.textContent = '(' + formatBytes(file.size) + ')';
-            if (overlay) overlay.classList.remove('hidden');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
-            }
+                    // Activar Pantalla de Carga para archivos pesados
+                    const overlay = document.getElementById('importLoadingOverlay');
+                    const fileNameEl = document.getElementById('loadingFileName');
+                    const fileSizeEl = document.getElementById('loadingFileSize');
+                    const stepTextEl = document.getElementById('loadingStepText');
+                    const stageLabelEl = document.getElementById('loadingStageLabel');
+                    const percentLabelEl = document.getElementById('loadingPercentLabel');
+                    const barEl = document.getElementById('importProgressBar');
+                    const barTopEl = document.getElementById('importProgressBarTop');
+                    const submitBtn = document.getElementById('importSubmitBtn');
 
-            const steps = [
-                { pct: 25, text: 'Verificando estructura y columnas de la Plantilla Oficial...', stage: 'Validando encabezados...' },
-                { pct: 55, text: 'Comprobando lotes y detectando registros duplicados...', stage: 'Analizando integridad...' },
-                { pct: 82, text: 'Registrando existencias y movimientos de trazabilidad en bodega...', stage: 'Guardando en base de datos...' },
-                { pct: 95, text: 'Finalizando transacción y actualizando catálogo...', stage: 'Completando operación...' }
-            ];
+                    if (fileNameEl) fileNameEl.textContent = file.name;
+                    if (fileSizeEl) fileSizeEl.textContent = '(' + formatBytes(file.size) + ')';
+                    if (overlay) overlay.classList.remove('hidden');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                    }
 
-            let currentStep = 0;
-            const interval = setInterval(() => {
-                if (currentStep >= steps.length) {
-                    clearInterval(interval);
-                    return;
+                    const steps = [
+                        { pct: 25, text: 'Verificando estructura y columnas de la Plantilla Oficial...', stage: 'Validando encabezados...' },
+                        { pct: 55, text: 'Comprobando lotes y detectando registros duplicados...', stage: 'Analizando integridad...' },
+                        { pct: 82, text: 'Registrando existencias y movimientos de trazabilidad en bodega...', stage: 'Guardando en base de datos...' },
+                        { pct: 95, text: 'Finalizando transacción y actualizando catálogo...', stage: 'Completando operación...' }
+                    ];
+
+                    let currentStep = 0;
+                    const interval = setInterval(() => {
+                        if (currentStep >= steps.length) {
+                            clearInterval(interval);
+                            return;
+                        }
+                        const st = steps[currentStep];
+                        if (barEl) barEl.style.width = st.pct + '%';
+                        if (barTopEl) barTopEl.style.width = st.pct + '%';
+                        if (percentLabelEl) percentLabelEl.textContent = st.pct + '%';
+                        if (stepTextEl) stepTextEl.textContent = st.text;
+                        if (stageLabelEl) stageLabelEl.textContent = st.stage;
+                        currentStep++;
+                    }, 650);
+
+                    document.getElementById('importForm').submit();
                 }
-                const st = steps[currentStep];
-                if (barEl) barEl.style.width = st.pct + '%';
-                if (barTopEl) barTopEl.style.width = st.pct + '%';
-                if (percentLabelEl) percentLabelEl.textContent = st.pct + '%';
-                if (stepTextEl) stepTextEl.textContent = st.text;
-                if (stageLabelEl) stageLabelEl.textContent = st.stage;
-                currentStep++;
-            }, 650);
+            });
 
-            return true;
+            return false;
         }
 
         function toggleManualEstadoHelp(val) {
@@ -2022,16 +2042,105 @@
                 return false;
             }
 
-            const btn = document.getElementById('manualDepositSubmitBtn');
-            const txt = document.getElementById('manualDepositSubmitText');
-            if (btn) {
-                btn.disabled = true;
-                btn.classList.add('opacity-70', 'cursor-wait');
+            event.preventDefault();
+
+            const prodName = document.getElementById('manualProductSearchInput')?.value || 'Producto';
+            const lote = document.getElementById('manualLoteInput')?.value || '';
+            const cantidad = document.getElementById('manualCantidadInput')?.value || '0';
+            const estado = document.getElementById('manualEstadoSelect')?.value || 'Disponible';
+
+            Swal.fire({
+                title: '¿Confirmar Ingreso Manual?',
+                html: `Se registrará el producto <strong>${prodName}</strong> (Lote: <strong>${lote}</strong>) con <strong>${cantidad}</strong> unidades en estado <strong>${estado}</strong>.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d9488',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, registrar ingreso',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const btn = document.getElementById('manualDepositSubmitBtn');
+                    const txt = document.getElementById('manualDepositSubmitText');
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-70', 'cursor-wait');
+                    }
+                    if (txt) {
+                        txt.textContent = 'Guardando Ingreso...';
+                    }
+                    form.submit();
+                }
+            });
+
+            return false;
+        }
+
+        function confirmEditLoteInventario(event) {
+            event.preventDefault();
+            const form = document.getElementById('editLoteForm');
+            const estado = document.getElementById('modal_estado')?.value;
+            const motivo = (document.getElementById('modal_motivo')?.value || '').trim();
+            const prod = document.getElementById('modal_producto_nombre')?.textContent || 'Producto';
+            const lote = document.getElementById('modal_lote_nombre')?.textContent || '';
+
+            if ((estado === 'Cuarentena' || estado === 'Merma') && !motivo) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Motivo requerido',
+                    text: 'Debes indicar el motivo para cambiar el estado a ' + estado + '.',
+                    confirmButtonColor: '#0d9488'
+                });
+                document.getElementById('modal_motivo')?.focus();
+                return false;
             }
-            if (txt) {
-                txt.textContent = 'Guardando Ingreso...';
+
+            if (estado === 'Cuarentena') {
+                Swal.fire({
+                    title: '¿Enviar lote a Cuarentena?',
+                    html: `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) quedará bloqueado preventivamente y pasará a control técnico en Cuarentena.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d97706',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, enviar a cuarentena',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
+                });
+            } else if (estado === 'Merma') {
+                Swal.fire({
+                    title: '¿Declarar Merma de Lote?',
+                    html: `El lote <strong>${lote}</strong> de <strong>${prod}</strong> será dado de baja definitiva como Merma y retirado del stock disponible.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e11d48',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, declarar merma',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
+                });
+            } else {
+                Swal.fire({
+                    title: '¿Cambiar estado a Disponible?',
+                    html: `El lote <strong>${lote}</strong> de <strong>${prod}</strong> quedará liberado para entrega y despacho.`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#059669',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, guardar cambio',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
+                });
             }
-            return true;
+
+            return false;
         }
 
         document.addEventListener('DOMContentLoaded', function() {

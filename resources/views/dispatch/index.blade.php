@@ -703,6 +703,7 @@
                                     @role('Administrador')
                                         <div class="flex items-center gap-2">
                                             <select
+                                                onfocus="this.dataset.prevVal = this.value"
                                                 onchange="asignarSolicitudUsuario({{ $solicitud->id }}, this.value, this)"
                                                 class="bg-slate-50 hover:bg-white border border-slate-300 text-slate-800 text-[12px] font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 cursor-pointer min-w-[185px]">
                                                 <option value="">— Sin asignar —</option>
@@ -1252,18 +1253,45 @@
             if (padDespachaElem) signatureDespacha = new SignaturePad(padDespachaElem, padOptions);
             if (padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
 
-            // asignacion de firmas a los inputs ocultos antes del submit
+            // asignacion de firmas a los inputs ocultos antes del submit con confirmación SweetAlert2
             const form = document.getElementById('despachoForm');
+            let despachoSubmitConfirmed = false;
             if (form) {
-                form.addEventListener('submit', function() {
-                    if (signatureDespacha && !signatureDespacha.isEmpty()) {
-                        document.getElementById('firma_despacha_input').value = signatureDespacha.toDataURL(
-                            'image/png');
+                form.addEventListener('submit', function(e) {
+                    if (despachoSubmitConfirmed) return;
+
+                    if (!form.checkValidity()) {
+                        return;
                     }
-                    if (signatureRecibe && !signatureRecibe.isEmpty()) {
-                        document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL(
-                            'image/png');
-                    }
+
+                    e.preventDefault();
+
+                    const destSelect = document.getElementById('destinatario_select');
+                    const destinatario = destSelect && destSelect.selectedIndex >= 0 ? destSelect.options[destSelect.selectedIndex].text.trim() : 'Destinatario';
+                    const itemsCount = document.querySelectorAll('.producto-item').length;
+
+                    Swal.fire({
+                        title: '¿Confirmar Emisión de Despacho?',
+                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s).<br><span class="text-[12px] text-slate-500 mt-1 block">El stock de los lotes asignados se rebajará según orden FEFO.</span>`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#0f766e',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Sí, emitir despacho',
+                        cancelButtonText: 'Revisar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (signatureDespacha && !signatureDespacha.isEmpty()) {
+                                document.getElementById('firma_despacha_input').value = signatureDespacha.toDataURL('image/png');
+                            }
+                            if (signatureRecibe && !signatureRecibe.isEmpty()) {
+                                document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL('image/png');
+                            }
+                            despachoSubmitConfirmed = true;
+                            form.submit();
+                        }
+                    });
                 });
             }
 
@@ -1733,6 +1761,34 @@
         }
 
         async function asignarSolicitudUsuario(solicitudId, userId, selectElem) {
+            const userName = selectElem && selectElem.selectedIndex >= 0 ? selectElem.options[selectElem.selectedIndex].text.trim() : '';
+            const prevVal = selectElem ? (selectElem.dataset.prevVal ?? '') : '';
+
+            const confirmTitle = userId ? '¿Asignar Solicitud?' : '¿Desasignar Solicitud?';
+            const confirmHtml = userId
+                ? `¿Deseas asignar la atención de esta solicitud al funcionario <strong>${userName}</strong>?`
+                : 'La solicitud volverá al estado <strong>Pendiente</strong> sin funcionario responsable asignado.';
+            const confirmBtnText = userId ? 'Sí, asignar' : 'Sí, desasignar';
+
+            const result = await Swal.fire({
+                title: confirmTitle,
+                html: confirmHtml,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: confirmBtnText,
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            });
+
+            if (!result.isConfirmed) {
+                if (selectElem) selectElem.value = prevVal;
+                return;
+            }
+
+            if (selectElem) selectElem.dataset.prevVal = userId;
+
             const spinner = document.getElementById('assign-spinner-' + solicitudId);
             if (spinner) spinner.classList.remove('hidden');
             if (selectElem) selectElem.disabled = true;

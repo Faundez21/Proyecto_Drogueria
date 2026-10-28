@@ -173,12 +173,10 @@
                                             </svg>
                                         </button>
 
-                                        <form action="{{ route('aisle.destroy', $aisle->id) }}" method="POST"
-                                            onsubmit="return confirm('¿Estás seguro de que deseas eliminar este pasillo?');"
-                                            class="inline">
+                                        <form id="delete-aisle-{{ $aisle->id }}" action="{{ route('aisle.destroy', $aisle->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
+                                            <button type="button" onclick="confirmDeleteAisle('{{ $aisle->id }}', '{{ addslashes($aisle->name) }}')"
                                                 class="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                                                 title="Eliminar pasillo">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -497,6 +495,24 @@
 
         function closeHistory() {
             document.getElementById('HistoryModal').classList.add('hidden');
+        }
+
+        function confirmDeleteAisle(id, name) {
+            Swal.fire({
+                title: '¿Eliminar Pasillo?',
+                html: `¿Estás seguro de que deseas eliminar el pasillo <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará el pasillo del mapa de distribución.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-aisle-' + id).submit();
+                }
+            });
         }
     </script>
 @endsection

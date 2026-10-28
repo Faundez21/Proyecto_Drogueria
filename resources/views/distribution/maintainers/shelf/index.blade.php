@@ -180,12 +180,10 @@
                                             </svg>
                                         </button>
 
-                                        <form action="{{ route('shelf.destroy', $shelf->id) }}" method="POST"
-                                            onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta estantería?');"
-                                            class="inline">
+                                        <form id="delete-shelf-{{ $shelf->id }}" action="{{ route('shelf.destroy', $shelf->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
+                                            <button type="button" onclick="confirmDeleteShelf('{{ $shelf->id }}', '{{ addslashes($shelf->name) }}')"
                                                 class="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                                                 title="Eliminar estantería">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -536,6 +534,24 @@
 
         function closeHistory() {
             document.getElementById('HistoryModal').classList.add('hidden');
+        }
+
+        function confirmDeleteShelf(id, name) {
+            Swal.fire({
+                title: '¿Eliminar Estantería?',
+                html: `¿Estás seguro de que deseas eliminar la estantería <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará la estantería y sus niveles asociados.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-shelf-' + id).submit();
+                }
+            });
         }
     </script>
 @endsection

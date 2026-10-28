@@ -177,17 +177,15 @@
                                             </svg>
                                         </button>
 
-                                        <form action="{{ route('position.destroy', $position->id) }}" method="POST"
-                                            onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta posición?');"
-                                            class="inline">
+                                        <form id="delete-position-{{ $position->id }}" action="{{ route('position.destroy', $position->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
+                                            <button type="button" onclick="confirmDeletePosition('{{ $position->id }}', '{{ addslashes($position->name) }}')"
                                                 class="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                                                 title="Eliminar posición">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 01-1 1v3M4 7h16">
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                                                     </path>
                                                 </svg>
                                             </button>
@@ -508,6 +506,24 @@
 
         function closeHistory() {
             document.getElementById('HistoryModal').classList.add('hidden');
+        }
+
+        function confirmDeletePosition(id, name) {
+            Swal.fire({
+                title: '¿Eliminar Posición?',
+                html: `¿Estás seguro de que deseas eliminar la posición <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará la posición física del mapa de distribución.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-position-' + id).submit();
+                }
+            });
         }
     </script>
 @endsection
