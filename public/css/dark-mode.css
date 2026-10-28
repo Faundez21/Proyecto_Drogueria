@@ -258,7 +258,7 @@ html.dark .login-theme-toggle { position: fixed; top: 16px; right: 16px; z-index
 .login-theme-toggle { position: fixed; top: 16px; right: 16px; z-index: 50; }
 
 /* ---------- Paneles/modales sobre fondo con desenfoque ---------- */
-html.dark .bg-slate-900\/70, html.dark .bg-slate-900\/80 { background-color: rgba(8, 12, 22, .78); }
+html.dark .bg-slate-900\/70, html.dark .bg-slate-900\/75, html.dark .bg-slate-900\/80 { background-color: rgba(8, 12, 22, .78); }
 /* ---------- Grises (login y vistas con text-gray) ---------- */
 html.dark .text-gray-500 { color: #A8B6CA; }
 html.dark .text-gray-400 { color: #8D9CB3; }
