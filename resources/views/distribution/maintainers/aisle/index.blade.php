@@ -230,7 +230,7 @@
                 </button>
             </div>
 
-            <form action="{{ route('aisle.store') }}" method="POST">
+            <form id="createAisleForm" action="{{ route('aisle.store') }}" method="POST" onsubmit="confirmCreateAisle(event)">
                 @csrf
                 <div class="p-6 space-y-4">
                     <div>
@@ -341,7 +341,7 @@
                 </button>
             </div>
 
-            <form id="editForm" method="POST">
+            <form id="editForm" method="POST" onsubmit="confirmEditAisle(event)">
                 @csrf
                 @method('PUT')
                 <div class="p-6 space-y-4">
@@ -495,6 +495,49 @@
 
         function closeHistory() {
             document.getElementById('HistoryModal').classList.add('hidden');
+        }
+
+        function confirmCreateAisle(e) {
+            e.preventDefault();
+            const form = e.target;
+            const name = document.getElementById('name')?.value.trim();
+            if (!name) return;
+            Swal.fire({
+                title: '¿Crear Pasillo?',
+                html: `¿Confirmas registrar el pasillo <strong>${name}</strong> en el sistema?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, crear pasillo',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+
+        function confirmEditAisle(e) {
+            e.preventDefault();
+            const form = e.target;
+            const name = document.getElementById('editName')?.value.trim();
+            Swal.fire({
+                title: '¿Guardar Cambios?',
+                html: `¿Confirmas actualizar los datos del pasillo <strong>${name}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, guardar cambios',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
         }
 
         function confirmDeleteAisle(id, name) {
