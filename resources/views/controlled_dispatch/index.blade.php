@@ -129,6 +129,23 @@
             @csrf
             <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
 
+            <!-- Banner informativo cuando se carga una solicitud -->
+            <div id="banner_solicitud_activa" class="hidden mx-6 mt-5 p-4 bg-rose-50 border border-rose-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        SOL
+                    </div>
+                    <div>
+                        <p id="banner_solicitud_titulo" class="text-[13px] font-extrabold text-rose-900"></p>
+                        <p id="banner_solicitud_subtitulo" class="text-[11.5px] text-rose-700"></p>
+                    </div>
+                </div>
+                <button type="button" onclick="desvincularSolicitudActivaControlado()"
+                    class="text-[11.5px] font-bold text-rose-800 hover:text-rose-900 bg-white px-3 py-1.5 rounded-lg border border-rose-200 transition-colors cursor-pointer shrink-0">
+                    Desvincular solicitud
+                </button>
+            </div>
+
             <!-- seccion de datos del remitente y correlativo -->
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
                 <div>
@@ -1047,13 +1064,33 @@
             }
         }
 
+        function desvincularSolicitudActivaControlado() {
+            const requestInput = document.getElementById('establishment_request_id');
+            if (requestInput) requestInput.value = '';
+            const banner = document.getElementById('banner_solicitud_activa');
+            if (banner) banner.classList.add('hidden');
+        }
+
         function usarSolicitudControlado(id) {
             const solicitud = solicitudesControlado.find(s => s.id === id);
             if (!solicitud) return;
 
+            // Helper de normalización para matching insensible a mayúsculas, tildes y símbolos
+            const normText = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+
             // marcar la solicitud de origen
             const requestInput = document.getElementById('establishment_request_id');
             if (requestInput) requestInput.value = solicitud.id;
+
+            // actualizar banner informativo
+            const banner = document.getElementById('banner_solicitud_activa');
+            const bannerTitulo = document.getElementById('banner_solicitud_titulo');
+            const bannerSubtitulo = document.getElementById('banner_solicitud_subtitulo');
+            if (banner && bannerTitulo && bannerSubtitulo) {
+                bannerTitulo.textContent = `Atendiendo Solicitud ${solicitud.numero_solicitud} — ${solicitud.establecimiento}`;
+                bannerSubtitulo.textContent = `Solicitante: ${solicitud.responsable || 'N/A'} · Estado actual: ${solicitud.estado} · Al confirmar el despacho se actualizará el estado automáticamente.`;
+                banner.classList.remove('hidden');
+            }
 
             // clasificacion interna + establecimiento (matching insensible a mayusculas)
             const clasificacion = document.getElementById('clasificacion_select');
@@ -1061,19 +1098,38 @@
             toggleClasificacion();
 
             const selectEst = document.getElementById('establecimiento_interno');
-            const objetivo = (solicitud.establecimiento ?? '').trim().toLowerCase();
-            const opcionEst = Array.from(selectEst.options).find(op => {
-                const val = op.value.trim().toLowerCase();
-                return val === objetivo || (objetivo && (val.includes(objetivo) || objetivo.includes(val)));
+            const objetivoNorm = normText(solicitud.establecimiento);
+            let opcionEst = Array.from(selectEst.options).find(op => {
+                const valNorm = normText(op.value);
+                return valNorm === objetivoNorm;
             });
+
+            if (!opcionEst) {
+                opcionEst = Array.from(selectEst.options).find(op => {
+                    const valNorm = normText(op.value);
+                    return valNorm && objetivoNorm && (valNorm.includes(objetivoNorm) || objetivoNorm.includes(valNorm));
+                });
+            }
+
             if (opcionEst) {
                 selectEst.value = opcionEst.value;
                 actualizarDireccionInterna();
+            } else if (solicitud.establecimiento) {
+                const selectClasif = document.getElementById('clasificacion_select');
+                if (selectClasif) {
+                    selectClasif.value = 'Externo';
+                    toggleClasificacion();
+                    const inputExt = document.getElementById('establecimiento_externo');
+                    if (inputExt) inputExt.value = solicitud.establecimiento;
+                }
             }
 
-            // condiciones de transporte
+            // condiciones de transporte / observaciones
             const condiciones = document.querySelector('input[name="condiciones_transporte"]');
-            if (condiciones) condiciones.value = solicitud.observaciones ?? '';
+            if (condiciones) {
+                const refTexto = `Ref: Solicitud ${solicitud.numero_solicitud}${solicitud.responsable ? ' (' + solicitud.responsable + ')' : ''}`;
+                condiciones.value = solicitud.observaciones ? `${solicitud.observaciones} - ${refTexto}` : refTexto;
+            }
 
             // limpiar filas actuales
             while (tbody.children.length > 0) tbody.children[0].remove();
@@ -1081,9 +1137,9 @@
             let normales = [];
             let sinStock = [];
 
-            solicitud.items.forEach(item => {
-                const nombreItem = item.product.nombre ?? ('Producto #' + item.product_id);
-                const pendiente = Math.max(0, item.cantidad_solicitada - (item.cantidad_despachada ?? 0));
+            (solicitud.items || []).forEach(item => {
+                const nombreItem = item.product?.nombre ?? ('Producto #' + item.product_id);
+                const pendiente = Math.max(0, (parseInt(item.cantidad_solicitada) || 0) - (parseInt(item.cantidad_despachada) || 0));
 
                 if (pendiente <= 0) return;
 
@@ -1094,20 +1150,35 @@
 
                 const tr = addRow();
                 const selectProducto = tr.querySelector('select[name="productos[]"]');
-                const opcion = Array.from(selectProducto.options).find(op => op.value.trim().toLowerCase() ===
-                    nombreItem.trim().toLowerCase());
+                const itemNorm = normText(nombreItem);
+
+                let opcion = Array.from(selectProducto.options).find(op =>
+                    normText(op.value) === itemNorm
+                );
+
+                if (!opcion) {
+                    opcion = Array.from(selectProducto.options).find(op => {
+                        const optNorm = normText(op.value);
+                        return optNorm && itemNorm && (optNorm.includes(itemNorm) || itemNorm.includes(optNorm));
+                    });
+                }
 
                 if (opcion) {
                     selectProducto.value = opcion.value;
                     llenarDatosFila(selectProducto);
                     const selectPrograma = tr.querySelector('select[name="programas[]"]');
                     if (selectPrograma && item.programa) {
-                        const optProg = Array.from(selectPrograma.options).find(o => o.value.trim().toLowerCase() === String(item.programa).trim().toLowerCase());
+                        const progNorm = normText(item.programa);
+                        const optProg = Array.from(selectPrograma.options).find(o =>
+                            normText(o.value) === progNorm || normText(o.text) === progNorm
+                        );
                         if (optProg) selectPrograma.value = optProg.value;
                     }
                     const cantInput = tr.querySelector('input[name="cantidades[]"]');
-                    cantInput.value = pendiente;
-                    validarStock(cantInput);
+                    if (cantInput) {
+                        cantInput.value = pendiente;
+                        validarStock(cantInput);
+                    }
                 } else {
                     tr.remove();
                     sinStock.push(nombreItem);
@@ -1131,6 +1202,20 @@
             }
 
             closeSolicitudesControlado();
+
+            // Notificación toast de éxito al cargar
+            if (typeof Swal !== 'undefined' && normales.length === 0 && sinStock.length === 0) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: `Solicitud ${solicitud.numero_solicitud} cargada`,
+                    text: 'Se completaron los datos del establecimiento y fármacos controlados solicitados.',
+                    showConfirmButton: false,
+                    timer: 3500,
+                    timerProgressBar: true
+                });
+            }
 
             if (normales.length > 0) {
                 Swal.fire({
