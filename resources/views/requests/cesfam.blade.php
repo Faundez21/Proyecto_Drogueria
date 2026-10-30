@@ -32,10 +32,46 @@
 
         <!-- notificacion de exito -->
         @if (session('success'))
-            <div class="p-4 mb-4 text-sm text-teal-800 rounded-xl bg-teal-50 border border-teal-200 font-medium shadow-sm"
+            <div class="p-4 mb-4 text-sm text-teal-800 rounded-xl bg-teal-50 border border-teal-200 font-medium shadow-sm flex items-center justify-between"
                 role="alert">
-                {{ session('success') }}
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>{{ session('success') }}</span>
+                </div>
             </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Solicitud CESFAM Registrada con Éxito!',
+                            html: `<p class="text-sm text-slate-600 font-medium">{{ session('success') }}</p>`,
+                            confirmButtonColor: '#0d9488',
+                            confirmButtonText: 'Aceptar',
+                            timer: 5000,
+                            timerProgressBar: true
+                        });
+                    }
+                });
+            </script>
+        @endif
+
+        @if ($errors->any())
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Verifique los datos de la solicitud',
+                            html: `<ul class="text-left text-xs space-y-1 text-rose-700">@foreach ($errors->all() as $error)<li>• {{ $error }}</li>@endforeach</ul>`,
+                            confirmButtonColor: '#e11d48',
+                            confirmButtonText: 'Entendido'
+                        });
+                    }
+                });
+            </script>
         @endif
 
         <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
@@ -593,6 +629,14 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Enviando solicitud CESFAM...',
+                            text: 'Por favor espere mientras se registra la solicitud.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
                         document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL('image/png');
                         requestSubmitConfirmed = true;
                         document.getElementById('requestForm').submit();

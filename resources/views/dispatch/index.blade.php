@@ -2143,6 +2143,9 @@
                 banner.classList.remove('hidden');
             }
 
+            // Helper de normalización para matching insensible a mayúsculas, tildes y símbolos
+            const normText = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+
             // seleccionar clasificacion interna
             const clasificacion = document.getElementById('clasificacion_select');
             clasificacion.value = 'Interno';
@@ -2150,29 +2153,39 @@
 
             // seleccionar establecimiento
             const selectEstablecimiento = document.getElementById('establecimiento_interno');
+            const estSolicitudNorm = normText(solicitud.establecimiento);
 
-            const establecimientoSolicitud = solicitud.establecimiento
-                .trim()
-                .toLowerCase();
-
-            const opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option => {
-                const optVal = option.value.trim().toLowerCase();
-                return optVal === establecimientoSolicitud || 
-                    (establecimientoSolicitud && (optVal.includes(establecimientoSolicitud) || establecimientoSolicitud.includes(optVal)));
+            let opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option => {
+                const optNorm = normText(option.value);
+                return optNorm === estSolicitudNorm;
             });
+
+            if (!opcionEstablecimiento) {
+                opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option => {
+                    const optNorm = normText(option.value);
+                    return optNorm && estSolicitudNorm && (optNorm.includes(estSolicitudNorm) || estSolicitudNorm.includes(optNorm));
+                });
+            }
 
             if (opcionEstablecimiento) {
                 selectEstablecimiento.value = opcionEstablecimiento.value;
                 actualizarDireccionInterna();
+            } else if (solicitud.establecimiento) {
+                // Si es un destino externo que no figura en la lista interna
+                const selectClasif = document.getElementById('clasificacion_select');
+                if (selectClasif) {
+                    selectClasif.value = 'Externo';
+                    toggleClasificacion();
+                    const inputExt = document.getElementById('establecimiento_externo');
+                    if (inputExt) inputExt.value = solicitud.establecimiento;
+                }
             }
 
-            // rellenar observaciones
-            const observaciones = document.querySelector(
-                'input[name="condiciones_transporte"]'
-            );
-
+            // rellenar observaciones con referencia clara
+            const observaciones = document.querySelector('input[name="condiciones_transporte"]');
             if (observaciones) {
-                observaciones.value = solicitud.observaciones ?? '';
+                const refTexto = `Ref: Solicitud ${solicitud.numero_solicitud}${solicitud.responsable ? ' (' + solicitud.responsable + ')' : ''}`;
+                observaciones.value = solicitud.observaciones ? `${solicitud.observaciones} - ${refTexto}` : refTexto;
             }
 
             // eliminar las filas actuales de productos
@@ -2198,17 +2211,19 @@
                 }
 
                 const tr = addRow();
-                const selectProducto = tr.querySelector(
-                    'select[name="productos[]"]'
+                const selectProducto = tr.querySelector('select[name="productos[]"]');
+                const itemNorm = normText(nombreItem);
+
+                let opcionProducto = Array.from(selectProducto.options).find(option =>
+                    normText(option.value) === itemNorm
                 );
 
-                const nombreProducto = nombreItem
-                    .trim()
-                    .toLowerCase();
-
-                const opcionProducto = Array.from(selectProducto.options).find(option =>
-                    option.value.trim().toLowerCase() === nombreProducto
-                );
+                if (!opcionProducto) {
+                    opcionProducto = Array.from(selectProducto.options).find(option => {
+                        const optNorm = normText(option.value);
+                        return optNorm && itemNorm && (optNorm.includes(itemNorm) || itemNorm.includes(optNorm));
+                    });
+                }
 
                 if (opcionProducto) {
                     selectProducto.value = opcionProducto.value;
@@ -2219,17 +2234,18 @@
                     // Seleccionar programa si viene en la solicitud
                     const selectPrograma = tr.querySelector('select[name="programas[]"]');
                     if (selectPrograma && item.programa) {
-                        const optProg = Array.from(selectPrograma.options).find(o => o.value.trim().toLowerCase() === String(item.programa).trim().toLowerCase());
+                        const progNorm = normText(item.programa);
+                        const optProg = Array.from(selectPrograma.options).find(o =>
+                            normText(o.value) === progNorm || normText(o.text) === progNorm
+                        );
                         if (optProg) selectPrograma.value = optProg.value;
                     }
 
-                    const cantidad = tr.querySelector(
-                        'input[name="cantidades[]"]'
-                    );
-                    cantidad.value = pendiente;
-
-                    // Forzar que la cantidad no exceda el stock real que tienes actualmente
-                    validarStock(cantidad);
+                    const cantidad = tr.querySelector('input[name="cantidades[]"]');
+                    if (cantidad) {
+                        cantidad.value = pendiente;
+                        validarStock(cantidad);
+                    }
                 } else {
                     // si el producto no tiene stock disponible, se elimina esta fila y lo guardamos
                     tr.remove();
@@ -2282,6 +2298,20 @@
 
             // cerrar modal de solicitudes
             closeSolicitudes();
+
+            // Notificación de que se completaron los datos de la solicitud
+            if (typeof Swal !== 'undefined' && productosControlados.length === 0 && productosFaltantes.length === 0) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: `Solicitud ${solicitud.numero_solicitud} cargada`,
+                    text: 'Se completaron el establecimiento, observaciones y productos solicitados.',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
