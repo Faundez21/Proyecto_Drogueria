@@ -205,11 +205,15 @@ class EstablishmentRequestController extends Controller
             'numero_solicitud' => '#' . str_pad($establishmentRequest->id, 5, '0', STR_PAD_LEFT),
         ]);
 
+        $itemsResumen = [];
         foreach ($validated['producto'] as $index => $productId) {
             $consumoVal = $validated['consumo_anterior'][$index] ?? null;
             if ($consumoVal === null || $consumoVal === '') {
                 $consumoVal = SolicitudService::calcularConsumoAnterior($validated['establecimiento'], (int) $productId);
             }
+
+            $product = Product::find($productId);
+            $nombreProd = $product ? $product->nombre : "Producto #{$productId}";
 
             $establishmentRequest->items()->create([
                 'product_id' => $productId,
@@ -219,15 +223,45 @@ class EstablishmentRequestController extends Controller
                 'cantidad_solicitada' => (int) $validated['cantidad_solicitada'][$index],
                 'cantidad_despachada' => 0,
             ]);
+
+            $itemsResumen[] = [
+                'producto' => $nombreProd,
+                'programa' => !empty($validated['programa'][$index]) ? $validated['programa'][$index] : 'General',
+                'consumo_anterior' => (int) $consumoVal,
+                'stock_actual' => (int) $validated['stock_actual'][$index],
+                'cantidad_solicitada' => (int) $validated['cantidad_solicitada'][$index],
+            ];
         }
 
         $rutaRetorno = ($validated['tipo_vista'] ?? '') === 'cesfam' || $esCesfam
             ? 'requests.cesfam'
             : 'requests.index';
 
+        $solicitudDetail = [
+            'numero_solicitud' => $establishmentRequest->numero_solicitud,
+            'establecimiento' => $validated['establecimiento'],
+            'tipo' => $esCesfam ? 'CESFAM' : 'Establecimiento de Salud',
+            'fecha_solicitud' => date('d/m/Y', strtotime($validated['fecha_solicitud'])),
+            'responsable' => $validated['responsable'],
+            'cargo' => $validated['cargo'] ?? 'N/A',
+            'observaciones' => $validated['observaciones'] ?? '',
+            'total_items' => count($itemsResumen),
+            'total_unidades' => array_sum(array_column($itemsResumen, 'cantidad_solicitada')),
+            'items' => $itemsResumen,
+        ];
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'ok' => true,
+                'message' => "Solicitud {$establishmentRequest->numero_solicitud} registrada exitosamente para {$validated['establecimiento']}.",
+                'detail' => $solicitudDetail,
+            ]);
+        }
+
         return redirect()
             ->route($rutaRetorno)
-            ->with('success', "Solicitud {$establishmentRequest->numero_solicitud} registrada exitosamente para {$validated['establecimiento']}.");
+            ->with('success', "Solicitud {$establishmentRequest->numero_solicitud} registrada exitosamente para {$validated['establecimiento']}.")
+            ->with('solicitud_success_detail', $solicitudDetail);
     }
 
     /**

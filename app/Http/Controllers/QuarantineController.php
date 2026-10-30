@@ -123,6 +123,6 @@ class QuarantineController extends Controller
 
     public function update(Request $request, string $id)
     {
-        // El update lo manejas desde InventoryController, pero si lo tienes aquí, la lógica es la misma.
+   
     }
 }

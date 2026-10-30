@@ -278,12 +278,12 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Lote</label>
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Lote <span class="text-[11px] font-normal text-slate-400">(Opcional / S/L)</span></label>
                                     <input type="text" name="lote[]" placeholder="Ej: L-4893" class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
                                 </div>
                                 <div>
-                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">F. Vencimiento</label>
-                                    <input type="date" name="fecha_vencimiento[]" class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">F. Vencimiento <span class="text-rose-500">*</span></label>
+                                    <input type="date" name="fecha_vencimiento[]" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
                                 </div>
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Cantidad <span class="text-rose-500">*</span></label>
@@ -296,20 +296,20 @@
                             </div>
 
                             <!-- Distribución Física en Bodega -->
-                            <div class="mt-3.5 pt-3 border-t border-slate-200/80 bg-slate-50/80 rounded-xl p-3 sm:p-3.5 border border-dashed border-slate-300">
-                                <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-                                    <span class="text-[11.5px] font-bold text-slate-700 flex items-center gap-1.5 uppercase tracking-wide">
+                            <div class="mt-6 pt-4 pb-4 px-4 sm:px-5 border border-dashed border-slate-300/90 bg-slate-50/90 rounded-2xl shadow-2xs">
+                                <div class="flex flex-wrap items-center justify-between gap-2 mb-3.5 pb-2.5 border-b border-slate-200/70">
+                                    <span class="text-[12px] font-bold text-slate-700 flex items-center gap-1.5 uppercase tracking-wide">
                                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         </svg>
                                         Distribución Física en Bodega (Ubicación)
                                     </span>
-                                    <span class="text-[11px] text-slate-500 font-medium">Asigna pasillo, estante y nivel para ordenar el stock de inmediato</span>
+                                    <span class="text-[11.5px] text-slate-500 font-medium">Asigna pasillo, estante y nivel para ordenar el stock de inmediato</span>
                                 </div>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-1">
                                     <div>
-                                        <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Pasillo</label>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Pasillo</label>
                                         <select name="pasillo[]" onchange="onPasilloChange(this)" class="select-pasillo-recepcion w-full bg-white border border-slate-300 text-slate-800 rounded-lg py-2 px-2.5 text-[12.5px] focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs outline-none">
                                             <option value="">Seleccione Pasillo...</option>
                                             @foreach($pasillosLista ?? [] as $pasillo)
@@ -1117,6 +1117,7 @@
                 let totalUnidades = 0;
                 let totalNeto = 0;
                 const itemsPayload = [];
+                let faltaVencimiento = false;
 
                 productCards.forEach(card => {
                     const prodSelect = card.querySelector('.select-producto-recepcion') || card.querySelector('select[name="product_id[]"]');
@@ -1130,6 +1131,10 @@
                     const price = parseFloat(priceInput?.value) || 0;
 
                     if (prodSelect && prodSelect.value) {
+                        if (!vencInput || !vencInput.value) {
+                            faltaVencimiento = true;
+                        }
+
                         itemsCount++;
                         totalUnidades += qty;
                         totalNeto += (qty * price);
@@ -1147,6 +1152,16 @@
                         });
                     }
                 });
+
+                if (faltaVencimiento) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha de vencimiento obligatoria',
+                        text: 'Debes ingresar la fecha de vencimiento para todos los productos a recepcionar.',
+                        confirmButtonColor: '#0d9488'
+                    });
+                    return;
+                }
 
                 if (itemsCount === 0) {
                     itemsCount = productCards.length;
@@ -1305,7 +1320,7 @@
                             <strong>${item.product ? item.product.nombre : 'Prod Eliminado'}</strong><br>
                             <span class="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-bold border ${g.badgeClass}">${item.tipo_producto || key}</span>
                         </td>
-                        <td class="px-4 py-3">${item.lote || 'S/L'}<br><span class="text-[10px] text-slate-500">${item.fecha_vencimiento || 'N/A'}</span></td>
+                        <td class="px-4 py-3">${item.lote || 'S/L'}<br><span class="text-[10px] text-slate-500">${item.fecha_vencimiento ? (item.fecha_vencimiento.includes('-') ? item.fecha_vencimiento.split('T')[0].split('-').reverse().join('/') : item.fecha_vencimiento) : 'N/A'}</span></td>
                         <td class="px-4 py-3 text-center font-bold">${item.cantidad}</td>
                         <td class="px-4 py-3 text-right font-mono-das font-bold">$${Math.round(parseFloat(item.valor_total_item || 0)).toLocaleString('es-CL')}</td>
                     `;

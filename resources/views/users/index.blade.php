@@ -154,46 +154,62 @@
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
 
         <!-- Cabecera con buscador y filtros en vivo -->
-        <div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-2.5">
-                    <h3 class="text-[15px] font-extrabold text-slate-800">Directorio de Usuarios y Accesos</h3>
-                    <span id="contadorUsuariosFiltrados" class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-teal-50 text-teal-700 border border-teal-200">
-                        {{ $totalUsuarios }} usuario(s)
-                    </span>
+        <div class="p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <h3 class="text-[15px] font-extrabold text-slate-800">Directorio de Usuarios y Accesos</h3>
+                        <span id="contadorUsuariosFiltrados" class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-teal-50 text-teal-700 border border-teal-200">
+                            {{ $totalUsuarios }} usuario(s)
+                        </span>
+                    </div>
+                    <p class="text-[12px] text-slate-500 mt-0.5">Filtra y gestiona los funcionarios según su rol asignado o estado de cuenta.</p>
                 </div>
-                <p class="text-[12px] text-slate-500 mt-0.5">Filtra por nombre, correo, rol asignado o estado de cuenta.</p>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-                <div class="relative min-w-[240px]">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    <input type="text" id="filtroBusquedaUsuario" oninput="filtrarTablaUsuarios()"
-                        placeholder="Buscar nombre o correo..."
-                        class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-[12.5px] font-medium text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end pt-2 border-t border-slate-200/60">
+                <div>
+                    <label for="filtroBusquedaUsuario" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Buscar Funcionario</label>
+                    <div class="relative">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="filtroBusquedaUsuario" oninput="filtrarTablaUsuarios()"
+                            placeholder="Nombre, apellido o correo..."
+                            class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-[12.5px] font-medium text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 shadow-2xs">
+                    </div>
                 </div>
 
-                <select id="filtroRolUsuario" onchange="filtrarTablaUsuarios()"
-                    class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-[12.5px] font-semibold text-slate-700 focus:outline-none focus:border-teal-500 cursor-pointer">
-                    <option value="">Todos los roles</option>
-                    @foreach ($roles as $rol)
-                        <option value="{{ strtolower($rol->name) }}">{{ $rol->name }}</option>
-                    @endforeach
-                </select>
+                <div>
+                    <label for="filtroRolUsuario" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Rol de Usuario</label>
+                    <select id="filtroRolUsuario" onchange="filtrarTablaUsuarios()"
+                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-[12.5px] font-semibold text-slate-700 focus:outline-none focus:border-teal-500 cursor-pointer shadow-2xs">
+                        <option value="">Todos los roles</option>
+                        @foreach ($roles as $rol)
+                            <option value="{{ strtolower($rol->name) }}">{{ $rol->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-                <select id="filtroEstadoUsuario" onchange="filtrarTablaUsuarios()"
-                    class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-[12.5px] font-semibold text-slate-700 focus:outline-none focus:border-teal-500 cursor-pointer">
-                    <option value="">Todos los estados</option>
-                    <option value="activo">Activos</option>
-                    <option value="inactivo">Inactivos</option>
-                </select>
+                <div>
+                    <label for="filtroEstadoUsuario" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Estado de Cuenta</label>
+                    <select id="filtroEstadoUsuario" onchange="filtrarTablaUsuarios()"
+                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-[12.5px] font-semibold text-slate-700 focus:outline-none focus:border-teal-500 cursor-pointer shadow-2xs">
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activos</option>
+                        <option value="inactivo">Inactivos</option>
+                    </select>
+                </div>
 
-                <button type="button" onclick="limpiarFiltrosUsuarios()"
-                    class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-xl text-[12px] font-bold transition-colors cursor-pointer shrink-0">
-                    Limpiar
-                </button>
+                <div>
+                    <button type="button" onclick="limpiarFiltrosUsuarios()"
+                        class="w-full px-4 py-2 bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-xl text-[12.5px] font-bold transition-all shadow-2xs hover:shadow-sm cursor-pointer flex items-center justify-center gap-1.5 h-[38px]">
+                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Limpiar Filtros
+                    </button>
+                </div>
             </div>
         </div>
 
