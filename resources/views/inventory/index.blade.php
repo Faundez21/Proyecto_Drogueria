@@ -1089,24 +1089,27 @@
         </div>
 
         <!-- Modal: Editar Lote -->
-        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
-                    <h2 class="text-[16px] font-bold text-white tracking-wide">Actualizar Estado y Ubicación de Lote</h2>
+        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 transition-all">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-lg max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden my-auto">
+                <div class="px-4 sm:px-6 py-4 bg-slate-800 flex justify-between items-center shrink-0 border-b border-slate-700">
+                    <div>
+                        <h2 class="text-[15px] sm:text-[16px] font-bold text-white tracking-wide">Actualizar Estado y Ubicación de Lote</h2>
+                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Gestiona la posición física en bodega o el bloqueo del lote.</p>
+                    </div>
                     <button type="button" onclick="closeEditLote()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
-                <form id="editLoteForm" method="POST" action="" class="bg-white" novalidate onsubmit="return confirmEditLoteInventario(event)">
+                <form id="editLoteForm" method="POST" action="" class="bg-white flex flex-col flex-1 min-h-0 overflow-hidden" novalidate onsubmit="return confirmEditLoteInventario(event)">
                     @csrf
                     @method('PUT')
-                    <div class="p-6 space-y-4">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Modificando Lote de:</span>
-                            <p id="modal_producto_nombre" class="text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
+                    <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
+                        <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Modificando Lote de:</span>
+                            <p id="modal_producto_nombre" class="text-[13.5px] sm:text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
                             <div class="mt-2 inline-block bg-white border border-slate-300 px-3 py-1 rounded-lg shadow-sm">
-                                <p id="modal_lote_nombre" class="text-[13px] font-mono font-bold text-slate-700"></p>
+                                <p id="modal_lote_nombre" class="text-[12.5px] sm:text-[13px] font-mono font-bold text-slate-700"></p>
                             </div>
                             <div class="flex justify-center gap-1.5 mt-2 flex-wrap">
                                 <span id="modal_categoria_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200"></span>
@@ -1114,31 +1117,31 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Valor Unitario</span>
-                                <p id="modal_valor_unitario" class="text-[13px] font-bold text-slate-800 font-mono-das">$ 0</p>
+                        <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+                            <div class="bg-white border border-slate-200 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase block truncate">Valor Unit.</span>
+                                <p id="modal_valor_unitario" class="text-[11.5px] sm:text-[13px] font-bold text-slate-800 font-mono-das truncate">$ 0</p>
                             </div>
-                            <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Stock</span>
-                                <p id="modal_cantidad" class="text-[13px] font-bold text-slate-800">0</p>
+                            <div class="bg-white border border-slate-200 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase block truncate">Stock</span>
+                                <p id="modal_cantidad" class="text-[11.5px] sm:text-[13px] font-bold text-slate-800 truncate">0</p>
                             </div>
-                            <div class="bg-teal-50 border border-teal-200 rounded-xl p-2.5 text-center shadow-sm">
-                                <span class="text-[10px] font-bold text-teal-500 uppercase block">Valor Total</span>
-                                <p id="modal_valor_total" class="text-[13px] font-extrabold text-teal-800 font-mono-das">$ 0</p>
+                            <div class="bg-teal-50 border border-teal-200 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
+                                <span class="text-[9px] sm:text-[10px] font-bold text-teal-600 uppercase block truncate">Valor Total</span>
+                                <p id="modal_valor_total" class="text-[11.5px] sm:text-[13px] font-extrabold text-teal-800 font-mono-das truncate">$ 0</p>
                             </div>
                         </div>
 
                         <!-- Ubicación Física en Bodega (Distribución) -->
-                        <div class="bg-slate-50/80 p-3.5 rounded-xl border border-slate-200">
-                            <label class="block text-[12px] font-bold text-slate-700 mb-2 flex items-center gap-1.5 uppercase tracking-wide">
-                                <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <div class="bg-slate-50/90 p-3 sm:p-3.5 rounded-xl border border-slate-200">
+                            <label class="block text-[11.5px] sm:text-[12px] font-bold text-slate-700 mb-2 flex items-center gap-1.5 uppercase tracking-wide">
+                                <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                 Ubicación Física en Bodega (Distribución)
                             </label>
-                            <div class="grid grid-cols-2 gap-2.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
-                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pasillo</label>
-                                    <select id="modal_edit_pasillo" name="pasillo" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pasillo</label>
+                                    <select id="modal_edit_pasillo" name="pasillo" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
                                         <option value="">(Sin asignar / P.A)</option>
                                         @foreach ($pasillosLista ?? [] as $pas)
                                             <option value="{{ $pas }}">{{ $pas }}</option>
@@ -1146,8 +1149,8 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estante</label>
-                                    <select id="modal_edit_estante" name="estante" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estante</label>
+                                    <select id="modal_edit_estante" name="estante" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
                                         <option value="">(Sin asignar / P.A)</option>
                                         @foreach ($estantesLista ?? [] as $est)
                                             <option value="{{ $est }}">{{ $est }}</option>
@@ -1155,8 +1158,8 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nivel</label>
-                                    <select id="modal_edit_nivel" name="nivel" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nivel</label>
+                                    <select id="modal_edit_nivel" name="nivel" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
                                         <option value="">(Sin nivel)</option>
                                         @foreach ($nivelesLista ?? [] as $niv)
                                             <option value="{{ $niv }}">Nivel {{ $niv }}</option>
@@ -1164,8 +1167,8 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Posición</label>
-                                    <select id="modal_edit_posicion" name="posicion" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Posición</label>
+                                    <select id="modal_edit_posicion" name="posicion" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
                                         <option value="">(Sin posición)</option>
                                         @foreach ($posicionesLista ?? [] as $pos)
                                             <option value="{{ $pos }}">Posición {{ $pos }}</option>
@@ -1176,8 +1179,8 @@
                         </div>
 
                         <div>
-                            <label for="modal_estado" class="block text-[13px] font-bold text-slate-700 mb-2">Seleccione Nuevo Estado Físico *</label>
-                            <select id="modal_estado" name="estado" onchange="toggleMotivoField(this.value)" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 font-semibold text-slate-700 shadow-sm cursor-pointer transition-colors">
+                            <label for="modal_estado" class="block text-[12.5px] sm:text-[13px] font-bold text-slate-700 mb-1.5 sm:mb-2">Seleccione Nuevo Estado Físico *</label>
+                            <select id="modal_estado" name="estado" onchange="toggleMotivoField(this.value)" required class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 sm:py-3 text-[12.5px] sm:text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 font-semibold text-slate-700 shadow-xs cursor-pointer transition-colors">
                                 <option value="Disponible">🟢 Disponible (Liberado para entrega)</option>
                                 <option value="Cuarentena">🟠 En Cuarentena (Bloqueo preventivo)</option>
                                 <option value="Merma">🔴 En Merma (Dañado / Vencido)</option>
@@ -1185,14 +1188,14 @@
                         </div>
 
                         <div id="motivoContainer" class="hidden">
-                            <label for="modal_motivo" class="block text-[13px] font-bold text-slate-700 mb-1.5">Motivo <span class="text-rose-500">*</span></label>
-                            <textarea id="modal_motivo" name="motivo" rows="3" placeholder="Indique la razón de la merma o cuarentena..." class="w-full rounded-xl border border-slate-300 bg-white p-3 text-[12px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-slate-700 shadow-sm"></textarea>
+                            <label for="modal_motivo" class="block text-[12.5px] sm:text-[13px] font-bold text-slate-700 mb-1.5">Motivo <span class="text-rose-500">*</span></label>
+                            <textarea id="modal_motivo" name="motivo" rows="3" placeholder="Indique la razón de la merma o cuarentena..." class="w-full rounded-xl border border-slate-300 bg-white p-3 text-[12px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-slate-700 shadow-xs resize-none"></textarea>
                         </div>
                     </div>
 
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl shrink-0">
-                        <button type="button" onclick="closeEditLote()" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 text-[13px] font-bold transition-colors shadow-sm cursor-pointer">Cancelar</button>
-                        <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[13px] font-bold transition-all shadow-sm cursor-pointer">Confirmar Cambio</button>
+                    <div class="px-4 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 rounded-b-2xl shrink-0">
+                        <button type="button" onclick="closeEditLote()" class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 text-[13px] font-bold transition-colors shadow-xs cursor-pointer text-center">Cancelar</button>
+                        <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-xs cursor-pointer text-center">Confirmar Cambio</button>
                     </div>
                 </form>
             </div>
@@ -1609,6 +1612,13 @@
 
             let motivoInput = document.getElementById('modal_motivo');
             if (motivoInput) motivoInput.value = motivo;
+
+            // Guardar valores iniciales para detectar reubicación física exacta
+            form.dataset.initialPasillo = (pasillo && pasillo !== 'P.A') ? pasillo : '';
+            form.dataset.initialEstante = (estante && estante !== 'P.A') ? estante : '';
+            form.dataset.initialNivel = nivel || '';
+            form.dataset.initialPosicion = posicion || '';
+            form.dataset.initialEstado = selectedVal;
 
             toggleMotivoField(selectedVal);
 
@@ -2148,6 +2158,20 @@
             const loteRaw = document.getElementById('modal_lote_nombre')?.textContent || '';
             const lote = loteRaw.replace(/^LOTE:\s*/i, '').trim();
 
+            const pasillo = document.getElementById('modal_edit_pasillo')?.value || '';
+            const estante = document.getElementById('modal_edit_estante')?.value || '';
+            const nivel = document.getElementById('modal_edit_nivel')?.value || '';
+            const posicion = document.getElementById('modal_edit_posicion')?.value || '';
+
+            const initPas = form.dataset.initialPasillo || '';
+            const initEst = form.dataset.initialEstante || '';
+            const initNiv = form.dataset.initialNivel || '';
+            const initPos = form.dataset.initialPosicion || '';
+            const initEstado = form.dataset.initialEstado || 'Disponible';
+
+            const cambioUbic = (pasillo !== initPas) || (estante !== initEst) || (nivel !== initNiv) || (posicion !== initPos);
+            const cambioEstado = (estado !== initEstado);
+
             if ((estado === 'Cuarentena' || estado === 'Merma') && !motivo) {
                 Swal.fire({
                     icon: 'warning',
@@ -2158,6 +2182,13 @@
                 document.getElementById('modal_motivo')?.focus();
                 return false;
             }
+
+            let ubiParts = [];
+            if (pasillo) ubiParts.push('Pasillo ' + pasillo);
+            if (estante) ubiParts.push('Estante ' + estante);
+            if (nivel) ubiParts.push('Nivel ' + nivel);
+            if (posicion) ubiParts.push('Posición ' + posicion);
+            let ubiTxt = ubiParts.length > 0 ? ubiParts.join(' · ') : 'Sin asignar (P.A)';
 
             if (estado === 'Cuarentena') {
                 Swal.fire({
@@ -2193,15 +2224,40 @@
                         form.submit();
                     }
                 });
+            } else if (!cambioEstado && cambioUbic) {
+                // Mover ubicación física en bodega
+                Swal.fire({
+                    title: '¿Mover Lote en Bodega?',
+                    html: `
+                        <p class="text-sm text-slate-600 mb-2.5">¿Confirmas el traslado del lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>
+                        <div class="p-3 bg-teal-50 border border-teal-200 rounded-xl text-teal-900 text-xs font-bold text-center">
+                            Nueva Ubicación: <span class="text-teal-700">${ubiTxt}</span>
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0f766e',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, mover lote',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        closeEditLote();
+                        form.submit();
+                    }
+                });
             } else {
                 Swal.fire({
-                    title: '¿Mover lote a Disponible?',
-                    html: `El lote <strong>${lote}</strong> de <strong>${prod}</strong> quedará liberado y pasará a estar <strong>Disponible</strong> para entrega y despacho.`,
+                    title: cambioEstado ? '¿Mover lote a Disponible?' : '¿Guardar Cambios?',
+                    html: cambioEstado 
+                        ? `El lote <strong>${lote}</strong> de <strong>${prod}</strong> quedará liberado y pasará a estar <strong>Disponible</strong> para entrega y despacho.`
+                        : `¿Confirmas actualizar la información del lote <strong>${lote}</strong> de <strong>${prod}</strong>?`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#059669',
                     cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, mover a disponible',
+                    confirmButtonText: 'Sí, confirmar',
                     cancelButtonText: 'Cancelar',
                     reverseButtons: true
                 }).then((result) => {
@@ -2220,6 +2276,28 @@
             if (selEstado) {
                 toggleManualEstadoHelp(selEstado.value);
             }
+
+            @if (session('lote_moved_success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Operación Exitosa!',
+                    html: `
+                        <div class="text-left bg-slate-50 border border-slate-200 rounded-xl p-3.5 my-2">
+                            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5">Producto</p>
+                            <p class="text-[13px] font-extrabold text-slate-800 leading-snug">{{ session('lote_moved_success')['producto'] }}</p>
+                            <div class="mt-2.5 pt-2.5 border-t border-slate-200 flex flex-wrap items-center justify-between gap-1.5">
+                                <span class="text-[11px] font-mono font-bold bg-white border border-slate-300 px-2 py-0.5 rounded text-slate-700">LOTE: {{ session('lote_moved_success')['lote'] }}</span>
+                                <span class="text-[11px] font-bold text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">{{ session('lote_moved_success')['ubicacion'] }}</span>
+                            </div>
+                        </div>
+                        <p class="text-[12px] text-slate-500 mt-2">{{ session('success') }}</p>
+                    `,
+                    confirmButtonColor: '#0f766e',
+                    confirmButtonText: 'Entendido',
+                    timer: 4500,
+                    timerProgressBar: true
+                });
+            @endif
 
             @if (session('open_modal') === 'import')
                 openImport();

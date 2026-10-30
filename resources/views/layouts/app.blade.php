@@ -866,7 +866,7 @@
         });
 
         // 2. Interceptor de Flash Messages de Laravel con SweetAlert2 Modal
-        @if (session('success') && !session('reception_success_detail') && !session('dispatch_success_detail') && !session('controlled_dispatch_success_detail'))
+        @if (session('success') && !session('reception_success_detail') && !session('dispatch_success_detail') && !session('controlled_dispatch_success_detail') && !session('lote_moved_success'))
             Swal.fire({
                 icon: 'success',
                 title: '¡Operación Exitosa!',
