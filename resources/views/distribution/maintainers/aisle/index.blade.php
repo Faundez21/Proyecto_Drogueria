@@ -208,18 +208,18 @@
 
     <!-- Modal Crear Pasillo -->
     <div id="createModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
-            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800 shrink-0">
+            <div class="bg-slate-900 px-4 sm:px-6 py-3.5 sm:py-4.5 flex items-center justify-between border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-[16px] font-bold text-white leading-tight">Nuevo Pasillo</h2>
-                        <p class="text-slate-400 text-[12px] mt-0.5">Registra un nuevo pasillo físico en la bodega.</p>
+                        <h2 class="text-[15px] sm:text-[16px] font-bold text-white leading-tight">Nuevo Pasillo</h2>
+                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Registra un nuevo pasillo físico en la bodega.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCreate()"
@@ -230,7 +230,7 @@
                 </button>
             </div>
 
-            <form id="createAisleForm" action="{{ route('aisle.store') }}" method="POST" onsubmit="confirmCreateAisle(event)" class="flex flex-col flex-1 overflow-hidden">
+            <form id="createAisleForm" action="{{ route('aisle.store') }}" method="POST" onsubmit="confirmCreateAisle(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 @csrf
                 <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
                     <div>
@@ -263,13 +263,13 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-200 shrink-0">
+                <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-2.5 px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-t border-slate-200 shrink-0">
                     <button type="button" onclick="closeCreate()"
-                        class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                        class="w-full sm:w-auto px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer text-center">
                         Cancelar
                     </button>
                     <button type="submit"
-                        class="px-5 py-2 text-[13px] font-bold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-sm cursor-pointer">
+                        class="w-full sm:w-auto px-5 py-2 text-[13px] font-bold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-sm cursor-pointer text-center">
                         Guardar Pasillo
                     </button>
                 </div>
@@ -279,12 +279,12 @@
 
     <!-- Modal Ver Pasillo -->
     <div id="showModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
-            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800 shrink-0">
+            <div class="bg-slate-900 px-4 sm:px-6 py-3.5 sm:py-4.5 flex items-center justify-between border-b border-slate-800 shrink-0">
                 <div>
-                    <h2 class="text-[16px] font-bold text-white leading-tight">Ficha del Pasillo</h2>
-                    <p class="text-slate-400 text-[12px] mt-0.5">Información registrada en la bodega.</p>
+                    <h2 class="text-[15px] sm:text-[16px] font-bold text-white leading-tight">Ficha del Pasillo</h2>
+                    <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Información registrada en la bodega.</p>
                 </div>
                 <button type="button" onclick="closeShow()"
                     class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors cursor-pointer">
@@ -295,7 +295,7 @@
             </div>
 
             <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pasillo</p>
                         <div class="flex items-center gap-2 mt-1">
@@ -315,9 +315,9 @@
                 </div>
             </div>
 
-            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200 shrink-0">
+            <div class="flex justify-end px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-t border-slate-200 shrink-0">
                 <button type="button" onclick="closeShow()"
-                    class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                    class="w-full sm:w-auto px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer text-center">
                     Cerrar
                 </button>
             </div>
@@ -326,66 +326,68 @@
 
     <!-- Modal Editar Pasillo -->
     <div id="editModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
-            <div class="bg-slate-900 px-6 py-4.5 flex items-center justify-between border-b border-slate-800 shrink-0">
-                <div>
-                    <h2 class="text-[16px] font-bold text-white leading-tight">Editar Pasillo</h2>
-                    <p class="text-slate-400 text-[12px] mt-0.5">Actualiza los datos del pasillo seleccionado.</p>
-                </div>
-                <button type="button" onclick="closeEdit()"
-                    class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors cursor-pointer">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-
-            <form id="editForm" method="POST" onsubmit="confirmEditAisle(event)" class="flex flex-col flex-1 overflow-hidden">
-                @csrf
-                @method('PUT')
-                <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
+        class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4">
+        <div class="flex min-h-full items-center justify-center">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden text-left my-auto">
+                <div class="bg-slate-900 px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between border-b border-slate-800 shrink-0">
                     <div>
-                        <label for="editName" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
-                            Nombre del Pasillo <span class="text-rose-500">*</span>
-                        </label>
-                        <input type="text" name="name" id="editName" required
-                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                        <h2 class="text-[15px] sm:text-[16px] font-bold text-white leading-tight">Editar Pasillo</h2>
+                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Actualiza los datos del pasillo seleccionado.</p>
                     </div>
+                    <button type="button" onclick="closeEdit()"
+                        class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
 
-                    <div>
-                        <label for="editColor" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
-                            Color Identificador (Visor 3D) <span class="text-rose-500">*</span>
-                        </label>
-                        <div class="flex items-center gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
-                            <input type="color" name="color" id="editColor" value="#3B82F6"
-                                class="w-10 h-9 rounded border border-slate-300 cursor-pointer bg-white p-0.5">
-                            <span class="text-[12px] text-slate-500">
-                                Color aplicado a las etiquetas del pasillo en el visor 3D.
-                            </span>
+                <form id="editForm" method="POST" onsubmit="confirmEditAisle(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                    @csrf
+                    @method('PUT')
+                    <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                        <div>
+                            <label for="editName" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                                Nombre del Pasillo <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" name="name" id="editName" required
+                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                        </div>
+
+                        <div>
+                            <label for="editColor" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                                Color Identificador (Visor 3D) <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="flex items-center gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                                <input type="color" name="color" id="editColor" value="#3B82F6"
+                                    class="w-10 h-9 rounded border border-slate-300 cursor-pointer bg-white p-0.5">
+                                <span class="text-[12px] text-slate-500">
+                                    Color aplicado a las etiquetas del pasillo en el visor 3D.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="editDescription" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
+                                Descripción Operativa
+                            </label>
+                            <textarea name="description" id="editDescription" rows="3"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition resize-none"></textarea>
                         </div>
                     </div>
 
-                    <div>
-                        <label for="editDescription" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
-                            Descripción Operativa
-                        </label>
-                        <textarea name="description" id="editDescription" rows="3"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition resize-none"></textarea>
+                    <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-2.5 px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-t border-slate-200 shrink-0">
+                        <button type="button" onclick="closeEdit()"
+                            class="w-full sm:w-auto px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer text-center">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                            class="w-full sm:w-auto px-5 py-2 text-[13px] font-bold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-sm cursor-pointer text-center">
+                            Guardar Cambios
+                        </button>
                     </div>
-                </div>
-
-                <div class="flex justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-200 shrink-0">
-                    <button type="button" onclick="closeEdit()"
-                        class="px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
-                        Cancelar
-                    </button>
-                    <button type="submit"
-                        class="px-5 py-2 text-[13px] font-bold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-sm cursor-pointer">
-                        Guardar Cambios
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 

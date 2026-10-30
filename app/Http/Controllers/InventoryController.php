@@ -324,7 +324,11 @@ class InventoryController extends Controller
 
         $inventory = Inventory::findOrFail($id);
         $estadoAnterior = $inventory->estado;
+        $pasilloAnterior = $inventory->pasillo;
         $estanteAnterior = $inventory->estante;
+        $nivelAnterior = $inventory->nivel;
+        $posicionAnterior = $inventory->posicion;
+
         $data = $request->only(['estado', 'motivo']);
 
         if ($request->has('pasillo')) {
@@ -347,8 +351,18 @@ class InventoryController extends Controller
 
         $inventory->update($data);
 
-        $cambioUbicacion = isset($data['estante']) && $data['estante'] !== $estanteAnterior;
+        $cambioUbicacion = ($inventory->pasillo ?? '') !== ($pasilloAnterior ?? '')
+            || ($inventory->estante ?? '') !== ($estanteAnterior ?? '')
+            || ($inventory->nivel ?? '') !== ($nivelAnterior ?? '')
+            || ($inventory->posicion ?? '') !== ($posicionAnterior ?? '');
         $cambioEstado = $estadoAnterior !== $inventory->estado;
+
+        $ubicTxt = [];
+        if (!empty($inventory->pasillo) && $inventory->pasillo !== 'P.A') $ubicTxt[] = "Pasillo {$inventory->pasillo}";
+        if (!empty($inventory->estante) && $inventory->estante !== 'P.A') $ubicTxt[] = "Estante {$inventory->estante}";
+        if (!empty($inventory->nivel)) $ubicTxt[] = "Nivel {$inventory->nivel}";
+        if (!empty($inventory->posicion)) $ubicTxt[] = "Posición {$inventory->posicion}";
+        $detUbic = !empty($ubicTxt) ? implode(' · ', $ubicTxt) : 'Sin asignar (P.A)';
 
         if ($cambioEstado) {
             StockMovement::create([
@@ -374,14 +388,21 @@ class InventoryController extends Controller
                 'tipo_movimiento' => 'Reubicación',
                 'cantidad' => $inventory->cantidad,
                 'fecha_hora' => now(),
-                'origen_destino' => 'Ubicación asignada: ' . ($inventory->estante ?: 'P.A'),
+                'origen_destino' => 'Ubicación asignada: ' . $detUbic,
                 'documento_respaldo' => 'Ordenamiento en bodega',
                 'estado_lote' => $inventory->estado,
             ]);
         }
 
         if ($cambioUbicacion && !$cambioEstado) {
-            $mensaje = "Ubicación del lote actualizada exitosamente a «{$inventory->estante}» (ordenado en distribución).";
+            $mensaje = "El lote {$inventory->lote} ha sido reubicado exitosamente en bodega ({$detUbic}).";
+            return redirect()->back()
+                ->with('success', $mensaje)
+                ->with('lote_moved_success', [
+                    'producto' => $inventory->producto,
+                    'lote' => $inventory->lote,
+                    'ubicacion' => $detUbic,
+                ]);
         } elseif ($data['estado'] == 'Cuarentena') {
             $mensaje = 'El lote ha sido bloqueado y enviado a cuarentena.';
         } elseif ($data['estado'] == 'Merma') {
@@ -390,7 +411,14 @@ class InventoryController extends Controller
             $mensaje = 'El lote ha sido actualizado exitosamente.';
         }
 
-        return redirect()->back()->with('success', $mensaje);
+        return redirect()->back()
+            ->with('success', $mensaje)
+            ->with('lote_moved_success', [
+                'producto' => $inventory->producto,
+                'lote' => $inventory->lote,
+                'ubicacion' => $detUbic,
+                'estado' => $inventory->estado,
+            ]);
     }
 
     /**

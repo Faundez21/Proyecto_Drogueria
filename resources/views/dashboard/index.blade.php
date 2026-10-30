@@ -616,79 +616,80 @@
         </div>
     </div>
 
-    <!-- MODAL DE ESCÁNER QR DE DIRECCIONAMIENTO CLÍNICO (REDISEÑADO) -->
-    <div id="scannerModalDashboard" class="hidden fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 transition-all animate-fade-in">
-        <div class="bg-slate-900 rounded-3xl shadow-2xl border border-slate-700/80 p-0 w-full max-w-md max-h-[94vh] flex flex-col overflow-hidden my-auto text-white">
-            <!-- Header futurista -->
-            <div class="px-5 py-4 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/80 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="relative flex items-center justify-center">
-                        <span class="w-3 h-3 rounded-full bg-emerald-500 animate-ping absolute"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 relative"></span>
+    <!-- MODAL DE ESCÁNER QR DE DIRECCIONAMIENTO CLÍNICO -->
+    <div id="scannerModalDashboard" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
+        <div class="flex min-h-full items-center justify-center">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
+                <!-- Header limpio -->
+                <div class="px-5 py-4 bg-slate-800 text-white flex justify-between items-center shrink-0 border-b border-slate-700">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-[15px] font-bold text-white tracking-wide leading-tight">
+                                Escáner QR de Lotes
+                            </h2>
+                            <p class="text-[11px] text-teal-300 font-medium">Lectura óptica y consulta inmediata</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="text-[15px] font-extrabold text-white tracking-wide flex items-center gap-2">
-                            Escáner Óptico de Lotes
-                        </h2>
-                        <p class="text-[11px] text-teal-300 font-medium">Lectura QR y Trazabilidad Inmediata</p>
-                    </div>
-                </div>
-                <button type="button" onclick="closeDashboardScanner()" class="text-slate-400 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-xl cursor-pointer">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-
-            <!-- Visor HUD de Cámara -->
-            <div class="p-5 flex flex-col items-center bg-slate-950/60">
-                <div class="relative w-full max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-black border-2 border-slate-700/80 shadow-2xl flex items-center justify-center" id="scannerVisualContainer">
-                    <!-- Elemento nativo de feed de cámara -->
-                    <div id="reader-dashboard-feed" class="w-full h-full object-cover"></div>
-
-                    <!-- HUD Overlay: 4 esquinas neón + láser animado -->
-                    <div class="pointer-events-none absolute inset-6 flex items-center justify-center" id="scannerHudOverlay">
-                        <!-- 4 Esquinas -->
-                        <div class="absolute top-0 left-0 w-6 h-6 border-t-[3.5px] border-l-[3.5px] border-teal-400 rounded-tl-lg shadow-[0_0_8px_rgba(45,212,191,0.8)]"></div>
-                        <div class="absolute top-0 right-0 w-6 h-6 border-t-[3.5px] border-r-[3.5px] border-teal-400 rounded-tr-lg shadow-[0_0_8px_rgba(45,212,191,0.8)]"></div>
-                        <div class="absolute bottom-0 left-0 w-6 h-6 border-b-[3.5px] border-l-[3.5px] border-teal-400 rounded-bl-lg shadow-[0_0_8px_rgba(45,212,191,0.8)]"></div>
-                        <div class="absolute bottom-0 right-0 w-6 h-6 border-b-[3.5px] border-r-[3.5px] border-teal-400 rounded-br-lg shadow-[0_0_8px_rgba(45,212,191,0.8)]"></div>
-
-                        <!-- Línea láser animada -->
-                        <div class="scan-laser-bar"></div>
-                    </div>
-
-                    <!-- Mensaje de estado mientras conecta la cámara -->
-                    <div id="scannerLoadingState" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center z-10 transition-opacity">
-                        <div class="w-10 h-10 border-3 border-teal-400 border-t-transparent rounded-full animate-spin mb-3"></div>
-                        <p class="text-sm font-bold text-white">Iniciando sensor de cámara...</p>
-                        <p class="text-xs text-slate-400 mt-1">Conceda permiso de acceso a la cámara si el navegador lo solicita.</p>
-                    </div>
-                </div>
-
-                <!-- Barra de control y estado -->
-                <div class="w-full max-w-[320px] flex items-center justify-between mt-4 px-1">
-                    <div class="flex items-center gap-2 text-[12px] text-slate-300 font-medium">
-                        <span class="inline-block w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
-                        <span id="scannerStatusTxt">Buscando código QR...</span>
-                    </div>
-
-                    <!-- Botón para alternar cámaras si hay más de una -->
-                    <button type="button" id="btnSwitchCamera" onclick="switchScannerCamera()"
-                        class="hidden px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-teal-300 rounded-lg text-[11px] font-bold border border-slate-700 transition-colors items-center gap-1.5 cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        Cambiar Cámara
+                    <button type="button" onclick="closeDashboardScanner()" class="text-slate-400 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-lg cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
-                <p class="text-[12px] text-slate-400 mt-3 text-center leading-relaxed max-w-sm">
-                    Apunta la cámara al código QR de la caja o medicamento. Al detectarlo, el sistema abrirá automáticamente su Ficha de Trazabilidad y Kardex.
-                </p>
-            </div>
+                <!-- Visor de Cámara adaptado a Modo Claro / Oscuro -->
+                <div class="p-4 sm:p-5 flex flex-col items-center bg-slate-50/70 overflow-y-auto flex-1">
+                    <div class="relative w-full max-w-[300px] sm:max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-black border-2 border-slate-300 shadow-md flex items-center justify-center" id="scannerVisualContainer">
+                        <!-- Elemento nativo de feed de cámara -->
+                        <div id="reader-dashboard-feed" class="w-full h-full object-cover"></div>
 
-            <!-- Footer modal -->
-            <div class="px-5 py-3.5 bg-slate-900 border-t border-slate-800 flex justify-end">
-                <button type="button" onclick="closeDashboardScanner()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-[12.5px] font-bold transition-colors cursor-pointer">
-                    Cerrar Escáner
-                </button>
+                        <!-- HUD Overlay: 4 esquinas nítidas + línea láser -->
+                        <div class="pointer-events-none absolute inset-5 flex items-center justify-center" id="scannerHudOverlay">
+                            <div class="absolute top-0 left-0 w-5 h-5 border-t-[3px] border-l-[3px] border-teal-400 rounded-tl-md"></div>
+                            <div class="absolute top-0 right-0 w-5 h-5 border-t-[3px] border-r-[3px] border-teal-400 rounded-tr-md"></div>
+                            <div class="absolute bottom-0 left-0 w-5 h-5 border-b-[3px] border-l-[3px] border-teal-400 rounded-bl-md"></div>
+                            <div class="absolute bottom-0 right-0 w-5 h-5 border-b-[3px] border-r-[3px] border-teal-400 rounded-br-md"></div>
+
+                            <div class="scan-laser-bar"></div>
+                        </div>
+
+                        <!-- Mensaje de estado mientras conecta la cámara -->
+                        <div id="scannerLoadingState" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center z-10 transition-opacity">
+                            <div class="w-8 h-8 border-3 border-teal-400 border-t-transparent rounded-full animate-spin mb-2.5"></div>
+                            <p class="text-[13px] font-bold text-white">Iniciando sensor de cámara...</p>
+                            <p class="text-[11px] text-slate-300 mt-0.5">Conceda permiso de acceso a la cámara en el navegador.</p>
+                        </div>
+                    </div>
+
+                    <!-- Barra de control y estado -->
+                    <div class="w-full max-w-[300px] sm:max-w-[320px] flex items-center justify-between mt-3.5 px-0.5">
+                        <div class="flex items-center gap-2 text-[12px] text-slate-600 font-medium">
+                            <span class="inline-block w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
+                            <span id="scannerStatusTxt">Buscando código QR...</span>
+                        </div>
+
+                        <!-- Botón para alternar cámaras si hay más de una -->
+                        <button type="button" id="btnSwitchCamera" onclick="switchScannerCamera()"
+                            class="hidden px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold border border-slate-300 transition-colors items-center gap-1.5 cursor-pointer shadow-2xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Cambiar Cámara
+                        </button>
+                    </div>
+
+                    <p class="text-[11.5px] text-slate-500 mt-3 text-center leading-relaxed max-w-sm">
+                        Apunta la cámara al código QR de la caja o medicamento. Al detectarlo, el sistema abrirá automáticamente su Ficha de Trazabilidad y Kardex.
+                    </p>
+                </div>
+
+                <!-- Footer modal -->
+                <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
+                    <button type="button" onclick="closeDashboardScanner()" class="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-[12.5px] font-bold shadow-xs transition-colors cursor-pointer">
+                        Cerrar Escáner
+                    </button>
+                </div>
             </div>
         </div>
     </div>
