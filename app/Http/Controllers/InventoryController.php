@@ -364,6 +364,13 @@ class InventoryController extends Controller
         if (!empty($inventory->posicion)) $ubicTxt[] = "Posición {$inventory->posicion}";
         $detUbic = !empty($ubicTxt) ? implode(' · ', $ubicTxt) : 'Sin asignar (P.A)';
 
+        $ubicAntTxt = [];
+        if (!empty($pasilloAnterior) && $pasilloAnterior !== 'P.A') $ubicAntTxt[] = "Pasillo {$pasilloAnterior}";
+        if (!empty($estanteAnterior) && $estanteAnterior !== 'P.A') $ubicAntTxt[] = "Estante {$estanteAnterior}";
+        if (!empty($nivelAnterior)) $ubicAntTxt[] = "Nivel {$nivelAnterior}";
+        if (!empty($posicionAnterior)) $ubicAntTxt[] = "Posición {$posicionAnterior}";
+        $detUbicAnterior = !empty($ubicAntTxt) ? implode(' · ', $ubicAntTxt) : 'Sin asignar (P.A)';
+
         if ($cambioEstado) {
             StockMovement::create([
                 'inventory_id' => $inventory->id,
@@ -394,31 +401,60 @@ class InventoryController extends Controller
             ]);
         }
 
-        if ($cambioUbicacion && !$cambioEstado) {
+        // Determinar tipo de movimiento y mensaje contextual
+        if ($estadoAnterior === 'Merma' && $inventory->estado === 'Cuarentena') {
+            $tipo = 'merma_a_cuarentena';
+            $mensaje = "El lote {$inventory->lote} ha sido trasladado desde Merma a Cuarentena para reevaluación técnica.";
+        } elseif ($estadoAnterior === 'Merma' && $inventory->estado === 'Disponible') {
+            $tipo = 'merma_a_disponible';
+            $mensaje = "El lote {$inventory->lote} ha sido reactivado desde Merma a Disponible para entrega y despacho.";
+        } elseif ($estadoAnterior === 'Disponible' && $inventory->estado === 'Cuarentena') {
+            $tipo = 'disponible_a_cuarentena';
+            $mensaje = "El lote {$inventory->lote} ha sido bloqueado preventivamente y enviado a Cuarentena.";
+        } elseif ($estadoAnterior === 'Cuarentena' && $inventory->estado === 'Disponible') {
+            $tipo = 'cuarentena_a_disponible';
+            $mensaje = "El lote {$inventory->lote} ha sido liberado exitosamente como Disponible para despacho.";
+        } elseif ($cambioEstado && $inventory->estado === 'Merma') {
+            $tipo = 'a_merma';
+            $mensaje = "El lote {$inventory->lote} ha sido declarado como Merma y retirado del stock disponible.";
+        } elseif ($cambioUbicacion && !$cambioEstado) {
+            $tipo = 'reubicacion';
             $mensaje = "El lote {$inventory->lote} ha sido reubicado exitosamente en bodega ({$detUbic}).";
-            return redirect()->back()
-                ->with('success', $mensaje)
-                ->with('lote_moved_success', [
-                    'producto' => $inventory->producto,
-                    'lote' => $inventory->lote,
-                    'ubicacion' => $detUbic,
-                ]);
-        } elseif ($data['estado'] == 'Cuarentena') {
-            $mensaje = 'El lote ha sido bloqueado y enviado a cuarentena.';
-        } elseif ($data['estado'] == 'Merma') {
-            $mensaje = 'El lote ha sido declarado como Merma.';
+        } elseif (!$cambioEstado && $inventory->estado === 'Cuarentena') {
+            $tipo = 'actualizacion_cuarentena';
+            $mensaje = "Se ha actualizado la justificación del lote {$inventory->lote} en Cuarentena.";
+        } elseif (!$cambioEstado && $inventory->estado === 'Merma') {
+            $tipo = 'actualizacion_merma';
+            $mensaje = "Se ha actualizado la información del lote {$inventory->lote} en Merma.";
         } else {
-            $mensaje = 'El lote ha sido actualizado exitosamente.';
+            $tipo = 'actualizacion';
+            $mensaje = "El lote {$inventory->lote} ha sido actualizado exitosamente.";
         }
+
+        $statusPayload = [
+            'tipo' => $tipo,
+            'correlativo' => 'MOV-' . str_pad($inventory->id, 5, '0', STR_PAD_LEFT),
+            'producto' => $inventory->producto,
+            'lote' => $inventory->lote,
+            'categoria' => $inventory->categoria ?? 'General',
+            'programa' => $inventory->programa ?: null,
+            'fecha_vencimiento' => $inventory->fecha_vencimiento ? \Carbon\Carbon::parse($inventory->fecha_vencimiento)->format('d/m/Y') : 'N/A',
+            'estado_anterior' => $estadoAnterior,
+            'nuevo_estado' => $inventory->estado,
+            'cantidad' => number_format($inventory->cantidad ?? 0, 0, ',', '.'),
+            'valor_unitario' => $inventory->valor_neto_unitario ? number_format((float) $inventory->valor_neto_unitario, 0, ',', '.') : null,
+            'valor_total' => $inventory->valor_neto_unitario ? number_format((float) ($inventory->valor_neto_unitario * ($inventory->cantidad ?? 0)), 0, ',', '.') : null,
+            'motivo' => $request->input('motivo') ?: '',
+            'ubicacion' => $detUbic,
+            'ubicacion_anterior' => $detUbicAnterior,
+            'fecha_hora' => now()->format('d/m/Y H:i'),
+            'usuario' => Auth::user() ? trim(Auth::user()->name . ' ' . (Auth::user()->last_name ?? '')) : 'Sistema',
+            'mensaje' => $mensaje,
+        ];
 
         return redirect()->back()
             ->with('success', $mensaje)
-            ->with('lote_moved_success', [
-                'producto' => $inventory->producto,
-                'lote' => $inventory->lote,
-                'ubicacion' => $detUbic,
-                'estado' => $inventory->estado,
-            ]);
+            ->with('lote_status_success', $statusPayload);
     }
 
     /**

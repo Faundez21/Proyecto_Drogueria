@@ -479,10 +479,7 @@
                                                                         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[12px] font-bold bg-teal-50 text-teal-800 border border-teal-200 font-mono-das">$ {{ number_format($valorTotalLote, 0, ',', '.') }}</span>
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
-                                                                        <div class="inline-flex items-center justify-center gap-1.5">
-                                                                            <button type="button" onclick="openQRModal('{{ e($loteId) }}', '{{ e($nombreProducto) }}', '{{ e($loteCodigo) }}', '{{ e($textoVencimiento) }}', '{{ $stockLote }}', '{{ e(data_get($loteData, 'razon_social') ?? 'Droguería DAS') }}')" class="p-1.5 text-slate-600 bg-slate-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-slate-200 hover:border-teal-600 shadow-sm cursor-pointer" title="Generar Etiqueta QR de este lote">
-                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                                                                            </button>
+                                                                        <div class="inline-flex items-center justify-center">
                                                                             <button type="button" onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}', '{{ e($loteCategoria) }}', '{{ e($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}', '{{ e($pasilloVal ?? '') }}', '{{ e($estanteVal ?? '') }}', '{{ e(data_get($loteData, 'nivel') ?? '') }}', '{{ e(data_get($loteData, 'posicion') ?? '') }}')" class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Editar Estado y Ubicación">
                                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                                             </button>
@@ -1049,8 +1046,8 @@
                         <h2 class="text-[17px] text-black font-black tracking-widest uppercase">DROGUERÍA DAS</h2>
                         <span class="text-[11px] text-black font-bold font-mono tracking-widest uppercase mt-0.5">Control de Trazabilidad</span>
                     </div>
-                    <div class="bg-white p-2 mb-4 z-10 flex justify-center w-full">
-                        <img id="qrcode" alt="Código QR del lote" class="w-[140px] h-[140px]">
+                    <div class="p-2 mb-4 z-10 flex justify-center w-full" style="background-color: #ffffff !important;">
+                        <img id="qrcode" alt="Código QR del lote" class="w-[140px] h-[140px] rounded-lg" style="background-color: #ffffff !important;">
                     </div>
                     <div class="w-full z-10 space-y-2.5 px-2">
                         <div class="text-center mb-4">
@@ -1321,7 +1318,7 @@
                                     </td>
                                     <td class="px-6 py-3.5 text-center">
                                         <button type="button"
-                                            onclick="openEditLote('{{ e($mLoteId) }}', '{{ e($mLoteCodigo) }}', '{{ e($mNombre) }}', 'Merma', '{{ e($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}', '{{ e($mObj->categoria ?? 'General') }}', '{{ e($mObj->programa ?? '') }}', '{{ $mValorUnitario }}', '{{ $mStock }}')"
+                                            onclick="openEditLote('{{ e($mLoteId) }}', '{{ e($mLoteCodigo) }}', '{{ e($mNombre) }}', 'Merma', '{{ e($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}', '{{ e($mObj->categoria ?? 'General') }}', '{{ e($mObj->programa ?? '') }}', '{{ $mValorUnitario }}', '{{ $mStock }}', '{{ e(data_get($mObj, 'pasillo') ?? '') }}', '{{ e(data_get($mObj, 'estante') ?? '') }}', '{{ e(data_get($mObj, 'nivel') ?? '') }}', '{{ e(data_get($mObj, 'posicion') ?? '') }}')"
                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center justify-center" title="Editar Estado">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                         </button>
@@ -2191,14 +2188,17 @@
             let ubiTxt = ubiParts.length > 0 ? ubiParts.join(' · ') : 'Sin asignar (P.A)';
 
             if (estado === 'Cuarentena') {
+                const isFromMerma = (initEstado === 'Merma');
                 Swal.fire({
-                    title: '¿Enviar lote a Cuarentena?',
-                    html: `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) quedará bloqueado preventivamente y pasará a control técnico en Cuarentena.`,
+                    title: isFromMerma ? '¿Mover lote de Merma a Cuarentena?' : '¿Enviar lote a Cuarentena?',
+                    html: isFromMerma
+                        ? `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) será reactivado desde Merma y trasladado a <strong>Cuarentena</strong> para reevaluación técnica.`
+                        : `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) quedará bloqueado preventivamente y pasará a control técnico en Cuarentena.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d97706',
                     cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, enviar a cuarentena',
+                    confirmButtonText: isFromMerma ? 'Sí, mover a cuarentena' : 'Sí, enviar a cuarentena',
                     cancelButtonText: 'Cancelar',
                     reverseButtons: true
                 }).then((result) => {
@@ -2208,8 +2208,9 @@
                     }
                 });
             } else if (estado === 'Merma') {
+                const isFromCuarentena = (initEstado === 'Cuarentena');
                 Swal.fire({
-                    title: '¿Declarar Merma de Lote?',
+                    title: isFromCuarentena ? '¿Declarar Merma desde Cuarentena?' : '¿Declarar Merma de Lote?',
                     html: `El lote <strong>${lote}</strong> de <strong>${prod}</strong> será dado de baja definitiva como Merma y retirado del stock disponible.`,
                     icon: 'warning',
                     showCancelButton: true,
@@ -2248,16 +2249,34 @@
                     }
                 });
             } else {
+                const isFromMerma = (initEstado === 'Merma');
+                const isFromCuarentena = (initEstado === 'Cuarentena');
+                let tit = '¿Guardar Cambios?';
+                let txt = `¿Confirmas actualizar la información del lote <strong>${lote}</strong> de <strong>${prod}</strong>?`;
+                let btnTxt = 'Sí, confirmar';
+
+                if (isFromMerma && estado === 'Disponible') {
+                    tit = '¿Reactivar lote a Disponible?';
+                    txt = `El lote <strong>${lote}</strong> de <strong>${prod}</strong> será retirado de Merma y habilitado como <strong>Disponible</strong> para entrega y despacho.`;
+                    btnTxt = 'Sí, reactivar a disponible';
+                } else if (isFromCuarentena && estado === 'Disponible') {
+                    tit = '¿Liberar lote a Disponible?';
+                    txt = `El lote <strong>${lote}</strong> de <strong>${prod}</strong> será liberado de Cuarentena y habilitado como <strong>Disponible</strong> para entrega y despacho.`;
+                    btnTxt = 'Sí, liberar lote';
+                } else if (cambioEstado && estado === 'Disponible') {
+                    tit = '¿Mover lote a Disponible?';
+                    txt = `El lote <strong>${lote}</strong> de <strong>${prod}</strong> quedará liberado y pasará a estar <strong>Disponible</strong> para entrega y despacho.`;
+                    btnTxt = 'Sí, mover a disponible';
+                }
+
                 Swal.fire({
-                    title: cambioEstado ? '¿Mover lote a Disponible?' : '¿Guardar Cambios?',
-                    html: cambioEstado 
-                        ? `El lote <strong>${lote}</strong> de <strong>${prod}</strong> quedará liberado y pasará a estar <strong>Disponible</strong> para entrega y despacho.`
-                        : `¿Confirmas actualizar la información del lote <strong>${lote}</strong> de <strong>${prod}</strong>?`,
+                    title: tit,
+                    html: txt,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#059669',
                     cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, confirmar',
+                    confirmButtonText: btnTxt,
                     cancelButtonText: 'Cancelar',
                     reverseButtons: true
                 }).then((result) => {
@@ -2276,28 +2295,6 @@
             if (selEstado) {
                 toggleManualEstadoHelp(selEstado.value);
             }
-
-            @if (session('lote_moved_success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Operación Exitosa!',
-                    html: `
-                        <div class="text-left bg-slate-50 border border-slate-200 rounded-xl p-3.5 my-2">
-                            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5">Producto</p>
-                            <p class="text-[13px] font-extrabold text-slate-800 leading-snug">{{ session('lote_moved_success')['producto'] }}</p>
-                            <div class="mt-2.5 pt-2.5 border-t border-slate-200 flex flex-wrap items-center justify-between gap-1.5">
-                                <span class="text-[11px] font-mono font-bold bg-white border border-slate-300 px-2 py-0.5 rounded text-slate-700">LOTE: {{ session('lote_moved_success')['lote'] }}</span>
-                                <span class="text-[11px] font-bold text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">{{ session('lote_moved_success')['ubicacion'] }}</span>
-                            </div>
-                        </div>
-                        <p class="text-[12px] text-slate-500 mt-2">{{ session('success') }}</p>
-                    `,
-                    confirmButtonColor: '#0f766e',
-                    confirmButtonText: 'Entendido',
-                    timer: 4500,
-                    timerProgressBar: true
-                });
-            @endif
 
             @if (session('open_modal') === 'import')
                 openImport();

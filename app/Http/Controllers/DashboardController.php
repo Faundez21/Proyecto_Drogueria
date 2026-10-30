@@ -455,8 +455,18 @@ class DashboardController extends Controller
 
         $recentMovements = $recentMovements->sortByDesc('fecha_hora')->take(6)->values();
 
-        // 8. ÚLTIMO LOTE INGRESADO (Para panel QR)
-        $latestInventory = (clone $invQuery)->where('cantidad', '>', 0)->latest('created_at')->first();
+        // 8. ÚLTIMO LOTE INGRESADO A BODEGA (Para panel de rotulación QR)
+        $latestInventory = (clone $invQuery)->where('cantidad', '>', 0)
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->first();
+
+        if (! $latestInventory) {
+            $latestInventory = Inventory::where('cantidad', '>', 0)
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->first();
+        }
 
         // 9. LISTAS PARA DROPDOWNS
         $categoriasLista = Inventory::whereNotNull('categoria')->where('categoria', '!=', '')->distinct()->orderBy('categoria')->pluck('categoria');

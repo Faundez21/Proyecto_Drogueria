@@ -276,20 +276,135 @@ html.dark .bg-gray-200 { background-color: #364763; }
 html.dark .bg-blue-900 { background-color: #1E3A5F; }
 html.dark .bg-slate-900:not(button):not(a) { background-color: #1E293B; }
 
-/* ---------- Tarjetas de etiquetas QR físicas (siempre claras para legibilidad óptica) ---------- */
+/* ---------- Tarjetas de etiquetas QR físicas (siempre fondo blanco puro y texto negro para legibilidad e impresión) ---------- */
 html.dark #qrPrintableCard {
     background-color: #FFFFFF !important;
     color: #000000 !important;
     border-color: #CBD5E1 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6) !important;
 }
 html.dark #qrPrintableCard * {
     color: #000000 !important;
+}
+html.dark #qrPrintableCard div {
+    background-color: transparent !important;
 }
 html.dark #qrPrintableCard .text-slate-500 {
     color: #475569 !important;
 }
 html.dark #qrPrintableCard .border-slate-300 {
     border-color: #CBD5E1 !important;
+}
+html.dark #qrPrintableCard .border-black {
+    border-color: #000000 !important;
+}
+html.dark #qrPrintableCard #qrcode,
+html.dark #qrPrintableCard img {
+    background-color: #FFFFFF !important;
+}
+
+/* ---------- Contenedores de visualización de QR (ej: Dashboard y paneles de lote) ---------- */
+html.dark #qr-container,
+html.dark .qr-container,
+html.dark [id*="qr-container"] {
+    background-color: #FFFFFF !important;
+    border-color: #475569 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+html.dark #qr-container img,
+html.dark .qr-container img,
+html.dark #qrcode,
+html.dark img[src*="qr"] {
+    background-color: #FFFFFF !important;
+    border-radius: 8px;
+}
+
+/* ---------- Modales y Visor de Escáner QR en Modo Oscuro (Dispatch, Controlled Dispatch, Dashboard) ---------- */
+html.dark #scannerModal > div,
+html.dark #scannerModal > div > div,
+html.dark #scannerModalDashboard > div,
+html.dark #scannerModalDashboard > div > div {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+    color: #E2E8F0 !important;
+}
+
+html.dark #scannerModal .bg-slate-50\/70,
+html.dark #scannerModalDashboard .bg-slate-50\/70,
+html.dark #scannerModal .bg-slate-50,
+html.dark #scannerModalDashboard .bg-slate-50 {
+    background-color: #172132 !important;
+    border-color: #2F3D55 !important;
+}
+
+html.dark #scannerVisualContainer {
+    background-color: #000000 !important;
+    border-color: #475569 !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 24px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Motor nativo HTML5 QR Scanner en modo oscuro */
+html.dark #reader-feed,
+html.dark #reader-dashboard-feed {
+    background-color: #000000 !important;
+    color: #F1F5F9 !important;
+}
+html.dark #reader-feed *,
+html.dark #reader-dashboard-feed * {
+    color: #F1F5F9 !important;
+}
+html.dark #reader-feed select,
+html.dark #reader-dashboard-feed select {
+    background-color: #1E293B !important;
+    color: #E2E8F0 !important;
+    border: 1px solid #475569 !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+}
+html.dark #reader-feed button,
+html.dark #reader-dashboard-feed button {
+    background-color: #0F766E !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+}
+
+/* Barra de estado y botones del modal de escaneo */
+html.dark #scannerStatusTxt {
+    color: #E2E8F0 !important;
+}
+html.dark #btnSwitchCamera {
+    background-color: #243044 !important;
+    color: #E2E8F0 !important;
+    border-color: #475569 !important;
+}
+html.dark #btnSwitchCamera:hover {
+    background-color: #2C3A52 !important;
+    color: #FFFFFF !important;
+}
+
+html.dark #scannerModal p,
+html.dark #scannerModalDashboard p {
+    color: #94A3B8;
+}
+
+/* Footer de los modales de escaneo */
+html.dark #scannerModal .border-t,
+html.dark #scannerModalDashboard .border-t {
+    border-color: #2F3D55 !important;
+    background-color: #172132 !important;
+}
+html.dark #scannerModal button[onclick*="closeScanner"],
+html.dark #scannerModalDashboard button[onclick*="closeDashboardScanner"] {
+    background-color: #243044 !important;
+    color: #E2E8F0 !important;
+    border-color: #475569 !important;
+}
+html.dark #scannerModal button[onclick*="closeScanner"]:hover,
+html.dark #scannerModalDashboard button[onclick*="closeDashboardScanner"]:hover {
+    background-color: #2C3A52 !important;
+    color: #FFFFFF !important;
 }
 
 /* ---------- Blindaje de modales fijos contra márgenes no deseados (space-y-*) ---------- */

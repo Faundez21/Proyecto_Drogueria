@@ -34,7 +34,7 @@
                     </a>
                 @endcan
                 <button type="button" onclick="openDashboardScanner()"
-                    class="items-center justify-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-xl text-[12.5px] font-bold hover:bg-slate-900 transition-all shadow-sm cursor-pointer inline-flex">
+                    class="items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white dark:bg-teal-700 dark:hover:bg-teal-600 px-4 py-2 rounded-xl text-[12.5px] font-bold transition-all shadow-sm cursor-pointer inline-flex">
                     <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
                     </svg>
@@ -249,12 +249,13 @@
         <!-- FILA 2: 4 KPIs DE ESTABLECIMIENTOS Y CESFAM -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- 1. Solicitudes y Despachos CESFAM -->
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-purple-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-purple-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
+                title="Solicitudes de medicamentos generadas exclusivamente por centros CESFAM en este período. 'Pendientes' indica pedidos aún en preparación o entrega.">
                 <div>
                     <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Red CESFAM ({{ $periodoTexto }})</p>
                     <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($solicitudesCesfamCount ?? 0, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">solicitudes</span></h3>
                     <p class="text-[11px] font-bold text-purple-600 mt-0.5">
-                        {{ $cesfamActivasCount ?? 0 }} activas · {{ number_format($unidadesDespachadasCesfam ?? 0, 0, ',', '.') }} uds. desp.
+                        {{ $cesfamActivasCount ?? 0 }} pendientes de entrega · {{ number_format($unidadesDespachadasCesfam ?? 0, 0, ',', '.') }} uds. desp.
                     </p>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shrink-0">
@@ -265,12 +266,13 @@
             </div>
 
             <!-- 2. Solicitudes y Despachos Establecimientos -->
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-teal-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-teal-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
+                title="Solicitudes de medicamentos de otros centros de la red comunal (CECOSF, Postas Rurales, SAR).">
                 <div>
-                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Establecimientos ({{ $periodoTexto }})</p>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">CECOSF / Postas ({{ $periodoTexto }})</p>
                     <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($solicitudesEstablecimientosCount ?? 0, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">solicitudes</span></h3>
                     <p class="text-[11px] font-bold text-teal-600 mt-0.5">
-                        {{ $estabActivasCount ?? 0 }} activas · {{ number_format($unidadesDespachadasEstablecimientos ?? 0, 0, ',', '.') }} uds. desp.
+                        {{ $estabActivasCount ?? 0 }} pendientes de entrega · {{ number_format($unidadesDespachadasEstablecimientos ?? 0, 0, ',', '.') }} uds. desp.
                     </p>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0">
@@ -282,12 +284,13 @@
             </div>
 
             <!-- 3. Cola de Despacho (Asignadas vs Sin Asignar) -->
-            <a href="{{ route('dispatch.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-indigo-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
+            <a href="{{ route('dispatch.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-indigo-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
+                title="Pedidos de la red pendientes de ser surtidos o despachados en bodega central.">
                 <div>
-                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Pedidos por Despachar</p>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Pedidos por Surtir</p>
                     <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($solicitudesPorDespacharCount ?? 0, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">en cola</span></h3>
                     <p class="text-[11px] font-bold text-indigo-600 mt-0.5">
-                        {{ $solicitudesAsignadasCount ?? 0 }} asignadas · {{ $solicitudesSinAsignarCount ?? 0 }} sin asignar
+                        {{ $solicitudesAsignadasCount ?? 0 }} con bodeguero · {{ $solicitudesSinAsignarCount ?? 0 }} sin asignar
                     </p>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shrink-0">
@@ -298,12 +301,13 @@
             </a>
 
             <!-- 4. Cumplimiento y Stock Declarado -->
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-emerald-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-emerald-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
+                title="Nivel de Servicio: porcentaje de unidades entregadas respecto al total solicitado en los pedidos de este período. 'Stock en centros' corresponde al saldo físico declarado por los centros al pedir.">
                 <div>
-                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Cumplimiento de Red</p>
-                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ $porcentajeCumplimientoRed ?? 0 }}% <span class="text-xs font-bold text-slate-500">entregado</span></h3>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Cumplimiento de Pedidos</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ $porcentajeCumplimientoRed ?? 0 }}% <span class="text-xs font-bold text-slate-500">abastecido</span></h3>
                     <p class="text-[11px] font-bold text-emerald-600 mt-0.5">
-                        Stock red: {{ number_format($stockDeclaradoRed ?? 0, 0, ',', '.') }} uds.
+                        {{ number_format($totalUnidadesEntregadasSolicitudes ?? 0, 0, ',', '.') }} / {{ number_format($totalUnidadesSolicitadas ?? 0, 0, ',', '.') }} uds. <span class="text-slate-400 font-normal">| Centros: {{ number_format($stockDeclaradoRed ?? 0, 0, ',', '.') }} u.</span>
                     </p>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
@@ -312,6 +316,7 @@
                     </svg>
                 </div>
             </div>
+        </div>
         </div>
 
         <!-- SECCIÓN PRINCIPAL EN 2 COLUMNAS: PANEL CON PESTAÑAS (IZQUIERDA) + QR Y ACCESOS (DERECHA) -->
@@ -512,9 +517,9 @@
 
                     @if ($latestInventory)
                         <div class="flex items-center gap-4">
-                            <div class="w-24 h-24 bg-slate-50 p-2 rounded-xl border border-slate-200 shrink-0 flex items-center justify-center shadow-2xs" id="qr-container">
-                                <img src="{{ route('qr.image', $latestInventory->id) }}"
-                                    alt="Código QR Lote" class="w-full h-full object-contain">
+                            <div class="w-24 h-24 bg-white p-2 rounded-xl border border-slate-200 shrink-0 flex items-center justify-center shadow-2xs" id="qr-container">
+                                <img src="{{ route('qr.image', $latestInventory->id) }}?t={{ $latestInventory->updated_at?->timestamp ?? time() }}"
+                                    alt="Código QR Lote" class="w-full h-full object-contain bg-white rounded-lg">
                             </div>
                             <div class="min-w-0 flex-1">
                                 <h3 class="font-extrabold text-[13px] text-slate-800 truncate" title="{{ $latestInventory->producto }}">
@@ -949,42 +954,181 @@
                 <!DOCTYPE html>
                 <html>
                     <head>
-                        <title>Rótulo Adhesivo QR - Lote ${loteTxt}</title>
+                        <title>Rótulo QR - Lote ${loteTxt}</title>
                         <style>
-                            @page { size: auto; margin: 6mm; }
-                            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 12px; background: #fff; color: #0f172a; }
-                            .label-container {
-                                width: 280px;
-                                border: 2px solid #0f172a;
-                                border-radius: 12px;
-                                padding: 12px;
-                                margin: 0 auto;
-                                text-align: center;
-                                box-sizing: border-box;
+                            @page { size: auto; margin: 4mm; }
+                            * { box-sizing: border-box; }
+                            body {
+                                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                                margin: 0;
+                                padding: 8px;
+                                background: #ffffff;
+                                color: #000000;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
                             }
-                            .header { font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #0d9488; text-transform: uppercase; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px; margin-bottom: 8px; }
-                            .qr-wrap { display: flex; justify-content: center; margin: 6px 0; }
-                            .qr-wrap img { width: 130px; height: 130px; }
-                            .prod-title { font-size: 13px; font-weight: 800; margin: 6px 0 3px 0; line-height: 1.2; word-break: break-word; }
-                            .lote-badge { font-family: monospace; font-size: 14px; font-weight: 900; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; display: inline-block; margin: 4px 0; }
-                            .info-grid { font-size: 10.5px; margin-top: 6px; border-top: 1px dashed #cbd5e1; padding-top: 6px; display: flex; justify-content: space-between; text-align: left; }
-                            .info-grid div span { color: #64748b; font-size: 9px; display: block; text-transform: uppercase; font-weight: 700; }
+                            .qr-card {
+                                width: 330px;
+                                border: 2px solid #000000;
+                                border-radius: 14px;
+                                padding: 14px 16px;
+                                position: relative;
+                                background: #ffffff;
+                                text-align: center;
+                            }
+                            .dash-border {
+                                position: absolute;
+                                inset: 4px;
+                                border: 1.5px dashed #94a3b8;
+                                border-radius: 10px;
+                                pointer-events: none;
+                            }
+                            .card-header {
+                                border-bottom: 2px solid #000000;
+                                padding-bottom: 6px;
+                                margin-bottom: 10px;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .card-header h2 {
+                                margin: 0;
+                                font-size: 16px;
+                                font-weight: 900;
+                                letter-spacing: 2px;
+                                text-transform: uppercase;
+                                color: #000000;
+                            }
+                            .card-header span {
+                                font-size: 10px;
+                                font-weight: 700;
+                                letter-spacing: 1.5px;
+                                text-transform: uppercase;
+                                color: #334155;
+                                font-family: monospace;
+                                display: block;
+                                margin-top: 2px;
+                            }
+                            .qr-img-wrap {
+                                margin: 6px auto;
+                                width: 140px;
+                                height: 140px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .qr-img-wrap img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                            }
+                            .prod-title {
+                                font-size: 13.5px;
+                                font-weight: 900;
+                                text-transform: uppercase;
+                                line-height: 1.25;
+                                margin: 8px 0 10px 0;
+                                word-break: break-word;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .meta-table {
+                                width: 100%;
+                                border-top: 1px solid #000000;
+                                border-bottom: 1px solid #000000;
+                                padding: 6px 0;
+                                margin-bottom: 6px;
+                                display: flex;
+                                justify-content: space-between;
+                                text-align: left;
+                                font-family: monospace;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .meta-table .meta-item {
+                                display: flex;
+                                flex-col: column;
+                            }
+                            .meta-table .label {
+                                font-size: 9px;
+                                font-weight: 700;
+                                text-transform: uppercase;
+                                color: #475569;
+                                display: block;
+                            }
+                            .meta-table .val {
+                                font-size: 13px;
+                                font-weight: 900;
+                                color: #000000;
+                            }
+                            .footer-row {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-end;
+                                text-align: left;
+                                font-family: monospace;
+                                padding-top: 4px;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .footer-row .label {
+                                font-size: 9px;
+                                font-weight: 700;
+                                text-transform: uppercase;
+                                color: #475569;
+                                display: block;
+                            }
+                            .footer-row .val {
+                                font-size: 12px;
+                                font-weight: 800;
+                                color: #000000;
+                            }
+                            .footer-row .stock-val {
+                                font-size: 16px;
+                                font-weight: 900;
+                                color: #000000;
+                            }
                         </style>
                     </head>
                     <body>
-                        <div class="label-container">
-                            <div class="header">Droguería Municipal · Control de Lote</div>
-                            <div class="qr-wrap"><img src="${qrImage.src}" /></div>
+                        <div class="qr-card">
+                            <div class="dash-border"></div>
+                            <div class="card-header">
+                                <h2>DROGUERÍA DAS</h2>
+                                <span>Control de Trazabilidad</span>
+                            </div>
+                            <div class="qr-img-wrap">
+                                <img src="${qrImage.src}" alt="QR Lote" />
+                            </div>
                             <div class="prod-title">${productoTxt}</div>
-                            <div class="lote-badge">LOTE: ${loteTxt}</div>
-                            <div class="info-grid">
-                                <div><span>Vencimiento</span><strong>${vencimientoTxt}</strong></div>
-                                <div><span>Ubicación</span><strong>${ubicacionTxt}</strong></div>
-                                <div><span>Stock Inicial</span><strong>${cantidadTxt} u.</strong></div>
+                            <div class="meta-table">
+                                <div class="meta-item">
+                                    <span class="label">Lote Identificador</span>
+                                    <span class="val">${loteTxt}</span>
+                                </div>
+                                <div class="meta-item" style="text-align: right;">
+                                    <span class="label">Fecha Vencimiento</span>
+                                    <span class="val">${vencimientoTxt}</span>
+                                </div>
+                            </div>
+                            <div class="footer-row">
+                                <div>
+                                    <span class="label">Ubicación Bodega</span>
+                                    <span class="val">${ubicacionTxt}</span>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span class="label">Stock Físico</span>
+                                    <span class="stock-val">${cantidadTxt} UNID.</span>
+                                </div>
                             </div>
                         </div>
                         <script>
-                            window.onload = function() { window.print(); setTimeout(() => window.close(), 500); }
+                            window.onload = function() {
+                                window.print();
+                                setTimeout(() => window.close(), 600);
+                            };
                         <\/script>
                     </body>
                 </html>
