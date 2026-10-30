@@ -648,10 +648,7 @@
                 window.location.reload();
             }
         });
-
-        // ==========================================
         // MODAL 1: RECUPERAR CONTRASEÑA
-        // ==========================================
         function abrirModalRecuperacion(event) {
             if (event) event.preventDefault();
             const modal = document.getElementById('forgotPasswordModal');
@@ -740,9 +737,7 @@
             }
         }
 
-        // ==========================================
         // MODAL 2: CONTACTAR AL ADMINISTRADOR
-        // ==========================================
         function contactarAdministrador() {
             const modal = document.getElementById('contactAdminModal');
             if (modal) modal.classList.remove('hidden');

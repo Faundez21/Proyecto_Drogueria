@@ -157,6 +157,11 @@ class InventoryService
         $datos = self::resolverRelaciones($datos);
         $lote = self::normalizarLote($datos['lote'] ?? null);
 
+        $fechaVence = (!empty($datos['fecha_vencimiento']) && trim((string)$datos['fecha_vencimiento']) !== '' && $datos['fecha_vencimiento'] !== 'N/A')
+            ? $datos['fecha_vencimiento']
+            : null;
+        $datos['fecha_vencimiento'] = $fechaVence;
+
         $batch = Inventory::where('producto', $datos['producto'])
             ->where('estado', '!=', 'Merma')
             ->where(function ($q) use ($lote) {
@@ -173,7 +178,7 @@ class InventoryService
             $batch->increment('cantidad', $datos['cantidad']);
             $batch->fill([
                 'valor_neto_unitario' => $datos['valor_neto_unitario'] ?? $batch->valor_neto_unitario,
-                'fecha_vencimiento' => $datos['fecha_vencimiento'] ?? $batch->fecha_vencimiento,
+                'fecha_vencimiento' => $fechaVence ?? $batch->fecha_vencimiento,
                 'user_id' => $datos['user_id'] ?? $batch->user_id,
                 'provider_id' => $datos['provider_id'] ?? $batch->provider_id,
                 'reception_id' => $datos['reception_id'] ?? $batch->reception_id,

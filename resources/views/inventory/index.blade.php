@@ -1692,7 +1692,7 @@
             document.getElementById('DepositModal').classList.add('hidden');
         }
 
-        // ====== LÓGICA FILTROS AVANZADOS MERMA ======
+        //  LÓGICA FILTROS AVANZADOS MERMA 
         function openMerma() {
             document.getElementById('mermaModal').classList.remove('hidden');
             filterMermas();
@@ -1766,7 +1766,6 @@
             if(document.getElementById('mermaUserFilter')) document.getElementById('mermaUserFilter').value = '';
             filterMermas();
         }
-        // ============================================
 
         function showSearchDropdown() {
             const dropdown = document.getElementById('searchDropdown');

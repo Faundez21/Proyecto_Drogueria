@@ -100,6 +100,22 @@ class ReceptionController extends Controller
 
     public function store(Request $request)
     {
+        // Normalizar campos opcionales para evitar cadenas vacías que fallen en validación date o inserción SQL
+        if ($request->has('fecha_vencimiento') && is_array($request->fecha_vencimiento)) {
+            $fechas = array_map(function ($val) {
+                if (is_string($val)) {
+                    $val = trim($val);
+                    return $val === '' ? null : $val;
+                }
+                return $val ?: null;
+            }, $request->fecha_vencimiento);
+            $request->merge(['fecha_vencimiento' => $fechas]);
+        }
+
+        if ($request->has('orden_compra') && empty(trim((string)$request->orden_compra))) {
+            $request->merge(['orden_compra' => null]);
+        }
+
         $validated = $request->validate([
             'fecha_recepcion' => ['required', 'date'],
             'tipo_documento' => ['required', 'string', 'max:255'],
@@ -117,8 +133,8 @@ class ReceptionController extends Controller
             'valor_unitario.*' => ['nullable', 'numeric', 'min:0'],
             'lote' => ['nullable', 'array'],
             'lote.*' => ['nullable', 'string', 'max:255'],
-            'fecha_vencimiento' => ['nullable', 'array'],
-            'fecha_vencimiento.*' => ['nullable', 'date'],
+            'fecha_vencimiento' => ['required', 'array', 'min:1'],
+            'fecha_vencimiento.*' => ['required', 'date'],
             'tipo_producto' => ['nullable', 'array'],
             'tipo_producto.*' => ['nullable', 'string', 'max:255'],
             'programa' => ['nullable', 'array'],
@@ -131,6 +147,10 @@ class ReceptionController extends Controller
             'nivel.*' => ['nullable', 'string', 'max:100'],
             'posicion' => ['nullable', 'array'],
             'posicion.*' => ['nullable', 'string', 'max:100'],
+        ], [
+            'fecha_vencimiento.required' => 'Debes ingresar la fecha de vencimiento para cada producto.',
+            'fecha_vencimiento.*.required' => 'La fecha de vencimiento es obligatoria para cada producto recepcionado.',
+            'fecha_vencimiento.*.date' => 'La fecha de vencimiento ingresada no es válida.',
         ]);
 
         $provider = Provider::findOrFail($validated['provider_id']);
@@ -166,7 +186,8 @@ class ReceptionController extends Controller
                 $valorU = (float) ($validated['valor_unitario'][$index] ?? 0);
                 $subtotal = $cantidad * $valorU;
                 $subtotalIva = round($subtotal * $factorIva);
-                $fechaVence = $validated['fecha_vencimiento'][$index] ?? null;
+                $rawVence = $validated['fecha_vencimiento'][$index] ?? null;
+                $fechaVence = (!empty($rawVence) && trim((string)$rawVence) !== '') ? trim((string)$rawVence) : null;
                 $loteItem = !empty($validated['lote'][$index]) ? trim($validated['lote'][$index]) : 'S/L';
 
                 $tipoSolicitado = $validated['tipo_producto'][$index] ?? null;

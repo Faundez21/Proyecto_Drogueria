@@ -210,10 +210,6 @@ html.dark .theme-icon-moon { display: none; }
     html.dark body { background: #fff !important; color: #000 !important; }
 }
 
-/* =====================================================================
-   AJUSTES ADICIONALES (v2)
-   ===================================================================== */
-
 /* ---------- Barra lateral más suave ---------- */
 html.dark {
     --sidebar-bg: #1C2639;

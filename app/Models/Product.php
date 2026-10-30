@@ -14,7 +14,6 @@ class Product extends Model
         'nombre',
     ];
 
-    // Relación con ReceptionItems (opcional pero recomendada para el futuro)
     public function receptionItems()
     {
         return $this->hasMany(ReceptionItem::class, 'product_id');
