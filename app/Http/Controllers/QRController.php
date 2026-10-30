@@ -20,10 +20,16 @@ class QRController extends Controller
         $svg = (new Generator())
             ->format('svg')
             ->size(300)
-            ->margin(0)
+            ->margin(1)
+            ->color(0, 0, 0)
+            ->backgroundColor(255, 255, 255)
             ->errorCorrection('M')
             ->generate($contenido);
 
-        return response($svg)->header('Content-Type', 'image/svg+xml');
+        return response($svg)
+            ->header('Content-Type', 'image/svg+xml')
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 }

@@ -63,9 +63,9 @@
         <!-- Contenedor Principal Tabla Niveles -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
             <!-- Cabecera y filtros -->
-            <div class="p-4 sm:px-6 border-b border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="p-4 sm:p-5 border-b border-slate-200/80 bg-white flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center shrink-0">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                         </svg>
@@ -76,9 +76,9 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                <div class="w-full lg:max-w-3xl flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-end">
                     <select id="levelShelfFilter" onchange="filtrarNiveles()"
-                        class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] text-slate-700 font-medium focus:bg-white focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        class="w-full sm:w-64 md:w-72 px-4 py-2.5 bg-slate-50 hover:bg-slate-100/70 border border-slate-200 rounded-xl text-[13px] text-slate-700 font-medium focus:bg-white focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition-all cursor-pointer">
                         <option value="">Todas las estanterías</option>
                         @foreach ($shelves as $shelf)
                             <option value="{{ $shelf->id }}">
@@ -87,12 +87,12 @@
                         @endforeach
                     </select>
 
-                    <div class="relative w-full sm:w-64">
-                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="relative flex-1 min-w-[200px] sm:min-w-[260px]">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         <input type="text" id="levelSearchInput" oninput="filtrarNiveles()" placeholder="Buscar nivel o descripción..."
-                            class="w-full pl-9 pr-3.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl text-[13px] text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-2xs transition-all">
                     </div>
                 </div>
             </div>
@@ -333,16 +333,23 @@
 
     <!-- Modal Editar Nivel -->
     <div id="editModal"
-        class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4">
-        <div class="flex min-h-full items-center justify-center">
-            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden text-left my-auto">
-                <div class="bg-slate-900 px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between border-b border-slate-800 shrink-0">
-                    <div>
-                        <h2 class="text-[15px] sm:text-[16px] font-bold text-white leading-tight">Editar Nivel</h2>
-                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Modifica la información del nivel.</p>
+        class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-3 sm:p-5">
+        <div class="flex min-h-full items-center justify-center py-4">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
+                <div class="bg-slate-900 px-5 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-400/30 text-purple-300 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-[16px] font-bold text-white leading-tight">Editar Nivel</h2>
+                            <p class="text-slate-400 text-[12px] mt-0.5">Modifica la información del nivel.</p>
+                        </div>
                     </div>
                     <button type="button" onclick="closeEdit()"
-                        class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors cursor-pointer">
+                        class="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-2 transition-colors cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -352,14 +359,14 @@
                 <form id="editForm" method="POST" onsubmit="confirmEditLevel(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                     @csrf
                     @method('PUT')
-                    <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                    <div class="p-5 sm:p-6 space-y-4.5 overflow-y-auto flex-1 overscroll-contain">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div>
                                 <label for="editNumber" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
                                     Número de Nivel <span class="text-rose-500">*</span>
                                 </label>
                                 <input type="number" name="number" id="editNumber" min="1" required
-                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 font-mono-das focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] text-slate-800 font-mono-das focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
                             </div>
 
                             <div>
@@ -367,7 +374,7 @@
                                     Estantería <span class="text-rose-500">*</span>
                                 </label>
                                 <select name="shelf_id" id="editShelfId" required
-                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
                                     @foreach ($shelves as $shelf)
                                         <option value="{{ $shelf->id }}">
                                             {{ $shelf->name }}{{ optional($shelf->aisle)->name ? ' (' . $shelf->aisle->name . ')' : '' }}
@@ -382,17 +389,17 @@
                                 Descripción Operativa
                             </label>
                             <textarea name="description" id="editDescription" rows="3"
-                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition resize-none"></textarea>
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition resize-none"></textarea>
                         </div>
                     </div>
 
-                    <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-2.5 px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-t border-slate-200 shrink-0">
+                    <div class="flex flex-col-reverse sm:flex-row justify-end gap-2.5 px-5 sm:px-6 py-4 bg-slate-50 border-t border-slate-200 shrink-0">
                         <button type="button" onclick="closeEdit()"
-                            class="w-full sm:w-auto px-4 py-2 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer text-center">
+                            class="w-full sm:w-auto px-5 py-2.5 text-[13px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer text-center">
                             Cancelar
                         </button>
                         <button type="submit"
-                            class="w-full sm:w-auto px-5 py-2 text-[13px] font-bold text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-sm cursor-pointer text-center">
+                            class="w-full sm:w-auto px-6 py-2.5 text-[13px] font-bold text-white bg-teal-600 rounded-xl hover:bg-teal-700 transition-colors shadow-sm cursor-pointer text-center">
                             Guardar Cambios
                         </button>
                     </div>
