@@ -250,7 +250,7 @@
                 class="fixed inset-y-0 left-0 w-[260px] flex flex-col z-50 transform -translate-x-full lg:translate-x-0 lg:static lg:shrink-0 transition-transform duration-300 ease-in-out"
                 style="background-color: var(--sidebar-bg); box-shadow: 2px 0 8px rgba(0,0,0,0.15);">
 
-                <div class="h-[75px] flex items-center px-5 shrink-0 relative border-b border-slate-800 bg-[#0F172A]">
+                <div class="h-[70px] flex items-center px-5 shrink-0 relative border-b border-slate-800 bg-[#0F172A]">
                     <a href="{{ route('dashboard.index') }}" class="brand-container flex items-center gap-3.5 group">
                         <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-[#0F172A]">
                             <img src="{{ asset('images/favicon.svg') }}" alt="Logo DAS"
@@ -647,7 +647,7 @@
                             </button>
 
                             <div id="notifications-menu"
-                                class="hidden absolute right-0 mt-2 w-[350px] sm:w-[370px] rounded-xl z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-xl">
+                                class="hidden absolute right-0 mt-2 w-[350px] sm:w-[370px] rounded-2xl z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-2xl transition-all">
                                 <div class="px-4 py-3 flex justify-between items-center border-b border-slate-100 bg-slate-50">
                                     <div class="flex items-center gap-2">
                                         <h3 class="text-[13px] font-extrabold text-slate-800">Centro de Alertas</h3>
@@ -665,12 +665,12 @@
                                 <!-- Selector de Pestañas: Pendientes y Vistas -->
                                 <div class="flex border-b border-slate-200/80 bg-slate-50/70 p-1.5 gap-1.5 text-[12px] font-bold">
                                     <button id="tab-notif-pendientes" type="button" onclick="cambiarTabNotificaciones('pendientes')"
-                                        class="flex-1 py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 bg-white text-teal-700 shadow-2xs border border-slate-200/60 cursor-pointer">
+                                        class="notif-tab-active flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 bg-white text-teal-700 shadow-2xs border border-slate-200/60 cursor-pointer">
                                         <span>Pendientes</span>
                                         <span id="notif-count" class="text-white text-[10px] font-mono-das font-extrabold px-1.5 py-0.2 rounded-full bg-rose-500">0</span>
                                     </button>
                                     <button id="tab-notif-vistas" type="button" onclick="cambiarTabNotificaciones('vistas')"
-                                        class="flex-1 py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 hover:bg-white/60 cursor-pointer">
+                                        class="notif-tab-inactive flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 hover:bg-white/60 cursor-pointer">
                                         <span>Vistas</span>
                                         <span id="notif-read-count" class="text-slate-600 text-[10px] font-mono-das font-bold px-1.5 py-0.2 rounded-full bg-slate-200">0</span>
                                     </button>
@@ -1307,16 +1307,16 @@
             const btnMarcarTodas = document.getElementById('btn-marcar-todas-notif');
 
             if (tab === 'pendientes') {
-                tabPend.className = 'flex-1 py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 bg-white text-teal-700 shadow-2xs border border-slate-200/60 cursor-pointer';
-                tabVist.className = 'flex-1 py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 hover:bg-white/60 cursor-pointer';
+                tabPend.className = 'notif-tab-active flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 bg-white text-teal-700 shadow-2xs border border-slate-200/60 cursor-pointer';
+                tabVist.className = 'notif-tab-inactive flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 hover:bg-white/60 cursor-pointer';
                 listPend.classList.remove('hidden');
                 listVist.classList.add('hidden');
                 if (btnMarcarTodas && currentNotifKeys.length > 0) {
                     btnMarcarTodas.classList.remove('hidden');
                 }
             } else {
-                tabVist.className = 'flex-1 py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 bg-white text-teal-700 shadow-2xs border border-slate-200/60 cursor-pointer';
-                tabPend.className = 'flex-1 py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 hover:bg-white/60 cursor-pointer';
+                tabVist.className = 'notif-tab-active flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 bg-white text-teal-700 shadow-2xs border border-slate-200/60 cursor-pointer';
+                tabPend.className = 'notif-tab-inactive flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 hover:bg-white/60 cursor-pointer';
                 listPend.classList.add('hidden');
                 listVist.classList.remove('hidden');
                 if (btnMarcarTodas) {
@@ -1365,7 +1365,7 @@
                         let html = '';
                         data.data.forEach(n => {
                             html += `
-                            <div class="group relative flex items-start gap-2 p-2 rounded-lg transition-colors hover:bg-slate-50 border-b border-slate-100 last:border-0" data-notif-id="${n.id}">
+                            <div class="group relative flex items-start gap-2 p-2 rounded-xl transition-colors hover:bg-slate-50 border-b border-slate-100 last:border-0" data-notif-id="${n.id}">
                                 <a href="${n.url}" onclick="onNotifClick('${n.id}')" class="flex-1 flex gap-2.5 min-w-0">
                                     <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${n.bg} ${n.color}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${n.icon}</svg>
@@ -1377,7 +1377,7 @@
                                     </div>
                                 </a>
                                 <button onclick="marcarNotificacionVista(event, '${n.id}')" type="button"
-                                    class="shrink-0 p-1.5 text-slate-400 hover:text-teal-700 hover:bg-teal-50 rounded-md transition-colors cursor-pointer"
+                                    class="shrink-0 p-1.5 text-slate-400 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
                                     title="Marcar como vista">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
@@ -1396,7 +1396,7 @@
                         let htmlVistas = '';
                         data.read_data.forEach(n => {
                             htmlVistas += `
-                            <div class="group relative flex items-start gap-2 p-2 rounded-lg transition-colors hover:bg-slate-100/70 border-b border-slate-100 last:border-0 opacity-80 hover:opacity-100" data-notif-read-id="${n.id}">
+                            <div class="group relative flex items-start gap-2 p-2 rounded-xl transition-colors hover:bg-slate-100/70 border-b border-slate-100 last:border-0 opacity-80 hover:opacity-100" data-notif-read-id="${n.id}">
                                 <a href="${n.url}" class="flex-1 flex gap-2.5 min-w-0">
                                     <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-slate-100 text-slate-500">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${n.icon}</svg>
@@ -1404,14 +1404,14 @@
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-1.5">
                                             <p class="text-[12px] font-bold text-slate-700 leading-snug">${n.title}</p>
-                                            <span class="inline-block text-[9.5px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 font-semibold">Vista</span>
+                                            <span class="inline-block text-[9.5px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 font-semibold border border-slate-200/60">Vista</span>
                                         </div>
                                         <p class="text-[11px] font-normal mt-0.5 leading-snug text-slate-500">${n.message}</p>
                                         <p class="text-[10px] font-mono font-medium mt-1 text-slate-400">${n.read_at_human || 'Vista recientemente'}</p>
                                     </div>
                                 </a>
                                 <button onclick="desmarcarNotificacionVista(event, '${n.id}')" type="button"
-                                    class="shrink-0 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors cursor-pointer"
+                                    class="shrink-0 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
                                     title="Restaurar a pendientes">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>

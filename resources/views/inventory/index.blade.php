@@ -1087,7 +1087,7 @@
 
         <!-- Modal: Editar Lote -->
         <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-lg max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden my-auto">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-0 w-full max-w-lg max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden my-auto">
                 <div class="px-4 sm:px-6 py-4 bg-slate-800 flex justify-between items-center shrink-0 border-b border-slate-700">
                     <div>
                         <h2 class="text-[15px] sm:text-[16px] font-bold text-white tracking-wide">Actualizar Estado y Ubicación de Lote</h2>
@@ -1098,47 +1098,47 @@
                     </button>
                 </div>
 
-                <form id="editLoteForm" method="POST" action="" class="bg-white flex flex-col flex-1 min-h-0 overflow-hidden" novalidate onsubmit="return confirmEditLoteInventario(event)">
+                <form id="editLoteForm" method="POST" action="" class="bg-white dark:bg-slate-900 flex flex-col flex-1 min-h-0 overflow-hidden" novalidate onsubmit="return confirmEditLoteInventario(event)">
                     @csrf
                     @method('PUT')
                     <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
-                        <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200 text-center">
-                            <span class="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Modificando Lote de:</span>
-                            <p id="modal_producto_nombre" class="text-[13.5px] sm:text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
-                            <div class="mt-2 inline-block bg-white border border-slate-300 px-3 py-1 rounded-lg shadow-sm">
-                                <p id="modal_lote_nombre" class="text-[12.5px] sm:text-[13px] font-mono font-bold text-slate-700"></p>
+                        <div class="bg-slate-50 dark:bg-slate-800/80 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-center">
+                            <span class="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Modificando Lote de:</span>
+                            <p id="modal_producto_nombre" class="text-[13.5px] sm:text-[14px] font-extrabold text-slate-800 dark:text-slate-100 w-full break-words leading-tight"></p>
+                            <div class="mt-2 inline-block bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-1 rounded-lg shadow-sm">
+                                <p id="modal_lote_nombre" class="text-[12.5px] sm:text-[13px] font-mono font-bold text-slate-700 dark:text-slate-200"></p>
                             </div>
                             <div class="flex justify-center gap-1.5 mt-2 flex-wrap">
-                                <span id="modal_categoria_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200"></span>
-                                <span id="modal_programa_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100"></span>
+                                <span id="modal_categoria_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"></span>
+                                <span id="modal_programa_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800"></span>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
-                            <div class="bg-white border border-slate-200 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
-                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase block truncate">Valor Unit.</span>
-                                <p id="modal_valor_unitario" class="text-[11.5px] sm:text-[13px] font-bold text-slate-800 font-mono-das truncate">$ 0</p>
+                            <div class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase block truncate">Valor Unit.</span>
+                                <p id="modal_valor_unitario" class="text-[11.5px] sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 font-mono-das truncate">$ 0</p>
                             </div>
-                            <div class="bg-white border border-slate-200 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
-                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase block truncate">Stock</span>
-                                <p id="modal_cantidad" class="text-[11.5px] sm:text-[13px] font-bold text-slate-800 truncate">0</p>
+                            <div class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase block truncate">Stock</span>
+                                <p id="modal_cantidad" class="text-[11.5px] sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 truncate">0</p>
                             </div>
-                            <div class="bg-teal-50 border border-teal-200 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
-                                <span class="text-[9px] sm:text-[10px] font-bold text-teal-600 uppercase block truncate">Valor Total</span>
-                                <p id="modal_valor_total" class="text-[11.5px] sm:text-[13px] font-extrabold text-teal-800 font-mono-das truncate">$ 0</p>
+                            <div class="bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/80 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
+                                <span class="text-[9px] sm:text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase block truncate">Valor Total</span>
+                                <p id="modal_valor_total" class="text-[11.5px] sm:text-[13px] font-extrabold text-teal-800 dark:text-teal-300 font-mono-das truncate">$ 0</p>
                             </div>
                         </div>
 
                         <!-- Ubicación Física en Bodega (Distribución) -->
-                        <div class="bg-slate-50/90 p-3 sm:p-3.5 rounded-xl border border-slate-200">
-                            <label class="block text-[11.5px] sm:text-[12px] font-bold text-slate-700 mb-2 flex items-center gap-1.5 uppercase tracking-wide">
-                                <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <div class="bg-slate-50 dark:bg-slate-800/80 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <label class="block text-[11.5px] sm:text-[12px] font-bold text-slate-700 dark:text-slate-200 mb-2.5 flex items-center gap-1.5 uppercase tracking-wide">
+                                <svg class="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                 Ubicación Física en Bodega (Distribución)
                             </label>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
-                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pasillo</label>
-                                    <select id="modal_edit_pasillo" name="pasillo" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Pasillo</label>
+                                    <select id="modal_edit_pasillo" name="pasillo" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin asignar / P.A)</option>
                                         @foreach ($pasillosLista ?? [] as $pas)
                                             <option value="{{ $pas }}">{{ $pas }}</option>
@@ -1146,8 +1146,8 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estante</label>
-                                    <select id="modal_edit_estante" name="estante" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Estante</label>
+                                    <select id="modal_edit_estante" name="estante" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin asignar / P.A)</option>
                                         @foreach ($estantesLista ?? [] as $est)
                                             <option value="{{ $est }}">{{ $est }}</option>
@@ -1155,8 +1155,8 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nivel</label>
-                                    <select id="modal_edit_nivel" name="nivel" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Nivel</label>
+                                    <select id="modal_edit_nivel" name="nivel" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin nivel)</option>
                                         @foreach ($nivelesLista ?? [] as $niv)
                                             <option value="{{ $niv }}">Nivel {{ $niv }}</option>
@@ -1164,8 +1164,8 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Posición</label>
-                                    <select id="modal_edit_posicion" name="posicion" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Posición</label>
+                                    <select id="modal_edit_posicion" name="posicion" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin posición)</option>
                                         @foreach ($posicionesLista ?? [] as $pos)
                                             <option value="{{ $pos }}">Posición {{ $pos }}</option>
@@ -1176,8 +1176,8 @@
                         </div>
 
                         <div>
-                            <label for="modal_estado" class="block text-[12.5px] sm:text-[13px] font-bold text-slate-700 mb-1.5 sm:mb-2">Seleccione Nuevo Estado Físico *</label>
-                            <select id="modal_estado" name="estado" onchange="toggleMotivoField(this.value)" required class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 sm:py-3 text-[12.5px] sm:text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 font-semibold text-slate-700 shadow-xs cursor-pointer transition-colors">
+                            <label for="modal_estado" class="block text-[12.5px] sm:text-[13px] font-bold text-slate-700 dark:text-slate-200 mb-1.5 sm:mb-2">Seleccione Nuevo Estado Físico *</label>
+                            <select id="modal_estado" name="estado" onchange="toggleMotivoField(this.value)" required class="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3.5 py-2.5 sm:py-3 text-[12.5px] sm:text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 font-semibold shadow-xs cursor-pointer transition-colors">
                                 <option value="Disponible">🟢 Disponible (Liberado para entrega)</option>
                                 <option value="Cuarentena">🟠 En Cuarentena (Bloqueo preventivo)</option>
                                 <option value="Merma">🔴 En Merma (Dañado / Vencido)</option>
@@ -1185,13 +1185,13 @@
                         </div>
 
                         <div id="motivoContainer" class="hidden">
-                            <label for="modal_motivo" class="block text-[12.5px] sm:text-[13px] font-bold text-slate-700 mb-1.5">Motivo <span class="text-rose-500">*</span></label>
-                            <textarea id="modal_motivo" name="motivo" rows="3" placeholder="Indique la razón de la merma o cuarentena..." class="w-full rounded-xl border border-slate-300 bg-white p-3 text-[12px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-slate-700 shadow-xs resize-none"></textarea>
+                            <label for="modal_motivo" class="block text-[12.5px] sm:text-[13px] font-bold text-slate-700 dark:text-slate-200 mb-1.5">Motivo <span class="text-rose-500">*</span></label>
+                            <textarea id="modal_motivo" name="motivo" rows="3" placeholder="Indique la razón de la merma o cuarentena..." class="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 p-3 text-[12px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-xs resize-none dark:placeholder-slate-500"></textarea>
                         </div>
                     </div>
 
-                    <div class="px-4 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 rounded-b-2xl shrink-0">
-                        <button type="button" onclick="closeEditLote()" class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-100 text-[13px] font-bold transition-colors shadow-xs cursor-pointer text-center">Cancelar</button>
+                    <div class="px-4 sm:px-6 py-3.5 bg-slate-50 dark:bg-slate-800/90 border-t border-slate-200 dark:border-slate-700 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 rounded-b-2xl shrink-0">
+                        <button type="button" onclick="closeEditLote()" class="w-full sm:w-auto px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-[13px] font-bold transition-colors shadow-xs cursor-pointer text-center">Cancelar</button>
                         <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-xs cursor-pointer text-center">Confirmar Cambio</button>
                     </div>
                 </form>
