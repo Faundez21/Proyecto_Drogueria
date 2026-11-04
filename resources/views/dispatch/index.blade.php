@@ -688,7 +688,7 @@
                                     {{ $solicitud->numero_solicitud }}
                                     @if ($esMixta)
                                         <span class="block mt-1">
-                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-gradient-to-r from-teal-50 to-amber-50 text-amber-800 border border-amber-200" title="Contiene productos normales y fármacos controlados">
+                                            <span class="das-badge-mixta-amber inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-gradient-to-r from-teal-50 to-amber-50 text-amber-800 border border-amber-200" title="Contiene productos normales y fármacos controlados">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                                 Mixta
                                             </span>
@@ -1355,35 +1355,35 @@
 
             function showDispatchSuccessModal(dispData) {
                 const htmlDetail = `
-                    <div class="text-left text-xs text-slate-700">
-                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl mb-3 space-y-1.5">
-                            <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200">
-                                <span class="font-bold text-slate-900 text-sm">Guía N° ${dispData.correlativo}</span>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">DESPACHO CONFORME</span>
+                    <div class="das-swal-container text-left text-xs text-slate-700">
+                        <div class="das-swal-summary p-3.5 bg-slate-50 border border-slate-200 rounded-xl mb-3.5 space-y-1.5">
+                            <div class="das-swal-summary-header flex items-center justify-between pb-2 mb-2 border-b border-slate-200">
+                                <span class="das-swal-summary-title font-bold text-slate-900 text-sm">Guía N° ${dispData.correlativo}</span>
+                                <span class="das-swal-badge-ok px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">DESPACHO CONFORME</span>
                             </div>
-                            <p><strong>Destino:</strong> ${dispData.destino}</p>
-                            <p><strong>Clasificación:</strong> ${dispData.clasificacion}</p>
-                            <p><strong>Fecha de Emisión:</strong> ${dispData.fecha}</p>
-                            <p><strong>Total Unidades Despachadas:</strong> ${Number(dispData.total_unidades || 0).toLocaleString('es-CL')} uds. (${dispData.total_items} producto${dispData.total_items === 1 ? '' : 's'})</p>
+                            <p class="das-swal-meta"><strong>Destino:</strong> ${dispData.destino}</p>
+                            <p class="das-swal-meta"><strong>Clasificación:</strong> ${dispData.clasificacion}</p>
+                            <p class="das-swal-meta"><strong>Fecha de Emisión:</strong> ${dispData.fecha}</p>
+                            <p class="das-swal-meta"><strong>Total Unidades Despachadas:</strong> ${Number(dispData.total_unidades || 0).toLocaleString('es-CL')} uds. (${dispData.total_items} producto${dispData.total_items === 1 ? '' : 's'})</p>
                         </div>
-                        <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Productos Despachados:</p>
-                        <div class="max-h-56 overflow-y-auto border border-slate-200 rounded-lg shadow-inner">
-                            <table class="w-full text-[11.5px] text-left">
+                        <p class="das-swal-section-title font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Productos Despachados:</p>
+                        <div class="das-swal-table-wrap max-h-56 overflow-y-auto border border-slate-200 rounded-lg shadow-inner">
+                            <table class="das-swal-table w-full text-[11.5px] text-left">
                                 <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
                                     <tr>
-                                        <th class="p-2">Producto</th>
-                                        <th class="p-2 text-center">Lote FEFO</th>
-                                        <th class="p-2 text-center">Vencimiento</th>
-                                        <th class="p-2 text-right">Cantidad</th>
+                                        <th class="p-2.5">Producto</th>
+                                        <th class="p-2.5 text-center">Lote FEFO</th>
+                                        <th class="p-2.5 text-center">Vencimiento</th>
+                                        <th class="p-2.5 text-right">Cantidad</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100 bg-white">
                                     ${(dispData.items || []).map(it => `
                                         <tr class="hover:bg-slate-50">
-                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
-                                            <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
-                                            <td class="p-2 text-center text-slate-600">${it.vencimiento}</td>
-                                            <td class="p-2 text-right font-bold text-slate-900">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
+                                            <td class="p-2.5 font-medium text-slate-800">${it.producto}</td>
+                                            <td class="p-2.5 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
+                                            <td class="p-2.5 text-center text-slate-600">${it.vencimiento}</td>
+                                            <td class="p-2.5 text-right font-bold text-emerald-700 das-swal-qty">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -1400,16 +1400,16 @@
                     Swal.fire({
                         title: '¡Despacho Normal Emitido!',
                         html: `
-                            <div class="text-left text-xs text-slate-700">
+                            <div class="das-swal-container text-left text-xs text-slate-700">
                                 ${htmlDetail}
-                                <div class="mt-4 p-3.5 bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-300 rounded-xl flex items-start gap-3 shadow-xs">
-                                    <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-sm">!</div>
-                                    <div>
-                                        <p class="font-bold text-amber-950 text-[13px]">Solicitud Mixta: Fármacos Controlados Pendientes</p>
-                                        <p class="text-slate-600 text-[11.5px] mt-0.5">
-                                            Esta solicitud aún tiene <strong>${dispData.cant_controlados_pendientes} fármaco(s) controlado(s)</strong> pendiente(s) por despachar.
+                                <div class="das-swal-mixed-banner mt-4 p-3.5 bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-300 rounded-xl flex items-start gap-3 shadow-xs">
+                                    <div class="das-swal-mixed-icon w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs font-extrabold text-sm">!</div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="das-swal-mixed-title font-bold text-amber-950 text-[13px]">Solicitud Mixta: Fármacos Controlados Pendientes</p>
+                                        <p class="das-swal-mixed-text text-slate-600 text-[11.5px] mt-1 leading-relaxed">
+                                            Esta solicitud aún tiene <strong>${dispData.cant_controlados_pendientes} fármaco(s) controlado(s)</strong> pendiente(s) por despachar en el módulo de Despacho Controlado.
                                         </p>
-                                        <p class="text-amber-900 font-semibold text-[11.5px] mt-1.5">
+                                        <p class="das-swal-mixed-cta text-amber-900 font-semibold text-[11.5px] mt-1.5">
                                             ¿Deseas emitir el Despacho Controlado ahora mismo?
                                         </p>
                                     </div>
@@ -1421,9 +1421,9 @@
                         showDenyButton: Boolean(dispData.pdf_url),
                         confirmButtonColor: '#e11d48',
                         confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg> Ir a Despacho Controlado',
-                        denyButtonColor: '#0f172a',
+                        denyButtonColor: '#2563eb',
                         denyButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Ver Guía PDF',
-                        cancelButtonColor: '#64748b',
+                        cancelButtonColor: '#475569',
                         cancelButtonText: 'Dejar para después',
                         allowOutsideClick: false,
                         width: '660px'
@@ -1447,7 +1447,7 @@
                     confirmButtonColor: '#0f766e',
                     confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar',
                     showCancelButton: Boolean(dispData.pdf_url),
-                    cancelButtonColor: '#0f172a',
+                    cancelButtonColor: '#2563eb',
                     cancelButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Ver Guía PDF',
                     reverseButtons: true,
                     allowOutsideClick: false,
@@ -2477,12 +2477,33 @@
             if (productosControlados.length > 0) {
                 Swal.fire({
                     icon: 'info',
-                    title: 'Estupefacientes -> Despacho Controlado',
-                    html: 'Los siguientes estupefacientes de la solicitud <b>' + (solicitud.numero_solicitud ??
-                            '') +
-                        '</b> deben despacharse por el módulo <b>Despacho Controlado</b>:<br><br><b>' +
-                        productosControlados.join('<br>') + '</b>',
-                    confirmButtonColor: '#0f968c'
+                    title: 'Solicitud Mixta: Fármacos Controlados',
+                    html: `
+                        <div class="das-swal-container text-left text-xs">
+                            <div class="das-swal-mixed-banner p-3.5 bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-300 rounded-xl flex items-start gap-3">
+                                <div class="das-swal-mixed-icon w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 font-extrabold text-sm">!</div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="das-swal-mixed-title font-bold text-amber-950 text-[13px]">
+                                        Solicitud ${solicitud.numero_solicitud ?? ''} contiene Estupefacientes
+                                    </p>
+                                    <p class="das-swal-mixed-text text-slate-600 text-[11.5px] mt-1 leading-relaxed">
+                                        Se cargaron los medicamentos e insumos normales en este formulario. Los siguientes fármacos deben despacharse por el módulo <strong>Despacho Controlado</strong>:
+                                    </p>
+                                    <ul class="das-swal-pill-list mt-2.5 space-y-1.5">
+                                        ${productosControlados.map(prod => `
+                                            <li class="das-swal-pill-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11.5px] font-bold">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
+                                                <span>${prod}</span>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonColor: '#0f968c',
+                    confirmButtonText: 'Entendido, continuar despacho normal',
+                    width: '540px'
                 });
             }
 

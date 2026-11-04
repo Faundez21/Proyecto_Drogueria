@@ -859,7 +859,7 @@
                                         <span class="font-mono font-extrabold text-[13px] text-slate-900">{{ $solicitud->numero_solicitud }}</span>
                                         <span class="text-[13.5px] font-extrabold text-slate-800">{{ $solicitud->establecimiento }}</span>
                                         @if ($itemsNormal->isNotEmpty())
-                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-gradient-to-r from-teal-50 to-rose-50 text-rose-800 border border-rose-200" title="Contiene también productos normales">
+                                            <span class="das-badge-mixta-rose inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-gradient-to-r from-teal-50 to-rose-50 text-rose-800 border border-rose-200" title="Contiene también productos normales">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                                 Mixta (+{{ $itemsNormal->count() }} normales)
                                             </span>
@@ -1265,11 +1265,33 @@
             if (normales.length > 0) {
                 Swal.fire({
                     icon: 'info',
-                    title: 'Medicamentos -> Despacho Normal',
-                    html: 'Los siguientes productos de la solicitud <b>' + (solicitud.numero_solicitud ?? '') +
-                        '</b> NO son estupefacientes y deben despacharse por el módulo <b>Despacho Normal</b>:<br><br><b>' +
-                        normales.join('<br>') + '</b>',
-                    confirmButtonColor: '#be123c'
+                    title: 'Solicitud Mixta: Medicamentos Normales',
+                    html: `
+                        <div class="das-swal-container text-left text-xs">
+                            <div class="das-swal-mixed-banner das-swal-mixed-banner-teal p-3.5 bg-gradient-to-r from-teal-50 to-amber-50 border border-teal-300 rounded-xl flex items-start gap-3">
+                                <div class="das-swal-mixed-icon das-swal-mixed-icon-teal w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 font-extrabold text-sm">!</div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="das-swal-mixed-title font-bold text-teal-950 text-[13px]">
+                                        Solicitud ${solicitud.numero_solicitud ?? ''} contiene Productos Normales
+                                    </p>
+                                    <p class="das-swal-mixed-text text-slate-600 text-[11.5px] mt-1 leading-relaxed">
+                                        Se cargaron los fármacos controlados en este formulario. Los siguientes productos NO son estupefacientes y deben despacharse por el módulo <strong>Despacho Normal</strong>:
+                                    </p>
+                                    <ul class="das-swal-pill-list mt-2.5 space-y-1.5">
+                                        ${normales.map(prod => `
+                                            <li class="das-swal-pill-item das-swal-pill-item-teal flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11.5px] font-bold">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+                                                <span>${prod}</span>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonColor: '#be123c',
+                    confirmButtonText: 'Entendido, continuar despacho controlado',
+                    width: '540px'
                 });
             } else if (sinStock.length > 0) {
                 Swal.fire({
@@ -1314,36 +1336,36 @@
 
             function showControlledDispatchSuccessModal(ctrlData) {
                 const htmlDetail = `
-                    <div class="text-left text-xs text-slate-700">
-                        <div class="p-3 bg-rose-50/80 border border-rose-200 rounded-xl mb-3 space-y-1.5">
-                            <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-rose-200">
-                                <span class="font-bold text-rose-950 text-sm">Guía Controlada N° ${ctrlData.correlativo}</span>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300">FÁRMACOS CONTROLADOS</span>
+                    <div class="das-swal-container text-left text-xs text-slate-700">
+                        <div class="das-swal-summary das-swal-summary-rose p-3.5 bg-rose-50/80 border border-rose-200 rounded-xl mb-3.5 space-y-1.5">
+                            <div class="das-swal-summary-header flex items-center justify-between pb-2 mb-2 border-b border-rose-200">
+                                <span class="das-swal-summary-title font-bold text-rose-950 text-sm">Guía Controlada N° ${ctrlData.correlativo}</span>
+                                <span class="das-swal-badge-rose px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300">FÁRMACOS CONTROLADOS</span>
                             </div>
-                            <p><strong>Destino:</strong> ${ctrlData.destino}</p>
-                            <p><strong>Clasificación:</strong> ${ctrlData.clasificacion}</p>
-                            <p><strong>Fecha de Emisión:</strong> ${ctrlData.fecha}</p>
-                            ${ctrlData.series_recetas ? `<p><strong>Series Recetas:</strong> ${ctrlData.series_recetas}</p>` : ''}
-                            <p><strong>Total Fármacos Controlados:</strong> ${Number(ctrlData.total_unidades || 0).toLocaleString('es-CL')} uds. (${ctrlData.total_items} producto${ctrlData.total_items === 1 ? '' : 's'})</p>
+                            <p class="das-swal-meta"><strong>Destino:</strong> ${ctrlData.destino}</p>
+                            <p class="das-swal-meta"><strong>Clasificación:</strong> ${ctrlData.clasificacion}</p>
+                            <p class="das-swal-meta"><strong>Fecha de Emisión:</strong> ${ctrlData.fecha}</p>
+                            ${ctrlData.series_recetas ? `<p class="das-swal-meta"><strong>Series Recetas:</strong> ${ctrlData.series_recetas}</p>` : ''}
+                            <p class="das-swal-meta"><strong>Total Fármacos Controlados:</strong> ${Number(ctrlData.total_unidades || 0).toLocaleString('es-CL')} uds. (${ctrlData.total_items} producto${ctrlData.total_items === 1 ? '' : 's'})</p>
                         </div>
-                        <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Fármacos Despachados:</p>
-                        <div class="max-h-56 overflow-y-auto border border-rose-200 rounded-lg shadow-inner">
-                            <table class="w-full text-[11.5px] text-left">
+                        <p class="das-swal-section-title font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Fármacos Despachados:</p>
+                        <div class="das-swal-table-wrap max-h-56 overflow-y-auto border border-rose-200 rounded-lg shadow-inner">
+                            <table class="das-swal-table das-swal-table-rose w-full text-[11.5px] text-left">
                                 <thead class="bg-rose-50 text-rose-900 font-bold sticky top-0 border-b border-rose-100">
                                     <tr>
-                                        <th class="p-2">Fármaco Controlado</th>
-                                        <th class="p-2 text-center">Lote FEFO</th>
-                                        <th class="p-2 text-center">Vencimiento</th>
-                                        <th class="p-2 text-right">Cantidad</th>
+                                        <th class="p-2.5">Fármaco Controlado</th>
+                                        <th class="p-2.5 text-center">Lote FEFO</th>
+                                        <th class="p-2.5 text-center">Vencimiento</th>
+                                        <th class="p-2.5 text-right">Cantidad</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-rose-100 bg-white">
                                     ${(ctrlData.items || []).map(it => `
                                         <tr class="hover:bg-rose-50/40">
-                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
-                                            <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
-                                            <td class="p-2 text-center text-slate-600">${it.vencimiento}</td>
-                                            <td class="p-2 text-right font-bold text-rose-700">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
+                                            <td class="p-2.5 font-medium text-slate-800">${it.producto}</td>
+                                            <td class="p-2.5 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
+                                            <td class="p-2.5 text-center text-slate-600">${it.vencimiento}</td>
+                                            <td class="p-2.5 text-right font-bold text-rose-700 das-swal-qty-rose">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -1356,6 +1378,50 @@
                     triggerSilentDownloadControlado(ctrlData.pdf_url);
                 }
 
+                if (ctrlData.tiene_normales_pendientes && ctrlData.url_despacho_normal) {
+                    Swal.fire({
+                        title: '¡Despacho Controlado Emitido!',
+                        html: `
+                            <div class="das-swal-container text-left text-xs text-slate-700">
+                                ${htmlDetail}
+                                <div class="das-swal-mixed-banner das-swal-mixed-banner-teal mt-4 p-3.5 bg-gradient-to-r from-teal-50 to-amber-50 border border-teal-300 rounded-xl flex items-start gap-3 shadow-xs">
+                                    <div class="das-swal-mixed-icon das-swal-mixed-icon-teal w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs font-extrabold text-sm">!</div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="das-swal-mixed-title font-bold text-teal-950 text-[13px]">Solicitud Mixta: Productos Normales Pendientes</p>
+                                        <p class="das-swal-mixed-text text-slate-600 text-[11.5px] mt-1 leading-relaxed">
+                                            Esta solicitud aún tiene <strong>${ctrlData.cant_normales_pendientes} producto(s) normal(es)</strong> pendiente(s) por despachar en el módulo de Despacho Normal.
+                                        </p>
+                                        <p class="das-swal-mixed-cta font-semibold text-[11.5px] mt-1.5">
+                                            ¿Deseas emitir el Despacho Normal ahora mismo?
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        icon: 'info',
+                        showCancelButton: true,
+                        showDenyButton: Boolean(ctrlData.pdf_url),
+                        confirmButtonColor: '#0f766e',
+                        confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg> Ir a Despacho Normal',
+                        denyButtonColor: '#be123c',
+                        denyButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Ver Guía Controlada PDF',
+                        cancelButtonColor: '#475569',
+                        cancelButtonText: 'Dejar para después',
+                        allowOutsideClick: false,
+                        width: '660px'
+                    }).then((res) => {
+                        if (res.isConfirmed) {
+                            window.location.href = ctrlData.url_despacho_normal;
+                        } else if (res.isDenied && ctrlData.pdf_url) {
+                            window.open(ctrlData.pdf_url, '_blank');
+                            window.location.reload();
+                        } else {
+                            window.location.reload();
+                        }
+                    });
+                    return;
+                }
+
                 Swal.fire({
                     title: '¡Despacho Realizado con Éxito!',
                     html: htmlDetail,
@@ -1363,7 +1429,7 @@
                     confirmButtonColor: '#0f766e',
                     confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar',
                     showCancelButton: Boolean(ctrlData.pdf_url),
-                    cancelButtonColor: '#881337',
+                    cancelButtonColor: '#be123c',
                     cancelButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Ver Guía Controlada PDF',
                     reverseButtons: true,
                     allowOutsideClick: false,

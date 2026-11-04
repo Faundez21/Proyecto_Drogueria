@@ -180,12 +180,25 @@ class ControlledDispatchController extends Controller
                 }
             }
 
+            $normalesPendientesCount = 0;
+            $solicitudOrigenId = null;
+
             if (! empty($validated['establishment_request_id'] ?? null)) {
+                $solicitudOrigenId = (int) $validated['establishment_request_id'];
                 SolicitudService::registrarDespacho(
-                    (int) $validated['establishment_request_id'],
+                    $solicitudOrigenId,
                     $validated['productos'],
                     $validated['cantidades']
                 );
+
+                $reqModel = EstablishmentRequest::with('items.product')->find($solicitudOrigenId);
+                if ($reqModel) {
+                    $normalesPendientesCount = $reqModel->items->filter(function ($it) {
+                        $nom = $it->product->nombre ?? '';
+                        $falta = ($it->cantidad_solicitada - $it->cantidad_despachada);
+                        return ! InventoryService::esControlado($nom) && $falta > 0;
+                    })->count();
+                }
             }
 
             DB::commit();
@@ -201,6 +214,10 @@ class ControlledDispatchController extends Controller
                 'items' => $itemsControlados,
                 'pdf_url' => route('controlled_dispatch.pdf', $dispatch->id),
                 'auto_download' => ($validated['action'] ?? '') === 'save_and_download',
+                'tiene_normales_pendientes' => $normalesPendientesCount > 0,
+                'cant_normales_pendientes' => $normalesPendientesCount,
+                'solicitud_id' => $solicitudOrigenId,
+                'url_despacho_normal' => $solicitudOrigenId ? route('dispatch.index', ['solicitud_id' => $solicitudOrigenId]) : null,
             ];
 
             if ($request->expectsJson() || $request->ajax()) {
