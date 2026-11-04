@@ -337,13 +337,16 @@
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Posición</label>
-                                        <select name="posicion[]" class="select-posicion-recepcion w-full bg-white border border-slate-300 text-slate-800 rounded-lg py-2 px-2.5 text-[12.5px] focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs outline-none">
+                                        <select name="posicion[]" onchange="onPosicionChange(this)" class="select-posicion-recepcion w-full bg-white border border-slate-300 text-slate-800 rounded-lg py-2 px-2.5 text-[12.5px] focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs outline-none">
                                             <option value="">Seleccione Posición...</option>
                                             @foreach($posicionesLista ?? [] as $posicion)
                                                 <option value="{{ $posicion }}">Posición {{ $posicion }}</option>
                                             @endforeach
                                         </select>
                                     </div>
+                                </div>
+                                <div class="estado-ubicacion-recepcion mt-2.5 px-3 py-2 rounded-lg text-[11.5px] font-medium bg-slate-100 text-slate-600 border border-slate-200 flex items-center justify-between gap-2">
+                                    <span>Seleccione Pasillo y Estante para ver sus niveles y posiciones disponibles.</span>
                                 </div>
                             </div>
                         </div>
@@ -808,107 +811,59 @@
             if (targetBtn) {
                 filtrarGrupoFila(targetBtn, grupoInicial);
             }
+            if (window.LoteStatus && window.LoteStatus.Ubicacion) {
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(clone), 'init', true);
+            }
             return clone;
         }
 
         window.distribucionJerarquia = @json($distribucionJerarquia ?? []);
+        window.ubicacionesOcupadas = @json($ubicacionesOcupadas ?? []);
         window.todosLosPasillos = @json($pasillosLista ?? []);
         window.todosLosEstantes = @json($estantesLista ?? []);
         window.todosLosNiveles = @json($nivelesLista ?? []);
         window.todosLasPosiciones = @json($posicionesLista ?? []);
 
+        function obtenerConfigUbicacionFila(card) {
+            const selProd = card.querySelector('.select-producto-recepcion');
+            const prodText = selProd && selProd.selectedIndex >= 0 && selProd.value
+                ? selProd.options[selProd.selectedIndex].text.trim()
+                : '';
+            const loteVal = (card.querySelector('input[name="lote[]"]')?.value || '').trim();
+            return {
+                selectPasillo: card.querySelector('.select-pasillo-recepcion'),
+                selectEstante: card.querySelector('.select-estante-recepcion'),
+                selectNivel: card.querySelector('.select-nivel-recepcion'),
+                selectPosicion: card.querySelector('.select-posicion-recepcion'),
+                statusEl: card.querySelector('.estado-ubicacion-recepcion'),
+                rowElement: card,
+                producto: prodText,
+                lote: loteVal,
+            };
+        }
+
         function onPasilloChange(selectPasillo) {
-            const card = selectPasillo.closest('.producto-item');
-            if (!card) return;
-            const pasillo = selectPasillo.value.trim().toLowerCase();
-            const selectEstante = card.querySelector('.select-estante-recepcion');
-            if (!selectEstante) return;
-
-            const estanteActual = selectEstante.value;
-            selectEstante.innerHTML = '<option value="">Seleccione Estante...</option>';
-
-            const jerarquia = window.distribucionJerarquia || [];
-            let estantesFiltrados = jerarquia.filter(item => !pasillo || (item.pasillo || '').toLowerCase() === pasillo).map(i => i.estante);
-
-            if (estantesFiltrados.length === 0) {
-                estantesFiltrados = window.todosLosEstantes || [];
-            }
-
-            estantesFiltrados.forEach(est => {
-                const opt = document.createElement('option');
-                opt.value = est;
-                opt.textContent = est;
-                if (est === estanteActual) opt.selected = true;
-                selectEstante.appendChild(opt);
-            });
+            const card = selectPasillo?.closest('.producto-item');
+            if (!card || !window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(card), 'pasillo', false);
         }
 
         function onEstanteChange(selectEstante) {
-            const card = selectEstante.closest('.producto-item');
-            if (!card) return;
-            const estanteNombre = selectEstante.value.trim();
-            const jerarquia = window.distribucionJerarquia || [];
-            const infoEstante = jerarquia.find(item => (item.estante || '').toLowerCase() === estanteNombre.toLowerCase());
-
-            const selectPasillo = card.querySelector('.select-pasillo-recepcion');
-            if (selectPasillo && infoEstante && infoEstante.pasillo) {
-                selectPasillo.value = infoEstante.pasillo;
-            }
-
-            const selectNivel = card.querySelector('.select-nivel-recepcion');
-            if (selectNivel) {
-                const nivelActual = selectNivel.value;
-                selectNivel.innerHTML = '<option value="">Seleccione Nivel...</option>';
-                const niveles = (infoEstante && infoEstante.niveles && infoEstante.niveles.length > 0)
-                    ? infoEstante.niveles.map(n => n.nivel)
-                    : (window.todosLosNiveles || []);
-
-                niveles.forEach(niv => {
-                    const opt = document.createElement('option');
-                    opt.value = niv;
-                    opt.textContent = 'Nivel ' + niv;
-                    if (niv === nivelActual) opt.selected = true;
-                    selectNivel.appendChild(opt);
-                });
-            }
-
-            onNivelChange(selectNivel);
+            const card = selectEstante?.closest('.producto-item');
+            if (!card || !window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(card), 'estante', false);
         }
 
         function onNivelChange(selectNivel) {
-            if (!selectNivel) return;
-            const card = selectNivel.closest('.producto-item');
-            if (!card) return;
-            const selectEstante = card.querySelector('.select-estante-recepcion');
-            const selectPosicion = card.querySelector('.select-posicion-recepcion');
-            if (!selectPosicion) return;
+            const card = selectNivel?.closest('.producto-item');
+            if (!card || !window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(card), 'nivel', false);
+        }
 
-            const estanteNombre = (selectEstante?.value || '').trim().toLowerCase();
-            const nivelNum = (selectNivel.value || '').trim();
-            const jerarquia = window.distribucionJerarquia || [];
-            const infoEstante = jerarquia.find(item => (item.estante || '').toLowerCase() === estanteNombre);
-
-            let posiciones = [];
-            if (infoEstante && infoEstante.niveles) {
-                const infoNivel = infoEstante.niveles.find(n => (n.nivel || '').toString() === nivelNum.toString());
-                if (infoNivel && infoNivel.posiciones) {
-                    posiciones = infoNivel.posiciones;
-                }
-            }
-
-            if (posiciones.length === 0) {
-                posiciones = window.todosLasPosiciones || [];
-            }
-
-            const posActual = selectPosicion.value;
-            selectPosicion.innerHTML = '<option value="">Seleccione Posición...</option>';
-            posiciones.forEach(pos => {
-                const opt = document.createElement('option');
-                opt.value = pos;
-                opt.textContent = 'Posición ' + pos;
-                if (pos === posActual) opt.selected = true;
-                selectPosicion.appendChild(opt);
-            });
+        function onPosicionChange(selectPosicion) {
+            const card = selectPosicion?.closest('.producto-item');
+            if (!card || !window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(card), 'posicion', false);
         }
 
         function agregarFilaPorGrupo(grupo) {
@@ -1076,6 +1031,11 @@
 
             // 2. logica dinamica de productos y totales
             const container = document.getElementById('productos_container');
+            if (window.LoteStatus && window.LoteStatus.Ubicacion) {
+                container.querySelectorAll('.producto-item').forEach(card => {
+                    window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(card), 'init', true);
+                });
+            }
 
             window.calcularTotalGeneralRecepcion = function() {
                 let totalNeto = 0;

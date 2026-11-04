@@ -207,19 +207,15 @@
                                     </label>
 
                                     <select name="programa[]" required
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-programa">
                                         <option value="" disabled selected>
                                             Seleccione...
                                         </option>
-                                        <option value="Morbilidad General">
-                                            Morbilidad General
-                                        </option>
-                                        <option value="Cardiovascular">
-                                            Cardiovascular
-                                        </option>
-                                        <option value="IRA/ERA">
-                                            IRA/ERA
-                                        </option>
+                                        @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
+                                            <option value="{{ $progOpt }}">
+                                                {{ $progOpt }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="lg:col-span-2">
@@ -237,7 +233,9 @@
                                         <optgroup label="Medicamentos e Insumos">
                                             @foreach ($products as $product)
                                                 @if (!in_array($product->nombre, $controlados))
-                                                    <option value="{{ $product->id }}">
+                                                    <option value="{{ $product->id }}"
+                                                        data-programa="{{ $product->programa_sugerido ?? '' }}"
+                                                        data-categoria="{{ $product->categoria_sugerida ?? '' }}">
                                                         {{ $product->nombre }}
                                                     </option>
                                                 @endif
@@ -247,7 +245,9 @@
                                         <optgroup label="Estupefacientes y Controlados">
                                             @foreach ($products as $product)
                                                 @if (in_array($product->nombre, $controlados))
-                                                    <option value="{{ $product->id }}">
+                                                    <option value="{{ $product->id }}"
+                                                        data-programa="{{ $product->programa_sugerido ?? '' }}"
+                                                        data-categoria="{{ $product->categoria_sugerida ?? 'Estupefacientes' }}">
                                                         {{ $product->nombre }}
                                                     </option>
                                                 @endif
@@ -456,9 +456,28 @@
                 const est = (establecimientoSelect?.value || '').trim();
                 const prodSelect = itemRow.querySelector('.select-producto');
                 const prodId = prodSelect ? prodSelect.value : '';
+                const progSelect = itemRow.querySelector('select[name="programa[]"]');
                 const inputConsumo = itemRow.querySelector('input[name="consumo_anterior[]"]');
                 const infoConsumo = itemRow.querySelector('.info-consumo-anterior');
                 const infoStock = itemRow.querySelector('.info-ultimo-stock');
+
+                if (prodSelect && progSelect && prodSelect.selectedIndex >= 0) {
+                    const selectedOpt = prodSelect.options[prodSelect.selectedIndex];
+                    const progSugerido = (selectedOpt?.getAttribute('data-programa') || '').trim();
+                    if (progSugerido) {
+                        let matchedProg = Array.from(progSelect.options).find(
+                            o => o.value && o.value.toLowerCase() === progSugerido.toLowerCase()
+                        );
+                        if (!matchedProg) {
+                            const newOpt = document.createElement('option');
+                            newOpt.value = progSugerido;
+                            newOpt.textContent = progSugerido;
+                            progSelect.appendChild(newOpt);
+                            matchedProg = newOpt;
+                        }
+                        progSelect.value = matchedProg.value;
+                    }
+                }
 
                 if (!inputConsumo) return;
 

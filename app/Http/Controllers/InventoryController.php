@@ -39,15 +39,7 @@ class InventoryController extends Controller
         $puedeVerControlados = auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado');
 
         if (! $puedeVerControlados) {
-            $query->where('categoria', '!=', 'Fármacos Controlados');
-        } else {
-            if ($request->input('categoria') === 'Fármacos Controlados') {
-                $query->where('categoria', 'Fármacos Controlados');
-            }
-        }
-
-        if ($request->filled('categoria') && $request->input('categoria') !== 'Fármacos Controlados') {
-            $query->where('categoria', $request->categoria);
+            $query->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']);
         }
 
         // 1. Filtro de Búsqueda Global (Producto, Lote, Categoría)
@@ -57,13 +49,26 @@ class InventoryController extends Controller
                 $q->where('producto', 'LIKE', "%{$search}%")
                     ->orWhere('lote', 'LIKE', "%{$search}%")
                     ->orWhere('categoria', 'LIKE', "%{$search}%")
+                    ->orWhere('programa', 'LIKE', "%{$search}%")
                     ->orWhere('rut_proveedor', 'LIKE', "%{$search}%");
             });
         }
 
         // 2. Filtros Específicos
         if ($request->filled('categoria')) {
-            $query->where('categoria', $request->categoria);
+            $catFiltro = trim($request->input('categoria'));
+            $catLower = mb_strtolower($catFiltro);
+            if (in_array($catLower, ['fármacos', 'farmacos', 'medicamentos'])) {
+                $query->whereIn('categoria', ['Fármacos', 'Farmacos', 'Medicamentos']);
+            } elseif (in_array($catLower, ['insumos clínicos', 'insumos clinicos', 'insumos'])) {
+                $query->whereIn('categoria', ['Insumos Clínicos', 'Insumos Clinicos', 'Insumos']);
+            } elseif (in_array($catLower, ['fármacos controlados', 'farmacos controlados', 'estupefacientes'])) {
+                if ($puedeVerControlados) {
+                    $query->whereIn('categoria', ['Fármacos Controlados', 'Farmacos Controlados', 'Estupefacientes']);
+                }
+            } else {
+                $query->where('categoria', $catFiltro);
+            }
         }
         if ($request->filled('pasillo')) {
             $query->where('pasillo', $request->pasillo);
@@ -105,56 +110,36 @@ class InventoryController extends Controller
         // --- CONSULTAS INDEPENDIENTES PARA LOS MODALES ---
         $mermas = Inventory::with('user')
             ->where('estado', 'Merma')
-            ->when(! $puedeVerControlados, fn ($q) => $q->where('categoria', '!=', 'Fármacos Controlados'))
+            ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']))
             ->orderBy('updated_at', 'desc')
             ->get();
         $historial = Inventory::with('user')
-            ->when(! $puedeVerControlados, fn ($q) => $q->where('categoria', '!=', 'Fármacos Controlados'))
+            ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']))
             ->orderBy('created_at', 'desc')
             ->limit(150)
             ->get();
 
         // 5. Generar lista de productos únicos combinando Catálogo Maestro + Inventario
+        InventoryService::sincronizarProductosDesdeInventario();
         $productosInv = Inventory::select('producto')
             ->whereNotNull('producto')
             ->where('producto', '!=', '')
             ->distinct()
             ->pluck('producto');
         $productosCat = Product::orderBy('nombre')->pluck('nombre');
-        $productosLista = $productosInv->merge($productosCat)->unique()->sort()->values();
+        $productosLista = $productosInv->merge($productosCat)->unique()->sort(SORT_NATURAL)->values();
 
         // 6. Listas para filtros y formularios combinando Mantenedores Físicos + Inventario
-        $programasBase = collect([
-            'Morbilidad General',
-            'Fondo de Farmacia (FOFAR)',
-            'Cardiovascular',
-            'IRA/ERA',
-            'Salud Mental',
-        ]);
-        $programasInv = Inventory::whereNotNull('programa')
-            ->where('programa', '!=', '')
-            ->distinct()
-            ->orderBy('programa', 'asc')
-            ->pluck('programa')
-            ->map(fn ($p) => trim((string) $p))
-            ->filter();
-        $programasLista = $programasBase->merge($programasInv)->unique()->sort()->values();
+        $programasLista = InventoryService::programasLista();
+        $categoriasLista = InventoryService::categoriasLista($puedeVerControlados);
 
-        $pasillosInv = Inventory::whereNotNull('pasillo')->where('pasillo', '!=', '')->distinct()->pluck('pasillo');
-        $pasillosMant = Aisle::orderBy('name')->pluck('name');
-        $pasillosLista = $pasillosMant->merge($pasillosInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $estantesInv = Inventory::whereNotNull('estante')->where('estante', '!=', '')->distinct()->pluck('estante');
-        $estantesMant = Shelf::orderBy('name')->pluck('name');
-        $estantesLista = $estantesMant->merge($estantesInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $nivelesInv = Inventory::whereNotNull('nivel')->where('nivel', '!=', '')->distinct()->pluck('nivel')->map(fn ($v) => (string) $v);
-        $nivelesMant = Level::orderBy('number')->pluck('number')->map(fn ($v) => (string) $v);
-        $nivelesLista = $nivelesMant->merge($nivelesInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $posicionesInv = Inventory::whereNotNull('posicion')->where('posicion', '!=', '')->distinct()->pluck('posicion');
-        $posicionesMant = Position::orderBy('name')->pluck('name');
-        $posicionesLista = $posicionesMant->merge($posicionesInv)->unique()->sort(SORT_NATURAL)->values();
+        $datosDist = InventoryService::datosDistribucionFisica();
+        $pasillosLista = $datosDist['pasillosLista'];
+        $estantesLista = $datosDist['estantesLista'];
+        $nivelesLista = $datosDist['nivelesLista'];
+        $posicionesLista = $datosDist['posicionesLista'];
+        $distribucionJerarquia = $datosDist['distribucionJerarquia'];
+        $ubicacionesOcupadas = $datosDist['ubicacionesOcupadas'];
 
         $proveedoresActivos = \App\Models\Provider::where('status', 'activo')
             ->orderBy('name')
@@ -166,10 +151,13 @@ class InventoryController extends Controller
             'historial',
             'productosLista',
             'programasLista',
+            'categoriasLista',
             'pasillosLista',
             'estantesLista',
             'nivelesLista',
             'posicionesLista',
+            'distribucionJerarquia',
+            'ubicacionesOcupadas',
             'proveedoresActivos'
         ));
     }
@@ -226,6 +214,27 @@ class InventoryController extends Controller
         }
 
         $validated = $validator->validated();
+
+        if (($validated['estado'] ?? 'Disponible') !== 'Merma' && ! empty($validated['estante']) && ! empty($validated['nivel'])) {
+            $ocupante = InventoryService::verificarUbicacionOcupada(
+                $validated['estante'] ?? null,
+                $validated['nivel'] ?? null,
+                $validated['posicion'] ?? null,
+                null,
+                $validated['producto'] ?? null,
+                $validated['lote'] ?? null
+            );
+
+            if ($ocupante) {
+                $detallePos = ! empty($validated['posicion']) ? ", Posición {$validated['posicion']}" : '';
+                $msgOcupado = "La ubicación seleccionada (Estante {$validated['estante']}, Nivel {$validated['nivel']}{$detallePos}) ya se encuentra ocupada por «{$ocupante->producto}» (Lote: " . ($ocupante->lote ?: 'S/L') . ").";
+
+                return redirect()->back()
+                    ->withInput()
+                    ->with('open_modal', 'deposit')
+                    ->with('error', $msgOcupado);
+            }
+        }
 
         try {
             $inventory = DB::transaction(function () use ($validated, $request) {
@@ -354,6 +363,33 @@ class InventoryController extends Controller
             $data['posicion'] = $request->filled('posicion') ? trim($request->posicion) : null;
         }
 
+        $estanteEvaluar = $data['estante'] ?? $inventory->estante;
+        $nivelEvaluar = array_key_exists('nivel', $data) ? $data['nivel'] : $inventory->nivel;
+        $posicionEvaluar = array_key_exists('posicion', $data) ? $data['posicion'] : $inventory->posicion;
+
+        if (($data['estado'] ?? $inventory->estado) !== 'Merma' && ! empty($estanteEvaluar) && $estanteEvaluar !== 'P.A' && ! empty($nivelEvaluar)) {
+            $ocupante = InventoryService::verificarUbicacionOcupada(
+                $estanteEvaluar,
+                $nivelEvaluar,
+                $posicionEvaluar,
+                (int) $inventory->id
+            );
+
+            if ($ocupante) {
+                $detallePos = ! empty($posicionEvaluar) ? ", Posición {$posicionEvaluar}" : '';
+                $msgOcupado = "La ubicación seleccionada (Estante {$estanteEvaluar}, Nivel {$nivelEvaluar}{$detallePos}) ya se encuentra en uso por «{$ocupante->producto}» (Lote: " . ($ocupante->lote ?: 'S/L') . "). Seleccione otra ubicación disponible.";
+
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'ok' => false,
+                        'message' => $msgOcupado,
+                    ], 422);
+                }
+
+                return redirect()->back()->with('error', $msgOcupado);
+            }
+        }
+
         $data['user_id'] = Auth::id();
 
         // Resolver relaciones foráneas de ubicación física
@@ -457,6 +493,7 @@ class InventoryController extends Controller
             'motivo' => $request->input('motivo') ?: '',
             'ubicacion' => $detUbic,
             'ubicacion_anterior' => $detUbicAnterior,
+            'cambio_ubicacion' => $cambioUbicacion,
             'fecha_hora' => now()->format('d/m/Y H:i'),
             'usuario' => Auth::user() ? trim(Auth::user()->name . ' ' . (Auth::user()->last_name ?? '')) : 'Sistema',
             'mensaje' => $mensaje,

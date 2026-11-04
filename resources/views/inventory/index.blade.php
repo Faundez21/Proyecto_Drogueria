@@ -122,13 +122,9 @@
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
                         <select name="categoria" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todas</option>
-                            <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
-                            <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
-                            @if(auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado'))
-                                <option value="Fármacos Controlados" {{ request('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>
-                                    Fármacos Controlados
-                                </option>
-                            @endif
+                            @foreach ($categoriasLista ?? ['Fármacos', 'Medicamentos', 'Insumos Clínicos', 'Insumos', 'Equipamiento'] as $catOpt)
+                                <option value="{{ $catOpt }}" {{ request('categoria') == $catOpt ? 'selected' : '' }}>{{ $catOpt }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -904,14 +900,9 @@
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Categoría <span class="text-rose-500">*</span></label>
                                 <select name="categoria" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="" disabled {{ old('categoria') ? '' : 'selected' }}>Seleccionar...</option>
-                                    <option value="Medicamentos" {{ old('categoria') == 'Medicamentos' ? 'selected' : '' }}>Medicamentos</option>
-                                    <option value="Fármacos" {{ old('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
-                                    <option value="Insumos" {{ old('categoria') == 'Insumos' ? 'selected' : '' }}>Insumos</option>
-                                    <option value="Insumos Clínicos" {{ old('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
-                                    <option value="Equipamiento" {{ old('categoria') == 'Equipamiento' ? 'selected' : '' }}>Equipamiento</option>
-                                    @role('Administrador')
-                                        <option value="Fármacos Controlados" {{ old('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>Fármacos Controlados (Estupefacientes/Psicotrópicos)</option>
-                                    @endrole
+                                    @foreach ($categoriasLista ?? ['Medicamentos', 'Fármacos', 'Insumos', 'Insumos Clínicos', 'Equipamiento'] as $catOpt)
+                                        <option value="{{ $catOpt }}" {{ old('categoria') == $catOpt ? 'selected' : '' }}>{{ $catOpt }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div>
@@ -926,7 +917,7 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Pasillo Ubicación</label>
-                                <select name="pasillo" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                <select name="pasillo" id="manual_pasillo" onchange="onManualUbicacionChange('pasillo')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="">Seleccione Pasillo...</option>
                                     @foreach ($pasillosLista ?? [] as $pasillo)
                                         <option value="{{ $pasillo }}" {{ old('pasillo') == $pasillo ? 'selected' : '' }}>{{ $pasillo }}</option>
@@ -935,7 +926,7 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Estante Ubicación</label>
-                                <select name="estante" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                <select name="estante" id="manual_estante" onchange="onManualUbicacionChange('estante')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="">Seleccione Estante...</option>
                                     @foreach ($estantesLista ?? [] as $estante)
                                         <option value="{{ $estante }}" {{ old('estante') == $estante ? 'selected' : '' }}>{{ $estante }}</option>
@@ -944,7 +935,7 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Nivel</label>
-                                <select name="nivel" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                <select name="nivel" id="manual_nivel" onchange="onManualUbicacionChange('nivel')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="">Seleccione Nivel...</option>
                                     @foreach ($nivelesLista ?? [] as $nivel)
                                         <option value="{{ $nivel }}" {{ old('nivel') == $nivel ? 'selected' : '' }}>{{ $nivel }}</option>
@@ -953,23 +944,23 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Posición</label>
-                                <select name="posicion" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                <select name="posicion" id="manual_posicion" onchange="onManualUbicacionChange('posicion')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="">Seleccione Posición...</option>
                                     @foreach ($posicionesLista ?? [] as $posicion)
                                         <option value="{{ $posicion }}" {{ old('posicion') == $posicion ? 'selected' : '' }}>{{ $posicion }}</option>
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="sm:col-span-2 lg:col-span-4">
+                                <div id="manual_ubicacion_status" class="px-3 py-2 rounded-lg text-[11.5px] font-medium bg-slate-100 text-slate-600 border border-slate-200 flex items-center justify-between gap-2">
+                                    <span>Seleccione Pasillo y Estante para ver sus niveles y posiciones disponibles.</span>
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa</label>
                                 <input type="text" name="programa" list="programasManualList" value="{{ old('programa') }}" placeholder="Ej. FOFAR / Morbilidad General" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                                 <datalist id="programasManualList">
-                                    <option value="Morbilidad General"></option>
-                                    <option value="Fondo de Farmacia (FOFAR)"></option>
-                                    <option value="Cardiovascular"></option>
-                                    <option value="IRA/ERA"></option>
-                                    <option value="Salud Mental"></option>
-                                    @foreach($programasLista ?? [] as $progOpt)
+                                    @foreach($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
                                         <option value="{{ $progOpt }}"></option>
                                     @endforeach
                                 </datalist>
@@ -1138,7 +1129,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
                                     <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Pasillo</label>
-                                    <select id="modal_edit_pasillo" name="pasillo" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
+                                    <select id="modal_edit_pasillo" name="pasillo" onchange="onModalEditUbicacionChange('pasillo')" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin asignar / P.A)</option>
                                         @foreach ($pasillosLista ?? [] as $pas)
                                             <option value="{{ $pas }}">{{ $pas }}</option>
@@ -1147,7 +1138,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Estante</label>
-                                    <select id="modal_edit_estante" name="estante" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
+                                    <select id="modal_edit_estante" name="estante" onchange="onModalEditUbicacionChange('estante')" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin asignar / P.A)</option>
                                         @foreach ($estantesLista ?? [] as $est)
                                             <option value="{{ $est }}">{{ $est }}</option>
@@ -1156,7 +1147,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Nivel</label>
-                                    <select id="modal_edit_nivel" name="nivel" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
+                                    <select id="modal_edit_nivel" name="nivel" onchange="onModalEditUbicacionChange('nivel')" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin nivel)</option>
                                         @foreach ($nivelesLista ?? [] as $niv)
                                             <option value="{{ $niv }}">Nivel {{ $niv }}</option>
@@ -1165,13 +1156,16 @@
                                 </div>
                                 <div>
                                     <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Posición</label>
-                                    <select id="modal_edit_posicion" name="posicion" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
+                                    <select id="modal_edit_posicion" name="posicion" onchange="onModalEditUbicacionChange('posicion')" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin posición)</option>
                                         @foreach ($posicionesLista ?? [] as $pos)
                                             <option value="{{ $pos }}">Posición {{ $pos }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+                            </div>
+                            <div id="modal_edit_ubicacion_status" class="mt-2.5 px-3 py-2 rounded-lg text-[11.5px] font-medium bg-slate-100 text-slate-600 border border-slate-200 flex items-center justify-between gap-2">
+                                <span>Seleccione Pasillo y Estante para ver sus niveles y posiciones disponibles.</span>
                             </div>
                         </div>
 
@@ -1555,9 +1549,68 @@
             }
         }
 
+        window.distribucionJerarquia = @json($distribucionJerarquia ?? []);
+        window.ubicacionesOcupadas = @json($ubicacionesOcupadas ?? []);
+        window.todosLosPasillos = @json($pasillosLista ?? []);
+        window.todosLosEstantes = @json($estantesLista ?? []);
+        window.todosLosNiveles = @json($nivelesLista ?? []);
+        window.todosLasPosiciones = @json($posicionesLista ?? []);
+
+        function obtenerConfigModalEditUbicacion() {
+            const form = document.getElementById('editLoteForm');
+            return {
+                selectPasillo: document.getElementById('modal_edit_pasillo'),
+                selectEstante: document.getElementById('modal_edit_estante'),
+                selectNivel: document.getElementById('modal_edit_nivel'),
+                selectPosicion: document.getElementById('modal_edit_posicion'),
+                statusEl: document.getElementById('modal_edit_ubicacion_status'),
+                ignoreLoteId: form?.dataset?.loteId ? parseInt(form.dataset.loteId, 10) : null,
+                producto: document.getElementById('modal_producto_nombre')?.textContent?.trim() || '',
+                lote: (document.getElementById('modal_lote_nombre')?.textContent || '').replace(/^LOTE:\s*/i, '').trim(),
+                initialUbicacion: {
+                    pasillo: form?.dataset?.initialPasillo || '',
+                    estante: form?.dataset?.initialEstante || '',
+                    nivel: form?.dataset?.initialNivel || '',
+                    posicion: form?.dataset?.initialPosicion || '',
+                },
+            };
+        }
+
+        function onModalEditUbicacionChange(trigger) {
+            if (!window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), trigger, false);
+        }
+
+        function obtenerConfigManualUbicacion() {
+            const form = document.querySelector('#DepositModal form');
+            return {
+                selectPasillo: document.getElementById('manual_pasillo'),
+                selectEstante: document.getElementById('manual_estante'),
+                selectNivel: document.getElementById('manual_nivel'),
+                selectPosicion: document.getElementById('manual_posicion'),
+                statusEl: document.getElementById('manual_ubicacion_status'),
+                producto: form?.querySelector('input[name="producto"]')?.value?.trim() || '',
+                lote: form?.querySelector('input[name="lote"]')?.value?.trim() || '',
+            };
+        }
+
+        function onManualUbicacionChange(trigger) {
+            if (!window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigManualUbicacion(), trigger, false);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.LoteStatus?.Ubicacion && document.getElementById('manual_estante')) {
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigManualUbicacion(), 'init', true);
+            }
+        });
+
         function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0, pasillo = '', estante = '', nivel = '', posicion = '') {
             const form = document.getElementById('editLoteForm');
-            if (form) form.action = "/inventory/" + id;
+            if (form) {
+                form.action = "/inventory/" + id;
+                form.dataset.loteId = id;
+            }
 
             document.getElementById('modal_producto_nombre').textContent = producto;
             document.getElementById('modal_lote_nombre').textContent = "LOTE: " + lote;
@@ -1585,18 +1638,37 @@
                 }
             }
 
-            // Precargar campos de ubicación física
+            const pasClean = (pasillo && pasillo !== 'P.A') ? pasillo : '';
+            const estClean = (estante && estante !== 'P.A') ? estante : '';
+            const nivClean = window.LoteStatus?.Ubicacion ? window.LoteStatus.Ubicacion.normNivel(nivel) : (nivel || '');
+            const posClean = window.LoteStatus?.Ubicacion ? window.LoteStatus.Ubicacion.normPos(posicion) : (posicion || '');
+
+            // Guardar valores iniciales para detectar reubicación física exacta
+            form.dataset.initialPasillo = pasClean;
+            form.dataset.initialEstante = estClean;
+            form.dataset.initialNivel = nivClean;
+            form.dataset.initialPosicion = posClean;
+
+            // Precargar campos de ubicación física y sincronizar niveles/posiciones del estante
             const selPas = document.getElementById('modal_edit_pasillo');
-            if (selPas) selPas.value = (pasillo && pasillo !== 'P.A') ? pasillo : '';
+            if (selPas) selPas.value = pasClean;
 
             const selEst = document.getElementById('modal_edit_estante');
-            if (selEst) selEst.value = (estante && estante !== 'P.A') ? estante : '';
+            if (selEst) selEst.value = estClean;
 
             const selNiv = document.getElementById('modal_edit_nivel');
-            if (selNiv) selNiv.value = nivel || '';
+            if (selNiv) selNiv.value = nivClean;
 
             const selPos = document.getElementById('modal_edit_posicion');
-            if (selPos) selPos.value = posicion || '';
+            if (selPos) selPos.value = posClean;
+
+            if (window.LoteStatus?.Ubicacion) {
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), 'init', true);
+                if (selNiv && nivClean) selNiv.value = nivClean;
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), 'init', true);
+                if (selPos && posClean) selPos.value = posClean;
+                window.LoteStatus.Ubicacion.actualizarIndicadorVisual(obtenerConfigModalEditUbicacion());
+            }
 
             let estadoSelect = document.getElementById('modal_estado');
             let estadoFormat = (estado || '').toLowerCase();
@@ -1610,11 +1682,6 @@
             let motivoInput = document.getElementById('modal_motivo');
             if (motivoInput) motivoInput.value = motivo;
 
-            // Guardar valores iniciales para detectar reubicación física exacta
-            form.dataset.initialPasillo = (pasillo && pasillo !== 'P.A') ? pasillo : '';
-            form.dataset.initialEstante = (estante && estante !== 'P.A') ? estante : '';
-            form.dataset.initialNivel = nivel || '';
-            form.dataset.initialPosicion = posicion || '';
             form.dataset.initialEstado = selectedVal;
 
             toggleMotivoField(selectedVal);
