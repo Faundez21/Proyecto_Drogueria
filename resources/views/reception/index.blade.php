@@ -225,21 +225,21 @@
                                         <option value="" disabled selected>Buscar producto por grupo...</option>
                                         <optgroup label="Medicamentos (Fármacos)" data-optgroup="Medicamentos">
                                             @foreach($productosAgrupados['Medicamentos'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Medicamentos" data-programa="{{ $product->programa_sugerido ?? '' }}">
+                                                <option value="{{ $product->id }}" data-grupo="Medicamentos" data-categoria="{{ $product->categoria_sugerida ?? 'Medicamentos' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">
                                                     {{ $product->nombre }}
                                                 </option>
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Insumos y Equipamiento" data-optgroup="Insumos">
                                             @foreach($productosAgrupados['Insumos'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Insumos" data-programa="{{ $product->programa_sugerido ?? '' }}">
+                                                <option value="{{ $product->id }}" data-grupo="Insumos" data-categoria="{{ $product->categoria_sugerida ?? 'Insumos' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">
                                                     {{ $product->nombre }}
                                                 </option>
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Estupefacientes y Controlados" data-optgroup="Estupefacientes">
                                             @foreach($productosAgrupados['Estupefacientes'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Estupefacientes" data-programa="{{ $product->programa_sugerido ?? '' }}">
+                                                <option value="{{ $product->id }}" data-grupo="Estupefacientes" data-categoria="{{ $product->categoria_sugerida ?? 'Estupefacientes' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">
                                                     {{ $product->nombre }} (Controlado)
                                                 </option>
                                             @endforeach
@@ -250,20 +250,20 @@
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoría / Clasificación <span class="text-rose-500">*</span></label>
                                     <select name="tipo_producto[]" required onchange="onCategoriaReceptionChange(this)" class="select-categoria-recepcion w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" disabled selected>Seleccione categoría...</option>
-                                        <optgroup label="Medicamentos (Fármacos)">
-                                            <option value="Medicamentos" data-grupo="Medicamentos">MEDICAMENTOS GENERALES</option>
-                                            <option value="F-FOFAR" data-grupo="Medicamentos">FOFAR (FARMACIA)</option>
-                                            <option value="F-PALIATIVOS" data-grupo="Medicamentos">CUIDADOS PALIATIVOS</option>
-                                            <option value="F-PARO" data-grupo="Medicamentos">CARRO DE PARO</option>
+                                        <optgroup label="Medicamentos (Fármacos)" data-optgroup-cat="Medicamentos">
+                                            @foreach($categoriasAgrupadas['Medicamentos'] ?? ['Medicamentos' => 'MEDICAMENTOS GENERALES', 'Fármacos' => 'FÁRMACOS', 'F-FOFAR' => 'FOFAR (FARMACIA)', 'F-PALIATIVOS' => 'CUIDADOS PALIATIVOS', 'F-PARO' => 'CARRO DE PARO'] as $catVal => $catLabel)
+                                                <option value="{{ $catVal }}" data-grupo="Medicamentos">{{ $catLabel }}</option>
+                                            @endforeach
                                         </optgroup>
-                                        <optgroup label="Insumos Clínicos y Equipamiento">
-                                            <option value="Insumos" data-grupo="Insumos">INSUMOS CLÍNICOS GENERALES</option>
-                                            <option value="I-CIRUGIA" data-grupo="Insumos">CIRUGÍA MENOR (INSUMOS)</option>
-                                            <option value="I-URGENCIA" data-grupo="Insumos">URGENCIA CIRUGÍA (INSUMOS)</option>
-                                            <option value="E-COMUNAL" data-grupo="Insumos">EQUIPAMIENTO COMUNAL</option>
+                                        <optgroup label="Insumos Clínicos y Equipamiento" data-optgroup-cat="Insumos">
+                                            @foreach($categoriasAgrupadas['Insumos'] ?? ['Insumos' => 'INSUMOS CLÍNICOS GENERALES', 'Insumos Clínicos' => 'INSUMOS CLÍNICOS', 'Equipamiento' => 'EQUIPAMIENTO', 'I-CIRUGIA' => 'CIRUGÍA MENOR (INSUMOS)', 'I-URGENCIA' => 'URGENCIA CIRUGÍA (INSUMOS)', 'E-COMUNAL' => 'EQUIPAMIENTO COMUNAL'] as $catVal => $catLabel)
+                                                <option value="{{ $catVal }}" data-grupo="Insumos">{{ $catLabel }}</option>
+                                            @endforeach
                                         </optgroup>
-                                        <optgroup label="Estupefacientes y Psicotrópicos">
-                                            <option value="Estupefacientes" data-grupo="Estupefacientes">ESTUPEFACIENTES / CONTROLADOS</option>
+                                        <optgroup label="Estupefacientes y Psicotrópicos" data-optgroup-cat="Estupefacientes">
+                                            @foreach($categoriasAgrupadas['Estupefacientes'] ?? ['Estupefacientes' => 'ESTUPEFACIENTES / CONTROLADOS', 'Fármacos Controlados' => 'FÁRMACOS CONTROLADOS'] as $catVal => $catLabel)
+                                                <option value="{{ $catVal }}" data-grupo="Estupefacientes">{{ $catLabel }}</option>
+                                            @endforeach
                                         </optgroup>
                                     </select>
                                 </div>
@@ -694,29 +694,49 @@
             }
 
             const grupo = opt.getAttribute('data-grupo') || 'Medicamentos';
+            const catSugerida = (opt.getAttribute('data-categoria') || '').trim();
             const progSugerido = (opt.getAttribute('data-programa') || '').trim();
             const selectCat = card.querySelector('.select-categoria-recepcion');
             const selectProg = card.querySelector('.select-programa-recepcion') || card.querySelector('select[name="programa[]"]');
 
-            if (grupo === 'Estupefacientes') {
-                selectCat.value = 'Estupefacientes';
-            } else {
-                const catOpt = selectCat.options[selectCat.selectedIndex];
-                const catGrupoActual = catOpt ? catOpt.getAttribute('data-grupo') : null;
-                if (!catGrupoActual || catGrupoActual !== grupo) {
+            if (selectCat) {
+                if (catSugerida && catSugerida.toLowerCase() !== 'general') {
+                    let matchedOpt = Array.from(selectCat.options).find(
+                        o => o.value && o.value.toLowerCase() === catSugerida.toLowerCase()
+                    );
+                    if (!matchedOpt) {
+                        const newOpt = document.createElement('option');
+                        newOpt.value = catSugerida;
+                        newOpt.textContent = catSugerida.toUpperCase();
+                        newOpt.setAttribute('data-grupo', grupo);
+                        const targetOg = selectCat.querySelector(`optgroup[data-optgroup-cat="${grupo}"]`) || selectCat;
+                        targetOg.appendChild(newOpt);
+                        matchedOpt = newOpt;
+                    }
+                    selectCat.value = matchedOpt.value;
+                } else if (grupo === 'Estupefacientes') {
+                    selectCat.value = 'Estupefacientes';
+                } else {
                     selectCat.value = (grupo === 'Insumos') ? 'Insumos' : 'Medicamentos';
                 }
             }
 
-            if (selectProg && progSugerido) {
-                let exists = Array.from(selectProg.options).some(o => o.value === progSugerido);
-                if (!exists) {
-                    const newOpt = document.createElement('option');
-                    newOpt.value = progSugerido;
-                    newOpt.textContent = progSugerido;
-                    selectProg.appendChild(newOpt);
+            if (selectProg) {
+                if (progSugerido) {
+                    let matchedProg = Array.from(selectProg.options).find(
+                        o => o.value && o.value.toLowerCase() === progSugerido.toLowerCase()
+                    );
+                    if (!matchedProg) {
+                        const newOpt = document.createElement('option');
+                        newOpt.value = progSugerido;
+                        newOpt.textContent = progSugerido;
+                        selectProg.appendChild(newOpt);
+                        matchedProg = newOpt;
+                    }
+                    selectProg.value = matchedProg.value;
+                } else {
+                    selectProg.value = '';
                 }
-                selectProg.value = progSugerido;
             }
 
             actualizarEstiloCardGrupo(card, grupo);

@@ -40,25 +40,124 @@ class ReceptionController extends Controller
         $providers = Provider::where('status', 'activo')->orderBy('name')->get();
         $products = Product::orderBy('nombre')->get();
 
-        $categoriasInv = Inventory::select('producto', 'categoria')
-            ->whereNotNull('categoria')
-            ->where('categoria', '!=', '')
-            ->orderBy('id', 'asc')
-            ->get()
-            ->pluck('categoria', 'producto');
+        // Mapear categoría y programa desde Inventario (incluyendo Carga Masiva) e Historial de Recepciones
+        $categoriasPorNombre = [];
+        $categoriasPorId = [];
+        $programasPorNombre = [];
+        $programasPorId = [];
 
-        $programasInv = Inventory::select('producto', 'programa')
-            ->whereNotNull('programa')
-            ->where('programa', '!=', '')
+        $itemsRecHist = ReceptionItem::with('product:id,nombre')
+            ->whereNotNull('tipo_producto')
+            ->where('tipo_producto', '!=', '')
             ->orderBy('id', 'asc')
-            ->get()
-            ->pluck('programa', 'producto');
+            ->get(['product_id', 'tipo_producto']);
+
+        foreach ($itemsRecHist as $itemHist) {
+            $catVal = trim((string) $itemHist->tipo_producto);
+            if ($catVal === '' || mb_strtolower($catVal) === 'general') {
+                continue;
+            }
+            if ($itemHist->product_id) {
+                $categoriasPorId[(int) $itemHist->product_id] = $catVal;
+            }
+            if ($itemHist->product?->nombre) {
+                $categoriasPorNombre[mb_strtolower(trim($itemHist->product->nombre))] = $catVal;
+            }
+        }
+
+        $registrosInv = Inventory::select('product_id', 'producto', 'categoria', 'programa')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        foreach ($registrosInv as $regInv) {
+            $keyNombre = mb_strtolower(trim((string) $regInv->producto));
+            $prodId = $regInv->product_id ? (int) $regInv->product_id : null;
+
+            $catVal = trim((string) ($regInv->categoria ?? ''));
+            if ($catVal !== '') {
+                $esGeneral = mb_strtolower($catVal) === 'general';
+                if ($keyNombre !== '' && (! $esGeneral || ! isset($categoriasPorNombre[$keyNombre]))) {
+                    $categoriasPorNombre[$keyNombre] = $catVal;
+                }
+                if ($prodId && (! $esGeneral || ! isset($categoriasPorId[$prodId]))) {
+                    $categoriasPorId[$prodId] = $catVal;
+                }
+            }
+
+            $progVal = trim((string) ($regInv->programa ?? ''));
+            if ($progVal !== '') {
+                if ($keyNombre !== '') {
+                    $programasPorNombre[$keyNombre] = $progVal;
+                }
+                if ($prodId) {
+                    $programasPorId[$prodId] = $progVal;
+                }
+            }
+        }
 
         foreach ($products as $prod) {
-            $catHist = $categoriasInv[$prod->nombre] ?? null;
+            $keyProd = mb_strtolower(trim($prod->nombre));
+            $catHist = $categoriasPorId[(int) $prod->id] ?? ($categoriasPorNombre[$keyProd] ?? null);
+            $progHist = $programasPorId[(int) $prod->id] ?? ($programasPorNombre[$keyProd] ?? '');
+
             $prod->grupo_recepcion = InventoryService::clasificarGrupoProducto($prod->nombre, $catHist);
-            $prod->programa_sugerido = $programasInv[$prod->nombre] ?? '';
-            $prod->categoria_sugerida = $catHist ?? '';
+            $prod->programa_sugerido = $progHist;
+            $prod->categoria_sugerida = ($catHist && mb_strtolower($catHist) !== 'general')
+                ? $catHist
+                : ($prod->grupo_recepcion === 'Estupefacientes' ? 'Estupefacientes' : ($prod->grupo_recepcion === 'Insumos' ? 'Insumos' : 'Medicamentos'));
+        }
+
+        // Categorías base + todas las categorías existentes en Inventario y Carga Masiva agrupadas por clasificación
+        $categoriasAgrupadas = [
+            'Medicamentos' => [
+                'Medicamentos' => 'MEDICAMENTOS GENERALES',
+                'Fármacos' => 'FÁRMACOS',
+                'F-FOFAR' => 'FOFAR (FARMACIA)',
+                'F-PALIATIVOS' => 'CUIDADOS PALIATIVOS',
+                'F-PARO' => 'CARRO DE PARO',
+            ],
+            'Insumos' => [
+                'Insumos' => 'INSUMOS CLÍNICOS GENERALES',
+                'Insumos Clínicos' => 'INSUMOS CLÍNICOS',
+                'Equipamiento' => 'EQUIPAMIENTO',
+                'I-CIRUGIA' => 'CIRUGÍA MENOR (INSUMOS)',
+                'I-URGENCIA' => 'URGENCIA CIRUGÍA (INSUMOS)',
+                'E-COMUNAL' => 'EQUIPAMIENTO COMUNAL',
+            ],
+            'Estupefacientes' => [
+                'Estupefacientes' => 'ESTUPEFACIENTES / CONTROLADOS',
+                'Fármacos Controlados' => 'FÁRMACOS CONTROLADOS',
+            ],
+        ];
+
+        $categoriasEnBD = Inventory::whereNotNull('categoria')
+            ->where('categoria', '!=', '')
+            ->distinct()
+            ->pluck('categoria')
+            ->merge(
+                ReceptionItem::whereNotNull('tipo_producto')
+                    ->where('tipo_producto', '!=', '')
+                    ->distinct()
+                    ->pluck('tipo_producto')
+            )
+            ->map(fn ($c) => trim((string) $c))
+            ->filter(fn ($c) => $c !== '' && mb_strtolower($c) !== 'general')
+            ->unique();
+
+        foreach ($categoriasEnBD as $catBD) {
+            $yaExiste = false;
+            foreach ($categoriasAgrupadas as $grp => $lista) {
+                foreach ($lista as $valKey => $labelText) {
+                    if (mb_strtolower($valKey) === mb_strtolower($catBD)) {
+                        $yaExiste = true;
+                        break 2;
+                    }
+                }
+            }
+            if (! $yaExiste) {
+                $grupoDestino = InventoryService::clasificarGrupoProducto('', $catBD);
+                $categoriasAgrupadas[$grupoDestino][$catBD] = mb_strtoupper($catBD);
+            }
         }
 
         // Programas base + todos los programas existentes en Inventario y Carga Masiva
@@ -97,8 +196,8 @@ class ReceptionController extends Controller
                     return (int) $inv->reception_id === (int) $rec->id
                         && (int) $inv->product_id === (int) $rItem->product_id;
                 });
-                $nomProd = $rItem->product?->nombre ?? '';
-                $rItem->setAttribute('programa', $match?->programa ?? ($programasInv[$nomProd] ?? null));
+                $nomProd = mb_strtolower(trim($rItem->product?->nombre ?? ''));
+                $rItem->setAttribute('programa', $match?->programa ?? ($programasPorId[(int) $rItem->product_id] ?? ($programasPorNombre[$nomProd] ?? null)));
             }
         }
         $nextCorrelativo = (int) Reception::max('correlativo') + 1;
@@ -141,6 +240,7 @@ class ReceptionController extends Controller
             'receptions',
             'products',
             'productosAgrupados',
+            'categoriasAgrupadas',
             'programasLista',
             'nextCorrelativo',
             'controlados',
