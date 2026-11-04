@@ -34,8 +34,18 @@ class QuarantineController extends Controller
 
         // Filtros Específicos Avanzados
         if ($request->filled('categoria')) {
-            if ($request->categoria !== 'Fármacos Controlados' || $puedeVerControlados) {
-                $query->where('categoria', $request->categoria);
+            $catFiltro = trim($request->input('categoria'));
+            $catLower = mb_strtolower($catFiltro);
+            if (in_array($catLower, ['fármacos', 'farmacos', 'medicamentos'])) {
+                $query->whereIn('categoria', ['Fármacos', 'Farmacos', 'Medicamentos']);
+            } elseif (in_array($catLower, ['insumos clínicos', 'insumos clinicos', 'insumos'])) {
+                $query->whereIn('categoria', ['Insumos Clínicos', 'Insumos Clinicos', 'Insumos']);
+            } elseif (in_array($catLower, ['fármacos controlados', 'farmacos controlados', 'estupefacientes'])) {
+                if ($puedeVerControlados) {
+                    $query->whereIn('categoria', ['Fármacos Controlados', 'Farmacos Controlados', 'Estupefacientes']);
+                }
+            } else {
+                $query->where('categoria', $catFiltro);
             }
         }
         if ($request->filled('pasillo')) {
@@ -99,22 +109,34 @@ class QuarantineController extends Controller
                 ->get();
         }
 
-        // 3. Generar listas para los Dropdowns de Filtros (Solo de productos en Cuarentena)
+        // 3. Generar listas para los Dropdowns de Filtros y Modales
         $baseDropdownQuery = Inventory::where('estado', 'Cuarentena')
-            ->when(! $puedeVerControlados, fn ($q) => $q->where('categoria', '!=', 'Fármacos Controlados'));
+            ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']));
 
         $productosLista = (clone $baseDropdownQuery)->select('producto')->distinct()->orderBy('producto', 'asc')->pluck('producto');
-        $programasLista = (clone $baseDropdownQuery)->whereNotNull('programa')->where('programa', '!=', '')->distinct()->orderBy('programa', 'asc')->pluck('programa');
-        $pasillosLista = (clone $baseDropdownQuery)->whereNotNull('pasillo')->where('pasillo', '!=', '')->distinct()->orderBy('pasillo', 'asc')->pluck('pasillo');
-        $estantesLista = (clone $baseDropdownQuery)->whereNotNull('estante')->where('estante', '!=', '')->distinct()->orderBy('estante', 'asc')->pluck('estante');
+        $programasLista = InventoryService::programasLista();
+        $categoriasLista = InventoryService::categoriasLista($puedeVerControlados);
+
+        $datosDist = InventoryService::datosDistribucionFisica();
+        $pasillosLista = $datosDist['pasillosLista'];
+        $estantesLista = $datosDist['estantesLista'];
+        $nivelesLista = $datosDist['nivelesLista'];
+        $posicionesLista = $datosDist['posicionesLista'];
+        $distribucionJerarquia = $datosDist['distribucionJerarquia'];
+        $ubicacionesOcupadas = $datosDist['ubicacionesOcupadas'];
 
         return view('quarantine.index', compact(
             'inventories',
             'historial',
             'productosLista',
             'programasLista',
+            'categoriasLista',
             'pasillosLista',
             'estantesLista',
+            'nivelesLista',
+            'posicionesLista',
+            'distribucionJerarquia',
+            'ubicacionesOcupadas',
             'totalLotesGlobal',
             'totalUnidadesGlobal',
             'valorTotalRetenido'

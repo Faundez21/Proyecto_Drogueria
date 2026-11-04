@@ -63,6 +63,7 @@ class DispatchController extends Controller
             ->values();
 
         $establecimientos = InventoryService::establecimientos();
+        $programasLista = InventoryService::programasLista();
 
         return view('dispatch.index', compact(
             'correlativo',
@@ -72,7 +73,8 @@ class DispatchController extends Controller
             'usuariosAsignables',
             'misSolicitudesAsignadas',
             'controlados',
-            'establecimientos'
+            'establecimientos',
+            'programasLista'
         ));
     }
 

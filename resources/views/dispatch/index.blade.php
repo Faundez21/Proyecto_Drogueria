@@ -495,7 +495,8 @@
                     <option value="" disabled selected>Seleccione producto del inventario...</option>
                     @foreach ($inventarioDisponible as $inv)
                         <option value="{{ $inv->producto }}" data-lote="{{ $inv->lote ?? 'S/L' }}"
-                            data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $inv->cantidad ?? 0 }}">
+                            data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $inv->cantidad ?? 0 }}"
+                            data-programa="{{ $inv->programa ?? '' }}">
                             {{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})
                         </option>
                     @endforeach
@@ -513,9 +514,9 @@
             <td class="px-3 py-2.5 border-r border-slate-100 align-middle">
                 <select name="programas[]" required
                     class="w-full bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
-                    <option value="Morbilidad General" selected>Morbilidad General</option>
-                    <option value="Cardiovascular">Cardiovascular</option>
-                    <option value="IRA/ERA">Respiratorio (IRA/ERA)</option>
+                    @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $idxProg => $progOpt)
+                        <option value="{{ $progOpt }}" {{ $idxProg === 0 ? 'selected' : '' }}>{{ $progOpt }}</option>
+                    @endforeach
                 </select>
             </td>
             <td class="px-3 py-2.5 border-r border-slate-100 align-middle">
@@ -1803,6 +1804,22 @@
 
             loteInput.value = option.getAttribute('data-lote') || '';
             venceInput.value = option.getAttribute('data-vence') || '';
+
+            const progSugerido = (option.getAttribute('data-programa') || '').trim();
+            const progSelect = tr.querySelector('select[name="programas[]"]');
+            if (progSelect && progSugerido) {
+                let matchedProg = Array.from(progSelect.options).find(
+                    o => o.value && o.value.toLowerCase() === progSugerido.toLowerCase()
+                );
+                if (!matchedProg) {
+                    const newOpt = document.createElement('option');
+                    newOpt.value = progSugerido;
+                    newOpt.textContent = progSugerido;
+                    progSelect.appendChild(newOpt);
+                    matchedProg = newOpt;
+                }
+                progSelect.value = matchedProg.value;
+            }
 
             let stock = parseInt(option.getAttribute('data-stock')) || 0;
             cantInput.setAttribute('max', stock);

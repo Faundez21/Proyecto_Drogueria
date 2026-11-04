@@ -203,37 +203,14 @@ class ReceptionController extends Controller
         $nextCorrelativo = (int) Reception::max('correlativo') + 1;
         $controlados = InventoryService::controlados();
 
-        // Extraer campos de distribución física
-        $shelves = Shelf::with(['aisle', 'levels.positions'])->orderBy('name')->get();
-
-        $pasillosInv = Inventory::whereNotNull('pasillo')->where('pasillo', '!=', '')->where('pasillo', '!=', 'P.A')->distinct()->pluck('pasillo');
-        $pasillosMant = Aisle::orderBy('name')->pluck('name');
-        $pasillosLista = $pasillosMant->merge($pasillosInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $estantesInv = Inventory::whereNotNull('estante')->where('estante', '!=', '')->where('estante', '!=', 'P.A')->distinct()->pluck('estante');
-        $estantesMant = Shelf::orderBy('name')->pluck('name');
-        $estantesLista = $estantesMant->merge($estantesInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $nivelesInv = Inventory::whereNotNull('nivel')->where('nivel', '!=', '')->distinct()->pluck('nivel')->map(fn ($v) => (string) $v);
-        $nivelesMant = Level::distinct()->orderBy('number')->pluck('number')->map(fn ($v) => (string) $v);
-        $nivelesLista = $nivelesMant->merge($nivelesInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $posicionesInv = Inventory::whereNotNull('posicion')->where('posicion', '!=', '')->distinct()->pluck('posicion');
-        $posicionesMant = Position::distinct()->orderBy('name')->pluck('name');
-        $posicionesLista = $posicionesMant->merge($posicionesInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $distribucionJerarquia = $shelves->map(function ($s) {
-            return [
-                'estante' => $s->name,
-                'pasillo' => $s->aisle?->name ?? '',
-                'niveles' => $s->levels->map(function ($lvl) {
-                    return [
-                        'nivel' => (string) $lvl->number,
-                        'posiciones' => $lvl->positions->pluck('name')->values()->all(),
-                    ];
-                })->values()->all(),
-            ];
-        })->values();
+        // Extraer campos de distribución física y ubicaciones ocupadas
+        $datosDist = InventoryService::datosDistribucionFisica();
+        $pasillosLista = $datosDist['pasillosLista'];
+        $estantesLista = $datosDist['estantesLista'];
+        $nivelesLista = $datosDist['nivelesLista'];
+        $posicionesLista = $datosDist['posicionesLista'];
+        $distribucionJerarquia = $datosDist['distribucionJerarquia'];
+        $ubicacionesOcupadas = $datosDist['ubicacionesOcupadas'];
 
         return view('reception.index', compact(
             'providers',
@@ -248,7 +225,8 @@ class ReceptionController extends Controller
             'estantesLista',
             'nivelesLista',
             'posicionesLista',
-            'distribucionJerarquia'
+            'distribucionJerarquia',
+            'ubicacionesOcupadas'
         ));
     }
 
@@ -309,6 +287,54 @@ class ReceptionController extends Controller
 
         $provider = Provider::findOrFail($validated['provider_id']);
         $nombreProveedor = $provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor';
+
+        // Validar que ninguna ubicación física seleccionada esté ocupada en bodega ni duplicada entre productos distintos del acta
+        $ubicacionesEnActa = [];
+        foreach ($validated['product_id'] as $index => $prodId) {
+            $estCheck = ! empty($validated['estante'][$index]) ? trim((string) $validated['estante'][$index]) : '';
+            $nivCheck = ! empty($validated['nivel'][$index]) ? InventoryService::normalizarNivel($validated['nivel'][$index]) : '';
+            $posCheck = ! empty($validated['posicion'][$index]) ? InventoryService::normalizarPosicion($validated['posicion'][$index]) : '';
+
+            if ($estCheck === '' || strtoupper($estCheck) === 'P.A' || $nivCheck === '') {
+                continue;
+            }
+
+            $productCheck = Product::find($prodId);
+            $nomProdCheck = $productCheck?->nombre ?? ('Producto #' . $prodId);
+            $loteCheck = ! empty($validated['lote'][$index]) ? trim((string) $validated['lote'][$index]) : 'S/L';
+
+            $ocupanteBD = InventoryService::verificarUbicacionOcupada(
+                $estCheck,
+                $nivCheck,
+                $posCheck,
+                null,
+                $nomProdCheck,
+                $loteCheck
+            );
+
+            if ($ocupanteBD) {
+                $detallePos = $posCheck !== '' ? ", Posición {$posCheck}" : '';
+                $msgError = "La ubicación seleccionada para «{$nomProdCheck}» (Estante {$estCheck}, Nivel {$nivCheck}{$detallePos}) ya está ocupada en bodega por «{$ocupanteBD->producto}» (Lote: " . ($ocupanteBD->lote ?: 'S/L') . ").";
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['ok' => false, 'message' => $msgError], 422);
+                }
+
+                return redirect()->back()->withInput()->with('error', $msgError);
+            }
+
+            $slotKey = mb_strtolower($estCheck) . '|' . mb_strtolower($nivCheck) . '|' . mb_strtolower($posCheck);
+            $prodLoteKey = mb_strtolower(trim($nomProdCheck)) . '|' . mb_strtolower((string) InventoryService::normalizarLote($loteCheck));
+            if ($posCheck !== '' && isset($ubicacionesEnActa[$slotKey]) && $ubicacionesEnActa[$slotKey]['prod_lote'] !== $prodLoteKey) {
+                $otro = $ubicacionesEnActa[$slotKey]['nombre'];
+                $msgError = "No puedes asignar la misma ubicación (Estante {$estCheck}, Nivel {$nivCheck}, Posición {$posCheck}) a dos lotes distintos en la misma recepción («{$otro}» y «{$nomProdCheck}»).";
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['ok' => false, 'message' => $msgError], 422);
+                }
+
+                return redirect()->back()->withInput()->with('error', $msgError);
+            }
+            $ubicacionesEnActa[$slotKey] = ['prod_lote' => $prodLoteKey, 'nombre' => $nomProdCheck];
+        }
 
         DB::beginTransaction();
 

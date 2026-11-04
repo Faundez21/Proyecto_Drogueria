@@ -15,12 +15,29 @@ class EstablishmentRequestController extends Controller
 {
     public function index()
     {
+        InventoryService::sincronizarProductosDesdeInventario();
         $controlados = InventoryService::controlados();
+        $metadatos = InventoryService::mapaMetadatosProductos();
 
         // Solo Medicamentos e Insumos (sin estupefacientes)
         $products = Product::whereNotIn('nombre', $controlados)
             ->orderBy('nombre')
-            ->get();
+            ->get()
+            ->filter(function ($prod) use ($metadatos) {
+                $key = mb_strtolower(trim($prod->nombre));
+                $cat = $metadatos['categoriasPorId'][(int) $prod->id] ?? ($metadatos['categoriasPorNombre'][$key] ?? null);
+
+                return InventoryService::clasificarGrupoProducto($prod->nombre, $cat) !== 'Estupefacientes';
+            })
+            ->values();
+
+        foreach ($products as $prod) {
+            $key = mb_strtolower(trim($prod->nombre));
+            $cat = $metadatos['categoriasPorId'][(int) $prod->id] ?? ($metadatos['categoriasPorNombre'][$key] ?? null);
+            $prog = $metadatos['programasPorId'][(int) $prod->id] ?? ($metadatos['programasPorNombre'][$key] ?? '');
+            $prod->categoria_sugerida = $cat ?: InventoryService::clasificarGrupoProducto($prod->nombre, $cat);
+            $prod->programa_sugerido = $prog;
+        }
 
         // Solo establecimientos que NO son CESFAM
         $establecimientos = array_values(array_filter(
@@ -49,26 +66,22 @@ class EstablishmentRequestController extends Controller
         ];
         $nombresEstablecimientosQuery = array_values(array_unique(array_merge($nombresEstablecimientos, $nombresHistoricos)));
 
-        // Inventario propio de los Establecimientos registrado en las solicitudes (independiente del Inventario de Droguería)
+        // Inventario propio de los Establecimientos registrado en las solicitudes
         $inventarioSolicitudes = EstablishmentItem::with(['request', 'product'])
             ->whereHas('request', fn ($q) => $q->whereIn('establecimiento', $nombresEstablecimientosQuery))
             ->whereHas('product', fn ($q) => $q->whereNotIn('nombre', $controlados))
             ->orderByDesc('id')
             ->get();
 
-        $productosLista = $inventarioSolicitudes
-            ->map(fn ($item) => $item->product->nombre ?? null)
+        $productosLista = $products->pluck('nombre')
+            ->merge($inventarioSolicitudes->map(fn ($item) => $item->product->nombre ?? null))
             ->filter()
             ->unique()
-            ->sort()
+            ->sort(SORT_NATURAL)
             ->values();
 
-        $programasLista = $inventarioSolicitudes
-            ->pluck('programa')
-            ->filter()
-            ->unique()
-            ->sort()
-            ->values();
+        $programasLista = InventoryService::programasLista($inventarioSolicitudes->pluck('programa'));
+        $categoriasLista = InventoryService::categoriasLista(false);
 
         $consumoMapa = SolicitudService::mapaConsumoYStock($nombresEstablecimientosQuery);
 
@@ -79,16 +92,27 @@ class EstablishmentRequestController extends Controller
             'inventarioSolicitudes',
             'productosLista',
             'programasLista',
+            'categoriasLista',
             'consumoMapa'
         ));
     }
 
     public function cesfam()
     {
+        InventoryService::sincronizarProductosDesdeInventario();
         $controlados = InventoryService::controlados();
+        $metadatos = InventoryService::mapaMetadatosProductos();
 
         // Medicamentos, insumos y estupefacientes
         $products = Product::orderBy('nombre')->get();
+
+        foreach ($products as $prod) {
+            $key = mb_strtolower(trim($prod->nombre));
+            $cat = $metadatos['categoriasPorId'][(int) $prod->id] ?? ($metadatos['categoriasPorNombre'][$key] ?? null);
+            $prog = $metadatos['programasPorId'][(int) $prod->id] ?? ($metadatos['programasPorNombre'][$key] ?? '');
+            $prod->categoria_sugerida = $cat ?: InventoryService::clasificarGrupoProducto($prod->nombre, $cat);
+            $prod->programa_sugerido = $prog;
+        }
 
         // Solo establecimientos tipo CESFAM
         $establecimientos = array_values(array_filter(
@@ -113,25 +137,21 @@ class EstablishmentRequestController extends Controller
         ];
         $nombresCesfamQuery = array_values(array_unique(array_merge($nombresCesfam, $nombresCesfamHistoricos)));
 
-        // Inventario propio de los CESFAM registrado en las solicitudes (independiente del Inventario de Droguería)
+        // Inventario propio de los CESFAM registrado en las solicitudes
         $inventarioSolicitudes = EstablishmentItem::with(['request', 'product'])
             ->whereHas('request', fn ($q) => $q->whereIn('establecimiento', $nombresCesfamQuery))
             ->orderByDesc('id')
             ->get();
 
-        $productosLista = $inventarioSolicitudes
-            ->map(fn ($item) => $item->product->nombre ?? null)
+        $productosLista = $products->pluck('nombre')
+            ->merge($inventarioSolicitudes->map(fn ($item) => $item->product->nombre ?? null))
             ->filter()
             ->unique()
-            ->sort()
+            ->sort(SORT_NATURAL)
             ->values();
 
-        $programasLista = $inventarioSolicitudes
-            ->pluck('programa')
-            ->filter()
-            ->unique()
-            ->sort()
-            ->values();
+        $programasLista = InventoryService::programasLista($inventarioSolicitudes->pluck('programa'));
+        $categoriasLista = InventoryService::categoriasLista(true);
 
         $consumoMapa = SolicitudService::mapaConsumoYStock($nombresCesfamQuery);
 
@@ -142,6 +162,7 @@ class EstablishmentRequestController extends Controller
             'inventarioSolicitudes',
             'productosLista',
             'programasLista',
+            'categoriasLista',
             'consumoMapa'
         ));
     }
