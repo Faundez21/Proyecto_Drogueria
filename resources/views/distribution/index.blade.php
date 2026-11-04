@@ -2578,8 +2578,23 @@
                             // Si la estantería aún no tiene posición guardada, se acomoda en una grilla
                             const tienePos = shelf.pos_x !== null && shelf.pos_x !== undefined && shelf.pos_z !==
                                 null && shelf.pos_z !== undefined;
-                            const px = tienePos ? (Number(shelf.pos_x) || 0) : -30 + (idx % 6) * 12;
-                            const pz = tienePos ? (Number(shelf.pos_z) || 0) : -12 + Math.floor(idx / 6) * 14;
+                            let px = tienePos ? (Number(shelf.pos_x) || 0) : -30 + (idx % 6) * 12;
+                            let pz = tienePos ? (Number(shelf.pos_z) || 0) : -12 + Math.floor(idx / 6) * 14;
+
+                            // Evitar que dos estanterías aparezcan superpuestas al cargar
+                            const MIN_INIT_SEP = 4.6;
+                            let intentosSeparacion = 0;
+                            while (
+                                racks.some(r => Math.abs(px - r.position.x) < MIN_INIT_SEP && Math.abs(pz - r.position.z) < MIN_INIT_SEP) &&
+                                intentosSeparacion < 60
+                            ) {
+                                px += 6;
+                                if (px > 34) {
+                                    px = -30;
+                                    pz += 7;
+                                }
+                                intentosSeparacion++;
+                            }
 
                             const nombrePasillo = shelf.aisle ? shelf.aisle.name : 'Sin pasillo';
                             if (shelf.aisle && shelf.aisle.name) {
@@ -3143,13 +3158,59 @@
                             controls.target.z += dz;
                         });
 
-                        // --- LÓGICA DE MOVIMIENTO POR CLIC (CON LÍMITES DE PAREDES, SNAP Y CANCELAR) ---
+                        // --- LÓGICA DE MOVIMIENTO POR CLIC (CON LÍMITES DE PAREDES, SNAP, COLISIÓN Y CANCELAR) ---
                         let isMoving = false;
                         let snapGridEnabled = true;
                         let moveOriginPos = null;
+                        let collidingRack = null;
+                        let cursorInCollision = false;
                         const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -1.5);
                         const WALL_LIMIT_X = 36;
                         const WALL_LIMIT_Z = 21;
+                        const MIN_RACK_SEP = 4.6; // Ancho físico de cada estantería (4.4u) + margen de seguridad
+
+                        function detectarColisionEstante(mesh, x, z) {
+                            if (!mesh) return null;
+                            for (const other of racks) {
+                                if (other === mesh) continue;
+                                if (
+                                    Math.abs(x - other.position.x) < MIN_RACK_SEP &&
+                                    Math.abs(z - other.position.z) < MIN_RACK_SEP
+                                ) {
+                                    return other;
+                                }
+                            }
+                            return null;
+                        }
+
+                        function limpiarAlertaColision() {
+                            if (collidingRack && collidingRack.material) {
+                                const origColor = collidingRack.userData.origHitColor ?? colorOcupacion(collidingRack.userData.pct);
+                                collidingRack.material.color.setHex(origColor);
+                                collidingRack.material.emissive.setHex(origColor);
+                                collidingRack.material.opacity = 0;
+                                collidingRack.material.emissiveIntensity = 0;
+                            }
+                            collidingRack = null;
+                            cursorInCollision = false;
+                        }
+
+                        function marcarAlertaColision(otherRack) {
+                            if (collidingRack && collidingRack !== otherRack) {
+                                limpiarAlertaColision();
+                            }
+                            collidingRack = otherRack;
+                            cursorInCollision = true;
+                            if (otherRack && otherRack.material) {
+                                if (otherRack.userData.origHitColor === undefined) {
+                                    otherRack.userData.origHitColor = otherRack.material.color.getHex();
+                                }
+                                otherRack.material.color.setHex(0xef4444);
+                                otherRack.material.emissive.setHex(0xef4444);
+                                otherRack.material.opacity = 0.35;
+                                otherRack.material.emissiveIntensity = 0.85;
+                            }
+                        }
 
                         function actualizarPosicionEstante(mesh, x, z) {
                             mesh.position.x = x;
@@ -3172,6 +3233,7 @@
                         window.addEventListener('start-moving', () => {
                             if (!selectedObject) return;
                             isMoving = true;
+                            limpiarAlertaColision();
                             moveOriginPos = {
                                 x: selectedObject.position.x,
                                 z: selectedObject.position.z
@@ -3190,6 +3252,7 @@
 
                         window.addEventListener('cancel-moving', () => {
                             if (!isMoving || !selectedObject) return;
+                            limpiarAlertaColision();
                             if (moveOriginPos) {
                                 actualizarPosicionEstante(selectedObject, moveOriginPos.x, moveOriginPos.z);
                                 renderAisles();
@@ -3224,7 +3287,25 @@
                                         nx = Math.round(nx * 10) / 10;
                                         nz = Math.round(nz * 10) / 10;
                                     }
-                                    actualizarPosicionEstante(selectedObject, nx, nz);
+
+                                    const estanteEnConflicto = detectarColisionEstante(selectedObject, nx, nz);
+                                    if (!estanteEnConflicto) {
+                                        limpiarAlertaColision();
+                                        wrapper.style.cursor = 'move';
+                                        actualizarPosicionEstante(selectedObject, nx, nz);
+                                    } else {
+                                        marcarAlertaColision(estanteEnConflicto);
+                                        wrapper.style.cursor = 'not-allowed';
+
+                                        // Permitir deslizar por el eje libre sin montarse encima del otro estante
+                                        const curX = selectedObject.position.x;
+                                        const curZ = selectedObject.position.z;
+                                        if (!detectarColisionEstante(selectedObject, nx, curZ)) {
+                                            actualizarPosicionEstante(selectedObject, nx, curZ);
+                                        } else if (!detectarColisionEstante(selectedObject, curX, nz)) {
+                                            actualizarPosicionEstante(selectedObject, curX, nz);
+                                        }
+                                    }
                                 }
                                 return;
                             }
@@ -3279,10 +3360,34 @@
                             }
 
                             if (isMoving && selectedObject) {
+                                const colisionActual = collidingRack || detectarColisionEstante(
+                                    selectedObject,
+                                    selectedObject.position.x,
+                                    selectedObject.position.z
+                                );
+
+                                if (cursorInCollision || colisionActual) {
+                                    const nombreOcupado = colisionActual?.userData?.code || 'otra estantería';
+                                    if (typeof Swal !== 'undefined') {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Ubicación Ocupada',
+                                            html: `No puedes colocar la estantería <strong>${selectedObject.userData.code}</strong> encima de <strong>${nombreOcupado}</strong>.<br><span class="text-xs text-slate-500">Selecciona un espacio libre en el piso de la bodega.</span>`,
+                                            confirmButtonColor: '#0f766e',
+                                            timer: 2600,
+                                            timerProgressBar: true
+                                        });
+                                    }
+                                    return;
+                                }
+
+                                limpiarAlertaColision();
+                                const prevPos = moveOriginPos ? { ...moveOriginPos } : null;
                                 isMoving = false;
                                 moveOriginPos = null;
                                 controls.enabled = true;
                                 wrapper.style.cursor = 'default';
+                                const movedRack = selectedObject;
                                 const movedCode = selectedObject.userData.code;
 
                                 window.dispatchEvent(new CustomEvent('moving-state', {
@@ -3293,6 +3398,7 @@
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json',
+                                            'Accept': 'application/json',
                                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                         },
                                         body: JSON.stringify({
@@ -3300,9 +3406,12 @@
                                             pos_z: selectedObject.position.z
                                         })
                                     })
-                                    .then(response => {
-                                        if (!response.ok) throw new Error('Error al actualizar posición');
-                                        return response.json();
+                                    .then(async response => {
+                                        const data = await response.json().catch(() => ({}));
+                                        if (!response.ok) {
+                                            throw new Error(data.message || 'Error al actualizar posición');
+                                        }
+                                        return data;
                                     })
                                     .then(() => {
                                         window.dispatchEvent(new CustomEvent('rack-saved-toast', {
@@ -3321,11 +3430,15 @@
                                     })
                                     .catch(error => {
                                         console.error('Error guardando posición:', error);
+                                        if (prevPos && movedRack) {
+                                            actualizarPosicionEstante(movedRack, prevPos.x, prevPos.z);
+                                            renderAisles();
+                                        }
                                         if (typeof Swal !== 'undefined') {
                                             Swal.fire({
                                                 icon: 'error',
-                                                title: 'Error de reubicación',
-                                                text: 'No se pudo guardar la nueva posición en la base de datos.',
+                                                title: 'No se pudo reubicar',
+                                                text: error.message || 'No se pudo guardar la nueva posición en la base de datos.',
                                                 confirmButtonColor: '#0f766e'
                                             });
                                         }
