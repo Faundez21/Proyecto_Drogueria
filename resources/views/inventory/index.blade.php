@@ -2040,9 +2040,11 @@
                     showClientImportAlert(
                         'warning',
                         'Advertencia: Archivo Ya Utilizado Recientemente',
-                        `El archivo «${file.name}» coincide exactamente con uno subido el ${history[fileFingerprint]}. Si vuelve a importarlo sin cambios, el sistema bloqueará los lotes duplicados.`
+                        `El archivo «${file.name}» coincide con uno subido el ${history[fileFingerprint]}. La casilla de confirmación se ha activado para permitir reprocesarlo.`
                     );
                     if (forceWrap) forceWrap.classList.remove('hidden');
+                    const forceCheck = document.getElementById('forceReimportCheck');
+                    if (forceCheck) forceCheck.checked = true;
                 }
             } catch (e) {}
         }
@@ -2087,14 +2089,14 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Registrar huella local del archivo enviado
+                    // Guardar huella pendiente; solo se confirmará en el historial si el servidor completa la importación con éxito
                     try {
                         const fileFingerprint = `${file.name}|${file.size}|${file.lastModified}`;
-                        const historyRaw = localStorage.getItem('das_imported_files_history') || '{}';
-                        const history = JSON.parse(historyRaw);
                         const nowStr = new Date().toLocaleDateString('es-CL') + ' ' + new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
-                        history[fileFingerprint] = nowStr;
-                        localStorage.setItem('das_imported_files_history', JSON.stringify(history));
+                        sessionStorage.setItem('das_pending_import_file', JSON.stringify({
+                            fingerprint: fileFingerprint,
+                            date: nowStr
+                        }));
                     } catch (e) {}
 
                     // Activar Pantalla de Carga para archivos pesados
@@ -2224,6 +2226,33 @@
             if (selEstado) {
                 toggleManualEstadoHelp(selEstado.value);
             }
+
+            @if (($inventories->total() ?? 0) === 0 && ($historial->count() ?? 0) === 0)
+                try {
+                    localStorage.removeItem('das_imported_files_history');
+                    sessionStorage.removeItem('das_pending_import_file');
+                } catch (e) {}
+            @endif
+
+            @if (session('import_completed_ok'))
+                try {
+                    const pendingRaw = sessionStorage.getItem('das_pending_import_file');
+                    if (pendingRaw) {
+                        const pending = JSON.parse(pendingRaw);
+                        if (pending && pending.fingerprint) {
+                            const historyRaw = localStorage.getItem('das_imported_files_history') || '{}';
+                            const history = JSON.parse(historyRaw);
+                            history[pending.fingerprint] = pending.date;
+                            localStorage.setItem('das_imported_files_history', JSON.stringify(history));
+                        }
+                        sessionStorage.removeItem('das_pending_import_file');
+                    }
+                } catch (e) {}
+            @else
+                try {
+                    sessionStorage.removeItem('das_pending_import_file');
+                } catch (e) {}
+            @endif
 
             @if (session('open_modal') === 'import')
                 openImport();

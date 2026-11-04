@@ -163,9 +163,17 @@ class InventoryService
             ? $datos['fecha_vencimiento']
             : null;
         $datos['fecha_vencimiento'] = $fechaVence;
+        $datos['valor_neto_unitario'] = isset($datos['valor_neto_unitario']) && $datos['valor_neto_unitario'] !== '' && $datos['valor_neto_unitario'] !== null
+            ? (float) $datos['valor_neto_unitario']
+            : 0;
+        $datos['fecha_recepcion'] = !empty($datos['fecha_recepcion']) ? $datos['fecha_recepcion'] : now()->format('Y-m-d');
+        $datos['tipo_documento'] = !empty($datos['tipo_documento']) ? $datos['tipo_documento'] : 'Carga Masiva';
+        $datos['numero_documento'] = !empty($datos['numero_documento']) ? $datos['numero_documento'] : 'S/N';
+        $datos['estado'] = !empty($datos['estado']) ? $datos['estado'] : 'Disponible';
+        $datos['categoria'] = !empty($datos['categoria']) ? $datos['categoria'] : self::clasificarGrupoProducto((string) ($datos['producto'] ?? ''));
 
         $batch = Inventory::where('producto', $datos['producto'])
-            ->where('estado', '!=', 'Merma')
+            ->where('estado', $datos['estado'])
             ->where(function ($q) use ($lote) {
                 if ($lote === null) {
                     $q->whereNull('lote')->orWhere('lote', 'S/L')->orWhere('lote', '');
@@ -177,10 +185,10 @@ class InventoryService
             ->first();
 
         if ($batch) {
-            $batch->increment('cantidad', $datos['cantidad']);
+            $batch->increment('cantidad', (int) ($datos['cantidad'] ?? 0));
             $batch->fill([
                 'categoria' => (!empty($datos['categoria']) && $datos['categoria'] !== 'General') ? $datos['categoria'] : ($batch->categoria ?: ($datos['categoria'] ?? 'General')),
-                'valor_neto_unitario' => $datos['valor_neto_unitario'] ?? $batch->valor_neto_unitario,
+                'valor_neto_unitario' => !empty($datos['valor_neto_unitario']) ? $datos['valor_neto_unitario'] : ($batch->valor_neto_unitario ?? 0),
                 'fecha_vencimiento' => $fechaVence ?? $batch->fecha_vencimiento,
                 'user_id' => $datos['user_id'] ?? $batch->user_id,
                 'provider_id' => $datos['provider_id'] ?? $batch->provider_id,
@@ -200,7 +208,13 @@ class InventoryService
             return $batch;
         }
 
-        return Inventory::create($datos + ['lote' => $lote]);
+        if (empty($datos['correlativo_interno'])) {
+            $datos['correlativo_interno'] = ((int) Inventory::max('correlativo_interno')) + 1;
+        }
+
+        $datos['lote'] = $lote ?? 'S/L';
+
+        return Inventory::create($datos);
     }
 
     /**

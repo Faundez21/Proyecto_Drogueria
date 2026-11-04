@@ -173,11 +173,11 @@ class InventoryController extends Controller
             'tipo_documento' => 'required|string|max:255',
             'numero_documento' => 'required|string|max:255',
             'orden_compra' => 'nullable|string|max:255',
-            'origen_mercaderia' => 'nullable|string|max:255',
+            'origen_mercaderia' => 'nullable|string|max:500',
             'rut_proveedor' => 'nullable|string|max:30',
-            'razon_social' => 'nullable|string|max:255',
-            'producto' => 'required|string|max:255',
-            'categoria' => 'required|string|max:255',
+            'razon_social' => 'nullable|string|max:500',
+            'producto' => 'required|string|max:1000',
+            'categoria' => 'required|string|max:500',
             'estado' => 'required|in:Disponible,Cuarentena,Merma',
             'motivo' => 'nullable|string|max:1000',
             'lote' => 'nullable|string|max:255',
@@ -186,7 +186,7 @@ class InventoryController extends Controller
             'valor_neto_unitario' => 'nullable|integer|min:0',
             'pasillo' => 'nullable|string|max:50',
             'estante' => 'nullable|string|max:50',
-            'programa' => 'nullable|string|max:255',
+            'programa' => 'nullable|string|max:500',
             'nivel' => 'nullable|string|max:100',
             'posicion' => 'nullable|string|max:100',
             'solicitud_pedido_mensual' => 'nullable|boolean',
@@ -562,6 +562,11 @@ class InventoryController extends Controller
         }
 
         // 3. Detectar si el archivo exacto ya fue importado (por Hash SHA-256)
+        // Si la tabla de inventario está vacía (ej. tras limpiar datos de prueba), reiniciar historial de hashes
+        if (Inventory::count() === 0) {
+            session()->forget('inventory_imported_hashes');
+        }
+
         $fileHash = hash_file('sha256', $file->getRealPath());
         $importedHashes = session('inventory_imported_hashes', []);
 
@@ -570,20 +575,27 @@ class InventoryController extends Controller
             return redirect()->back()
                 ->with('open_modal', 'import')
                 ->with('import_error_title', 'Archivo Duplicado Detectado')
-                ->with('error', "El archivo «{$file->getClientOriginalName()}» ya fue procesado anteriormente el {$prev['fecha']} ({$prev['registros']} registros importados). Se bloqueó la subida para evitar duplicar existencias.");
+                ->with('error', "El archivo «{$file->getClientOriginalName()}» ya fue procesado anteriormente el {$prev['fecha']} ({$prev['registros']} registros importados). Marque la casilla de confirmación si desea volver a procesarlo.");
         }
 
         try {
-            $total = DB::transaction(function () use ($file) {
-                $import = new InventoriesImport(Auth::id());
+            $resumen = DB::transaction(function () use ($file, $request) {
+                $import = new InventoriesImport((int) Auth::id(), $request->boolean('force_reimport'));
                 Excel::import($import, $file);
 
                 if ($import->importados() === 0) {
-                    throw new \RuntimeException('El archivo seleccionado está vacío o no contiene registros válidos bajo la fila de encabezados.');
+                    throw new \RuntimeException('El archivo seleccionado está vacío o no contiene filas con nombre de PRODUCTO bajo la fila de encabezados.');
                 }
 
-                return $import->importados();
+                return [
+                    'total' => $import->importados(),
+                    'disponibles' => $import->disponibles(),
+                    'cuarentena' => $import->enCuarentena(),
+                    'merma' => $import->enMerma(),
+                ];
             });
+
+            $total = $resumen['total'];
 
             // Guardar huella del archivo importado en la sesión
             $importedHashes[$fileHash] = [
@@ -593,11 +605,25 @@ class InventoryController extends Controller
             ];
             session(['inventory_imported_hashes' => $importedHashes]);
 
-            return redirect()->back()->with('success', "Carga masiva completada con éxito: {$total} lote(s) de inventario verificados e ingresados a bodega.");
+            $detallesEstado = [];
+            if ($resumen['disponibles'] > 0) {
+                $detallesEstado[] = "{$resumen['disponibles']} en Inventario Disponible";
+            }
+            if ($resumen['cuarentena'] > 0) {
+                $detallesEstado[] = "{$resumen['cuarentena']} en Cuarentena";
+            }
+            if ($resumen['merma'] > 0) {
+                $detallesEstado[] = "{$resumen['merma']} en Merma";
+            }
+            $textoDesglose = ! empty($detallesEstado) ? ' (' . implode(', ', $detallesEstado) . ')' : '';
+
+            return redirect()->back()
+                ->with('import_completed_ok', true)
+                ->with('success', "Carga masiva completada con éxito: {$total} lote(s) ingresados a bodega{$textoDesglose}.");
         } catch (\RuntimeException $e) {
             return redirect()->back()
                 ->with('open_modal', 'import')
-                ->with('import_error_title', 'Error en Validación de Datos / Duplicados')
+                ->with('import_error_title', 'Error en Validación de Datos')
                 ->with('error', $e->getMessage());
         } catch (ValidationException $e) {
             $primerError = collect($e->failures())->first();
@@ -613,22 +639,16 @@ class InventoryController extends Controller
 
             return redirect()->back()
                 ->with('open_modal', 'import')
-                ->with('import_error_title', 'Archivo Incompatible o Corrupto')
-                ->with('error', 'No fue posible leer la estructura del archivo. Asegúrese de que sea un archivo Excel (.xlsx / .xls) válido generado desde la Plantilla Oficial.');
+                ->with('import_error_title', 'Error al Procesar el Archivo')
+                ->with('error', 'No se pudo completar la carga masiva: ' . $e->getMessage());
         }
     }
 
     /**
-     * Descarga la plantilla oficial de carga masiva (o la genera dinámicamente si no existe en disco).
+     * Descarga la plantilla oficial de carga masiva con estado Disponible por defecto.
      */
     public function template()
     {
-        $filePath = public_path('plantillas/plantilla_inventario.xlsx');
-
-        if (file_exists($filePath)) {
-            return response()->download($filePath, 'Plantilla_Carga_Masiva_Inventario_DAS.xlsx');
-        }
-
         $export = new class implements FromArray, WithHeadings, ShouldAutoSize, WithStyles {
             public function headings(): array
             {
