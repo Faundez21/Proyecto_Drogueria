@@ -1655,9 +1655,7 @@
                         // Opciones del selector de niveles (se llenan al dibujar las estanterías)
                         const nivelesGlobales = new Map();
 
-                        // =====================================================
                         // TEXTURAS PROCEDURALES (cartón, cinta, madera, etiquetas, acero)
-                        // =====================================================
 
                         // Placa con texto (alta resolución para que se lea de cerca)
                         function texturaTexto(texto, colorFondo, colorTexto, tamanoFuente) {
@@ -2264,9 +2262,7 @@
                             return tex;
                         }
 
-                        // =====================================================
                         // ESTANTERÍA / CAJA FUERTE
-                        // =====================================================
                         function crearEstanteriaRealista(shelf, rackData, px, pz) {
                             const grupo = new THREE.Group();
 
@@ -3428,9 +3424,7 @@
                             mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
                         }
 
-                        // =====================================================
                         // HOVER SOBRE CAJAS: detalle del producto + contorno
-                        // =====================================================
                         const hoverBox = document.createElement('div');
                         hoverBox.className = 'glass-panel';
                         hoverBox.style.cssText =
