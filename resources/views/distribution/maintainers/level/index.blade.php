@@ -411,10 +411,10 @@
     <!-- Modal de Historial de Niveles -->
     <div id="HistoryModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
             <!-- Encabezado -->
-            <div class="px-5 py-4 sm:px-6 sm:py-4 bg-slate-900 flex justify-between items-center shrink-0 border-b border-slate-800">
-                <div class="flex items-center gap-3.5 min-w-0 pr-2">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 bg-slate-800 flex justify-between items-center shrink-0 border-b border-slate-700">
+                <div class="flex items-center gap-3 min-w-0 pr-2">
                     <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 text-purple-300 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -422,13 +422,13 @@
                     </div>
                     <div class="min-w-0">
                         <div class="flex items-center gap-2.5 flex-wrap">
-                            <h2 class="text-base sm:text-[17px] font-bold text-white tracking-wide leading-tight">Historial de Niveles</h2>
+                            <h2 class="text-base sm:text-lg font-bold text-white tracking-wide leading-tight">Historial de Niveles</h2>
                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono-das font-bold bg-purple-500/20 text-purple-300 border border-purple-400/30">
                                 {{ $levels->count() }} {{ $levels->count() === 1 ? 'registro' : 'registros' }}
                             </span>
                         </div>
-                        <p class="text-[11.5px] sm:text-[12px] text-slate-400 mt-0.5 font-medium truncate sm:whitespace-normal">
-                            Registro de auditoría de creación, asociación por estantería y modificaciones de niveles.
+                        <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5 font-medium truncate sm:whitespace-normal">
+                            Registro de auditoría de creación y modificaciones de niveles.
                         </p>
                     </div>
                 </div>
@@ -442,23 +442,23 @@
             </div>
 
             <!-- Barra de Búsqueda y Filtros del Historial -->
-            <div class="p-3.5 sm:px-6 sm:py-3.5 bg-slate-50 border-b border-slate-200 shrink-0">
-                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3 items-end">
+            <div class="p-4 sm:px-6 sm:py-4 bg-slate-50 border-b border-slate-200 shrink-0">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                     <div class="sm:col-span-6">
-                        <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Buscar en el Historial</label>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Buscar en el Historial</label>
                         <div class="relative">
                             <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                             <input type="text" id="historyLevelSearch" oninput="filtrarHistorialNiveles()"
                                 placeholder="Buscar por número de nivel, estantería o descripción..."
-                                class="w-full pl-9 pr-3.5 py-2 bg-white border border-slate-300 rounded-lg text-[12.5px] text-slate-800 placeholder-slate-400 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-2xs">
+                                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-[12.5px] text-slate-800 placeholder-slate-400 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                         </div>
                     </div>
                     <div class="sm:col-span-4">
-                        <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Filtrar por Estantería</label>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Filtrar por Estantería</label>
                         <select id="historyLevelShelfFilter" onchange="filtrarHistorialNiveles()"
-                            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[12.5px] text-slate-700 font-medium outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-2xs cursor-pointer">
+                            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[12.5px] text-slate-700 font-medium outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm cursor-pointer">
                             <option value="">Todas las estanterías</option>
                             @foreach ($shelves as $shelf)
                                 <option value="{{ $shelf->id }}">
@@ -469,7 +469,7 @@
                     </div>
                     <div class="sm:col-span-2">
                         <button type="button" onclick="limpiarFiltroHistorialNiveles()"
-                            class="w-full py-2 px-3 bg-white border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors text-[12.5px] font-bold shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer">
+                            class="w-full py-2 px-3 bg-white border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors text-[12.5px] font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
                             <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                             </svg>
@@ -480,17 +480,18 @@
             </div>
 
             <!-- Tabla del Historial -->
-            <div class="overflow-x-auto flex-1 min-h-[220px] max-h-[58vh] bg-white">
-                <table class="w-full text-left text-[12.5px] sm:text-[13px] text-slate-600 whitespace-nowrap min-w-[780px]">
-                    <thead class="bg-slate-50 text-slate-500 uppercase text-[10.5px] sm:text-[11px] font-bold tracking-wider border-b border-slate-200 sticky top-0 z-10 shadow-2xs">
+            <div class="overflow-x-auto flex-1 min-h-[180px] bg-white">
+                <table class="w-full text-left text-[12.5px] sm:text-[13px] text-slate-600 whitespace-nowrap min-w-[720px] lg:min-w-full">
+                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10.5px] sm:text-[11px] font-bold tracking-wider border-b border-slate-200 sticky top-0 z-10 shadow-sm">
                         <tr>
-                            <th class="px-5 py-3.5 w-20">ID</th>
-                            <th class="px-5 py-3.5">Nivel</th>
-                            <th class="px-5 py-3.5">Estantería / Pasillo</th>
-                            <th class="px-5 py-3.5 text-center">Posiciones</th>
-                            <th class="px-5 py-3.5">Descripción Operativa</th>
-                            <th class="px-5 py-3.5 text-center">Evento / Estado</th>
-                            <th class="px-5 py-3.5">Última Actualización</th>
+                            <th class="px-4 py-3 sm:px-6 w-20">ID</th>
+                            <th class="px-4 py-3 sm:px-6">Nivel</th>
+                            <th class="px-4 py-3 sm:px-6">Estantería / Pasillo</th>
+                            <th class="px-4 py-3 sm:px-6 text-center">Posiciones</th>
+                            <th class="px-4 py-3 sm:px-6">Descripción Operativa</th>
+                            <th class="px-4 py-3 sm:px-6 text-center">Evento / Estado</th>
+                            <th class="px-4 py-3 sm:px-6">Creación</th>
+                            <th class="px-4 py-3 sm:px-6">Última Actualización</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -504,17 +505,17 @@
                             <tr class="history-level-row hover:bg-slate-50/80 transition-colors"
                                 data-shelf="{{ $l->shelf_id }}"
                                 data-search="{{ strtolower('#' . $l->id . ' nivel ' . $l->number . ' ' . $lShelfName . ' ' . ($lAisleName ?? '') . ' ' . ($l->description ?? '')) }}">
-                                <td class="px-5 py-3.5">
+                                <td class="px-4 py-3 sm:px-6">
                                     <span class="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 font-mono-das text-[11px] font-bold text-slate-600">
                                         #{{ $l->id }}
                                     </span>
                                 </td>
-                                <td class="px-5 py-3.5">
+                                <td class="px-4 py-3 sm:px-6">
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-purple-50 text-purple-800 border border-purple-200 font-bold text-[12px]">
                                         Nivel {{ $l->number }}
                                     </span>
                                 </td>
-                                <td class="px-5 py-3.5">
+                                <td class="px-4 py-3 sm:px-6">
                                     <div class="flex flex-col">
                                         <span class="font-bold text-slate-800">{{ $lShelfName }}</span>
                                         @if ($lAisleName)
@@ -522,15 +523,15 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-5 py-3.5 text-center">
+                                <td class="px-4 py-3 sm:px-6 text-center">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11.5px] font-bold {{ $lPositions > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200' }}">
-                                        {{ $lPositions }} {{ $lPositions === 1 ? 'pos.' : 'pos.' }}
+                                        {{ $lPositions }} pos.
                                     </span>
                                 </td>
-                                <td class="px-5 py-3.5 text-slate-600 max-w-xs truncate" title="{{ $l->description ?: 'Sin descripción' }}">
+                                <td class="px-4 py-3 sm:px-6 text-slate-600 max-w-xs truncate" title="{{ $l->description ?: 'Sin descripción' }}">
                                     {{ $l->description ?: 'Sin descripción' }}
                                 </td>
-                                <td class="px-5 py-3.5 text-center">
+                                <td class="px-4 py-3 sm:px-6 text-center">
                                     @if ($fueEditado)
                                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[11px] font-bold">
                                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Modificado
@@ -541,17 +542,20 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-5 py-3.5 font-mono-das text-[12px] text-slate-700 font-semibold">
+                                <td class="px-4 py-3 sm:px-6 font-mono-das text-[12px] text-slate-500">
+                                    {{ optional($l->created_at)->format('d/m/Y H:i') ?? 'S/F' }}
+                                </td>
+                                <td class="px-4 py-3 sm:px-6 font-mono-das text-[12px] text-slate-700 font-semibold">
                                     {{ optional($l->updated_at)->format('d/m/Y H:i') ?? 'Registro inicial' }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-12 text-center text-slate-400">Sin registros de historial</td>
+                                <td colspan="8" class="px-6 py-12 text-center text-slate-400">Sin registros de historial</td>
                             </tr>
                         @endforelse
                         <tr id="historyLevelEmptyRow" class="hidden">
-                            <td colspan="7" class="px-6 py-12 text-center text-slate-400">
+                            <td colspan="8" class="px-6 py-12 text-center text-slate-400">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg class="w-9 h-9 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -565,12 +569,12 @@
             </div>
 
             <!-- Pie del Modal -->
-            <div class="px-5 py-3.5 sm:px-6 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-between items-center gap-3 shrink-0">
-                <span class="text-[12px] font-bold text-slate-500 uppercase tracking-wider">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-between items-center gap-3 shrink-0">
+                <span class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">
                     Mostrando <strong id="historyLevelCount" class="text-teal-700 font-mono-das">{{ $levels->count() }}</strong> de <strong class="font-mono-das text-slate-700">{{ $levels->count() }}</strong> niveles
                 </span>
                 <button type="button" onclick="closeHistory()"
-                    class="w-full sm:w-auto px-6 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-[13px] font-bold shadow-2xs cursor-pointer text-center">
+                    class="w-full sm:w-auto px-6 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-xs sm:text-sm font-bold shadow-sm cursor-pointer text-center">
                     Cerrar Historial
                 </button>
             </div>

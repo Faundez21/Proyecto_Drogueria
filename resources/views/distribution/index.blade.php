@@ -1008,6 +1008,514 @@
                         const cajasMeshes = []; // todas las cajas (para el hover con detalle)
                         const pulsers = []; // materiales que "laten" (alertas de vencimiento, LED)
 
+                        // ZONA EXTERIOR DE DESPACHO Y AMBULANCIA 3D (FUERA DE BODEGA)
+                        
+                        (function crearZonaExteriorYAmbulancia() {
+                            const extGroup = new THREE.Group();
+                            const bayX = 22;
+                            const bayZ = 32.2;
+
+                            // 1. Textura de asfalto y demarcación vial de estacionamiento de emergencia
+                            const asphaltCanvas = document.createElement('canvas');
+                            asphaltCanvas.width = 512;
+                            asphaltCanvas.height = 256;
+                            const actx = asphaltCanvas.getContext('2d');
+                            actx.fillStyle = '#1e293b';
+                            actx.fillRect(0, 0, 512, 256);
+
+                            // Granulado de asfalto
+                            for (let i = 0; i < 1800; i++) {
+                                const v = 25 + Math.floor(Math.random() * 28);
+                                actx.fillStyle = `rgba(${v + 15},${v + 22},${v + 35},0.35)`;
+                                actx.fillRect(Math.random() * 512, Math.random() * 256, 2, 2);
+                            }
+
+                            // Borde perimetral amarillo de bahía exclusiva
+                            actx.strokeStyle = '#facc15';
+                            actx.lineWidth = 8;
+                            actx.setLineDash([22, 14]);
+                            actx.strokeRect(24, 18, 464, 220);
+                            actx.setLineDash([]);
+
+                            // Franja peatonal / achurado de seguridad junto al portón
+                            actx.fillStyle = 'rgba(250, 204, 21, 0.85)';
+                            for (let x = 40; x < 460; x += 36) {
+                                actx.beginPath();
+                                actx.moveTo(x, 12);
+                                actx.lineTo(x + 18, 12);
+                                actx.lineTo(x + 6, 42);
+                                actx.lineTo(x - 12, 42);
+                                actx.closePath();
+                                actx.fill();
+                            }
+
+                            // Texto pintado en pavimento
+                            actx.fillStyle = 'rgba(250, 204, 21, 0.78)';
+                            actx.font = 'bold 28px Arial';
+                            actx.textAlign = 'center';
+                            actx.textBaseline = 'middle';
+                            actx.fillText('ZONA AMBULANCIA · DAS', 256, 214);
+
+                            const asphaltTex = new THREE.CanvasTexture(asphaltCanvas);
+                            asphaltTex.anisotropy = 8;
+                            const padMat = new THREE.MeshStandardMaterial({
+                                map: asphaltTex,
+                                roughness: 0.92
+                            });
+                            const pad = new THREE.Mesh(new THREE.BoxGeometry(24, 0.24, 13.4), padMat);
+                            pad.position.set(bayX, -0.1, bayZ);
+                            pad.receiveShadow = true;
+                            extGroup.add(pad);
+
+                            // Solera / bordillo perimetral de hormigón
+                            const curbMat = new THREE.MeshStandardMaterial({
+                                color: '#94a3b8',
+                                roughness: 0.75
+                            });
+                            const curbFront = new THREE.Mesh(new THREE.BoxGeometry(24.4, 0.32, 0.35), curbMat);
+                            curbFront.position.set(bayX, 0.08, bayZ + 6.7);
+                            extGroup.add(curbFront);
+
+                            // 2. Portón metálico de despacho en el muro exterior (z = 25) + alero y letrero
+                            const gateGroup = new THREE.Group();
+                            gateGroup.position.set(bayX, 0, 25.55);
+
+                            // Cortina metálica enrollable
+                            const shutterCanvas = document.createElement('canvas');
+                            shutterCanvas.width = 256;
+                            shutterCanvas.height = 256;
+                            const sctx = shutterCanvas.getContext('2d');
+                            sctx.fillStyle = '#475569';
+                            sctx.fillRect(0, 0, 256, 256);
+                            for (let y = 0; y < 256; y += 12) {
+                                sctx.fillStyle = '#cbd5e1';
+                                sctx.fillRect(0, y, 256, 5);
+                                sctx.fillStyle = '#1e293b';
+                                sctx.fillRect(0, y + 9, 256, 3);
+                            }
+                            const shutterTex = new THREE.CanvasTexture(shutterCanvas);
+                            const shutterMat = new THREE.MeshStandardMaterial({
+                                map: shutterTex,
+                                roughness: 0.45,
+                                metalness: 0.45
+                            });
+                            const shutter = new THREE.Mesh(new THREE.BoxGeometry(7.2, 6.2, 0.22), shutterMat);
+                            shutter.position.set(0, 3.1, 0);
+                            gateGroup.add(shutter);
+
+                            // Marco del portón y alero protector
+                            const frameMat = new THREE.MeshStandardMaterial({
+                                color: '#0f172a',
+                                roughness: 0.4,
+                                metalness: 0.3
+                            });
+                            [-3.75, 3.75].forEach(px => {
+                                const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.35, 6.6, 0.45), frameMat);
+                                pillar.position.set(px, 3.3, 0.05);
+                                gateGroup.add(pillar);
+                            });
+                            const canopy = new THREE.Mesh(new THREE.BoxGeometry(8.8, 0.28, 2.2), frameMat);
+                            canopy.position.set(0, 6.65, 0.9);
+                            canopy.castShadow = true;
+                            gateGroup.add(canopy);
+
+                            // Letrero luminoso sobre el portón
+                            const signCanvas = document.createElement('canvas');
+                            signCanvas.width = 512;
+                            signCanvas.height = 96;
+                            const sgctx = signCanvas.getContext('2d');
+                            sgctx.fillStyle = '#0f766e';
+                            sgctx.fillRect(0, 0, 512, 96);
+                            sgctx.strokeStyle = '#5eead4';
+                            sgctx.lineWidth = 6;
+                            sgctx.strokeRect(4, 4, 504, 88);
+                            sgctx.fillStyle = '#ffffff';
+                            sgctx.font = 'bold 34px Arial';
+                            sgctx.textAlign = 'center';
+                            sgctx.textBaseline = 'middle';
+                            sgctx.fillText('DESPACHO · DROGUERÍA', 256, 50);
+                            const signTex = new THREE.CanvasTexture(signCanvas);
+                            const signMesh = new THREE.Mesh(
+                                new THREE.PlaneGeometry(7.8, 1.35),
+                                new THREE.MeshBasicMaterial({ map: signTex })
+                            );
+                            signMesh.position.set(0, 7.65, 0.15);
+                            gateGroup.add(signMesh);
+
+                            // Bolardos de protección amarillos junto al portón
+                            const bollardMat = new THREE.MeshStandardMaterial({ color: '#eab308', roughness: 0.4 });
+                            const bollardTopMat = new THREE.MeshStandardMaterial({ color: '#111827', roughness: 0.5 });
+                            [-4.3, 4.3].forEach(bx => {
+                                const bol = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 1.2, 16), bollardMat);
+                                bol.position.set(bx, 0.6, 0.85);
+                                bol.castShadow = true;
+                                gateGroup.add(bol);
+                                const bolTop = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.25, 16), bollardTopMat);
+                                bolTop.position.set(bx, 1.05, 0.85);
+                                gateGroup.add(bolTop);
+                            });
+
+                            extGroup.add(gateGroup);
+
+                            // 3. AMBULANCIA 3D REALISTA (SAMU / DROGUERÍA DAS)
+                            const amb = new THREE.Group();
+                            // Estacionada frente al andén mirando hacia +X (lista para despacho)
+                            amb.position.set(bayX, 0.02, bayZ + 0.6);
+
+                            // --- Textura lateral del módulo sanitario ---
+                            function crearTexturaLateralAmbulancia(espejo) {
+                                const c = document.createElement('canvas');
+                                c.width = 512;
+                                c.height = 256;
+                                const ctx = c.getContext('2d');
+
+                                // Carrocería blanca clínica
+                                ctx.fillStyle = '#f8fafc';
+                                ctx.fillRect(0, 0, 512, 256);
+
+                                // Franja institucional verde esmeralda / azul salud
+                                ctx.fillStyle = '#0d9488';
+                                ctx.fillRect(0, 148, 512, 34);
+                                ctx.fillStyle = '#dc2626';
+                                ctx.fillRect(0, 182, 512, 14);
+
+                                // Banda reflectante Battenburg inferior
+                                for (let x = 0; x < 512; x += 32) {
+                                    ctx.fillStyle = (x / 32) % 2 === 0 ? '#facc15' : '#dc2626';
+                                    ctx.fillRect(x, 224, 32, 16);
+                                }
+
+                                // Ventana lateral polarizada
+                                const winX = espejo ? 70 : 300;
+                                ctx.fillStyle = '#0f172a';
+                                ctx.fillRect(winX, 42, 140, 74);
+                                ctx.strokeStyle = '#64748b';
+                                ctx.lineWidth = 5;
+                                ctx.strokeRect(winX, 42, 140, 74);
+                                // Brillo diagonal en el vidrio
+                                ctx.fillStyle = 'rgba(148, 163, 184, 0.28)';
+                                ctx.beginPath();
+                                ctx.moveTo(winX + 12, 110);
+                                ctx.lineTo(winX + 55, 48);
+                                ctx.lineTo(winX + 82, 48);
+                                ctx.lineTo(winX + 38, 110);
+                                ctx.closePath();
+                                ctx.fill();
+
+                                // Cruz médica de emergencia (roja con borde blanco)
+                                const cx = espejo ? 345 : 135;
+                                const cy = 86;
+                                ctx.fillStyle = '#dc2626';
+                                ctx.fillRect(cx - 16, cy - 46, 32, 92);
+                                ctx.fillRect(cx - 46, cy - 16, 92, 32);
+
+                                // Textos institucionales
+                                ctx.fillStyle = '#0f172a';
+                                ctx.font = 'bold 30px Arial';
+                                ctx.textAlign = 'center';
+                                ctx.fillText('AMBULANCIA', 256, 30);
+
+                                ctx.fillStyle = '#ffffff';
+                                ctx.font = 'bold 21px Arial';
+                                ctx.fillText('SALUD MUNICIPAL · DROGUERÍA DAS', 256, 171);
+
+                                const tex = new THREE.CanvasTexture(c);
+                                tex.anisotropy = 8;
+                                return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.35, metalness: 0.1 });
+                            }
+
+                            // --- Textura puertas traseras ---
+                            function crearTexturaTraseraAmbulancia() {
+                                const c = document.createElement('canvas');
+                                c.width = 256;
+                                c.height = 256;
+                                const ctx = c.getContext('2d');
+                                ctx.fillStyle = '#f8fafc';
+                                ctx.fillRect(0, 0, 256, 256);
+
+                                // Junta central de doble puerta
+                                ctx.strokeStyle = '#64748b';
+                                ctx.lineWidth = 4;
+                                ctx.beginPath();
+                                ctx.moveTo(128, 10);
+                                ctx.lineTo(128, 246);
+                                ctx.stroke();
+
+                                // Dos ventanas traseras
+                                [28, 144].forEach(wx => {
+                                    ctx.fillStyle = '#0f172a';
+                                    ctx.fillRect(wx, 44, 84, 78);
+                                    ctx.strokeStyle = '#475569';
+                                    ctx.lineWidth = 4;
+                                    ctx.strokeRect(wx, 44, 84, 78);
+                                });
+
+                                // Franja verde y roja
+                                ctx.fillStyle = '#0d9488';
+                                ctx.fillRect(0, 145, 256, 28);
+                                ctx.fillStyle = '#dc2626';
+                                ctx.fillRect(0, 173, 256, 12);
+
+                                // Texto superior
+                                ctx.fillStyle = '#dc2626';
+                                ctx.font = 'bold 24px Arial';
+                                ctx.textAlign = 'center';
+                                ctx.fillText('AMBULANCIA', 128, 28);
+
+                                // Chevrones reflectantes inferiores
+                                for (let x = -32; x < 288; x += 28) {
+                                    ctx.fillStyle = (Math.abs(x / 28) % 2 === 0) ? '#dc2626' : '#facc15';
+                                    ctx.beginPath();
+                                    ctx.moveTo(x, 248);
+                                    ctx.lineTo(x + 14, 248);
+                                    ctx.lineTo(x + 28, 212);
+                                    ctx.lineTo(x + 14, 212);
+                                    ctx.closePath();
+                                    ctx.fill();
+                                }
+
+                                const tex = new THREE.CanvasTexture(c);
+                                tex.anisotropy = 8;
+                                return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.4 });
+                            }
+
+                            // --- Textura techo del módulo sanitario (cruz roja vista desde arriba / 2D) ---
+                            function crearTexturaTechoAmbulancia() {
+                                const c = document.createElement('canvas');
+                                c.width = 512;
+                                c.height = 256;
+                                const ctx = c.getContext('2d');
+                                ctx.fillStyle = '#ffffff';
+                                ctx.fillRect(0, 0, 512, 256);
+                                ctx.strokeStyle = '#cbd5e1';
+                                ctx.lineWidth = 8;
+                                ctx.strokeRect(10, 10, 492, 236);
+
+                                // Gran cruz roja en el techo (visible en vista 2D aérea)
+                                const cx = 210, cy = 128;
+                                ctx.fillStyle = '#dc2626';
+                                ctx.fillRect(cx - 24, cy - 75, 48, 150);
+                                ctx.fillRect(cx - 75, cy - 24, 150, 48);
+
+                                ctx.fillStyle = '#0f172a';
+                                ctx.font = 'bold 36px Arial';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                ctx.fillText('DAS-01', 390, 128);
+
+                                const tex = new THREE.CanvasTexture(c);
+                                tex.anisotropy = 8;
+                                return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.4 });
+                            }
+
+                            const matBlanco = new THREE.MeshStandardMaterial({
+                                color: '#f8fafc',
+                                roughness: 0.32,
+                                metalness: 0.12
+                            });
+                            const matChasis = new THREE.MeshStandardMaterial({
+                                color: '#1e293b',
+                                roughness: 0.7,
+                                metalness: 0.3
+                            });
+                            const matVidrio = new THREE.MeshStandardMaterial({
+                                color: '#0f172a',
+                                roughness: 0.12,
+                                metalness: 0.75
+                            });
+                            const matFranjaTeal = new THREE.MeshStandardMaterial({
+                                color: '#0d9488',
+                                roughness: 0.35
+                            });
+
+                            // Módulo médico trasero (caja principal): X ∈ [-4.4, 1.4], Y ∈ [0.75, 4.15], Z ∈ [-1.75, 1.75]
+                            const matSideLeft = crearTexturaLateralAmbulancia(false);
+                            const matSideRight = crearTexturaLateralAmbulancia(true);
+                            const matRear = crearTexturaTraseraAmbulancia();
+                            const matRoof = crearTexturaTechoAmbulancia();
+
+                            // Orden de caras BoxGeometry: [+x (frente caja), -x (puertas traseras), +y (techo), -y (piso), +z (lado derecho), -z (lado izquierdo)]
+                            const boxMaterials = [
+                                matBlanco,
+                                matRear,
+                                matRoof,
+                                matChasis,
+                                matSideLeft,
+                                matSideRight
+                            ];
+                            const medicalBox = new THREE.Mesh(new THREE.BoxGeometry(5.8, 3.4, 3.5), boxMaterials);
+                            medicalBox.position.set(-1.5, 2.45, 0);
+                            medicalBox.castShadow = true;
+                            medicalBox.receiveShadow = true;
+                            amb.add(medicalBox);
+
+                            // Chasis inferior y faldones laterales
+                            const chassis = new THREE.Mesh(new THREE.BoxGeometry(8.8, 0.42, 3.2), matChasis);
+                            chassis.position.set(0.05, 0.68, 0);
+                            chassis.castShadow = true;
+                            amb.add(chassis);
+
+                            // Cabina delantera (X ∈ [1.4, 4.4])
+                            const cabBody = new THREE.Mesh(new THREE.BoxGeometry(2.9, 2.55, 3.25), matBlanco);
+                            cabBody.position.set(2.75, 2.02, 0);
+                            cabBody.castShadow = true;
+                            cabBody.receiveShadow = true;
+                            amb.add(cabBody);
+
+                            // Franja verde en la cabina
+                            const cabStripe = new THREE.Mesh(new THREE.BoxGeometry(2.94, 0.38, 3.29), matFranjaTeal);
+                            cabStripe.position.set(2.75, 1.45, 0);
+                            amb.add(cabStripe);
+
+                            // Capó / trompa delantera (X ∈ [3.9, 4.85])
+                            const hood = new THREE.Mesh(new THREE.BoxGeometry(1.15, 1.45, 3.18), matBlanco);
+                            hood.position.set(4.35, 1.47, 0);
+                            hood.castShadow = true;
+                            amb.add(hood);
+
+                            // Parabrisas inclinado
+                            const windshield = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.25, 2.85), matVidrio);
+                            windshield.position.set(3.98, 2.55, 0);
+                            windshield.rotation.z = 0.36;
+                            amb.add(windshield);
+
+                            // Ventanillas laterales de la cabina
+                            [-1.64, 1.64].forEach(vz => {
+                                const sideWin = new THREE.Mesh(new THREE.PlaneGeometry(1.65, 0.95), matVidrio);
+                                sideWin.position.set(2.85, 2.52, vz);
+                                sideWin.rotation.y = vz > 0 ? 0 : Math.PI;
+                                amb.add(sideWin);
+                            });
+
+                            // Espejos retrovisores laterales
+                            [-1.78, 1.78].forEach(mz => {
+                                const mirror = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.48, 0.14), matChasis);
+                                mirror.position.set(3.55, 2.35, mz);
+                                amb.add(mirror);
+                            });
+
+                            // Parrilla frontal + parachoques delantero y trasero
+                            const grille = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.72, 2.1), matChasis);
+                            grille.position.set(4.92, 1.38, 0);
+                            amb.add(grille);
+
+                            const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.42, 3.42), matChasis);
+                            frontBumper.position.set(4.95, 0.78, 0);
+                            amb.add(frontBumper);
+
+                            const rearBumper = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.38, 3.56), matChasis);
+                            rearBumper.position.set(-4.48, 0.75, 0);
+                            amb.add(rearBumper);
+
+                            // Ruedas (4 neumáticos con llantas metálicas)
+                            const tireGeo = new THREE.CylinderGeometry(0.68, 0.68, 0.48, 24);
+                            const rimGeo = new THREE.CylinderGeometry(0.38, 0.38, 0.50, 16);
+                            const matTire = new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.85 });
+                            const matRim = new THREE.MeshStandardMaterial({ color: '#cbd5e1', roughness: 0.3, metalness: 0.65 });
+
+                            [
+                                [-2.55, -1.62],
+                                [-2.55, 1.62],
+                                [3.15, -1.62],
+                                [3.15, 1.62]
+                            ].forEach(([wx, wz]) => {
+                                const wheelGroup = new THREE.Group();
+                                wheelGroup.position.set(wx, 0.68, wz);
+                                const tire = new THREE.Mesh(tireGeo, matTire);
+                                tire.rotation.x = Math.PI / 2;
+                                tire.castShadow = true;
+                                wheelGroup.add(tire);
+                                const rim = new THREE.Mesh(rimGeo, matRim);
+                                rim.rotation.x = Math.PI / 2;
+                                wheelGroup.add(rim);
+                                amb.add(wheelGroup);
+                            });
+
+                            // Faros delanteros (blancos/cálidos) y luces traseras
+                            const headlightMat = new THREE.MeshStandardMaterial({
+                                color: '#fef08a',
+                                emissive: '#fef08a',
+                                emissiveIntensity: 0.9,
+                                roughness: 0.2
+                            });
+                            [-1.25, 1.25].forEach(hz => {
+                                const hl = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.28, 0.44), headlightMat);
+                                hl.position.set(4.94, 1.42, hz);
+                                amb.add(hl);
+                            });
+
+                            // Baliza de emergencia superior (Roja + Azul con parpadeo en tiempo real)
+                            const lightbarBase = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.14, 2.2), matChasis);
+                            lightbarBase.position.set(2.45, 3.38, 0);
+                            amb.add(lightbarBase);
+
+                            const sirenRedMat = new THREE.MeshStandardMaterial({
+                                color: '#ef4444',
+                                emissive: '#ef4444',
+                                emissiveIntensity: 1.1,
+                                roughness: 0.2
+                            });
+                            const sirenBlueMat = new THREE.MeshStandardMaterial({
+                                color: '#3b82f6',
+                                emissive: '#3b82f6',
+                                emissiveIntensity: 1.1,
+                                roughness: 0.2
+                            });
+
+                            const sirenLeft = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.26, 0.92), sirenRedMat);
+                            sirenLeft.position.set(2.45, 3.55, -0.58);
+                            amb.add(sirenLeft);
+
+                            const sirenRight = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.26, 0.92), sirenBlueMat);
+                            sirenRight.position.set(2.45, 3.55, 0.58);
+                            amb.add(sirenRight);
+
+                            // Balizas traseras superiores en el módulo sanitario
+                            [-1.4, 1.4].forEach((bz, idx) => {
+                                const matBeacon = idx === 0 ? sirenRedMat : sirenBlueMat;
+                                const rearBeacon = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.24, 0.46), matBeacon);
+                                rearBeacon.position.set(-4.42, 3.92, bz);
+                                amb.add(rearBeacon);
+                                const frontBoxBeacon = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.24, 0.46), matBeacon);
+                                frontBoxBeacon.position.set(1.42, 3.92, bz);
+                                amb.add(frontBoxBeacon);
+                            });
+
+                            // Registrar destello de sirenas en el loop de animación
+                            pulsers.push({
+                                mat: sirenRedMat,
+                                base: 0.9,
+                                amp: 0.85,
+                                speed: 7.5
+                            });
+                            pulsers.push({
+                                mat: sirenBlueMat,
+                                base: 0.9,
+                                amp: -0.85,
+                                speed: 7.5
+                            });
+
+                            extGroup.add(amb);
+                            buildGroup.add(extGroup);
+
+                            // Etiqueta flotante 3D para la Ambulancia Exterior
+                            const ambMarkerEl = document.createElement('div');
+                            ambMarkerEl.className =
+                                'rack-marker aisle-marker px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider shadow-md';
+                            ambMarkerEl.style.backgroundColor = '#0f766e';
+                            ambMarkerEl.style.setProperty('--marker-color', '#0f766e');
+                            ambMarkerEl.style.color = '#ffffff';
+                            ambMarkerEl.style.border = '1px solid rgba(255,255,255,0.45)';
+                            ambMarkerEl.textContent = '🚑 AMBULANCIA · DESPACHO';
+                            labelsContainer.appendChild(ambMarkerEl);
+
+                            markers.push({
+                                element: ambMarkerEl,
+                                rackCode: null,
+                                pos3D: new THREE.Vector3(bayX, 5.2, bayZ + 0.6)
+                            });
+                        })();
+
                         // --- Utilidades de texto / números ---
                         // txt: texto normalizado ("Nivel 1 " -> "nivel 1")
                         const txt = (s) => String(s ?? '').trim().toLowerCase();
