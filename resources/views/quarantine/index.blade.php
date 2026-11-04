@@ -911,78 +911,14 @@
             else motivoInput.placeholder = "Justificación para mantener inmovilizado...";
         }
 
+        /**
+         * Escenario CUARENTENA: bloqueo preventivo / control técnico / liberación,
+         * con confirmación previa, envío AJAX y SweetAlert2 de éxito.
+         * Si la decisión es "Merma", delega en LoteStatus.Merma.
+         * Lógica en: public/js/lotes/lote-status.js
+         */
         function confirmDecisionCuarentena(event) {
-            event.preventDefault();
-            const form = document.getElementById('editLoteForm');
-            const estado = document.getElementById('modal_estado')?.value;
-            const motivo = (document.getElementById('modal_motivo')?.value || '').trim();
-            const prod = document.getElementById('modal_producto_nombre')?.textContent || 'Producto';
-            const loteRaw = document.getElementById('modal_lote_nombre')?.textContent || '';
-            const lote = loteRaw.replace(/^LOTE:\s*/i, '').trim();
-
-            if (!motivo) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Motivo requerido',
-                    text: 'Debes indicar la justificación u observación correspondiente.',
-                    confirmButtonColor: '#f59e0b'
-                });
-                document.getElementById('modal_motivo')?.focus();
-                return false;
-            }
-
-            if (estado === 'Disponible') {
-                Swal.fire({
-                    title: '¿Liberar lote a Disponible?',
-                    html: `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) será aprobado y reincorporado al inventario <strong>Disponible</strong> para despacho.`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#059669',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, liberar lote',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        closeEditLote();
-                        form.submit();
-                    }
-                });
-            } else if (estado === 'Merma') {
-                Swal.fire({
-                    title: '¿Declarar Merma sanitaria?',
-                    html: `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) será declarado como <strong>Merma</strong> y dado de baja definitiva del inventario. Esta acción no se puede deshacer.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#e11d48',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, declarar merma',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        closeEditLote();
-                        form.submit();
-                    }
-                });
-            } else {
-                Swal.fire({
-                    title: '¿Mantener en Cuarentena?',
-                    html: `Se actualizará la justificación del lote <strong>${lote}</strong> de <strong>${prod}</strong> manteniéndolo inmovilizado en Cuarentena.`,
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d97706',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, guardar estado',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        closeEditLote();
-                        form.submit();
-                    }
-                });
-            }
+            LoteStatus.Cuarentena.onSubmit(event);
             return false;
         }
 
