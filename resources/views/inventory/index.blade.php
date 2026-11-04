@@ -961,7 +961,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa Ministerial</label>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa</label>
                                 <input type="text" name="programa" list="programasManualList" value="{{ old('programa') }}" placeholder="Ej. FOFAR / Morbilidad General" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                                 <datalist id="programasManualList">
                                     <option value="Morbilidad General"></option>

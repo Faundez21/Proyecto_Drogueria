@@ -80,8 +80,12 @@
         <tr>
             <td class="logo-container">
                 <div>
-                    @if(file_exists(public_path('images/favicon4.png')))
-                        <img src="{{ public_path('images/favicon4.png') }}" class="logo-icon" alt="Logo">
+                    @php
+                        $logoPath = public_path('images/favicon4.png');
+                        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+                    @endphp
+                    @if($logoBase64)
+                        <img src="{{ $logoBase64 }}" class="logo-icon" alt="Logo">
                     @endif
                     <div style="display: inline-block; vertical-align: middle;">
                         <h2 class="logo-title">DROGUERÍA COMUNAL DAS</h2>
@@ -188,10 +192,18 @@
                     </tr>
                     @foreach($grpData['items'] as $item)
                     @php
-                        $prog = \App\Models\Inventory::where('product_id', $item->product_id)
-                            ->where('lote', $item->lote)
-                            ->where('correlativo_interno', $reception->correlativo)
-                            ->value('programa') ?: 'General DAS';
+                        $prog = \App\Models\Inventory::where('reception_id', $reception->id)
+                            ->where('product_id', $item->product_id)
+                            ->whereNotNull('programa')
+                            ->where('programa', '!=', '')
+                            ->value('programa');
+                        if (! $prog) {
+                            $prog = \App\Models\Inventory::where('product_id', $item->product_id)
+                                ->whereNotNull('programa')
+                                ->where('programa', '!=', '')
+                                ->orderByDesc('id')
+                                ->value('programa') ?: 'General DAS';
+                        }
                     @endphp
                     <tr>
                         <td style="color: #64748b; font-weight: bold;">{{ $correlativoFila++ }}</td>

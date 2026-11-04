@@ -20,9 +20,7 @@
 (function (window, document) {
     'use strict';
 
-    /* ------------------------------------------------------------------ *
-     *  1. INYECCIÓN DE ESTILOS ADAPTATIVOS (LIGHT MODE + DARK MODE)
-     * ------------------------------------------------------------------ */
+     //1. INYECCIÓN DE ESTILOS ADAPTATIVOS (LIGHT MODE + DARK MODE)
     function injectStyles() {
         if (document.getElementById('lote-status-swal-styles')) return;
 
@@ -189,12 +187,19 @@
                 font-size: 0.82rem !important;
                 padding: 0.62rem 1.35rem !important;
                 letter-spacing: 0.01em !important;
-                display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 gap: 0.45rem !important;
                 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14) !important;
                 transition: transform 0.12s ease, filter 0.15s ease !important;
+            }
+            .swal2-popup.ls-swal-popup .swal2-styled:not([style*="display: none"]):not([style*="display:none"]) {
+                display: inline-flex;
+            }
+            .swal2-popup.ls-swal-popup .swal2-styled[style*="display: none"],
+            .swal2-popup.ls-swal-popup .swal2-styled[style*="display:none"],
+            .swal2-popup.ls-swal-popup .swal2-actions.swal2-loading .swal2-styled {
+                display: none !important;
             }
             .swal2-popup.ls-swal-popup .swal2-styled:hover {
                 filter: brightness(1.06);
@@ -548,10 +553,8 @@
     } else {
         injectStyles();
     }
+     //  CORE: utilidades compartidas
 
-    /* ------------------------------------------------------------------ *
-     *  CORE: utilidades compartidas
-     * ------------------------------------------------------------------ */
     const COLORS = {
         cancel: '#64748b',
         teal: '#0f766e',
@@ -630,6 +633,8 @@
             icon: 'warning',
             title: 'Motivo requerido',
             text: mensaje || `Debes indicar el motivo para cambiar el estado a ${ctx.estado}.`,
+            showDenyButton: false,
+            showCancelButton: false,
             confirmButtonColor: COLORS.teal,
             customClass: { popup: 'ls-swal-popup' },
         });
@@ -645,6 +650,7 @@
             html,
             icon,
             width: '500px',
+            showDenyButton: false,
             showCancelButton: true,
             confirmButtonColor: color,
             cancelButtonColor: COLORS.cancel,
@@ -665,6 +671,8 @@
             allowOutsideClick: false,
             allowEscapeKey: false,
             showConfirmButton: false,
+            showDenyButton: false,
+            showCancelButton: false,
             customClass: { popup: 'ls-swal-popup' },
             didOpen: () => Swal.showLoading(),
         });
@@ -718,14 +726,15 @@
             icon: 'error',
             title,
             html,
+            showDenyButton: false,
+            showCancelButton: false,
             confirmButtonColor: COLORS.teal,
             customClass: { popup: 'ls-swal-popup' },
         });
     }
 
-    /* ------------------------------------------------------------------ *
-     *  Comprobante de éxito (compatible con Light Mode y Dark Mode)
-     * ------------------------------------------------------------------ */
+     // Comprobante de éxito (compatible con Light Mode y Dark Mode)
+
     const THEMES = {
         a_merma:                  { title: '¡Merma Declarada con Éxito!',            badge: 'MERMA DEFINITIVA',         op: 'Declaración de Merma (Baja de Stock)',  theme: 'ls-theme-rose',    c: COLORS.rose },
         actualizacion_merma:      { title: '¡Registro de Merma Actualizado!',        badge: 'MERMA',                    op: 'Actualización de Lote en Merma',        theme: 'ls-theme-rose',    c: COLORS.rose },
@@ -837,6 +846,8 @@
             title: t.title,
             html: construirComprobante(payload, t),
             width: '680px',
+            showDenyButton: false,
+            showCancelButton: false,
             confirmButtonColor: t.c,
             confirmButtonText:
                 '<svg style="width:16px;height:16px;display:inline-block;vertical-align:-3px;margin-right:4px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Aceptar y Continuar',
@@ -878,9 +889,7 @@
         }
     }
 
-    /* ------------------------------------------------------------------ *
-     *  ESCENARIO 3: MERMA
-     * ------------------------------------------------------------------ */
+    //  ESCENARIO 3: MERMA
     const Merma = {
         aplica(ctx) {
             return ctx.estado === 'Merma' || ctx.estadoInicial === 'Merma';
@@ -958,9 +967,8 @@
         },
     };
 
-    /* ------------------------------------------------------------------ *
-     *  ESCENARIO 2: CUARENTENA (bloqueo preventivo y control técnico)
-     * ------------------------------------------------------------------ */
+     // ESCENARIO 2: CUARENTENA (bloqueo preventivo y control técnico)
+
     const Cuarentena = {
         confirmConfig(ctx) {
             const prod = esc(ctx.producto);
@@ -1024,9 +1032,7 @@
         },
     };
 
-    /* ------------------------------------------------------------------ *
-     *  ESCENARIO 1: INVENTARIO (cambio de estado / reubicación)
-     * ------------------------------------------------------------------ */
+     // ESCENARIO 1: INVENTARIO (cambio de estado / reubicación)
     const Inventario = {
         confirmConfig(ctx) {
             const prod = esc(ctx.producto);
@@ -1079,9 +1085,7 @@
         },
     };
 
-    /* ------------------------------------------------------------------ *
-     *  API pública
-     * ------------------------------------------------------------------ */
+   // API pública
     window.LoteStatus = {
         Inventario,
         Cuarentena,

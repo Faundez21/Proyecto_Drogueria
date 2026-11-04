@@ -59,6 +59,8 @@
         .font-bold { font-weight: 700; }
         
         .badge-cat { display: inline-block; padding: 1.5px 5px; font-size: 7.5px; font-weight: 700; border-radius: 3px; background-color: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+        .badge-prog { display: inline-block; padding: 1.5px 5px; font-size: 7.5px; font-weight: 700; border-radius: 3px; background-color: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .badge-prog-empty { display: inline-block; padding: 1.5px 5px; font-size: 7.5px; font-weight: 600; border-radius: 3px; background-color: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
         .badge-red { color: #b91c1c; background-color: #fef2f2; border: 1px solid #fecaca; padding: 1.5px 5px; border-radius: 3px; font-weight: 800; font-size: 8px; display: inline-block; }
         .badge-orange { color: #c2410c; background-color: #fff7ed; border: 1px solid #fed7aa; padding: 1.5px 5px; border-radius: 3px; font-weight: 800; font-size: 8px; display: inline-block; }
         .badge-green { color: #15803d; background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 1.5px 5px; border-radius: 3px; font-weight: 800; font-size: 8px; display: inline-block; }
@@ -96,8 +98,12 @@
         <tr>
             <td class="logo-container">
                 <div>
-                    @if(file_exists(public_path('images/favicon4.png')))
-                        <img src="{{ public_path('images/favicon4.png') }}" class="logo-icon" alt="Logo">
+                    @php
+                        $logoPath = public_path('images/favicon4.png');
+                        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+                    @endphp
+                    @if($logoBase64)
+                        <img src="{{ $logoBase64 }}" class="logo-icon" alt="Logo">
                     @endif
                     <div style="display: inline-block; vertical-align: middle;">
                         <h2 class="logo-title">DROGUERÍA COMUNAL DAS</h2>
@@ -138,21 +144,22 @@
     <table class="items-table">
         <thead>
             <tr>
-                <th style="width: 4%;" class="text-center">#</th>
-                <th style="width: 26%;">Producto Principal</th>
-                <th style="width: 13%;">Categoría</th>
-                <th style="width: 11%;">N° Lote</th>
-                <th style="width: 11%;" class="text-center">Vencimiento</th>
-                <th style="width: 13%;">Ubicación Física</th>
-                <th style="width: 7%;" class="text-center">Stock</th>
-                <th style="width: 7%;" class="text-right">V. Unit.</th>
+                <th style="width: 3.5%;" class="text-center">#</th>
+                <th style="width: 22%;">Producto Principal</th>
+                <th style="width: 11.5%;">Categoría</th>
+                <th style="width: 12%;">Programa</th>
+                <th style="width: 9.5%;">N° Lote</th>
+                <th style="width: 9.5%;" class="text-center">Vencimiento</th>
+                <th style="width: 11.5%;">Ubicación Física</th>
+                <th style="width: 6%;" class="text-center">Stock</th>
+                <th style="width: 6.5%;" class="text-right">V. Unit.</th>
                 <th style="width: 8%;" class="text-right">V. Total</th>
             </tr>
         </thead>
         <tbody>
             @if($totalRegistros == 0)
                 <tr>
-                    <td colspan="9" class="text-center" style="padding: 18px; color: #64748b;">No hay registros de inventario que coincidan con los filtros seleccionados.</td>
+                    <td colspan="10" class="text-center" style="padding: 18px; color: #64748b;">No hay registros de inventario que coincidan con los filtros seleccionados.</td>
                 </tr>
             @else
                 @foreach($inventories as $idx => $inv)
@@ -165,6 +172,7 @@
                         $stock = (float) ($inv->stock_total ?? ($inv->cantidad ?? 0));
                         $valorUnitario = (float) ($inv->valor_neto_unitario ?? 0);
                         $valorTotal = $stock * $valorUnitario;
+                        $programaTxt = !empty($inv->programa) ? trim((string) $inv->programa) : '';
 
                         $fechaVenc = $inv->fecha_vencimiento;
                         $textoVenc = 'N/A';
@@ -190,6 +198,13 @@
                         <td class="text-center" style="color: #64748b; font-weight: bold;">{{ $idx + 1 }}</td>
                         <td class="font-bold" style="color: #0f172a;">{{ $producto }}</td>
                         <td><span class="badge-cat">{{ $inv->categoria ?? 'General' }}</span></td>
+                        <td>
+                            @if($programaTxt !== '')
+                                <span class="badge-prog">{{ $programaTxt }}</span>
+                            @else
+                                <span class="badge-prog-empty">Sin programa</span>
+                            @endif
+                        </td>
                         <td style="font-family: 'Courier New', monospace; font-weight: 700;">{{ $inv->lote ?? 'S/L' }}</td>
                         <td class="text-center">
                             @if($classVenc)
@@ -205,7 +220,7 @@
                     </tr>
                 @endforeach
                 <tr class="total-row">
-                    <td colspan="6" class="text-right">TOTALES CONSOLIDADOS DEL REPORTE:</td>
+                    <td colspan="7" class="text-right">TOTALES CONSOLIDADOS DEL REPORTE:</td>
                     <td class="text-center">{{ number_format($totalUnidadesReporte, 0, ',', '.') }}</td>
                     <td class="text-right">VALOR TOTAL:</td>
                     <td class="text-right" style="color: #0f766e;">${{ number_format($sumaTotalPdf, 0, ',', '.') }}</td>

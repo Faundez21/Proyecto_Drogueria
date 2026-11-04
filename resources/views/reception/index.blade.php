@@ -225,21 +225,21 @@
                                         <option value="" disabled selected>Buscar producto por grupo...</option>
                                         <optgroup label="Medicamentos (Fármacos)" data-optgroup="Medicamentos">
                                             @foreach($productosAgrupados['Medicamentos'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Medicamentos">
+                                                <option value="{{ $product->id }}" data-grupo="Medicamentos" data-programa="{{ $product->programa_sugerido ?? '' }}">
                                                     {{ $product->nombre }}
                                                 </option>
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Insumos y Equipamiento" data-optgroup="Insumos">
                                             @foreach($productosAgrupados['Insumos'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Insumos">
+                                                <option value="{{ $product->id }}" data-grupo="Insumos" data-programa="{{ $product->programa_sugerido ?? '' }}">
                                                     {{ $product->nombre }}
                                                 </option>
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Estupefacientes y Controlados" data-optgroup="Estupefacientes">
                                             @foreach($productosAgrupados['Estupefacientes'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Estupefacientes">
+                                                <option value="{{ $product->id }}" data-grupo="Estupefacientes" data-programa="{{ $product->programa_sugerido ?? '' }}">
                                                     {{ $product->nombre }} (Controlado)
                                                 </option>
                                             @endforeach
@@ -270,11 +270,11 @@
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Programa</label>
                                     <select name="programa[]"
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        class="select-programa-recepcion w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" selected>Sin programa</option>
-                                        <option value="Morbilidad General">Morbilidad General</option>
-                                        <option value="Cardiovascular">Cardiovascular</option>
-                                        <option value="IRA/ERA">Respiratorio (IRA/ERA)</option>
+                                        @foreach($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
+                                            <option value="{{ $progOpt }}">{{ $progOpt === 'IRA/ERA' ? 'Respiratorio (IRA/ERA)' : $progOpt }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div>
@@ -694,7 +694,9 @@
             }
 
             const grupo = opt.getAttribute('data-grupo') || 'Medicamentos';
+            const progSugerido = (opt.getAttribute('data-programa') || '').trim();
             const selectCat = card.querySelector('.select-categoria-recepcion');
+            const selectProg = card.querySelector('.select-programa-recepcion') || card.querySelector('select[name="programa[]"]');
 
             if (grupo === 'Estupefacientes') {
                 selectCat.value = 'Estupefacientes';
@@ -704,6 +706,17 @@
                 if (!catGrupoActual || catGrupoActual !== grupo) {
                     selectCat.value = (grupo === 'Insumos') ? 'Insumos' : 'Medicamentos';
                 }
+            }
+
+            if (selectProg && progSugerido) {
+                let exists = Array.from(selectProg.options).some(o => o.value === progSugerido);
+                if (!exists) {
+                    const newOpt = document.createElement('option');
+                    newOpt.value = progSugerido;
+                    newOpt.textContent = progSugerido;
+                    selectProg.appendChild(newOpt);
+                }
+                selectProg.value = progSugerido;
             }
 
             actualizarEstiloCardGrupo(card, grupo);
@@ -984,7 +997,10 @@
                                     <tr class="hover:bg-slate-50">
                                         <td class="p-2 font-medium text-slate-800">
                                             ${it.producto}
-                                            ${it.tipo ? `<span class="block text-[10px] text-slate-500 font-normal">${it.tipo}</span>` : ''}
+                                            <div class="flex flex-wrap gap-1 mt-0.5">
+                                                ${it.tipo ? `<span class="text-[10px] text-slate-500 font-normal">${it.tipo}</span>` : ''}
+                                                ${it.programa && it.programa !== 'Sin programa' ? `<span class="px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[9.5px] font-bold">${it.programa}</span>` : ''}
+                                            </div>
                                         </td>
                                         <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote || 'S/L'}</td>
                                         <td class="p-2 text-center text-slate-600">${it.vencimiento || 'N/A'}</td>
@@ -1122,6 +1138,7 @@
                 productCards.forEach(card => {
                     const prodSelect = card.querySelector('.select-producto-recepcion') || card.querySelector('select[name="product_id[]"]');
                     const catSelect = card.querySelector('.select-categoria-recepcion') || card.querySelector('select[name="tipo_producto[]"]');
+                    const progSelect = card.querySelector('.select-programa-recepcion') || card.querySelector('select[name="programa[]"]');
                     const qtyInput = card.querySelector('.calc-qty') || card.querySelector('input[name="cantidad_unitaria[]"]');
                     const priceInput = card.querySelector('.calc-price') || card.querySelector('input[name="valor_unitario[]"]');
                     const loteInput = card.querySelector('input[name="lote[]"]');
@@ -1141,11 +1158,13 @@
 
                         const rawNombre = prodSelect.options[prodSelect.selectedIndex]?.text.trim() || 'Producto';
                         const rawCat = catSelect && catSelect.selectedIndex >= 0 ? catSelect.options[catSelect.selectedIndex]?.text.trim() : '';
+                        const rawProg = progSelect && progSelect.value ? progSelect.value.trim() : 'General DAS';
                         const rawVence = vencInput?.value ? vencInput.value.split('-').reverse().join('/') : 'N/A';
 
                         itemsPayload.push({
                             producto: rawNombre,
                             tipo: rawCat,
+                            programa: rawProg,
                             lote: loteInput?.value?.trim() || 'S/L',
                             vencimiento: rawVence,
                             cantidad: qty
@@ -1319,6 +1338,7 @@
                         <td class="px-4 py-3">
                             <strong>${item.product ? item.product.nombre : 'Prod Eliminado'}</strong><br>
                             <span class="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-bold border ${g.badgeClass}">${item.tipo_producto || key}</span>
+                            ${item.programa ? `<span class="inline-block mt-0.5 ml-1 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">${item.programa}</span>` : ''}
                         </td>
                         <td class="px-4 py-3">${item.lote || 'S/L'}<br><span class="text-[10px] text-slate-500">${item.fecha_vencimiento ? (item.fecha_vencimiento.includes('-') ? item.fecha_vencimiento.split('T')[0].split('-').reverse().join('/') : item.fecha_vencimiento) : 'N/A'}</span></td>
                         <td class="px-4 py-3 text-center font-bold">${item.cantidad}</td>
