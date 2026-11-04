@@ -589,6 +589,83 @@ div[id$="Modal"], div[id*="modal"], div[id*="Modal"] {
     margin-bottom: 0 !important;
 }
 
+/* ---------- Diseño Base y Scroll para Modales de Historial (#HistoryModal) ---------- */
+#HistoryModal:not(.hidden) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 1rem !important;
+}
+#HistoryModal > div {
+    width: 100% !important;
+    max-width: 68rem !important;
+    max-height: 88vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border-radius: 1rem !important;
+    overflow: hidden !important;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.38) !important;
+}
+#HistoryModal > div > div:first-child {
+    padding: 1rem 1.5rem !important;
+    background-color: #0f172a !important;
+    border-bottom: 1px solid #1e293b !important;
+    flex-shrink: 0 !important;
+}
+#HistoryModal > div > div:nth-child(2) {
+    padding: 0.875rem 1.5rem !important;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0 !important;
+}
+#HistoryModal > div > div.overflow-x-auto {
+    flex: 1 1 auto !important;
+    min-height: 200px !important;
+    max-height: 54vh !important;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+    background-color: #ffffff;
+}
+#HistoryModal table {
+    width: 100% !important;
+    min-width: 740px !important;
+    border-collapse: collapse !important;
+}
+#HistoryModal thead {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    background-color: #f1f5f9 !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+}
+#HistoryModal thead th {
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    color: #475569 !important;
+}
+#HistoryModal tbody td {
+    padding: 0.75rem 1.25rem !important;
+    vertical-align: middle !important;
+}
+#HistoryModal tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.15s ease;
+}
+#HistoryModal tbody tr:hover {
+    background-color: #f8fafc;
+}
+#HistoryModal > div > div:last-child {
+    padding: 0.875rem 1.5rem !important;
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    flex-shrink: 0 !important;
+}
+
 /* ---------- Modales de Historial y Mantenedores en Modo Oscuro ---------- */
 html.dark #HistoryModal > div,
 html.dark #createModal > div,
@@ -605,9 +682,23 @@ html.dark #editModal > div > div > div:first-child {
     background-color: #0F172A !important;
     border-color: #1E293B !important;
 }
-html.dark #HistoryModal thead.sticky {
+html.dark #HistoryModal > div > div:nth-child(2),
+html.dark #HistoryModal > div > div:last-child {
     background-color: #162032 !important;
     border-color: #334155 !important;
+}
+html.dark #HistoryModal > div > div.overflow-x-auto {
+    background-color: #1E293B !important;
+}
+html.dark #HistoryModal thead {
+    background-color: #0F172A !important;
+    border-color: #334155 !important;
+}
+html.dark #HistoryModal thead th {
+    color: #94A3B8 !important;
+}
+html.dark #HistoryModal tbody tr {
+    border-color: #293548 !important;
 }
 html.dark #HistoryModal tbody tr:hover {
     background-color: #263449 !important;
@@ -625,6 +716,7 @@ html.dark #editModal textarea {
     color: #F8FAFC !important;
 }
 html.dark #HistoryModal button[onclick*="closeHistory"],
+html.dark #HistoryModal button[onclick*="limpiarFiltroHistorial"],
 html.dark #showModal button[onclick*="closeShow"],
 html.dark #createModal button[onclick*="closeCreate"],
 html.dark #editModal button[onclick*="closeEdit"] {
@@ -633,11 +725,397 @@ html.dark #editModal button[onclick*="closeEdit"] {
     color: #E2E8F0 !important;
 }
 html.dark #HistoryModal button[onclick*="closeHistory"]:hover,
+html.dark #HistoryModal button[onclick*="limpiarFiltroHistorial"]:hover,
 html.dark #showModal button[onclick*="closeShow"]:hover,
 html.dark #createModal button[onclick*="closeCreate"]:hover,
 html.dark #editModal button[onclick*="closeEdit"]:hover {
     background-color: #32425C !important;
     color: #FFFFFF !important;
 }
+/* MODALES DE DESPACHO REALIZADO CON ÉXITO Y SOLICITUD MIXTA (CLARO + OSCURO) */
+.das-swal-summary {
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.75rem;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.9rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+.das-swal-summary-rose {
+    background-color: #fff1f2;
+    border-color: #fecdd3;
+}
+.das-swal-summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+.das-swal-summary-rose .das-swal-summary-header {
+    border-bottom-color: #fecdd3;
+}
+.das-swal-summary-title {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+.das-swal-summary-rose .das-swal-summary-title {
+    color: #881337;
+}
+.das-swal-meta {
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: #334155;
+    margin: 0.2rem 0;
+}
+.das-swal-meta strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+.das-swal-badge-ok {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+    padding: 0.15rem 0.55rem;
+    border-radius: 0.375rem;
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+}
+.das-swal-badge-rose {
+    background-color: #ffe4e6;
+    color: #9f1239;
+    border: 1px solid #fda4af;
+    padding: 0.15rem 0.55rem;
+    border-radius: 0.375rem;
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+}
+
+/* Tabla de productos despachados en el modal */
+.das-swal-section-title {
+    font-size: 0.69rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #475569;
+    margin-bottom: 0.45rem;
+}
+.das-swal-table-wrap {
+    max-height: 14rem;
+    overflow-y: auto;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.65rem;
+    background-color: #ffffff;
+}
+.das-swal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.73rem;
+}
+.das-swal-table thead {
+    background-color: #f1f5f9;
+    border-bottom: 1px solid #cbd5e1;
+}
+.das-swal-table-rose thead {
+    background-color: #ffe4e6;
+    border-bottom: 1px solid #fecdd3;
+}
+.das-swal-table th {
+    padding: 0.55rem 0.65rem;
+    font-weight: 800;
+    color: #334155;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+}
+.das-swal-table-rose th {
+    color: #881337;
+}
+.das-swal-table td {
+    padding: 0.55rem 0.65rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+}
+
+/* Banner de Solicitud Mixta (Modo Claro base) */
+.das-swal-mixed-banner {
+    background: linear-gradient(135deg, #fffbeb 0%, #fff1f2 100%);
+    border: 1px solid #fbbf24;
+    border-left: 4px solid #f59e0b;
+    border-radius: 0.75rem;
+    padding: 0.9rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+.das-swal-mixed-banner-teal {
+    background: linear-gradient(135deg, #f0fdfa 0%, #fffbeb 100%);
+    border: 1px solid #2dd4bf;
+    border-left: 4px solid #0d9488;
+}
+.das-swal-mixed-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #f59e0b, #e11d48);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(225, 29, 72, 0.25);
+}
+.das-swal-mixed-icon-teal {
+    background: linear-gradient(135deg, #0d9488, #0284c7);
+    box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);
+}
+.das-swal-mixed-title {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #78350f;
+}
+.das-swal-mixed-banner-teal .das-swal-mixed-title {
+    color: #134e4a;
+}
+.das-swal-mixed-text {
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: #334155;
+    margin-top: 0.25rem;
+}
+.das-swal-mixed-text strong {
+    color: #0f172a;
+    font-weight: 800;
+}
+.das-swal-mixed-cta {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #9f1239;
+    margin-top: 0.45rem;
+}
+.das-swal-mixed-banner-teal .das-swal-mixed-cta {
+    color: #0f766e;
+}
+
+/* Lista de píldoras de productos en alerta de Solicitud Mixta */
+.das-swal-pill-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.65rem 0 0 0;
+    max-height: 9.5rem;
+    overflow-y: auto;
+}
+.das-swal-pill-item {
+    background-color: rgba(255, 255, 255, 0.88);
+    border: 1px solid #fda4af;
+    color: #881337;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.73rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+.das-swal-pill-item-teal {
+    border-color: #5eead4;
+    color: #115e59;
+}
+
+/* MODO OSCURO: Modales de Despacho Exitoso y Solicitud Mixta */
+html.dark .das-swal-summary {
+    background: linear-gradient(145deg, #111827 0%, #162235 100%) !important;
+    border: 1px solid #2e4057 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 12px rgba(0, 0, 0, 0.28) !important;
+}
+html.dark .das-swal-summary-rose {
+    background: linear-gradient(145deg, #1f1220 0%, #2a1526 100%) !important;
+    border: 1px solid rgba(244, 63, 94, 0.42) !important;
+}
+html.dark .das-swal-summary-header {
+    border-bottom-color: #2c3e55 !important;
+}
+html.dark .das-swal-summary-rose .das-swal-summary-header {
+    border-bottom-color: rgba(244, 63, 94, 0.3) !important;
+}
+html.dark .das-swal-summary-title {
+    color: #f8fafc !important;
+}
+html.dark .das-swal-summary-rose .das-swal-summary-title {
+    color: #ffe4e6 !important;
+}
+html.dark .das-swal-meta {
+    color: #cbd5e1 !important;
+}
+html.dark .das-swal-meta strong {
+    color: #f8fafc !important;
+}
+html.dark .das-swal-badge-ok {
+    background-color: rgba(16, 185, 129, 0.22) !important;
+    color: #6ee7b7 !important;
+    border-color: rgba(52, 211, 153, 0.45) !important;
+}
+html.dark .das-swal-badge-rose {
+    background-color: rgba(244, 63, 94, 0.24) !important;
+    color: #fda4af !important;
+    border-color: rgba(251, 113, 133, 0.5) !important;
+}
+
+html.dark .das-swal-section-title {
+    color: #94a3b8 !important;
+}
+html.dark .das-swal-table-wrap {
+    background-color: #0f172a !important;
+    border-color: #2e4057 !important;
+}
+html.dark .das-swal-table thead {
+    background-color: #162032 !important;
+    border-bottom-color: #2e4057 !important;
+}
+html.dark .das-swal-table-rose thead {
+    background-color: #281424 !important;
+    border-bottom-color: rgba(244, 63, 94, 0.35) !important;
+}
+html.dark .das-swal-table th {
+    color: #94a3b8 !important;
+}
+html.dark .das-swal-table-rose th {
+    color: #fda4af !important;
+}
+html.dark .das-swal-table tbody {
+    background-color: #131c2e !important;
+}
+html.dark .das-swal-table tbody tr {
+    border-bottom-color: #223047 !important;
+}
+html.dark .das-swal-table tbody tr:hover {
+    background-color: #1b2840 !important;
+}
+html.dark .das-swal-table td {
+    color: #e2e8f0 !important;
+    border-bottom-color: #223047 !important;
+}
+html.dark .das-swal-qty {
+    color: #34d399 !important;
+}
+html.dark .das-swal-qty-rose {
+    color: #fb7185 !important;
+}
+
+/* Banner de Solicitud Mixta en Modo Oscuro */
+html.dark .das-swal-mixed-banner,
+html.dark .swal2-html-container .from-amber-50.to-rose-50 {
+    background: linear-gradient(135deg, rgba(120, 53, 15, 0.38) 0%, rgba(136, 19, 55, 0.38) 100%) !important;
+    background-image: linear-gradient(135deg, rgba(120, 53, 15, 0.38) 0%, rgba(136, 19, 55, 0.38) 100%) !important;
+    border: 1px solid rgba(251, 191, 36, 0.45) !important;
+    border-left: 4px solid #f59e0b !important;
+    box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.45) !important;
+}
+html.dark .das-swal-mixed-banner-teal,
+html.dark .swal2-html-container .from-teal-50.to-amber-50 {
+    background: linear-gradient(135deg, rgba(19, 78, 74, 0.45) 0%, rgba(30, 58, 138, 0.38) 100%) !important;
+    background-image: linear-gradient(135deg, rgba(19, 78, 74, 0.45) 0%, rgba(30, 58, 138, 0.38) 100%) !important;
+    border: 1px solid rgba(45, 212, 191, 0.45) !important;
+    border-left: 4px solid #14b8a6 !important;
+}
+html.dark .das-swal-mixed-title,
+html.dark .swal2-html-container .text-amber-950,
+html.dark .swal2-html-container .text-rose-950,
+html.dark .swal2-html-container .text-teal-950 {
+    color: #fef3c7 !important;
+}
+html.dark .das-swal-mixed-banner-teal .das-swal-mixed-title {
+    color: #ccfbf1 !important;
+}
+html.dark .das-swal-mixed-text {
+    color: #e2e8f0 !important;
+}
+html.dark .das-swal-mixed-text strong {
+    color: #fde68a !important;
+}
+html.dark .das-swal-mixed-banner-teal .das-swal-mixed-text strong {
+    color: #5eead4 !important;
+}
+html.dark .das-swal-mixed-cta {
+    color: #fda4af !important;
+}
+html.dark .das-swal-mixed-banner-teal .das-swal-mixed-cta {
+    color: #5eead4 !important;
+}
+
+/* Lista de píldoras en Modo Oscuro */
+html.dark .das-swal-pill-item {
+    background-color: rgba(15, 23, 42, 0.78) !important;
+    border-color: rgba(251, 113, 133, 0.45) !important;
+    color: #ffe4e6 !important;
+}
+html.dark .das-swal-pill-item-teal {
+    background-color: rgba(15, 23, 42, 0.78) !important;
+    border-color: rgba(45, 212, 191, 0.45) !important;
+    color: #ccfbf1 !important;
+}
+
+/* Insignias "Mixta" en tablas y tarjetas de solicitudes */
+html.dark .das-badge-mixta-amber,
+html.dark .from-teal-50.to-amber-50 {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.22) 0%, rgba(245, 158, 11, 0.25) 100%) !important;
+    background-image: linear-gradient(135deg, rgba(20, 184, 166, 0.22) 0%, rgba(245, 158, 11, 0.25) 100%) !important;
+    color: #fde68a !important;
+    border-color: rgba(251, 191, 36, 0.45) !important;
+}
+html.dark .das-badge-mixta-rose,
+html.dark .from-teal-50.to-rose-50 {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.22) 0%, rgba(244, 63, 94, 0.25) 100%) !important;
+    background-image: linear-gradient(135deg, rgba(20, 184, 166, 0.22) 0%, rgba(244, 63, 94, 0.25) 100%) !important;
+    color: #fecdd3 !important;
+    border-color: rgba(251, 113, 133, 0.45) !important;
+}
+
+/* Botones de acción en SweetAlert2 en Modo Oscuro */
+html.dark .swal2-actions button.swal2-confirm,
+html.dark .swal2-actions button.swal2-deny,
+html.dark .swal2-actions button.swal2-cancel {
+    font-weight: 700 !important;
+    border-radius: 0.6rem !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Modales #SolicitudesModal y #SolicitudesControladoModal en Modo Oscuro */
+html.dark #SolicitudesModal > div,
+html.dark #SolicitudesControladoModal > div {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+    color: #E2E8F0 !important;
+}
+html.dark #SolicitudesControladoModal .card-solicitud-controlado {
+    background-color: #162032 !important;
+    border-color: #2E4057 !important;
+}
+html.dark #SolicitudesControladoModal .card-solicitud-controlado > div:first-child {
+    background-color: #111A29 !important;
+    border-bottom-color: #29384D !important;
+}
+html.dark #SolicitudesModal input,
+html.dark #SolicitudesModal select,
+html.dark #SolicitudesControladoModal input,
+html.dark #SolicitudesControladoModal select {
+    background-color: #0F172A !important;
+    border-color: #475569 !important;
+    color: #F8FAFC !important;
+}
+html.dark #SolicitudesModal tr[id^="solicitud-"] {
+    background-color: #111827 !important;
+}
+html.dark #SolicitudesModal tr[id^="solicitud-"] > td > div > div {
+    background-color: #162032 !important;
+    border-color: #2E4057 !important;
+}
+
 
 

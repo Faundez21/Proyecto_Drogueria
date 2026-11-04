@@ -788,7 +788,7 @@
                 </main>
             </div>
 
-            <!-- MODAL DE BÚSQUEDA GLOBAL "NIVEL INSANO" (Navegación por Teclado) -->
+            <!-- Modal de busqueda" (Navegación por Teclado) -->
 
             <div id="search-modal"
                 class="fixed inset-0 z-50 hidden flex items-start justify-center p-3 sm:p-4 pt-8 sm:pt-16 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-200"
@@ -934,7 +934,7 @@
             });
         }
 
-        // --- BÚSQUEDA GLOBAL "NIVEL INSANO" ---
+        // Busqueda Global 
         let searchTimeout = null;
         let selectedSearchIndex = -1;
         let searchResultsCount = 0;
