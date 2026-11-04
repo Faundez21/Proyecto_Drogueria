@@ -473,9 +473,7 @@ html.dark #editLoteModal button[onclick*="closeEditLote"] {
     border-color: #475569 !important;
 }
 
-/* =====================================================================
-   CENTRO DE ALERTAS - MODO OSCURO
-   ===================================================================== */
+/* CENTRO DE ALERTAS - MODO OSCURO */
 html.dark #notifications-menu {
     background-color: #1A2434 !important;
     border-color: #2F3E56 !important;
