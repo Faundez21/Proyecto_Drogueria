@@ -122,11 +122,32 @@ class ShelfController extends Controller
             'pos_z' => 'required|numeric',
         ]);
 
-        // Buscamos la estantería y le actualizamos sus coordenadas
         $shelf = Shelf::findOrFail($id);
+        $posX = (float) $request->pos_x;
+        $posZ = (float) $request->pos_z;
+
+        // Validar que no se superponga encima de otra estantería (ancho físico ~4.4 unidades)
+        $minSeparacion = 4.5;
+        $conflicto = Shelf::where('id', '!=', $shelf->id)
+            ->whereNotNull('pos_x')
+            ->whereNotNull('pos_z')
+            ->get()
+            ->first(function ($otro) use ($posX, $posZ, $minSeparacion) {
+                return abs(((float) $otro->pos_x) - $posX) < $minSeparacion
+                    && abs(((float) $otro->pos_z) - $posZ) < $minSeparacion;
+            });
+
+        if ($conflicto) {
+            return response()->json([
+                'success' => false,
+                'message' => "No se puede colocar la estantería {$shelf->name} encima de {$conflicto->name}. Selecciona un espacio libre.",
+            ], 422);
+        }
+
+        // Actualizamos sus coordenadas
         $shelf->update([
-            'pos_x' => $request->pos_x,
-            'pos_z' => $request->pos_z
+            'pos_x' => $posX,
+            'pos_z' => $posZ,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Posición actualizada correctamente']);
