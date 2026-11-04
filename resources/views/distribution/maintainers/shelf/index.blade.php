@@ -215,11 +215,11 @@
 
     <!-- Modal Crear Estantería -->
     <div id="createModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+        class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
-            <div class="bg-slate-900 px-4 sm:px-6 py-3.5 sm:py-4.5 flex items-center justify-between border-b border-slate-800 shrink-0">
+            <div class="bg-slate-900 px-5 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800 shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center">
+                    <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
@@ -299,9 +299,9 @@
 
     <!-- Modal Ver Estantería -->
     <div id="showModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+        class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
-            <div class="bg-slate-900 px-4 sm:px-6 py-3.5 sm:py-4.5 flex items-center justify-between border-b border-slate-800 shrink-0">
+            <div class="bg-slate-900 px-5 sm:px-6 py-4 flex items-center justify-between border-b border-slate-800 shrink-0">
                 <div>
                     <h2 class="text-[15px] sm:text-[16px] font-bold text-white leading-tight">Ficha de la Estantería</h2>
                     <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Información registrada en la bodega.</p>
@@ -434,56 +434,174 @@
         </div>
     </div>
 
-    <!-- Modal de Historial -->
+    <!-- Modal de Historial de Estanterías -->
     <div id="HistoryModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-            <div class="bg-slate-900 px-6 py-4.5 flex justify-between items-center border-b border-slate-800 shrink-0">
-                <div>
-                    <h2 class="text-[16px] font-bold text-white">Historial de Estanterías</h2>
-                    <p class="text-[12px] text-slate-400 mt-0.5">Registro de auditoría de creación y modificaciones de estanterías.</p>
+        class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
+            <!-- Encabezado -->
+            <div class="px-5 py-4 sm:px-6 sm:py-4 bg-slate-900 flex justify-between items-center shrink-0 border-b border-slate-800">
+                <div class="flex items-center gap-3.5 min-w-0 pr-2">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-300 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <h2 class="text-base sm:text-[17px] font-bold text-white tracking-wide leading-tight">Historial de Estanterías</h2>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono-das font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                                {{ $shelves->count() }} {{ $shelves->count() === 1 ? 'registro' : 'registros' }}
+                            </span>
+                        </div>
+                        <p class="text-[11.5px] sm:text-[12px] text-slate-400 mt-0.5 font-medium truncate sm:whitespace-normal">
+                            Registro de auditoría de creación, asignación de pasillos, capacidad y modificaciones de estanterías.
+                        </p>
+                    </div>
                 </div>
                 <button type="button" onclick="closeHistory()"
-                    class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer">
+                    class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer shrink-0"
+                    aria-label="Cerrar modal">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
 
-            <div class="p-4 sm:p-6 overflow-y-auto flex-1">
-                <div class="overflow-x-auto max-h-96 border border-slate-200 rounded-xl">
-                    <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
-                        <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0">
-                            <tr>
-                                <th class="px-4 py-3">Estantería</th>
-                                <th class="px-4 py-3">Pasillo</th>
-                                <th class="px-4 py-3 text-center">Capacidad</th>
-                                <th class="px-4 py-3">Última Actualización</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            @forelse ($shelves as $s)
-                                <tr class="hover:bg-slate-50/60 transition-colors">
-                                    <td class="px-4 py-3 font-bold text-slate-800">{{ $s->name }}</td>
-                                    <td class="px-4 py-3 text-slate-600">{{ $s->aisle->name ?? 'Sin pasillo' }}</td>
-                                    <td class="px-4 py-3 text-center font-mono-das">{{ $s->capacidad > 0 ? number_format($s->capacidad, 0, ',', '.') . ' uds.' : 'Sin límite' }}</td>
-                                    <td class="px-4 py-3 font-mono-das text-[12px] text-slate-500">{{ optional($s->updated_at)->format('d/m/Y H:i') ?? 'Registro inicial' }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-4 py-6 text-center text-slate-400">Sin registros de historial</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+            <!-- Barra de Búsqueda y Filtros del Historial -->
+            <div class="p-3.5 sm:px-6 sm:py-3.5 bg-slate-50 border-b border-slate-200 shrink-0">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3 items-end">
+                    <div class="sm:col-span-6">
+                        <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Buscar en el Historial</label>
+                        <div class="relative">
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" id="historyShelfSearch" oninput="filtrarHistorialEstanterias()"
+                                placeholder="Buscar por nombre de estantería, pasillo o descripción..."
+                                class="w-full pl-9 pr-3.5 py-2 bg-white border border-slate-300 rounded-lg text-[12.5px] text-slate-800 placeholder-slate-400 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-2xs">
+                        </div>
+                    </div>
+                    <div class="sm:col-span-4">
+                        <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Filtrar por Pasillo</label>
+                        <select id="historyShelfAisleFilter" onchange="filtrarHistorialEstanterias()"
+                            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[12.5px] text-slate-700 font-medium outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-2xs cursor-pointer">
+                            <option value="">Todos los pasillos</option>
+                            @foreach ($aisles as $aisle)
+                                <option value="{{ $aisle->id }}">{{ $aisle->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <button type="button" onclick="limpiarFiltroHistorialEstanterias()"
+                            class="w-full py-2 px-3 bg-white border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors text-[12.5px] font-bold shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer">
+                            <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            <span>Limpiar</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex justify-end px-6 py-4 bg-slate-50 border-t border-slate-200 shrink-0">
+            <!-- Tabla del Historial -->
+            <div class="overflow-x-auto flex-1 min-h-[220px] max-h-[58vh] bg-white">
+                <table class="w-full text-left text-[12.5px] sm:text-[13px] text-slate-600 whitespace-nowrap min-w-[780px]">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-[10.5px] sm:text-[11px] font-bold tracking-wider border-b border-slate-200 sticky top-0 z-10 shadow-2xs">
+                        <tr>
+                            <th class="px-5 py-3.5 w-20">ID</th>
+                            <th class="px-5 py-3.5">Estantería</th>
+                            <th class="px-5 py-3.5">Pasillo Asignado</th>
+                            <th class="px-5 py-3.5 text-center">Niveles</th>
+                            <th class="px-5 py-3.5 text-center">Capacidad Máx.</th>
+                            <th class="px-5 py-3.5 text-center">Evento / Estado</th>
+                            <th class="px-5 py-3.5">Última Actualización</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse ($shelves as $s)
+                            @php
+                                $sColor = optional($s->aisle)->color ?: '#3B82F6';
+                                $sLevels = $s->levels_count ?? 0;
+                                $fueEditado = $s->created_at && $s->updated_at && $s->updated_at->gt($s->created_at->copy()->addSeconds(2));
+                            @endphp
+                            <tr class="history-shelf-row hover:bg-slate-50/80 transition-colors"
+                                data-aisle="{{ $s->aisle_id }}"
+                                data-search="{{ strtolower('#' . $s->id . ' ' . $s->name . ' ' . ($s->aisle->name ?? '') . ' ' . ($s->description ?? '')) }}">
+                                <td class="px-5 py-3.5">
+                                    <span class="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 font-mono-das text-[11px] font-bold text-slate-600">
+                                        #{{ $s->id }}
+                                    </span>
+                                </td>
+                                <td class="px-5 py-3.5">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-slate-800">{{ $s->name }}</span>
+                                        @if ($s->description)
+                                            <span class="text-[11px] text-slate-400 truncate max-w-[200px]" title="{{ $s->description }}">{{ $s->description }}</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-5 py-3.5">
+                                    <span class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-lg bg-slate-50 border border-slate-200 text-[12px] font-semibold text-slate-700">
+                                        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: {{ $sColor }};"></span>
+                                        {{ $s->aisle->name ?? 'Sin pasillo' }}
+                                    </span>
+                                </td>
+                                <td class="px-5 py-3.5 text-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11.5px] font-bold {{ $sLevels > 0 ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-slate-100 text-slate-500 border border-slate-200' }}">
+                                        {{ $sLevels }} {{ $sLevels === 1 ? 'nivel' : 'niveles' }}
+                                    </span>
+                                </td>
+                                <td class="px-5 py-3.5 text-center">
+                                    @if ($s->capacidad > 0)
+                                        <span class="inline-flex px-2.5 py-0.5 rounded-md text-[11.5px] font-bold bg-teal-50 text-teal-700 border border-teal-200 font-mono-das">
+                                            {{ number_format($s->capacidad, 0, ',', '.') }} uds.
+                                        </span>
+                                    @else
+                                        <span class="text-[11.5px] text-slate-400 font-medium">Sin límite</span>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-3.5 text-center">
+                                    @if ($fueEditado)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[11px] font-bold">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Modificado
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[11px] font-bold">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Activo
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-3.5 font-mono-das text-[12px] text-slate-700 font-semibold">
+                                    {{ optional($s->updated_at)->format('d/m/Y H:i') ?? 'Registro inicial' }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center text-slate-400">Sin registros de historial</td>
+                            </tr>
+                        @endforelse
+                        <tr id="historyShelfEmptyRow" class="hidden">
+                            <td colspan="7" class="px-6 py-12 text-center text-slate-400">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-9 h-9 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    <span class="text-[13px] font-semibold text-slate-500">No se encontraron estanterías con los filtros aplicados.</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pie del Modal -->
+            <div class="px-5 py-3.5 sm:px-6 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-between items-center gap-3 shrink-0">
+                <span class="text-[12px] font-bold text-slate-500 uppercase tracking-wider">
+                    Mostrando <strong id="historyShelfCount" class="text-teal-700 font-mono-das">{{ $shelves->count() }}</strong> de <strong class="font-mono-das text-slate-700">{{ $shelves->count() }}</strong> estanterías
+                </span>
                 <button type="button" onclick="closeHistory()"
-                    class="px-5 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
-                    Cerrar
+                    class="w-full sm:w-auto px-6 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-[13px] font-bold shadow-2xs cursor-pointer text-center">
+                    Cerrar Historial
                 </button>
             </div>
         </div>
@@ -539,10 +657,44 @@
 
         function openHistory() {
             document.getElementById('HistoryModal').classList.remove('hidden');
+            filtrarHistorialEstanterias();
         }
 
         function closeHistory() {
             document.getElementById('HistoryModal').classList.add('hidden');
+        }
+
+        function filtrarHistorialEstanterias() {
+            const term = (document.getElementById('historyShelfSearch')?.value || '').toLowerCase().trim();
+            const aisleId = document.getElementById('historyShelfAisleFilter')?.value || '';
+            const rows = document.querySelectorAll('.history-shelf-row');
+            let visibles = 0;
+
+            rows.forEach(row => {
+                const text = row.getAttribute('data-search') || '';
+                const rowAisle = row.getAttribute('data-aisle') || '';
+                const matchText = term === '' || text.includes(term);
+                const matchAisle = aisleId === '' || rowAisle === aisleId;
+                const show = matchText && matchAisle;
+                row.classList.toggle('hidden', !show);
+                if (show) visibles++;
+            });
+
+            const countEl = document.getElementById('historyShelfCount');
+            if (countEl) countEl.textContent = visibles;
+
+            const emptyRow = document.getElementById('historyShelfEmptyRow');
+            if (emptyRow && rows.length > 0) {
+                emptyRow.classList.toggle('hidden', visibles > 0);
+            }
+        }
+
+        function limpiarFiltroHistorialEstanterias() {
+            const s = document.getElementById('historyShelfSearch');
+            const a = document.getElementById('historyShelfAisleFilter');
+            if (s) s.value = '';
+            if (a) a.value = '';
+            filtrarHistorialEstanterias();
         }
 
         function confirmCreateShelf(e) {

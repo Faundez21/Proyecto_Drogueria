@@ -907,40 +907,53 @@
         }
 
         // Datos de jerarquía y ocupación de bodega para LoteStatus.Ubicacion
-        window.distribucionJerarquia = @json($distribucionJerarquia ?? ['pasillos' => [], 'estantes' => []]);
+        window.distribucionJerarquia = @json($distribucionJerarquia ?? []);
         window.ubicacionesOcupadas = @json($ubicacionesOcupadas ?? []);
-        window.todosLosPasillos = @json(array_values($pasillosLista ?? []));
-        window.todosLosEstantes = @json(array_values($estantesLista ?? []));
-        window.todosLosNiveles = @json(array_values($nivelesLista ?? []));
-        window.todasLasPosiciones = @json(array_values($posicionesLista ?? []));
+        window.todosLosPasillos = @json(collect($pasillosLista ?? [])->values());
+        window.todosLosEstantes = @json(collect($estantesLista ?? [])->values());
+        window.todosLosNiveles = @json(collect($nivelesLista ?? [])->values());
+        window.todosLasPosiciones = @json(collect($posicionesLista ?? [])->values());
+
+        function obtenerConfigModalEditUbicacion() {
+            const form = document.getElementById('editLoteForm');
+            return {
+                selectPasillo: document.getElementById('modal_edit_pasillo'),
+                selectEstante: document.getElementById('modal_edit_estante'),
+                selectNivel: document.getElementById('modal_edit_nivel'),
+                selectPosicion: document.getElementById('modal_edit_posicion'),
+                statusEl: document.getElementById('modal_edit_ubicacion_status'),
+                ignoreLoteId: form?.dataset?.loteId ? parseInt(form.dataset.loteId, 10) : null,
+                producto: document.getElementById('modal_producto_nombre')?.textContent?.trim() || '',
+                lote: (document.getElementById('modal_lote_nombre')?.textContent || '').replace(/^LOTE:\s*/i, '').trim(),
+                initialUbicacion: {
+                    pasillo: form?.dataset?.initialPasillo || '',
+                    estante: form?.dataset?.initialEstante || '',
+                    nivel: form?.dataset?.initialNivel || '',
+                    posicion: form?.dataset?.initialPosicion || '',
+                },
+            };
+        }
 
         function onModalEditUbicacionChange(trigger) {
-            const form = document.getElementById('editLoteForm');
-            const excludeLoteId = form ? (form.dataset.loteId || null) : null;
-            if (window.LoteStatus && window.LoteStatus.Ubicacion) {
-                window.LoteStatus.Ubicacion.sincronizarSelectores({
-                    pasilloSelect: document.getElementById('modal_edit_pasillo'),
-                    estanteSelect: document.getElementById('modal_edit_estante'),
-                    nivelSelect: document.getElementById('modal_edit_nivel'),
-                    posicionSelect: document.getElementById('modal_edit_posicion'),
-                    statusEl: document.getElementById('modal_edit_ubicacion_status'),
-                    excludeLoteId: excludeLoteId,
-                    trigger: trigger,
-                    alertOnOccupied: true
-                });
-            }
+            if (!window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), trigger, false);
         }
 
         // Modales (Edición Lote)
         function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0, pasillo = '', estante = '', nivel = '', posicion = '') {
             const form = document.getElementById('editLoteForm');
+            const pasClean = (pasillo && pasillo !== 'P.A') ? pasillo : '';
+            const estClean = (estante && estante !== 'P.A') ? estante : '';
+            const nivClean = window.LoteStatus?.Ubicacion ? window.LoteStatus.Ubicacion.normNivel(nivel) : ((nivel && nivel !== 'P.A') ? nivel : '');
+            const posClean = window.LoteStatus?.Ubicacion ? window.LoteStatus.Ubicacion.normPos(posicion) : ((posicion && posicion !== 'P.A') ? posicion : '');
+
             if (form) {
                 form.action = "/inventory/" + id;
                 form.dataset.loteId = id;
-                form.dataset.initialPasillo = (pasillo && pasillo !== 'P.A') ? pasillo : '';
-                form.dataset.initialEstante = (estante && estante !== 'P.A') ? estante : '';
-                form.dataset.initialNivel = (nivel && nivel !== 'P.A') ? nivel : '';
-                form.dataset.initialPosicion = (posicion && posicion !== 'P.A') ? posicion : '';
+                form.dataset.initialPasillo = pasClean;
+                form.dataset.initialEstante = estClean;
+                form.dataset.initialNivel = nivClean;
+                form.dataset.initialPosicion = posClean;
             }
 
             setText('modal_producto_nombre', producto);
@@ -984,22 +997,17 @@
             const selNivel = document.getElementById('modal_edit_nivel');
             const selPosicion = document.getElementById('modal_edit_posicion');
 
-            if (selPasillo) selPasillo.value = (pasillo && pasillo !== 'P.A') ? pasillo : '';
-            if (selEstante) selEstante.value = (estante && estante !== 'P.A') ? estante : '';
-            if (selNivel) selNivel.value = (nivel && nivel !== 'P.A') ? nivel : '';
-            if (selPosicion) selPosicion.value = (posicion && posicion !== 'P.A') ? posicion : '';
+            if (selPasillo) selPasillo.value = pasClean;
+            if (selEstante) selEstante.value = estClean;
+            if (selNivel) selNivel.value = nivClean;
+            if (selPosicion) selPosicion.value = posClean;
 
-            if (window.LoteStatus && window.LoteStatus.Ubicacion) {
-                window.LoteStatus.Ubicacion.sincronizarSelectores({
-                    pasilloSelect: selPasillo,
-                    estanteSelect: selEstante,
-                    nivelSelect: selNivel,
-                    posicionSelect: selPosicion,
-                    statusEl: document.getElementById('modal_edit_ubicacion_status'),
-                    excludeLoteId: id,
-                    trigger: 'init',
-                    alertOnOccupied: false
-                });
+            if (window.LoteStatus?.Ubicacion) {
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), 'init', true);
+                if (selNivel && nivClean) selNivel.value = nivClean;
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), 'init', true);
+                if (selPosicion && posClean) selPosicion.value = posClean;
+                window.LoteStatus.Ubicacion.actualizarIndicadorVisual(obtenerConfigModalEditUbicacion());
             }
 
             toggleMotivoField(selectedVal);

@@ -589,3 +589,55 @@ div[id$="Modal"], div[id*="modal"], div[id*="Modal"] {
     margin-bottom: 0 !important;
 }
 
+/* ---------- Modales de Historial y Mantenedores en Modo Oscuro ---------- */
+html.dark #HistoryModal > div,
+html.dark #createModal > div,
+html.dark #showModal > div,
+html.dark #editModal > div > div {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+    color: #E2E8F0 !important;
+}
+html.dark #HistoryModal > div > div:first-child,
+html.dark #createModal > div > div:first-child,
+html.dark #showModal > div > div:first-child,
+html.dark #editModal > div > div > div:first-child {
+    background-color: #0F172A !important;
+    border-color: #1E293B !important;
+}
+html.dark #HistoryModal thead.sticky {
+    background-color: #162032 !important;
+    border-color: #334155 !important;
+}
+html.dark #HistoryModal tbody tr:hover {
+    background-color: #263449 !important;
+}
+html.dark #HistoryModal input,
+html.dark #HistoryModal select,
+html.dark #createModal input,
+html.dark #createModal select,
+html.dark #createModal textarea,
+html.dark #editModal input,
+html.dark #editModal select,
+html.dark #editModal textarea {
+    background-color: #0F172A !important;
+    border-color: #475569 !important;
+    color: #F8FAFC !important;
+}
+html.dark #HistoryModal button[onclick*="closeHistory"],
+html.dark #showModal button[onclick*="closeShow"],
+html.dark #createModal button[onclick*="closeCreate"],
+html.dark #editModal button[onclick*="closeEdit"] {
+    background-color: #243044 !important;
+    border-color: #475569 !important;
+    color: #E2E8F0 !important;
+}
+html.dark #HistoryModal button[onclick*="closeHistory"]:hover,
+html.dark #showModal button[onclick*="closeShow"]:hover,
+html.dark #createModal button[onclick*="closeCreate"]:hover,
+html.dark #editModal button[onclick*="closeEdit"]:hover {
+    background-color: #32425C !important;
+    color: #FFFFFF !important;
+}
+
+
