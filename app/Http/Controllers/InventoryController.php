@@ -452,6 +452,16 @@ class InventoryController extends Controller
             'mensaje' => $mensaje,
         ];
 
+        // Petición AJAX (fetch/async): responder JSON para que el frontend muestre
+        // el SweetAlert2 de éxito SIN recargar la página (evita que la recarga lo interrumpa).
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'message' => $mensaje,
+                'data' => $statusPayload,
+            ]);
+        }
+
         return redirect()->back()
             ->with('success', $mensaje)
             ->with('lote_status_success', $statusPayload);
