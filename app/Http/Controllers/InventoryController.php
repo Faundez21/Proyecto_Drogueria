@@ -124,11 +124,21 @@ class InventoryController extends Controller
         $productosLista = $productosInv->merge($productosCat)->unique()->sort()->values();
 
         // 6. Listas para filtros y formularios combinando Mantenedores Físicos + Inventario
-        $programasLista = Inventory::whereNotNull('programa')
+        $programasBase = collect([
+            'Morbilidad General',
+            'Fondo de Farmacia (FOFAR)',
+            'Cardiovascular',
+            'IRA/ERA',
+            'Salud Mental',
+        ]);
+        $programasInv = Inventory::whereNotNull('programa')
             ->where('programa', '!=', '')
             ->distinct()
             ->orderBy('programa', 'asc')
-            ->pluck('programa');
+            ->pluck('programa')
+            ->map(fn ($p) => trim((string) $p))
+            ->filter();
+        $programasLista = $programasBase->merge($programasInv)->unique()->sort()->values();
 
         $pasillosInv = Inventory::whereNotNull('pasillo')->where('pasillo', '!=', '')->distinct()->pluck('pasillo');
         $pasillosMant = Aisle::orderBy('name')->pluck('name');

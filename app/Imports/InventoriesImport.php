@@ -141,7 +141,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             'estante' => trim((string) ($row['estante'] ?? '')) ?: null,
             'nivel' => trim((string) ($row['nivel'] ?? '')) ?: null,
             'posicion' => trim((string) ($row['posicion'] ?? '')) ?: null,
-            'programa' => trim((string) ($row['programa'] ?? '')) ?: null,
+            'programa' => trim((string) ($row['programa'] ?? ($row['programa_ministerial'] ?? ($row['programas'] ?? '')))) ?: null,
         ]);
 
         InventoryService::registrarMovimiento($batch, [

@@ -75,8 +75,12 @@
         <tr>
             <td class="logo-container">
                 <div>
-                    @if(file_exists(public_path('images/favicon4.png')))
-                        <img src="{{ public_path('images/favicon4.png') }}" class="logo-icon" alt="Logo">
+                    @php
+                        $logoPath = public_path('images/favicon4.png');
+                        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+                    @endphp
+                    @if($logoBase64)
+                        <img src="{{ $logoBase64 }}" class="logo-icon" alt="Logo">
                     @endif
                     <div style="display: inline-block; vertical-align: middle;">
                         <h2 class="logo-title">DROGUERÍA COMUNAL DAS</h2>

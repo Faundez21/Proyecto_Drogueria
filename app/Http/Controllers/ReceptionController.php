@@ -27,19 +27,55 @@ class ReceptionController extends Controller
             Product::firstOrCreate(['nombre' => $ctrlNombre]);
         }
 
+        // Sincronizar productos que hayan ingresado por Carga Masiva o Inventario Directo
+        $productosEnInventario = Inventory::whereNotNull('producto')
+            ->where('producto', '!=', '')
+            ->distinct()
+            ->pluck('producto');
+
+        foreach ($productosEnInventario as $prodInvNombre) {
+            Product::firstOrCreate(['nombre' => trim($prodInvNombre)]);
+        }
+
         $providers = Provider::where('status', 'activo')->orderBy('name')->get();
         $products = Product::orderBy('nombre')->get();
 
         $categoriasInv = Inventory::select('producto', 'categoria')
             ->whereNotNull('categoria')
             ->where('categoria', '!=', '')
+            ->orderBy('id', 'asc')
             ->get()
             ->pluck('categoria', 'producto');
+
+        $programasInv = Inventory::select('producto', 'programa')
+            ->whereNotNull('programa')
+            ->where('programa', '!=', '')
+            ->orderBy('id', 'asc')
+            ->get()
+            ->pluck('programa', 'producto');
 
         foreach ($products as $prod) {
             $catHist = $categoriasInv[$prod->nombre] ?? null;
             $prod->grupo_recepcion = InventoryService::clasificarGrupoProducto($prod->nombre, $catHist);
+            $prod->programa_sugerido = $programasInv[$prod->nombre] ?? '';
+            $prod->categoria_sugerida = $catHist ?? '';
         }
+
+        // Programas base + todos los programas existentes en Inventario y Carga Masiva
+        $programasBase = collect([
+            'Morbilidad General',
+            'Fondo de Farmacia (FOFAR)',
+            'Cardiovascular',
+            'IRA/ERA',
+            'Salud Mental',
+        ]);
+        $programasEnBD = Inventory::whereNotNull('programa')
+            ->where('programa', '!=', '')
+            ->distinct()
+            ->pluck('programa')
+            ->map(fn ($p) => trim((string) $p))
+            ->filter();
+        $programasLista = $programasBase->merge($programasEnBD)->unique()->values();
 
         $productosAgrupados = [
             'Medicamentos' => $products->where('grupo_recepcion', 'Medicamentos')->values(),
@@ -48,6 +84,23 @@ class ReceptionController extends Controller
         ];
 
         $receptions = Reception::with(['provider', 'items.product'])->orderBy('created_at', 'desc')->get();
+
+        // Asociar el programa registrado en inventario a cada ítem de recepción para el historial
+        $invPorRecepcion = Inventory::whereNotNull('reception_id')
+            ->whereNotNull('programa')
+            ->where('programa', '!=', '')
+            ->get(['reception_id', 'product_id', 'lote', 'programa']);
+
+        foreach ($receptions as $rec) {
+            foreach ($rec->items as $rItem) {
+                $match = $invPorRecepcion->first(function ($inv) use ($rec, $rItem) {
+                    return (int) $inv->reception_id === (int) $rec->id
+                        && (int) $inv->product_id === (int) $rItem->product_id;
+                });
+                $nomProd = $rItem->product?->nombre ?? '';
+                $rItem->setAttribute('programa', $match?->programa ?? ($programasInv[$nomProd] ?? null));
+            }
+        }
         $nextCorrelativo = (int) Reception::max('correlativo') + 1;
         $controlados = InventoryService::controlados();
 
@@ -88,6 +141,7 @@ class ReceptionController extends Controller
             'receptions',
             'products',
             'productosAgrupados',
+            'programasLista',
             'nextCorrelativo',
             'controlados',
             'pasillosLista',
@@ -269,6 +323,7 @@ class ReceptionController extends Controller
                     'vencimiento' => !empty($fechaVence) ? date('d/m/Y', strtotime($fechaVence)) : 'N/A',
                     'cantidad' => (int) $cantidad,
                     'tipo' => $categoriaInventario,
+                    'programa' => !empty($validated['programa'][$index]) ? trim($validated['programa'][$index]) : ($batch->programa ?: 'Sin programa'),
                     'subtotal_iva' => $subtotalIva,
                     'ubicacion' => $ubicacionTexto,
                 ];
