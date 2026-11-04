@@ -132,11 +132,11 @@
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
                         <select name="categoria" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                             <option value="">Todas</option>
-                            <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
-                            <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
-                            @if(auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado'))
-                                <option value="Fármacos Controlados" {{ request('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>Fármacos Controlados</option>
-                            @endif
+                            @foreach($categoriasLista ?? ['Fármacos', 'Insumos Clínicos'] as $catItem)
+                                @if($catItem !== 'Fármacos Controlados' || auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado'))
+                                    <option value="{{ $catItem }}" {{ request('categoria') == $catItem ? 'selected' : '' }}>{{ $catItem }}</option>
+                                @endif
+                            @endforeach
                         </select>
                     </div>
 
@@ -324,6 +324,8 @@
 
                                                                     $pasilloVal = data_get($loteData, 'pasillo_nombre') ?? data_get($loteData, 'aisle.nombre') ?? data_get($loteData, 'pasillo') ?? 'P.A';
                                                                     $estanteVal = data_get($loteData, 'estanteria_nombre') ?? data_get($loteData, 'shelf.nombre') ?? data_get($loteData, 'estante') ?? 'P.A';
+                                                                    $nivelVal = data_get($loteData, 'nivel') ?? '';
+                                                                    $posicionVal = data_get($loteData, 'posicion') ?? '';
                                                                     $stockLote = data_get($loteData, 'stock_total') ?? data_get($loteData, 'cantidad') ?? 0;
                                                                     $loteId = data_get($loteData, 'id') ?? 0;
                                                                     $loteCodigo = data_get($loteData, 'lote') ?? 'S/L';
@@ -339,7 +341,7 @@
                                                                         <span class="text-[10px] uppercase font-semibold {{ $badgeVencimientoClass }}">Vence: {{ $textoVencimiento }}</span>
                                                                     </td>
                                                                     <td class="px-4 py-3">
-                                                                        <div class="flex items-center gap-1.5 text-[11px]">
+                                                                        <div class="flex items-center gap-1.5 text-[11px] flex-wrap">
                                                                             <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">P:</span> <b class="text-slate-800">{{ $pasilloVal }}</b></span>
                                                                             @can('ver.distribucion')
                                                                                 @if (!empty($estanteVal) && $estanteVal !== 'P.A')
@@ -353,6 +355,12 @@
                                                                             @else
                                                                                 <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">E:</span> <b class="text-slate-800">{{ $estanteVal }}</b></span>
                                                                             @endcan
+                                                                            @if(!empty($nivelVal) && $nivelVal !== 'P.A')
+                                                                                <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">N:</span> <b class="text-slate-800">{{ $nivelVal }}</b></span>
+                                                                            @endif
+                                                                            @if(!empty($posicionVal) && $posicionVal !== 'P.A')
+                                                                                <span class="bg-white text-slate-600 px-2 py-1 rounded shadow-sm border border-slate-200"><span class="text-slate-400">Pos:</span> <b class="text-slate-800">{{ $posicionVal }}</b></span>
+                                                                            @endif
                                                                         </div>
                                                                     </td>
                                                                     <td class="px-4 py-3">
@@ -371,7 +379,7 @@
                                                                         <button type="button" onclick="openQRModal('{{ addslashes($loteId) }}', '{{ addslashes($nombreProducto) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($textoVencimiento) }}', '{{ $stockLote }}', 'Droguería DAS')" class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Generar Etiqueta QR">
                                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                                                         </button>
-                                                                        <button type="button" onclick="openEditLote('{{ addslashes($loteId) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($nombreProducto) }}', 'Cuarentena', '{{ addslashes($loteMotivo) }}', '{{ addslashes($loteCategoria) }}', '{{ addslashes($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}')" class="p-1.5 text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded-lg transition-all border border-amber-200 shadow-sm cursor-pointer" title="Cambiar Estado (Liberar / Merma)">
+                                                                        <button type="button" onclick="openEditLote('{{ addslashes($loteId) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($nombreProducto) }}', 'Cuarentena', '{{ addslashes($loteMotivo) }}', '{{ addslashes($loteCategoria) }}', '{{ addslashes($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}', '{{ addslashes($pasilloVal) }}', '{{ addslashes($estanteVal) }}', '{{ addslashes($nivelVal) }}', '{{ addslashes($posicionVal) }}')" class="p-1.5 text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded-lg transition-all border border-amber-200 shadow-sm cursor-pointer" title="Cambiar Estado / Ubicación">
                                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                                         </button>
                                                                     </td>
@@ -439,8 +447,8 @@
                         <h2 class="text-[17px] text-black font-black tracking-widest uppercase">DROGUERÍA DAS</h2>
                         <span class="text-[11px] text-black font-bold font-mono tracking-widest uppercase mt-0.5">Control de Trazabilidad</span>
                     </div>
-                    <div class="bg-white p-2 mb-4 z-10 flex justify-center w-full">
-                        <img id="qrcode" alt="Código QR del lote" class="w-[140px] h-[140px]">
+                    <div class="p-2 mb-4 z-10 flex justify-center w-full" style="background-color: #ffffff !important;">
+                        <img id="qrcode" alt="Código QR del lote" class="w-[140px] h-[140px] rounded-lg" style="background-color: #ffffff !important;">
                     </div>
                     <div class="w-full z-10 space-y-2.5 px-2">
                         <div class="text-center mb-4"><span id="qrProducto" class="text-[14px] font-black text-black block leading-tight uppercase">PRODUCTO</span></div>
@@ -507,6 +515,49 @@
                                 <option value="Disponible">🟢 Liberar (Aprobar y regresar a Disponible)</option>
                                 <option value="Merma">🔴 Declarar Merma (Desecho / Rechazo)</option>
                             </select>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2.5">
+                            <span class="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider block">Ubicación Física en Bodega (Distribución)</span>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Pasillo</label>
+                                    <select id="modal_edit_pasillo" name="pasillo" onchange="onModalEditUbicacionChange('pasillo')" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-[12px] font-semibold text-slate-700 outline-none focus:border-amber-500">
+                                        <option value="">P.A</option>
+                                        @foreach($pasillosLista ?? [] as $pItem)
+                                            <option value="{{ $pItem }}">{{ $pItem }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Estante</label>
+                                    <select id="modal_edit_estante" name="estante" onchange="onModalEditUbicacionChange('estante')" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-[12px] font-semibold text-slate-700 outline-none focus:border-amber-500">
+                                        <option value="">P.A</option>
+                                        @foreach($estantesLista ?? [] as $eItem)
+                                            <option value="{{ $eItem }}">{{ $eItem }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nivel</label>
+                                    <select id="modal_edit_nivel" name="nivel" onchange="onModalEditUbicacionChange('nivel')" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-[12px] font-semibold text-slate-700 outline-none focus:border-amber-500">
+                                        <option value="">S/N</option>
+                                        @foreach($nivelesLista ?? [] as $nItem)
+                                            <option value="{{ $nItem }}">{{ $nItem }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Posición</label>
+                                    <select id="modal_edit_posicion" name="posicion" onchange="onModalEditUbicacionChange('posicion')" class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-[12px] font-semibold text-slate-700 outline-none focus:border-amber-500">
+                                        <option value="">S/P</option>
+                                        @foreach($posicionesLista ?? [] as $posItem)
+                                            <option value="{{ $posItem }}">{{ $posItem }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="modal_edit_ubicacion_status" class="hidden"></div>
                         </div>
 
                         <div id="motivoContainer">
@@ -855,10 +906,55 @@
             }
         }
 
-        // Modales (Edición Lote)
-        function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0) {
+        // Datos de jerarquía y ocupación de bodega para LoteStatus.Ubicacion
+        window.distribucionJerarquia = @json($distribucionJerarquia ?? []);
+        window.ubicacionesOcupadas = @json($ubicacionesOcupadas ?? []);
+        window.todosLosPasillos = @json(collect($pasillosLista ?? [])->values());
+        window.todosLosEstantes = @json(collect($estantesLista ?? [])->values());
+        window.todosLosNiveles = @json(collect($nivelesLista ?? [])->values());
+        window.todosLasPosiciones = @json(collect($posicionesLista ?? [])->values());
+
+        function obtenerConfigModalEditUbicacion() {
             const form = document.getElementById('editLoteForm');
-            if (form) form.action = "/inventory/" + id;
+            return {
+                selectPasillo: document.getElementById('modal_edit_pasillo'),
+                selectEstante: document.getElementById('modal_edit_estante'),
+                selectNivel: document.getElementById('modal_edit_nivel'),
+                selectPosicion: document.getElementById('modal_edit_posicion'),
+                statusEl: document.getElementById('modal_edit_ubicacion_status'),
+                ignoreLoteId: form?.dataset?.loteId ? parseInt(form.dataset.loteId, 10) : null,
+                producto: document.getElementById('modal_producto_nombre')?.textContent?.trim() || '',
+                lote: (document.getElementById('modal_lote_nombre')?.textContent || '').replace(/^LOTE:\s*/i, '').trim(),
+                initialUbicacion: {
+                    pasillo: form?.dataset?.initialPasillo || '',
+                    estante: form?.dataset?.initialEstante || '',
+                    nivel: form?.dataset?.initialNivel || '',
+                    posicion: form?.dataset?.initialPosicion || '',
+                },
+            };
+        }
+
+        function onModalEditUbicacionChange(trigger) {
+            if (!window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), trigger, false);
+        }
+
+        // Modales (Edición Lote)
+        function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0, pasillo = '', estante = '', nivel = '', posicion = '') {
+            const form = document.getElementById('editLoteForm');
+            const pasClean = (pasillo && pasillo !== 'P.A') ? pasillo : '';
+            const estClean = (estante && estante !== 'P.A') ? estante : '';
+            const nivClean = window.LoteStatus?.Ubicacion ? window.LoteStatus.Ubicacion.normNivel(nivel) : ((nivel && nivel !== 'P.A') ? nivel : '');
+            const posClean = window.LoteStatus?.Ubicacion ? window.LoteStatus.Ubicacion.normPos(posicion) : ((posicion && posicion !== 'P.A') ? posicion : '');
+
+            if (form) {
+                form.action = "/inventory/" + id;
+                form.dataset.loteId = id;
+                form.dataset.initialPasillo = pasClean;
+                form.dataset.initialEstante = estClean;
+                form.dataset.initialNivel = nivClean;
+                form.dataset.initialPosicion = posClean;
+            }
 
             setText('modal_producto_nombre', producto);
             setText('modal_lote_nombre', "LOTE: " + lote);
@@ -896,6 +992,24 @@
             const motivoInput = document.getElementById('modal_motivo');
             if (motivoInput) motivoInput.value = motivo;
 
+            const selPasillo = document.getElementById('modal_edit_pasillo');
+            const selEstante = document.getElementById('modal_edit_estante');
+            const selNivel = document.getElementById('modal_edit_nivel');
+            const selPosicion = document.getElementById('modal_edit_posicion');
+
+            if (selPasillo) selPasillo.value = pasClean;
+            if (selEstante) selEstante.value = estClean;
+            if (selNivel) selNivel.value = nivClean;
+            if (selPosicion) selPosicion.value = posClean;
+
+            if (window.LoteStatus?.Ubicacion) {
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), 'init', true);
+                if (selNivel && nivClean) selNivel.value = nivClean;
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), 'init', true);
+                if (selPosicion && posClean) selPosicion.value = posClean;
+                window.LoteStatus.Ubicacion.actualizarIndicadorVisual(obtenerConfigModalEditUbicacion());
+            }
+
             toggleMotivoField(selectedVal);
             document.getElementById('editLoteModal').classList.remove('hidden');
         }
@@ -911,78 +1025,14 @@
             else motivoInput.placeholder = "Justificación para mantener inmovilizado...";
         }
 
+        /**
+         * Escenario CUARENTENA: bloqueo preventivo / control técnico / liberación,
+         * con confirmación previa, envío AJAX y SweetAlert2 de éxito.
+         * Si la decisión es "Merma", delega en LoteStatus.Merma.
+         * Lógica en: public/js/lotes/lote-status.js
+         */
         function confirmDecisionCuarentena(event) {
-            event.preventDefault();
-            const form = document.getElementById('editLoteForm');
-            const estado = document.getElementById('modal_estado')?.value;
-            const motivo = (document.getElementById('modal_motivo')?.value || '').trim();
-            const prod = document.getElementById('modal_producto_nombre')?.textContent || 'Producto';
-            const loteRaw = document.getElementById('modal_lote_nombre')?.textContent || '';
-            const lote = loteRaw.replace(/^LOTE:\s*/i, '').trim();
-
-            if (!motivo) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Motivo requerido',
-                    text: 'Debes indicar la justificación u observación correspondiente.',
-                    confirmButtonColor: '#f59e0b'
-                });
-                document.getElementById('modal_motivo')?.focus();
-                return false;
-            }
-
-            if (estado === 'Disponible') {
-                Swal.fire({
-                    title: '¿Liberar lote a Disponible?',
-                    html: `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) será aprobado y reincorporado al inventario <strong>Disponible</strong> para despacho.`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#059669',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, liberar lote',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        closeEditLote();
-                        form.submit();
-                    }
-                });
-            } else if (estado === 'Merma') {
-                Swal.fire({
-                    title: '¿Declarar Merma sanitaria?',
-                    html: `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) será declarado como <strong>Merma</strong> y dado de baja definitiva del inventario. Esta acción no se puede deshacer.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#e11d48',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, declarar merma',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        closeEditLote();
-                        form.submit();
-                    }
-                });
-            } else {
-                Swal.fire({
-                    title: '¿Mantener en Cuarentena?',
-                    html: `Se actualizará la justificación del lote <strong>${lote}</strong> de <strong>${prod}</strong> manteniéndolo inmovilizado en Cuarentena.`,
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d97706',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, guardar estado',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        closeEditLote();
-                        form.submit();
-                    }
-                });
-            }
+            LoteStatus.Cuarentena.onSubmit(event);
             return false;
         }
 

@@ -106,7 +106,7 @@
                     recetas cheque. Solo solicitudes de CESFAM.</p>
             </div>
             <button type="button" onclick="openSolicitudesControlado()"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition-all duration-200 cursor-pointer">
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition-all duration-200 cursor-pointer">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4"></path>
@@ -128,6 +128,23 @@
         <form action="{{ route('controlled_dispatch.store') }}" method="POST" id="despachoControladoForm">
             @csrf
             <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
+
+            <!-- Banner informativo cuando se carga una solicitud -->
+            <div id="banner_solicitud_activa" class="hidden mx-6 mt-5 p-4 bg-rose-50 border border-rose-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        SOL
+                    </div>
+                    <div>
+                        <p id="banner_solicitud_titulo" class="text-[13px] font-extrabold text-rose-900"></p>
+                        <p id="banner_solicitud_subtitulo" class="text-[11.5px] text-rose-700"></p>
+                    </div>
+                </div>
+                <button type="button" onclick="desvincularSolicitudActivaControlado()"
+                    class="text-[11.5px] font-bold text-rose-800 hover:text-rose-900 bg-white px-3 py-1.5 rounded-lg border border-rose-200 transition-colors cursor-pointer shrink-0">
+                    Desvincular solicitud
+                </button>
+            </div>
 
             <!-- seccion de datos del remitente y correlativo -->
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
@@ -270,14 +287,13 @@
 
                     <div class="flex items-center gap-2.5">
                         <button type="button" onclick="openScanner()"
-                            class="px-3.5 py-2 bg-gradient-to-r from-rose-600 to-rose-700 text-white rounded-xl text-[12px] font-bold hover:from-rose-700 hover:to-rose-800 transition-all flex items-center gap-2 shadow-sm hover:shadow cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M3 5a2 2 0 012-2h2m4 0h2m4 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-4 0h-2m-4 0H5a2 2 0 01-2-2v-2m4-10h2v2H7V7zm8 0h2v2h-2V7zM7 15h2v2H7v-2zm8-2h2v4h-2v-4zm-4-2h2v2h-2v-2z">
-                                </path>
+                            class="px-3.5 py-2 text-white bg-rose-600 hover:bg-rose-700 rounded-xl text-[12px] font-bold shadow-sm hover:shadow transition-all flex items-center gap-2 cursor-pointer"
+                            style="background-color: #e11d48 !important; color: #ffffff !important;">
+                            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
                             </svg>
-                            Escanear QR
+                            <span>Escanear QR</span>
                         </button>
                         <button type="button" onclick="addRow()"
                             class="px-3.5 py-2 bg-white text-slate-700 hover:text-rose-700 border border-slate-300 hover:border-rose-400 rounded-xl text-[12px] font-bold hover:bg-rose-50/40 transition-colors flex items-center gap-2 shadow-xs cursor-pointer">
@@ -386,7 +402,8 @@
                     <option value="" disabled selected>Seleccione estupefaciente...</option>
                     @foreach ($inventarioDisponible as $inv)
                         <option value="{{ $inv->producto }}" data-lote="{{ $inv->lote ?? 'S/L' }}"
-                            data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $inv->cantidad ?? 0 }}">
+                            data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $inv->cantidad ?? 0 }}"
+                            data-programa="{{ $inv->programa ?? '' }}">
                             {{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})
                         </option>
                     @endforeach
@@ -404,10 +421,9 @@
             <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="programas[]" required
                     class="w-full bg-white border border-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
-                    <option value="Morbilidad General" selected>Morbilidad General</option>
-                    <option value="Cardiovascular">Cardiovascular</option>
-                    <option value="Salud Mental">Salud Mental</option>
-                    <option value="Paliativos">Cuidados Paliativos</option>
+                    @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental', 'Cuidados Paliativos'] as $idxProg => $progOpt)
+                        <option value="{{ $progOpt }}" {{ $idxProg === 0 ? 'selected' : '' }}>{{ $progOpt }}</option>
+                    @endforeach
                 </select>
             </td>
             <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
@@ -684,34 +700,80 @@
             </div>
         </div>
     </div>
-
-    <!-- AQUÍ ESTÁ LA SOLUCIÓN: VENTANA MODAL PARA EL ESCÁNER QR -->
-    <div id="scannerModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
-            <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
-                <div>
-                    <h2 class="text-xl font-bold text-white tracking-wide">Escanear Etiqueta QR</h2>
-                    <p class="text-[12px] text-slate-300 mt-1 uppercase tracking-wider font-semibold">Acerque el código a
-                        la cámara</p>
+    <!-- MODAL DE ESCÁNER QR DE DESPACHO CONTROLADO (ESTILO DASHBOARD) -->
+    <div id="scannerModal" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
+        <div class="flex min-h-full items-center justify-center">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
+                <!-- Header limpio con acento institucional -->
+                <div class="px-5 py-4 bg-slate-800 text-white flex justify-between items-center shrink-0 border-b border-slate-700">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-rose-500/20 border border-rose-400/30 text-rose-300 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-[15px] font-bold text-white tracking-wide leading-tight">
+                                Escanear Etiqueta QR
+                            </h2>
+                            <p class="text-[11px] text-rose-300 font-medium">Validación automática de Stock</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeScanner()" class="text-slate-400 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-lg cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
-                <button type="button" onclick="closeScanner()"
-                    class="text-slate-400 hover:text-white transition-colors bg-white/10 p-2 rounded-lg cursor-pointer">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-            <div class="p-6 bg-slate-50 flex items-center justify-center">
-                <!-- CONTENEDOR 'reader' DONDE HTML5-QRCODE INYECTA LA CÁMARA -->
-                <div id="reader"
-                    class="w-full rounded-lg overflow-hidden border-2 border-dashed border-rose-300 bg-white"></div>
-            </div>
-            <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end">
-                <button type="button" onclick="closeScanner()"
-                    class="px-6 py-2.5 bg-rose-600 text-white hover:bg-rose-700 rounded-xl transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar
-                    Escaneo</button>
+
+                <!-- Visor de Cámara adaptado a Modo Claro / Oscuro -->
+                <div class="p-4 sm:p-5 flex flex-col items-center bg-slate-50/70 overflow-y-auto flex-1">
+                    <div class="relative w-full max-w-[300px] sm:max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-black border-2 border-slate-300 shadow-md flex items-center justify-center" id="scannerVisualContainer">
+                        <!-- Elemento nativo de feed de cámara -->
+                        <div id="reader-feed" class="w-full h-full object-cover"></div>
+
+                        <!-- HUD Overlay: 4 esquinas nítidas + línea láser en tono rose -->
+                        <div class="pointer-events-none absolute inset-5 flex items-center justify-center" id="scannerHudOverlay">
+                            <div class="absolute top-0 left-0 w-5 h-5 border-t-[3px] border-l-[3px] border-rose-400 rounded-tl-md"></div>
+                            <div class="absolute top-0 right-0 w-5 h-5 border-t-[3px] border-r-[3px] border-rose-400 rounded-tr-md"></div>
+                            <div class="absolute bottom-0 left-0 w-5 h-5 border-b-[3px] border-l-[3px] border-rose-400 rounded-bl-md"></div>
+                            <div class="absolute bottom-0 right-0 w-5 h-5 border-b-[3px] border-r-[3px] border-rose-400 rounded-br-md"></div>
+
+                            <div class="scan-laser-bar-rose"></div>
+                        </div>
+
+                        <!-- Mensaje de estado mientras conecta la cámara -->
+                        <div id="scannerLoadingState" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center z-10 transition-opacity">
+                            <div class="w-8 h-8 border-3 border-rose-400 border-t-transparent rounded-full animate-spin mb-2.5"></div>
+                            <p class="text-[13px] font-bold text-white">Iniciando sensor de cámara...</p>
+                            <p class="text-[11px] text-slate-300 mt-0.5">Conceda permiso de acceso a la cámara en el navegador.</p>
+                        </div>
+                    </div>
+
+                    <!-- Barra de control y estado -->
+                    <div class="w-full max-w-[300px] sm:max-w-[320px] flex items-center justify-between mt-3.5 px-0.5">
+                        <div class="flex items-center gap-2 text-[12px] text-slate-600 font-medium">
+                            <span class="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                            <span id="scannerStatusTxt">Buscando código QR...</span>
+                        </div>
+
+                        <!-- Botón para alternar cámaras si hay más de una -->
+                        <button type="button" id="btnSwitchCamera" onclick="switchScannerCamera()"
+                            class="hidden px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold border border-slate-300 transition-colors items-center gap-1.5 cursor-pointer shadow-2xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Cambiar Cámara
+                        </button>
+                    </div>
+
+                    <p class="text-[11.5px] text-slate-500 mt-3 text-center leading-relaxed max-w-sm">
+                        Apunte la cámara a la etiqueta del producto controlado. El sistema leerá el Lote, seleccionará el estupefaciente en la tabla y validará el stock.
+                    </p>
+                </div>
+
+                <!-- Footer modal -->
+                <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
+                    <button type="button" onclick="closeScanner()" class="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-[12.5px] font-bold shadow-xs transition-colors cursor-pointer">
+                        Cancelar Escaneo
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -797,7 +859,7 @@
                                         <span class="font-mono font-extrabold text-[13px] text-slate-900">{{ $solicitud->numero_solicitud }}</span>
                                         <span class="text-[13.5px] font-extrabold text-slate-800">{{ $solicitud->establecimiento }}</span>
                                         @if ($itemsNormal->isNotEmpty())
-                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-gradient-to-r from-teal-50 to-rose-50 text-rose-800 border border-rose-200" title="Contiene también productos normales">
+                                            <span class="das-badge-mixta-rose inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-gradient-to-r from-teal-50 to-rose-50 text-rose-800 border border-rose-200" title="Contiene también productos normales">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                                 Mixta (+{{ $itemsNormal->count() }} normales)
                                             </span>
@@ -931,7 +993,7 @@
         const esControladoJS = (nombre) => @json($controlados).some(c => c.toLowerCase() === String(nombre ?? '')
             .trim().toLowerCase());
 
-        // ===== SOLICITUDES (ESTUPEFACIENTES) =====
+        //  SOLICITUDES (ESTUPEFACIENTES) 
         function openSolicitudesControlado() {
             filtrarSolicitudesControladoModal();
             document.getElementById('SolicitudesControladoModal').classList.remove('hidden');
@@ -1047,13 +1109,33 @@
             }
         }
 
+        function desvincularSolicitudActivaControlado() {
+            const requestInput = document.getElementById('establishment_request_id');
+            if (requestInput) requestInput.value = '';
+            const banner = document.getElementById('banner_solicitud_activa');
+            if (banner) banner.classList.add('hidden');
+        }
+
         function usarSolicitudControlado(id) {
             const solicitud = solicitudesControlado.find(s => s.id === id);
             if (!solicitud) return;
 
+            // Helper de normalización para matching insensible a mayúsculas, tildes y símbolos
+            const normText = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+
             // marcar la solicitud de origen
             const requestInput = document.getElementById('establishment_request_id');
             if (requestInput) requestInput.value = solicitud.id;
+
+            // actualizar banner informativo
+            const banner = document.getElementById('banner_solicitud_activa');
+            const bannerTitulo = document.getElementById('banner_solicitud_titulo');
+            const bannerSubtitulo = document.getElementById('banner_solicitud_subtitulo');
+            if (banner && bannerTitulo && bannerSubtitulo) {
+                bannerTitulo.textContent = `Atendiendo Solicitud ${solicitud.numero_solicitud} — ${solicitud.establecimiento}`;
+                bannerSubtitulo.textContent = `Solicitante: ${solicitud.responsable || 'N/A'} · Estado actual: ${solicitud.estado} · Al confirmar el despacho se actualizará el estado automáticamente.`;
+                banner.classList.remove('hidden');
+            }
 
             // clasificacion interna + establecimiento (matching insensible a mayusculas)
             const clasificacion = document.getElementById('clasificacion_select');
@@ -1061,19 +1143,38 @@
             toggleClasificacion();
 
             const selectEst = document.getElementById('establecimiento_interno');
-            const objetivo = (solicitud.establecimiento ?? '').trim().toLowerCase();
-            const opcionEst = Array.from(selectEst.options).find(op => {
-                const val = op.value.trim().toLowerCase();
-                return val === objetivo || (objetivo && (val.includes(objetivo) || objetivo.includes(val)));
+            const objetivoNorm = normText(solicitud.establecimiento);
+            let opcionEst = Array.from(selectEst.options).find(op => {
+                const valNorm = normText(op.value);
+                return valNorm === objetivoNorm;
             });
+
+            if (!opcionEst) {
+                opcionEst = Array.from(selectEst.options).find(op => {
+                    const valNorm = normText(op.value);
+                    return valNorm && objetivoNorm && (valNorm.includes(objetivoNorm) || objetivoNorm.includes(valNorm));
+                });
+            }
+
             if (opcionEst) {
                 selectEst.value = opcionEst.value;
                 actualizarDireccionInterna();
+            } else if (solicitud.establecimiento) {
+                const selectClasif = document.getElementById('clasificacion_select');
+                if (selectClasif) {
+                    selectClasif.value = 'Externo';
+                    toggleClasificacion();
+                    const inputExt = document.getElementById('establecimiento_externo');
+                    if (inputExt) inputExt.value = solicitud.establecimiento;
+                }
             }
 
-            // condiciones de transporte
+            // condiciones de transporte / observaciones
             const condiciones = document.querySelector('input[name="condiciones_transporte"]');
-            if (condiciones) condiciones.value = solicitud.observaciones ?? '';
+            if (condiciones) {
+                const refTexto = `Ref: Solicitud ${solicitud.numero_solicitud}${solicitud.responsable ? ' (' + solicitud.responsable + ')' : ''}`;
+                condiciones.value = solicitud.observaciones ? `${solicitud.observaciones} - ${refTexto}` : refTexto;
+            }
 
             // limpiar filas actuales
             while (tbody.children.length > 0) tbody.children[0].remove();
@@ -1081,9 +1182,9 @@
             let normales = [];
             let sinStock = [];
 
-            solicitud.items.forEach(item => {
-                const nombreItem = item.product.nombre ?? ('Producto #' + item.product_id);
-                const pendiente = Math.max(0, item.cantidad_solicitada - (item.cantidad_despachada ?? 0));
+            (solicitud.items || []).forEach(item => {
+                const nombreItem = item.product?.nombre ?? ('Producto #' + item.product_id);
+                const pendiente = Math.max(0, (parseInt(item.cantidad_solicitada) || 0) - (parseInt(item.cantidad_despachada) || 0));
 
                 if (pendiente <= 0) return;
 
@@ -1094,20 +1195,35 @@
 
                 const tr = addRow();
                 const selectProducto = tr.querySelector('select[name="productos[]"]');
-                const opcion = Array.from(selectProducto.options).find(op => op.value.trim().toLowerCase() ===
-                    nombreItem.trim().toLowerCase());
+                const itemNorm = normText(nombreItem);
+
+                let opcion = Array.from(selectProducto.options).find(op =>
+                    normText(op.value) === itemNorm
+                );
+
+                if (!opcion) {
+                    opcion = Array.from(selectProducto.options).find(op => {
+                        const optNorm = normText(op.value);
+                        return optNorm && itemNorm && (optNorm.includes(itemNorm) || itemNorm.includes(optNorm));
+                    });
+                }
 
                 if (opcion) {
                     selectProducto.value = opcion.value;
                     llenarDatosFila(selectProducto);
                     const selectPrograma = tr.querySelector('select[name="programas[]"]');
                     if (selectPrograma && item.programa) {
-                        const optProg = Array.from(selectPrograma.options).find(o => o.value.trim().toLowerCase() === String(item.programa).trim().toLowerCase());
+                        const progNorm = normText(item.programa);
+                        const optProg = Array.from(selectPrograma.options).find(o =>
+                            normText(o.value) === progNorm || normText(o.text) === progNorm
+                        );
                         if (optProg) selectPrograma.value = optProg.value;
                     }
                     const cantInput = tr.querySelector('input[name="cantidades[]"]');
-                    cantInput.value = pendiente;
-                    validarStock(cantInput);
+                    if (cantInput) {
+                        cantInput.value = pendiente;
+                        validarStock(cantInput);
+                    }
                 } else {
                     tr.remove();
                     sinStock.push(nombreItem);
@@ -1132,14 +1248,50 @@
 
             closeSolicitudesControlado();
 
+            // Notificación toast de éxito al cargar
+            if (typeof Swal !== 'undefined' && normales.length === 0 && sinStock.length === 0) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: `Solicitud ${solicitud.numero_solicitud} cargada`,
+                    text: 'Se completaron los datos del establecimiento y fármacos controlados solicitados.',
+                    showConfirmButton: false,
+                    timer: 3500,
+                    timerProgressBar: true
+                });
+            }
+
             if (normales.length > 0) {
                 Swal.fire({
                     icon: 'info',
-                    title: 'Medicamentos -> Despacho Normal',
-                    html: 'Los siguientes productos de la solicitud <b>' + (solicitud.numero_solicitud ?? '') +
-                        '</b> NO son estupefacientes y deben despacharse por el módulo <b>Despacho Normal</b>:<br><br><b>' +
-                        normales.join('<br>') + '</b>',
-                    confirmButtonColor: '#be123c'
+                    title: 'Solicitud Mixta: Medicamentos Normales',
+                    html: `
+                        <div class="das-swal-container text-left text-xs">
+                            <div class="das-swal-mixed-banner das-swal-mixed-banner-teal p-3.5 bg-gradient-to-r from-teal-50 to-amber-50 border border-teal-300 rounded-xl flex items-start gap-3">
+                                <div class="das-swal-mixed-icon das-swal-mixed-icon-teal w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 font-extrabold text-sm">!</div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="das-swal-mixed-title font-bold text-teal-950 text-[13px]">
+                                        Solicitud ${solicitud.numero_solicitud ?? ''} contiene Productos Normales
+                                    </p>
+                                    <p class="das-swal-mixed-text text-slate-600 text-[11.5px] mt-1 leading-relaxed">
+                                        Se cargaron los fármacos controlados en este formulario. Los siguientes productos NO son estupefacientes y deben despacharse por el módulo <strong>Despacho Normal</strong>:
+                                    </p>
+                                    <ul class="das-swal-pill-list mt-2.5 space-y-1.5">
+                                        ${normales.map(prod => `
+                                            <li class="das-swal-pill-item das-swal-pill-item-teal flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11.5px] font-bold">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+                                                <span>${prod}</span>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonColor: '#be123c',
+                    confirmButtonText: 'Entendido, continuar despacho controlado',
+                    width: '540px'
                 });
             } else if (sinStock.length > 0) {
                 Swal.fire({
@@ -1184,36 +1336,36 @@
 
             function showControlledDispatchSuccessModal(ctrlData) {
                 const htmlDetail = `
-                    <div class="text-left text-xs text-slate-700">
-                        <div class="p-3 bg-rose-50/80 border border-rose-200 rounded-xl mb-3 space-y-1.5">
-                            <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-rose-200">
-                                <span class="font-bold text-rose-950 text-sm">Guía Controlada N° ${ctrlData.correlativo}</span>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300">FÁRMACOS CONTROLADOS</span>
+                    <div class="das-swal-container text-left text-xs text-slate-700">
+                        <div class="das-swal-summary das-swal-summary-rose p-3.5 bg-rose-50/80 border border-rose-200 rounded-xl mb-3.5 space-y-1.5">
+                            <div class="das-swal-summary-header flex items-center justify-between pb-2 mb-2 border-b border-rose-200">
+                                <span class="das-swal-summary-title font-bold text-rose-950 text-sm">Guía Controlada N° ${ctrlData.correlativo}</span>
+                                <span class="das-swal-badge-rose px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300">FÁRMACOS CONTROLADOS</span>
                             </div>
-                            <p><strong>Destino:</strong> ${ctrlData.destino}</p>
-                            <p><strong>Clasificación:</strong> ${ctrlData.clasificacion}</p>
-                            <p><strong>Fecha de Emisión:</strong> ${ctrlData.fecha}</p>
-                            ${ctrlData.series_recetas ? `<p><strong>Series Recetas:</strong> ${ctrlData.series_recetas}</p>` : ''}
-                            <p><strong>Total Fármacos Controlados:</strong> ${Number(ctrlData.total_unidades || 0).toLocaleString('es-CL')} uds. (${ctrlData.total_items} producto${ctrlData.total_items === 1 ? '' : 's'})</p>
+                            <p class="das-swal-meta"><strong>Destino:</strong> ${ctrlData.destino}</p>
+                            <p class="das-swal-meta"><strong>Clasificación:</strong> ${ctrlData.clasificacion}</p>
+                            <p class="das-swal-meta"><strong>Fecha de Emisión:</strong> ${ctrlData.fecha}</p>
+                            ${ctrlData.series_recetas ? `<p class="das-swal-meta"><strong>Series Recetas:</strong> ${ctrlData.series_recetas}</p>` : ''}
+                            <p class="das-swal-meta"><strong>Total Fármacos Controlados:</strong> ${Number(ctrlData.total_unidades || 0).toLocaleString('es-CL')} uds. (${ctrlData.total_items} producto${ctrlData.total_items === 1 ? '' : 's'})</p>
                         </div>
-                        <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Fármacos Despachados:</p>
-                        <div class="max-h-56 overflow-y-auto border border-rose-200 rounded-lg shadow-inner">
-                            <table class="w-full text-[11.5px] text-left">
+                        <p class="das-swal-section-title font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Fármacos Despachados:</p>
+                        <div class="das-swal-table-wrap max-h-56 overflow-y-auto border border-rose-200 rounded-lg shadow-inner">
+                            <table class="das-swal-table das-swal-table-rose w-full text-[11.5px] text-left">
                                 <thead class="bg-rose-50 text-rose-900 font-bold sticky top-0 border-b border-rose-100">
                                     <tr>
-                                        <th class="p-2">Fármaco Controlado</th>
-                                        <th class="p-2 text-center">Lote FEFO</th>
-                                        <th class="p-2 text-center">Vencimiento</th>
-                                        <th class="p-2 text-right">Cantidad</th>
+                                        <th class="p-2.5">Fármaco Controlado</th>
+                                        <th class="p-2.5 text-center">Lote FEFO</th>
+                                        <th class="p-2.5 text-center">Vencimiento</th>
+                                        <th class="p-2.5 text-right">Cantidad</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-rose-100 bg-white">
                                     ${(ctrlData.items || []).map(it => `
                                         <tr class="hover:bg-rose-50/40">
-                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
-                                            <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
-                                            <td class="p-2 text-center text-slate-600">${it.vencimiento}</td>
-                                            <td class="p-2 text-right font-bold text-rose-700">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
+                                            <td class="p-2.5 font-medium text-slate-800">${it.producto}</td>
+                                            <td class="p-2.5 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
+                                            <td class="p-2.5 text-center text-slate-600">${it.vencimiento}</td>
+                                            <td class="p-2.5 text-right font-bold text-rose-700 das-swal-qty-rose">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -1226,6 +1378,50 @@
                     triggerSilentDownloadControlado(ctrlData.pdf_url);
                 }
 
+                if (ctrlData.tiene_normales_pendientes && ctrlData.url_despacho_normal) {
+                    Swal.fire({
+                        title: '¡Despacho Controlado Emitido!',
+                        html: `
+                            <div class="das-swal-container text-left text-xs text-slate-700">
+                                ${htmlDetail}
+                                <div class="das-swal-mixed-banner das-swal-mixed-banner-teal mt-4 p-3.5 bg-gradient-to-r from-teal-50 to-amber-50 border border-teal-300 rounded-xl flex items-start gap-3 shadow-xs">
+                                    <div class="das-swal-mixed-icon das-swal-mixed-icon-teal w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs font-extrabold text-sm">!</div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="das-swal-mixed-title font-bold text-teal-950 text-[13px]">Solicitud Mixta: Productos Normales Pendientes</p>
+                                        <p class="das-swal-mixed-text text-slate-600 text-[11.5px] mt-1 leading-relaxed">
+                                            Esta solicitud aún tiene <strong>${ctrlData.cant_normales_pendientes} producto(s) normal(es)</strong> pendiente(s) por despachar en el módulo de Despacho Normal.
+                                        </p>
+                                        <p class="das-swal-mixed-cta font-semibold text-[11.5px] mt-1.5">
+                                            ¿Deseas emitir el Despacho Normal ahora mismo?
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        icon: 'info',
+                        showCancelButton: true,
+                        showDenyButton: Boolean(ctrlData.pdf_url),
+                        confirmButtonColor: '#0f766e',
+                        confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg> Ir a Despacho Normal',
+                        denyButtonColor: '#be123c',
+                        denyButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Ver Guía Controlada PDF',
+                        cancelButtonColor: '#475569',
+                        cancelButtonText: 'Dejar para después',
+                        allowOutsideClick: false,
+                        width: '660px'
+                    }).then((res) => {
+                        if (res.isConfirmed) {
+                            window.location.href = ctrlData.url_despacho_normal;
+                        } else if (res.isDenied && ctrlData.pdf_url) {
+                            window.open(ctrlData.pdf_url, '_blank');
+                            window.location.reload();
+                        } else {
+                            window.location.reload();
+                        }
+                    });
+                    return;
+                }
+
                 Swal.fire({
                     title: '¡Despacho Realizado con Éxito!',
                     html: htmlDetail,
@@ -1233,7 +1429,7 @@
                     confirmButtonColor: '#0f766e',
                     confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar',
                     showCancelButton: Boolean(ctrlData.pdf_url),
-                    cancelButtonColor: '#881337',
+                    cancelButtonColor: '#be123c',
                     cancelButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Ver Guía Controlada PDF',
                     reverseButtons: true,
                     allowOutsideClick: false,
@@ -1582,6 +1778,22 @@
             loteInput.value = option.getAttribute('data-lote');
             venceInput.value = option.getAttribute('data-vence');
 
+            const progSugerido = (option.getAttribute('data-programa') || '').trim();
+            const progSelect = tr.querySelector('select[name="programas[]"]');
+            if (progSelect && progSugerido) {
+                let matchedProg = Array.from(progSelect.options).find(
+                    o => o.value && o.value.toLowerCase() === progSugerido.toLowerCase()
+                );
+                if (!matchedProg) {
+                    const newOpt = document.createElement('option');
+                    newOpt.value = progSugerido;
+                    newOpt.textContent = progSugerido;
+                    progSelect.appendChild(newOpt);
+                    matchedProg = newOpt;
+                }
+                progSelect.value = matchedProg.value;
+            }
+
             let stock = parseInt(option.getAttribute('data-stock'));
             cantInput.setAttribute('max', stock);
             stockBadge.textContent = stock;
@@ -1640,9 +1852,27 @@
             }
         }
 
-        let html5QrcodeScanner = null;
+        // Inicialización y control del escáner óptico QR (Mismo motor y estética que Dashboard)
+        let html5QrScanner = null;
+        let availableCameras = [];
+        let currentCameraIndex = 0;
 
-        function openScanner() {
+        function playScannerBeep() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            } catch(e) {}
+        }
+
+        async function openScanner() {
             if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
                 Swal.fire({
                     icon: 'warning',
@@ -1652,79 +1882,206 @@
                 });
             }
 
-            // Aquí se muestra el modal que ahora sí existe en el HTML
-            document.getElementById('scannerModal').classList.remove('hidden');
+            const modal = document.getElementById('scannerModal');
+            const loadingState = document.getElementById('scannerLoadingState');
+            const statusTxt = document.getElementById('scannerStatusTxt');
+            const btnSwitch = document.getElementById('btnSwitchCamera');
 
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", {
-                fps: 10,
-                qrbox: {
-                    width: 250,
-                    height: 250
-                },
-                aspectRatio: 1.0
-            }, false);
-            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            modal.classList.remove('hidden');
+            if (loadingState) {
+                loadingState.style.display = 'flex';
+                loadingState.style.opacity = '1';
+            }
+            if (statusTxt) statusTxt.textContent = 'Iniciando cámara...';
+
+            try {
+                if (!html5QrScanner) {
+                    html5QrScanner = new Html5Qrcode("reader-feed");
+                }
+
+                try {
+                    availableCameras = await Html5Qrcode.getCameras();
+                    if (availableCameras && availableCameras.length > 1 && btnSwitch) {
+                        btnSwitch.classList.remove('hidden');
+                        btnSwitch.classList.add('inline-flex');
+                    }
+                } catch(camErr) {
+                    availableCameras = [];
+                }
+
+                startScannerWithCurrentCamera();
+            } catch (err) {
+                console.error("Error al iniciar lector:", err);
+                if (loadingState) {
+                    loadingState.innerHTML = `
+                        <div class="text-center p-4">
+                            <svg class="w-10 h-10 text-rose-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <p class="text-sm font-bold text-white">No se pudo acceder a la cámara</p>
+                            <p class="text-xs text-slate-400 mt-1">Verifica los permisos en tu navegador o conecta una cámara.</p>
+                        </div>
+                    `;
+                }
+                if (statusTxt) statusTxt.textContent = 'Error de cámara';
+            }
         }
 
-        function closeScanner() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear().catch(e => console.error(e));
-                html5QrcodeScanner = null;
+        async function startScannerWithCurrentCamera() {
+            const loadingState = document.getElementById('scannerLoadingState');
+            const statusTxt = document.getElementById('scannerStatusTxt');
+
+            let cameraConfig = { facingMode: "environment" };
+            if (availableCameras.length > 0 && availableCameras[currentCameraIndex]) {
+                cameraConfig = availableCameras[currentCameraIndex].id;
+            }
+
+            const scanConfig = {
+                fps: 15,
+                qrbox: { width: 220, height: 220 },
+                aspectRatio: 1.0
+            };
+
+            if (html5QrScanner && html5QrScanner.isScanning) {
+                await html5QrScanner.stop();
+            }
+
+            html5QrScanner.start(
+                cameraConfig,
+                scanConfig,
+                onScanSuccess,
+                function() {}
+            ).then(() => {
+                if (loadingState) {
+                    loadingState.style.opacity = '0';
+                    setTimeout(() => { loadingState.style.display = 'none'; }, 200);
+                }
+                if (statusTxt) statusTxt.textContent = 'Enfoca el código QR en el visor';
+            }).catch(e => {
+                console.error("Fallo al iniciar cámara:", e);
+                if (statusTxt) statusTxt.textContent = 'Error al activar cámara';
+            });
+        }
+
+        async function switchScannerCamera() {
+            if (availableCameras.length <= 1) return;
+            currentCameraIndex = (currentCameraIndex + 1) % availableCameras.length;
+            const statusTxt = document.getElementById('scannerStatusTxt');
+            if (statusTxt) statusTxt.textContent = 'Cambiando de cámara...';
+            await startScannerWithCurrentCamera();
+        }
+
+        async function closeScanner() {
+            if (html5QrScanner && html5QrScanner.isScanning) {
+                try {
+                    await html5QrScanner.stop();
+                } catch(e) {}
             }
             document.getElementById('scannerModal').classList.add('hidden');
         }
 
         function onScanSuccess(decodedText) {
+            playScannerBeep();
             closeScanner();
 
             let parsedData = {};
             let chunks = decodedText.split('|');
             chunks.forEach(chunk => {
-                let [key, val] = chunk.split(':');
-                if (key && val) parsedData[key.trim()] = val.trim();
+                let idx = chunk.indexOf(':');
+                if (idx > -1) {
+                    let key = chunk.substring(0, idx).trim().toUpperCase();
+                    let val = chunk.substring(idx + 1).trim();
+                    if (key) parsedData[key] = val;
+                }
             });
 
-            if (!parsedData.PROD || !parsedData.STOCK) {
+            const norm = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+            const cleanLote = l => {
+                let s = (l || '').toString().trim().toUpperCase();
+                if (!s || s === 'S/L' || s === 'SIN LOTE' || s === 'N/A' || s === 'NULL') return 'S/L';
+                return s;
+            };
+
+            let prodTarget = (parsedData.PROD || '').trim();
+            let loteTarget = (parsedData.LOTE || (!prodTarget ? decodedText.trim() : '')).trim();
+
+            if (!prodTarget && !loteTarget) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Formato Inválido',
-                    text: 'QR no compatible con el sistema.',
+                    text: 'El código QR no contiene datos compatibles de producto o lote.',
                     confirmButtonColor: '#e11d48'
                 });
                 return;
             }
 
-            let rowData = {
-                producto: parsedData.PROD.trim(),
-                lote: parsedData.LOTE ? parsedData.LOTE.trim() : 'S/L',
-                vencimiento: parsedData.VENCE ? parsedData.VENCE.trim() : 'N/A',
-                stock: parseInt(parsedData.STOCK)
-            };
-
-            let emptySelect = Array.from(tbody.querySelectorAll('select[name="productos[]"]')).find(sel => sel.value ===
-            '');
-            let tr;
-
-            if (emptySelect) {
-                tr = emptySelect.closest('tr');
-            } else {
-                tr = addRow();
-            }
+            let emptySelect = Array.from(tbody.querySelectorAll('select[name="productos[]"]')).find(sel => sel.value === '');
+            let tr = emptySelect ? emptySelect.closest('tr') : addRow();
 
             let select = tr.querySelector('select[name="productos[]"]');
-            let options = Array.from(select.options);
-            let targetOption = options.find(opt => opt.value === rowData.producto && opt.getAttribute('data-lote') ===
-                rowData.lote);
+            let options = Array.from(select.options).filter(opt => opt.value && !opt.disabled);
+
+            let targetOption = null;
+
+            // 1. Coincidencia exacta de Producto Y Lote
+            if (prodTarget && loteTarget) {
+                const targetProdNorm = norm(prodTarget);
+                const targetLoteNorm = cleanLote(loteTarget);
+                targetOption = options.find(opt => {
+                    return norm(opt.value) === targetProdNorm && cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm;
+                });
+            }
+
+            // 2. Coincidencia por Lote (si el lote es específico y distinto de S/L)
+            if (!targetOption && loteTarget && cleanLote(loteTarget) !== 'S/L') {
+                const targetLoteNorm = cleanLote(loteTarget);
+                targetOption = options.find(opt => cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm);
+            }
+
+            // 3. Coincidencia por Producto (primer lote disponible)
+            if (!targetOption && prodTarget) {
+                const targetProdNorm = norm(prodTarget);
+                targetOption = options.find(opt => norm(opt.value) === targetProdNorm);
+            }
+
+            // 4. Coincidencia parcial / difusa por Producto
+            if (!targetOption && prodTarget) {
+                const targetProdNorm = norm(prodTarget);
+                targetOption = options.find(opt => {
+                    const optNorm = norm(opt.value);
+                    return optNorm && targetProdNorm && (optNorm.includes(targetProdNorm) || targetProdNorm.includes(optNorm));
+                });
+            }
 
             if (targetOption) {
+                // Seleccionar índice exacto para no colisionar con productos duplicados
+                targetOption.selected = true;
+                select.selectedIndex = targetOption.index;
                 select.value = targetOption.value;
                 llenarDatosFila(select);
-                tr.querySelector('input[name="cantidades[]"]').focus();
-            } else {
+
+                const cantInput = tr.querySelector('input[name="cantidades[]"]');
+                if (cantInput) {
+                    cantInput.focus();
+                }
+
+                const stockDisp = parseInt(targetOption.getAttribute('data-stock')) || 0;
+                const loteEncontrado = targetOption.getAttribute('data-lote') || 'S/L';
+
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Sin Stock',
-                    text: 'El producto o lote escaneado ya no tiene stock disponible en la bodega.',
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: `Fármaco cargado: ${targetOption.value}`,
+                    text: `Lote: ${loteEncontrado} · Stock disp: ${stockDisp} uds.`,
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true
+                });
+            } else {
+                let nombreBuscado = prodTarget || loteTarget;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sin Stock en Fármacos Controlados',
+                    html: `El producto o lote <strong>${nombreBuscado}</strong> no figura con stock disponible en la bodega de <strong>Fármacos Controlados</strong>.<br><br><span class="text-xs text-slate-500">Recuerda que este módulo es exclusivo para estupefacientes y recetas cheque. Si es un producto común, búscalo en el módulo de Despacho general.</span>`,
                     confirmButtonColor: '#e11d48'
                 });
                 if (!emptySelect && tbody.children.length > 1) tr.remove();
@@ -1744,4 +2101,26 @@
             });
         @endif
     </script>
+
+    <style>
+        @keyframes scanLaserAnim {
+            0% { top: 6%; opacity: 0.6; }
+            50% { top: 88%; opacity: 1; }
+            100% { top: 6%; opacity: 0.6; }
+        }
+        .scan-laser-bar-rose {
+            position: absolute;
+            left: 5%;
+            right: 5%;
+            height: 2.5px;
+            background: linear-gradient(90deg, transparent, #f43f5e, #fb7185, #f43f5e, transparent);
+            box-shadow: 0 0 12px 2px rgba(244, 63, 94, 0.9);
+            animation: scanLaserAnim 2s ease-in-out infinite;
+        }
+        #reader-feed video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
+    </style>
 @endsection

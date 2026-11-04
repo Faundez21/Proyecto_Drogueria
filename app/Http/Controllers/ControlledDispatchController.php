@@ -62,6 +62,7 @@ class ControlledDispatchController extends Controller
             ->values();
 
         $establecimientos = InventoryService::establecimientos();
+        $programasLista = InventoryService::programasLista();
 
         return view('controlled_dispatch.index', compact(
             'correlativo',
@@ -71,7 +72,8 @@ class ControlledDispatchController extends Controller
             'usuariosAsignables',
             'misSolicitudesAsignadas',
             'controlados',
-            'establecimientos'
+            'establecimientos',
+            'programasLista'
         ));
     }
 
@@ -88,13 +90,13 @@ class ControlledDispatchController extends Controller
             'series_recetas' => 'nullable|string',
             'firma_recibe' => 'nullable|string',
             'productos' => 'required|array|min:1',
-            'productos.*' => 'required|string|max:255',
+            'productos.*' => 'required|string|max:1000',
             'lotes' => 'nullable|array',
             'lotes.*' => 'nullable|string|max:255',
             'vencimientos' => 'nullable|array',
             'vencimientos.*' => 'nullable|date',
             'programas' => 'nullable|array',
-            'programas.*' => 'nullable|string|max:255',
+            'programas.*' => 'nullable|string|max:500',
             'cantidades' => 'required|array|min:1',
             'cantidades.*' => 'required|integer|min:1',
             'establishment_request_id' => 'nullable|integer|exists:establishment_requests,id',
@@ -178,12 +180,25 @@ class ControlledDispatchController extends Controller
                 }
             }
 
+            $normalesPendientesCount = 0;
+            $solicitudOrigenId = null;
+
             if (! empty($validated['establishment_request_id'] ?? null)) {
+                $solicitudOrigenId = (int) $validated['establishment_request_id'];
                 SolicitudService::registrarDespacho(
-                    (int) $validated['establishment_request_id'],
+                    $solicitudOrigenId,
                     $validated['productos'],
                     $validated['cantidades']
                 );
+
+                $reqModel = EstablishmentRequest::with('items.product')->find($solicitudOrigenId);
+                if ($reqModel) {
+                    $normalesPendientesCount = $reqModel->items->filter(function ($it) {
+                        $nom = $it->product->nombre ?? '';
+                        $falta = ($it->cantidad_solicitada - $it->cantidad_despachada);
+                        return ! InventoryService::esControlado($nom) && $falta > 0;
+                    })->count();
+                }
             }
 
             DB::commit();
@@ -199,6 +214,10 @@ class ControlledDispatchController extends Controller
                 'items' => $itemsControlados,
                 'pdf_url' => route('controlled_dispatch.pdf', $dispatch->id),
                 'auto_download' => ($validated['action'] ?? '') === 'save_and_download',
+                'tiene_normales_pendientes' => $normalesPendientesCount > 0,
+                'cant_normales_pendientes' => $normalesPendientesCount,
+                'solicitud_id' => $solicitudOrigenId,
+                'url_despacho_normal' => $solicitudOrigenId ? route('dispatch.index', ['solicitud_id' => $solicitudOrigenId]) : null,
             ];
 
             if ($request->expectsJson() || $request->ajax()) {

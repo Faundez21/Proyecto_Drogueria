@@ -64,7 +64,7 @@ return new class extends Migration
             }
         }
 
-        // ===== Backfill de relaciones sobre datos existentes =====
+        //Backfill de relaciones sobre datos existentes 
 
         // Backfill: inventories -> providers (por rut o nombre)
         $providersByRut = DB::table('providers')->pluck('id', 'rut');

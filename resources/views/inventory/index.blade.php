@@ -122,13 +122,9 @@
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
                         <select name="categoria" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todas</option>
-                            <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
-                            <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
-                            @if(auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado'))
-                                <option value="Fármacos Controlados" {{ request('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>
-                                    Fármacos Controlados
-                                </option>
-                            @endif
+                            @foreach ($categoriasLista ?? ['Fármacos', 'Medicamentos', 'Insumos Clínicos', 'Insumos', 'Equipamiento'] as $catOpt)
+                                <option value="{{ $catOpt }}" {{ request('categoria') == $catOpt ? 'selected' : '' }}>{{ $catOpt }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -479,10 +475,7 @@
                                                                         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[12px] font-bold bg-teal-50 text-teal-800 border border-teal-200 font-mono-das">$ {{ number_format($valorTotalLote, 0, ',', '.') }}</span>
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
-                                                                        <div class="inline-flex items-center justify-center gap-1.5">
-                                                                            <button type="button" onclick="openQRModal('{{ e($loteId) }}', '{{ e($nombreProducto) }}', '{{ e($loteCodigo) }}', '{{ e($textoVencimiento) }}', '{{ $stockLote }}', '{{ e(data_get($loteData, 'razon_social') ?? 'Droguería DAS') }}')" class="p-1.5 text-slate-600 bg-slate-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-slate-200 hover:border-teal-600 shadow-sm cursor-pointer" title="Generar Etiqueta QR de este lote">
-                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                                                                            </button>
+                                                                        <div class="inline-flex items-center justify-center">
                                                                             <button type="button" onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}', '{{ e($loteCategoria) }}', '{{ e($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}', '{{ e($pasilloVal ?? '') }}', '{{ e($estanteVal ?? '') }}', '{{ e(data_get($loteData, 'nivel') ?? '') }}', '{{ e(data_get($loteData, 'posicion') ?? '') }}')" class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Editar Estado y Ubicación">
                                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                                             </button>
@@ -907,14 +900,9 @@
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Categoría <span class="text-rose-500">*</span></label>
                                 <select name="categoria" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="" disabled {{ old('categoria') ? '' : 'selected' }}>Seleccionar...</option>
-                                    <option value="Medicamentos" {{ old('categoria') == 'Medicamentos' ? 'selected' : '' }}>Medicamentos</option>
-                                    <option value="Fármacos" {{ old('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
-                                    <option value="Insumos" {{ old('categoria') == 'Insumos' ? 'selected' : '' }}>Insumos</option>
-                                    <option value="Insumos Clínicos" {{ old('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
-                                    <option value="Equipamiento" {{ old('categoria') == 'Equipamiento' ? 'selected' : '' }}>Equipamiento</option>
-                                    @role('Administrador')
-                                        <option value="Fármacos Controlados" {{ old('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>Fármacos Controlados (Estupefacientes/Psicotrópicos)</option>
-                                    @endrole
+                                    @foreach ($categoriasLista ?? ['Medicamentos', 'Fármacos', 'Insumos', 'Insumos Clínicos', 'Equipamiento'] as $catOpt)
+                                        <option value="{{ $catOpt }}" {{ old('categoria') == $catOpt ? 'selected' : '' }}>{{ $catOpt }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div>
@@ -929,7 +917,7 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Pasillo Ubicación</label>
-                                <select name="pasillo" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                <select name="pasillo" id="manual_pasillo" onchange="onManualUbicacionChange('pasillo')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="">Seleccione Pasillo...</option>
                                     @foreach ($pasillosLista ?? [] as $pasillo)
                                         <option value="{{ $pasillo }}" {{ old('pasillo') == $pasillo ? 'selected' : '' }}>{{ $pasillo }}</option>
@@ -938,7 +926,7 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Estante Ubicación</label>
-                                <select name="estante" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                <select name="estante" id="manual_estante" onchange="onManualUbicacionChange('estante')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="">Seleccione Estante...</option>
                                     @foreach ($estantesLista ?? [] as $estante)
                                         <option value="{{ $estante }}" {{ old('estante') == $estante ? 'selected' : '' }}>{{ $estante }}</option>
@@ -947,7 +935,7 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Nivel</label>
-                                <select name="nivel" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                <select name="nivel" id="manual_nivel" onchange="onManualUbicacionChange('nivel')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="">Seleccione Nivel...</option>
                                     @foreach ($nivelesLista ?? [] as $nivel)
                                         <option value="{{ $nivel }}" {{ old('nivel') == $nivel ? 'selected' : '' }}>{{ $nivel }}</option>
@@ -956,7 +944,7 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Posición</label>
-                                <select name="posicion" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
+                                <select name="posicion" id="manual_posicion" onchange="onManualUbicacionChange('posicion')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="">Seleccione Posición...</option>
                                     @foreach ($posicionesLista ?? [] as $posicion)
                                         <option value="{{ $posicion }}" {{ old('posicion') == $posicion ? 'selected' : '' }}>{{ $posicion }}</option>
@@ -964,15 +952,10 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa Ministerial</label>
+                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa</label>
                                 <input type="text" name="programa" list="programasManualList" value="{{ old('programa') }}" placeholder="Ej. FOFAR / Morbilidad General" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                                 <datalist id="programasManualList">
-                                    <option value="Morbilidad General"></option>
-                                    <option value="Fondo de Farmacia (FOFAR)"></option>
-                                    <option value="Cardiovascular"></option>
-                                    <option value="IRA/ERA"></option>
-                                    <option value="Salud Mental"></option>
-                                    @foreach($programasLista ?? [] as $progOpt)
+                                    @foreach($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
                                         <option value="{{ $progOpt }}"></option>
                                     @endforeach
                                 </datalist>
@@ -1049,8 +1032,8 @@
                         <h2 class="text-[17px] text-black font-black tracking-widest uppercase">DROGUERÍA DAS</h2>
                         <span class="text-[11px] text-black font-bold font-mono tracking-widest uppercase mt-0.5">Control de Trazabilidad</span>
                     </div>
-                    <div class="bg-white p-2 mb-4 z-10 flex justify-center w-full">
-                        <img id="qrcode" alt="Código QR del lote" class="w-[140px] h-[140px]">
+                    <div class="p-2 mb-4 z-10 flex justify-center w-full" style="background-color: #ffffff !important;">
+                        <img id="qrcode" alt="Código QR del lote" class="w-[140px] h-[140px] rounded-lg" style="background-color: #ffffff !important;">
                     </div>
                     <div class="w-full z-10 space-y-2.5 px-2">
                         <div class="text-center mb-4">
@@ -1089,56 +1072,59 @@
         </div>
 
         <!-- Modal: Editar Lote -->
-        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
-                    <h2 class="text-[16px] font-bold text-white tracking-wide">Actualizar Estado y Ubicación de Lote</h2>
+        <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 transition-all">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-0 w-full max-w-lg max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden my-auto">
+                <div class="px-4 sm:px-6 py-4 bg-slate-800 flex justify-between items-center shrink-0 border-b border-slate-700">
+                    <div>
+                        <h2 class="text-[15px] sm:text-[16px] font-bold text-white tracking-wide">Actualizar Estado y Ubicación de Lote</h2>
+                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Gestiona la posición física en bodega o el bloqueo del lote.</p>
+                    </div>
                     <button type="button" onclick="closeEditLote()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
-                <form id="editLoteForm" method="POST" action="" class="bg-white" novalidate onsubmit="return confirmEditLoteInventario(event)">
+                <form id="editLoteForm" method="POST" action="" class="bg-white dark:bg-slate-900 flex flex-col flex-1 min-h-0 overflow-hidden" novalidate onsubmit="return confirmEditLoteInventario(event)">
                     @csrf
                     @method('PUT')
-                    <div class="p-6 space-y-4">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Modificando Lote de:</span>
-                            <p id="modal_producto_nombre" class="text-[14px] font-extrabold text-slate-800 w-full break-words leading-tight"></p>
-                            <div class="mt-2 inline-block bg-white border border-slate-300 px-3 py-1 rounded-lg shadow-sm">
-                                <p id="modal_lote_nombre" class="text-[13px] font-mono font-bold text-slate-700"></p>
+                    <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
+                        <div class="bg-slate-50 dark:bg-slate-800/80 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-center">
+                            <span class="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Modificando Lote de:</span>
+                            <p id="modal_producto_nombre" class="text-[13.5px] sm:text-[14px] font-extrabold text-slate-800 dark:text-slate-100 w-full break-words leading-tight"></p>
+                            <div class="mt-2 inline-block bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 px-3 py-1 rounded-lg shadow-sm">
+                                <p id="modal_lote_nombre" class="text-[12.5px] sm:text-[13px] font-mono font-bold text-slate-700 dark:text-slate-200"></p>
                             </div>
                             <div class="flex justify-center gap-1.5 mt-2 flex-wrap">
-                                <span id="modal_categoria_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200"></span>
-                                <span id="modal_programa_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100"></span>
+                                <span id="modal_categoria_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"></span>
+                                <span id="modal_programa_chip" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800"></span>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Valor Unitario</span>
-                                <p id="modal_valor_unitario" class="text-[13px] font-bold text-slate-800 font-mono-das">$ 0</p>
+                        <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+                            <div class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase block truncate">Valor Unit.</span>
+                                <p id="modal_valor_unitario" class="text-[11.5px] sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 font-mono-das truncate">$ 0</p>
                             </div>
-                            <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Stock</span>
-                                <p id="modal_cantidad" class="text-[13px] font-bold text-slate-800">0</p>
+                            <div class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase block truncate">Stock</span>
+                                <p id="modal_cantidad" class="text-[11.5px] sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 truncate">0</p>
                             </div>
-                            <div class="bg-teal-50 border border-teal-200 rounded-xl p-2.5 text-center shadow-sm">
-                                <span class="text-[10px] font-bold text-teal-500 uppercase block">Valor Total</span>
-                                <p id="modal_valor_total" class="text-[13px] font-extrabold text-teal-800 font-mono-das">$ 0</p>
+                            <div class="bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/80 rounded-xl p-2 sm:p-2.5 text-center shadow-xs">
+                                <span class="text-[9px] sm:text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase block truncate">Valor Total</span>
+                                <p id="modal_valor_total" class="text-[11.5px] sm:text-[13px] font-extrabold text-teal-800 dark:text-teal-300 font-mono-das truncate">$ 0</p>
                             </div>
                         </div>
 
                         <!-- Ubicación Física en Bodega (Distribución) -->
-                        <div class="bg-slate-50/80 p-3.5 rounded-xl border border-slate-200">
-                            <label class="block text-[12px] font-bold text-slate-700 mb-2 flex items-center gap-1.5 uppercase tracking-wide">
-                                <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <div class="bg-slate-50 dark:bg-slate-800/80 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <label class="block text-[11.5px] sm:text-[12px] font-bold text-slate-700 dark:text-slate-200 mb-2.5 flex items-center gap-1.5 uppercase tracking-wide">
+                                <svg class="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                 Ubicación Física en Bodega (Distribución)
                             </label>
-                            <div class="grid grid-cols-2 gap-2.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
-                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pasillo</label>
-                                    <select id="modal_edit_pasillo" name="pasillo" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Pasillo</label>
+                                    <select id="modal_edit_pasillo" name="pasillo" onchange="onModalEditUbicacionChange('pasillo')" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin asignar / P.A)</option>
                                         @foreach ($pasillosLista ?? [] as $pas)
                                             <option value="{{ $pas }}">{{ $pas }}</option>
@@ -1146,8 +1132,8 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estante</label>
-                                    <select id="modal_edit_estante" name="estante" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Estante</label>
+                                    <select id="modal_edit_estante" name="estante" onchange="onModalEditUbicacionChange('estante')" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin asignar / P.A)</option>
                                         @foreach ($estantesLista ?? [] as $est)
                                             <option value="{{ $est }}">{{ $est }}</option>
@@ -1155,8 +1141,8 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nivel</label>
-                                    <select id="modal_edit_nivel" name="nivel" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Nivel</label>
+                                    <select id="modal_edit_nivel" name="nivel" onchange="onModalEditUbicacionChange('nivel')" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin nivel)</option>
                                         @foreach ($nivelesLista ?? [] as $niv)
                                             <option value="{{ $niv }}">Nivel {{ $niv }}</option>
@@ -1164,8 +1150,8 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Posición</label>
-                                    <select id="modal_edit_posicion" name="posicion" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
+                                    <label class="block text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Posición</label>
+                                    <select id="modal_edit_posicion" name="posicion" onchange="onModalEditUbicacionChange('posicion')" class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2 text-[12px] sm:text-[12.5px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs cursor-pointer">
                                         <option value="">(Sin posición)</option>
                                         @foreach ($posicionesLista ?? [] as $pos)
                                             <option value="{{ $pos }}">Posición {{ $pos }}</option>
@@ -1173,11 +1159,14 @@
                                     </select>
                                 </div>
                             </div>
+                            <div id="modal_edit_ubicacion_status" class="mt-2.5 px-3 py-2 rounded-lg text-[11.5px] font-medium bg-slate-100 text-slate-600 border border-slate-200 flex items-center justify-between gap-2">
+                                <span>Seleccione Pasillo y Estante para ver sus niveles y posiciones disponibles.</span>
+                            </div>
                         </div>
 
                         <div>
-                            <label for="modal_estado" class="block text-[13px] font-bold text-slate-700 mb-2">Seleccione Nuevo Estado Físico *</label>
-                            <select id="modal_estado" name="estado" onchange="toggleMotivoField(this.value)" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 font-semibold text-slate-700 shadow-sm cursor-pointer transition-colors">
+                            <label for="modal_estado" class="block text-[12.5px] sm:text-[13px] font-bold text-slate-700 dark:text-slate-200 mb-1.5 sm:mb-2">Seleccione Nuevo Estado Físico *</label>
+                            <select id="modal_estado" name="estado" onchange="toggleMotivoField(this.value)" required class="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3.5 py-2.5 sm:py-3 text-[12.5px] sm:text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 font-semibold shadow-xs cursor-pointer transition-colors">
                                 <option value="Disponible">🟢 Disponible (Liberado para entrega)</option>
                                 <option value="Cuarentena">🟠 En Cuarentena (Bloqueo preventivo)</option>
                                 <option value="Merma">🔴 En Merma (Dañado / Vencido)</option>
@@ -1185,14 +1174,14 @@
                         </div>
 
                         <div id="motivoContainer" class="hidden">
-                            <label for="modal_motivo" class="block text-[13px] font-bold text-slate-700 mb-1.5">Motivo <span class="text-rose-500">*</span></label>
-                            <textarea id="modal_motivo" name="motivo" rows="3" placeholder="Indique la razón de la merma o cuarentena..." class="w-full rounded-xl border border-slate-300 bg-white p-3 text-[12px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-slate-700 shadow-sm"></textarea>
+                            <label for="modal_motivo" class="block text-[12.5px] sm:text-[13px] font-bold text-slate-700 dark:text-slate-200 mb-1.5">Motivo <span class="text-rose-500">*</span></label>
+                            <textarea id="modal_motivo" name="motivo" rows="3" placeholder="Indique la razón de la merma o cuarentena..." class="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 p-3 text-[12px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-xs resize-none dark:placeholder-slate-500"></textarea>
                         </div>
                     </div>
 
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl shrink-0">
-                        <button type="button" onclick="closeEditLote()" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 text-[13px] font-bold transition-colors shadow-sm cursor-pointer">Cancelar</button>
-                        <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[13px] font-bold transition-all shadow-sm cursor-pointer">Confirmar Cambio</button>
+                    <div class="px-4 sm:px-6 py-3.5 bg-slate-50 dark:bg-slate-800/90 border-t border-slate-200 dark:border-slate-700 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 rounded-b-2xl shrink-0">
+                        <button type="button" onclick="closeEditLote()" class="w-full sm:w-auto px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-[13px] font-bold transition-colors shadow-xs cursor-pointer text-center">Cancelar</button>
+                        <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[13px] font-bold transition-all shadow-xs cursor-pointer text-center">Confirmar Cambio</button>
                     </div>
                 </form>
             </div>
@@ -1318,7 +1307,7 @@
                                     </td>
                                     <td class="px-6 py-3.5 text-center">
                                         <button type="button"
-                                            onclick="openEditLote('{{ e($mLoteId) }}', '{{ e($mLoteCodigo) }}', '{{ e($mNombre) }}', 'Merma', '{{ e($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}', '{{ e($mObj->categoria ?? 'General') }}', '{{ e($mObj->programa ?? '') }}', '{{ $mValorUnitario }}', '{{ $mStock }}')"
+                                            onclick="openEditLote('{{ e($mLoteId) }}', '{{ e($mLoteCodigo) }}', '{{ e($mNombre) }}', 'Merma', '{{ e($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}', '{{ e($mObj->categoria ?? 'General') }}', '{{ e($mObj->programa ?? '') }}', '{{ $mValorUnitario }}', '{{ $mStock }}', '{{ e(data_get($mObj, 'pasillo') ?? '') }}', '{{ e(data_get($mObj, 'estante') ?? '') }}', '{{ e(data_get($mObj, 'nivel') ?? '') }}', '{{ e(data_get($mObj, 'posicion') ?? '') }}')"
                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center justify-center" title="Editar Estado">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                         </button>
@@ -1555,9 +1544,68 @@
             }
         }
 
+        window.distribucionJerarquia = @json($distribucionJerarquia ?? []);
+        window.ubicacionesOcupadas = @json($ubicacionesOcupadas ?? []);
+        window.todosLosPasillos = @json($pasillosLista ?? []);
+        window.todosLosEstantes = @json($estantesLista ?? []);
+        window.todosLosNiveles = @json($nivelesLista ?? []);
+        window.todosLasPosiciones = @json($posicionesLista ?? []);
+
+        function obtenerConfigModalEditUbicacion() {
+            const form = document.getElementById('editLoteForm');
+            return {
+                selectPasillo: document.getElementById('modal_edit_pasillo'),
+                selectEstante: document.getElementById('modal_edit_estante'),
+                selectNivel: document.getElementById('modal_edit_nivel'),
+                selectPosicion: document.getElementById('modal_edit_posicion'),
+                statusEl: document.getElementById('modal_edit_ubicacion_status'),
+                ignoreLoteId: form?.dataset?.loteId ? parseInt(form.dataset.loteId, 10) : null,
+                producto: document.getElementById('modal_producto_nombre')?.textContent?.trim() || '',
+                lote: (document.getElementById('modal_lote_nombre')?.textContent || '').replace(/^LOTE:\s*/i, '').trim(),
+                initialUbicacion: {
+                    pasillo: form?.dataset?.initialPasillo || '',
+                    estante: form?.dataset?.initialEstante || '',
+                    nivel: form?.dataset?.initialNivel || '',
+                    posicion: form?.dataset?.initialPosicion || '',
+                },
+            };
+        }
+
+        function onModalEditUbicacionChange(trigger) {
+            if (!window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), trigger, false);
+        }
+
+        function obtenerConfigManualUbicacion() {
+            const form = document.querySelector('#DepositModal form');
+            return {
+                selectPasillo: document.getElementById('manual_pasillo'),
+                selectEstante: document.getElementById('manual_estante'),
+                selectNivel: document.getElementById('manual_nivel'),
+                selectPosicion: document.getElementById('manual_posicion'),
+                statusEl: null,
+                producto: form?.querySelector('input[name="producto"]')?.value?.trim() || '',
+                lote: form?.querySelector('input[name="lote"]')?.value?.trim() || '',
+            };
+        }
+
+        function onManualUbicacionChange(trigger) {
+            if (!window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigManualUbicacion(), trigger, false);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.LoteStatus?.Ubicacion && document.getElementById('manual_estante')) {
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigManualUbicacion(), 'init', true);
+            }
+        });
+
         function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0, pasillo = '', estante = '', nivel = '', posicion = '') {
             const form = document.getElementById('editLoteForm');
-            if (form) form.action = "/inventory/" + id;
+            if (form) {
+                form.action = "/inventory/" + id;
+                form.dataset.loteId = id;
+            }
 
             document.getElementById('modal_producto_nombre').textContent = producto;
             document.getElementById('modal_lote_nombre').textContent = "LOTE: " + lote;
@@ -1585,18 +1633,37 @@
                 }
             }
 
-            // Precargar campos de ubicación física
+            const pasClean = (pasillo && pasillo !== 'P.A') ? pasillo : '';
+            const estClean = (estante && estante !== 'P.A') ? estante : '';
+            const nivClean = window.LoteStatus?.Ubicacion ? window.LoteStatus.Ubicacion.normNivel(nivel) : (nivel || '');
+            const posClean = window.LoteStatus?.Ubicacion ? window.LoteStatus.Ubicacion.normPos(posicion) : (posicion || '');
+
+            // Guardar valores iniciales para detectar reubicación física exacta
+            form.dataset.initialPasillo = pasClean;
+            form.dataset.initialEstante = estClean;
+            form.dataset.initialNivel = nivClean;
+            form.dataset.initialPosicion = posClean;
+
+            // Precargar campos de ubicación física y sincronizar niveles/posiciones del estante
             const selPas = document.getElementById('modal_edit_pasillo');
-            if (selPas) selPas.value = (pasillo && pasillo !== 'P.A') ? pasillo : '';
+            if (selPas) selPas.value = pasClean;
 
             const selEst = document.getElementById('modal_edit_estante');
-            if (selEst) selEst.value = (estante && estante !== 'P.A') ? estante : '';
+            if (selEst) selEst.value = estClean;
 
             const selNiv = document.getElementById('modal_edit_nivel');
-            if (selNiv) selNiv.value = nivel || '';
+            if (selNiv) selNiv.value = nivClean;
 
             const selPos = document.getElementById('modal_edit_posicion');
-            if (selPos) selPos.value = posicion || '';
+            if (selPos) selPos.value = posClean;
+
+            if (window.LoteStatus?.Ubicacion) {
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), 'init', true);
+                if (selNiv && nivClean) selNiv.value = nivClean;
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), 'init', true);
+                if (selPos && posClean) selPos.value = posClean;
+                window.LoteStatus.Ubicacion.actualizarIndicadorVisual(obtenerConfigModalEditUbicacion());
+            }
 
             let estadoSelect = document.getElementById('modal_estado');
             let estadoFormat = (estado || '').toLowerCase();
@@ -1609,6 +1676,8 @@
 
             let motivoInput = document.getElementById('modal_motivo');
             if (motivoInput) motivoInput.value = motivo;
+
+            form.dataset.initialEstado = selectedVal;
 
             toggleMotivoField(selectedVal);
 
@@ -1692,7 +1761,7 @@
             document.getElementById('DepositModal').classList.add('hidden');
         }
 
-        // ====== LÓGICA FILTROS AVANZADOS MERMA ======
+        //  LÓGICA FILTROS AVANZADOS MERMA 
         function openMerma() {
             document.getElementById('mermaModal').classList.remove('hidden');
             filterMermas();
@@ -1766,7 +1835,6 @@
             if(document.getElementById('mermaUserFilter')) document.getElementById('mermaUserFilter').value = '';
             filterMermas();
         }
-        // ============================================
 
         function showSearchDropdown() {
             const dropdown = document.getElementById('searchDropdown');
@@ -1972,9 +2040,11 @@
                     showClientImportAlert(
                         'warning',
                         'Advertencia: Archivo Ya Utilizado Recientemente',
-                        `El archivo «${file.name}» coincide exactamente con uno subido el ${history[fileFingerprint]}. Si vuelve a importarlo sin cambios, el sistema bloqueará los lotes duplicados.`
+                        `El archivo «${file.name}» coincide con uno subido el ${history[fileFingerprint]}. La casilla de confirmación se ha activado para permitir reprocesarlo.`
                     );
                     if (forceWrap) forceWrap.classList.remove('hidden');
+                    const forceCheck = document.getElementById('forceReimportCheck');
+                    if (forceCheck) forceCheck.checked = true;
                 }
             } catch (e) {}
         }
@@ -2019,14 +2089,14 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Registrar huella local del archivo enviado
+                    // Guardar huella pendiente; solo se confirmará en el historial si el servidor completa la importación con éxito
                     try {
                         const fileFingerprint = `${file.name}|${file.size}|${file.lastModified}`;
-                        const historyRaw = localStorage.getItem('das_imported_files_history') || '{}';
-                        const history = JSON.parse(historyRaw);
                         const nowStr = new Date().toLocaleDateString('es-CL') + ' ' + new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
-                        history[fileFingerprint] = nowStr;
-                        localStorage.setItem('das_imported_files_history', JSON.stringify(history));
+                        sessionStorage.setItem('das_pending_import_file', JSON.stringify({
+                            fingerprint: fileFingerprint,
+                            date: nowStr
+                        }));
                     } catch (e) {}
 
                     // Activar Pantalla de Carga para archivos pesados
@@ -2140,79 +2210,14 @@
             return false;
         }
 
+        /**
+         * Escenario INVENTARIO: confirmación previa + envío AJAX + SweetAlert2 de éxito.
+         * Delega automáticamente en LoteStatus.Cuarentena / LoteStatus.Merma según el estado elegido.
+         * La página solo se refresca DESPUÉS de que el usuario cierra la alerta de éxito.
+         * Lógica en: public/js/lotes/lote-status.js
+         */
         function confirmEditLoteInventario(event) {
-            event.preventDefault();
-            const form = document.getElementById('editLoteForm');
-            const estado = document.getElementById('modal_estado')?.value;
-            const motivo = (document.getElementById('modal_motivo')?.value || '').trim();
-            const prod = document.getElementById('modal_producto_nombre')?.textContent || 'Producto';
-            const loteRaw = document.getElementById('modal_lote_nombre')?.textContent || '';
-            const lote = loteRaw.replace(/^LOTE:\s*/i, '').trim();
-
-            if ((estado === 'Cuarentena' || estado === 'Merma') && !motivo) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Motivo requerido',
-                    text: 'Debes indicar el motivo para cambiar el estado a ' + estado + '.',
-                    confirmButtonColor: '#0d9488'
-                });
-                document.getElementById('modal_motivo')?.focus();
-                return false;
-            }
-
-            if (estado === 'Cuarentena') {
-                Swal.fire({
-                    title: '¿Enviar lote a Cuarentena?',
-                    html: `El producto <strong>${prod}</strong> (Lote: <strong>${lote}</strong>) quedará bloqueado preventivamente y pasará a control técnico en Cuarentena.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d97706',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, enviar a cuarentena',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        closeEditLote();
-                        form.submit();
-                    }
-                });
-            } else if (estado === 'Merma') {
-                Swal.fire({
-                    title: '¿Declarar Merma de Lote?',
-                    html: `El lote <strong>${lote}</strong> de <strong>${prod}</strong> será dado de baja definitiva como Merma y retirado del stock disponible.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#e11d48',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, declarar merma',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        closeEditLote();
-                        form.submit();
-                    }
-                });
-            } else {
-                Swal.fire({
-                    title: '¿Mover lote a Disponible?',
-                    html: `El lote <strong>${lote}</strong> de <strong>${prod}</strong> quedará liberado y pasará a estar <strong>Disponible</strong> para entrega y despacho.`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#059669',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, mover a disponible',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        closeEditLote();
-                        form.submit();
-                    }
-                });
-            }
-
+            LoteStatus.Inventario.onSubmit(event);
             return false;
         }
 
@@ -2221,6 +2226,33 @@
             if (selEstado) {
                 toggleManualEstadoHelp(selEstado.value);
             }
+
+            @if (($inventories->total() ?? 0) === 0 && ($historial->count() ?? 0) === 0)
+                try {
+                    localStorage.removeItem('das_imported_files_history');
+                    sessionStorage.removeItem('das_pending_import_file');
+                } catch (e) {}
+            @endif
+
+            @if (session('import_completed_ok'))
+                try {
+                    const pendingRaw = sessionStorage.getItem('das_pending_import_file');
+                    if (pendingRaw) {
+                        const pending = JSON.parse(pendingRaw);
+                        if (pending && pending.fingerprint) {
+                            const historyRaw = localStorage.getItem('das_imported_files_history') || '{}';
+                            const history = JSON.parse(historyRaw);
+                            history[pending.fingerprint] = pending.date;
+                            localStorage.setItem('das_imported_files_history', JSON.stringify(history));
+                        }
+                        sessionStorage.removeItem('das_pending_import_file');
+                    }
+                } catch (e) {}
+            @else
+                try {
+                    sessionStorage.removeItem('das_pending_import_file');
+                } catch (e) {}
+            @endif
 
             @if (session('open_modal') === 'import')
                 openImport();

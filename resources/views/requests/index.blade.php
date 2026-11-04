@@ -32,10 +32,46 @@
 
         <!-- notificacion de exito -->
         @if (session('success'))
-            <div class="p-4 mb-4 text-sm text-teal-800 rounded-xl bg-teal-50 border border-teal-200 font-medium shadow-sm"
+            <div class="p-4 mb-4 text-sm text-teal-800 rounded-xl bg-teal-50 border border-teal-200 font-medium shadow-sm flex items-center justify-between"
                 role="alert">
-                {{ session('success') }}
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>{{ session('success') }}</span>
+                </div>
             </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Solicitud Registrada con Éxito!',
+                            html: `<p class="text-sm text-slate-600 font-medium">{{ session('success') }}</p>`,
+                            confirmButtonColor: '#0d9488',
+                            confirmButtonText: 'Aceptar',
+                            timer: 5000,
+                            timerProgressBar: true
+                        });
+                    }
+                });
+            </script>
+        @endif
+
+        @if ($errors->any())
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Verifique los datos de la solicitud',
+                            html: `<ul class="text-left text-xs space-y-1 text-rose-700">@foreach ($errors->all() as $error)<li>• {{ $error }}</li>@endforeach</ul>`,
+                            confirmButtonColor: '#e11d48',
+                            confirmButtonText: 'Entendido'
+                        });
+                    }
+                });
+            </script>
         @endif
 
         <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
@@ -171,19 +207,15 @@
                                     </label>
 
                                     <select name="programa[]" required
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-programa">
                                         <option value="" disabled selected>
                                             Seleccione...
                                         </option>
-                                        <option value="Morbilidad General">
-                                            Morbilidad General
-                                        </option>
-                                        <option value="Cardiovascular">
-                                            Cardiovascular
-                                        </option>
-                                        <option value="IRA/ERA">
-                                            IRA/ERA
-                                        </option>
+                                        @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
+                                            <option value="{{ $progOpt }}">
+                                                {{ $progOpt }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="lg:col-span-2">
@@ -200,7 +232,9 @@
 
                                         <optgroup label="Medicamentos e Insumos">
                                             @foreach ($products as $product)
-                                                <option value="{{ $product->id }}">
+                                                <option value="{{ $product->id }}"
+                                                    data-programa="{{ $product->programa_sugerido ?? '' }}"
+                                                    data-categoria="{{ $product->categoria_sugerida ?? '' }}">
                                                     {{ $product->nombre }}
                                                 </option>
                                             @endforeach
@@ -408,9 +442,28 @@
                 const est = (establecimientoSelect?.value || '').trim();
                 const prodSelect = itemRow.querySelector('.select-producto');
                 const prodId = prodSelect ? prodSelect.value : '';
+                const progSelect = itemRow.querySelector('select[name="programa[]"]');
                 const inputConsumo = itemRow.querySelector('input[name="consumo_anterior[]"]');
                 const infoConsumo = itemRow.querySelector('.info-consumo-anterior');
                 const infoStock = itemRow.querySelector('.info-ultimo-stock');
+
+                if (prodSelect && progSelect && prodSelect.selectedIndex >= 0) {
+                    const selectedOpt = prodSelect.options[prodSelect.selectedIndex];
+                    const progSugerido = (selectedOpt?.getAttribute('data-programa') || '').trim();
+                    if (progSugerido) {
+                        let matchedProg = Array.from(progSelect.options).find(
+                            o => o.value && o.value.toLowerCase() === progSugerido.toLowerCase()
+                        );
+                        if (!matchedProg) {
+                            const newOpt = document.createElement('option');
+                            newOpt.value = progSugerido;
+                            newOpt.textContent = progSugerido;
+                            progSelect.appendChild(newOpt);
+                            matchedProg = newOpt;
+                        }
+                        progSelect.value = matchedProg.value;
+                    }
+                }
 
                 if (!inputConsumo) return;
 
@@ -541,9 +594,76 @@
                 }, 10);
             });
 
-            let requestSubmitConfirmed = false;
+            function mostrarSweetAlertSolicitudExitosa(solData, recargarAlCerrar = false) {
+                if (!solData) return;
+
+                const htmlDetail = `
+                    <div class="text-left text-xs text-slate-700">
+                        <div class="p-3.5 bg-teal-50/70 border border-teal-200 rounded-xl mb-3 space-y-1.5">
+                            <div class="flex items-center justify-between pb-2 mb-1.5 border-b border-teal-200/80">
+                                <span class="font-extrabold text-teal-900 text-sm">Solicitud N° ${solData.numero_solicitud || ''}</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">SOLICITUD REGISTRADA CON ÉXITO</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
+                                <p><strong>Establecimiento:</strong> ${solData.establecimiento || 'N/A'}</p>
+                                <p><strong>Tipo:</strong> ${solData.tipo || 'Establecimiento'}</p>
+                                <p><strong>Fecha Solicitud:</strong> ${solData.fecha_solicitud || 'N/A'}</p>
+                                <p><strong>Responsable:</strong> ${solData.responsable || 'N/A'}${solData.cargo && solData.cargo !== 'N/A' ? ` (${solData.cargo})` : ''}</p>
+                                <p><strong>Total Productos:</strong> ${solData.total_items || 0} producto(s)</p>
+                                <p><strong>Total Unidades:</strong> <span class="font-bold text-teal-800">${Number(solData.total_unidades || 0).toLocaleString('es-CL')} unidades</span></p>
+                                ${solData.observaciones ? `<p class="col-span-1 sm:col-span-2 text-slate-500 italic mt-0.5"><strong>Obs:</strong> ${solData.observaciones}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Resumen de Productos Solicitados:</p>
+                        <div class="max-h-56 overflow-y-auto border border-slate-200 rounded-lg shadow-inner">
+                            <table class="w-full text-[11.5px] text-left">
+                                <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2">Producto</th>
+                                        <th class="p-2 text-center">Programa</th>
+                                        <th class="p-2 text-center">Consumo Ant.</th>
+                                        <th class="p-2 text-center">Stock Act.</th>
+                                        <th class="p-2 text-right">Cant. Solicitada</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 bg-white">
+                                    ${(solData.items || []).map(it => `
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
+                                            <td class="p-2 text-center text-slate-600 font-mono text-[11px]">${it.programa || 'General'}</td>
+                                            <td class="p-2 text-center text-slate-500">${Number(it.consumo_anterior || 0).toLocaleString('es-CL')}</td>
+                                            <td class="p-2 text-center text-slate-500">${Number(it.stock_actual || 0).toLocaleString('es-CL')}</td>
+                                            <td class="p-2 text-right font-bold text-teal-700">${Number(it.cantidad_solicitada || 0).toLocaleString('es-CL')} u.</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                Swal.fire({
+                    title: '¡Solicitud Creada con Éxito!',
+                    html: htmlDetail,
+                    icon: 'success',
+                    confirmButtonColor: '#0d9488',
+                    confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar y Finalizar',
+                    width: '660px',
+                    allowOutsideClick: false
+                }).then(() => {
+                    if (recargarAlCerrar) {
+                        window.location.href = "{{ route('requests.index') }}";
+                    }
+                });
+            }
+
+            @if (session('solicitud_success_detail'))
+                mostrarSweetAlertSolicitudExitosa(@json(session('solicitud_success_detail')), false);
+            @endif
+
             document.getElementById('requestForm').addEventListener('submit', function(e) {
-                if (requestSubmitConfirmed) return;
+                const form = this;
 
                 if (signatureRecibe.isEmpty()) {
                     e.preventDefault();
@@ -558,7 +678,7 @@
                     return;
                 }
 
-                if (!this.checkValidity()) {
+                if (!form.checkValidity()) {
                     return;
                 }
 
@@ -579,11 +699,70 @@
                     confirmButtonText: 'Sí, enviar solicitud',
                     cancelButtonText: 'Revisar',
                     reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL('image/png');
-                        requestSubmitConfirmed = true;
-                        document.getElementById('requestForm').submit();
+                }).then(async (result) => {
+                    if (!result.isConfirmed) return;
+
+                    document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL('image/png');
+
+                    Swal.fire({
+                        title: 'Registrando Solicitud...',
+                        text: 'Por favor espere mientras se guarda la solicitud en el sistema.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    try {
+                        const formData = new FormData(form);
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        const contentType = response.headers.get('content-type') || '';
+
+                        if (contentType.includes('application/json')) {
+                            const data = await response.json();
+
+                            if (response.ok && data.ok) {
+                                mostrarSweetAlertSolicitudExitosa(data.detail, true);
+                                return;
+                            }
+
+                            let errorMsg = data.message || 'Verifica los datos ingresados.';
+                            if (data.errors) {
+                                const firstKey = Object.keys(data.errors)[0];
+                                if (firstKey && data.errors[firstKey][0]) {
+                                    errorMsg = data.errors[firstKey][0];
+                                }
+                            }
+
+                            Swal.fire({
+                                title: 'No se pudo registrar la solicitud',
+                                text: errorMsg,
+                                icon: 'error',
+                                confirmButtonColor: '#e11d48',
+                                confirmButtonText: 'Revisar formulario'
+                            });
+                        } else if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            throw new Error('Error en la respuesta del servidor.');
+                        }
+                    } catch (err) {
+                        Swal.fire({
+                            title: 'Error al enviar solicitud',
+                            text: 'Ocurrió un problema de conexión o validación. Intente nuevamente.',
+                            icon: 'error',
+                            confirmButtonColor: '#e11d48',
+                            confirmButtonText: 'Entendido'
+                        });
                     }
                 });
             });

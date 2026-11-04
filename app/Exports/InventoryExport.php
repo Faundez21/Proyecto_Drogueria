@@ -13,13 +13,16 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
+use Maatwebsite\Excel\Concerns\WithDrawings;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles, WithEvents, WithTitle, WithCustomStartCell
+class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles, WithEvents, WithTitle, WithCustomStartCell, WithDrawings
 {
     protected EloquentBuilder $query;
 
@@ -43,6 +46,25 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
         return 'A4';
     }
 
+    public function drawings(): BaseDrawing|array
+    {
+        $logoPath = public_path('images/favicon4.png');
+        if (!file_exists($logoPath)) {
+            return [];
+        }
+
+        $drawing = new Drawing();
+        $drawing->setName('Logo Droguería DAS');
+        $drawing->setDescription('Logo Institucional Droguería Comunal DAS');
+        $drawing->setPath($logoPath);
+        $drawing->setHeight(42);
+        $drawing->setCoordinates('A1');
+        $drawing->setOffsetX(8);
+        $drawing->setOffsetY(4);
+
+        return [$drawing];
+    }
+
     public function headings(): array
     {
         return [
@@ -52,7 +74,7 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
             'FECHA VENCIMIENTO',
             'PASILLO',
             'ESTANTE',
-            'PROGRAMA MINISTERIAL',
+            'PROGRAMA',
             'STOCK FÍSICO',
             'VALOR NETO UNIT. ($)',
             'VALORIZACIÓN TOTAL ($)',
@@ -114,23 +136,31 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
                 $sheet = $event->sheet->getDelegate();
                 $highestRow = $sheet->getHighestRow();
 
-                // Encabezado Institucional en Filas 1 a 3
+                // Encabezado Institucional en Filas 1 a 3 (con sangría para el logo favicon4 en A1)
                 $sheet->mergeCells('A1:K1');
                 $sheet->setCellValue('A1', 'DROGUERÍA COMUNAL DAS - I. MUNICIPALIDAD DE TALCAHUANO');
                 $sheet->getStyle('A1')->applyFromArray([
                     'font' => ['bold' => true, 'size' => 14, 'color' => ['argb' => 'FF0F766E']],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'vertical' => Alignment::VERTICAL_CENTER],
+                    'alignment' => [
+                        'horizontal' => Alignment::HORIZONTAL_LEFT,
+                        'vertical' => Alignment::VERTICAL_CENTER,
+                        'indent' => 6,
+                    ],
                 ]);
 
                 $sheet->mergeCells('A2:K2');
                 $sheet->setCellValue('A2', 'REPORTE MAESTRO CONSOLIDADO DE EXISTENCIAS Y VALORIZACIÓN DE INVENTARIO · Emitido: ' . date('d/m/Y H:i') . ' hrs');
                 $sheet->getStyle('A2')->applyFromArray([
                     'font' => ['bold' => true, 'size' => 10, 'color' => ['argb' => 'FF475569']],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'vertical' => Alignment::VERTICAL_CENTER],
+                    'alignment' => [
+                        'horizontal' => Alignment::HORIZONTAL_LEFT,
+                        'vertical' => Alignment::VERTICAL_CENTER,
+                        'indent' => 6,
+                    ],
                 ]);
 
                 $sheet->getRowDimension(1)->setRowHeight(24);
-                $sheet->getRowDimension(2)->setRowHeight(18);
+                $sheet->getRowDimension(2)->setRowHeight(20);
                 $sheet->getRowDimension(4)->setRowHeight(26);
 
                 if ($highestRow >= 5) {

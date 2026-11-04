@@ -225,21 +225,21 @@
                                         <option value="" disabled selected>Buscar producto por grupo...</option>
                                         <optgroup label="Medicamentos (Fármacos)" data-optgroup="Medicamentos">
                                             @foreach($productosAgrupados['Medicamentos'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Medicamentos">
+                                                <option value="{{ $product->id }}" data-grupo="Medicamentos" data-categoria="{{ $product->categoria_sugerida ?? 'Medicamentos' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">
                                                     {{ $product->nombre }}
                                                 </option>
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Insumos y Equipamiento" data-optgroup="Insumos">
                                             @foreach($productosAgrupados['Insumos'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Insumos">
+                                                <option value="{{ $product->id }}" data-grupo="Insumos" data-categoria="{{ $product->categoria_sugerida ?? 'Insumos' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">
                                                     {{ $product->nombre }}
                                                 </option>
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Estupefacientes y Controlados" data-optgroup="Estupefacientes">
                                             @foreach($productosAgrupados['Estupefacientes'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Estupefacientes">
+                                                <option value="{{ $product->id }}" data-grupo="Estupefacientes" data-categoria="{{ $product->categoria_sugerida ?? 'Estupefacientes' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">
                                                     {{ $product->nombre }} (Controlado)
                                                 </option>
                                             @endforeach
@@ -250,40 +250,40 @@
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoría / Clasificación <span class="text-rose-500">*</span></label>
                                     <select name="tipo_producto[]" required onchange="onCategoriaReceptionChange(this)" class="select-categoria-recepcion w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" disabled selected>Seleccione categoría...</option>
-                                        <optgroup label="Medicamentos (Fármacos)">
-                                            <option value="Medicamentos" data-grupo="Medicamentos">MEDICAMENTOS GENERALES</option>
-                                            <option value="F-FOFAR" data-grupo="Medicamentos">FOFAR (FARMACIA)</option>
-                                            <option value="F-PALIATIVOS" data-grupo="Medicamentos">CUIDADOS PALIATIVOS</option>
-                                            <option value="F-PARO" data-grupo="Medicamentos">CARRO DE PARO</option>
+                                        <optgroup label="Medicamentos (Fármacos)" data-optgroup-cat="Medicamentos">
+                                            @foreach($categoriasAgrupadas['Medicamentos'] ?? ['Medicamentos' => 'MEDICAMENTOS GENERALES', 'Fármacos' => 'FÁRMACOS', 'F-FOFAR' => 'FOFAR (FARMACIA)', 'F-PALIATIVOS' => 'CUIDADOS PALIATIVOS', 'F-PARO' => 'CARRO DE PARO'] as $catVal => $catLabel)
+                                                <option value="{{ $catVal }}" data-grupo="Medicamentos">{{ $catLabel }}</option>
+                                            @endforeach
                                         </optgroup>
-                                        <optgroup label="Insumos Clínicos y Equipamiento">
-                                            <option value="Insumos" data-grupo="Insumos">INSUMOS CLÍNICOS GENERALES</option>
-                                            <option value="I-CIRUGIA" data-grupo="Insumos">CIRUGÍA MENOR (INSUMOS)</option>
-                                            <option value="I-URGENCIA" data-grupo="Insumos">URGENCIA CIRUGÍA (INSUMOS)</option>
-                                            <option value="E-COMUNAL" data-grupo="Insumos">EQUIPAMIENTO COMUNAL</option>
+                                        <optgroup label="Insumos Clínicos y Equipamiento" data-optgroup-cat="Insumos">
+                                            @foreach($categoriasAgrupadas['Insumos'] ?? ['Insumos' => 'INSUMOS CLÍNICOS GENERALES', 'Insumos Clínicos' => 'INSUMOS CLÍNICOS', 'Equipamiento' => 'EQUIPAMIENTO', 'I-CIRUGIA' => 'CIRUGÍA MENOR (INSUMOS)', 'I-URGENCIA' => 'URGENCIA CIRUGÍA (INSUMOS)', 'E-COMUNAL' => 'EQUIPAMIENTO COMUNAL'] as $catVal => $catLabel)
+                                                <option value="{{ $catVal }}" data-grupo="Insumos">{{ $catLabel }}</option>
+                                            @endforeach
                                         </optgroup>
-                                        <optgroup label="Estupefacientes y Psicotrópicos">
-                                            <option value="Estupefacientes" data-grupo="Estupefacientes">ESTUPEFACIENTES / CONTROLADOS</option>
+                                        <optgroup label="Estupefacientes y Psicotrópicos" data-optgroup-cat="Estupefacientes">
+                                            @foreach($categoriasAgrupadas['Estupefacientes'] ?? ['Estupefacientes' => 'ESTUPEFACIENTES / CONTROLADOS', 'Fármacos Controlados' => 'FÁRMACOS CONTROLADOS'] as $catVal => $catLabel)
+                                                <option value="{{ $catVal }}" data-grupo="Estupefacientes">{{ $catLabel }}</option>
+                                            @endforeach
                                         </optgroup>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Programa</label>
                                     <select name="programa[]"
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        class="select-programa-recepcion w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" selected>Sin programa</option>
-                                        <option value="Morbilidad General">Morbilidad General</option>
-                                        <option value="Cardiovascular">Cardiovascular</option>
-                                        <option value="IRA/ERA">Respiratorio (IRA/ERA)</option>
+                                        @foreach($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
+                                            <option value="{{ $progOpt }}">{{ $progOpt === 'IRA/ERA' ? 'Respiratorio (IRA/ERA)' : $progOpt }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Lote</label>
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Lote <span class="text-[11px] font-normal text-slate-400">(Opcional / S/L)</span></label>
                                     <input type="text" name="lote[]" placeholder="Ej: L-4893" class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
                                 </div>
                                 <div>
-                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">F. Vencimiento</label>
-                                    <input type="date" name="fecha_vencimiento[]" class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">F. Vencimiento <span class="text-rose-500">*</span></label>
+                                    <input type="date" name="fecha_vencimiento[]" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
                                 </div>
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Cantidad <span class="text-rose-500">*</span></label>
@@ -296,20 +296,20 @@
                             </div>
 
                             <!-- Distribución Física en Bodega -->
-                            <div class="mt-3.5 pt-3 border-t border-slate-200/80 bg-slate-50/80 rounded-xl p-3 sm:p-3.5 border border-dashed border-slate-300">
-                                <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-                                    <span class="text-[11.5px] font-bold text-slate-700 flex items-center gap-1.5 uppercase tracking-wide">
+                            <div class="mt-6 pt-4 pb-4 px-4 sm:px-5 border border-dashed border-slate-300/90 bg-slate-50/90 rounded-2xl shadow-2xs">
+                                <div class="flex flex-wrap items-center justify-between gap-2 mb-3.5 pb-2.5 border-b border-slate-200/70">
+                                    <span class="text-[12px] font-bold text-slate-700 flex items-center gap-1.5 uppercase tracking-wide">
                                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         </svg>
                                         Distribución Física en Bodega (Ubicación)
                                     </span>
-                                    <span class="text-[11px] text-slate-500 font-medium">Asigna pasillo, estante y nivel para ordenar el stock de inmediato</span>
+                                    <span class="text-[11.5px] text-slate-500 font-medium">Asigna pasillo, estante y nivel para ordenar el stock de inmediato</span>
                                 </div>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-1">
                                     <div>
-                                        <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Pasillo</label>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Pasillo</label>
                                         <select name="pasillo[]" onchange="onPasilloChange(this)" class="select-pasillo-recepcion w-full bg-white border border-slate-300 text-slate-800 rounded-lg py-2 px-2.5 text-[12.5px] focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs outline-none">
                                             <option value="">Seleccione Pasillo...</option>
                                             @foreach($pasillosLista ?? [] as $pasillo)
@@ -337,13 +337,16 @@
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Posición</label>
-                                        <select name="posicion[]" class="select-posicion-recepcion w-full bg-white border border-slate-300 text-slate-800 rounded-lg py-2 px-2.5 text-[12.5px] focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs outline-none">
+                                        <select name="posicion[]" onchange="onPosicionChange(this)" class="select-posicion-recepcion w-full bg-white border border-slate-300 text-slate-800 rounded-lg py-2 px-2.5 text-[12.5px] focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs outline-none">
                                             <option value="">Seleccione Posición...</option>
                                             @foreach($posicionesLista ?? [] as $posicion)
                                                 <option value="{{ $posicion }}">Posición {{ $posicion }}</option>
                                             @endforeach
                                         </select>
                                     </div>
+                                </div>
+                                <div class="estado-ubicacion-recepcion mt-2.5 px-3 py-2 rounded-lg text-[11.5px] font-medium bg-slate-100 text-slate-600 border border-slate-200 flex items-center justify-between gap-2">
+                                    <span>Seleccione Pasillo y Estante para ver sus niveles y posiciones disponibles.</span>
                                 </div>
                             </div>
                         </div>
@@ -694,15 +697,48 @@
             }
 
             const grupo = opt.getAttribute('data-grupo') || 'Medicamentos';
+            const catSugerida = (opt.getAttribute('data-categoria') || '').trim();
+            const progSugerido = (opt.getAttribute('data-programa') || '').trim();
             const selectCat = card.querySelector('.select-categoria-recepcion');
+            const selectProg = card.querySelector('.select-programa-recepcion') || card.querySelector('select[name="programa[]"]');
 
-            if (grupo === 'Estupefacientes') {
-                selectCat.value = 'Estupefacientes';
-            } else {
-                const catOpt = selectCat.options[selectCat.selectedIndex];
-                const catGrupoActual = catOpt ? catOpt.getAttribute('data-grupo') : null;
-                if (!catGrupoActual || catGrupoActual !== grupo) {
+            if (selectCat) {
+                if (catSugerida && catSugerida.toLowerCase() !== 'general') {
+                    let matchedOpt = Array.from(selectCat.options).find(
+                        o => o.value && o.value.toLowerCase() === catSugerida.toLowerCase()
+                    );
+                    if (!matchedOpt) {
+                        const newOpt = document.createElement('option');
+                        newOpt.value = catSugerida;
+                        newOpt.textContent = catSugerida.toUpperCase();
+                        newOpt.setAttribute('data-grupo', grupo);
+                        const targetOg = selectCat.querySelector(`optgroup[data-optgroup-cat="${grupo}"]`) || selectCat;
+                        targetOg.appendChild(newOpt);
+                        matchedOpt = newOpt;
+                    }
+                    selectCat.value = matchedOpt.value;
+                } else if (grupo === 'Estupefacientes') {
+                    selectCat.value = 'Estupefacientes';
+                } else {
                     selectCat.value = (grupo === 'Insumos') ? 'Insumos' : 'Medicamentos';
+                }
+            }
+
+            if (selectProg) {
+                if (progSugerido) {
+                    let matchedProg = Array.from(selectProg.options).find(
+                        o => o.value && o.value.toLowerCase() === progSugerido.toLowerCase()
+                    );
+                    if (!matchedProg) {
+                        const newOpt = document.createElement('option');
+                        newOpt.value = progSugerido;
+                        newOpt.textContent = progSugerido;
+                        selectProg.appendChild(newOpt);
+                        matchedProg = newOpt;
+                    }
+                    selectProg.value = matchedProg.value;
+                } else {
+                    selectProg.value = '';
                 }
             }
 
@@ -775,107 +811,59 @@
             if (targetBtn) {
                 filtrarGrupoFila(targetBtn, grupoInicial);
             }
+            if (window.LoteStatus && window.LoteStatus.Ubicacion) {
+                window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(clone), 'init', true);
+            }
             return clone;
         }
 
         window.distribucionJerarquia = @json($distribucionJerarquia ?? []);
+        window.ubicacionesOcupadas = @json($ubicacionesOcupadas ?? []);
         window.todosLosPasillos = @json($pasillosLista ?? []);
         window.todosLosEstantes = @json($estantesLista ?? []);
         window.todosLosNiveles = @json($nivelesLista ?? []);
         window.todosLasPosiciones = @json($posicionesLista ?? []);
 
+        function obtenerConfigUbicacionFila(card) {
+            const selProd = card.querySelector('.select-producto-recepcion');
+            const prodText = selProd && selProd.selectedIndex >= 0 && selProd.value
+                ? selProd.options[selProd.selectedIndex].text.trim()
+                : '';
+            const loteVal = (card.querySelector('input[name="lote[]"]')?.value || '').trim();
+            return {
+                selectPasillo: card.querySelector('.select-pasillo-recepcion'),
+                selectEstante: card.querySelector('.select-estante-recepcion'),
+                selectNivel: card.querySelector('.select-nivel-recepcion'),
+                selectPosicion: card.querySelector('.select-posicion-recepcion'),
+                statusEl: card.querySelector('.estado-ubicacion-recepcion'),
+                rowElement: card,
+                producto: prodText,
+                lote: loteVal,
+            };
+        }
+
         function onPasilloChange(selectPasillo) {
-            const card = selectPasillo.closest('.producto-item');
-            if (!card) return;
-            const pasillo = selectPasillo.value.trim().toLowerCase();
-            const selectEstante = card.querySelector('.select-estante-recepcion');
-            if (!selectEstante) return;
-
-            const estanteActual = selectEstante.value;
-            selectEstante.innerHTML = '<option value="">Seleccione Estante...</option>';
-
-            const jerarquia = window.distribucionJerarquia || [];
-            let estantesFiltrados = jerarquia.filter(item => !pasillo || (item.pasillo || '').toLowerCase() === pasillo).map(i => i.estante);
-
-            if (estantesFiltrados.length === 0) {
-                estantesFiltrados = window.todosLosEstantes || [];
-            }
-
-            estantesFiltrados.forEach(est => {
-                const opt = document.createElement('option');
-                opt.value = est;
-                opt.textContent = est;
-                if (est === estanteActual) opt.selected = true;
-                selectEstante.appendChild(opt);
-            });
+            const card = selectPasillo?.closest('.producto-item');
+            if (!card || !window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(card), 'pasillo', false);
         }
 
         function onEstanteChange(selectEstante) {
-            const card = selectEstante.closest('.producto-item');
-            if (!card) return;
-            const estanteNombre = selectEstante.value.trim();
-            const jerarquia = window.distribucionJerarquia || [];
-            const infoEstante = jerarquia.find(item => (item.estante || '').toLowerCase() === estanteNombre.toLowerCase());
-
-            const selectPasillo = card.querySelector('.select-pasillo-recepcion');
-            if (selectPasillo && infoEstante && infoEstante.pasillo) {
-                selectPasillo.value = infoEstante.pasillo;
-            }
-
-            const selectNivel = card.querySelector('.select-nivel-recepcion');
-            if (selectNivel) {
-                const nivelActual = selectNivel.value;
-                selectNivel.innerHTML = '<option value="">Seleccione Nivel...</option>';
-                const niveles = (infoEstante && infoEstante.niveles && infoEstante.niveles.length > 0)
-                    ? infoEstante.niveles.map(n => n.nivel)
-                    : (window.todosLosNiveles || []);
-
-                niveles.forEach(niv => {
-                    const opt = document.createElement('option');
-                    opt.value = niv;
-                    opt.textContent = 'Nivel ' + niv;
-                    if (niv === nivelActual) opt.selected = true;
-                    selectNivel.appendChild(opt);
-                });
-            }
-
-            onNivelChange(selectNivel);
+            const card = selectEstante?.closest('.producto-item');
+            if (!card || !window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(card), 'estante', false);
         }
 
         function onNivelChange(selectNivel) {
-            if (!selectNivel) return;
-            const card = selectNivel.closest('.producto-item');
-            if (!card) return;
-            const selectEstante = card.querySelector('.select-estante-recepcion');
-            const selectPosicion = card.querySelector('.select-posicion-recepcion');
-            if (!selectPosicion) return;
+            const card = selectNivel?.closest('.producto-item');
+            if (!card || !window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(card), 'nivel', false);
+        }
 
-            const estanteNombre = (selectEstante?.value || '').trim().toLowerCase();
-            const nivelNum = (selectNivel.value || '').trim();
-            const jerarquia = window.distribucionJerarquia || [];
-            const infoEstante = jerarquia.find(item => (item.estante || '').toLowerCase() === estanteNombre);
-
-            let posiciones = [];
-            if (infoEstante && infoEstante.niveles) {
-                const infoNivel = infoEstante.niveles.find(n => (n.nivel || '').toString() === nivelNum.toString());
-                if (infoNivel && infoNivel.posiciones) {
-                    posiciones = infoNivel.posiciones;
-                }
-            }
-
-            if (posiciones.length === 0) {
-                posiciones = window.todosLasPosiciones || [];
-            }
-
-            const posActual = selectPosicion.value;
-            selectPosicion.innerHTML = '<option value="">Seleccione Posición...</option>';
-            posiciones.forEach(pos => {
-                const opt = document.createElement('option');
-                opt.value = pos;
-                opt.textContent = 'Posición ' + pos;
-                if (pos === posActual) opt.selected = true;
-                selectPosicion.appendChild(opt);
-            });
+        function onPosicionChange(selectPosicion) {
+            const card = selectPosicion?.closest('.producto-item');
+            if (!card || !window.LoteStatus?.Ubicacion) return;
+            window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(card), 'posicion', false);
         }
 
         function agregarFilaPorGrupo(grupo) {
@@ -984,7 +972,10 @@
                                     <tr class="hover:bg-slate-50">
                                         <td class="p-2 font-medium text-slate-800">
                                             ${it.producto}
-                                            ${it.tipo ? `<span class="block text-[10px] text-slate-500 font-normal">${it.tipo}</span>` : ''}
+                                            <div class="flex flex-wrap gap-1 mt-0.5">
+                                                ${it.tipo ? `<span class="text-[10px] text-slate-500 font-normal">${it.tipo}</span>` : ''}
+                                                ${it.programa && it.programa !== 'Sin programa' ? `<span class="px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[9.5px] font-bold">${it.programa}</span>` : ''}
+                                            </div>
                                         </td>
                                         <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote || 'S/L'}</td>
                                         <td class="p-2 text-center text-slate-600">${it.vencimiento || 'N/A'}</td>
@@ -1040,6 +1031,11 @@
 
             // 2. logica dinamica de productos y totales
             const container = document.getElementById('productos_container');
+            if (window.LoteStatus && window.LoteStatus.Ubicacion) {
+                container.querySelectorAll('.producto-item').forEach(card => {
+                    window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigUbicacionFila(card), 'init', true);
+                });
+            }
 
             window.calcularTotalGeneralRecepcion = function() {
                 let totalNeto = 0;
@@ -1117,10 +1113,12 @@
                 let totalUnidades = 0;
                 let totalNeto = 0;
                 const itemsPayload = [];
+                let faltaVencimiento = false;
 
                 productCards.forEach(card => {
                     const prodSelect = card.querySelector('.select-producto-recepcion') || card.querySelector('select[name="product_id[]"]');
                     const catSelect = card.querySelector('.select-categoria-recepcion') || card.querySelector('select[name="tipo_producto[]"]');
+                    const progSelect = card.querySelector('.select-programa-recepcion') || card.querySelector('select[name="programa[]"]');
                     const qtyInput = card.querySelector('.calc-qty') || card.querySelector('input[name="cantidad_unitaria[]"]');
                     const priceInput = card.querySelector('.calc-price') || card.querySelector('input[name="valor_unitario[]"]');
                     const loteInput = card.querySelector('input[name="lote[]"]');
@@ -1130,23 +1128,39 @@
                     const price = parseFloat(priceInput?.value) || 0;
 
                     if (prodSelect && prodSelect.value) {
+                        if (!vencInput || !vencInput.value) {
+                            faltaVencimiento = true;
+                        }
+
                         itemsCount++;
                         totalUnidades += qty;
                         totalNeto += (qty * price);
 
                         const rawNombre = prodSelect.options[prodSelect.selectedIndex]?.text.trim() || 'Producto';
                         const rawCat = catSelect && catSelect.selectedIndex >= 0 ? catSelect.options[catSelect.selectedIndex]?.text.trim() : '';
+                        const rawProg = progSelect && progSelect.value ? progSelect.value.trim() : 'General DAS';
                         const rawVence = vencInput?.value ? vencInput.value.split('-').reverse().join('/') : 'N/A';
 
                         itemsPayload.push({
                             producto: rawNombre,
                             tipo: rawCat,
+                            programa: rawProg,
                             lote: loteInput?.value?.trim() || 'S/L',
                             vencimiento: rawVence,
                             cantidad: qty
                         });
                     }
                 });
+
+                if (faltaVencimiento) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha de vencimiento obligatoria',
+                        text: 'Debes ingresar la fecha de vencimiento para todos los productos a recepcionar.',
+                        confirmButtonColor: '#0d9488'
+                    });
+                    return;
+                }
 
                 if (itemsCount === 0) {
                     itemsCount = productCards.length;
@@ -1304,8 +1318,9 @@
                         <td class="px-4 py-3">
                             <strong>${item.product ? item.product.nombre : 'Prod Eliminado'}</strong><br>
                             <span class="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-bold border ${g.badgeClass}">${item.tipo_producto || key}</span>
+                            ${item.programa ? `<span class="inline-block mt-0.5 ml-1 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">${item.programa}</span>` : ''}
                         </td>
-                        <td class="px-4 py-3">${item.lote || 'S/L'}<br><span class="text-[10px] text-slate-500">${item.fecha_vencimiento || 'N/A'}</span></td>
+                        <td class="px-4 py-3">${item.lote || 'S/L'}<br><span class="text-[10px] text-slate-500">${item.fecha_vencimiento ? (item.fecha_vencimiento.includes('-') ? item.fecha_vencimiento.split('T')[0].split('-').reverse().join('/') : item.fecha_vencimiento) : 'N/A'}</span></td>
                         <td class="px-4 py-3 text-center font-bold">${item.cantidad}</td>
                         <td class="px-4 py-3 text-right font-mono-das font-bold">$${Math.round(parseFloat(item.valor_total_item || 0)).toLocaleString('es-CL')}</td>
                     `;

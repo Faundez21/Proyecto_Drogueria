@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // ===== 1. inventories <-> products =====
+        //  1. inventories <-> products 
         Schema::table('inventories', function (Blueprint $table) {
             $table->foreignId('product_id')->nullable()->after('id');
             $table->index('producto');
@@ -36,12 +36,12 @@ return new class extends Migration
             $table->foreign('product_id')->references('id')->on('products')->nullOnDelete();
         });
 
-        // ===== 2. receptions.correlativo único =====
+        //  2. receptions.correlativo único 
         Schema::table('receptions', function (Blueprint $table) {
             $table->unique('correlativo');
         });
 
-        // ===== 3. dispatch_items / controlled_dispatch_items -> inventories =====
+        //  3. dispatch_items / controlled_dispatch_items -> inventories 
         Schema::table('dispatch_items', function (Blueprint $table) {
             $table->foreignId('inventory_id')->nullable()->after('dispatch_id');
         });
@@ -56,7 +56,7 @@ return new class extends Migration
             $table->foreign('inventory_id')->references('id')->on('inventories')->nullOnDelete();
         });
 
-        // ===== 4. stock_movements -> inventories / users + índices =====
+        //  4. stock_movements -> inventories / users + índices 
         Schema::table('stock_movements', function (Blueprint $table) {
             $table->foreignId('inventory_id')->nullable()->after('id');
             $table->foreignId('user_id')->nullable()->after('inventory_id');
@@ -68,7 +68,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
         });
 
-        // ===== 5. Backfill: movimientos históricos de recepciones =====
+        //  5. Backfill: movimientos históricos de recepciones 
         $receptions = DB::table('receptions')->get();
         foreach ($receptions as $rec) {
             $items = DB::table('reception_items')->where('reception_id', $rec->id)->get();

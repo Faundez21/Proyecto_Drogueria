@@ -39,15 +39,7 @@ class InventoryController extends Controller
         $puedeVerControlados = auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado');
 
         if (! $puedeVerControlados) {
-            $query->where('categoria', '!=', 'Fármacos Controlados');
-        } else {
-            if ($request->input('categoria') === 'Fármacos Controlados') {
-                $query->where('categoria', 'Fármacos Controlados');
-            }
-        }
-
-        if ($request->filled('categoria') && $request->input('categoria') !== 'Fármacos Controlados') {
-            $query->where('categoria', $request->categoria);
+            $query->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']);
         }
 
         // 1. Filtro de Búsqueda Global (Producto, Lote, Categoría)
@@ -57,13 +49,26 @@ class InventoryController extends Controller
                 $q->where('producto', 'LIKE', "%{$search}%")
                     ->orWhere('lote', 'LIKE', "%{$search}%")
                     ->orWhere('categoria', 'LIKE', "%{$search}%")
+                    ->orWhere('programa', 'LIKE', "%{$search}%")
                     ->orWhere('rut_proveedor', 'LIKE', "%{$search}%");
             });
         }
 
         // 2. Filtros Específicos
         if ($request->filled('categoria')) {
-            $query->where('categoria', $request->categoria);
+            $catFiltro = trim($request->input('categoria'));
+            $catLower = mb_strtolower($catFiltro);
+            if (in_array($catLower, ['fármacos', 'farmacos', 'medicamentos'])) {
+                $query->whereIn('categoria', ['Fármacos', 'Farmacos', 'Medicamentos']);
+            } elseif (in_array($catLower, ['insumos clínicos', 'insumos clinicos', 'insumos'])) {
+                $query->whereIn('categoria', ['Insumos Clínicos', 'Insumos Clinicos', 'Insumos']);
+            } elseif (in_array($catLower, ['fármacos controlados', 'farmacos controlados', 'estupefacientes'])) {
+                if ($puedeVerControlados) {
+                    $query->whereIn('categoria', ['Fármacos Controlados', 'Farmacos Controlados', 'Estupefacientes']);
+                }
+            } else {
+                $query->where('categoria', $catFiltro);
+            }
         }
         if ($request->filled('pasillo')) {
             $query->where('pasillo', $request->pasillo);
@@ -105,46 +110,36 @@ class InventoryController extends Controller
         // --- CONSULTAS INDEPENDIENTES PARA LOS MODALES ---
         $mermas = Inventory::with('user')
             ->where('estado', 'Merma')
-            ->when(! $puedeVerControlados, fn ($q) => $q->where('categoria', '!=', 'Fármacos Controlados'))
+            ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']))
             ->orderBy('updated_at', 'desc')
             ->get();
         $historial = Inventory::with('user')
-            ->when(! $puedeVerControlados, fn ($q) => $q->where('categoria', '!=', 'Fármacos Controlados'))
+            ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']))
             ->orderBy('created_at', 'desc')
             ->limit(150)
             ->get();
 
         // 5. Generar lista de productos únicos combinando Catálogo Maestro + Inventario
+        InventoryService::sincronizarProductosDesdeInventario();
         $productosInv = Inventory::select('producto')
             ->whereNotNull('producto')
             ->where('producto', '!=', '')
             ->distinct()
             ->pluck('producto');
         $productosCat = Product::orderBy('nombre')->pluck('nombre');
-        $productosLista = $productosInv->merge($productosCat)->unique()->sort()->values();
+        $productosLista = $productosInv->merge($productosCat)->unique()->sort(SORT_NATURAL)->values();
 
         // 6. Listas para filtros y formularios combinando Mantenedores Físicos + Inventario
-        $programasLista = Inventory::whereNotNull('programa')
-            ->where('programa', '!=', '')
-            ->distinct()
-            ->orderBy('programa', 'asc')
-            ->pluck('programa');
+        $programasLista = InventoryService::programasLista();
+        $categoriasLista = InventoryService::categoriasLista($puedeVerControlados);
 
-        $pasillosInv = Inventory::whereNotNull('pasillo')->where('pasillo', '!=', '')->distinct()->pluck('pasillo');
-        $pasillosMant = Aisle::orderBy('name')->pluck('name');
-        $pasillosLista = $pasillosMant->merge($pasillosInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $estantesInv = Inventory::whereNotNull('estante')->where('estante', '!=', '')->distinct()->pluck('estante');
-        $estantesMant = Shelf::orderBy('name')->pluck('name');
-        $estantesLista = $estantesMant->merge($estantesInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $nivelesInv = Inventory::whereNotNull('nivel')->where('nivel', '!=', '')->distinct()->pluck('nivel')->map(fn ($v) => (string) $v);
-        $nivelesMant = Level::orderBy('number')->pluck('number')->map(fn ($v) => (string) $v);
-        $nivelesLista = $nivelesMant->merge($nivelesInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $posicionesInv = Inventory::whereNotNull('posicion')->where('posicion', '!=', '')->distinct()->pluck('posicion');
-        $posicionesMant = Position::orderBy('name')->pluck('name');
-        $posicionesLista = $posicionesMant->merge($posicionesInv)->unique()->sort(SORT_NATURAL)->values();
+        $datosDist = InventoryService::datosDistribucionFisica();
+        $pasillosLista = $datosDist['pasillosLista'];
+        $estantesLista = $datosDist['estantesLista'];
+        $nivelesLista = $datosDist['nivelesLista'];
+        $posicionesLista = $datosDist['posicionesLista'];
+        $distribucionJerarquia = $datosDist['distribucionJerarquia'];
+        $ubicacionesOcupadas = $datosDist['ubicacionesOcupadas'];
 
         $proveedoresActivos = \App\Models\Provider::where('status', 'activo')
             ->orderBy('name')
@@ -156,10 +151,13 @@ class InventoryController extends Controller
             'historial',
             'productosLista',
             'programasLista',
+            'categoriasLista',
             'pasillosLista',
             'estantesLista',
             'nivelesLista',
             'posicionesLista',
+            'distribucionJerarquia',
+            'ubicacionesOcupadas',
             'proveedoresActivos'
         ));
     }
@@ -175,11 +173,11 @@ class InventoryController extends Controller
             'tipo_documento' => 'required|string|max:255',
             'numero_documento' => 'required|string|max:255',
             'orden_compra' => 'nullable|string|max:255',
-            'origen_mercaderia' => 'nullable|string|max:255',
+            'origen_mercaderia' => 'nullable|string|max:500',
             'rut_proveedor' => 'nullable|string|max:30',
-            'razon_social' => 'nullable|string|max:255',
-            'producto' => 'required|string|max:255',
-            'categoria' => 'required|string|max:255',
+            'razon_social' => 'nullable|string|max:500',
+            'producto' => 'required|string|max:1000',
+            'categoria' => 'required|string|max:500',
             'estado' => 'required|in:Disponible,Cuarentena,Merma',
             'motivo' => 'nullable|string|max:1000',
             'lote' => 'nullable|string|max:255',
@@ -188,7 +186,7 @@ class InventoryController extends Controller
             'valor_neto_unitario' => 'nullable|integer|min:0',
             'pasillo' => 'nullable|string|max:50',
             'estante' => 'nullable|string|max:50',
-            'programa' => 'nullable|string|max:255',
+            'programa' => 'nullable|string|max:500',
             'nivel' => 'nullable|string|max:100',
             'posicion' => 'nullable|string|max:100',
             'solicitud_pedido_mensual' => 'nullable|boolean',
@@ -216,6 +214,27 @@ class InventoryController extends Controller
         }
 
         $validated = $validator->validated();
+
+        if (($validated['estado'] ?? 'Disponible') !== 'Merma' && ! empty($validated['estante']) && ! empty($validated['nivel'])) {
+            $ocupante = InventoryService::verificarUbicacionOcupada(
+                $validated['estante'] ?? null,
+                $validated['nivel'] ?? null,
+                $validated['posicion'] ?? null,
+                null,
+                $validated['producto'] ?? null,
+                $validated['lote'] ?? null
+            );
+
+            if ($ocupante) {
+                $detallePos = ! empty($validated['posicion']) ? ", Posición {$validated['posicion']}" : '';
+                $msgOcupado = "La ubicación seleccionada (Estante {$validated['estante']}, Nivel {$validated['nivel']}{$detallePos}) ya se encuentra ocupada por «{$ocupante->producto}» (Lote: " . ($ocupante->lote ?: 'S/L') . ").";
+
+                return redirect()->back()
+                    ->withInput()
+                    ->with('open_modal', 'deposit')
+                    ->with('error', $msgOcupado);
+            }
+        }
 
         try {
             $inventory = DB::transaction(function () use ($validated, $request) {
@@ -324,7 +343,11 @@ class InventoryController extends Controller
 
         $inventory = Inventory::findOrFail($id);
         $estadoAnterior = $inventory->estado;
+        $pasilloAnterior = $inventory->pasillo;
         $estanteAnterior = $inventory->estante;
+        $nivelAnterior = $inventory->nivel;
+        $posicionAnterior = $inventory->posicion;
+
         $data = $request->only(['estado', 'motivo']);
 
         if ($request->has('pasillo')) {
@@ -340,6 +363,33 @@ class InventoryController extends Controller
             $data['posicion'] = $request->filled('posicion') ? trim($request->posicion) : null;
         }
 
+        $estanteEvaluar = $data['estante'] ?? $inventory->estante;
+        $nivelEvaluar = array_key_exists('nivel', $data) ? $data['nivel'] : $inventory->nivel;
+        $posicionEvaluar = array_key_exists('posicion', $data) ? $data['posicion'] : $inventory->posicion;
+
+        if (($data['estado'] ?? $inventory->estado) !== 'Merma' && ! empty($estanteEvaluar) && $estanteEvaluar !== 'P.A' && ! empty($nivelEvaluar)) {
+            $ocupante = InventoryService::verificarUbicacionOcupada(
+                $estanteEvaluar,
+                $nivelEvaluar,
+                $posicionEvaluar,
+                (int) $inventory->id
+            );
+
+            if ($ocupante) {
+                $detallePos = ! empty($posicionEvaluar) ? ", Posición {$posicionEvaluar}" : '';
+                $msgOcupado = "La ubicación seleccionada (Estante {$estanteEvaluar}, Nivel {$nivelEvaluar}{$detallePos}) ya se encuentra en uso por «{$ocupante->producto}» (Lote: " . ($ocupante->lote ?: 'S/L') . "). Seleccione otra ubicación disponible.";
+
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'ok' => false,
+                        'message' => $msgOcupado,
+                    ], 422);
+                }
+
+                return redirect()->back()->with('error', $msgOcupado);
+            }
+        }
+
         $data['user_id'] = Auth::id();
 
         // Resolver relaciones foráneas de ubicación física
@@ -347,8 +397,25 @@ class InventoryController extends Controller
 
         $inventory->update($data);
 
-        $cambioUbicacion = isset($data['estante']) && $data['estante'] !== $estanteAnterior;
+        $cambioUbicacion = ($inventory->pasillo ?? '') !== ($pasilloAnterior ?? '')
+            || ($inventory->estante ?? '') !== ($estanteAnterior ?? '')
+            || ($inventory->nivel ?? '') !== ($nivelAnterior ?? '')
+            || ($inventory->posicion ?? '') !== ($posicionAnterior ?? '');
         $cambioEstado = $estadoAnterior !== $inventory->estado;
+
+        $ubicTxt = [];
+        if (!empty($inventory->pasillo) && $inventory->pasillo !== 'P.A') $ubicTxt[] = "Pasillo {$inventory->pasillo}";
+        if (!empty($inventory->estante) && $inventory->estante !== 'P.A') $ubicTxt[] = "Estante {$inventory->estante}";
+        if (!empty($inventory->nivel)) $ubicTxt[] = "Nivel {$inventory->nivel}";
+        if (!empty($inventory->posicion)) $ubicTxt[] = "Posición {$inventory->posicion}";
+        $detUbic = !empty($ubicTxt) ? implode(' · ', $ubicTxt) : 'Sin asignar (P.A)';
+
+        $ubicAntTxt = [];
+        if (!empty($pasilloAnterior) && $pasilloAnterior !== 'P.A') $ubicAntTxt[] = "Pasillo {$pasilloAnterior}";
+        if (!empty($estanteAnterior) && $estanteAnterior !== 'P.A') $ubicAntTxt[] = "Estante {$estanteAnterior}";
+        if (!empty($nivelAnterior)) $ubicAntTxt[] = "Nivel {$nivelAnterior}";
+        if (!empty($posicionAnterior)) $ubicAntTxt[] = "Posición {$posicionAnterior}";
+        $detUbicAnterior = !empty($ubicAntTxt) ? implode(' · ', $ubicAntTxt) : 'Sin asignar (P.A)';
 
         if ($cambioEstado) {
             StockMovement::create([
@@ -374,23 +441,77 @@ class InventoryController extends Controller
                 'tipo_movimiento' => 'Reubicación',
                 'cantidad' => $inventory->cantidad,
                 'fecha_hora' => now(),
-                'origen_destino' => 'Ubicación asignada: ' . ($inventory->estante ?: 'P.A'),
+                'origen_destino' => 'Ubicación asignada: ' . $detUbic,
                 'documento_respaldo' => 'Ordenamiento en bodega',
                 'estado_lote' => $inventory->estado,
             ]);
         }
 
-        if ($cambioUbicacion && !$cambioEstado) {
-            $mensaje = "Ubicación del lote actualizada exitosamente a «{$inventory->estante}» (ordenado en distribución).";
-        } elseif ($data['estado'] == 'Cuarentena') {
-            $mensaje = 'El lote ha sido bloqueado y enviado a cuarentena.';
-        } elseif ($data['estado'] == 'Merma') {
-            $mensaje = 'El lote ha sido declarado como Merma.';
+        // Determinar tipo de movimiento y mensaje contextual
+        if ($estadoAnterior === 'Merma' && $inventory->estado === 'Cuarentena') {
+            $tipo = 'merma_a_cuarentena';
+            $mensaje = "El lote {$inventory->lote} ha sido trasladado desde Merma a Cuarentena para reevaluación técnica.";
+        } elseif ($estadoAnterior === 'Merma' && $inventory->estado === 'Disponible') {
+            $tipo = 'merma_a_disponible';
+            $mensaje = "El lote {$inventory->lote} ha sido reactivado desde Merma a Disponible para entrega y despacho.";
+        } elseif ($estadoAnterior === 'Disponible' && $inventory->estado === 'Cuarentena') {
+            $tipo = 'disponible_a_cuarentena';
+            $mensaje = "El lote {$inventory->lote} ha sido bloqueado preventivamente y enviado a Cuarentena.";
+        } elseif ($estadoAnterior === 'Cuarentena' && $inventory->estado === 'Disponible') {
+            $tipo = 'cuarentena_a_disponible';
+            $mensaje = "El lote {$inventory->lote} ha sido liberado exitosamente como Disponible para despacho.";
+        } elseif ($cambioEstado && $inventory->estado === 'Merma') {
+            $tipo = 'a_merma';
+            $mensaje = "El lote {$inventory->lote} ha sido declarado como Merma y retirado del stock disponible.";
+        } elseif ($cambioUbicacion && !$cambioEstado) {
+            $tipo = 'reubicacion';
+            $mensaje = "El lote {$inventory->lote} ha sido reubicado exitosamente en bodega ({$detUbic}).";
+        } elseif (!$cambioEstado && $inventory->estado === 'Cuarentena') {
+            $tipo = 'actualizacion_cuarentena';
+            $mensaje = "Se ha actualizado la justificación del lote {$inventory->lote} en Cuarentena.";
+        } elseif (!$cambioEstado && $inventory->estado === 'Merma') {
+            $tipo = 'actualizacion_merma';
+            $mensaje = "Se ha actualizado la información del lote {$inventory->lote} en Merma.";
         } else {
-            $mensaje = 'El lote ha sido actualizado exitosamente.';
+            $tipo = 'actualizacion';
+            $mensaje = "El lote {$inventory->lote} ha sido actualizado exitosamente.";
         }
 
-        return redirect()->back()->with('success', $mensaje);
+        $statusPayload = [
+            'tipo' => $tipo,
+            'correlativo' => 'MOV-' . str_pad($inventory->id, 5, '0', STR_PAD_LEFT),
+            'producto' => $inventory->producto,
+            'lote' => $inventory->lote,
+            'categoria' => $inventory->categoria ?? 'General',
+            'programa' => $inventory->programa ?: null,
+            'fecha_vencimiento' => $inventory->fecha_vencimiento ? \Carbon\Carbon::parse($inventory->fecha_vencimiento)->format('d/m/Y') : 'N/A',
+            'estado_anterior' => $estadoAnterior,
+            'nuevo_estado' => $inventory->estado,
+            'cantidad' => number_format($inventory->cantidad ?? 0, 0, ',', '.'),
+            'valor_unitario' => $inventory->valor_neto_unitario ? number_format((float) $inventory->valor_neto_unitario, 0, ',', '.') : null,
+            'valor_total' => $inventory->valor_neto_unitario ? number_format((float) ($inventory->valor_neto_unitario * ($inventory->cantidad ?? 0)), 0, ',', '.') : null,
+            'motivo' => $request->input('motivo') ?: '',
+            'ubicacion' => $detUbic,
+            'ubicacion_anterior' => $detUbicAnterior,
+            'cambio_ubicacion' => $cambioUbicacion,
+            'fecha_hora' => now()->format('d/m/Y H:i'),
+            'usuario' => Auth::user() ? trim(Auth::user()->name . ' ' . (Auth::user()->last_name ?? '')) : 'Sistema',
+            'mensaje' => $mensaje,
+        ];
+
+        // Petición AJAX (fetch/async): responder JSON para que el frontend muestre
+        // el SweetAlert2 de éxito SIN recargar la página (evita que la recarga lo interrumpa).
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'message' => $mensaje,
+                'data' => $statusPayload,
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('success', $mensaje)
+            ->with('lote_status_success', $statusPayload);
     }
 
     /**
@@ -441,6 +562,11 @@ class InventoryController extends Controller
         }
 
         // 3. Detectar si el archivo exacto ya fue importado (por Hash SHA-256)
+        // Si la tabla de inventario está vacía (ej. tras limpiar datos de prueba), reiniciar historial de hashes
+        if (Inventory::count() === 0) {
+            session()->forget('inventory_imported_hashes');
+        }
+
         $fileHash = hash_file('sha256', $file->getRealPath());
         $importedHashes = session('inventory_imported_hashes', []);
 
@@ -449,20 +575,27 @@ class InventoryController extends Controller
             return redirect()->back()
                 ->with('open_modal', 'import')
                 ->with('import_error_title', 'Archivo Duplicado Detectado')
-                ->with('error', "El archivo «{$file->getClientOriginalName()}» ya fue procesado anteriormente el {$prev['fecha']} ({$prev['registros']} registros importados). Se bloqueó la subida para evitar duplicar existencias.");
+                ->with('error', "El archivo «{$file->getClientOriginalName()}» ya fue procesado anteriormente el {$prev['fecha']} ({$prev['registros']} registros importados). Marque la casilla de confirmación si desea volver a procesarlo.");
         }
 
         try {
-            $total = DB::transaction(function () use ($file) {
-                $import = new InventoriesImport(Auth::id());
+            $resumen = DB::transaction(function () use ($file, $request) {
+                $import = new InventoriesImport((int) Auth::id(), $request->boolean('force_reimport'));
                 Excel::import($import, $file);
 
                 if ($import->importados() === 0) {
-                    throw new \RuntimeException('El archivo seleccionado está vacío o no contiene registros válidos bajo la fila de encabezados.');
+                    throw new \RuntimeException('El archivo seleccionado está vacío o no contiene filas con nombre de PRODUCTO bajo la fila de encabezados.');
                 }
 
-                return $import->importados();
+                return [
+                    'total' => $import->importados(),
+                    'disponibles' => $import->disponibles(),
+                    'cuarentena' => $import->enCuarentena(),
+                    'merma' => $import->enMerma(),
+                ];
             });
+
+            $total = $resumen['total'];
 
             // Guardar huella del archivo importado en la sesión
             $importedHashes[$fileHash] = [
@@ -472,11 +605,25 @@ class InventoryController extends Controller
             ];
             session(['inventory_imported_hashes' => $importedHashes]);
 
-            return redirect()->back()->with('success', "Carga masiva completada con éxito: {$total} lote(s) de inventario verificados e ingresados a bodega.");
+            $detallesEstado = [];
+            if ($resumen['disponibles'] > 0) {
+                $detallesEstado[] = "{$resumen['disponibles']} en Inventario Disponible";
+            }
+            if ($resumen['cuarentena'] > 0) {
+                $detallesEstado[] = "{$resumen['cuarentena']} en Cuarentena";
+            }
+            if ($resumen['merma'] > 0) {
+                $detallesEstado[] = "{$resumen['merma']} en Merma";
+            }
+            $textoDesglose = ! empty($detallesEstado) ? ' (' . implode(', ', $detallesEstado) . ')' : '';
+
+            return redirect()->back()
+                ->with('import_completed_ok', true)
+                ->with('success', "Carga masiva completada con éxito: {$total} lote(s) ingresados a bodega{$textoDesglose}.");
         } catch (\RuntimeException $e) {
             return redirect()->back()
                 ->with('open_modal', 'import')
-                ->with('import_error_title', 'Error en Validación de Datos / Duplicados')
+                ->with('import_error_title', 'Error en Validación de Datos')
                 ->with('error', $e->getMessage());
         } catch (ValidationException $e) {
             $primerError = collect($e->failures())->first();
@@ -492,22 +639,16 @@ class InventoryController extends Controller
 
             return redirect()->back()
                 ->with('open_modal', 'import')
-                ->with('import_error_title', 'Archivo Incompatible o Corrupto')
-                ->with('error', 'No fue posible leer la estructura del archivo. Asegúrese de que sea un archivo Excel (.xlsx / .xls) válido generado desde la Plantilla Oficial.');
+                ->with('import_error_title', 'Error al Procesar el Archivo')
+                ->with('error', 'No se pudo completar la carga masiva: ' . $e->getMessage());
         }
     }
 
     /**
-     * Descarga la plantilla oficial de carga masiva (o la genera dinámicamente si no existe en disco).
+     * Descarga la plantilla oficial de carga masiva con estado Disponible por defecto.
      */
     public function template()
     {
-        $filePath = public_path('plantillas/plantilla_inventario.xlsx');
-
-        if (file_exists($filePath)) {
-            return response()->download($filePath, 'Plantilla_Carga_Masiva_Inventario_DAS.xlsx');
-        }
-
         $export = new class implements FromArray, WithHeadings, ShouldAutoSize, WithStyles {
             public function headings(): array
             {

@@ -22,7 +22,7 @@ class ReportController extends Controller
         $puedeVerControlados = $user && ($user->hasRole('Administrador') || $user->can('ver.despacho_controlado'));
 
         if (! $puedeVerControlados) {
-            $query->where('categoria', '!=', 'Fármacos Controlados');
+            $query->whereNotIn('categoria', ['Fármacos Controlados', 'Controlado', 'Estupefacientes']);
         }
 
         // 1. Filtro de Búsqueda (Texto general)
@@ -32,14 +32,26 @@ class ReportController extends Controller
                 $q->where('producto', 'like', "%{$search}%")
                     ->orWhere('lote', 'like', "%{$search}%")
                     ->orWhere('categoria', 'like', "%{$search}%")
+                    ->orWhere('programa', 'like', "%{$search}%")
                     ->orWhere('rut_proveedor', 'like', "%{$search}%");
             });
         }
 
-        // 2. Filtro de Categoría
+        // 2. Filtro de Categoría (con soporte para variantes de nombres en BD)
         if ($request->filled('categoria')) {
-            if ($request->input('categoria') !== 'Fármacos Controlados' || $puedeVerControlados) {
-                $query->where('categoria', $request->input('categoria'));
+            $cat = trim((string) $request->input('categoria'));
+            $esCatControlada = in_array($cat, ['Fármacos Controlados', 'Controlado', 'Estupefacientes'], true);
+
+            if (! $esCatControlada || $puedeVerControlados) {
+                if ($cat === 'Fármacos') {
+                    $query->whereIn('categoria', ['Fármacos', 'Medicamentos', 'F-FOFAR', 'F-PALIATIVOS', 'F-PARO']);
+                } elseif ($cat === 'Insumos Clínicos') {
+                    $query->whereIn('categoria', ['Insumos Clínicos', 'Insumos', 'I-CIRUGIA', 'I-URGENCIA', 'E-COMUNAL']);
+                } elseif ($cat === 'Fármacos Controlados') {
+                    $query->whereIn('categoria', ['Fármacos Controlados', 'Controlado', 'Estupefacientes']);
+                } else {
+                    $query->where('categoria', $cat);
+                }
             }
         }
 
@@ -91,6 +103,24 @@ class ReportController extends Controller
             ->selectRaw('SUM(cantidad * valor_neto_unitario) as total')
             ->value('total') ?? 0;
 
+        $user = auth()->user();
+        $puedeVerControlados = $user && ($user->hasRole('Administrador') || $user->can('ver.despacho_controlado'));
+
+        $categoriasBase = collect(['Fármacos', 'Insumos Clínicos']);
+        if ($puedeVerControlados) {
+            $categoriasBase->push('Fármacos Controlados');
+        }
+
+        $categoriasBD = Inventory::where('estado', 'Disponible')
+            ->whereNotNull('categoria')
+            ->where('categoria', '!=', '')
+            ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('categoria', ['Fármacos Controlados', 'Controlado', 'Estupefacientes']))
+            ->distinct()
+            ->orderBy('categoria')
+            ->pluck('categoria');
+
+        $categoriasUnicas = $categoriasBase->merge($categoriasBD)->unique()->values();
+
         $programasUnicos = Inventory::where('estado', 'Disponible')
             ->whereNotNull('programa')
             ->where('programa', '!=', '')
@@ -112,7 +142,7 @@ class ReportController extends Controller
             ->orderBy('estante')
             ->pluck('estante');
 
-        return view('reports.index', compact('inventories', 'valorTotal', 'programasUnicos', 'pasillosUnicos', 'estantesUnicos'));
+        return view('reports.index', compact('inventories', 'valorTotal', 'categoriasUnicas', 'programasUnicos', 'pasillosUnicos', 'estantesUnicos'));
     }
 
     public function exportExcel(Request $request)

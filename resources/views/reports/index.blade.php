@@ -79,21 +79,17 @@
 
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
-                        <select name="categoria" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        <select name="categoria" onchange="this.form.submit()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todas</option>
-                            <option value="Fármacos" {{ request('categoria') == 'Fármacos' ? 'selected' : '' }}>Fármacos</option>
-                            <option value="Insumos Clínicos" {{ request('categoria') == 'Insumos Clínicos' ? 'selected' : '' }}>Insumos Clínicos</option>
-                            @if(auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado'))
-                            <option value="Fármacos Controlados" {{ request('categoria') == 'Fármacos Controlados' ? 'selected' : '' }}>
-                                Fármacos Controlados
-                            </option>
-                            @endif
+                            @foreach($categoriasUnicas ?? ['Fármacos', 'Insumos Clínicos'] as $cat)
+                                <option value="{{ $cat }}" {{ request('categoria') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                            @endforeach
                         </select>
                     </div>
 
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Pasillo</label>
-                        <select name="pasillo" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        <select name="pasillo" onchange="this.form.submit()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todos</option>
                             @foreach($pasillosUnicos as $pas)
                                 <option value="{{ $pas }}" {{ request('pasillo') == $pas ? 'selected' : '' }}>{{ $pas }}</option>
@@ -103,7 +99,7 @@
 
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Estante</label>
-                        <select name="estante" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        <select name="estante" onchange="this.form.submit()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todos</option>
                             @foreach($estantesUnicos as $est)
                                 <option value="{{ $est }}" {{ request('estante') == $est ? 'selected' : '' }}>{{ $est }}</option>
@@ -113,7 +109,7 @@
 
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Programa</label>
-                        <select name="programa" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        <select name="programa" onchange="this.form.submit()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todos</option>
                             @foreach($programasUnicos as $prog)
                                 <option value="{{ $prog }}" {{ request('programa') == $prog ? 'selected' : '' }}>{{ $prog }}</option>
@@ -123,7 +119,7 @@
 
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Ordenar por</label>
-                        <select name="order_by" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        <select name="order_by" onchange="this.form.submit()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="recent" {{ request('order_by', 'recent') == 'recent' ? 'selected' : '' }}>Más recientes</option>
                             <option value="nombre_asc" {{ request('order_by') == 'nombre_asc' ? 'selected' : '' }}>Nombre (A-Z)</option>
                             <option value="stock_desc" {{ request('order_by') == 'stock_desc' ? 'selected' : '' }}>Mayor Stock</option>
@@ -142,6 +138,26 @@
                     </button>
                 </div>
             </form>
+
+            @if (request()->filled('pasillo') || request()->filled('estante') || request()->filled('categoria') || request()->filled('programa') || request()->filled('search'))
+                <div class="px-5 py-3 bg-teal-50 border-b border-teal-200 flex justify-between items-center text-xs text-teal-800 font-bold">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Filtro activo: <span class="underline">
+                            {{ implode(' | ', array_filter([
+                                request('search') ? 'Búsqueda: ' . request('search') : null,
+                                request('categoria') ? 'Categoría: ' . request('categoria') : null,
+                                request('pasillo') ? 'Pasillo: ' . request('pasillo') : null,
+                                request('estante') ? 'Estante: ' . request('estante') : null,
+                                request('programa') ? 'Programa: ' . request('programa') : null,
+                            ])) }}
+                        </span>
+                    </span>
+                    <a href="{{ route('reports.index') }}" class="px-3 py-1 bg-white border border-teal-300 rounded-lg text-teal-700 hover:bg-teal-100 transition-colors shadow-sm cursor-pointer text-[11px]">
+                        Limpiar Filtros
+                    </a>
+                </div>
+            @endif
 
             <div class="overflow-x-auto w-full">
                 @php
@@ -453,7 +469,7 @@
             const btnToggleFilters = document.getElementById('toggle-filters-btn');
             const filtersPanel = document.getElementById('filters-panel');
 
-            if(window.location.search.includes('categoria') || window.location.search.includes('pasillo') || window.location.search.includes('estante') || window.location.search.includes('order_by') || window.location.search.includes('search')) {
+            if(window.location.search.includes('categoria') || window.location.search.includes('pasillo') || window.location.search.includes('estante') || window.location.search.includes('programa') || window.location.search.includes('order_by') || window.location.search.includes('search')) {
                 if(filtersPanel) filtersPanel.classList.remove('hidden');
             }
 
