@@ -951,11 +951,6 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="sm:col-span-2 lg:col-span-4">
-                                <div id="manual_ubicacion_status" class="px-3 py-2 rounded-lg text-[11.5px] font-medium bg-slate-100 text-slate-600 border border-slate-200 flex items-center justify-between gap-2">
-                                    <span>Seleccione Pasillo y Estante para ver sus niveles y posiciones disponibles.</span>
-                                </div>
-                            </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa</label>
                                 <input type="text" name="programa" list="programasManualList" value="{{ old('programa') }}" placeholder="Ej. FOFAR / Morbilidad General" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
@@ -1588,7 +1583,7 @@
                 selectEstante: document.getElementById('manual_estante'),
                 selectNivel: document.getElementById('manual_nivel'),
                 selectPosicion: document.getElementById('manual_posicion'),
-                statusEl: document.getElementById('manual_ubicacion_status'),
+                statusEl: null,
                 producto: form?.querySelector('input[name="producto"]')?.value?.trim() || '',
                 lote: form?.querySelector('input[name="lote"]')?.value?.trim() || '',
             };
