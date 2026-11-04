@@ -619,9 +619,7 @@
             const csrfToken = '{{ csrf_token() }}';
             let selectedRow = null;
 
-            // =====================================================
             // VALIDACIONES: RUT CHILENO (módulo 11) Y TELÉFONO
-            // =====================================================
 
             // Deja sólo dígitos y K, en mayúscula
             function cleanRut(value) {
@@ -782,9 +780,7 @@
                 if (emailInput.value.trim()) checkEmailField();
             });
 
-            // =====================================================
             // --- Control del Panel de Filtros ---
-            // =====================================================
             const btnToggleFilters = document.getElementById('toggle-filters-btn');
             const filtersPanel = document.getElementById('filters-panel');
 

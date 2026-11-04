@@ -164,6 +164,7 @@ class GlobalSearchController extends Controller
 
                 foreach ($misSolicitudes as $sol) {
                     $notifications[] = [
+                        'id' => "sol_asig_{$sol->id}",
                         'color' => 'text-teal-600',
                         'bg' => 'bg-teal-100',
                         'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>',
@@ -184,6 +185,7 @@ class GlobalSearchController extends Controller
 
                     foreach ($sinAsignar as $sol) {
                         $notifications[] = [
+                            'id' => "sol_sin_asig_{$sol->id}",
                             'color' => 'text-indigo-600',
                             'bg' => 'bg-indigo-100',
                             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>',
@@ -204,6 +206,7 @@ class GlobalSearchController extends Controller
 
                 if ($clavesPendientes > 0) {
                     $notifications[] = [
+                        'id' => "pwd_reset_{$clavesPendientes}",
                         'color' => 'text-purple-600',
                         'bg' => 'bg-purple-100',
                         'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>',
@@ -238,6 +241,7 @@ class GlobalSearchController extends Controller
                         : route('inventory.index') . '?search=' . urlencode($vence->lote);
 
                     $notifications[] = [
+                        'id' => "fefo_{$vence->id}_{$vence->lote}",
                         'color' => 'text-rose-600',
                         'bg' => 'bg-rose-100',
                         'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>',
@@ -261,6 +265,7 @@ class GlobalSearchController extends Controller
                     $mensajeCuarentena = $dias == 0 ? "Lote {$cuar->lote} fue enviado a cuarentena hoy." : "Lote {$cuar->lote} lleva {$dias} días retenido.";
 
                     $notifications[] = [
+                        'id' => "cuarentena_{$cuar->id}_{$cuar->lote}",
                         'color' => 'text-amber-600',
                         'bg' => 'bg-amber-100',
                         'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>',
@@ -286,6 +291,7 @@ class GlobalSearchController extends Controller
 
                 foreach ($stockBajo as $bajo) {
                     $notifications[] = [
+                        'id' => "stock_bajo_{$bajo->id}_{$bajo->producto}",
                         'color' => 'text-orange-600',
                         'bg' => 'bg-orange-100',
                         'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
@@ -296,13 +302,96 @@ class GlobalSearchController extends Controller
                     ];
                 }
             }
+
+            // Separar notificaciones pendientes y notificaciones vistas
+            $readRecords = DB::table('user_read_notifications')
+                ->where('user_id', $user->id)
+                ->pluck('updated_at', 'notification_key')
+                ->all();
+
+            $readKeys = array_keys($readRecords);
+
+            $pendientes = [];
+            $vistas = [];
+
+            foreach ($notifications as $n) {
+                if (in_array($n['id'], $readKeys)) {
+                    $ts = $readRecords[$n['id']] ?? null;
+                    $n['read_at_human'] = $ts ? Carbon::parse($ts)->locale('es')->diffForHumans() : 'Vista';
+                    $vistas[] = $n;
+                } else {
+                    $pendientes[] = $n;
+                }
+            }
         } catch (\Throwable $e) {
             report($e);
+            $pendientes = [];
+            $vistas = [];
         }
 
         return response()->json([
-            'count' => count($notifications),
-            'data' => collect($notifications)->take(8)->values(),
+            'count' => count($pendientes),
+            'data' => collect($pendientes)->take(15)->values(),
+            'read_count' => count($vistas),
+            'read_data' => collect($vistas)->take(15)->values(),
         ]);
+    }
+
+    public function markAsRead(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['ok' => false], 401);
+        }
+
+        $key = $request->input('id');
+        if (!empty($key)) {
+            DB::table('user_read_notifications')->updateOrInsert(
+                ['user_id' => $user->id, 'notification_key' => $key],
+                ['created_at' => now(), 'updated_at' => now()]
+            );
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function unmarkAsRead(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['ok' => false], 401);
+        }
+
+        $key = $request->input('id');
+        if (!empty($key)) {
+            DB::table('user_read_notifications')
+                ->where('user_id', $user->id)
+                ->where('notification_key', $key)
+                ->delete();
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function markAllAsRead(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['ok' => false], 401);
+        }
+
+        $keys = $request->input('keys', []);
+        if (is_array($keys) && count($keys) > 0) {
+            foreach ($keys as $k) {
+                if (!empty($k)) {
+                    DB::table('user_read_notifications')->updateOrInsert(
+                        ['user_id' => $user->id, 'notification_key' => $k],
+                        ['created_at' => now(), 'updated_at' => now()]
+                    );
+                }
+            }
+        }
+
+        return response()->json(['ok' => true]);
     }
 }

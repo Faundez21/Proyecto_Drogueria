@@ -27,19 +27,154 @@ class ReceptionController extends Controller
             Product::firstOrCreate(['nombre' => $ctrlNombre]);
         }
 
+        // Sincronizar productos que hayan ingresado por Carga Masiva o Inventario Directo
+        $productosEnInventario = Inventory::whereNotNull('producto')
+            ->where('producto', '!=', '')
+            ->distinct()
+            ->pluck('producto');
+
+        foreach ($productosEnInventario as $prodInvNombre) {
+            Product::firstOrCreate(['nombre' => trim($prodInvNombre)]);
+        }
+
         $providers = Provider::where('status', 'activo')->orderBy('name')->get();
         $products = Product::orderBy('nombre')->get();
 
-        $categoriasInv = Inventory::select('producto', 'categoria')
-            ->whereNotNull('categoria')
-            ->where('categoria', '!=', '')
-            ->get()
-            ->pluck('categoria', 'producto');
+        // Mapear categoría y programa desde Inventario (incluyendo Carga Masiva) e Historial de Recepciones
+        $categoriasPorNombre = [];
+        $categoriasPorId = [];
+        $programasPorNombre = [];
+        $programasPorId = [];
+
+        $itemsRecHist = ReceptionItem::with('product:id,nombre')
+            ->whereNotNull('tipo_producto')
+            ->where('tipo_producto', '!=', '')
+            ->orderBy('id', 'asc')
+            ->get(['product_id', 'tipo_producto']);
+
+        foreach ($itemsRecHist as $itemHist) {
+            $catVal = trim((string) $itemHist->tipo_producto);
+            if ($catVal === '' || mb_strtolower($catVal) === 'general') {
+                continue;
+            }
+            if ($itemHist->product_id) {
+                $categoriasPorId[(int) $itemHist->product_id] = $catVal;
+            }
+            if ($itemHist->product?->nombre) {
+                $categoriasPorNombre[mb_strtolower(trim($itemHist->product->nombre))] = $catVal;
+            }
+        }
+
+        $registrosInv = Inventory::select('product_id', 'producto', 'categoria', 'programa')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        foreach ($registrosInv as $regInv) {
+            $keyNombre = mb_strtolower(trim((string) $regInv->producto));
+            $prodId = $regInv->product_id ? (int) $regInv->product_id : null;
+
+            $catVal = trim((string) ($regInv->categoria ?? ''));
+            if ($catVal !== '') {
+                $esGeneral = mb_strtolower($catVal) === 'general';
+                if ($keyNombre !== '' && (! $esGeneral || ! isset($categoriasPorNombre[$keyNombre]))) {
+                    $categoriasPorNombre[$keyNombre] = $catVal;
+                }
+                if ($prodId && (! $esGeneral || ! isset($categoriasPorId[$prodId]))) {
+                    $categoriasPorId[$prodId] = $catVal;
+                }
+            }
+
+            $progVal = trim((string) ($regInv->programa ?? ''));
+            if ($progVal !== '') {
+                if ($keyNombre !== '') {
+                    $programasPorNombre[$keyNombre] = $progVal;
+                }
+                if ($prodId) {
+                    $programasPorId[$prodId] = $progVal;
+                }
+            }
+        }
 
         foreach ($products as $prod) {
-            $catHist = $categoriasInv[$prod->nombre] ?? null;
+            $keyProd = mb_strtolower(trim($prod->nombre));
+            $catHist = $categoriasPorId[(int) $prod->id] ?? ($categoriasPorNombre[$keyProd] ?? null);
+            $progHist = $programasPorId[(int) $prod->id] ?? ($programasPorNombre[$keyProd] ?? '');
+
             $prod->grupo_recepcion = InventoryService::clasificarGrupoProducto($prod->nombre, $catHist);
+            $prod->programa_sugerido = $progHist;
+            $prod->categoria_sugerida = ($catHist && mb_strtolower($catHist) !== 'general')
+                ? $catHist
+                : ($prod->grupo_recepcion === 'Estupefacientes' ? 'Estupefacientes' : ($prod->grupo_recepcion === 'Insumos' ? 'Insumos' : 'Medicamentos'));
         }
+
+        // Categorías base + todas las categorías existentes en Inventario y Carga Masiva agrupadas por clasificación
+        $categoriasAgrupadas = [
+            'Medicamentos' => [
+                'Medicamentos' => 'MEDICAMENTOS GENERALES',
+                'Fármacos' => 'FÁRMACOS',
+                'F-FOFAR' => 'FOFAR (FARMACIA)',
+                'F-PALIATIVOS' => 'CUIDADOS PALIATIVOS',
+                'F-PARO' => 'CARRO DE PARO',
+            ],
+            'Insumos' => [
+                'Insumos' => 'INSUMOS CLÍNICOS GENERALES',
+                'Insumos Clínicos' => 'INSUMOS CLÍNICOS',
+                'Equipamiento' => 'EQUIPAMIENTO',
+                'I-CIRUGIA' => 'CIRUGÍA MENOR (INSUMOS)',
+                'I-URGENCIA' => 'URGENCIA CIRUGÍA (INSUMOS)',
+                'E-COMUNAL' => 'EQUIPAMIENTO COMUNAL',
+            ],
+            'Estupefacientes' => [
+                'Estupefacientes' => 'ESTUPEFACIENTES / CONTROLADOS',
+                'Fármacos Controlados' => 'FÁRMACOS CONTROLADOS',
+            ],
+        ];
+
+        $categoriasEnBD = Inventory::whereNotNull('categoria')
+            ->where('categoria', '!=', '')
+            ->distinct()
+            ->pluck('categoria')
+            ->merge(
+                ReceptionItem::whereNotNull('tipo_producto')
+                    ->where('tipo_producto', '!=', '')
+                    ->distinct()
+                    ->pluck('tipo_producto')
+            )
+            ->map(fn ($c) => trim((string) $c))
+            ->filter(fn ($c) => $c !== '' && mb_strtolower($c) !== 'general')
+            ->unique();
+
+        foreach ($categoriasEnBD as $catBD) {
+            $yaExiste = false;
+            foreach ($categoriasAgrupadas as $grp => $lista) {
+                foreach ($lista as $valKey => $labelText) {
+                    if (mb_strtolower($valKey) === mb_strtolower($catBD)) {
+                        $yaExiste = true;
+                        break 2;
+                    }
+                }
+            }
+            if (! $yaExiste) {
+                $grupoDestino = InventoryService::clasificarGrupoProducto('', $catBD);
+                $categoriasAgrupadas[$grupoDestino][$catBD] = mb_strtoupper($catBD);
+            }
+        }
+
+        // Programas base + todos los programas existentes en Inventario y Carga Masiva
+        $programasBase = collect([
+            'Morbilidad General',
+            'Fondo de Farmacia (FOFAR)',
+            'Cardiovascular',
+            'IRA/ERA',
+            'Salud Mental',
+        ]);
+        $programasEnBD = Inventory::whereNotNull('programa')
+            ->where('programa', '!=', '')
+            ->distinct()
+            ->pluck('programa')
+            ->map(fn ($p) => trim((string) $p))
+            ->filter();
+        $programasLista = $programasBase->merge($programasEnBD)->unique()->values();
 
         $productosAgrupados = [
             'Medicamentos' => $products->where('grupo_recepcion', 'Medicamentos')->values(),
@@ -48,58 +183,71 @@ class ReceptionController extends Controller
         ];
 
         $receptions = Reception::with(['provider', 'items.product'])->orderBy('created_at', 'desc')->get();
+
+        // Asociar el programa registrado en inventario a cada ítem de recepción para el historial
+        $invPorRecepcion = Inventory::whereNotNull('reception_id')
+            ->whereNotNull('programa')
+            ->where('programa', '!=', '')
+            ->get(['reception_id', 'product_id', 'lote', 'programa']);
+
+        foreach ($receptions as $rec) {
+            foreach ($rec->items as $rItem) {
+                $match = $invPorRecepcion->first(function ($inv) use ($rec, $rItem) {
+                    return (int) $inv->reception_id === (int) $rec->id
+                        && (int) $inv->product_id === (int) $rItem->product_id;
+                });
+                $nomProd = mb_strtolower(trim($rItem->product?->nombre ?? ''));
+                $rItem->setAttribute('programa', $match?->programa ?? ($programasPorId[(int) $rItem->product_id] ?? ($programasPorNombre[$nomProd] ?? null)));
+            }
+        }
         $nextCorrelativo = (int) Reception::max('correlativo') + 1;
         $controlados = InventoryService::controlados();
 
-        // Extraer campos de distribución física
-        $shelves = Shelf::with(['aisle', 'levels.positions'])->orderBy('name')->get();
-
-        $pasillosInv = Inventory::whereNotNull('pasillo')->where('pasillo', '!=', '')->where('pasillo', '!=', 'P.A')->distinct()->pluck('pasillo');
-        $pasillosMant = Aisle::orderBy('name')->pluck('name');
-        $pasillosLista = $pasillosMant->merge($pasillosInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $estantesInv = Inventory::whereNotNull('estante')->where('estante', '!=', '')->where('estante', '!=', 'P.A')->distinct()->pluck('estante');
-        $estantesMant = Shelf::orderBy('name')->pluck('name');
-        $estantesLista = $estantesMant->merge($estantesInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $nivelesInv = Inventory::whereNotNull('nivel')->where('nivel', '!=', '')->distinct()->pluck('nivel')->map(fn ($v) => (string) $v);
-        $nivelesMant = Level::distinct()->orderBy('number')->pluck('number')->map(fn ($v) => (string) $v);
-        $nivelesLista = $nivelesMant->merge($nivelesInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $posicionesInv = Inventory::whereNotNull('posicion')->where('posicion', '!=', '')->distinct()->pluck('posicion');
-        $posicionesMant = Position::distinct()->orderBy('name')->pluck('name');
-        $posicionesLista = $posicionesMant->merge($posicionesInv)->unique()->sort(SORT_NATURAL)->values();
-
-        $distribucionJerarquia = $shelves->map(function ($s) {
-            return [
-                'estante' => $s->name,
-                'pasillo' => $s->aisle?->name ?? '',
-                'niveles' => $s->levels->map(function ($lvl) {
-                    return [
-                        'nivel' => (string) $lvl->number,
-                        'posiciones' => $lvl->positions->pluck('name')->values()->all(),
-                    ];
-                })->values()->all(),
-            ];
-        })->values();
+        // Extraer campos de distribución física y ubicaciones ocupadas
+        $datosDist = InventoryService::datosDistribucionFisica();
+        $pasillosLista = $datosDist['pasillosLista'];
+        $estantesLista = $datosDist['estantesLista'];
+        $nivelesLista = $datosDist['nivelesLista'];
+        $posicionesLista = $datosDist['posicionesLista'];
+        $distribucionJerarquia = $datosDist['distribucionJerarquia'];
+        $ubicacionesOcupadas = $datosDist['ubicacionesOcupadas'];
 
         return view('reception.index', compact(
             'providers',
             'receptions',
             'products',
             'productosAgrupados',
+            'categoriasAgrupadas',
+            'programasLista',
             'nextCorrelativo',
             'controlados',
             'pasillosLista',
             'estantesLista',
             'nivelesLista',
             'posicionesLista',
-            'distribucionJerarquia'
+            'distribucionJerarquia',
+            'ubicacionesOcupadas'
         ));
     }
 
     public function store(Request $request)
     {
+        // Normalizar campos opcionales para evitar cadenas vacías que fallen en validación date o inserción SQL
+        if ($request->has('fecha_vencimiento') && is_array($request->fecha_vencimiento)) {
+            $fechas = array_map(function ($val) {
+                if (is_string($val)) {
+                    $val = trim($val);
+                    return $val === '' ? null : $val;
+                }
+                return $val ?: null;
+            }, $request->fecha_vencimiento);
+            $request->merge(['fecha_vencimiento' => $fechas]);
+        }
+
+        if ($request->has('orden_compra') && empty(trim((string)$request->orden_compra))) {
+            $request->merge(['orden_compra' => null]);
+        }
+
         $validated = $request->validate([
             'fecha_recepcion' => ['required', 'date'],
             'tipo_documento' => ['required', 'string', 'max:255'],
@@ -117,12 +265,12 @@ class ReceptionController extends Controller
             'valor_unitario.*' => ['nullable', 'numeric', 'min:0'],
             'lote' => ['nullable', 'array'],
             'lote.*' => ['nullable', 'string', 'max:255'],
-            'fecha_vencimiento' => ['nullable', 'array'],
-            'fecha_vencimiento.*' => ['nullable', 'date'],
+            'fecha_vencimiento' => ['required', 'array', 'min:1'],
+            'fecha_vencimiento.*' => ['required', 'date'],
             'tipo_producto' => ['nullable', 'array'],
-            'tipo_producto.*' => ['nullable', 'string', 'max:255'],
+            'tipo_producto.*' => ['nullable', 'string', 'max:500'],
             'programa' => ['nullable', 'array'],
-            'programa.*' => ['nullable', 'string', 'max:255'],
+            'programa.*' => ['nullable', 'string', 'max:500'],
             'pasillo' => ['nullable', 'array'],
             'pasillo.*' => ['nullable', 'string', 'max:50'],
             'estante' => ['nullable', 'array'],
@@ -131,10 +279,62 @@ class ReceptionController extends Controller
             'nivel.*' => ['nullable', 'string', 'max:100'],
             'posicion' => ['nullable', 'array'],
             'posicion.*' => ['nullable', 'string', 'max:100'],
+        ], [
+            'fecha_vencimiento.required' => 'Debes ingresar la fecha de vencimiento para cada producto.',
+            'fecha_vencimiento.*.required' => 'La fecha de vencimiento es obligatoria para cada producto recepcionado.',
+            'fecha_vencimiento.*.date' => 'La fecha de vencimiento ingresada no es válida.',
         ]);
 
         $provider = Provider::findOrFail($validated['provider_id']);
         $nombreProveedor = $provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor';
+
+        // Validar que ninguna ubicación física seleccionada esté ocupada en bodega ni duplicada entre productos distintos del acta
+        $ubicacionesEnActa = [];
+        foreach ($validated['product_id'] as $index => $prodId) {
+            $estCheck = ! empty($validated['estante'][$index]) ? trim((string) $validated['estante'][$index]) : '';
+            $nivCheck = ! empty($validated['nivel'][$index]) ? InventoryService::normalizarNivel($validated['nivel'][$index]) : '';
+            $posCheck = ! empty($validated['posicion'][$index]) ? InventoryService::normalizarPosicion($validated['posicion'][$index]) : '';
+
+            if ($estCheck === '' || strtoupper($estCheck) === 'P.A' || $nivCheck === '') {
+                continue;
+            }
+
+            $productCheck = Product::find($prodId);
+            $nomProdCheck = $productCheck?->nombre ?? ('Producto #' . $prodId);
+            $loteCheck = ! empty($validated['lote'][$index]) ? trim((string) $validated['lote'][$index]) : 'S/L';
+
+            $ocupanteBD = InventoryService::verificarUbicacionOcupada(
+                $estCheck,
+                $nivCheck,
+                $posCheck,
+                null,
+                $nomProdCheck,
+                $loteCheck
+            );
+
+            if ($ocupanteBD) {
+                $detallePos = $posCheck !== '' ? ", Posición {$posCheck}" : '';
+                $msgError = "La ubicación seleccionada para «{$nomProdCheck}» (Estante {$estCheck}, Nivel {$nivCheck}{$detallePos}) ya está ocupada en bodega por «{$ocupanteBD->producto}» (Lote: " . ($ocupanteBD->lote ?: 'S/L') . ").";
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['ok' => false, 'message' => $msgError], 422);
+                }
+
+                return redirect()->back()->withInput()->with('error', $msgError);
+            }
+
+            $slotKey = mb_strtolower($estCheck) . '|' . mb_strtolower($nivCheck) . '|' . mb_strtolower($posCheck);
+            $prodLoteKey = mb_strtolower(trim($nomProdCheck)) . '|' . mb_strtolower((string) InventoryService::normalizarLote($loteCheck));
+            if ($posCheck !== '' && isset($ubicacionesEnActa[$slotKey]) && $ubicacionesEnActa[$slotKey]['prod_lote'] !== $prodLoteKey) {
+                $otro = $ubicacionesEnActa[$slotKey]['nombre'];
+                $msgError = "No puedes asignar la misma ubicación (Estante {$estCheck}, Nivel {$nivCheck}, Posición {$posCheck}) a dos lotes distintos en la misma recepción («{$otro}» y «{$nomProdCheck}»).";
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['ok' => false, 'message' => $msgError], 422);
+                }
+
+                return redirect()->back()->withInput()->with('error', $msgError);
+            }
+            $ubicacionesEnActa[$slotKey] = ['prod_lote' => $prodLoteKey, 'nombre' => $nomProdCheck];
+        }
 
         DB::beginTransaction();
 
@@ -166,7 +366,8 @@ class ReceptionController extends Controller
                 $valorU = (float) ($validated['valor_unitario'][$index] ?? 0);
                 $subtotal = $cantidad * $valorU;
                 $subtotalIva = round($subtotal * $factorIva);
-                $fechaVence = $validated['fecha_vencimiento'][$index] ?? null;
+                $rawVence = $validated['fecha_vencimiento'][$index] ?? null;
+                $fechaVence = (!empty($rawVence) && trim((string)$rawVence) !== '') ? trim((string)$rawVence) : null;
                 $loteItem = !empty($validated['lote'][$index]) ? trim($validated['lote'][$index]) : 'S/L';
 
                 $tipoSolicitado = $validated['tipo_producto'][$index] ?? null;
@@ -248,6 +449,7 @@ class ReceptionController extends Controller
                     'vencimiento' => !empty($fechaVence) ? date('d/m/Y', strtotime($fechaVence)) : 'N/A',
                     'cantidad' => (int) $cantidad,
                     'tipo' => $categoriaInventario,
+                    'programa' => !empty($validated['programa'][$index]) ? trim($validated['programa'][$index]) : ($batch->programa ?: 'Sin programa'),
                     'subtotal_iva' => $subtotalIva,
                     'ubicacion' => $ubicacionTexto,
                 ];

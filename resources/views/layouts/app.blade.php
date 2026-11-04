@@ -26,6 +26,8 @@
 
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Gestión de estados de lote (Inventario / Cuarentena / Merma) con SweetAlert2 + AJAX -->
+    <script src="{{ asset('js/lotes/lote-status.js') }}?v={{ @filemtime(public_path('js/lotes/lote-status.js')) }}"></script>
 
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}?v={{ @filemtime(public_path('css/dark-mode.css')) }}">
 
@@ -250,7 +252,7 @@
                 class="fixed inset-y-0 left-0 w-[260px] flex flex-col z-50 transform -translate-x-full lg:translate-x-0 lg:static lg:shrink-0 transition-transform duration-300 ease-in-out"
                 style="background-color: var(--sidebar-bg); box-shadow: 2px 0 8px rgba(0,0,0,0.15);">
 
-                <div class="h-[75px] flex items-center px-5 shrink-0 relative border-b border-slate-800 bg-[#0F172A]">
+                <div class="h-[70px] flex items-center px-5 shrink-0 relative border-b border-slate-800 bg-[#0F172A]">
                     <a href="{{ route('dashboard.index') }}" class="brand-container flex items-center gap-3.5 group">
                         <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-[#0F172A]">
                             <img src="{{ asset('images/favicon.svg') }}" alt="Logo DAS"
@@ -647,17 +649,43 @@
                             </button>
 
                             <div id="notifications-menu"
-                                class="hidden absolute right-0 mt-2 w-[340px] rounded-lg z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-lg">
-                                <div
-                                    class="px-4 py-3.5 flex justify-between items-center border-b border-slate-100 bg-slate-50">
+                                class="hidden absolute right-0 mt-2 w-[350px] sm:w-[370px] rounded-2xl z-50 overflow-hidden opacity-0 scale-95 origin-top-right bg-white border border-slate-200 shadow-2xl transition-all">
+                                <div class="px-4 py-3 flex justify-between items-center border-b border-slate-100 bg-slate-50">
                                     <div class="flex items-center gap-2">
-                                        <h3 class="text-[13px] font-semibold text-slate-800">Notificaciones</h3>
-                                        <span id="notif-count"
-                                            class="text-white text-[10px] font-mono-das font-semibold px-1.5 py-0.5 rounded bg-slate-400">0</span>
+                                        <h3 class="text-[13px] font-extrabold text-slate-800">Centro de Alertas</h3>
                                     </div>
+                                    <button id="btn-marcar-todas-notif" onclick="marcarTodasNotificacionesVistas(event)" type="button"
+                                        class="hidden text-[11px] font-bold text-teal-600 hover:text-teal-800 transition-colors flex items-center gap-1 cursor-pointer"
+                                        title="Marcar todas las alertas pendientes como vistas">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Marcar todas
+                                    </button>
                                 </div>
-                                <div id="notif-list" class="max-h-[320px] overflow-y-auto p-2 space-y-1 sidebar-scroll">
+
+                                <!-- Selector de Pestañas: Pendientes y Vistas -->
+                                <div class="flex border-b border-slate-200/80 bg-slate-50/70 p-1.5 gap-1.5 text-[12px] font-bold">
+                                    <button id="tab-notif-pendientes" type="button" onclick="cambiarTabNotificaciones('pendientes')"
+                                        class="notif-tab-active flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 bg-white text-teal-700 shadow-2xs border border-slate-200/60 cursor-pointer">
+                                        <span>Pendientes</span>
+                                        <span id="notif-count" class="text-white text-[10px] font-mono-das font-extrabold px-1.5 py-0.2 rounded-full bg-rose-500">0</span>
+                                    </button>
+                                    <button id="tab-notif-vistas" type="button" onclick="cambiarTabNotificaciones('vistas')"
+                                        class="notif-tab-inactive flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 hover:bg-white/60 cursor-pointer">
+                                        <span>Vistas</span>
+                                        <span id="notif-read-count" class="text-slate-600 text-[10px] font-mono-das font-bold px-1.5 py-0.2 rounded-full bg-slate-200">0</span>
+                                    </button>
+                                </div>
+
+                                <!-- Lista Pendientes -->
+                                <div id="notif-list" class="max-h-[340px] overflow-y-auto p-2 space-y-1 sidebar-scroll">
                                     <div class="p-4 text-center text-slate-400 text-xs">Cargando alertas...</div>
+                                </div>
+
+                                <!-- Lista Vistas -->
+                                <div id="notif-read-list" class="hidden max-h-[340px] overflow-y-auto p-2 space-y-1 sidebar-scroll bg-slate-50/30">
+                                    <div class="p-4 text-center text-slate-400 text-xs">No hay notificaciones vistas.</div>
                                 </div>
                             </div>
                         </div>
@@ -760,7 +788,7 @@
                 </main>
             </div>
 
-            <!-- MODAL DE BÚSQUEDA GLOBAL "NIVEL INSANO" (Navegación por Teclado) -->
+            <!-- Modal de busqueda" (Navegación por Teclado) -->
 
             <div id="search-modal"
                 class="fixed inset-0 z-50 hidden flex items-start justify-center p-3 sm:p-4 pt-8 sm:pt-16 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-200"
@@ -840,7 +868,11 @@
         });
 
         // 2. Interceptor de Flash Messages de Laravel con SweetAlert2 Modal
-        @if (session('success') && !session('reception_success_detail') && !session('dispatch_success_detail') && !session('controlled_dispatch_success_detail'))
+        @if (session('lote_status_success'))
+            if (window.LoteStatus && window.LoteStatus.core) {
+                window.LoteStatus.core.mostrarExito(@json(session('lote_status_success')));
+            }
+        @elseif (session('success') && !session('reception_success_detail') && !session('dispatch_success_detail') && !session('controlled_dispatch_success_detail') && !session('lote_moved_success') && !session('lote_status_success'))
             Swal.fire({
                 icon: 'success',
                 title: '¡Operación Exitosa!',
@@ -902,7 +934,7 @@
             });
         }
 
-        // --- BÚSQUEDA GLOBAL "NIVEL INSANO" ---
+        // Busqueda Global 
         let searchTimeout = null;
         let selectedSearchIndex = -1;
         let searchResultsCount = 0;
@@ -1070,45 +1102,231 @@
         }
 
         // --- NOTIFICACIONES AJAX ---
+        let currentNotifKeys = [];
+        let currentNotifTab = 'pendientes';
+
+        function cambiarTabNotificaciones(tab) {
+            currentNotifTab = tab;
+            const tabPend = document.getElementById('tab-notif-pendientes');
+            const tabVist = document.getElementById('tab-notif-vistas');
+            const listPend = document.getElementById('notif-list');
+            const listVist = document.getElementById('notif-read-list');
+            const btnMarcarTodas = document.getElementById('btn-marcar-todas-notif');
+
+            if (tab === 'pendientes') {
+                tabPend.className = 'notif-tab-active flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 bg-white text-teal-700 shadow-2xs border border-slate-200/60 cursor-pointer';
+                tabVist.className = 'notif-tab-inactive flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 hover:bg-white/60 cursor-pointer';
+                listPend.classList.remove('hidden');
+                listVist.classList.add('hidden');
+                if (btnMarcarTodas && currentNotifKeys.length > 0) {
+                    btnMarcarTodas.classList.remove('hidden');
+                }
+            } else {
+                tabVist.className = 'notif-tab-active flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 bg-white text-teal-700 shadow-2xs border border-slate-200/60 cursor-pointer';
+                tabPend.className = 'notif-tab-inactive flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 hover:bg-white/60 cursor-pointer';
+                listPend.classList.add('hidden');
+                listVist.classList.remove('hidden');
+                if (btnMarcarTodas) {
+                    btnMarcarTodas.classList.add('hidden');
+                }
+            }
+        }
+
         function loadNotifications() {
             fetch('/api/notifications')
                 .then(res => res.json())
                 .then(data => {
                     const badge = document.getElementById('notif-badge');
                     const count = document.getElementById('notif-count');
+                    const readCount = document.getElementById('notif-read-count');
                     const list = document.getElementById('notif-list');
+                    const readList = document.getElementById('notif-read-list');
+                    const btnMarcarTodas = document.getElementById('btn-marcar-todas-notif');
 
+                    currentNotifKeys = (data.data || []).map(n => n.id).filter(Boolean);
+
+                    // 1. Contador del badge campana
                     if (data.count > 0) {
                         badge.classList.remove('hidden');
                         badge.textContent = data.count > 9 ? '9+' : data.count;
-                        count.textContent = data.count;
-                        count.style.backgroundColor = 'var(--alert)';
-
-                        let html = '';
-                        data.data.forEach(n => {
-                            html += `
-                            <a href="${n.url}" class="flex gap-3 p-2.5 rounded-md transition-colors hover:bg-slate-50 border-b border-slate-50 last:border-0">
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${n.bg} ${n.color}">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${n.icon}</svg>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-[13px] font-bold text-slate-800">${n.title}</p>
-                                    <p class="text-[11px] font-medium mt-0.5 leading-snug text-slate-500">${n.message}</p>
-                                    <p class="text-[10px] font-mono font-bold mt-1 text-slate-400">${n.time}</p>
-                                </div>
-                            </a>`;
-                        });
-                        list.innerHTML = html;
                     } else {
                         badge.classList.add('hidden');
                         badge.textContent = '0';
-                        count.textContent = '0';
-                        count.style.backgroundColor = 'var(--text-muted)';
+                    }
+
+                    // 2. Contadores en las pestañas
+                    if (count) count.textContent = data.count;
+                    if (readCount) readCount.textContent = data.read_count || 0;
+
+                    // 3. Botón "Marcar todas"
+                    if (btnMarcarTodas) {
+                        if (data.count > 0 && currentNotifTab === 'pendientes') {
+                            btnMarcarTodas.classList.remove('hidden');
+                        } else {
+                            btnMarcarTodas.classList.add('hidden');
+                        }
+                    }
+
+                    // 4. Renderizar lista PENDIENTES
+                    if (data.count > 0) {
+                        let html = '';
+                        data.data.forEach(n => {
+                            html += `
+                            <div class="group relative flex items-start gap-2 p-2 rounded-xl transition-colors hover:bg-slate-50 border-b border-slate-100 last:border-0" data-notif-id="${n.id}">
+                                <a href="${n.url}" onclick="onNotifClick('${n.id}')" class="flex-1 flex gap-2.5 min-w-0">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${n.bg} ${n.color}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${n.icon}</svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-[12.5px] font-bold text-slate-800 leading-snug">${n.title}</p>
+                                        <p class="text-[11px] font-medium mt-0.5 leading-snug text-slate-500">${n.message}</p>
+                                        <p class="text-[10px] font-mono font-bold mt-1 text-slate-400">${n.time}</p>
+                                    </div>
+                                </a>
+                                <button onclick="marcarNotificacionVista(event, '${n.id}')" type="button"
+                                    class="shrink-0 p-1.5 text-slate-400 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
+                                    title="Marcar como vista">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </button>
+                            </div>`;
+                        });
+                        list.innerHTML = html;
+                    } else {
                         list.innerHTML =
-                            '<div class="p-4 text-center text-slate-400 text-[12px] font-medium">No hay alertas clínicas pendientes.</div>';
+                            '<div class="p-6 text-center text-slate-400 text-[12px] font-medium flex flex-col items-center justify-center gap-1.5"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>¡Estás al día! No hay alertas pendientes.</span></div>';
+                    }
+
+                    // 5. Renderizar lista VISTAS (Apartado de Notificaciones Vistas)
+                    if (data.read_count > 0 && Array.isArray(data.read_data)) {
+                        let htmlVistas = '';
+                        data.read_data.forEach(n => {
+                            htmlVistas += `
+                            <div class="group relative flex items-start gap-2 p-2 rounded-xl transition-colors hover:bg-slate-100/70 border-b border-slate-100 last:border-0 opacity-80 hover:opacity-100" data-notif-read-id="${n.id}">
+                                <a href="${n.url}" class="flex-1 flex gap-2.5 min-w-0">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-slate-100 text-slate-500">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${n.icon}</svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <p class="text-[12px] font-bold text-slate-700 leading-snug">${n.title}</p>
+                                            <span class="inline-block text-[9.5px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 font-semibold border border-slate-200/60">Vista</span>
+                                        </div>
+                                        <p class="text-[11px] font-normal mt-0.5 leading-snug text-slate-500">${n.message}</p>
+                                        <p class="text-[10px] font-mono font-medium mt-1 text-slate-400">${n.read_at_human || 'Vista recientemente'}</p>
+                                    </div>
+                                </a>
+                                <button onclick="desmarcarNotificacionVista(event, '${n.id}')" type="button"
+                                    class="shrink-0 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                                    title="Restaurar a pendientes">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                                    </svg>
+                                </button>
+                            </div>`;
+                        });
+                        readList.innerHTML = htmlVistas;
+                    } else {
+                        readList.innerHTML =
+                            '<div class="p-6 text-center text-slate-400 text-[12px] font-medium flex flex-col items-center justify-center gap-1.5"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg><span>No tienes notificaciones en el apartado de vistas.</span></div>';
                     }
                 })
                 .catch(() => {});
+        }
+
+        function onNotifClick(id) {
+            if (!id) return;
+            fetch('/api/notifications/mark-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ id: id })
+            }).catch(() => {});
+        }
+
+        function marcarNotificacionVista(event, id) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const itemEl = document.querySelector(`[data-notif-id="${id}"]`);
+            if (itemEl) {
+                itemEl.classList.add('opacity-40', 'pointer-events-none');
+            }
+
+            fetch('/api/notifications/mark-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(res => res.json())
+            .then(() => {
+                loadNotifications();
+            })
+            .catch(() => {
+                if (itemEl) itemEl.classList.remove('opacity-40', 'pointer-events-none');
+            });
+        }
+
+        function desmarcarNotificacionVista(event, id) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const itemEl = document.querySelector(`[data-notif-read-id="${id}"]`);
+            if (itemEl) {
+                itemEl.classList.add('opacity-40', 'pointer-events-none');
+            }
+
+            fetch('/api/notifications/unmark-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(res => res.json())
+            .then(() => {
+                loadNotifications();
+            })
+            .catch(() => {
+                if (itemEl) itemEl.classList.remove('opacity-40', 'pointer-events-none');
+            });
+        }
+
+        function marcarTodasNotificacionesVistas(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            if (!currentNotifKeys.length) return;
+
+            const btn = document.getElementById('btn-marcar-todas-notif');
+            if (btn) btn.disabled = true;
+
+            fetch('/api/notifications/mark-all-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ keys: currentNotifKeys })
+            })
+            .then(res => res.json())
+            .then(() => {
+                loadNotifications();
+            })
+            .catch(() => {})
+            .finally(() => {
+                if (btn) btn.disabled = false;
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
