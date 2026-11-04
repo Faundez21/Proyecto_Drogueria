@@ -177,6 +177,7 @@ class InventoryService
         if ($batch) {
             $batch->increment('cantidad', $datos['cantidad']);
             $batch->fill([
+                'categoria' => (!empty($datos['categoria']) && $datos['categoria'] !== 'General') ? $datos['categoria'] : ($batch->categoria ?: ($datos['categoria'] ?? 'General')),
                 'valor_neto_unitario' => $datos['valor_neto_unitario'] ?? $batch->valor_neto_unitario,
                 'fecha_vencimiento' => $fechaVence ?? $batch->fecha_vencimiento,
                 'user_id' => $datos['user_id'] ?? $batch->user_id,
