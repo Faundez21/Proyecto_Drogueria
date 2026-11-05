@@ -387,15 +387,6 @@
     </div>
 
     <!-- Modal 1: Ficha técnica -->
-<<<<<<< HEAD
-    <div id="modal-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
-            data-close="modal-detail"></div>
-        <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 bg-white shadow-2xl border border-slate-200"
-            id="modal-detail-panel">
-            <div
-                class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-=======
     <div id="modal-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
             data-close="modal-detail"></div>
@@ -403,7 +394,6 @@
             id="modal-detail-panel">
             <div
                 class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white shrink-0">
->>>>>>> origin/cristobal
                 <div class="flex items-center gap-3.5">
                     <div id="detail-initials"
                         class="w-12 h-12 rounded-xl flex items-center justify-center font-mono-das font-bold text-[14px] text-teal-700 bg-teal-50 border border-teal-100 shadow-sm shrink-0">
@@ -461,11 +451,7 @@
                 </div>
             </div>
 
-<<<<<<< HEAD
-            <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50">
-=======
             <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50 shrink-0">
->>>>>>> origin/cristobal
                 <button type="button"
                     class="js-modal-close px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 w-full sm:w-auto transition-colors"
                     data-close="modal-detail">
@@ -480,17 +466,10 @@
     </div>
 
     <!-- Modal 2: Formulario (Registrar/Editar) -->
-<<<<<<< HEAD
-    <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
-            data-close="modal-edit"></div>
-        <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 max-h-[95vh] flex flex-col bg-white shadow-2xl border border-slate-200"
-=======
     <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
             data-close="modal-edit"></div>
         <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 max-h-[92vh] flex flex-col bg-white shadow-2xl border border-slate-200 my-auto"
->>>>>>> origin/cristobal
             id="modal-edit-panel">
 
             <div
@@ -533,14 +512,10 @@
                                     class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">RUT
                                     <span class="text-red-500">*</span></label>
                                 <input type="text" id="provider-rut" required placeholder="76.543.210-K"
-<<<<<<< HEAD
-                                    class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
-=======
                                     maxlength="12" autocomplete="off" inputmode="text"
                                     class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
                                 <p id="provider-rut-error" class="hidden text-[11.5px] font-medium text-red-600 mt-1.5">
                                 </p>
->>>>>>> origin/cristobal
                             </div>
 
                             <div>
@@ -581,25 +556,17 @@
                                 Electrónico <span class="text-red-500">*</span></label>
                             <input type="email" id="provider-email" required placeholder="contacto@empresa.cl"
                                 class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
-<<<<<<< HEAD
-=======
                             <p id="provider-email-error" class="hidden text-[11.5px] font-medium text-red-600 mt-1.5">
                             </p>
->>>>>>> origin/cristobal
                         </div>
                         <div>
                             <label
                                 class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Teléfono</label>
-<<<<<<< HEAD
-                            <input type="text" id="provider-phone" placeholder="+56 9 1234 5678"
-                                class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
-=======
                             <input type="text" id="provider-phone" placeholder="+56 9 1234 5678" maxlength="16"
                                 autocomplete="off" inputmode="tel"
                                 class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
                             <p id="provider-phone-error" class="hidden text-[11.5px] font-medium text-red-600 mt-1.5">
                             </p>
->>>>>>> origin/cristobal
                         </div>
                         <div class="sm:col-span-2">
                             <label
@@ -877,15 +844,9 @@
                     document.getElementById('detail-name').textContent = p.name;
                     document.getElementById('detail-rut').textContent = `RUT: ${p.rut}`;
                     document.getElementById('detail-email').textContent = p.email ||
-<<<<<<< HEAD
-                    'No registrado';
-                    document.getElementById('detail-phone').textContent = p.phone ||
-                    'No registrado';
-=======
                         'No registrado';
                     document.getElementById('detail-phone').textContent = p.phone ||
                         'No registrado';
->>>>>>> origin/cristobal
                     document.getElementById('detail-category').textContent = p.category;
 
                     const initials = p.name.split(' ').filter(n => n).map(n => n[0]).slice(0, 2)
@@ -983,8 +944,6 @@
                         icon: 'warning',
                         title: 'Faltan datos',
                         text: 'Completa los campos obligatorios.',
-<<<<<<< HEAD
-=======
                         confirmButtonColor: '#0d9488'
                     });
                     return;
@@ -1005,7 +964,6 @@
                         icon: 'error',
                         title: 'Datos inválidos',
                         html: problemas.join('<br>'),
->>>>>>> origin/cristobal
                         confirmButtonColor: '#0d9488'
                     });
                     return;
@@ -1057,12 +1015,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Error al guardar',
-<<<<<<< HEAD
-                            text: result.message ||
-                                'Verifica que el RUT o correo no estén duplicados.',
-=======
                             text: errores,
->>>>>>> origin/cristobal
                             confirmButtonColor: '#0d9488'
                         });
                     }

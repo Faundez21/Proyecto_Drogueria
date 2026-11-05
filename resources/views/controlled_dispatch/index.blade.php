@@ -3,17 +3,6 @@
 @section('subtitle', 'Directorio y gestion de guias de despacho de farmacos controlados.')
 
 @section('actions')
-<<<<<<< HEAD
-    <button type="button" onclick="openSolicitudes()"
-        class="px-4 py-2 bg-white text-teal-700 border border-teal-200 rounded-lg text-[12px] font-bold hover:bg-teal-50 transition-colors flex items-center gap-2 shadow-sm cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2z"></path>
-        </svg>
-        Ver Solicitudes
-    </button>
-=======
->>>>>>> origin/cristobal
     <button type="button" onclick="openBandeja()"
         class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition-all duration-200">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,11 +103,7 @@
             <div class="flex-1">
                 <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Despacho de Farmacos Controlados</h2>
                 <p class="text-[12px] text-slate-500 mt-0.5">Acceso restringido unicamente a estupefacientes y talonarios de
-<<<<<<< HEAD
-                    recetas cheque.</p>
-=======
                     recetas cheque. Solo solicitudes de CESFAM.</p>
->>>>>>> origin/cristobal
             </div>
             <button type="button" onclick="openSolicitudesControlado()"
                 class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition-all duration-200 cursor-pointer">
@@ -236,16 +221,6 @@
                             <option value="CESFAM LOS CERROS"
                                 data-direccion="Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano">CESFAM
                                 LOS CERROS</option>
-<<<<<<< HEAD
-                            <option value="CESFAM PAULINA AVENDAÑO"
-                                data-direccion="Calle Carlos Dittborn 4100, Villa San Martin, Talcahuano">CESFAM PAULINA
-                                AVENDAÑO</option>
-                            <option value="CESFAM SAN VICENTE" data-direccion="Calle Brasil 360, San Vicente, Talcahuano">
-                                CESFAM SAN VICENTE</option>
-                            <option value="CESFAM LEOCAN PORTUS"
-                                data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM LEOCAN
-                                PORTUS</option>
-=======
                             <option value="CESFAM PAULINA AVENDAÑO PEREDA"
                                 data-direccion="Calle Carlos Dittborn 4100, Villa San Martin, Talcahuano">CESFAM PAULINA
                                 AVENDAÑO PEREDA</option>
@@ -254,7 +229,6 @@
                             <option value="CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN"
                                 data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM ALCALDE
                                 LEOCÁN PORTUS GOVINDEN</option>
->>>>>>> origin/cristobal
                         </select>
                     </div>
 
@@ -303,29 +277,6 @@
             <!-- seccion de tabla de productos y stock -->
             <div class="p-6 bg-rose-50/20 border-b border-rose-100/60">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-<<<<<<< HEAD
-                    <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide">2. Detalle de Extraccion
-                        Controlada</h3>
-
-                    <div class="flex items-center gap-3">
-                        <button type="button" onclick="openScanner()"
-                            class="px-4 py-2 bg-rose-600 text-white rounded-lg text-[12px] font-bold hover:bg-rose-700 transition-all flex items-center gap-2 shadow-sm cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M3 5a2 2 0 012-2h2m4 0h2m4 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-4 0h-2m-4 0H5a2 2 0 01-2-2v-2m4-10h2v2H7V7zm8 0h2v2h-2V7zM7 15h2v2H7v-2zm8-2h2v4h-2v-4zm-4-2h2v2h-2v-2z">
-                                </path>
-                            </svg>
-                            Escanear Etiqueta QR
-                        </button>
-                        <button type="button" onclick="addRow()"
-                            class="px-4 py-2 bg-white text-rose-600 border border-rose-200 rounded-lg text-[12px] font-bold hover:bg-rose-50 transition-colors flex items-center gap-2 shadow-sm cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
-                                </path>
-                            </svg>
-                            Añadir Fila Manual
-=======
                     <div>
                         <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide flex items-center gap-2">
                             2. Detalle de Extracción Controlada
@@ -351,7 +302,6 @@
                                 </path>
                             </svg>
                             Añadir Fila
->>>>>>> origin/cristobal
                         </button>
                     </div>
                 </div>
@@ -359,11 +309,7 @@
                 <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-xs bg-white">
                     <table class="w-full text-left text-[13px] whitespace-nowrap" id="productsTable">
                         <thead
-<<<<<<< HEAD
-                            class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-extrabold text-[10px]">
-=======
                             class="bg-slate-100/80 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10.5px]">
->>>>>>> origin/cristobal
                             <tr>
                                 <th class="px-4 py-3.5 w-[36%]">Fármaco Controlado en Stock</th>
                                 <th class="px-4 py-3.5 w-[14%]">Lote</th>
@@ -428,9 +374,6 @@
                     class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 transition-colors text-center shadow-sm cursor-pointer">
                     Limpiar Formulario
                 </button>
-<<<<<<< HEAD
-                <button type="submit"
-=======
                 <button type="submit" name="action" value="save_and_download"
                     class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-xl text-[13px] font-bold hover:bg-blue-700 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -439,7 +382,6 @@
                     Guardar y Descargar PDF
                 </button>
                 <button type="submit" name="action" value="save_only"
->>>>>>> origin/cristobal
                     class="w-full sm:w-auto px-6 py-2.5 bg-rose-600 text-white rounded-xl text-[13px] font-bold hover:bg-rose-700 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
                     <svg class="w-4 h-4 text-rose-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -454,15 +396,6 @@
     <!-- plantilla oculta para generar nuevas filas de productos -->
     <template id="rowTemplate">
         <tr class="bg-white hover:bg-slate-50/80 transition-colors group">
-<<<<<<< HEAD
-            <td class="px-3 py-2 border-r border-slate-100">
-                <select name="productos[]" required onchange="llenarDatosFila(this)"
-                    class="w-full bg-white border border-slate-300 focus:border-rose-500 rounded-lg px-2.5 py-2 text-[12px] font-bold text-slate-800 outline-none shadow-sm cursor-pointer transition-colors">
-                    <option value="" disabled selected>Seleccione estupefaciente...</option>
-                    @foreach ($inventarioDisponible as $inv)
-                        <option value="{{ $inv->producto }}" data-lote="{{ $inv->lote ?? 'S/L' }}"
-                            data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $inv->cantidad ?? 0 }}">
-=======
             <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="productos[]" required onchange="llenarDatosFila(this)"
                     class="w-full bg-white border border-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 rounded-lg px-2.5 py-2 text-[12.5px] font-bold text-slate-800 outline-none shadow-xs cursor-pointer transition-colors">
@@ -471,43 +404,11 @@
                         <option value="{{ $inv->producto }}" data-lote="{{ $inv->lote ?? 'S/L' }}"
                             data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $inv->cantidad ?? 0 }}"
                             data-programa="{{ $inv->programa ?? '' }}">
->>>>>>> origin/cristobal
                             {{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})
                         </option>
                     @endforeach
                 </select>
             </td>
-<<<<<<< HEAD
-            <td class="px-3 py-2 border-r border-slate-100">
-                <input type="text" name="lotes[]" readonly placeholder="Auto..."
-                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] font-mono font-bold text-slate-500 outline-none shadow-inner cursor-not-allowed">
-            </td>
-            <td class="px-3 py-2 border-r border-slate-100 relative">
-                <input type="date" name="vencimientos[]" readonly
-                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] text-slate-500 outline-none shadow-inner cursor-not-allowed">
-                <div class="fefo-container"></div>
-            </td>
-            <td class="px-3 py-2 border-r border-slate-100">
-                <select name="programas[]" required
-                    class="w-full bg-white border border-slate-300 focus:border-rose-500 rounded-lg px-2.5 py-2 text-[12px] font-medium text-slate-700 outline-none shadow-sm cursor-pointer transition-colors">
-                    <option value="Morbilidad General" selected>Morbilidad General</option>
-                    <option value="Cardiovascular">Cardiovascular</option>
-                    <option value="Salud Mental">Salud Mental</option>
-                    <option value="Paliativos">Cuidados Paliativos</option>
-                </select>
-            </td>
-            <td class="px-3 py-2 border-r border-slate-100 relative pb-6">
-                <input type="number" name="cantidades[]" placeholder="0" min="1" oninput="validarStock(this)"
-                    required
-                    class="w-full bg-white border border-slate-300 focus:border-rose-500 rounded-lg px-2.5 py-2 text-[14px] font-black text-center text-slate-800 outline-none shadow-sm transition-colors">
-                <div
-                    class="stock-container absolute bottom-1 left-0 w-full text-center text-[10px] font-extrabold text-blue-600 hidden">
-                    Max: <span class="stock-max-badge">0</span></div>
-            </td>
-            <td class="px-3 py-2 text-center">
-                <button type="button" onclick="removeRow(this)"
-                    class="p-2 bg-white text-slate-400 hover:text-white hover:bg-rose-600 rounded-lg transition-colors cursor-pointer shadow-sm border border-slate-200"
-=======
             <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <input type="text" name="lotes[]" readonly placeholder="Auto..."
                     class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] font-mono font-bold text-slate-600 outline-none shadow-inner cursor-not-allowed text-center">
@@ -539,7 +440,6 @@
             <td class="px-3.5 py-2.5 text-center align-middle">
                 <button type="button" onclick="removeRow(this)"
                     class="p-2 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-lg transition-colors cursor-pointer shadow-xs"
->>>>>>> origin/cristobal
                     title="Quitar Fila">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -553,15 +453,9 @@
 
     <!-- ventana modal para el historial de despachos controlados -->
     <div id="BandejaModal"
-<<<<<<< HEAD
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-        <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
-=======
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
             class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
->>>>>>> origin/cristobal
 
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                 <div>
@@ -803,8 +697,6 @@
                 <button type="button" onclick="closeBandeja()"
                     class="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 rounded-xl transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cerrar
                     Historial</button>
-<<<<<<< HEAD
-=======
             </div>
         </div>
     </div>
@@ -882,25 +774,10 @@
                         Cancelar Escaneo
                     </button>
                 </div>
->>>>>>> origin/cristobal
             </div>
         </div>
     </div>
 
-<<<<<<< HEAD
-    <!-- AQUÍ ESTÁ LA SOLUCIÓN: VENTANA MODAL PARA EL ESCÁNER QR -->
-    <div id="scannerModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg flex flex-col overflow-hidden">
-            <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
-                <div>
-                    <h2 class="text-xl font-bold text-white tracking-wide">Escanear Etiqueta QR</h2>
-                    <p class="text-[12px] text-slate-300 mt-1 uppercase tracking-wider font-semibold">Acerque el código a
-                        la cámara</p>
-                </div>
-                <button type="button" onclick="closeScanner()"
-                    class="text-slate-400 hover:text-white transition-colors bg-white/10 p-2 rounded-lg cursor-pointer">
-=======
     <!-- modal de solicitudes con estupefacientes -->
     <div id="SolicitudesControladoModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
@@ -913,24 +790,12 @@
                 </div>
                 <button type="button" onclick="closeSolicitudesControlado()"
                     class="text-rose-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-lg cursor-pointer">
->>>>>>> origin/cristobal
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                         </path>
                     </svg>
                 </button>
             </div>
-<<<<<<< HEAD
-            <div class="p-6 bg-slate-50 flex items-center justify-center">
-                <!-- CONTENEDOR 'reader' DONDE HTML5-QRCODE INYECTA LA CÁMARA -->
-                <div id="reader"
-                    class="w-full rounded-lg overflow-hidden border-2 border-dashed border-rose-300 bg-white"></div>
-            </div>
-            <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end">
-                <button type="button" onclick="closeScanner()"
-                    class="px-6 py-2.5 bg-rose-600 text-white hover:bg-rose-700 rounded-xl transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar
-                    Escaneo</button>
-=======
 
             <!-- Filtros del modal controlado -->
             <div class="px-6 py-3.5 bg-slate-50 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1110,7 +975,6 @@
                         <p class="text-[12px] mt-1">Solo las solicitudes de establecimientos CESFAM pueden contener estupefacientes.</p>
                     </div>
                 @endif
->>>>>>> origin/cristobal
             </div>
         </div>
     </div>
@@ -1450,18 +1314,6 @@
             if (padDespachaElem) signatureDespacha = new SignaturePad(padDespachaElem, padOptions);
             if (padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
 
-<<<<<<< HEAD
-            const form = document.getElementById('despachoForm');
-            if (form) {
-                form.addEventListener('submit', function() {
-                    if (signatureDespacha && !signatureDespacha.isEmpty()) {
-                        document.getElementById('firma_despacha_input').value = signatureDespacha.toDataURL(
-                            'image/png');
-                    }
-                    if (signatureRecibe && !signatureRecibe.isEmpty()) {
-                        document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL(
-                            'image/png');
-=======
             const form = document.getElementById('despachoControladoForm');
             let despachoControladoSubmitAction = 'save_only';
 
@@ -1597,7 +1449,6 @@
                     if (!form.checkValidity()) {
                         form.reportValidity();
                         return;
->>>>>>> origin/cristobal
                     }
 
                     const clasif = document.getElementById('clasificacion_select')?.value || 'Interno';
@@ -1711,11 +1562,7 @@
                 btnLimpiar.addEventListener('click', function() {
                     if (signatureDespacha) signatureDespacha.clear();
                     if (signatureRecibe) signatureRecibe.clear();
-<<<<<<< HEAD
-                    const items = document.querySelectorAll('.producto-item');
-=======
                     const items = document.querySelectorAll('#productsBody tr');
->>>>>>> origin/cristobal
                     for (let i = 1; i < items.length; i++) {
                         items[i].remove();
                     }
@@ -1884,15 +1731,12 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             addRow();
-<<<<<<< HEAD
-=======
             filtrarSolicitudesControladoModal();
             const params = new URLSearchParams(window.location.search);
             const solIdParam = parseInt(params.get('solicitud_id'));
             if (solIdParam) {
                 setTimeout(() => usarSolicitudControlado(solIdParam), 150);
             }
->>>>>>> origin/cristobal
         });
 
         function addNewRowFromTemplate() {
@@ -2038,26 +1882,6 @@
                 });
             }
 
-<<<<<<< HEAD
-            // Aquí se muestra el modal que ahora sí existe en el HTML
-            document.getElementById('scannerModal').classList.remove('hidden');
-
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", {
-                fps: 10,
-                qrbox: {
-                    width: 250,
-                    height: 250
-                },
-                aspectRatio: 1.0
-            }, false);
-            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-        }
-
-        function closeScanner() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear().catch(e => console.error(e));
-                html5QrcodeScanner = null;
-=======
             const modal = document.getElementById('scannerModal');
             const loadingState = document.getElementById('scannerLoadingState');
             const statusTxt = document.getElementById('scannerStatusTxt');
@@ -2150,7 +1974,6 @@
                 try {
                     await html5QrScanner.stop();
                 } catch(e) {}
->>>>>>> origin/cristobal
             }
             document.getElementById('scannerModal').classList.add('hidden');
         }
@@ -2162,13 +1985,6 @@
             let parsedData = {};
             let chunks = decodedText.split('|');
             chunks.forEach(chunk => {
-<<<<<<< HEAD
-                let [key, val] = chunk.split(':');
-                if (key && val) parsedData[key.trim()] = val.trim();
-            });
-
-            if (!parsedData.PROD || !parsedData.STOCK) {
-=======
                 let idx = chunk.indexOf(':');
                 if (idx > -1) {
                     let key = chunk.substring(0, idx).trim().toUpperCase();
@@ -2188,7 +2004,6 @@
             let loteTarget = (parsedData.LOTE || (!prodTarget ? decodedText.trim() : '')).trim();
 
             if (!prodTarget && !loteTarget) {
->>>>>>> origin/cristobal
                 Swal.fire({
                     icon: 'error',
                     title: 'Formato Inválido',
@@ -2198,29 +2013,6 @@
                 return;
             }
 
-<<<<<<< HEAD
-            let rowData = {
-                producto: parsedData.PROD.trim(),
-                lote: parsedData.LOTE ? parsedData.LOTE.trim() : 'S/L',
-                vencimiento: parsedData.VENCE ? parsedData.VENCE.trim() : 'N/A',
-                stock: parseInt(parsedData.STOCK)
-            };
-
-            let emptySelect = Array.from(tbody.querySelectorAll('select[name="productos[]"]')).find(sel => sel.value ===
-            '');
-            let tr;
-
-            if (emptySelect) {
-                tr = emptySelect.closest('tr');
-            } else {
-                tr = addRow();
-            }
-
-            let select = tr.querySelector('select[name="productos[]"]');
-            let options = Array.from(select.options);
-            let targetOption = options.find(opt => opt.value === rowData.producto && opt.getAttribute('data-lote') ===
-                rowData.lote);
-=======
             let emptySelect = Array.from(tbody.querySelectorAll('select[name="productos[]"]')).find(sel => sel.value === '');
             let tr = emptySelect ? emptySelect.closest('tr') : addRow();
 
@@ -2258,7 +2050,6 @@
                     return optNorm && targetProdNorm && (optNorm.includes(targetProdNorm) || targetProdNorm.includes(optNorm));
                 });
             }
->>>>>>> origin/cristobal
 
             if (targetOption) {
                 // Seleccionar índice exacto para no colisionar con productos duplicados
@@ -2310,8 +2101,6 @@
             });
         @endif
     </script>
-<<<<<<< HEAD
-=======
 
     <style>
         @keyframes scanLaserAnim {
@@ -2334,5 +2123,4 @@
             object-fit: cover !important;
         }
     </style>
->>>>>>> origin/cristobal
 @endsection

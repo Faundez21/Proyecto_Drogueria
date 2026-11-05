@@ -10,14 +10,10 @@ class Inventory extends Model
     use HasFactory;
 
     protected $fillable = [
-<<<<<<< HEAD
-        'user_id',
-=======
         'product_id',
         'user_id',
         'provider_id',
         'reception_id',
->>>>>>> origin/cristobal
         'correlativo_interno',
         'fecha_recepcion',
         'tipo_documento',
@@ -63,9 +59,6 @@ class Inventory extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-<<<<<<< HEAD
-}
-=======
 
     public function product()
     {
@@ -117,4 +110,3 @@ class Inventory extends Model
         return $this->hasMany(ControlledDispatchItem::class);
     }
 }
->>>>>>> origin/cristobal

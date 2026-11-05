@@ -3,9 +3,6 @@
 @section('title', 'Solicitudes Establecimientos')
 @section('subtitle', 'Registro y gestión de solicitudes de medicamentos e insumos para establecimientos.')
 
-<<<<<<< HEAD
-
-=======
 @section('actions')
     @role('Administrador')
         <button type="button" onclick="openRequestInventoryModal()"
@@ -19,7 +16,6 @@
         </button>
     @endrole
 @endsection
->>>>>>> origin/cristobal
 
 @section('content')
     <!-- migas de pan -->
@@ -252,17 +248,11 @@
                                         Consumo mensual del mes anterior <span class="text-rose-500">*</span>
                                     </label>
 
-<<<<<<< HEAD
-                                    <input type="number" name="stock_actual[]" min="1" required
-                                        placeholder="Ej: 500"
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold">
-=======
                                     <input type="number" name="consumo_anterior[]" min="0" readonly
                                         value="0"
                                         placeholder="Se calculará automáticamente"
                                         class="w-full bg-slate-100 border border-slate-200 text-slate-700 rounded-lg py-2.5 px-3.5 text-[13px] font-bold cursor-not-allowed input-consumo-anterior">
                                     <span class="block text-[10.5px] text-slate-400 mt-1 info-consumo-anterior">Calculado según despachos del mes anterior</span>
->>>>>>> origin/cristobal
                                 </div>
 
                                 <div>
@@ -604,17 +594,6 @@
                 }, 10);
             });
 
-<<<<<<< HEAD
-            document.getElementById('requestForm').addEventListener('submit', function(e) {
-                if (signatureRecibe.isEmpty()) {
-                    e.preventDefault();
-                    alert('Debe firmar la solicitud antes de enviarla.');
-                    return;
-                }
-
-                document.getElementById('firma_recibe_input').value =
-                    signatureRecibe.toDataURL('image/png');
-=======
             function mostrarSweetAlertSolicitudExitosa(solData, recargarAlCerrar = false) {
                 if (!solData) return;
 
@@ -786,7 +765,6 @@
                         });
                     }
                 });
->>>>>>> origin/cristobal
             });
 
             actualizarResumen();

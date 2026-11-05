@@ -33,35 +33,6 @@
 @endsection
 
 @section('content')
-<<<<<<< HEAD
-    <div class="w-full">
-
-        <!-- miga de pan -->
-
-        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-2 px-1 pt-2">
-
-            <a href="{{ route('distribution.index') }}" class="hover:text-blue-900">
-                Distribución
-            </a>
-
-            <span>/</span>
-
-            <span class="text-gray-800 font-medium">
-                Niveles
-            </span>
-            @role('Administrador')
-                <div class="flex gap-2 w-full sm:w-auto ml-auto">
-                    <button type="button" onclick="openHistory()"
-                        class="w-full sm:w-auto bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors shadow-sm">
-                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Ver Historial
-                    </button>
-                </div>
-            @endrole
-=======
     <div class="space-y-6">
         <!-- Ruta de navegación -->
         <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
@@ -75,7 +46,6 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
             <span class="font-medium text-slate-800">Niveles</span>
->>>>>>> origin/cristobal
         </div>
 
         <!-- Barra de Navegación Jerárquica de Bodega -->
