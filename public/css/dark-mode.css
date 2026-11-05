@@ -1,0 +1,1119 @@
+/* =====================================================================
+   MODO OSCURO - Droguería DAS
+   Se activa con la clase "dark" en <html>. Sobrescribe las utilidades
+   claras de Tailwind para que todas las vistas se adapten sin tocarlas.
+   Paleta:  fondo #1A2332 · tarjeta #243044 · sutil #202B3D · elevado #2C3A52
+   ===================================================================== */
+
+html.dark {
+    color-scheme: dark;
+    --nav-bg: #243044;
+    --main-bg: #1A2332;
+    --border-light: #364560;
+    --text-main: #E2E8F0;
+    --text-muted: #94A3B8;
+}
+
+html.dark body { background-color: #1A2332; color: #E2E8F0; }
+html.dark ::selection { background: rgba(20, 184, 166, .5); color: #fff; }
+
+/* ---------- Superficies neutras ---------- */
+html.dark .bg-white,
+html.dark .focus\:bg-white:focus { background-color: #243044; }
+html.dark .bg-white\/90,
+html.dark .bg-white\/95 { background-color: rgba(17, 28, 46, .94); }
+
+html.dark .bg-slate-50, html.dark .bg-gray-50,
+html.dark .bg-slate-50\/30, html.dark .bg-slate-50\/40, html.dark .bg-slate-50\/50,
+html.dark .bg-slate-50\/60, html.dark .bg-slate-50\/80, html.dark .bg-slate-50\/90,
+html.dark .focus\:bg-gray-50:focus { background-color: #202B3D; }
+
+html.dark .bg-slate-100, html.dark .bg-gray-100,
+html.dark .bg-slate-100\/50, html.dark .focus\:bg-gray-100:focus { background-color: #2C3A52; }
+
+html.dark .bg-slate-200, html.dark .bg-slate-200\/70, html.dark .bg-slate-300 { background-color: #364763; }
+
+html.dark .hover\:bg-white:hover { background-color: #2A384F; }
+html.dark .hover\:bg-slate-50:hover, html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-slate-50\/60:hover, html.dark .hover\:bg-slate-50\/70:hover,
+html.dark .hover\:bg-slate-50\/80:hover { background-color: #2A384F; }
+html.dark .hover\:bg-slate-100:hover, html.dark .hover\:bg-gray-100:hover,
+html.dark .hover\:bg-slate-100\/70:hover { background-color: #32425C; }
+html.dark .hover\:bg-slate-200:hover, html.dark .hover\:bg-slate-200\/50:hover { background-color: #3A4B68; }
+
+/* ---------- Texto neutro ---------- */
+html.dark .text-slate-900, html.dark .text-slate-800, html.dark .text-gray-900, html.dark .text-gray-800 { color: #F1F5F9; }
+html.dark .text-slate-700, html.dark .text-gray-700 { color: #E2E8F0; }
+html.dark .text-slate-600, html.dark .text-gray-600 { color: #CBD5E1; }
+html.dark .text-slate-500 { color: #A8B6CA; }
+html.dark .text-slate-400 { color: #8D9CB3; }
+html.dark .hover\:text-slate-900:hover, html.dark .hover\:text-slate-800:hover,
+html.dark .hover\:text-slate-600:hover, html.dark .hover\:text-gray-900:hover,
+html.dark .hover\:text-gray-800:hover, html.dark .hover\:text-gray-700:hover,
+html.dark .group:hover .group-hover\:text-slate-700 { color: #F8FAFC; }
+
+/* ---------- Bordes y divisores ---------- */
+html.dark .border-slate-50, html.dark .border-slate-100, html.dark .border-gray-100 { border-color: #2F3D55; }
+html.dark .border-slate-200, html.dark .border-slate-200\/60, html.dark .border-slate-200\/80,
+html.dark .border-slate-200\/90, html.dark .border-gray-200 { border-color: #364560; }
+html.dark .border-slate-300, html.dark .border-gray-300,
+html.dark .focus\:border-gray-300:focus { border-color: #45577A; }
+html.dark .hover\:border-slate-300:hover, html.dark .hover\:border-gray-300:hover { border-color: #5A6E92; }
+html.dark .border-white { border-color: #243044; }
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #2F3D55; }
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: #364560; }
+html.dark .ring-slate-200 { --tw-ring-color: #364560; }
+
+/* ---------- Formularios ---------- */
+html.dark input, html.dark select, html.dark textarea { color: #E2E8F0; }
+html.dark input::placeholder, html.dark textarea::placeholder { color: #7586A0; }
+html.dark input:disabled, html.dark select:disabled, html.dark textarea:disabled,
+html.dark input[readonly] { color: #94A3B8; }
+html.dark input[type="date"]::-webkit-calendar-picker-indicator,
+html.dark input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(.8); cursor: pointer; }
+html.dark option { background-color: #243044; color: #E2E8F0; }
+html.dark input[type="checkbox"], html.dark input[type="radio"] { accent-color: #14B8A6; }
+
+/* ---------- Botones primarios oscuros (slate-800) ---------- */
+html.dark button.bg-slate-800, html.dark a.bg-slate-800 { background-color: #0F766E; }
+html.dark button.bg-slate-800:hover, html.dark a.bg-slate-800:hover,
+html.dark button.hover\:bg-slate-900:hover, html.dark a.hover\:bg-slate-900:hover { background-color: #115E59; }
+
+/* ---------- Tintes de color (fondos) ---------- */
+html.dark .bg-emerald-50, html.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, .2); }
+html.dark .bg-teal-50, html.dark .bg-teal-100,
+html.dark .bg-teal-50\/30, html.dark .bg-teal-50\/60, html.dark .bg-teal-50\/70, html.dark .bg-teal-50\/80 { background-color: rgba(20, 184, 166, .2); }
+html.dark .bg-amber-50, html.dark .bg-amber-100, html.dark .bg-amber-50\/20, html.dark .bg-yellow-50 { background-color: rgba(245, 158, 11, .2); }
+html.dark .bg-rose-50, html.dark .bg-rose-100, html.dark .bg-red-50,
+html.dark .bg-rose-50\/30, html.dark .bg-rose-50\/60, html.dark .bg-rose-50\/70 { background-color: rgba(244, 63, 94, .2); }
+html.dark .bg-blue-50, html.dark .bg-blue-100 { background-color: rgba(59, 130, 246, .2); }
+html.dark .bg-indigo-50, html.dark .bg-indigo-100,
+html.dark .bg-indigo-50\/30, html.dark .bg-indigo-50\/40, html.dark .bg-indigo-50\/60, html.dark .bg-indigo-50\/70 { background-color: rgba(99, 102, 241, .2); }
+html.dark .bg-purple-50, html.dark .bg-purple-100 { background-color: rgba(168, 85, 247, .2); }
+
+/* hover con tinte */
+html.dark .hover\:bg-emerald-50:hover, html.dark .hover\:bg-emerald-100:hover { background-color: rgba(16, 185, 129, .32); }
+html.dark .hover\:bg-teal-50:hover, html.dark .hover\:bg-teal-100:hover,
+html.dark .group:hover .group-hover\:bg-teal-100, html.dark .group:hover .group-hover\:bg-teal-100\/50 { background-color: rgba(20, 184, 166, .32); }
+html.dark .hover\:bg-amber-50:hover, html.dark .hover\:bg-amber-100:hover, html.dark .hover\:bg-amber-50\/40:hover,
+html.dark .group:hover .group-hover\:bg-amber-100 { background-color: rgba(245, 158, 11, .32); }
+html.dark .hover\:bg-rose-50:hover, html.dark .hover\:bg-rose-100:hover, html.dark .hover\:bg-rose-50\/30:hover,
+html.dark .hover\:bg-rose-50\/40:hover, html.dark .group:hover .group-hover\:bg-rose-100 { background-color: rgba(244, 63, 94, .32); }
+html.dark .hover\:bg-blue-50:hover, html.dark .hover\:bg-blue-100:hover,
+html.dark .group:hover .group-hover\:bg-blue-100 { background-color: rgba(59, 130, 246, .32); }
+html.dark .hover\:bg-indigo-50:hover, html.dark .hover\:bg-indigo-100:hover, html.dark .hover\:bg-indigo-50\/40:hover,
+html.dark .focus\:bg-indigo-100:focus { background-color: rgba(99, 102, 241, .32); }
+html.dark .hover\:bg-purple-100:hover { background-color: rgba(168, 85, 247, .32); }
+
+/* ---------- Texto con color ---------- */
+html.dark .text-emerald-600, html.dark .text-emerald-700, html.dark .text-emerald-800, html.dark .text-emerald-900, html.dark .text-green-600 { color: #6EE7B7; }
+html.dark .text-teal-600, html.dark .text-teal-700, html.dark .text-teal-800, html.dark .text-teal-900,
+html.dark .hover\:text-teal-600:hover, html.dark .hover\:text-teal-700:hover, html.dark .hover\:text-teal-800:hover, html.dark .hover\:text-teal-900:hover,
+html.dark .group:hover .group-hover\:text-teal-600, html.dark .group:hover .group-hover\:text-teal-700 { color: #5EEAD4; }
+html.dark .text-amber-600, html.dark .text-amber-700, html.dark .text-amber-800, html.dark .text-amber-900,
+html.dark .text-yellow-800, html.dark .text-yellow-900,
+html.dark .hover\:text-amber-600:hover, html.dark .hover\:text-amber-700:hover, html.dark .hover\:text-amber-800:hover, html.dark .hover\:text-amber-900:hover,
+html.dark .group:hover .group-hover\:text-amber-700 { color: #FCD34D; }
+html.dark .text-rose-600, html.dark .text-rose-700, html.dark .text-rose-800, html.dark .text-rose-900, html.dark .text-red-600, html.dark .text-red-700,
+html.dark .hover\:text-rose-600:hover, html.dark .hover\:text-rose-700:hover, html.dark .hover\:text-rose-800:hover,
+html.dark .group:hover .group-hover\:text-rose-700 { color: #FDA4AF; }
+html.dark .text-blue-600, html.dark .text-blue-700, html.dark .text-blue-800,
+html.dark .hover\:text-blue-800:hover, html.dark .hover\:text-blue-900:hover,
+html.dark .group:hover .group-hover\:text-blue-700 { color: #93C5FD; }
+html.dark .text-indigo-600, html.dark .text-indigo-700, html.dark .text-indigo-800, html.dark .text-indigo-900,
+html.dark .hover\:text-indigo-800:hover, html.dark .group:hover .group-hover\:text-indigo-600 { color: #A5B4FC; }
+html.dark .text-purple-600, html.dark .text-purple-700, html.dark .text-purple-800 { color: #D8B4FE; }
+
+/* ---------- Bordes con color ---------- */
+html.dark .border-emerald-100, html.dark .border-emerald-200 { border-color: rgba(16, 185, 129, .5); }
+html.dark .border-teal-100, html.dark .border-teal-200, html.dark .border-teal-200\/80, html.dark .border-teal-300,
+html.dark .group:hover .group-hover\:border-teal-200 { border-color: rgba(20, 184, 166, .5); }
+html.dark .border-amber-100, html.dark .border-amber-200, html.dark .border-amber-200\/80, html.dark .border-amber-300,
+html.dark .border-yellow-200, html.dark .group:hover .group-hover\:border-amber-200 { border-color: rgba(245, 158, 11, .5); }
+html.dark .border-rose-100, html.dark .border-rose-200, html.dark .border-rose-300, html.dark .border-red-200 { border-color: rgba(244, 63, 94, .5); }
+html.dark .border-blue-100, html.dark .border-blue-200 { border-color: rgba(59, 130, 246, .5); }
+html.dark .border-indigo-100, html.dark .border-indigo-200, html.dark .border-indigo-300 { border-color: rgba(99, 102, 241, .5); }
+html.dark .border-purple-100, html.dark .border-purple-200 { border-color: rgba(168, 85, 247, .5); }
+html.dark .hover\:border-teal-200:hover, html.dark .hover\:border-teal-300:hover { border-color: rgba(20, 184, 166, .6); }
+html.dark .hover\:border-amber-300:hover { border-color: rgba(245, 158, 11, .6); }
+html.dark .hover\:border-rose-200:hover, html.dark .hover\:border-rose-300:hover { border-color: rgba(244, 63, 94, .6); }
+html.dark .hover\:border-blue-200:hover, html.dark .hover\:border-blue-300:hover { border-color: rgba(59, 130, 246, .6); }
+html.dark .hover\:border-emerald-200:hover { border-color: rgba(16, 185, 129, .6); }
+html.dark .hover\:border-indigo-200:hover, html.dark .hover\:border-indigo-300:hover { border-color: rgba(99, 102, 241, .6); }
+html.dark .decoration-indigo-300 { text-decoration-color: rgba(99, 102, 241, .6); }
+
+/* ---------- Anillos (líneas de tiempo) ---------- */
+html.dark .ring-amber-50 { --tw-ring-color: rgba(245, 158, 11, .2); }
+html.dark .ring-blue-50 { --tw-ring-color: rgba(59, 130, 246, .2); }
+html.dark .ring-emerald-50 { --tw-ring-color: rgba(16, 185, 129, .2); }
+html.dark .ring-rose-50 { --tw-ring-color: rgba(244, 63, 94, .2); }
+
+/* ---------- Degradados claros ---------- */
+html.dark .from-slate-50 { --tw-gradient-from: #202B3D; --tw-gradient-to: rgb(32 43 61 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+html.dark .from-slate-100 { --tw-gradient-from: #2C3A52; --tw-gradient-to: rgb(44 58 82 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+html.dark .from-teal-50 { --tw-gradient-from: #1B3A40; --tw-gradient-to: rgb(27 58 64 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+html.dark .via-white { --tw-gradient-stops: var(--tw-gradient-from), #243044, var(--tw-gradient-to); }
+html.dark .to-white { --tw-gradient-to: #243044; }
+html.dark .to-indigo-50 { --tw-gradient-to: #27305A; }
+html.dark .to-slate-300 { --tw-gradient-to: #364763; }
+
+/* ---------- Sombras ---------- */
+html.dark .shadow, html.dark .shadow-sm, html.dark .shadow-md, html.dark .shadow-lg,
+html.dark .shadow-xl, html.dark .shadow-2xl, html.dark .shadow-xs {
+    --tw-shadow-color: rgba(0, 0, 0, .55);
+    --tw-shadow: 0 4px 14px -2px rgba(0, 0, 0, .45);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+html.dark .shadow-inner { --tw-shadow: inset 0 2px 6px rgba(0, 0, 0, .45); }
+
+/* ---------- Componentes propios del layout ---------- */
+html.dark .search-result-item:focus,
+html.dark .search-result-item.active { background-color: rgba(20, 184, 166, .16) !important; border-color: rgba(20, 184, 166, .45) !important; }
+html.dark .search-result-item:focus svg.shrink-0,
+html.dark .search-result-item.active svg.shrink-0 { color: #5EEAD4; }
+html.dark .highlight-text { background-color: rgba(20, 184, 166, .3); color: #99F6E4; }
+html.dark .loader { border-color: #364560; border-top-color: #14B8A6; }
+html.dark .sidebar-scroll::-webkit-scrollbar-thumb { background: #45577A; }
+
+/* ---------- SweetAlert2 ---------- */
+.swal2-container {
+    z-index: 9999999 !important;
+}
+.swal2-popup {
+    border-radius: 18px !important;
+}
+.swal2-popup .swal2-success-circular-line-left,
+.swal2-popup .swal2-success-circular-line-right,
+.swal2-popup .swal2-success-fix {
+    background-color: transparent !important;
+}
+html.dark .swal2-popup {
+    background: #1E293B !important;
+    color: #E2E8F0 !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 25px 55px -12px rgba(0, 0, 0, .72) !important;
+}
+html.dark .swal2-title { color: #F8FAFC !important; }
+html.dark .swal2-html-container, html.dark .swal2-content { color: #E2E8F0 !important; }
+html.dark .swal2-input, html.dark .swal2-textarea, html.dark .swal2-select { background: #162032; color: #E2E8F0; border-color: #45577A; }
+html.dark .swal2-footer { border-top-color: #334155; color: #94A3B8; }
+html.dark .swal2-timer-progress-bar { background: rgba(255, 255, 255, .25); }
+html.dark .swal2-html-container table { color: #CBD5E1; }
+html.dark .swal2-html-container thead { background-color: #162032 !important; }
+html.dark .swal2-html-container th { color: #94A3B8 !important; }
+html.dark .swal2-html-container td { color: #E2E8F0 !important; border-color: #2C3B52 !important; }
+html.dark .swal2-html-container tbody.bg-white,
+html.dark .swal2-html-container .bg-white { background-color: #1E293B !important; }
+html.dark .swal2-html-container .bg-slate-50,
+html.dark .swal2-html-container .bg-slate-100 { background-color: #162032 !important; }
+html.dark .swal2-html-container .bg-amber-50,
+html.dark .swal2-html-container .bg-amber-50\/70 { background-color: rgba(245, 158, 11, .14) !important; }
+html.dark .swal2-html-container .bg-rose-50,
+html.dark .swal2-html-container .bg-rose-50\/70 { background-color: rgba(244, 63, 94, .14) !important; }
+html.dark .swal2-html-container .bg-emerald-50,
+html.dark .swal2-html-container .bg-emerald-50\/70 { background-color: rgba(16, 185, 129, .14) !important; }
+html.dark .swal2-html-container .bg-teal-50,
+html.dark .swal2-html-container .bg-teal-50\/70 { background-color: rgba(20, 184, 166, .14) !important; }
+html.dark .swal2-html-container .text-slate-900,
+html.dark .swal2-html-container .text-slate-800 { color: #F8FAFC !important; }
+html.dark .swal2-html-container .text-slate-700 { color: #E2E8F0 !important; }
+html.dark .swal2-html-container .text-slate-600 { color: #CBD5E1 !important; }
+html.dark .swal2-html-container .text-slate-500 { color: #94A3B8 !important; }
+
+/* ---------- Barras de desplazamiento ---------- */
+html.dark ::-webkit-scrollbar { width: 10px; height: 10px; }
+html.dark ::-webkit-scrollbar-track { background: #1A2332; }
+html.dark ::-webkit-scrollbar-thumb { background: #364763; border-radius: 8px; border: 2px solid #1A2332; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #4A5E80; }
+
+/* ---------- Botón de tema ---------- */
+.theme-icon-sun { display: none; }
+html.dark .theme-icon-sun { display: block; }
+html.dark .theme-icon-moon { display: none; }
+
+/* ---------- Impresión: siempre en claro ---------- */
+@media print {
+    html.dark body { background: #fff !important; color: #000 !important; }
+}
+
+/* ---------- Barra lateral más suave ---------- */
+html.dark {
+    --sidebar-bg: #1C2639;
+    --sidebar-hover: #2A374F;
+    --sidebar-text: #A8B6CA;
+}
+html.dark .bg-\[\#0F172A\] { background-color: #1C2639; }
+html.dark aside .border-slate-800 { border-color: #2C3A52; }
+html.dark aside .bg-slate-800 { background-color: #2A374F; }
+html.dark .flow-rail::before { background: #3A4B68; }
+
+/* ---------- Fondos oscuros de encabezados y modales ---------- */
+html.dark .bg-slate-800:not(button):not(a) { background-color: #2C3A52; }
+html.dark .bg-slate-700:not(button):not(a) { background-color: #364763; }
+html.dark .bg-slate-700.text-white { background-color: #364763; }
+
+/* ---------- Botón de tema (encabezado) ---------- */
+.theme-toggle {
+    width: 38px; height: 38px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 9999px;
+    border: 1px solid #E2E8F0;
+    background: #F8FAFC;
+    color: #475569;
+    transition: all .2s ease;
+}
+.theme-toggle:hover { background: #F1F5F9; color: #0D9488; border-color: #CBD5E1; transform: rotate(-12deg); }
+html.dark .theme-toggle { background: #2C3A52; border-color: #45577A; color: #FBBF24; }
+html.dark .theme-toggle:hover { background: #364763; color: #FCD34D; border-color: #5A6E92; transform: rotate(12deg); }
+
+/* ---------- Mapa de distribución ---------- */
+html.dark .bg-\[\#eef2f6\] { background-color: #1A2332; }
+html.dark .glass-panel { background-color: rgba(30, 41, 59, .96); border-color: #364560; }
+html.dark .bg-\[\#1e293b\] { background-color: #1A2332; }
+html.dark .rack-marker { border-color: rgba(255, 255, 255, .25); }
+html.dark #warehouse-wrapper { background: #1A2332; }
+
+/* ---------- Tablas: filas y cabeceras ---------- */
+html.dark table thead { background-color: #202B3D; }
+html.dark tbody tr { border-color: #2F3D55; }
+html.dark table th { color: #A8B6CA; }
+
+/* ---------- Tarjetas de estado e indicadores con texto sobre tinte ---------- */
+html.dark .text-emerald-500 { color: #34D399; }
+html.dark .text-amber-500 { color: #FBBF24; }
+html.dark .text-rose-500 { color: #FB7185; }
+html.dark .text-teal-500 { color: #2DD4BF; }
+html.dark .text-blue-500 { color: #60A5FA; }
+
+/* ---------- Login ---------- */
+html.dark body.login-page,
+html.dark .bg-gradient-to-br.from-slate-100 { background-image: linear-gradient(135deg, #1A2332, #0F1623); }
+html.dark .login-theme-toggle { position: fixed; top: 16px; right: 16px; z-index: 50; }
+.login-theme-toggle { position: fixed; top: 16px; right: 16px; z-index: 50; }
+
+/* ---------- Paneles/modales sobre fondo con desenfoque ---------- */
+html.dark .bg-slate-900\/70, html.dark .bg-slate-900\/75, html.dark .bg-slate-900\/80 { background-color: rgba(8, 12, 22, .78); }
+/* ---------- Grises (login y vistas con text-gray) ---------- */
+html.dark .text-gray-500 { color: #A8B6CA; }
+html.dark .text-gray-400 { color: #8D9CB3; }
+html.dark .text-gray-300, html.dark .text-gray-200 { color: #CBD5E1; }
+html.dark .hover\:text-gray-700:hover { color: #F8FAFC; }
+html.dark .bg-gray-200 { background-color: #364763; }
+html.dark .bg-blue-900 { background-color: #1E3A5F; }
+html.dark .bg-slate-900:not(button):not(a) { background-color: #1E293B; }
+
+/* ---------- Tarjetas de etiquetas QR físicas (siempre fondo blanco puro y texto negro para legibilidad e impresión) ---------- */
+html.dark #qrPrintableCard {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border-color: #CBD5E1 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6) !important;
+}
+html.dark #qrPrintableCard * {
+    color: #000000 !important;
+}
+html.dark #qrPrintableCard div {
+    background-color: transparent !important;
+}
+html.dark #qrPrintableCard .text-slate-500 {
+    color: #475569 !important;
+}
+html.dark #qrPrintableCard .border-slate-300 {
+    border-color: #CBD5E1 !important;
+}
+html.dark #qrPrintableCard .border-black {
+    border-color: #000000 !important;
+}
+html.dark #qrPrintableCard #qrcode,
+html.dark #qrPrintableCard img {
+    background-color: #FFFFFF !important;
+}
+
+/* ---------- Contenedores de visualización de QR (ej: Dashboard y paneles de lote) ---------- */
+html.dark #qr-container,
+html.dark .qr-container,
+html.dark [id*="qr-container"] {
+    background-color: #FFFFFF !important;
+    border-color: #475569 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+html.dark #qr-container img,
+html.dark .qr-container img,
+html.dark #qrcode,
+html.dark img[src*="qr"] {
+    background-color: #FFFFFF !important;
+    border-radius: 8px;
+}
+
+/* ---------- Modales y Visor de Escáner QR en Modo Oscuro (Dispatch, Controlled Dispatch, Dashboard) ---------- */
+html.dark #scannerModal > div,
+html.dark #scannerModal > div > div,
+html.dark #scannerModalDashboard > div,
+html.dark #scannerModalDashboard > div > div {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+    color: #E2E8F0 !important;
+}
+
+html.dark #scannerModal .bg-slate-50\/70,
+html.dark #scannerModalDashboard .bg-slate-50\/70,
+html.dark #scannerModal .bg-slate-50,
+html.dark #scannerModalDashboard .bg-slate-50 {
+    background-color: #172132 !important;
+    border-color: #2F3D55 !important;
+}
+
+html.dark #scannerVisualContainer {
+    background-color: #000000 !important;
+    border-color: #475569 !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 24px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Motor nativo HTML5 QR Scanner en modo oscuro */
+html.dark #reader-feed,
+html.dark #reader-dashboard-feed {
+    background-color: #000000 !important;
+    color: #F1F5F9 !important;
+}
+html.dark #reader-feed *,
+html.dark #reader-dashboard-feed * {
+    color: #F1F5F9 !important;
+}
+html.dark #reader-feed select,
+html.dark #reader-dashboard-feed select {
+    background-color: #1E293B !important;
+    color: #E2E8F0 !important;
+    border: 1px solid #475569 !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+}
+html.dark #reader-feed button,
+html.dark #reader-dashboard-feed button {
+    background-color: #0F766E !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+}
+
+/* Barra de estado y botones del modal de escaneo */
+html.dark #scannerStatusTxt {
+    color: #E2E8F0 !important;
+}
+html.dark #btnSwitchCamera {
+    background-color: #243044 !important;
+    color: #E2E8F0 !important;
+    border-color: #475569 !important;
+}
+html.dark #btnSwitchCamera:hover {
+    background-color: #2C3A52 !important;
+    color: #FFFFFF !important;
+}
+
+html.dark #scannerModal p,
+html.dark #scannerModalDashboard p {
+    color: #94A3B8;
+}
+
+/* Footer de los modales de escaneo */
+html.dark #scannerModal .border-t,
+html.dark #scannerModalDashboard .border-t {
+    border-color: #2F3D55 !important;
+    background-color: #172132 !important;
+}
+html.dark #scannerModal button[onclick*="closeScanner"],
+html.dark #scannerModalDashboard button[onclick*="closeDashboardScanner"] {
+    background-color: #243044 !important;
+    color: #E2E8F0 !important;
+    border-color: #475569 !important;
+}
+html.dark #scannerModal button[onclick*="closeScanner"]:hover,
+html.dark #scannerModalDashboard button[onclick*="closeDashboardScanner"]:hover {
+    background-color: #2C3A52 !important;
+    color: #FFFFFF !important;
+}
+
+/* ---------- Modal Actualizar Estado y Ubicación de Lote en Modo Oscuro ---------- */
+html.dark #editLoteModal > div > div,
+html.dark #editLoteModal form {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+    color: #E2E8F0 !important;
+}
+html.dark #editLoteModal .bg-slate-50,
+html.dark #editLoteModal .bg-slate-50\/90 {
+    background-color: #16202E !important;
+    border-color: #334155 !important;
+}
+html.dark #editLoteModal label {
+    color: #E2E8F0 !important;
+}
+html.dark #editLoteModal .text-slate-500,
+html.dark #editLoteModal .text-slate-400 {
+    color: #94A3B8 !important;
+}
+html.dark #editLoteModal select,
+html.dark #editLoteModal textarea,
+html.dark #editLoteModal input {
+    background-color: #0F172A !important;
+    border-color: #475569 !important;
+    color: #F8FAFC !important;
+}
+html.dark #editLoteModal select option {
+    background-color: #0F172A !important;
+    color: #F8FAFC !important;
+}
+html.dark #editLoteModal .border-t {
+    background-color: #16202E !important;
+    border-color: #334155 !important;
+}
+html.dark #editLoteModal button[onclick*="closeEditLote"] {
+    background-color: #1E293B !important;
+    color: #E2E8F0 !important;
+    border-color: #475569 !important;
+}
+
+/* CENTRO DE ALERTAS - MODO OSCURO */
+html.dark #notifications-menu {
+    background-color: #1A2434 !important;
+    border-color: #2F3E56 !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.65), 0 8px 10px -6px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Encabezado del menú de alertas */
+html.dark #notifications-menu > div:first-child {
+    background-color: #141D2B !important;
+    border-color: #243144 !important;
+}
+html.dark #notifications-menu h3 {
+    color: #F8FAFC !important;
+}
+html.dark #btn-marcar-todas-notif {
+    color: #2DD4BF !important;
+}
+html.dark #btn-marcar-todas-notif:hover {
+    color: #5EEAD4 !important;
+}
+
+/* Barra de pestañas del Centro de Alertas */
+html.dark #notifications-menu .bg-slate-50\/70 {
+    background-color: #111823 !important;
+    border-color: #243144 !important;
+}
+html.dark #notifications-menu .notif-tab-active {
+    background-color: #243044 !important;
+    color: #2DD4BF !important;
+    border-color: #364560 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
+}
+html.dark #notifications-menu .notif-tab-inactive {
+    background-color: transparent !important;
+    color: #94A3B8 !important;
+    border-color: transparent !important;
+}
+html.dark #notifications-menu .notif-tab-inactive:hover {
+    background-color: #1C2737 !important;
+    color: #E2E8F0 !important;
+}
+html.dark #notif-read-count {
+    background-color: #2D3D54 !important;
+    color: #CBD5E1 !important;
+}
+
+/* Listas de alertas (Pendientes y Vistas) */
+html.dark #notif-list,
+html.dark #notif-read-list {
+    background-color: #1A2434 !important;
+}
+html.dark #notif-list > div,
+html.dark #notif-read-list > div {
+    border-color: #243144 !important;
+}
+html.dark #notif-list > div:hover,
+html.dark #notif-read-list > div:hover {
+    background-color: #222E40 !important;
+}
+
+/* Títulos y textos de alertas */
+html.dark #notif-list p.text-slate-800,
+html.dark #notif-read-list p.text-slate-700 {
+    color: #F8FAFC !important;
+}
+html.dark #notif-list p.text-slate-500,
+html.dark #notif-read-list p.text-slate-500 {
+    color: #94A3B8 !important;
+}
+html.dark #notif-list p.text-slate-400,
+html.dark #notif-read-list p.text-slate-400 {
+    color: #64748B !important;
+}
+
+/* Insignia "Vista" */
+html.dark #notif-read-list span.bg-slate-100 {
+    background-color: #243347 !important;
+    color: #94A3B8 !important;
+    border: 1px solid #2F3E56 !important;
+}
+
+/* Botones de acción dentro de las alertas */
+html.dark #notif-list button {
+    color: #64748B !important;
+}
+html.dark #notif-list button:hover {
+    color: #2DD4BF !important;
+    background-color: rgba(20, 184, 166, 0.18) !important;
+}
+html.dark #notif-read-list button {
+    color: #64748B !important;
+}
+html.dark #notif-read-list button:hover {
+    color: #818CF8 !important;
+    background-color: rgba(99, 102, 241, 0.18) !important;
+}
+
+/* Estados vacíos */
+html.dark #notif-list svg.text-slate-300,
+html.dark #notif-read-list svg.text-slate-300 {
+    color: #475569 !important;
+}
+html.dark #notif-list .text-slate-400,
+html.dark #notif-read-list .text-slate-400 {
+    color: #94A3B8 !important;
+}
+
+/* ---------- Blindaje de modales fijos contra márgenes no deseados (space-y-*) ---------- */
+div[id$="Modal"], div[id*="modal"], div[id*="Modal"] {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* ---------- Diseño Base y Scroll para Modales de Historial (#HistoryModal) ---------- */
+#HistoryModal:not(.hidden) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 1rem !important;
+}
+#HistoryModal > div {
+    width: 100% !important;
+    max-width: 68rem !important;
+    max-height: 88vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border-radius: 1rem !important;
+    overflow: hidden !important;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.38) !important;
+}
+#HistoryModal > div > div:first-child {
+    padding: 1rem 1.5rem !important;
+    background-color: #0f172a !important;
+    border-bottom: 1px solid #1e293b !important;
+    flex-shrink: 0 !important;
+}
+#HistoryModal > div > div:nth-child(2) {
+    padding: 0.875rem 1.5rem !important;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0 !important;
+}
+#HistoryModal > div > div.overflow-x-auto {
+    flex: 1 1 auto !important;
+    min-height: 200px !important;
+    max-height: 54vh !important;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+    background-color: #ffffff;
+}
+#HistoryModal table {
+    width: 100% !important;
+    min-width: 740px !important;
+    border-collapse: collapse !important;
+}
+#HistoryModal thead {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    background-color: #f1f5f9 !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+}
+#HistoryModal thead th {
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    color: #475569 !important;
+}
+#HistoryModal tbody td {
+    padding: 0.75rem 1.25rem !important;
+    vertical-align: middle !important;
+}
+#HistoryModal tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.15s ease;
+}
+#HistoryModal tbody tr:hover {
+    background-color: #f8fafc;
+}
+#HistoryModal > div > div:last-child {
+    padding: 0.875rem 1.5rem !important;
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    flex-shrink: 0 !important;
+}
+
+/* ---------- Modales de Historial y Mantenedores en Modo Oscuro ---------- */
+html.dark #HistoryModal > div,
+html.dark #createModal > div,
+html.dark #showModal > div,
+html.dark #editModal > div > div {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+    color: #E2E8F0 !important;
+}
+html.dark #HistoryModal > div > div:first-child,
+html.dark #createModal > div > div:first-child,
+html.dark #showModal > div > div:first-child,
+html.dark #editModal > div > div > div:first-child {
+    background-color: #0F172A !important;
+    border-color: #1E293B !important;
+}
+html.dark #HistoryModal > div > div:nth-child(2),
+html.dark #HistoryModal > div > div:last-child {
+    background-color: #162032 !important;
+    border-color: #334155 !important;
+}
+html.dark #HistoryModal > div > div.overflow-x-auto {
+    background-color: #1E293B !important;
+}
+html.dark #HistoryModal thead {
+    background-color: #0F172A !important;
+    border-color: #334155 !important;
+}
+html.dark #HistoryModal thead th {
+    color: #94A3B8 !important;
+}
+html.dark #HistoryModal tbody tr {
+    border-color: #293548 !important;
+}
+html.dark #HistoryModal tbody tr:hover {
+    background-color: #263449 !important;
+}
+html.dark #HistoryModal input,
+html.dark #HistoryModal select,
+html.dark #createModal input,
+html.dark #createModal select,
+html.dark #createModal textarea,
+html.dark #editModal input,
+html.dark #editModal select,
+html.dark #editModal textarea {
+    background-color: #0F172A !important;
+    border-color: #475569 !important;
+    color: #F8FAFC !important;
+}
+html.dark #HistoryModal button[onclick*="closeHistory"],
+html.dark #HistoryModal button[onclick*="limpiarFiltroHistorial"],
+html.dark #showModal button[onclick*="closeShow"],
+html.dark #createModal button[onclick*="closeCreate"],
+html.dark #editModal button[onclick*="closeEdit"] {
+    background-color: #243044 !important;
+    border-color: #475569 !important;
+    color: #E2E8F0 !important;
+}
+html.dark #HistoryModal button[onclick*="closeHistory"]:hover,
+html.dark #HistoryModal button[onclick*="limpiarFiltroHistorial"]:hover,
+html.dark #showModal button[onclick*="closeShow"]:hover,
+html.dark #createModal button[onclick*="closeCreate"]:hover,
+html.dark #editModal button[onclick*="closeEdit"]:hover {
+    background-color: #32425C !important;
+    color: #FFFFFF !important;
+}
+/* MODALES DE DESPACHO REALIZADO CON ÉXITO Y SOLICITUD MIXTA (CLARO + OSCURO) */
+.das-swal-summary {
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.75rem;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.9rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+.das-swal-summary-rose {
+    background-color: #fff1f2;
+    border-color: #fecdd3;
+}
+.das-swal-summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+.das-swal-summary-rose .das-swal-summary-header {
+    border-bottom-color: #fecdd3;
+}
+.das-swal-summary-title {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+.das-swal-summary-rose .das-swal-summary-title {
+    color: #881337;
+}
+.das-swal-meta {
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: #334155;
+    margin: 0.2rem 0;
+}
+.das-swal-meta strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+.das-swal-badge-ok {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+    padding: 0.15rem 0.55rem;
+    border-radius: 0.375rem;
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+}
+.das-swal-badge-rose {
+    background-color: #ffe4e6;
+    color: #9f1239;
+    border: 1px solid #fda4af;
+    padding: 0.15rem 0.55rem;
+    border-radius: 0.375rem;
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+}
+
+/* Tabla de productos despachados en el modal */
+.das-swal-section-title {
+    font-size: 0.69rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #475569;
+    margin-bottom: 0.45rem;
+}
+.das-swal-table-wrap {
+    max-height: 14rem;
+    overflow-y: auto;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.65rem;
+    background-color: #ffffff;
+}
+.das-swal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.73rem;
+}
+.das-swal-table thead {
+    background-color: #f1f5f9;
+    border-bottom: 1px solid #cbd5e1;
+}
+.das-swal-table-rose thead {
+    background-color: #ffe4e6;
+    border-bottom: 1px solid #fecdd3;
+}
+.das-swal-table th {
+    padding: 0.55rem 0.65rem;
+    font-weight: 800;
+    color: #334155;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+}
+.das-swal-table-rose th {
+    color: #881337;
+}
+.das-swal-table td {
+    padding: 0.55rem 0.65rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+}
+
+/* Banner de Solicitud Mixta (Modo Claro base) */
+.das-swal-mixed-banner {
+    background: linear-gradient(135deg, #fffbeb 0%, #fff1f2 100%);
+    border: 1px solid #fbbf24;
+    border-left: 4px solid #f59e0b;
+    border-radius: 0.75rem;
+    padding: 0.9rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+.das-swal-mixed-banner-teal {
+    background: linear-gradient(135deg, #f0fdfa 0%, #fffbeb 100%);
+    border: 1px solid #2dd4bf;
+    border-left: 4px solid #0d9488;
+}
+.das-swal-mixed-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #f59e0b, #e11d48);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(225, 29, 72, 0.25);
+}
+.das-swal-mixed-icon-teal {
+    background: linear-gradient(135deg, #0d9488, #0284c7);
+    box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);
+}
+.das-swal-mixed-title {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #78350f;
+}
+.das-swal-mixed-banner-teal .das-swal-mixed-title {
+    color: #134e4a;
+}
+.das-swal-mixed-text {
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: #334155;
+    margin-top: 0.25rem;
+}
+.das-swal-mixed-text strong {
+    color: #0f172a;
+    font-weight: 800;
+}
+.das-swal-mixed-cta {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #9f1239;
+    margin-top: 0.45rem;
+}
+.das-swal-mixed-banner-teal .das-swal-mixed-cta {
+    color: #0f766e;
+}
+
+/* Lista de píldoras de productos en alerta de Solicitud Mixta */
+.das-swal-pill-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.65rem 0 0 0;
+    max-height: 9.5rem;
+    overflow-y: auto;
+}
+.das-swal-pill-item {
+    background-color: rgba(255, 255, 255, 0.88);
+    border: 1px solid #fda4af;
+    color: #881337;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.73rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+.das-swal-pill-item-teal {
+    border-color: #5eead4;
+    color: #115e59;
+}
+
+/* MODO OSCURO: Modales de Despacho Exitoso y Solicitud Mixta */
+html.dark .das-swal-summary {
+    background: linear-gradient(145deg, #111827 0%, #162235 100%) !important;
+    border: 1px solid #2e4057 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 12px rgba(0, 0, 0, 0.28) !important;
+}
+html.dark .das-swal-summary-rose {
+    background: linear-gradient(145deg, #1f1220 0%, #2a1526 100%) !important;
+    border: 1px solid rgba(244, 63, 94, 0.42) !important;
+}
+html.dark .das-swal-summary-header {
+    border-bottom-color: #2c3e55 !important;
+}
+html.dark .das-swal-summary-rose .das-swal-summary-header {
+    border-bottom-color: rgba(244, 63, 94, 0.3) !important;
+}
+html.dark .das-swal-summary-title {
+    color: #f8fafc !important;
+}
+html.dark .das-swal-summary-rose .das-swal-summary-title {
+    color: #ffe4e6 !important;
+}
+html.dark .das-swal-meta {
+    color: #cbd5e1 !important;
+}
+html.dark .das-swal-meta strong {
+    color: #f8fafc !important;
+}
+html.dark .das-swal-badge-ok {
+    background-color: rgba(16, 185, 129, 0.22) !important;
+    color: #6ee7b7 !important;
+    border-color: rgba(52, 211, 153, 0.45) !important;
+}
+html.dark .das-swal-badge-rose {
+    background-color: rgba(244, 63, 94, 0.24) !important;
+    color: #fda4af !important;
+    border-color: rgba(251, 113, 133, 0.5) !important;
+}
+
+html.dark .das-swal-section-title {
+    color: #94a3b8 !important;
+}
+html.dark .das-swal-table-wrap {
+    background-color: #0f172a !important;
+    border-color: #2e4057 !important;
+}
+html.dark .das-swal-table thead {
+    background-color: #162032 !important;
+    border-bottom-color: #2e4057 !important;
+}
+html.dark .das-swal-table-rose thead {
+    background-color: #281424 !important;
+    border-bottom-color: rgba(244, 63, 94, 0.35) !important;
+}
+html.dark .das-swal-table th {
+    color: #94a3b8 !important;
+}
+html.dark .das-swal-table-rose th {
+    color: #fda4af !important;
+}
+html.dark .das-swal-table tbody {
+    background-color: #131c2e !important;
+}
+html.dark .das-swal-table tbody tr {
+    border-bottom-color: #223047 !important;
+}
+html.dark .das-swal-table tbody tr:hover {
+    background-color: #1b2840 !important;
+}
+html.dark .das-swal-table td {
+    color: #e2e8f0 !important;
+    border-bottom-color: #223047 !important;
+}
+html.dark .das-swal-qty {
+    color: #34d399 !important;
+}
+html.dark .das-swal-qty-rose {
+    color: #fb7185 !important;
+}
+
+/* Banner de Solicitud Mixta en Modo Oscuro */
+html.dark .das-swal-mixed-banner,
+html.dark .swal2-html-container .from-amber-50.to-rose-50 {
+    background: linear-gradient(135deg, rgba(120, 53, 15, 0.38) 0%, rgba(136, 19, 55, 0.38) 100%) !important;
+    background-image: linear-gradient(135deg, rgba(120, 53, 15, 0.38) 0%, rgba(136, 19, 55, 0.38) 100%) !important;
+    border: 1px solid rgba(251, 191, 36, 0.45) !important;
+    border-left: 4px solid #f59e0b !important;
+    box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.45) !important;
+}
+html.dark .das-swal-mixed-banner-teal,
+html.dark .swal2-html-container .from-teal-50.to-amber-50 {
+    background: linear-gradient(135deg, rgba(19, 78, 74, 0.45) 0%, rgba(30, 58, 138, 0.38) 100%) !important;
+    background-image: linear-gradient(135deg, rgba(19, 78, 74, 0.45) 0%, rgba(30, 58, 138, 0.38) 100%) !important;
+    border: 1px solid rgba(45, 212, 191, 0.45) !important;
+    border-left: 4px solid #14b8a6 !important;
+}
+html.dark .das-swal-mixed-title,
+html.dark .swal2-html-container .text-amber-950,
+html.dark .swal2-html-container .text-rose-950,
+html.dark .swal2-html-container .text-teal-950 {
+    color: #fef3c7 !important;
+}
+html.dark .das-swal-mixed-banner-teal .das-swal-mixed-title {
+    color: #ccfbf1 !important;
+}
+html.dark .das-swal-mixed-text {
+    color: #e2e8f0 !important;
+}
+html.dark .das-swal-mixed-text strong {
+    color: #fde68a !important;
+}
+html.dark .das-swal-mixed-banner-teal .das-swal-mixed-text strong {
+    color: #5eead4 !important;
+}
+html.dark .das-swal-mixed-cta {
+    color: #fda4af !important;
+}
+html.dark .das-swal-mixed-banner-teal .das-swal-mixed-cta {
+    color: #5eead4 !important;
+}
+
+/* Lista de píldoras en Modo Oscuro */
+html.dark .das-swal-pill-item {
+    background-color: rgba(15, 23, 42, 0.78) !important;
+    border-color: rgba(251, 113, 133, 0.45) !important;
+    color: #ffe4e6 !important;
+}
+html.dark .das-swal-pill-item-teal {
+    background-color: rgba(15, 23, 42, 0.78) !important;
+    border-color: rgba(45, 212, 191, 0.45) !important;
+    color: #ccfbf1 !important;
+}
+
+/* Insignias "Mixta" en tablas y tarjetas de solicitudes */
+html.dark .das-badge-mixta-amber,
+html.dark .from-teal-50.to-amber-50 {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.22) 0%, rgba(245, 158, 11, 0.25) 100%) !important;
+    background-image: linear-gradient(135deg, rgba(20, 184, 166, 0.22) 0%, rgba(245, 158, 11, 0.25) 100%) !important;
+    color: #fde68a !important;
+    border-color: rgba(251, 191, 36, 0.45) !important;
+}
+html.dark .das-badge-mixta-rose,
+html.dark .from-teal-50.to-rose-50 {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.22) 0%, rgba(244, 63, 94, 0.25) 100%) !important;
+    background-image: linear-gradient(135deg, rgba(20, 184, 166, 0.22) 0%, rgba(244, 63, 94, 0.25) 100%) !important;
+    color: #fecdd3 !important;
+    border-color: rgba(251, 113, 133, 0.45) !important;
+}
+
+/* Botones de acción en SweetAlert2 en Modo Oscuro */
+html.dark .swal2-actions button.swal2-confirm,
+html.dark .swal2-actions button.swal2-deny,
+html.dark .swal2-actions button.swal2-cancel {
+    font-weight: 700 !important;
+    border-radius: 0.6rem !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Modales #SolicitudesModal y #SolicitudesControladoModal en Modo Oscuro */
+html.dark #SolicitudesModal > div,
+html.dark #SolicitudesControladoModal > div {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+    color: #E2E8F0 !important;
+}
+html.dark #SolicitudesControladoModal .card-solicitud-controlado {
+    background-color: #162032 !important;
+    border-color: #2E4057 !important;
+}
+html.dark #SolicitudesControladoModal .card-solicitud-controlado > div:first-child {
+    background-color: #111A29 !important;
+    border-bottom-color: #29384D !important;
+}
+html.dark #SolicitudesModal input,
+html.dark #SolicitudesModal select,
+html.dark #SolicitudesControladoModal input,
+html.dark #SolicitudesControladoModal select {
+    background-color: #0F172A !important;
+    border-color: #475569 !important;
+    color: #F8FAFC !important;
+}
+html.dark #SolicitudesModal tr[id^="solicitud-"] {
+    background-color: #111827 !important;
+}
+html.dark #SolicitudesModal tr[id^="solicitud-"] > td > div > div {
+    background-color: #162032 !important;
+    border-color: #2E4057 !important;
+}
+
+
+

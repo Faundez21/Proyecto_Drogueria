@@ -1,18 +1,30 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Aisle;
+use App\Models\Level;
+use App\Models\Position;
+use App\Models\Shelf;
 use Illuminate\Http\Request;
 
 class AisleController extends Controller
 {
-
     public function index()
     {
-        // datos temporales
-        $aisles = Aisle::all();
+        $aisles = Aisle::withCount('shelves')
+            ->withSum('shelves', 'capacidad')
+            ->orderBy('id')
+            ->get();
 
-        return view('distribution.maintainers.aisle.index', compact('aisles'));
+        $counts = [
+            'aisles' => $aisles->count(),
+            'shelves' => Shelf::count(),
+            'levels' => Level::count(),
+            'positions' => Position::count(),
+        ];
+
+        return view('distribution.maintainers.aisle.index', compact('aisles', 'counts'));
     }
 
 
@@ -73,6 +85,8 @@ class AisleController extends Controller
             'color' => $request->color,
 
         ]);
+
+        $aisle->inventories()->update(['pasillo' => $aisle->name]);
 
         return redirect()
             ->route('aisle.index')

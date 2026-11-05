@@ -97,16 +97,29 @@ class ProviderController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+<<<<<<< HEAD
             'rut' => 'required|string|max:20|unique:providers',
             'name' => 'required|string|max:255',
             'category' => 'required|string',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
+=======
+            'rut' => 'required|string|min:9|max:20|unique:providers,rut',
+            'name' => 'required|string|max:255',
+            'category' => 'required|string',
+            'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|min:9|max:20',
+>>>>>>> origin/cristobal
             'business_line' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
         ], [
             'rut.required' => 'El RUT es obligatorio.',
             'rut.unique' => 'Este RUT ya está registrado.',
+<<<<<<< HEAD
+=======
+            'rut.min' => 'El RUT debe tener al menos 9 caracteres.',
+            'rut.max' => 'El RUT no puede superar los 20 caracteres.',
+>>>>>>> origin/cristobal
             'name.required' => 'El nombre del proveedor es obligatorio.',
             'category.required' => 'Debes seleccionar una categoría.',
             'email.required' => 'El correo electrónico es obligatorio.',
@@ -121,7 +134,11 @@ class ProviderController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+<<<<<<< HEAD
             'rut' => 'required|string|min:8|max:20|unique:providers,rut,' . $provider->id,
+=======
+            'rut' => 'required|string|min:9|max:20|unique:providers,rut,' . $provider->id,
+>>>>>>> origin/cristobal
             'email' => 'required|email|max:255',
             'category' => 'required|string',
             'phone' => 'nullable|string|min:9|max:20',
@@ -129,7 +146,11 @@ class ProviderController extends Controller
             'address' => 'nullable|string|max:255',
         ], [
             'rut.required' => 'El RUT es obligatorio.',
+<<<<<<< HEAD
             'rut.min' => 'El RUT debe tener al menos 8 caracteres.',
+=======
+            'rut.min' => 'El RUT debe tener al menos 9 caracteres.',
+>>>>>>> origin/cristobal
             'rut.unique' => 'Este RUT ya está registrado.',
             'name.required' => 'El nombre del proveedor es obligatorio.',
             'category.required' => 'Debes seleccionar una categoría.',

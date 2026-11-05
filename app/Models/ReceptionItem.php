@@ -18,8 +18,6 @@ class ReceptionItem extends Model
     {
         return $this->belongsTo(Reception::class, 'reception_id');
     }
-
-    // Aquí enlazamos con tu modelo de tabla inventario/productos
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id'); 

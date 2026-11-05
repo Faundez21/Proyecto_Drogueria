@@ -12,7 +12,7 @@ class Reception extends Model
     protected $fillable = [
         'correlativo', 'fecha_recepcion', 'tipo_documento', 'numero_documento', 
         'orden_compra', 'origen', 'provider_id', 'valor_total_recepcion', 
-        'firma_receptor'
+        'firma_proveedor', 'firma_receptor'
     ];
 
     public function provider()
@@ -23,5 +23,10 @@ class Reception extends Model
     public function items()
     {
         return $this->hasMany(ReceptionItem::class, 'reception_id');
+    }
+
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'reception_id');
     }
 }

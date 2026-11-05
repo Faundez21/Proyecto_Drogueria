@@ -3,14 +3,6 @@
 @section('subtitle', 'Directorio y gestion de guias de despacho emitidas.')
 
 @section('actions')
-    <button type="button" onclick="openSolicitudes()"
-        class="px-4 py-2 bg-white text-teal-700 border border-teal-200 rounded-lg text-[12px] font-bold hover:bg-teal-50 transition-colors flex items-center gap-2 shadow-sm cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2z"></path>
-        </svg>
-        Ver Solicitudes
-    </button>
     <button type="button" onclick="openBandeja()"
         class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,6 +15,10 @@
 @endsection
 
 @section('content')
+    @php
+        $totalActivas = collect($solicitudes)->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])->count();
+        $totalMias = isset($misSolicitudesAsignadas) ? count($misSolicitudesAsignadas) : 0;
+    @endphp
     <!-- migas de pan -->
     <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
         <span class="text-slate-400 font-semibold">03</span>
@@ -53,8 +49,67 @@
         </div>
     @endif
 
+    <!-- Solicitudes asignadas al usuario logueado -->
+    @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
+        <div class="mb-6 bg-gradient-to-r from-teal-50 via-white to-indigo-50 border border-teal-200 rounded-2xl p-4 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3 class="text-[13.5px] font-extrabold text-slate-800">
+                            Tienes {{ count($misSolicitudesAsignadas) }} solicitud(es) asignada(s) para despachar
+                        </h3>
+                        <p class="text-[11.5px] text-slate-500">
+                            Haz clic en "Cargar en Formulario" para preparar el despacho automáticamente o revisa el detalle en "Ver Solicitudes".
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="openSolicitudes('mias')"
+                    class="px-3.5 py-2 rounded-xl text-[12px] font-bold bg-white hover:bg-teal-50 text-teal-700 border border-teal-200 shadow-sm transition-colors cursor-pointer shrink-0">
+                    Ver mis asignadas
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                @foreach ($misSolicitudesAsignadas as $miSol)
+                    @php
+                        $esCesfamMiSol = \App\Services\InventoryService::esCesfam($miSol->establecimiento);
+                    @endphp
+                    <div class="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-mono font-extrabold text-[12px] text-slate-800">{{ $miSol->numero_solicitud }}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $esCesfamMiSol ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700' }}">
+                                    {{ $esCesfamMiSol ? 'CESFAM' : 'Establecimiento' }}
+                                </span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-indigo-100 text-indigo-700">
+                                    {{ $miSol->estado }}
+                                </span>
+                            </div>
+                            <p class="text-[12.5px] font-bold text-slate-800 truncate mt-0.5" title="{{ $miSol->establecimiento }}">
+                                {{ $miSol->establecimiento }}
+                            </p>
+                            <p class="text-[11px] text-slate-500">
+                                {{ $miSol->items->count() }} producto(s) · {{ \Carbon\Carbon::parse($miSol->fecha_solicitud)->format('d/m/Y') }}
+                            </p>
+                        </div>
+                        <button type="button" onclick="usarSolicitud({{ $miSol->id }})"
+                            class="px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-sm transition-colors cursor-pointer shrink-0">
+                            Cargar
+                        </button>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <!-- indicadores de rendimiento -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
             <div>
                 <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Despachos Hoy</p>
@@ -65,6 +120,18 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Solicitudes por Despachar</p>
+                <h3 class="text-2xl font-black text-amber-600 mt-1">{{ $totalActivas }}</h3>
+            </div>
+            <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
             </div>
         </div>
@@ -93,15 +160,51 @@
                     </path>
                 </svg>
             </div>
-            <div>
+            <div class="flex-1">
                 <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Registro de Despacho</h2>
                 <p class="text-[12px] text-slate-500 mt-0.5">Complete los datos del documento, cliente, productos a
                     despachar y firmas.</p>
             </div>
+            <button type="button" onclick="openSolicitudes()"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4"></path>
+                </svg>
+                Ver Solicitudes
+                @if ($totalActivas > 0)
+                    <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold bg-white/20 text-white">
+                        {{ $totalActivas }}
+                    </span>
+                @endif
+                @if ($totalMias > 0)
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
+                        {{ $totalMias }} asignada(s) a ti
+                    </span>
+                @endif
+            </button>
         </div>
 
         <form action="{{ route('dispatch.store') }}" method="POST" id="despachoForm">
             @csrf
+            <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
+
+            <!-- Banner informativo cuando se carga una solicitud -->
+            <div id="banner_solicitud_activa" class="hidden mx-6 mt-5 p-4 bg-teal-50 border border-teal-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        SOL
+                    </div>
+                    <div>
+                        <p id="banner_solicitud_titulo" class="text-[13px] font-extrabold text-teal-900"></p>
+                        <p id="banner_solicitud_subtitulo" class="text-[11.5px] text-teal-700"></p>
+                    </div>
+                </div>
+                <button type="button" onclick="desvincularSolicitudActiva()"
+                    class="text-[11.5px] font-bold text-teal-800 hover:text-rose-600 bg-white px-3 py-1.5 rounded-lg border border-teal-200 transition-colors cursor-pointer shrink-0">
+                    Desvincular solicitud
+                </button>
+            </div>
 
             <!-- seccion de datos del remitente y correlativo -->
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
@@ -178,31 +281,31 @@
                             <option value="CESFAM LOS CERROS"
                                 data-direccion="Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano">CESFAM
                                 LOS CERROS</option>
-                            <option value="CECOSF CENTINELA"
-                                data-direccion="Calle Punta Peñablanca 1301, poblacion Centinela, Talcahuano">CECOSF
-                                CENTINELA</option>
-                            <option value="CECOSF LOS LOBOS - LA GLORIA"
-                                data-direccion="Calle Los Lobos 1960, poblacion Los Lobos, Talcahuano">CECOSF LOS LOBOS -
-                                LA GLORIA</option>
-                            <option value="POSTA TUMBE" data-direccion="Maryland s/n, Caleta Tumbes, Talcahuano">POSTA
-                                TUMBE</option>
-                            <option value="CESFAM PAULINA AVENDAÑO"
+                            <option value="CESFAM PAULINA AVENDAÑO PEREDA"
                                 data-direccion="Calle Carlos Dittborn 4100, Villa San Martin, Talcahuano">CESFAM PAULINA
-                                AVENDAÑO</option>
+                                AVENDAÑO PEREDA</option>
                             <option value="CESFAM SAN VICENTE" data-direccion="Calle Brasil 360, San Vicente, Talcahuano">
                                 CESFAM SAN VICENTE</option>
-                            <option value="CECOSF LIBERTAD GAETE"
-                                data-direccion="Calle Isla San Ambrosio 509, poblacion Libertad, Talcahuano">CECOSF
-                                LIBERTAD GAETE</option>
-                            <option value="CECOSF 8 DE MAYO"
-                                data-direccion="Calle Aysen 7370, poblacion Diego Portales, Talcahuano">CECOSF 8 DE MAYO
-                            </option>
+                            <option value="CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN"
+                                data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM ALCALDE
+                                LEOCÁN PORTUS GOVINDEN</option>
                             <option value="CECOSF ESMERALDA"
                                 data-direccion="Calle San Miguel 546, Poblacion Patricio Lynch, Talcahuano">CECOSF
                                 ESMERALDA</option>
-                            <option value="CESFAM LEOCAN PORTUS"
-                                data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM LEOCAN
-                                PORTUS</option>
+                            <option value="CECOSF 8 DE MAYO"
+                                data-direccion="Calle Aysen 7370, poblacion Diego Portales, Talcahuano">CECOSF 8 DE MAYO
+                            </option>
+                            <option value="CECOSF LIBERTAD-GAETE"
+                                data-direccion="Calle Isla San Ambrosio 509, poblacion Libertad, Talcahuano">CECOSF
+                                LIBERTAD-GAETE</option>
+                            <option value="CECOSF LOS LOBOS-LA GLORIA"
+                                data-direccion="Calle Los Lobos 1960, poblacion Los Lobos, Talcahuano">CECOSF LOS LOBOS-LA
+                                GLORIA</option>
+                            <option value="CECOSF VILLA CENTINELA"
+                                data-direccion="Calle Punta Peñablanca 1301, poblacion Centinela, Talcahuano">CECOSF
+                                VILLA CENTINELA</option>
+                            <option value="POSTA RURAL TUMBES" data-direccion="Maryland s/n, Caleta Tumbes, Talcahuano">POSTA
+                                RURAL TUMBES</option>
                             <option value="SAR SAN VICENTE" data-direccion="Juan de la Cruz Tapia s/n, Talcahuano">SAR SAN
                                 VICENTE</option>
                             <option value="SAR LOS CERROS" data-direccion="Calle Coliumo S/N Nueva los Lobos, Talcahuano">
@@ -212,6 +315,14 @@
                                 CESFAM SAN VICENTE</option>
                             <option value="Laboratorio - CESFAM SAN VICENTE" data-direccion="Brasil 360, Talcahuano">
                                 Laboratorio - CESFAM SAN VICENTE</option>
+                            <option value="MÓDULO DENTAL JUNAEB" data-direccion="Calle Blanco Encalada 455, Talcahuano">
+                                MÓDULO DENTAL JUNAEB</option>
+                            <option value="MÓVIL: LICEO POLIVALENTE Y LICEO COMERCIAL" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">
+                                MÓVIL: LICEO POLIVALENTE Y LICEO COMERCIAL</option>
+                            <option value="MÓVIL: LICEO INDUSTRIAL Y LICEO ASUNCIÓN" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">
+                                MÓVIL: LICEO INDUSTRIAL Y LICEO ASUNCIÓN</option>
+                            <option value="MÓVIL: LICEO A-21" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">
+                                MÓVIL: LICEO A-21</option>
                         </select>
                     </div>
 
@@ -254,44 +365,50 @@
             </div>
 
             <!-- seccion de tabla de productos y stock -->
-            <div class="p-6 bg-slate-50/30 border-b border-slate-100">
+            <div class="p-6 bg-slate-50/40 border-b border-slate-200">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                    <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide">2. Detalle de Extraccion
-                        (Lotes en Stock)</h3>
+                    <div>
+                        <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                            2. Detalle de Extracción (Lotes en Stock)
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200 lowercase">criterio fefo</span>
+                        </h3>
+                        <p class="text-[11.5px] text-slate-500 mt-0.5">Selecciona el producto o escanea el QR del lote para rebajar stock de bodega central.</p>
+                    </div>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2.5">
                         <button type="button" onclick="openScanner()"
-                            class="px-4 py-2 bg-[#0f968c] text-white rounded-lg text-[12px] font-bold hover:bg-teal-700 transition-all flex items-center gap-2 shadow-sm cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="px-3.5 py-2 text-white rounded-xl text-[12px] font-bold shadow-sm hover:shadow transition-all flex items-center gap-2 cursor-pointer"
+                            style="background-color: #0f968c !important; color: #ffffff !important;">
+                            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2"
                                     d="M3 5a2 2 0 012-2h2m4 0h2m4 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-4 0h-2m-4 0H5a2 2 0 01-2-2v-2m4-10h2v2H7V7zm8 0h2v2h-2V7zM7 15h2v2H7v-2zm8-2h2v4h-2v-4zm-4-2h2v2h-2v-2z">
                                 </path>
                             </svg>
-                            Escanear Etiqueta QR
+                            Escanear QR
                         </button>
                         <button type="button" onclick="addRow()"
-                            class="px-4 py-2 bg-white text-blue-600 border border-blue-200 rounded-lg text-[12px] font-bold hover:bg-blue-50 transition-colors flex items-center gap-2 shadow-sm cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="px-3.5 py-2 bg-white text-slate-700 hover:text-teal-700 border border-slate-300 hover:border-teal-400 rounded-xl text-[12px] font-bold hover:bg-teal-50/40 transition-colors flex items-center gap-2 shadow-xs cursor-pointer">
+                            <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
                                 </path>
                             </svg>
-                            Añadir Fila Manual
+                            Añadir Fila
                         </button>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white">
+                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-xs bg-white">
                     <table class="w-full text-left text-[13px] whitespace-nowrap" id="productsTable">
                         <thead
-                            class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-extrabold text-[10px]">
+                            class="bg-slate-100/80 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10.5px]">
                             <tr>
-                                <th class="px-4 py-3.5 w-[35%]">Seleccionar Producto en Stock</th>
-                                <th class="px-4 py-3.5 w-[15%]">Lote Extraido</th>
+                                <th class="px-4 py-3.5 w-[36%]">Producto en Stock</th>
+                                <th class="px-4 py-3.5 w-[14%]">Lote</th>
                                 <th class="px-4 py-3.5 w-[15%]">Vencimiento (FEFO)</th>
                                 <th class="px-4 py-3.5 w-[15%]">Programa</th>
-                                <th class="px-4 py-3.5 w-[15%] text-center">Cantidad Rebajar</th>
-                                <th class="px-4 py-3.5 w-[5%] text-center"></th>
+                                <th class="px-4 py-3.5 w-[15%] text-center">Cantidad a Despachar</th>
+                                <th class="px-3 py-3.5 w-[5%] text-center"></th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100" id="productsBody">
@@ -350,7 +467,14 @@
                     class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 transition-colors text-center shadow-sm cursor-pointer">
                     Limpiar Formulario
                 </button>
-                <button type="submit"
+                <button type="submit" name="action" value="save_and_download"
+                    class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-xl text-[13px] font-bold hover:bg-blue-700 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Guardar y Descargar PDF
+                </button>
+                <button type="submit" name="action" value="save_only"
                     class="w-full sm:w-auto px-6 py-2.5 bg-slate-800 text-white rounded-xl text-[13px] font-bold hover:bg-slate-900 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
                     <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -365,46 +489,50 @@
     <!-- plantilla oculta para generar nuevas filas de productos -->
     <template id="rowTemplate">
         <tr class="bg-white hover:bg-slate-50/80 transition-colors group">
-            <td class="px-3 py-2 border-r border-slate-100">
+            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="productos[]" required onchange="llenarDatosFila(this)"
-                    class="w-full bg-white border border-slate-300 focus:border-teal-500 rounded-lg px-2.5 py-2 text-[12px] font-bold text-slate-800 outline-none shadow-sm cursor-pointer transition-colors">
+                    class="w-full bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12.5px] font-bold text-slate-800 outline-none shadow-xs cursor-pointer transition-colors">
                     <option value="" disabled selected>Seleccione producto del inventario...</option>
                     @foreach ($inventarioDisponible as $inv)
                         <option value="{{ $inv->producto }}" data-lote="{{ $inv->lote ?? 'S/L' }}"
-                            data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $inv->cantidad ?? 0 }}">
+                            data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $inv->cantidad ?? 0 }}"
+                            data-programa="{{ $inv->programa ?? '' }}">
                             {{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})
                         </option>
                     @endforeach
                 </select>
             </td>
-            <td class="px-3 py-2 border-r border-slate-100">
+            <td class="px-3 py-2.5 border-r border-slate-100 align-middle">
                 <input type="text" name="lotes[]" readonly placeholder="Auto..."
-                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] font-mono font-bold text-slate-500 outline-none shadow-inner cursor-not-allowed">
+                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] font-mono font-bold text-slate-600 outline-none shadow-inner cursor-not-allowed text-center">
             </td>
-            <td class="px-3 py-2 border-r border-slate-100 relative">
+            <td class="px-3 py-2.5 border-r border-slate-100 align-middle relative">
                 <input type="date" name="vencimientos[]" readonly
-                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] text-slate-500 outline-none shadow-inner cursor-not-allowed">
+                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] text-slate-600 outline-none shadow-inner cursor-not-allowed">
                 <div class="fefo-container"></div>
             </td>
-            <td class="px-3 py-2 border-r border-slate-100">
+            <td class="px-3 py-2.5 border-r border-slate-100 align-middle">
                 <select name="programas[]" required
-                    class="w-full bg-white border border-slate-300 focus:border-teal-500 rounded-lg px-2.5 py-2 text-[12px] font-medium text-slate-700 outline-none shadow-sm cursor-pointer transition-colors">
-                    <option value="Morbilidad General" selected>Morbilidad General</option>
-                    <option value="Cardiovascular">Cardiovascular</option>
-                    <option value="IRA/ERA">Respiratorio (IRA/ERA)</option>
+                    class="w-full bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
+                    @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $idxProg => $progOpt)
+                        <option value="{{ $progOpt }}" {{ $idxProg === 0 ? 'selected' : '' }}>{{ $progOpt }}</option>
+                    @endforeach
                 </select>
             </td>
-            <td class="px-3 py-2 border-r border-slate-100 relative pb-6">
-                <input type="number" name="cantidades[]" placeholder="0" min="1" oninput="validarStock(this)"
-                    required
-                    class="w-full bg-white border border-slate-300 focus:border-teal-500 rounded-lg px-2.5 py-2 text-[14px] font-black text-center text-slate-800 outline-none shadow-sm transition-colors">
-                <div
-                    class="stock-container absolute bottom-1 left-0 w-full text-center text-[10px] font-extrabold text-blue-600 hidden">
-                    Max: <span class="stock-max-badge">0</span></div>
+            <td class="px-3 py-2.5 border-r border-slate-100 align-middle">
+                <div class="space-y-1">
+                    <input type="number" name="cantidades[]" placeholder="0" min="1" oninput="validarStock(this)"
+                        required
+                        class="w-full bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 rounded-lg px-2.5 py-2 text-[14px] font-black text-center text-slate-900 outline-none shadow-xs transition-colors">
+                    <div
+                        class="stock-container text-center text-[10px] font-bold text-teal-700 hidden leading-tight">
+                        Disp: <span class="stock-max-badge font-mono font-black">0</span> uds.
+                    </div>
+                </div>
             </td>
-            <td class="px-3 py-2 text-center">
+            <td class="px-3 py-2.5 text-center align-middle">
                 <button type="button" onclick="removeRow(this)"
-                    class="p-2 bg-white text-slate-400 hover:text-white hover:bg-rose-600 rounded-lg transition-colors cursor-pointer shadow-sm border border-slate-200"
+                    class="p-2 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-lg transition-colors cursor-pointer shadow-xs"
                     title="Quitar Fila">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -418,16 +546,16 @@
 
     <!-- ventana modal para visualizar solicitudes pendientes -->
     <div id="SolicitudesModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-7xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
 
             <!-- cabecera del modal -->
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-bold text-white tracking-wide">Solicitudes de Establecimientos</h2>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Solicitudes de Establecimientos y CESFAM</h2>
                     <p class="text-[12px] text-slate-300 mt-1 uppercase tracking-wider font-semibold">
-                        Solicitudes pendientes de despacho
+                        Gestión, asignación a trabajadores y despacho de solicitudes
                     </p>
                 </div>
 
@@ -440,28 +568,55 @@
                 </button>
             </div>
 
-            <!-- buscador de solicitudes -->
+            <!-- buscador y filtros avanzados de solicitudes -->
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <div class="flex-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+                    <div class="lg:col-span-2">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                             Buscar solicitud
                         </label>
-
-                        <input type="text" placeholder="Establecimiento, solicitud o producto..."
-                            class="w-full py-2.5 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
+                        <input type="text" id="filtroSolicitudTexto" oninput="filtrarSolicitudesModal()"
+                            placeholder="Establecimiento, N° solicitud, responsable o producto..."
+                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
                     </div>
 
-                    <div class="sm:w-48">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                            Tipo Origen
+                        </label>
+                        <select id="filtroSolicitudTipo" onchange="filtrarSolicitudesModal()"
+                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            <option value="">Todos (CESFAM y Establec.)</option>
+                            <option value="cesfam">Solo CESFAM</option>
+                            <option value="establecimiento">Solo Establecimientos</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                             Estado
                         </label>
+                        <select id="filtroSolicitudEstado" onchange="filtrarSolicitudesModal()"
+                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            <option value="activas" selected>Activas (Por despachar)</option>
+                            <option value="">Todas (Incluye Despachadas)</option>
+                            <option value="pendiente">Pendiente (Sin asignar)</option>
+                            <option value="asignada">Asignada</option>
+                            <option value="parcial">Parcial</option>
+                            <option value="despachado">Despachado</option>
+                        </select>
+                    </div>
 
-                        <select
-                            class="w-full py-2.5 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                            Asignación
+                        </label>
+                        <select id="filtroSolicitudAsignacion" onchange="filtrarSolicitudesModal()"
+                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
                             <option value="">Todas</option>
-                            <option value="pendiente">Pendientes</option>
-                            <option value="parcial">Parciales</option>
+                            <option value="mias">Asignadas a mí ({{ $totalMias }})</option>
+                            <option value="sin_asignar">Sin asignar</option>
+                            <option value="asignadas">Con trabajador asignado</option>
                         </select>
                     </div>
                 </div>
@@ -473,79 +628,145 @@
                     <thead
                         class="bg-white text-slate-500 uppercase text-[11px] font-extrabold border-b border-slate-200 sticky top-0 shadow-sm z-10">
                         <tr>
-                            <th class="px-6 py-4 w-12">Detalle</th>
-                            <th class="px-6 py-4">Solicitud</th>
-                            <th class="px-6 py-4">Establecimiento</th>
-                            <th class="px-6 py-4">Fecha</th>
-                            <th class="px-6 py-4 text-center">Productos</th>
-                            <th class="px-6 py-4 text-center">Estado</th>
+                            <th class="px-4 py-4 w-12 text-center">Detalle</th>
+                            <th class="px-4 py-4">Solicitud</th>
+                            <th class="px-4 py-4">Establecimiento / Origen</th>
+                            <th class="px-4 py-4">Fecha</th>
+                            <th class="px-4 py-4 text-center">Productos</th>
+                            <th class="px-4 py-4 text-center">Estado</th>
+                            <th class="px-4 py-4">Asignar Trabajador (Despacho)</th>
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100" id="tablaSolicitudesBody">
 
                         @forelse($solicitudes as $solicitud)
 
                             @php
                                 $solicitudKey = 'solicitud-' . $solicitud->id;
+                                $esCesfamSol = \App\Services\InventoryService::esCesfam($solicitud->establecimiento);
+                                $esMia = (int) ($solicitud->assigned_user_id ?? 0) === (int) auth()->id();
+                                $nombresProdSol = $solicitud->items->map(fn($i) => $i->product->nombre ?? '')->implode(' ');
+                                $textoBusqueda = mb_strtolower(
+                                    $solicitud->numero_solicitud . ' ' .
+                                    $solicitud->establecimiento . ' ' .
+                                    ($solicitud->responsable ?? '') . ' ' .
+                                    ($solicitud->assignedUser->name ?? '') . ' ' .
+                                    $nombresProdSol
+                                );
+                                $totalItemsSol = $solicitud->items->count();
+                                $completadosItemsSol = $solicitud->items->filter(fn($i) => $i->cantidad_despachada >= $i->cantidad_solicitada)->count();
+                                $tieneItemsControlados = $solicitud->items->contains(fn($i) => \App\Services\InventoryService::esControlado($i->product->nombre ?? ''));
+                                $tieneItemsNormales = $solicitud->items->contains(fn($i) => !\App\Services\InventoryService::esControlado($i->product->nombre ?? ''));
+                                $esMixta = $tieneItemsControlados && $tieneItemsNormales;
                             @endphp
 
                             <!-- solicitud -->
-                            <tr class="bg-white hover:bg-slate-50 transition-colors cursor-pointer group"
+                            <tr class="fila-solicitud-modal bg-white hover:bg-slate-50 transition-colors cursor-pointer group {{ $esMia ? 'bg-teal-50/30' : '' }}"
+                                data-key="{{ $solicitudKey }}"
+                                data-search="{{ $textoBusqueda }}"
+                                data-tipo="{{ $esCesfamSol ? 'cesfam' : 'establecimiento' }}"
+                                data-estado="{{ mb_strtolower($solicitud->estado) }}"
+                                data-assigned-id="{{ $solicitud->assigned_user_id ?? '' }}"
+                                data-es-mia="{{ $esMia ? '1' : '0' }}"
                                 onclick="toggleSolicitud('{{ $solicitudKey }}')">
 
-                                <td class="px-6 py-4 text-center">
+                                <td class="px-4 py-4 text-center">
                                     <button type="button"
                                         class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200">
-
                                         <svg class="w-4 h-4 transform transition-transform duration-300"
                                             id="arrow-{{ $solicitudKey }}" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
-
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 9l-7 7-7-7">
                                             </path>
-
                                         </svg>
-
                                     </button>
                                 </td>
 
-                                <td class="px-6 py-4 font-mono font-extrabold text-slate-800">
+                                <td class="px-4 py-4 font-mono font-extrabold text-slate-800">
                                     {{ $solicitud->numero_solicitud }}
+                                    @if ($esMixta)
+                                        <span class="block mt-1">
+                                            <span class="das-badge-mixta-amber inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-gradient-to-r from-teal-50 to-amber-50 text-amber-800 border border-amber-200" title="Contiene productos normales y fármacos controlados">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                Mixta
+                                            </span>
+                                        </span>
+                                    @endif
                                 </td>
 
-                                <td class="px-6 py-4 font-bold text-slate-800">
-                                    {{ $solicitud->establecimiento }}
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-slate-800">{{ $solicitud->establecimiento }}</span>
+                                        <span class="px-2 py-0.5 rounded text-[9.5px] font-extrabold uppercase {{ $esCesfamSol ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-teal-50 text-teal-700 border border-teal-200' }}">
+                                            {{ $esCesfamSol ? 'CESFAM' : 'Establecimiento' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">
+                                        Solicita: {{ $solicitud->responsable }} {{ $solicitud->cargo ? '('.$solicitud->cargo.')' : '' }}
+                                    </p>
                                 </td>
 
-                                <td class="px-6 py-4 font-medium text-slate-600">
+                                <td class="px-4 py-4 font-medium text-slate-600">
                                     {{ \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d-m-Y') }}
                                 </td>
 
-                                <td class="px-6 py-4 text-center font-bold text-slate-700">
-                                    {{ $solicitud->items->count() }}
+                                <td class="px-4 py-4 text-center">
+                                    <span class="font-extrabold text-slate-800">{{ $totalItemsSol }}</span>
+                                    <span class="block text-[10px] text-slate-400 font-semibold">
+                                        {{ $completadosItemsSol }}/{{ $totalItemsSol }} compl.
+                                    </span>
                                 </td>
 
-                                <td class="px-6 py-4 text-center">
+                                <td class="px-4 py-4 text-center">
+                                    @php
+                                        $estadoClase = match($solicitud->estado) {
+                                            'Pendiente' => 'bg-amber-100 text-amber-800 border-amber-200',
+                                            'Asignada' => 'bg-indigo-100 text-indigo-800 border-indigo-200',
+                                            'Parcial' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                            'Despachado' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                                            default => 'bg-slate-100 text-slate-700 border-slate-200',
+                                        };
+                                    @endphp
+                                    <span id="badge-estado-solicitud-{{ $solicitud->id }}"
+                                        class="{{ $estadoClase }} border px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase inline-block">
+                                        {{ $solicitud->estado }}
+                                    </span>
+                                </td>
 
-                                    @if ($solicitud->estado === 'Pendiente')
-                                        <span
-                                            class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
-                                            Pendiente
-                                        </span>
-                                    @elseif ($solicitud->estado === 'Parcial')
-                                        <span
-                                            class="bg-blue-100 text-blue-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
-                                            Parcial
-                                        </span>
+                                <td class="px-4 py-4" onclick="event.stopPropagation()">
+                                    @role('Administrador')
+                                        <div class="flex items-center gap-2">
+                                            <select
+                                                onfocus="this.dataset.prevVal = this.value"
+                                                onchange="asignarSolicitudUsuario({{ $solicitud->id }}, this.value, this)"
+                                                class="bg-slate-50 hover:bg-white border border-slate-300 text-slate-800 text-[12px] font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 cursor-pointer min-w-[185px]">
+                                                <option value="">— Sin asignar —</option>
+                                                @foreach ($usuariosAsignables ?? [] as $usr)
+                                                    <option value="{{ $usr->id }}" {{ (int) $solicitud->assigned_user_id === (int) $usr->id ? 'selected' : '' }}>
+                                                        {{ $usr->name }} {{ $usr->last_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <span id="assign-spinner-{{ $solicitud->id }}" class="hidden text-[11px] font-bold text-teal-600">
+                                                Guardando...
+                                            </span>
+                                        </div>
                                     @else
-                                        <span
-                                            class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase">
-                                            {{ $solicitud->estado }}
-                                        </span>
-                                    @endif
-
+                                        @if ($esMia)
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
+                                                Asignada a ti
+                                            </span>
+                                        @elseif ($solicitud->assignedUser)
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                                {{ $solicitud->assignedUser->name }} {{ $solicitud->assignedUser->last_name }}
+                                            </span>
+                                        @else
+                                            <span class="text-[11px] text-slate-400 italic">Sin asignar</span>
+                                        @endif
+                                    @endrole
                                 </td>
 
                             </tr>
@@ -554,7 +775,7 @@
                             <!-- detalle de la solicitud -->
                             <tr id="{{ $solicitudKey }}" class="hidden bg-slate-100/50 shadow-inner">
 
-                                <td colspan="6" class="p-0 border-b border-slate-300">
+                                <td colspan="7" class="p-0 border-b border-slate-300">
 
                                     <div class="py-4 pr-6 pl-14">
 
@@ -562,24 +783,31 @@
 
                                             <!-- cabecera del detalle -->
                                             <div
-                                                class="px-4 py-3 bg-slate-700 text-white flex justify-between items-center">
+                                                class="px-4 py-3 bg-slate-700 text-white flex flex-col sm:flex-row justify-between sm:items-center gap-2">
 
                                                 <div>
-
-                                                    <span class="text-[10px] font-bold uppercase tracking-widest">
+                                                    <span class="text-[10px] font-bold uppercase tracking-widest text-teal-300">
                                                         Detalle de Solicitud {{ $solicitud->numero_solicitud }}
                                                     </span>
 
-                                                    <p class="text-[11px] text-slate-300 mt-0.5">
+                                                    <p class="text-[12px] font-bold text-white mt-0.5">
                                                         {{ $solicitud->establecimiento }}
+                                                        @if ($solicitud->observaciones)
+                                                            <span class="font-normal text-slate-300"> · Obs: {{ $solicitud->observaciones }}</span>
+                                                        @endif
                                                     </p>
-
                                                 </div>
 
-                                                <button type="button" onclick="usarSolicitud({{ $solicitud->id }})"
-                                                    class="px-3 py-1.5 bg-[#0f968c] hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-colors">
-                                                    Usar Solicitud
-                                                </button>
+                                                @if ($solicitud->estado !== 'Despachado')
+                                                    <button type="button" onclick="usarSolicitud({{ $solicitud->id }})"
+                                                        class="px-3.5 py-1.5 bg-[#0f968c] hover:bg-teal-700 text-white rounded-lg text-[11.5px] font-bold transition-colors cursor-pointer shrink-0">
+                                                        Usar Solicitud para Despacho
+                                                    </button>
+                                                @else
+                                                    <span class="px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 rounded-lg text-[11px] font-bold">
+                                                        Solicitud Despachada Completamente
+                                                    </span>
+                                                @endif
 
                                             </div>
 
@@ -591,23 +819,11 @@
                                                     class="bg-slate-50 text-slate-500 uppercase font-extrabold border-b border-slate-200 text-[10px]">
 
                                                     <tr>
-
-                                                        <th class="px-4 py-3">
-                                                            Producto
-                                                        </th>
-
-                                                        <th class="px-4 py-3 text-center">
-                                                            Consumo mensual anterior
-                                                        </th>
-
-                                                        <th class="px-4 py-3 text-center">
-                                                            Stock Actual del establecimiento
-                                                        </th>
-
-                                                        <th class="px-4 py-3 text-center">
-                                                            Solicitado
-                                                        </th>
-
+                                                        <th class="px-4 py-3">Producto / Programa</th>
+                                                        <th class="px-4 py-3 text-center">Consumo mensual anterior</th>
+                                                        <th class="px-4 py-3 text-center">Stock Actual del establecimiento</th>
+                                                        <th class="px-4 py-3 text-center">Solicitado</th>
+                                                        <th class="px-4 py-3 text-center">Despachado / Pendiente</th>
                                                     </tr>
 
                                                 </thead>
@@ -616,22 +832,52 @@
                                                 <tbody class="divide-y divide-slate-100 text-slate-700">
 
                                                     @foreach ($solicitud->items as $item)
+                                                        @php
+                                                            $nombreProdItem = $item->product->nombre ?? ('Producto #' . $item->product_id);
+                                                            $esItemControlado = in_array($nombreProdItem, $controlados);
+                                                            $pendienteItem = max(0, (int) $item->cantidad_solicitada - (int) ($item->cantidad_despachada ?? 0));
+                                                        @endphp
                                                         <tr class="hover:bg-slate-50">
 
-                                                            <td class="px-4 py-3 font-bold">
-                                                                {{ $item->product->nombre }}
+                                                            <td class="px-4 py-3">
+                                                                <div class="flex items-center gap-2">
+                                                                    <span class="font-bold text-slate-800">{{ $nombreProdItem }}</span>
+                                                                    @if ($item->programa)
+                                                                        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold border border-slate-200">
+                                                                            {{ $item->programa }}
+                                                                        </span>
+                                                                    @endif
+                                                                    @if ($esItemControlado)
+                                                                        <span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 text-[10px] font-extrabold border border-rose-200">
+                                                                            Estupefaciente (Despacho Controlado)
+                                                                        </span>
+                                                                    @endif
+                                                                </div>
                                                             </td>
 
-                                                            <td class="px-4 py-3 text-center">
-                                                                {{ $item->consumo_anterior ?? '—' }}
+                                                            <td class="px-4 py-3 text-center font-bold text-slate-700">
+                                                                {{ number_format((int) ($item->consumo_anterior ?? 0), 0, ',', '.') }} uds.
                                                             </td>
 
                                                             <td class="px-4 py-3 text-center font-extrabold text-blue-700">
-                                                                {{ $item->stock_actual }}
+                                                                {{ number_format((int) ($item->stock_actual ?? 0), 0, ',', '.') }} uds.
                                                             </td>
 
                                                             <td class="px-4 py-3 text-center font-extrabold text-teal-700">
-                                                                {{ $item->cantidad_solicitada }}
+                                                                {{ number_format((int) $item->cantidad_solicitada, 0, ',', '.') }} uds.
+                                                            </td>
+
+                                                            <td class="px-4 py-3 text-center">
+                                                                @if ($pendienteItem === 0)
+                                                                    <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-extrabold text-[11px] border border-emerald-200">
+                                                                        {{ number_format((int) $item->cantidad_despachada, 0, ',', '.') }} desp. (Completo)
+                                                                    </span>
+                                                                @else
+                                                                    <span class="font-bold text-slate-600">{{ number_format((int) $item->cantidad_despachada, 0, ',', '.') }} desp.</span>
+                                                                    <span class="ml-1 px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-extrabold text-[11px] border border-amber-200">
+                                                                        Faltan {{ number_format($pendienteItem, 0, ',', '.') }} uds.
+                                                                    </span>
+                                                                @endif
                                                             </td>
 
                                                         </tr>
@@ -653,7 +899,7 @@
 
                             <tr>
 
-                                <td colspan="6" class="px-6 py-16 text-center">
+                                <td colspan="7" class="px-6 py-16 text-center">
 
                                     <div class="flex flex-col items-center justify-center text-slate-400">
 
@@ -703,9 +949,9 @@
 
     <!-- ventana modal para el historial de despachos emitidos con buscador y multiples filtros -->
     <div id="BandejaModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl flex flex-col overflow-hidden">
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
 
             <!-- cabecera de modal historico -->
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
@@ -776,20 +1022,24 @@
                             class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
                         <datalist id="sugerencias-destinos">
                             <option value="CESFAM LOS CERROS">
-                            <option value="CECOSF CENTINELA">
-                            <option value="CECOSF LOS LOBOS - LA GLORIA">
-                            <option value="POSTA TUMBE">
-                            <option value="CESFAM PAULINA AVENDAÑO">
+                            <option value="CESFAM PAULINA AVENDAÑO PEREDA">
                             <option value="CESFAM SAN VICENTE">
-                            <option value="CECOSF LIBERTAD GAETE">
-                            <option value="CECOSF 8 DE MAYO">
+                            <option value="CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN">
                             <option value="CECOSF ESMERALDA">
-                            <option value="CESFAM LEOCAN PORTUS">
+                            <option value="CECOSF 8 DE MAYO">
+                            <option value="CECOSF LIBERTAD-GAETE">
+                            <option value="CECOSF LOS LOBOS-LA GLORIA">
+                            <option value="CECOSF VILLA CENTINELA">
+                            <option value="POSTA RURAL TUMBES">
                             <option value="SAR SAN VICENTE">
                             <option value="SAR LOS CERROS">
                             <option value="UAPO">
                             <option value="Dental - CESFAM SAN VICENTE">
                             <option value="Laboratorio - CESFAM SAN VICENTE">
+                            <option value="MÓDULO DENTAL JUNAEB">
+                            <option value="MÓVIL: LICEO POLIVALENTE Y LICEO COMERCIAL">
+                            <option value="MÓVIL: LICEO INDUSTRIAL Y LICEO ASUNCIÓN">
+                            <option value="MÓVIL: LICEO A-21">
                         </datalist>
                     </div>
 
@@ -976,41 +1226,80 @@
         </div>
     </div>
 
-    <!-- ventana modal para el escaner de codigos qr -->
-    <div id="scannerModal"
-        class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all">
-        <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-0 w-full max-w-md flex flex-col overflow-hidden">
-            <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
-                <div>
-                    <h2 class="text-[16px] font-bold text-white tracking-wide">Escanear Etiqueta QR</h2>
-                    <p class="text-[11px] text-slate-300 mt-0.5 uppercase tracking-wider font-semibold">Validacion
-                        automatica de Stock</p>
+    <!-- MODAL DE ESCÁNER QR DE DIRECCIONAMIENTO CLÍNICO / DESPACHO -->
+    <div id="scannerModal" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
+        <div class="flex min-h-full items-center justify-center">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
+                <!-- Header limpio -->
+                <div class="px-5 py-4 bg-slate-800 text-white flex justify-between items-center shrink-0 border-b border-slate-700">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-[15px] font-bold text-white tracking-wide leading-tight">
+                                Escanear Etiqueta QR
+                            </h2>
+                            <p class="text-[11px] text-teal-300 font-medium">Validación automática de Stock</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeScanner()" class="text-slate-400 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-lg cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
-                <button type="button" onclick="closeScanner()"
-                    class="text-slate-400 hover:text-white transition-colors bg-white/10 p-2 rounded-xl cursor-pointer">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
 
-            <div class="p-6 bg-slate-50 flex flex-col items-center">
-                <div
-                    class="bg-white border-[3px] border-slate-200 border-dashed rounded-2xl p-2 w-full max-w-sm flex flex-col items-center">
-                    <div id="reader" class="w-full rounded-xl overflow-hidden shadow-inner bg-black"></div>
+                <!-- Visor de Cámara adaptado a Modo Claro / Oscuro -->
+                <div class="p-4 sm:p-5 flex flex-col items-center bg-slate-50/70 overflow-y-auto flex-1">
+                    <div class="relative w-full max-w-[300px] sm:max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-black border-2 border-slate-300 shadow-md flex items-center justify-center" id="scannerVisualContainer">
+                        <!-- Elemento nativo de feed de cámara -->
+                        <div id="reader-feed" class="w-full h-full object-cover"></div>
+
+                        <!-- HUD Overlay: 4 esquinas nítidas + línea láser -->
+                        <div class="pointer-events-none absolute inset-5 flex items-center justify-center" id="scannerHudOverlay">
+                            <div class="absolute top-0 left-0 w-5 h-5 border-t-[3px] border-l-[3px] border-teal-400 rounded-tl-md"></div>
+                            <div class="absolute top-0 right-0 w-5 h-5 border-t-[3px] border-r-[3px] border-teal-400 rounded-tr-md"></div>
+                            <div class="absolute bottom-0 left-0 w-5 h-5 border-b-[3px] border-l-[3px] border-teal-400 rounded-bl-md"></div>
+                            <div class="absolute bottom-0 right-0 w-5 h-5 border-b-[3px] border-r-[3px] border-teal-400 rounded-br-md"></div>
+
+                            <div class="scan-laser-bar"></div>
+                        </div>
+
+                        <!-- Mensaje de estado mientras conecta la cámara -->
+                        <div id="scannerLoadingState" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center z-10 transition-opacity">
+                            <div class="w-8 h-8 border-3 border-teal-400 border-t-transparent rounded-full animate-spin mb-2.5"></div>
+                            <p class="text-[13px] font-bold text-white">Iniciando sensor de cámara...</p>
+                            <p class="text-[11px] text-slate-300 mt-0.5">Conceda permiso de acceso a la cámara en el navegador.</p>
+                        </div>
+                    </div>
+
+                    <!-- Barra de control y estado -->
+                    <div class="w-full max-w-[300px] sm:max-w-[320px] flex items-center justify-between mt-3.5 px-0.5">
+                        <div class="flex items-center gap-2 text-[12px] text-slate-600 font-medium">
+                            <span class="inline-block w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
+                            <span id="scannerStatusTxt">Buscando código QR...</span>
+                        </div>
+
+                        <!-- Botón para alternar cámaras si hay más de una -->
+                        <button type="button" id="btnSwitchCamera" onclick="switchScannerCamera()"
+                            class="hidden px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold border border-slate-300 transition-colors items-center gap-1.5 cursor-pointer shadow-2xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Cambiar Cámara
+                        </button>
+                    </div>
+
+                    <p class="text-[11.5px] text-slate-500 mt-3 text-center leading-relaxed max-w-sm">
+                        Apunte la cámara a la etiqueta del producto. El sistema leerá el Lote, seleccionará el producto en la tabla y establecerá el tope máximo de extracción.
+                    </p>
                 </div>
-                <p class="text-[12px] font-medium text-slate-500 mt-5 text-center leading-relaxed max-w-sm">
-                    Apunte la camara a la etiqueta del producto. El sistema leera el Lote, seleccionara el producto en la
-                    tabla y establecera el tope maximo de extraccion.
-                </p>
-            </div>
 
-            <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end">
-                <button type="button" onclick="closeScanner()"
-                    class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">Cancelar
-                    Escaneo</button>
+                <!-- Footer modal -->
+                <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
+                    <button type="button" onclick="closeScanner()" class="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-[12.5px] font-bold shadow-xs transition-colors cursor-pointer">
+                        Cancelar Escaneo
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1026,6 +1315,10 @@
         let signatureDespacha = null;
         let signatureRecibe = null;
         const solicitudes = @json($solicitudes);
+        const listaControlados = @json($controlados);
+
+        const esControladoJS = (nombre) => listaControlados.some(c => c.toLowerCase() === String(nombre ?? '').trim()
+            .toLowerCase());
 
         document.addEventListener('DOMContentLoaded', function() {
             // inicializar pads de firmas si existen
@@ -1039,18 +1332,246 @@
             if (padDespachaElem) signatureDespacha = new SignaturePad(padDespachaElem, padOptions);
             if (padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
 
-            // asignacion de firmas a los inputs ocultos antes del submit
+            // asignacion de firmas a los inputs ocultos antes del submit con confirmación SweetAlert2 y AJAX
             const form = document.getElementById('despachoForm');
+            let despachoSubmitAction = 'save_only';
+
+            document.querySelectorAll('#despachoForm button[type="submit"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    despachoSubmitAction = this.value || 'save_only';
+                });
+            });
+
+            function triggerSilentDownload(pdfUrl) {
+                if (!pdfUrl) return;
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = pdfUrl;
+                document.body.appendChild(iframe);
+                setTimeout(() => {
+                    if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+                }, 60000);
+            }
+
+            function showDispatchSuccessModal(dispData) {
+                const htmlDetail = `
+                    <div class="das-swal-container text-left text-xs text-slate-700">
+                        <div class="das-swal-summary p-3.5 bg-slate-50 border border-slate-200 rounded-xl mb-3.5 space-y-1.5">
+                            <div class="das-swal-summary-header flex items-center justify-between pb-2 mb-2 border-b border-slate-200">
+                                <span class="das-swal-summary-title font-bold text-slate-900 text-sm">Guía N° ${dispData.correlativo}</span>
+                                <span class="das-swal-badge-ok px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">DESPACHO CONFORME</span>
+                            </div>
+                            <p class="das-swal-meta"><strong>Destino:</strong> ${dispData.destino}</p>
+                            <p class="das-swal-meta"><strong>Clasificación:</strong> ${dispData.clasificacion}</p>
+                            <p class="das-swal-meta"><strong>Fecha de Emisión:</strong> ${dispData.fecha}</p>
+                            <p class="das-swal-meta"><strong>Total Unidades Despachadas:</strong> ${Number(dispData.total_unidades || 0).toLocaleString('es-CL')} uds. (${dispData.total_items} producto${dispData.total_items === 1 ? '' : 's'})</p>
+                        </div>
+                        <p class="das-swal-section-title font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Detalle de Productos Despachados:</p>
+                        <div class="das-swal-table-wrap max-h-56 overflow-y-auto border border-slate-200 rounded-lg shadow-inner">
+                            <table class="das-swal-table w-full text-[11.5px] text-left">
+                                <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2.5">Producto</th>
+                                        <th class="p-2.5 text-center">Lote FEFO</th>
+                                        <th class="p-2.5 text-center">Vencimiento</th>
+                                        <th class="p-2.5 text-right">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 bg-white">
+                                    ${(dispData.items || []).map(it => `
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="p-2.5 font-medium text-slate-800">${it.producto}</td>
+                                            <td class="p-2.5 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
+                                            <td class="p-2.5 text-center text-slate-600">${it.vencimiento}</td>
+                                            <td class="p-2.5 text-right font-bold text-emerald-700 das-swal-qty">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                if (dispData.auto_download && dispData.pdf_url) {
+                    triggerSilentDownload(dispData.pdf_url);
+                }
+
+                if (dispData.tiene_controlados_pendientes && dispData.url_despacho_controlado) {
+                    Swal.fire({
+                        title: '¡Despacho Normal Emitido!',
+                        html: `
+                            <div class="das-swal-container text-left text-xs text-slate-700">
+                                ${htmlDetail}
+                                <div class="das-swal-mixed-banner mt-4 p-3.5 bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-300 rounded-xl flex items-start gap-3 shadow-xs">
+                                    <div class="das-swal-mixed-icon w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs font-extrabold text-sm">!</div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="das-swal-mixed-title font-bold text-amber-950 text-[13px]">Solicitud Mixta: Fármacos Controlados Pendientes</p>
+                                        <p class="das-swal-mixed-text text-slate-600 text-[11.5px] mt-1 leading-relaxed">
+                                            Esta solicitud aún tiene <strong>${dispData.cant_controlados_pendientes} fármaco(s) controlado(s)</strong> pendiente(s) por despachar en el módulo de Despacho Controlado.
+                                        </p>
+                                        <p class="das-swal-mixed-cta text-amber-900 font-semibold text-[11.5px] mt-1.5">
+                                            ¿Deseas emitir el Despacho Controlado ahora mismo?
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        icon: 'info',
+                        showCancelButton: true,
+                        showDenyButton: Boolean(dispData.pdf_url),
+                        confirmButtonColor: '#e11d48',
+                        confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg> Ir a Despacho Controlado',
+                        denyButtonColor: '#2563eb',
+                        denyButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Ver Guía PDF',
+                        cancelButtonColor: '#475569',
+                        cancelButtonText: 'Dejar para después',
+                        allowOutsideClick: false,
+                        width: '660px'
+                    }).then((res) => {
+                        if (res.isConfirmed) {
+                            window.location.href = dispData.url_despacho_controlado;
+                        } else if (res.isDenied && dispData.pdf_url) {
+                            window.open(dispData.pdf_url, '_blank');
+                            window.location.reload();
+                        } else {
+                            window.location.reload();
+                        }
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: '¡Despacho Realizado con Éxito!',
+                    html: htmlDetail,
+                    icon: 'success',
+                    confirmButtonColor: '#0f766e',
+                    confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar',
+                    showCancelButton: Boolean(dispData.pdf_url),
+                    cancelButtonColor: '#2563eb',
+                    cancelButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Ver Guía PDF',
+                    reverseButtons: true,
+                    allowOutsideClick: false,
+                    width: '640px'
+                }).then((res) => {
+                    if (res.dismiss === Swal.DismissReason.cancel && dispData.pdf_url) {
+                        window.open(dispData.pdf_url, '_blank');
+                    }
+                    window.location.reload();
+                });
+            }
+
             if (form) {
-                form.addEventListener('submit', function() {
-                    if (signatureDespacha && !signatureDespacha.isEmpty()) {
-                        document.getElementById('firma_despacha_input').value = signatureDespacha.toDataURL(
-                            'image/png');
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    if (!form.checkValidity()) {
+                        form.reportValidity();
+                        return;
                     }
-                    if (signatureRecibe && !signatureRecibe.isEmpty()) {
-                        document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL(
-                            'image/png');
+
+                    const clasif = document.getElementById('clasificacion_select')?.value || 'Interno';
+                    let destinatario = '';
+                    if (clasif === 'Externo') {
+                        const ext = (document.getElementById('establecimiento_externo')?.value || '').trim();
+                        const tipoExt = (document.getElementById('tipo_externo')?.value || '').trim();
+                        destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Externo');
+                    } else {
+                        const selInt = document.getElementById('establecimiento_interno');
+                        destinatario = selInt && selInt.selectedIndex >= 0 && selInt.value
+                            ? selInt.options[selInt.selectedIndex].text.trim()
+                            : 'Establecimiento Interno';
                     }
+
+                    const rows = document.querySelectorAll('#productsBody tr');
+                    let itemsCount = 0;
+                    let totalUnidades = 0;
+
+                    rows.forEach(tr => {
+                        const selProd = tr.querySelector('select[name="productos[]"]');
+                        const inpCant = tr.querySelector('input[name="cantidades[]"]');
+                        const cant = parseInt(inpCant?.value) || 0;
+                        if (selProd && selProd.value) {
+                            itemsCount++;
+                            totalUnidades += cant;
+                        }
+                    });
+
+                    if (itemsCount === 0 && rows.length > 0) {
+                        itemsCount = rows.length;
+                    }
+
+                    const textoUnidades = totalUnidades > 0 ? ` (${totalUnidades.toLocaleString('es-CL')} unidades en total)` : '';
+
+                    Swal.fire({
+                        title: '¿Confirmar Emisión de Despacho?',
+                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s)${textoUnidades}.<br><span class="text-[12px] text-slate-500 mt-1 block">El stock de los lotes asignados se rebajará según orden FEFO.</span>`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#0f766e',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Sí, emitir despacho',
+                        cancelButtonText: 'Revisar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (signatureDespacha && !signatureDespacha.isEmpty()) {
+                                document.getElementById('firma_despacha_input').value = signatureDespacha.toDataURL('image/png');
+                            }
+                            if (signatureRecibe && !signatureRecibe.isEmpty()) {
+                                document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL('image/png');
+                            }
+
+                            const formData = new FormData(form);
+                            formData.set('action', despachoSubmitAction);
+
+                            Swal.fire({
+                                title: 'Procesando Despacho...',
+                                html: '<span class="text-xs text-slate-500">Descontando existencias por FEFO y registrando trazabilidad...</span>',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            fetch(form.getAttribute('action'), {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form.querySelector('input[name="_token"]')?.value
+                                },
+                                body: formData
+                            })
+                            .then(async response => {
+                                const data = await response.json().catch(() => ({}));
+                                if (!response.ok) {
+                                    let errorMsg = data.message || 'Error al procesar el despacho.';
+                                    if (data.errors) {
+                                        errorMsg = Object.values(data.errors).flat().join('<br>');
+                                    }
+                                    throw new Error(errorMsg);
+                                }
+                                return data;
+                            })
+                            .then(data => {
+                                if (data.success && data.detail) {
+                                    showDispatchSuccessModal(data.detail);
+                                } else {
+                                    throw new Error(data.message || 'Error inesperado al emitir el despacho.');
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'No se pudo emitir el despacho',
+                                    html: `<div class="text-xs text-rose-700 bg-rose-50 p-3 rounded-lg border border-rose-200">${error.message}</div>`,
+                                    confirmButtonColor: '#e11d48',
+                                    confirmButtonText: 'Entendido'
+                                });
+                            });
+                        }
+                    });
                 });
             }
 
@@ -1061,7 +1582,7 @@
                     if (signatureDespacha) signatureDespacha.clear();
                     if (signatureRecibe) signatureRecibe.clear();
                     // eliminar filas extra de productos
-                    const items = document.querySelectorAll('.producto-item');
+                    const items = document.querySelectorAll('#productsBody tr');
                     for (let i = 1; i < items.length; i++) {
                         items[i].remove();
                     }
@@ -1284,6 +1805,25 @@
             loteInput.value = option.getAttribute('data-lote') || '';
             venceInput.value = option.getAttribute('data-vence') || '';
 
+<<<<<<< HEAD
+=======
+            const progSugerido = (option.getAttribute('data-programa') || '').trim();
+            const progSelect = tr.querySelector('select[name="programas[]"]');
+            if (progSelect && progSugerido) {
+                let matchedProg = Array.from(progSelect.options).find(
+                    o => o.value && o.value.toLowerCase() === progSugerido.toLowerCase()
+                );
+                if (!matchedProg) {
+                    const newOpt = document.createElement('option');
+                    newOpt.value = progSugerido;
+                    newOpt.textContent = progSugerido;
+                    progSelect.appendChild(newOpt);
+                    matchedProg = newOpt;
+                }
+                progSelect.value = matchedProg.value;
+            }
+
+>>>>>>> origin/cristobal
             let stock = parseInt(option.getAttribute('data-stock')) || 0;
             cantInput.setAttribute('max', stock);
             stockBadge.textContent = stock;
@@ -1373,10 +1913,27 @@
             }
         }
 
-        // inicializacion e interaccion con la libreria de la camara qr
-        let html5QrcodeScanner = null;
+        // Inicialización y control del escáner óptico QR (Mismo motor y estética que Dashboard)
+        let html5QrScanner = null;
+        let availableCameras = [];
+        let currentCameraIndex = 0;
 
-        function openScanner() {
+        function playScannerBeep() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            } catch(e) {}
+        }
+
+        async function openScanner() {
             if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
                 Swal.fire({
                     icon: 'warning',
@@ -1386,78 +1943,208 @@
                 });
             }
 
-            document.getElementById('scannerModal').classList.remove('hidden');
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", {
-                fps: 10,
-                qrbox: {
-                    width: 250,
-                    height: 250
-                },
-                aspectRatio: 1.0
-            }, false);
-            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            const modal = document.getElementById('scannerModal');
+            const loadingState = document.getElementById('scannerLoadingState');
+            const statusTxt = document.getElementById('scannerStatusTxt');
+            const btnSwitch = document.getElementById('btnSwitchCamera');
+
+            modal.classList.remove('hidden');
+            if (loadingState) {
+                loadingState.style.display = 'flex';
+                loadingState.style.opacity = '1';
+            }
+            if (statusTxt) statusTxt.textContent = 'Iniciando cámara...';
+
+            try {
+                if (!html5QrScanner) {
+                    html5QrScanner = new Html5Qrcode("reader-feed");
+                }
+
+                try {
+                    availableCameras = await Html5Qrcode.getCameras();
+                    if (availableCameras && availableCameras.length > 1 && btnSwitch) {
+                        btnSwitch.classList.remove('hidden');
+                        btnSwitch.classList.add('inline-flex');
+                    }
+                } catch(camErr) {
+                    availableCameras = [];
+                }
+
+                startScannerWithCurrentCamera();
+            } catch (err) {
+                console.error("Error al iniciar lector:", err);
+                if (loadingState) {
+                    loadingState.innerHTML = `
+                        <div class="text-center p-4">
+                            <svg class="w-10 h-10 text-rose-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <p class="text-sm font-bold text-white">No se pudo acceder a la cámara</p>
+                            <p class="text-xs text-slate-400 mt-1">Verifica los permisos en tu navegador o conecta una cámara.</p>
+                        </div>
+                    `;
+                }
+                if (statusTxt) statusTxt.textContent = 'Error de cámara';
+            }
         }
 
-        function closeScanner() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear().catch(e => console.error(e));
-                html5QrcodeScanner = null;
+        async function startScannerWithCurrentCamera() {
+            const loadingState = document.getElementById('scannerLoadingState');
+            const statusTxt = document.getElementById('scannerStatusTxt');
+
+            let cameraConfig = { facingMode: "environment" };
+            if (availableCameras.length > 0 && availableCameras[currentCameraIndex]) {
+                cameraConfig = availableCameras[currentCameraIndex].id;
+            }
+
+            const scanConfig = {
+                fps: 15,
+                qrbox: { width: 220, height: 220 },
+                aspectRatio: 1.0
+            };
+
+            if (html5QrScanner && html5QrScanner.isScanning) {
+                await html5QrScanner.stop();
+            }
+
+            html5QrScanner.start(
+                cameraConfig,
+                scanConfig,
+                onScanSuccess,
+                function() {}
+            ).then(() => {
+                if (loadingState) {
+                    loadingState.style.opacity = '0';
+                    setTimeout(() => { loadingState.style.display = 'none'; }, 200);
+                }
+                if (statusTxt) statusTxt.textContent = 'Enfoca el código QR en el visor';
+            }).catch(e => {
+                console.error("Fallo al iniciar cámara:", e);
+                if (statusTxt) statusTxt.textContent = 'Error al activar cámara';
+            });
+        }
+
+        async function switchScannerCamera() {
+            if (availableCameras.length <= 1) return;
+            currentCameraIndex = (currentCameraIndex + 1) % availableCameras.length;
+            const statusTxt = document.getElementById('scannerStatusTxt');
+            if (statusTxt) statusTxt.textContent = 'Cambiando de cámara...';
+            await startScannerWithCurrentCamera();
+        }
+
+        async function closeScanner() {
+            if (html5QrScanner && html5QrScanner.isScanning) {
+                try {
+                    await html5QrScanner.stop();
+                } catch(e) {}
             }
             document.getElementById('scannerModal').classList.add('hidden');
         }
 
         // captura correcta de la informacion del qr e integracion con el select
         function onScanSuccess(decodedText) {
+            playScannerBeep();
             closeScanner();
 
             let parsedData = {};
             let chunks = decodedText.split('|');
             chunks.forEach(chunk => {
-                let [key, val] = chunk.split(':');
-                if (key && val) parsedData[key.trim()] = val.trim();
+                let idx = chunk.indexOf(':');
+                if (idx > -1) {
+                    let key = chunk.substring(0, idx).trim().toUpperCase();
+                    let val = chunk.substring(idx + 1).trim();
+                    if (key) parsedData[key] = val;
+                }
             });
 
-            if (!parsedData.PROD || !parsedData.STOCK) {
+            const norm = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+            const cleanLote = l => {
+                let s = (l || '').toString().trim().toUpperCase();
+                if (!s || s === 'S/L' || s === 'SIN LOTE' || s === 'N/A' || s === 'NULL') return 'S/L';
+                return s;
+            };
+
+            let prodTarget = (parsedData.PROD || '').trim();
+            let loteTarget = (parsedData.LOTE || (!prodTarget ? decodedText.trim() : '')).trim();
+
+            if (!prodTarget && !loteTarget) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Formato Inválido',
-                    text: 'QR no compatible con el sistema.',
+                    text: 'El código QR no contiene datos compatibles de producto o lote.',
                     confirmButtonColor: '#0f968c'
                 });
                 return;
             }
 
-            let rowData = {
-                producto: parsedData.PROD.trim(),
-                lote: parsedData.LOTE ? parsedData.LOTE.trim() : 'S/L',
-                vencimiento: parsedData.VENCE ? parsedData.VENCE.trim() : 'N/A',
-                stock: parseInt(parsedData.STOCK)
-            };
-
             let emptySelect = Array.from(tbody.querySelectorAll('select[name="productos[]"]')).find(sel => sel.value ===
                 '');
-            let tr;
-
-            if (emptySelect) {
-                tr = emptySelect.closest('tr');
-            } else {
-                tr = addRow();
-            }
+            let tr = emptySelect ? emptySelect.closest('tr') : addRow();
 
             let select = tr.querySelector('select[name="productos[]"]');
-            let options = Array.from(select.options);
-            let targetOption = options.find(opt => opt.value === rowData.producto && opt.getAttribute('data-lote') ===
-                rowData.lote);
+            let options = Array.from(select.options).filter(opt => opt.value && !opt.disabled);
+
+            let targetOption = null;
+
+            // 1. Coincidencia exacta de Producto Y Lote
+            if (prodTarget && loteTarget) {
+                const targetProdNorm = norm(prodTarget);
+                const targetLoteNorm = cleanLote(loteTarget);
+                targetOption = options.find(opt => {
+                    return norm(opt.value) === targetProdNorm && cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm;
+                });
+            }
+
+            // 2. Coincidencia por Lote (si el lote es específico y distinto de S/L)
+            if (!targetOption && loteTarget && cleanLote(loteTarget) !== 'S/L') {
+                const targetLoteNorm = cleanLote(loteTarget);
+                targetOption = options.find(opt => cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm);
+            }
+
+            // 3. Coincidencia por Producto (primer lote disponible)
+            if (!targetOption && prodTarget) {
+                const targetProdNorm = norm(prodTarget);
+                targetOption = options.find(opt => norm(opt.value) === targetProdNorm);
+            }
+
+            // 4. Coincidencia parcial / difusa por Producto
+            if (!targetOption && prodTarget) {
+                const targetProdNorm = norm(prodTarget);
+                targetOption = options.find(opt => {
+                    const optNorm = norm(opt.value);
+                    return optNorm && targetProdNorm && (optNorm.includes(targetProdNorm) || targetProdNorm.includes(optNorm));
+                });
+            }
 
             if (targetOption) {
+                // Seleccionar índice exacto para no colisionar con productos de mismo nombre y diferente lote
+                targetOption.selected = true;
+                select.selectedIndex = targetOption.index;
                 select.value = targetOption.value;
                 llenarDatosFila(select);
-                tr.querySelector('input[name="cantidades[]"]').focus();
-            } else {
+
+                const cantInput = tr.querySelector('input[name="cantidades[]"]');
+                if (cantInput) {
+                    cantInput.focus();
+                }
+
+                const stockDisp = parseInt(targetOption.getAttribute('data-stock')) || 0;
+                const loteEncontrado = targetOption.getAttribute('data-lote') || 'S/L';
+
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Sin Stock',
-                    text: 'El producto o lote escaneado ya no tiene stock disponible en la bodega.',
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: `Producto cargado: ${targetOption.value}`,
+                    text: `Lote: ${loteEncontrado} · Stock disp: ${stockDisp} uds.`,
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true
+                });
+            } else {
+                let nombreBuscado = prodTarget || loteTarget;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sin Stock Disponible',
+                    html: `El producto o lote <strong>${nombreBuscado}</strong> no figura con stock disponible en la bodega central.<br><br><span class="text-xs text-slate-500">Verifique que el lote tenga stock en estado "Disponible" o revise el módulo de Cuarentena / Controlados.</span>`,
                     confirmButtonColor: '#0f968c'
                 });
                 if (!emptySelect && tbody.children.length > 1) tr.remove();
@@ -1465,12 +2152,167 @@
         }
 
         // funciones para mostrar u ocultar las solicitudes
-        function openSolicitudes() {
+        function openSolicitudes(filtroAsignacion = null) {
+            if (filtroAsignacion) {
+                const selAsig = document.getElementById('filtroSolicitudAsignacion');
+                if (selAsig) selAsig.value = filtroAsignacion;
+            }
+            filtrarSolicitudesModal();
             document.getElementById('SolicitudesModal').classList.remove('hidden');
         }
 
         function closeSolicitudes() {
             document.getElementById('SolicitudesModal').classList.add('hidden');
+        }
+
+        function filtrarSolicitudesModal() {
+            const texto = (document.getElementById('filtroSolicitudTexto')?.value || '').trim().toLowerCase();
+            const tipo = (document.getElementById('filtroSolicitudTipo')?.value || '').toLowerCase();
+            const estado = (document.getElementById('filtroSolicitudEstado')?.value || '').toLowerCase();
+            const asignacion = (document.getElementById('filtroSolicitudAsignacion')?.value || '').toLowerCase();
+
+            document.querySelectorAll('.fila-solicitud-modal').forEach(fila => {
+                const rowSearch = (fila.dataset.search || '').toLowerCase();
+                const rowTipo = (fila.dataset.tipo || '').toLowerCase();
+                const rowEstado = (fila.dataset.estado || '').toLowerCase();
+                const rowAssignedId = fila.dataset.assignedId || '';
+                const rowEsMia = fila.dataset.esMia === '1';
+                const key = fila.dataset.key;
+                const detailRow = key ? document.getElementById(key) : null;
+
+                let matchTexto = !texto || rowSearch.includes(texto);
+                let matchTipo = !tipo || rowTipo === tipo;
+                let matchEstado = true;
+                if (estado === 'activas') {
+                    matchEstado = ['pendiente', 'asignada', 'parcial'].includes(rowEstado);
+                } else if (estado) {
+                    matchEstado = rowEstado === estado;
+                }
+
+                let matchAsignacion = true;
+                if (asignacion === 'mias') {
+                    matchAsignacion = rowEsMia;
+                } else if (asignacion === 'sin_asignar') {
+                    matchAsignacion = !rowAssignedId;
+                } else if (asignacion === 'asignadas') {
+                    matchAsignacion = !!rowAssignedId;
+                }
+
+                if (matchTexto && matchTipo && matchEstado && matchAsignacion) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                    if (detailRow) detailRow.classList.add('hidden');
+                }
+            });
+        }
+
+        async function asignarSolicitudUsuario(solicitudId, userId, selectElem) {
+            const userName = selectElem && selectElem.selectedIndex >= 0 ? selectElem.options[selectElem.selectedIndex].text.trim() : '';
+            const prevVal = selectElem ? (selectElem.dataset.prevVal ?? '') : '';
+
+            const confirmTitle = userId ? '¿Asignar Solicitud?' : '¿Desasignar Solicitud?';
+            const confirmHtml = userId
+                ? `¿Deseas asignar la atención de esta solicitud al funcionario <strong>${userName}</strong>?`
+                : 'La solicitud volverá al estado <strong>Pendiente</strong> sin funcionario responsable asignado.';
+            const confirmBtnText = userId ? 'Sí, asignar' : 'Sí, desasignar';
+
+            const result = await Swal.fire({
+                title: confirmTitle,
+                html: confirmHtml,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: confirmBtnText,
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            });
+
+            if (!result.isConfirmed) {
+                if (selectElem) selectElem.value = prevVal;
+                return;
+            }
+
+            if (selectElem) selectElem.dataset.prevVal = userId;
+
+            const spinner = document.getElementById('assign-spinner-' + solicitudId);
+            if (spinner) spinner.classList.remove('hidden');
+            if (selectElem) selectElem.disabled = true;
+
+            try {
+                const res = await fetch(`{{ url('requests') }}/${solicitudId}/assign`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        assigned_user_id: userId ? parseInt(userId) : null
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    throw new Error(data.message || 'No se pudo asignar la solicitud');
+                }
+
+                // Actualizar estado visual del badge y atributos de la fila
+                const badge = document.getElementById('badge-estado-solicitud-' + solicitudId);
+                if (badge && data.estado) {
+                    badge.textContent = data.estado;
+                    badge.className = 'border px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase inline-block ';
+                    if (data.estado === 'Pendiente') {
+                        badge.className += 'bg-amber-100 text-amber-800 border-amber-200';
+                    } else if (data.estado === 'Asignada') {
+                        badge.className += 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                    } else if (data.estado === 'Parcial') {
+                        badge.className += 'bg-blue-100 text-blue-800 border-blue-200';
+                    } else {
+                        badge.className += 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                    }
+                }
+
+                const fila = selectElem ? selectElem.closest('.fila-solicitud-modal') : null;
+                if (fila) {
+                    fila.dataset.estado = (data.estado || '').toLowerCase();
+                    fila.dataset.assignedId = data.assigned_user_id ? String(data.assigned_user_id) : '';
+                    fila.dataset.esMia = (parseInt(data.assigned_user_id || 0) === {{ (int) auth()->id() }}) ? '1' : '0';
+                }
+
+                const solObj = solicitudes.find(s => s.id === solicitudId);
+                if (solObj) {
+                    solObj.estado = data.estado;
+                    solObj.assigned_user_id = data.assigned_user_id;
+                }
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: data.message,
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al asignar',
+                    text: err.message || 'Ocurrió un error al asignar la solicitud.',
+                    confirmButtonColor: '#0f968c'
+                });
+            } finally {
+                if (spinner) spinner.classList.add('hidden');
+                if (selectElem) selectElem.disabled = false;
+            }
+        }
+
+        function desvincularSolicitudActiva() {
+            const requestInput = document.getElementById('establishment_request_id');
+            if (requestInput) requestInput.value = '';
+            const banner = document.getElementById('banner_solicitud_activa');
+            if (banner) banner.classList.add('hidden');
         }
 
         // despliegue de detalles de una solicitud
@@ -1495,6 +2337,23 @@
 
             if (!solicitud) return;
 
+            // marcar la solicitud de origen para que el servidor la actualice al despachar
+            const requestInput = document.getElementById('establishment_request_id');
+            if (requestInput) requestInput.value = solicitud.id;
+
+            // Mostrar banner de solicitud activa
+            const banner = document.getElementById('banner_solicitud_activa');
+            const bannerTitulo = document.getElementById('banner_solicitud_titulo');
+            const bannerSubtitulo = document.getElementById('banner_solicitud_subtitulo');
+            if (banner && bannerTitulo && bannerSubtitulo) {
+                bannerTitulo.textContent = `Atendiendo Solicitud ${solicitud.numero_solicitud} — ${solicitud.establecimiento}`;
+                bannerSubtitulo.textContent = `Solicitante: ${solicitud.responsable || 'N/A'} · Estado actual: ${solicitud.estado} · Al confirmar el despacho se actualizará el estado automáticamente.`;
+                banner.classList.remove('hidden');
+            }
+
+            // Helper de normalización para matching insensible a mayúsculas, tildes y símbolos
+            const normText = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+
             // seleccionar clasificacion interna
             const clasificacion = document.getElementById('clasificacion_select');
             clasificacion.value = 'Interno';
@@ -1502,20 +2361,50 @@
 
             // seleccionar establecimiento
             const selectEstablecimiento = document.getElementById('establecimiento_interno');
+<<<<<<< HEAD
             const establecimientoSolicitud = solicitud.establecimiento.trim().toLowerCase();
             const opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option =>
                 option.value.trim().toLowerCase() === establecimientoSolicitud
             );
+=======
+            const estSolicitudNorm = normText(solicitud.establecimiento);
+
+            let opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option => {
+                const optNorm = normText(option.value);
+                return optNorm === estSolicitudNorm;
+            });
+
+            if (!opcionEstablecimiento) {
+                opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option => {
+                    const optNorm = normText(option.value);
+                    return optNorm && estSolicitudNorm && (optNorm.includes(estSolicitudNorm) || estSolicitudNorm.includes(optNorm));
+                });
+            }
+>>>>>>> origin/cristobal
 
             if (opcionEstablecimiento) {
                 selectEstablecimiento.value = opcionEstablecimiento.value;
                 actualizarDireccionInterna();
+            } else if (solicitud.establecimiento) {
+                // Si es un destino externo que no figura en la lista interna
+                const selectClasif = document.getElementById('clasificacion_select');
+                if (selectClasif) {
+                    selectClasif.value = 'Externo';
+                    toggleClasificacion();
+                    const inputExt = document.getElementById('establecimiento_externo');
+                    if (inputExt) inputExt.value = solicitud.establecimiento;
+                }
             }
 
+<<<<<<< HEAD
             // rellenar observaciones
+=======
+            // rellenar observaciones con referencia clara
+>>>>>>> origin/cristobal
             const observaciones = document.querySelector('input[name="condiciones_transporte"]');
             if (observaciones) {
-                observaciones.value = solicitud.observaciones ?? '';
+                const refTexto = `Ref: Solicitud ${solicitud.numero_solicitud}${solicitud.responsable ? ' (' + solicitud.responsable + ')' : ''}`;
+                observaciones.value = solicitud.observaciones ? `${solicitud.observaciones} - ${refTexto}` : refTexto;
             }
 
             // eliminar las filas actuales de productos
@@ -1524,16 +2413,44 @@
             }
 
             let productosFaltantes = [];
+            let productosControlados = [];
 
-            // agregar los productos de la solicitud
+            // agregar los productos pendientes de la solicitud (los estupefacientes van al módulo controlado)
             solicitud.items.forEach(item => {
+                const nombreItem = item.product?.nombre ?? ('Producto #' + item.product_id);
+                const pendiente = Math.max(0, (parseInt(item.cantidad_solicitada) || 0) - (parseInt(item.cantidad_despachada) || 0));
+
+                if (pendiente <= 0) {
+                    return;
+                }
+
+                if (esControladoJS(nombreItem)) {
+                    productosControlados.push(nombreItem + ' (x' + pendiente + ')');
+                    return;
+                }
+
                 const tr = addRow();
                 const selectProducto = tr.querySelector('select[name="productos[]"]');
+<<<<<<< HEAD
                 const nombreProducto = item.product.nombre.trim().toLowerCase();
 
                 const opcionProducto = Array.from(selectProducto.options).find(option =>
                     option.value.trim().toLowerCase() === nombreProducto
                 );
+=======
+                const itemNorm = normText(nombreItem);
+
+                let opcionProducto = Array.from(selectProducto.options).find(option =>
+                    normText(option.value) === itemNorm
+                );
+
+                if (!opcionProducto) {
+                    opcionProducto = Array.from(selectProducto.options).find(option => {
+                        const optNorm = normText(option.value);
+                        return optNorm && itemNorm && (optNorm.includes(itemNorm) || itemNorm.includes(optNorm));
+                    });
+                }
+>>>>>>> origin/cristobal
 
                 if (opcionProducto) {
                     selectProducto.value = opcionProducto.value;
@@ -1541,14 +2458,34 @@
                     // Llena la fila con lotes y límites
                     llenarDatosFila(selectProducto);
 
+<<<<<<< HEAD
                     const cantidad = tr.querySelector('input[name="cantidades[]"]');
                     cantidad.value = item.cantidad_solicitada;
 
                     validarStock(cantidad);
                 } else {
                     // si el producto no tiene stock disponible o está controlado, se elimina esta fila y lo guardamos
+=======
+                    // Seleccionar programa si viene en la solicitud
+                    const selectPrograma = tr.querySelector('select[name="programas[]"]');
+                    if (selectPrograma && item.programa) {
+                        const progNorm = normText(item.programa);
+                        const optProg = Array.from(selectPrograma.options).find(o =>
+                            normText(o.value) === progNorm || normText(o.text) === progNorm
+                        );
+                        if (optProg) selectPrograma.value = optProg.value;
+                    }
+
+                    const cantidad = tr.querySelector('input[name="cantidades[]"]');
+                    if (cantidad) {
+                        cantidad.value = pendiente;
+                        validarStock(cantidad);
+                    }
+                } else {
+                    // si el producto no tiene stock disponible, se elimina esta fila y lo guardamos
+>>>>>>> origin/cristobal
                     tr.remove();
-                    productosFaltantes.push(item.product.nombre);
+                    productosFaltantes.push(nombreItem);
                 }
             });
 
@@ -1557,6 +2494,7 @@
                 addRow();
             }
 
+<<<<<<< HEAD
             // Si la solicitud tiene una firma registrada, la dibujamos en el pad del receptor
             if (solicitud.firma_solicitante) {
                 // signatureRecibe es la variable global que controla tu <canvas id="pad_recibe">
@@ -1568,21 +2506,128 @@
             // -----------------------------------
 
             // alerta para notificar que no haya stock de algun producto solicitado
+=======
+            // alerta para notificar productos sin stock
+>>>>>>> origin/cristobal
             if (productosFaltantes.length > 0) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Falta de Stock o Controlado',
-                    text: 'Los siguientes productos no se agregaron porque ya no tienen stock o son controlados por sistema: ' +
+                    title: 'Falta de Stock',
+                    text: 'Los siguientes productos no se agregaron porque no hay stock Disponible en bodega: ' +
                         productosFaltantes.join(', '),
                     confirmButtonColor: '#0f968c'
                 });
             }
 
+            // alerta: los estupefacientes de esta solicitud van por Despacho Controlado
+            if (productosControlados.length > 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Solicitud Mixta: Fármacos Controlados',
+                    html: `
+                        <div class="das-swal-container text-left text-xs">
+                            <div class="das-swal-mixed-banner p-3.5 bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-300 rounded-xl flex items-start gap-3">
+                                <div class="das-swal-mixed-icon w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 font-extrabold text-sm">!</div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="das-swal-mixed-title font-bold text-amber-950 text-[13px]">
+                                        Solicitud ${solicitud.numero_solicitud ?? ''} contiene Estupefacientes
+                                    </p>
+                                    <p class="das-swal-mixed-text text-slate-600 text-[11.5px] mt-1 leading-relaxed">
+                                        Se cargaron los medicamentos e insumos normales en este formulario. Los siguientes fármacos deben despacharse por el módulo <strong>Despacho Controlado</strong>:
+                                    </p>
+                                    <ul class="das-swal-pill-list mt-2.5 space-y-1.5">
+                                        ${productosControlados.map(prod => `
+                                            <li class="das-swal-pill-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11.5px] font-bold">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
+                                                <span>${prod}</span>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonColor: '#0f968c',
+                    confirmButtonText: 'Entendido, continuar despacho normal',
+                    width: '540px'
+                });
+            }
+
+            // precargar la firma del solicitante del establecimiento en el pad de recepcion
+            if (solicitud.firma_solicitante) {
+                if (signatureRecibe) {
+                    signatureRecibe.clear();
+                    signatureRecibe.fromDataURL(solicitud.firma_solicitante);
+                }
+                const firmaInput = document.getElementById('firma_recibe_input');
+                if (firmaInput) firmaInput.value = solicitud.firma_solicitante;
+            } else {
+                if (signatureRecibe) signatureRecibe.clear();
+                const firmaInput = document.getElementById('firma_recibe_input');
+                if (firmaInput) firmaInput.value = '';
+            }
+
             // cerrar modal de solicitudes
             closeSolicitudes();
+
+            // Notificación de que se completaron los datos de la solicitud
+            if (typeof Swal !== 'undefined' && productosControlados.length === 0 && productosFaltantes.length === 0) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: `Solicitud ${solicitud.numero_solicitud} cargada`,
+                    text: 'Se completaron el establecimiento, observaciones y productos solicitados.',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
         }
 
+<<<<<<< HEAD
+=======
+        document.addEventListener('DOMContentLoaded', function() {
+            filtrarSolicitudesModal();
+            const params = new URLSearchParams(window.location.search);
+            const solIdParam = parseInt(params.get('solicitud_id'));
+            if (solIdParam) {
+                setTimeout(() => usarSolicitud(solIdParam), 150);
+            }
+        });
+>>>>>>> origin/cristobal
 
         function onScanFailure(error) {}
+
+        @if (session('dispatch_success_detail'))
+            document.addEventListener('DOMContentLoaded', function() {
+                const dispData = @json(session('dispatch_success_detail'));
+                if (typeof showDispatchSuccessModal === 'function') {
+                    showDispatchSuccessModal(dispData);
+                }
+            });
+        @endif
     </script>
+
+    <style>
+        @keyframes scanLaserAnim {
+            0% { top: 6%; opacity: 0.6; }
+            50% { top: 88%; opacity: 1; }
+            100% { top: 6%; opacity: 0.6; }
+        }
+        .scan-laser-bar {
+            position: absolute;
+            left: 5%;
+            right: 5%;
+            height: 2.5px;
+            background: linear-gradient(90deg, transparent, #2dd4bf, #5eead4, #2dd4bf, transparent);
+            box-shadow: 0 0 12px 2px rgba(45, 212, 191, 0.9);
+            animation: scanLaserAnim 2s ease-in-out infinite;
+        }
+        #reader-feed video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
+    </style>
 @endsection

@@ -387,6 +387,7 @@
     </div>
 
     <!-- Modal 1: Ficha técnica -->
+<<<<<<< HEAD
     <div id="modal-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
             data-close="modal-detail"></div>
@@ -394,6 +395,15 @@
             id="modal-detail-panel">
             <div
                 class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+=======
+    <div id="modal-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
+            data-close="modal-detail"></div>
+        <div class="relative w-full max-w-2xl max-h-[92vh] flex flex-col my-auto rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 bg-white shadow-2xl border border-slate-200"
+            id="modal-detail-panel">
+            <div
+                class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white shrink-0">
+>>>>>>> origin/cristobal
                 <div class="flex items-center gap-3.5">
                     <div id="detail-initials"
                         class="w-12 h-12 rounded-xl flex items-center justify-center font-mono-das font-bold text-[14px] text-teal-700 bg-teal-50 border border-teal-100 shadow-sm shrink-0">
@@ -451,7 +461,11 @@
                 </div>
             </div>
 
+<<<<<<< HEAD
             <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50">
+=======
+            <div class="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/50 shrink-0">
+>>>>>>> origin/cristobal
                 <button type="button"
                     class="js-modal-close px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 w-full sm:w-auto transition-colors"
                     data-close="modal-detail">
@@ -466,10 +480,17 @@
     </div>
 
     <!-- Modal 2: Formulario (Registrar/Editar) -->
+<<<<<<< HEAD
     <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
             data-close="modal-edit"></div>
         <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 max-h-[95vh] flex flex-col bg-white shadow-2xl border border-slate-200"
+=======
+    <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
+            data-close="modal-edit"></div>
+        <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden opacity-0 scale-95 transition-all duration-200 max-h-[92vh] flex flex-col bg-white shadow-2xl border border-slate-200 my-auto"
+>>>>>>> origin/cristobal
             id="modal-edit-panel">
 
             <div
@@ -488,7 +509,7 @@
                 </button>
             </div>
 
-            <form class="p-6 space-y-6 overflow-y-auto" onsubmit="return false;">
+            <form class="p-6 space-y-6 overflow-y-auto" onsubmit="return false;" novalidate>
                 <input type="hidden" id="provider-id" value="">
 
                 <!-- SECCIÓN 1: DATOS GENERALES -->
@@ -512,7 +533,14 @@
                                     class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">RUT
                                     <span class="text-red-500">*</span></label>
                                 <input type="text" id="provider-rut" required placeholder="76.543.210-K"
+<<<<<<< HEAD
                                     class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+=======
+                                    maxlength="12" autocomplete="off" inputmode="text"
+                                    class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                                <p id="provider-rut-error" class="hidden text-[11.5px] font-medium text-red-600 mt-1.5">
+                                </p>
+>>>>>>> origin/cristobal
                             </div>
 
                             <div>
@@ -553,12 +581,25 @@
                                 Electrónico <span class="text-red-500">*</span></label>
                             <input type="email" id="provider-email" required placeholder="contacto@empresa.cl"
                                 class="w-full px-4 py-2.5 rounded-xl text-[13.5px] border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+<<<<<<< HEAD
+=======
+                            <p id="provider-email-error" class="hidden text-[11.5px] font-medium text-red-600 mt-1.5">
+                            </p>
+>>>>>>> origin/cristobal
                         </div>
                         <div>
                             <label
                                 class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Teléfono</label>
+<<<<<<< HEAD
                             <input type="text" id="provider-phone" placeholder="+56 9 1234 5678"
                                 class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+=======
+                            <input type="text" id="provider-phone" placeholder="+56 9 1234 5678" maxlength="16"
+                                autocomplete="off" inputmode="tel"
+                                class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
+                            <p id="provider-phone-error" class="hidden text-[11.5px] font-medium text-red-600 mt-1.5">
+                            </p>
+>>>>>>> origin/cristobal
                         </div>
                         <div class="sm:col-span-2">
                             <label
@@ -610,6 +651,167 @@
         document.addEventListener('DOMContentLoaded', () => {
             const csrfToken = '{{ csrf_token() }}';
             let selectedRow = null;
+
+            // VALIDACIONES: RUT CHILENO (módulo 11) Y TELÉFONO
+
+            // Deja sólo dígitos y K, en mayúscula
+            function cleanRut(value) {
+                return String(value || '').replace(/[^0-9kK]/g, '').toUpperCase();
+            }
+
+            // Formatea mientras se escribe: 12.345.678-5
+            function formatRut(value) {
+                let clean = cleanRut(value).slice(0, 9);
+                if (clean.length <= 1) return clean;
+
+                let body = clean.slice(0, -1).replace(/\D/g, ''); // la K sólo es válida al final
+                const dv = clean.slice(-1);
+                body = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                return `${body}-${dv}`;
+            }
+
+            // Valida largo, formato y dígito verificador
+            function validateRut(value) {
+                const clean = cleanRut(value);
+                if (clean.length < 8 || clean.length > 9) return false; // cuerpo de 7 u 8 dígitos + DV
+
+                const body = clean.slice(0, -1);
+                const dv = clean.slice(-1);
+                if (!/^\d+$/.test(body)) return false;
+                if (parseInt(body, 10) < 1000000) return false;
+
+                let sum = 0;
+                let multiplier = 2;
+                for (let i = body.length - 1; i >= 0; i--) {
+                    sum += parseInt(body[i], 10) * multiplier;
+                    multiplier = multiplier === 7 ? 2 : multiplier + 1;
+                }
+                const result = 11 - (sum % 11);
+                const expected = result === 11 ? '0' : result === 10 ? 'K' : String(result);
+
+                return dv === expected;
+            }
+
+            // Extrae los 9 dígitos nacionales (sin +56)
+            function getPhoneDigits(value) {
+                let v = String(value || '').trim();
+                let digits;
+
+                if (v.startsWith('+56')) {
+                    digits = v.slice(3).replace(/\D/g, '');
+                } else {
+                    digits = v.replace(/\D/g, '');
+                    if (digits.length > 9 && digits.startsWith('56')) digits = digits.slice(2);
+                }
+                return digits.slice(0, 9);
+            }
+
+            // Formatea: +56 9 1234 5678
+            function formatPhone(value) {
+                const d = getPhoneDigits(value);
+                if (!d) return '+56 ';
+                let out = `+56 ${d[0]}`;
+                if (d.length > 1) out += ` ${d.slice(1, 5)}`;
+                if (d.length > 5) out += ` ${d.slice(5, 9)}`;
+                return out;
+            }
+
+            // El teléfono es opcional; si se ingresa, debe tener 9 dígitos y comenzar en 2-9
+            function validatePhone(value) {
+                const d = getPhoneDigits(value);
+                if (d.length === 0) return true;
+                return /^[2-9]\d{8}$/.test(d);
+            }
+
+            function validateEmail(value) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+            }
+
+            // --- Helpers de error en campos ---
+            const rutInput = document.getElementById('provider-rut');
+            const phoneInput = document.getElementById('provider-phone');
+            const emailInput = document.getElementById('provider-email');
+
+            function setFieldError(input, errorId, message) {
+                const errorEl = document.getElementById(errorId);
+                if (message) {
+                    input.classList.remove('border-slate-300', 'focus:border-teal-500', 'focus:ring-teal-500/20');
+                    input.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500/20');
+                    errorEl.textContent = message;
+                    errorEl.classList.remove('hidden');
+                } else {
+                    input.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500/20');
+                    input.classList.add('border-slate-300', 'focus:border-teal-500', 'focus:ring-teal-500/20');
+                    errorEl.textContent = '';
+                    errorEl.classList.add('hidden');
+                }
+            }
+
+            function checkRutField() {
+                if (!rutInput.value.trim()) {
+                    setFieldError(rutInput, 'provider-rut-error', 'El RUT es obligatorio.');
+                    return false;
+                }
+                if (!validateRut(rutInput.value)) {
+                    setFieldError(rutInput, 'provider-rut-error', 'RUT inválido. Revisa el número y el dígito verificador.');
+                    return false;
+                }
+                setFieldError(rutInput, 'provider-rut-error', '');
+                return true;
+            }
+
+            function checkPhoneField() {
+                if (!validatePhone(phoneInput.value)) {
+                    setFieldError(phoneInput, 'provider-phone-error',
+                        'Teléfono inválido. Debe tener 9 dígitos, ej: +56 9 1234 5678.');
+                    return false;
+                }
+                setFieldError(phoneInput, 'provider-phone-error', '');
+                return true;
+            }
+
+            function checkEmailField() {
+                if (!emailInput.value.trim() || !validateEmail(emailInput.value.trim())) {
+                    setFieldError(emailInput, 'provider-email-error', 'Ingresa un correo electrónico válido.');
+                    return false;
+                }
+                setFieldError(emailInput, 'provider-email-error', '');
+                return true;
+            }
+
+            function clearFieldErrors() {
+                setFieldError(rutInput, 'provider-rut-error', '');
+                setFieldError(phoneInput, 'provider-phone-error', '');
+                setFieldError(emailInput, 'provider-email-error', '');
+            }
+
+            // --- Eventos de los campos ---
+            rutInput.addEventListener('input', () => {
+                rutInput.value = formatRut(rutInput.value);
+                if (document.getElementById('provider-rut-error').textContent) checkRutField();
+            });
+            rutInput.addEventListener('blur', () => {
+                if (rutInput.value.trim()) checkRutField();
+            });
+
+            phoneInput.addEventListener('input', () => {
+                phoneInput.value = formatPhone(phoneInput.value);
+                if (document.getElementById('provider-phone-error').textContent) checkPhoneField();
+            });
+            phoneInput.addEventListener('focus', () => {
+                if (!phoneInput.value.trim()) phoneInput.value = '+56 ';
+            });
+            phoneInput.addEventListener('keydown', (e) => {
+                // Evita borrar el prefijo +56
+                if ((e.key === 'Backspace' || e.key === 'Delete') && getPhoneDigits(phoneInput.value).length === 0) {
+                    e.preventDefault();
+                }
+            });
+            phoneInput.addEventListener('blur', () => checkPhoneField());
+
+            emailInput.addEventListener('blur', () => {
+                if (emailInput.value.trim()) checkEmailField();
+            });
 
             // --- Control del Panel de Filtros ---
             const btnToggleFilters = document.getElementById('toggle-filters-btn');
@@ -667,7 +869,7 @@
             // --- 1. Ver Ficha Técnica ---
             document.querySelectorAll('.js-view-detail').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const row = e.target.closest('.provider-row');
+                    const row = e.currentTarget.closest('.provider-row');
                     if (!row) return;
                     selectedRow = row;
                     const p = getProviderFromRow(row);
@@ -675,9 +877,15 @@
                     document.getElementById('detail-name').textContent = p.name;
                     document.getElementById('detail-rut').textContent = `RUT: ${p.rut}`;
                     document.getElementById('detail-email').textContent = p.email ||
+<<<<<<< HEAD
                     'No registrado';
                     document.getElementById('detail-phone').textContent = p.phone ||
                     'No registrado';
+=======
+                        'No registrado';
+                    document.getElementById('detail-phone').textContent = p.phone ||
+                        'No registrado';
+>>>>>>> origin/cristobal
                     document.getElementById('detail-category').textContent = p.category;
 
                     const initials = p.name.split(' ').filter(n => n).map(n => n[0]).slice(0, 2)
@@ -702,18 +910,20 @@
 
             // --- 2. Formulario de Guardado ---
             function openEditForm(row = null) {
+                clearFieldErrors();
+
                 if (row) {
                     const p = getProviderFromRow(row);
                     document.getElementById('modal-edit-title').textContent = 'Editar Proveedor';
                     document.getElementById('provider-id').value = p.id;
 
                     document.getElementById('provider-name').value = p.name;
-                    document.getElementById('provider-rut').value = p.rut;
+                    rutInput.value = formatRut(p.rut);
                     document.getElementById('provider-category').value = p.category;
                     document.getElementById('provider-business-line').value = p.business_line;
 
-                    document.getElementById('provider-email').value = p.email;
-                    document.getElementById('provider-phone').value = p.phone || '+56 ';
+                    emailInput.value = p.email;
+                    phoneInput.value = p.phone ? formatPhone(p.phone) : '+56 ';
                     document.getElementById('provider-address').value = p.address;
 
                     document.querySelector(`input[name="edit-status"][value="${p.status}"]`).checked = true;
@@ -723,12 +933,12 @@
                     document.getElementById('provider-id').value = '';
 
                     document.getElementById('provider-name').value = '';
-                    document.getElementById('provider-rut').value = '';
+                    rutInput.value = '';
                     document.getElementById('provider-category').value = '';
                     document.getElementById('provider-business-line').value = '';
 
-                    document.getElementById('provider-email').value = '';
-                    document.getElementById('provider-phone').value = '+56 ';
+                    emailInput.value = '';
+                    phoneInput.value = '+56 ';
                     document.getElementById('provider-address').value = '';
 
                     document.querySelector('input[name="edit-status"][value="activo"]').checked = true;
@@ -740,7 +950,7 @@
             document.getElementById('btn-new-provider').addEventListener('click', () => openEditForm());
 
             document.querySelectorAll('.js-edit-provider').forEach(btn => {
-                btn.addEventListener('click', (e) => openEditForm(e.target.closest('.provider-row')));
+                btn.addEventListener('click', (e) => openEditForm(e.currentTarget.closest('.provider-row')));
             });
 
             document.getElementById('modal-detail-edit-btn').addEventListener('click', () => {
@@ -750,27 +960,52 @@
 
             document.getElementById('modal-edit-action').addEventListener('click', async () => {
                 const id = document.getElementById('provider-id').value;
+                const phoneDigits = getPhoneDigits(phoneInput.value);
+
                 const data = {
                     name: document.getElementById('provider-name').value.trim(),
-                    rut: document.getElementById('provider-rut').value.trim(),
+                    rut: rutInput.value.trim(),
                     category: document.getElementById('provider-category').value,
                     business_line: document.getElementById('provider-business-line').value.trim(),
-                    email: document.getElementById('provider-email').value.trim(),
-                    phone: document.getElementById('provider-phone').value.trim(),
+                    email: emailInput.value.trim(),
+                    // Si no hay dígitos, se envía vacío; si no, formato estándar
+                    phone: phoneDigits ? formatPhone(phoneInput.value) : '',
                     address: document.getElementById('provider-address').value.trim(),
                     status: document.querySelector('input[name="edit-status"]:checked').value
                 };
 
-                // Limpiar prefijo de teléfono si está vacío
-                if (data.phone === '+56' || data.phone === '+56 ') {
-                    data.phone = '';
-                }
-
+                // Campos obligatorios
                 if (!data.name || !data.rut || !data.category || !data.email) {
+                    // Marca los errores de RUT y correo si corresponde
+                    if (!data.rut) checkRutField();
+                    if (!data.email) checkEmailField();
                     Swal.fire({
                         icon: 'warning',
                         title: 'Faltan datos',
                         text: 'Completa los campos obligatorios.',
+<<<<<<< HEAD
+=======
+                        confirmButtonColor: '#0d9488'
+                    });
+                    return;
+                }
+
+                // Validaciones de formato (RUT, correo y teléfono)
+                const rutOk = checkRutField();
+                const emailOk = checkEmailField();
+                const phoneOk = checkPhoneField();
+
+                if (!rutOk || !emailOk || !phoneOk) {
+                    const problemas = [];
+                    if (!rutOk) problemas.push('El RUT no es válido.');
+                    if (!emailOk) problemas.push('El correo electrónico no es válido.');
+                    if (!phoneOk) problemas.push('El teléfono no es válido (9 dígitos, ej: +56 9 1234 5678).');
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Datos inválidos',
+                        html: problemas.join('<br>'),
+>>>>>>> origin/cristobal
                         confirmButtonColor: '#0d9488'
                     });
                     return;
@@ -807,11 +1042,27 @@
                         });
                     } else {
                         const result = await response.json();
+
+                        // Muestra errores del servidor junto a los campos si existen
+                        if (result.errors) {
+                            if (result.errors.rut) setFieldError(rutInput, 'provider-rut-error', result.errors.rut[0]);
+                            if (result.errors.phone) setFieldError(phoneInput, 'provider-phone-error', result.errors.phone[0]);
+                            if (result.errors.email) setFieldError(emailInput, 'provider-email-error', result.errors.email[0]);
+                        }
+
+                        const errores = result.errors ?
+                            Object.values(result.errors).flat().join('\n') :
+                            result.message || 'Verifica los datos ingresados.';
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Error al guardar',
+<<<<<<< HEAD
                             text: result.message ||
                                 'Verifica que el RUT o correo no estén duplicados.',
+=======
+                            text: errores,
+>>>>>>> origin/cristobal
                             confirmButtonColor: '#0d9488'
                         });
                     }
@@ -831,7 +1082,7 @@
             // --- 3. Botón Activar/Desactivar con SweetAlert2 ---
             document.querySelectorAll('.js-toggle-status').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const row = e.target.closest('.provider-row');
+                    const row = e.currentTarget.closest('.provider-row');
                     if (!row) return;
                     const p = getProviderFromRow(row);
                     const isActivo = p.status === 'activo';

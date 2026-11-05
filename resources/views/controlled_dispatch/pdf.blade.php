@@ -2,129 +2,203 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Guia de Despacho Controlado {{ $despacho->correlativo }}</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
+    <title>Guía de Despacho Controlado {{ $despacho->correlativo }}</title>
     <style>
-        body { font-family: 'Helvetica', sans-serif; font-size: 12px; color: #333; }
+        @page { margin: 28px 36px 45px 36px; }
+        body { font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif; font-size: 10.5px; color: #1e293b; line-height: 1.4; }
         
-        /* cabecera con color rojo carmesi para diferenciar de guias normales */
-        .header { width: 100%; border-bottom: 2px solid #be123c; padding-bottom: 10px; margin-bottom: 20px; }
-        .header table { width: 100%; border: none; }
-        .header td { border: none; }
-        .title { font-size: 18px; font-weight: bold; text-align: right; color: #be123c; }
+        /* Cabecera Institucional Controlados (Carmesí) */
+        .top-accent { height: 5px; background-color: #be123c; width: 100%; margin-bottom: 12px; border-radius: 2px; }
+        .header-table { width: 100%; border-bottom: 2px solid #be123c; padding-bottom: 12px; margin-bottom: 14px; border-collapse: collapse; }
+        .logo-container { width: 55%; vertical-align: middle; }
+        .logo-icon { width: 32px; height: 32px; vertical-align: middle; margin-right: 8px; }
+        .logo-title { font-size: 17px; font-weight: 800; color: #be123c; margin: 0; display: inline-block; vertical-align: middle; letter-spacing: 0.4px; }
+        .logo-subtitle { font-size: 9px; color: #475569; margin: 2px 0 0 0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .logo-address { font-size: 8.5px; color: #64748b; margin: 1px 0 0 0; }
         
-        /* cajas de informacion */
-        .box { border: 1px solid #ccc; padding: 10px; border-radius: 5px; margin-bottom: 15px; line-height: 1.6; }
-        .box-warning { border: 1px solid #facc15; background-color: #fefce8; padding: 10px; border-radius: 5px; margin-bottom: 15px; line-height: 1.6; }
-        
-        /* tabla de productos */
-        table.items { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        table.items th, table.items td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        table.items th { background-color: #fff1f2; font-size: 11px; text-transform: uppercase; color: #be123c; }
-        
-        /* estilos para las firmas */
-        table.signatures { width: 100%; margin-top: 60px; text-align: center; border: none; }
-        table.signatures td { border: none; vertical-align: bottom; }
-        .signature-line { width: 60%; margin: 0 auto; border-top: 1px solid #333; padding-top: 5px; margin-top: 5px; font-size: 11px; }
-        
-        /* pie de pagina */
-        .footer { position: fixed; bottom: 30px; width: 100%; text-align: center; font-size: 10px; border-top: 1px solid #ccc; padding-top: 10px; color: #666; }
+        .doc-meta { width: 45%; text-align: right; vertical-align: middle; }
+        .doc-box { display: inline-block; border: 1.5px solid #be123c; background-color: #fff1f2; border-radius: 6px; padding: 8px 14px; text-align: center; }
+        .doc-type-label { font-size: 8.5px; font-weight: 900; color: #be123c; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 3px 0; }
+        .doc-correlativo { font-size: 14px; font-weight: 900; color: #881337; margin: 0 0 3px 0; font-family: 'Courier New', monospace; }
+        .doc-date { font-size: 8.5px; color: #475569; margin: 0; font-weight: 600; }
+
+        /* Alerta Sanitaria */
+        .sanitary-banner { background-color: #fff1f2; border: 1px solid #fecdd3; border-left: 4px solid #be123c; padding: 6px 10px; margin-bottom: 10px; font-size: 8.5px; color: #881337; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+
+        /* Secciones y Tablas de Información */
+        .section-header { background-color: #f8fafc; color: #be123c; font-size: 9.5px; font-weight: 800; text-transform: uppercase; padding: 5px 10px; margin: 10px 0 5px 0; border-left: 4px solid #be123c; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; letter-spacing: 0.5px; }
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+        .info-table th { background-color: #fff1f2; color: #881337; font-size: 8.5px; font-weight: 800; text-transform: uppercase; text-align: left; padding: 6px 8px; border: 1px solid #fecdd3; width: 20%; letter-spacing: 0.3px; }
+        .info-table td { font-size: 10px; color: #0f172a; font-weight: 600; padding: 6px 8px; border: 1px solid #cbd5e1; width: 30%; }
+
+        /* Recetas Cheque Box */
+        .cheque-box { border: 1.5px solid #f59e0b; background-color: #fffbeb; padding: 8px 10px; border-radius: 5px; margin: 8px 0; }
+        .cheque-title { font-size: 9px; font-weight: 900; color: #b45309; text-transform: uppercase; margin: 0 0 3px 0; }
+        .cheque-content { font-family: 'Courier New', monospace; font-size: 10.5px; font-weight: 700; color: #78350f; margin: 0; }
+
+        /* Tabla de Artículos */
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+        .items-table th { background-color: #be123c; color: #ffffff; font-size: 8.5px; font-weight: 800; text-transform: uppercase; text-align: center; padding: 7px 6px; border: 1px solid #9f1239; letter-spacing: 0.3px; }
+        .items-table td { font-size: 9.5px; color: #1e293b; padding: 6px 6px; border: 1px solid #cbd5e1; text-align: center; vertical-align: middle; }
+        .items-table td.text-left { text-align: left; }
+        .items-table tr:nth-child(even) td { background-color: #fff1f2; }
+
+        .badge { display: inline-block; padding: 2px 5px; font-size: 8px; font-weight: 700; border-radius: 3px; background-color: #ffe4e6; color: #9f1239; border: 1px solid #fecdd3; }
+
+        .total-row td { background-color: #ffe4e6 !important; border-top: 2px solid #be123c; padding: 7px 8px; }
+        .total-label { font-size: 10px; font-weight: 900; color: #881337; text-transform: uppercase; text-align: right; }
+        .total-amount { font-size: 11.5px; font-weight: 900; color: #be123c; text-align: center; }
+
+        /* Firmas */
+        .signatures-wrapper { margin-top: 34px; width: 100%; page-break-inside: avoid; }
+        .signatures-table { width: 100%; border-collapse: collapse; }
+        .signature-box { width: 48%; text-align: center; vertical-align: bottom; padding: 6px; }
+        .signature-image-container { height: 60px; margin-bottom: 3px; }
+        .signature-img { max-width: 155px; height: 55px; object-fit: contain; }
+        .signature-line { width: 85%; border-top: 1.5px solid #881337; margin: 0 auto 4px auto; }
+        .signature-title { font-size: 9.5px; font-weight: 800; color: #881337; margin: 0; text-transform: uppercase; }
+        .signature-subtitle { font-size: 8.5px; color: #64748b; margin: 2px 0 0 0; }
+
+        /* Pie de página */
+        .footer { position: fixed; bottom: -25px; left: 0; right: 0; height: 22px; text-align: left; font-size: 8px; color: #64748b; border-top: 1px solid #cbd5e1; padding-top: 4px; }
     </style>
 </head>
 <body>
-    
-    <!-- cabecera del documento -->
-    <div class="header">
-        <table>
-            <tr>
-                <td width="60%">
-                    <strong>I. MUNICIPALIDAD DE TALCAHUANO</strong><br>
-                    Drogueria Comunal Central<br>
-                    Blanco Encalada 450, Talcahuano
-                </td>
-                <td width="40%" class="title">
-                    GUIA ESTUPEFACIENTES {{ strtoupper($despacho->clasificacion ?? 'INTERNA') }}<br>
-                    N° {{ $despacho->correlativo }}
-                </td>
-            </tr>
-        </table>
-    </div>
 
-    <!-- informacion general del despacho controlado -->
-    <div class="box">
-        <strong>CLASIFICACION:</strong> {{ ucfirst($despacho->clasificacion ?? 'Interno') }}<br>
-        <strong>DESTINO:</strong> {{ $despacho->establecimiento_destino }}<br>
-        <strong>DIRECCION:</strong> {{ $despacho->direccion_destino ?? 'S/D' }}<br>
-        <strong>FECHA EMISION:</strong> {{ \Carbon\Carbon::parse($despacho->fecha_despacho)->format('d/m/Y') }}<br>
-        <strong>CONDICIONES:</strong> {{ $despacho->condiciones_transporte ?? 'Transporte Normal' }}
-    </div>
+    <div class="top-accent"></div>
 
-    <!-- seccion exclusiva para series de recetas cheque -->
-    @if($despacho->series_recetas)
-        <div class="box-warning">
-            <strong style="color: #ca8a04;">SERIES RECETAS CHEQUE DESPACHADAS:</strong><br>
-            {{ $despacho->series_recetas }}
-        </div>
-    @endif
+    @php
+        $totalCantidad = $despacho->items->sum('cantidad');
+    @endphp
 
-    <!-- tabla de productos extraidos -->
-    <table class="items">
-        <thead>
-            <tr>
-                <th>Producto Controlado</th>
-                <th>Lote</th>
-                <th>Vencimiento</th>
-                <th>Programa</th>
-                <th style="text-align: center;">Cantidad Extraida</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($despacho->items as $item)
-            <tr>
-                <td>{{ $item->producto }}</td>
-                <td>{{ $item->lote }}</td>
-                <td>{{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</td>
-                <td>{{ $item->programa }}</td>
-                <td style="text-align: center; font-weight: bold;">{{ number_format($item->cantidad, 0, ',', '.') }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-    <!-- firmas de responsabilidad civil y sanitaria -->
-    <table class="signatures">
+    <table class="header-table">
         <tr>
-            <!-- firma de quien despacha (q.f) -->
-            <td style="width: 50%;">
-                @if(isset($despacho->firma_despacha) && $despacho->firma_despacha)
-                    <img src="{{ $despacho->firma_despacha }}" style="max-height: 80px;" alt="Firma Despacha">
-                @else
-                    <div style="height: 80px;"></div>
-                @endif
-                <div class="signature-line">
-                    <strong>Firma Quien Despacha (Q.F)</strong><br>
-                    Bodega Central / DAS
+            <td class="logo-container">
+                <div>
+                    @php
+                        $logoPath = public_path('images/favicon4.png');
+                        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+                    @endphp
+                    @if($logoBase64)
+                        <img src="{{ $logoBase64 }}" class="logo-icon" alt="Logo">
+                    @endif
+                    <div style="display: inline-block; vertical-align: middle;">
+                        <h2 class="logo-title">DROGUERÍA COMUNAL DAS</h2>
+                        <p class="logo-subtitle">I. Municipalidad de Talcahuano · Unidad de Estupefacientes y Psicotrópicos</p>
+                        <p class="logo-address">Blanco Encalada 450, Talcahuano · Control Sanitario D.S. N° 404 / 405 MINSAL</p>
+                    </div>
                 </div>
             </td>
-            
-            <!-- firma de quien recibe -->
-            <td style="width: 50%;">
-                @if(isset($despacho->firma_recibe) && $despacho->firma_recibe)
-                    <img src="{{ $despacho->firma_recibe }}" style="max-height: 80px;" alt="Firma Recibe">
-                @else
-                    <div style="height: 80px;"></div>
-                @endif
-                <div class="signature-line">
-                    <strong>Firma Quien Recibe</strong><br>
-                    Establecimiento Destino
+            <td class="doc-meta">
+                <div class="doc-box">
+                    <p class="doc-type-label">Guía Estupefacientes {{ strtoupper($despacho->clasificacion ?? 'INTERNA') }}</p>
+                    <p class="doc-correlativo">N° {{ $despacho->correlativo }}</p>
+                    <p class="doc-date">Fecha Emisión: {{ \Carbon\Carbon::parse($despacho->fecha_despacho)->format('d/m/Y') }}</p>
                 </div>
             </td>
         </tr>
     </table>
 
-    <!-- pie de pagina -->
-    <div class="footer">
-        Documento generado automaticamente por Sistema de Inventario DAS - {{ date('d/m/Y H:i') }}
+    <div class="sanitary-banner">
+        DOCUMENTO SUJETO A FISCALIZACIÓN SANITARIA ESTRICTA · CUSTODIA EXCLUSIVA QUÍMICO FARMACÉUTICO (D.S. 404/405)
     </div>
+
+    <div class="section-header">1. Antecedentes del Establecimiento Receptor y Transporte</div>
+    <table class="info-table">
+        <tbody>
+            <tr>
+                <th>Establecimiento Destino</th>
+                <td style="font-weight: 800; color: #be123c;">{{ $despacho->establecimiento_destino }}</td>
+                <th>Clasificación</th>
+                <td>{{ strtoupper($despacho->clasificacion ?? 'Despacho Controlado') }}</td>
+            </tr>
+            <tr>
+                <th>Dirección Destino</th>
+                <td>{{ $despacho->direccion_destino ?: 'Red Comunal de Salud - Talcahuano' }}</td>
+                <th>Condición Custodia</th>
+                <td>{{ $despacho->condiciones_transporte ?: 'Valija Sellada / Custodia Directa' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    @if($despacho->series_recetas)
+        <div class="cheque-box">
+            <p class="cheque-title">Folio / Series de Recetas Cheque o Talonarios Despachados:</p>
+            <p class="cheque-content">{{ $despacho->series_recetas }}</p>
+        </div>
+    @endif
+
+    <div class="section-header">2. Detalle de Fármacos Sometidos a Control Legal</div>
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width: 6%;">#</th>
+                <th style="width: 38%; text-align: left;">Producto Controlado (Psicotrópico / Estupefaciente)</th>
+                <th style="width: 16%;">N° de Lote</th>
+                <th style="width: 14%;">Vencimiento</th>
+                <th style="width: 14%;">Programa</th>
+                <th style="width: 12%;">Cant. Extraída</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($despacho->items as $idx => $item)
+            <tr>
+                <td style="color: #881337; font-weight: bold;">{{ $idx + 1 }}</td>
+                <td class="text-left"><strong style="font-size: 10px; color: #0f172a;">{{ $item->producto }}</strong></td>
+                <td style="font-family: 'Courier New', monospace; font-weight: 700;">{{ $item->lote ?: 'S/L' }}</td>
+                <td>{{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</td>
+                <td><span class="badge">{{ $item->programa ?: 'Controlado DAS' }}</span></td>
+                <td><strong style="font-size: 10.5px; color: #be123c;">{{ number_format($item->cantidad, 0, ',', '.') }}</strong></td>
+            </tr>
+            @endforeach
+            <tr class="total-row">
+                <td colspan="5" class="total-label">TOTAL UNIDADES CONTROLADAS DESPACHADAS:</td>
+                <td class="total-amount">{{ number_format($totalCantidad, 0, ',', '.') }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="signatures-wrapper">
+        <table class="signatures-table">
+            <tr>
+                <td class="signature-box" style="width: 50%;">
+                    <div class="signature-image-container">
+                        @if(isset($despacho->firma_despacha) && $despacho->firma_despacha)
+                            <img src="{{ $despacho->firma_despacha }}" class="signature-img" alt="Firma Despacha">
+                        @endif
+                    </div>
+                    <div class="signature-line"></div>
+                    <p class="signature-title">Firma Quien Despacha (Q.F)</p>
+                    <p class="signature-subtitle">Bodega Central / DAS</p>
+                </td>
+                <td class="signature-box" style="width: 50%;">
+                    <div class="signature-image-container">
+                        @if(isset($despacho->firma_recibe) && $despacho->firma_recibe)
+                            <img src="{{ $despacho->firma_recibe }}" class="signature-img" alt="Firma Recibe">
+                        @endif
+                    </div>
+                    <div class="signature-line"></div>
+                    <p class="signature-title">Firma Quien Recibe</p>
+                    <p class="signature-subtitle">Establecimiento Destino</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        Documento oficial de Control de Estupefacientes y Psicotrópicos - Droguería Comunal DAS Talcahuano · {{ date('d/m/Y H:i') }}
+    </div>
+
+    <script type="text/php">
+        if (isset($pdf)) {
+            $text = "Página {PAGE_NUM} de {PAGE_COUNT}";
+            $size = 8;
+            $font = $fontMetrics->getFont("Helvetica");
+            $width = $fontMetrics->get_text_width($text, $font, $size);
+            $x = $pdf->get_width() - $width - 36;
+            $y = $pdf->get_height() - 28;
+            $pdf->page_text($x, $y, $text, $font, $size, array(0.53, 0.07, 0.22));
+        }
+    </script>
 </body>
 </html>

@@ -19,4 +19,14 @@ class Provider extends Model
         'address', 
         'status'
     ];
+
+    public function receptions()
+    {
+        return $this->hasMany(Reception::class, 'provider_id');
+    }
+
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'provider_id');
+    }
 }

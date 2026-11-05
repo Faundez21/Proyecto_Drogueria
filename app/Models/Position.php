@@ -16,4 +16,9 @@ class Position extends Model
     {
         return $this->belongsTo(Level::class);
     }
+
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'position_id');
+    }
 }
