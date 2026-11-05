@@ -1805,8 +1805,6 @@
             loteInput.value = option.getAttribute('data-lote') || '';
             venceInput.value = option.getAttribute('data-vence') || '';
 
-<<<<<<< HEAD
-=======
             const progSugerido = (option.getAttribute('data-programa') || '').trim();
             const progSelect = tr.querySelector('select[name="programas[]"]');
             if (progSelect && progSugerido) {
@@ -1823,7 +1821,6 @@
                 progSelect.value = matchedProg.value;
             }
 
->>>>>>> origin/cristobal
             let stock = parseInt(option.getAttribute('data-stock')) || 0;
             cantInput.setAttribute('max', stock);
             stockBadge.textContent = stock;
@@ -2361,12 +2358,6 @@
 
             // seleccionar establecimiento
             const selectEstablecimiento = document.getElementById('establecimiento_interno');
-<<<<<<< HEAD
-            const establecimientoSolicitud = solicitud.establecimiento.trim().toLowerCase();
-            const opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option =>
-                option.value.trim().toLowerCase() === establecimientoSolicitud
-            );
-=======
             const estSolicitudNorm = normText(solicitud.establecimiento);
 
             let opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option => {
@@ -2380,7 +2371,6 @@
                     return optNorm && estSolicitudNorm && (optNorm.includes(estSolicitudNorm) || estSolicitudNorm.includes(optNorm));
                 });
             }
->>>>>>> origin/cristobal
 
             if (opcionEstablecimiento) {
                 selectEstablecimiento.value = opcionEstablecimiento.value;
@@ -2396,11 +2386,7 @@
                 }
             }
 
-<<<<<<< HEAD
-            // rellenar observaciones
-=======
             // rellenar observaciones con referencia clara
->>>>>>> origin/cristobal
             const observaciones = document.querySelector('input[name="condiciones_transporte"]');
             if (observaciones) {
                 const refTexto = `Ref: Solicitud ${solicitud.numero_solicitud}${solicitud.responsable ? ' (' + solicitud.responsable + ')' : ''}`;
@@ -2431,13 +2417,6 @@
 
                 const tr = addRow();
                 const selectProducto = tr.querySelector('select[name="productos[]"]');
-<<<<<<< HEAD
-                const nombreProducto = item.product.nombre.trim().toLowerCase();
-
-                const opcionProducto = Array.from(selectProducto.options).find(option =>
-                    option.value.trim().toLowerCase() === nombreProducto
-                );
-=======
                 const itemNorm = normText(nombreItem);
 
                 let opcionProducto = Array.from(selectProducto.options).find(option =>
@@ -2450,7 +2429,6 @@
                         return optNorm && itemNorm && (optNorm.includes(itemNorm) || itemNorm.includes(optNorm));
                     });
                 }
->>>>>>> origin/cristobal
 
                 if (opcionProducto) {
                     selectProducto.value = opcionProducto.value;
@@ -2458,14 +2436,6 @@
                     // Llena la fila con lotes y límites
                     llenarDatosFila(selectProducto);
 
-<<<<<<< HEAD
-                    const cantidad = tr.querySelector('input[name="cantidades[]"]');
-                    cantidad.value = item.cantidad_solicitada;
-
-                    validarStock(cantidad);
-                } else {
-                    // si el producto no tiene stock disponible o está controlado, se elimina esta fila y lo guardamos
-=======
                     // Seleccionar programa si viene en la solicitud
                     const selectPrograma = tr.querySelector('select[name="programas[]"]');
                     if (selectPrograma && item.programa) {
@@ -2483,7 +2453,6 @@
                     }
                 } else {
                     // si el producto no tiene stock disponible, se elimina esta fila y lo guardamos
->>>>>>> origin/cristobal
                     tr.remove();
                     productosFaltantes.push(nombreItem);
                 }
@@ -2494,21 +2463,7 @@
                 addRow();
             }
 
-<<<<<<< HEAD
-            // Si la solicitud tiene una firma registrada, la dibujamos en el pad del receptor
-            if (solicitud.firma_solicitante) {
-                // signatureRecibe es la variable global que controla tu <canvas id="pad_recibe">
-                signatureRecibe.fromDataURL(solicitud.firma_solicitante);
-            } else {
-                // Si no traía firma, limpiamos por si acaso había algo dibujado antes
-                signatureRecibe.clear();
-            }
-            // -----------------------------------
-
-            // alerta para notificar que no haya stock de algun producto solicitado
-=======
             // alerta para notificar productos sin stock
->>>>>>> origin/cristobal
             if (productosFaltantes.length > 0) {
                 Swal.fire({
                     icon: 'warning',
@@ -2585,8 +2540,6 @@
             }
         }
 
-<<<<<<< HEAD
-=======
         document.addEventListener('DOMContentLoaded', function() {
             filtrarSolicitudesModal();
             const params = new URLSearchParams(window.location.search);
@@ -2595,7 +2548,6 @@
                 setTimeout(() => usarSolicitud(solIdParam), 150);
             }
         });
->>>>>>> origin/cristobal
 
         function onScanFailure(error) {}
 

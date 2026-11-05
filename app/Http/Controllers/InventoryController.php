@@ -335,21 +335,14 @@ class InventoryController extends Controller
         $request->validate([
             'estado' => 'required|in:Cuarentena,Disponible,Merma',
             'motivo' => 'nullable|string|max:1000',
-<<<<<<< HEAD
-=======
             'pasillo' => 'nullable|string|max:50',
             'estante' => 'nullable|string|max:50',
             'nivel' => 'nullable|string|max:100',
             'posicion' => 'nullable|string|max:100',
->>>>>>> origin/cristobal
         ]);
 
         $inventory = Inventory::findOrFail($id);
         $estadoAnterior = $inventory->estado;
-<<<<<<< HEAD
-
-        $data = $request->only(['estado', 'motivo']);
-=======
         $pasilloAnterior = $inventory->pasillo;
         $estanteAnterior = $inventory->estante;
         $nivelAnterior = $inventory->nivel;
@@ -397,7 +390,6 @@ class InventoryController extends Controller
             }
         }
 
->>>>>>> origin/cristobal
         $data['user_id'] = Auth::id();
 
         // Resolver relaciones foráneas de ubicación física
@@ -405,11 +397,6 @@ class InventoryController extends Controller
 
         $inventory->update($data);
 
-<<<<<<< HEAD
-        // Registrar el movimiento solo cuando cambia el estado
-        if ($estadoAnterior !== $inventory->estado) {
-            StockMovement::create([
-=======
         $cambioUbicacion = ($inventory->pasillo ?? '') !== ($pasilloAnterior ?? '')
             || ($inventory->estante ?? '') !== ($estanteAnterior ?? '')
             || ($inventory->nivel ?? '') !== ($nivelAnterior ?? '')
@@ -434,7 +421,6 @@ class InventoryController extends Controller
             StockMovement::create([
                 'inventory_id' => $inventory->id,
                 'user_id' => Auth::id(),
->>>>>>> origin/cristobal
                 'producto' => $inventory->producto,
                 'lote' => $inventory->lote,
                 'fecha_vencimiento' => $inventory->fecha_vencimiento,
@@ -442,19 +428,6 @@ class InventoryController extends Controller
                 'cantidad' => $inventory->cantidad,
                 'fecha_hora' => now(),
                 'origen_destino' => 'Desde: ' . $estadoAnterior . ' / Hacia: ' . $inventory->estado,
-<<<<<<< HEAD
-                'documento_respaldo' => 'Gestión de inventario',
-                'estado_lote' => $inventory->estado,
-            ]);
-        }
-
-        if ($data['estado'] == 'Cuarentena') {
-            $mensaje = 'El lote ha sido bloqueado y enviado a cuarentena.';
-        } elseif ($data['estado'] == 'Merma') {
-            $mensaje = 'El lote ha sido declarado como Merma.';
-        } else {
-            $mensaje = 'El lote ha sido liberado exitosamente.';
-=======
                 'documento_respaldo' => $request->filled('motivo') ? $request->input('motivo') : 'Gestión de inventario',
                 'estado_lote' => $inventory->estado,
             ]);
@@ -472,7 +445,6 @@ class InventoryController extends Controller
                 'documento_respaldo' => 'Ordenamiento en bodega',
                 'estado_lote' => $inventory->estado,
             ]);
->>>>>>> origin/cristobal
         }
 
         // Determinar tipo de movimiento y mensaje contextual
@@ -582,17 +554,12 @@ class InventoryController extends Controller
             'excel.max' => 'El archivo supera el tamaño máximo permitido de 20 MB.',
         ]);
 
-<<<<<<< HEAD
-        try {
-            Excel::import(new \App\Imports\InventoriesImport(Auth::id()), $request->file('excel'));
-=======
         if ($validator->fails()) {
             return redirect()->back()
                 ->with('open_modal', 'import')
                 ->with('import_error_title', 'Error de Validación del Archivo')
                 ->with('error', $validator->errors()->first('excel'));
         }
->>>>>>> origin/cristobal
 
         // 3. Detectar si el archivo exacto ya fue importado (por Hash SHA-256)
         // Si la tabla de inventario está vacía (ej. tras limpiar datos de prueba), reiniciar historial de hashes
