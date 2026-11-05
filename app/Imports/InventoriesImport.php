@@ -88,14 +88,11 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
 
         $cantidadRaw = $row['cantidad'] ?? null;
         if ($cantidadRaw === null || trim((string) $cantidadRaw) === '') {
-            $cantidad = 1;
+            $cantidad = 0;
         } else {
             $cantidad = $this->entero($cantidadRaw);
             if ($cantidad === null || $cantidad < 0) {
-                throw new \RuntimeException("Fila N° " . ($this->registro + 1) . " ({$producto}): La CANTIDAD debe ser un número válido.");
-            }
-            if ($cantidad === 0) {
-                $cantidad = 1;
+                $cantidad = 0;
             }
         }
 
@@ -391,20 +388,25 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
     private function entero(mixed $valor): ?int
     {
         if ($valor === null || trim((string) $valor) === '') {
-            return null;
+            return 0;
         }
 
         if (is_numeric($valor)) {
-            return (int) floor((float) $valor);
+            $num = (int) floor((float) $valor);
+            // Evitar que códigos concatenados por error en Excel (> 50 millones) inflen el inventario
+            return ($num >= 0 && $num <= 50000000) ? $num : 0;
         }
 
-        // Soportar separadores de miles o unidades (ej: '1.500', '500 uds')
-        $limpio = preg_replace('/[^\d\-]/', '', str_replace('.', '', (string) $valor));
-        if ($limpio !== '' && is_numeric($limpio)) {
-            return (int) $limpio;
+        $str = trim((string) $valor);
+
+        // Soportar únicamente formato numérico con separador de miles válido (ej: '1.500', '12.000')
+        if (preg_match('/^\d{1,3}(\.\d{3})+$/', $str)) {
+            $num = (int) str_replace('.', '', $str);
+            return ($num >= 0 && $num <= 50000000) ? $num : 0;
         }
 
-        return null;
+        // Si la celda contiene texto o varios números separados (que Excel ignora en AUTOSUMA), contar como 0
+        return 0;
     }
 
     private function decimal(mixed $valor): ?float
