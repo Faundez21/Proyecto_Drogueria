@@ -9,6 +9,7 @@ class EstablishmentItem extends Model
     protected $fillable = [
         'establishment_request_id',
         'product_id',
+        'programa',
         'consumo_anterior',
         'stock_actual',
         'cantidad_solicitada',

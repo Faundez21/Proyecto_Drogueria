@@ -14,10 +14,29 @@ class Product extends Model
         'nombre',
     ];
 
-    // Relación con ReceptionItems (opcional pero recomendada para el futuro)
     public function receptionItems()
     {
         return $this->hasMany(ReceptionItem::class, 'product_id');
+    }
+
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'product_id');
+    }
+
+    public function establishmentItems()
+    {
+        return $this->hasMany(EstablishmentItem::class, 'product_id');
+    }
+
+    public function dispatchItems()
+    {
+        return $this->hasMany(DispatchItem::class, 'product_id');
+    }
+
+    public function controlledDispatchItems()
+    {
+        return $this->hasMany(ControlledDispatchItem::class, 'product_id');
     }
 
 }

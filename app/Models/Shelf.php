@@ -13,7 +13,8 @@ class Shelf extends Model
         'aisle_id',
         'pos_x',
         'pos_z',
-        'rotation'
+        'rotation',
+        'capacidad'
     ];
 
     // relacion una estantería pertenece a un pasillo
@@ -24,5 +25,10 @@ class Shelf extends Model
     public function levels()
     {
         return $this->hasMany(Level::class);
+    }
+
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'shelf_id');
     }
 }

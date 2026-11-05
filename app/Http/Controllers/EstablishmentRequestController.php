@@ -1,38 +1,190 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Product;
+
+use App\Models\EstablishmentItem;
 use App\Models\EstablishmentRequest;
+use App\Models\Product;
+use App\Models\User;
+use App\Services\InventoryService;
+use App\Services\SolicitudService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EstablishmentRequestController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
+        InventoryService::sincronizarProductosDesdeInventario();
+        $controlados = InventoryService::controlados();
+        $metadatos = InventoryService::mapaMetadatosProductos();
+
+        // Solo Medicamentos e Insumos (sin estupefacientes)
+        $products = Product::whereNotIn('nombre', $controlados)
+            ->orderBy('nombre')
+            ->get()
+            ->filter(function ($prod) use ($metadatos) {
+                $key = mb_strtolower(trim($prod->nombre));
+                $cat = $metadatos['categoriasPorId'][(int) $prod->id] ?? ($metadatos['categoriasPorNombre'][$key] ?? null);
+
+                return InventoryService::clasificarGrupoProducto($prod->nombre, $cat) !== 'Estupefacientes';
+            })
+            ->values();
+
+        foreach ($products as $prod) {
+            $key = mb_strtolower(trim($prod->nombre));
+            $cat = $metadatos['categoriasPorId'][(int) $prod->id] ?? ($metadatos['categoriasPorNombre'][$key] ?? null);
+            $prog = $metadatos['programasPorId'][(int) $prod->id] ?? ($metadatos['programasPorNombre'][$key] ?? '');
+            $prod->categoria_sugerida = $cat ?: InventoryService::clasificarGrupoProducto($prod->nombre, $cat);
+            $prod->programa_sugerido = $prog;
+        }
+
+        // Solo establecimientos que NO son CESFAM
+        $establecimientos = array_values(array_filter(
+            InventoryService::establecimientos(),
+            fn (array $est) => ($est['tipo'] ?? '') !== 'CESFAM'
+        ));
+
+        $nombresEstablecimientos = array_column($establecimientos, 'nombre');
+        $nombresHistoricos = [
+            'CECOSF Centinela',
+            'CECOSF CENTINELA',
+            'CECOSF Villa Centinela',
+            'CECOSF VILLA CENTINELA',
+            'CECOSF Los Lobos - La Gloria',
+            'CECOSF LOS LOBOS - LA GLORIA',
+            'CECOSF Los Lobos-La Gloria',
+            'CECOSF LOS LOBOS-LA GLORIA',
+            'Posta Tumbe',
+            'POSTA TUMBE',
+            'Posta Rural Tumbes',
+            'POSTA RURAL TUMBES',
+            'CECOSF Libertad Gaete',
+            'CECOSF LIBERTAD GAETE',
+            'CECOSF Libertad-Gaete',
+            'CECOSF LIBERTAD-GAETE',
+        ];
+        $nombresEstablecimientosQuery = array_values(array_unique(array_merge($nombresEstablecimientos, $nombresHistoricos)));
+
+        // Inventario propio de los Establecimientos registrado en las solicitudes
+        $inventarioSolicitudes = EstablishmentItem::with(['request', 'product'])
+            ->whereHas('request', fn ($q) => $q->whereIn('establecimiento', $nombresEstablecimientosQuery))
+            ->whereHas('product', fn ($q) => $q->whereNotIn('nombre', $controlados))
+            ->orderByDesc('id')
+            ->get();
+
+        $productosLista = $products->pluck('nombre')
+            ->merge($inventarioSolicitudes->map(fn ($item) => $item->product->nombre ?? null))
+            ->filter()
+            ->unique()
+            ->sort(SORT_NATURAL)
+            ->values();
+
+        $programasLista = InventoryService::programasLista($inventarioSolicitudes->pluck('programa'));
+        $categoriasLista = InventoryService::categoriasLista(false);
+
+        $consumoMapa = SolicitudService::mapaConsumoYStock($nombresEstablecimientosQuery);
+
+        return view('requests.index', compact(
+            'products',
+            'controlados',
+            'establecimientos',
+            'inventarioSolicitudes',
+            'productosLista',
+            'programasLista',
+            'categoriasLista',
+            'consumoMapa'
+        ));
+    }
+
+    public function cesfam()
+    {
+        InventoryService::sincronizarProductosDesdeInventario();
+        $controlados = InventoryService::controlados();
+        $metadatos = InventoryService::mapaMetadatosProductos();
+
+        // Medicamentos, insumos y estupefacientes
         $products = Product::orderBy('nombre')->get();
 
-        return view('requests.index', compact('products'));
-    }
-    public function show(EstablishmentRequest $establishmentRequest)
-    {
-        //
+        foreach ($products as $prod) {
+            $key = mb_strtolower(trim($prod->nombre));
+            $cat = $metadatos['categoriasPorId'][(int) $prod->id] ?? ($metadatos['categoriasPorNombre'][$key] ?? null);
+            $prog = $metadatos['programasPorId'][(int) $prod->id] ?? ($metadatos['programasPorNombre'][$key] ?? '');
+            $prod->categoria_sugerida = $cat ?: InventoryService::clasificarGrupoProducto($prod->nombre, $cat);
+            $prod->programa_sugerido = $prog;
+        }
+
+        // Solo establecimientos tipo CESFAM
+        $establecimientos = array_values(array_filter(
+            InventoryService::establecimientos(),
+            fn (array $est) => ($est['tipo'] ?? '') === 'CESFAM'
+        ));
+
+        $nombresCesfam = array_column($establecimientos, 'nombre');
+        $nombresCesfamHistoricos = [
+            'CESFAM Los Cerros',
+            'CESFAM LOS CERROS',
+            'CESFAM Paulina Avendaño',
+            'CESFAM PAULINA AVENDAÑO',
+            'CESFAM Paulina Avendaño Pereda',
+            'CESFAM PAULINA AVENDAÑO PEREDA',
+            'CESFAM San Vicente',
+            'CESFAM SAN VICENTE',
+            'CESFAM Leocan Portus',
+            'CESFAM LEOCAN PORTUS',
+            'CESFAM Alcalde Leocán Portus Govinden',
+            'CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN',
+        ];
+        $nombresCesfamQuery = array_values(array_unique(array_merge($nombresCesfam, $nombresCesfamHistoricos)));
+
+        // Inventario propio de los CESFAM registrado en las solicitudes
+        $inventarioSolicitudes = EstablishmentItem::with(['request', 'product'])
+            ->whereHas('request', fn ($q) => $q->whereIn('establecimiento', $nombresCesfamQuery))
+            ->orderByDesc('id')
+            ->get();
+
+        $productosLista = $products->pluck('nombre')
+            ->merge($inventarioSolicitudes->map(fn ($item) => $item->product->nombre ?? null))
+            ->filter()
+            ->unique()
+            ->sort(SORT_NATURAL)
+            ->values();
+
+        $programasLista = InventoryService::programasLista($inventarioSolicitudes->pluck('programa'));
+        $categoriasLista = InventoryService::categoriasLista(true);
+
+        $consumoMapa = SolicitudService::mapaConsumoYStock($nombresCesfamQuery);
+
+        return view('requests.cesfam', compact(
+            'products',
+            'controlados',
+            'establecimientos',
+            'inventarioSolicitudes',
+            'productosLista',
+            'programasLista',
+            'categoriasLista',
+            'consumoMapa'
+        ));
     }
 
     public function store(Request $request)
     {
+        $nombresEstablecimientos = array_column(InventoryService::establecimientos(), 'nombre');
+
         $validated = $request->validate([
-            'establecimiento' => 'required|string',
+            'tipo_vista' => 'nullable|string|in:establecimientos,cesfam',
+            'establecimiento' => ['required', 'string', Rule::in($nombresEstablecimientos)],
             'fecha_solicitud' => 'required|date',
             'responsable' => 'required|string',
             'cargo' => 'nullable|string',
             'observaciones' => 'nullable|string',
-            'firma_recibe' => 'nullable|string',
+            'firma_recibe' => 'required|string',
 
             'producto' => 'required|array',
             'producto.*' => 'required|integer|exists:products,id',
+
+            'programa' => 'nullable|array',
+            'programa.*' => 'nullable|string',
 
             'consumo_anterior' => 'nullable|array',
             'consumo_anterior.*' => 'nullable|integer|min:0',
@@ -42,7 +194,22 @@ class EstablishmentRequestController extends Controller
 
             'cantidad_solicitada' => 'required|array',
             'cantidad_solicitada.*' => 'required|integer|min:1',
+        ], [
+            'firma_recibe.required' => 'Debes firmar la solicitud antes de enviarla.',
         ]);
+
+        $esCesfam = InventoryService::esCesfam($validated['establecimiento']);
+
+        // Solo los CESFAM pueden solicitar estupefacientes
+        foreach ($validated['producto'] as $productId) {
+            $nombre = Product::find($productId)->nombre ?? '';
+
+            if (InventoryService::esControlado($nombre) && (! $esCesfam || ($validated['tipo_vista'] ?? '') === 'establecimientos')) {
+                return back()
+                    ->with('error', "El establecimiento '{$validated['establecimiento']}' solo puede solicitar medicamentos e insumos no estupefacientes.")
+                    ->withInput();
+            }
+        }
 
         $establishmentRequest = EstablishmentRequest::create([
             'establecimiento' => $validated['establecimiento'],
@@ -59,32 +226,117 @@ class EstablishmentRequestController extends Controller
             'numero_solicitud' => '#' . str_pad($establishmentRequest->id, 5, '0', STR_PAD_LEFT),
         ]);
 
+        $itemsResumen = [];
         foreach ($validated['producto'] as $index => $productId) {
+            $consumoVal = $validated['consumo_anterior'][$index] ?? null;
+            if ($consumoVal === null || $consumoVal === '') {
+                $consumoVal = SolicitudService::calcularConsumoAnterior($validated['establecimiento'], (int) $productId);
+            }
+
+            $product = Product::find($productId);
+            $nombreProd = $product ? $product->nombre : "Producto #{$productId}";
+
             $establishmentRequest->items()->create([
                 'product_id' => $productId,
-                'consumo_anterior' => $validated['consumo_anterior'][$index] ?? null,
-                'stock_actual' => $validated['stock_actual'][$index],
-                'cantidad_solicitada' => $validated['cantidad_solicitada'][$index],
+                'programa' => $validated['programa'][$index] ?? null,
+                'consumo_anterior' => (int) $consumoVal,
+                'stock_actual' => (int) $validated['stock_actual'][$index],
+                'cantidad_solicitada' => (int) $validated['cantidad_solicitada'][$index],
                 'cantidad_despachada' => 0,
+            ]);
+
+            $itemsResumen[] = [
+                'producto' => $nombreProd,
+                'programa' => !empty($validated['programa'][$index]) ? $validated['programa'][$index] : 'General',
+                'consumo_anterior' => (int) $consumoVal,
+                'stock_actual' => (int) $validated['stock_actual'][$index],
+                'cantidad_solicitada' => (int) $validated['cantidad_solicitada'][$index],
+            ];
+        }
+
+        $rutaRetorno = ($validated['tipo_vista'] ?? '') === 'cesfam' || $esCesfam
+            ? 'requests.cesfam'
+            : 'requests.index';
+
+        $solicitudDetail = [
+            'numero_solicitud' => $establishmentRequest->numero_solicitud,
+            'establecimiento' => $validated['establecimiento'],
+            'tipo' => $esCesfam ? 'CESFAM' : 'Establecimiento de Salud',
+            'fecha_solicitud' => date('d/m/Y', strtotime($validated['fecha_solicitud'])),
+            'responsable' => $validated['responsable'],
+            'cargo' => $validated['cargo'] ?? 'N/A',
+            'observaciones' => $validated['observaciones'] ?? '',
+            'total_items' => count($itemsResumen),
+            'total_unidades' => array_sum(array_column($itemsResumen, 'cantidad_solicitada')),
+            'items' => $itemsResumen,
+        ];
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'ok' => true,
+                'message' => "Solicitud {$establishmentRequest->numero_solicitud} registrada exitosamente para {$validated['establecimiento']}.",
+                'detail' => $solicitudDetail,
             ]);
         }
 
         return redirect()
-            ->route('requests.index')
-            ->with('success', 'Solicitud registrada exitosamente.');
-    }
-    public function edit(EstablishmentRequest $establishmentRequest)
-    {
-        //
+            ->route($rutaRetorno)
+            ->with('success', "Solicitud {$establishmentRequest->numero_solicitud} registrada exitosamente para {$validated['establecimiento']}.")
+            ->with('solicitud_success_detail', $solicitudDetail);
     }
 
-    public function update(Request $request, EstablishmentRequest $establishmentRequest)
+    /**
+     * Permite al Administrador asignar o desasignar una solicitud a un trabajador desde Despacho,
+     * recalculando automáticamente el estado de la solicitud (Pendiente <-> Asignada / Parcial / Despachado).
+     */
+    public function assign(Request $request, EstablishmentRequest $establishmentRequest)
     {
-        //
-    }
+        $validated = $request->validate([
+            'assigned_user_id' => 'nullable|integer|exists:users,id',
+        ]);
 
-    public function destroy(EstablishmentRequest $establishmentRequest)
-    {
-        //
+        $userId = $validated['assigned_user_id'] ?? null;
+
+        if ($userId) {
+            $candidateUser = User::find($userId);
+            if (!$candidateUser || (!$candidateUser->hasRole('Administrador') && !$candidateUser->can('ver.despacho') && !$candidateUser->can('ver.despacho_controlado'))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El usuario seleccionado no cuenta con permisos para operar en los módulos de Despacho.',
+                ], 422);
+            }
+        }
+
+        $establishmentRequest->update([
+            'assigned_user_id' => $userId,
+            'assigned_at' => $userId ? now() : null,
+        ]);
+
+        $nuevoEstado = SolicitudService::actualizarEstado($establishmentRequest->id);
+        $establishmentRequest->load('assignedUser');
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'id' => $establishmentRequest->id,
+                'numero_solicitud' => $establishmentRequest->numero_solicitud,
+                'estado' => $nuevoEstado,
+                'assigned_user_id' => $establishmentRequest->assigned_user_id,
+                'assigned_user_name' => $establishmentRequest->assignedUser
+                    ? trim($establishmentRequest->assignedUser->name . ' ' . ($establishmentRequest->assignedUser->last_name ?? ''))
+                    : null,
+                'assigned_at' => $establishmentRequest->assigned_at?->format('d/m/Y H:i'),
+                'message' => $userId
+                    ? "Solicitud {$establishmentRequest->numero_solicitud} asignada a " . trim($establishmentRequest->assignedUser->name . ' ' . ($establishmentRequest->assignedUser->last_name ?? '')) . '.'
+                    : "Solicitud {$establishmentRequest->numero_solicitud} quedó sin asignar.",
+            ]);
+        }
+
+        return back()->with(
+            'success',
+            $userId
+                ? "Solicitud {$establishmentRequest->numero_solicitud} asignada correctamente."
+                : "Asignación removida de la solicitud {$establishmentRequest->numero_solicitud}."
+        );
     }
 }

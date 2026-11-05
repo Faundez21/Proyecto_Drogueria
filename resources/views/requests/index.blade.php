@@ -1,9 +1,25 @@
 @extends('layouts.app')
 
-@section('title', 'Solicitudes')
-@section('subtitle', 'Registro y gestión de solicitudes de establecimientos.')
+@section('title', 'Solicitudes Establecimientos')
+@section('subtitle', 'Registro y gestión de solicitudes de medicamentos e insumos para establecimientos.')
 
+<<<<<<< HEAD
 
+=======
+@section('actions')
+    @role('Administrador')
+        <button type="button" onclick="openRequestInventoryModal()"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
+            <svg class="w-4 h-4 text-teal-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                </path>
+            </svg>
+            Ver Inventario Establecimientos
+        </button>
+    @endrole
+@endsection
+>>>>>>> origin/cristobal
 
 @section('content')
     <!-- migas de pan -->
@@ -13,17 +29,53 @@
         <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
         </svg>
-        <span class="font-semibold text-slate-800">Solicitudes</span>
+        <span class="font-semibold text-slate-800">Solicitudes Establecimientos</span>
     </div>
 
     <div class="space-y-6">
 
         <!-- notificacion de exito -->
         @if (session('success'))
-            <div class="p-4 mb-4 text-sm text-teal-800 rounded-xl bg-teal-50 border border-teal-200 font-medium shadow-sm"
+            <div class="p-4 mb-4 text-sm text-teal-800 rounded-xl bg-teal-50 border border-teal-200 font-medium shadow-sm flex items-center justify-between"
                 role="alert">
-                {{ session('success') }}
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>{{ session('success') }}</span>
+                </div>
             </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Solicitud Registrada con Éxito!',
+                            html: `<p class="text-sm text-slate-600 font-medium">{{ session('success') }}</p>`,
+                            confirmButtonColor: '#0d9488',
+                            confirmButtonText: 'Aceptar',
+                            timer: 5000,
+                            timerProgressBar: true
+                        });
+                    }
+                });
+            </script>
+        @endif
+
+        @if ($errors->any())
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Verifique los datos de la solicitud',
+                            html: `<ul class="text-left text-xs space-y-1 text-rose-700">@foreach ($errors->all() as $error)<li>• {{ $error }}</li>@endforeach</ul>`,
+                            confirmButtonColor: '#e11d48',
+                            confirmButtonText: 'Entendido'
+                        });
+                    }
+                });
+            </script>
         @endif
 
         <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
@@ -33,10 +85,10 @@
                 class="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h2 class="text-[15px] font-bold text-slate-800">
-                        Registro de Solicitud
+                        Registro de Solicitud de Establecimiento
                     </h2>
                     <p class="text-[12px] text-slate-500 mt-0.5">
-                        Complete los datos del establecimiento y los productos requeridos.
+                        Complete los datos del establecimiento y los medicamentos o insumos requeridos.
                     </p>
                 </div>
             </div>
@@ -44,6 +96,7 @@
             <!-- formulario principal -->
             <form action="{{ route('requests.store') }}" method="POST" class="divide-y divide-slate-100" id="requestForm">
                 @csrf
+                <input type="hidden" name="tipo_vista" value="establecimientos">
 
                 <!-- seccion 1: establecimiento -->
                 <div class="p-6">
@@ -61,7 +114,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-                        <div class="lg:col-span-2">
+                        <div class="lg:col-span-3">
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                 Establecimiento <span class="text-rose-500">*</span>
                             </label>
@@ -69,13 +122,9 @@
                             <select name="establecimiento" id="establecimiento_select" required
                                 class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione establecimiento...</option>
-                                <option value="CECOSF Centinela">CECOSF Centinela</option>
-                                <option value="CECOSF San Vicente">CECOSF San Vicente</option>
-                                <option value="CECOSF Esmeralda">CECOSF Esmeralda</option>
-                                <option value="CECOSF Los Lobos">CECOSF Los Lobos</option>
-                                <option value="CECOSF Libertad">CECOSF Libertad</option>
-                                <option value="CESFAM San Vicente">CESFAM San Vicente</option>
-                                <option value="Posta Rural">Posta Rural</option>
+                                @foreach ($establecimientos as $est)
+                                    <option value="{{ $est['nombre'] }}">{{ $est['nombre'] }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -88,12 +137,13 @@
                                 class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                         </div>
 
-                        <div>
+                        <!-- N° Solicitud oculto pero funcional -->
+                        <div class="hidden">
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                 N° Solicitud
                             </label>
 
-                            <input type="text" value="#00001" readonly
+                            <input type="text" name="numero_solicitud" value="#00001" readonly
                                 class="w-full bg-slate-100 border border-slate-200 text-teal-700 font-bold rounded-lg block py-2.5 px-3.5 text-[13px] cursor-not-allowed">
                         </div>
 
@@ -129,12 +179,12 @@
                             </svg>
 
                             <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">
-                                2. Productos Solicitados
+                                2. Productos Solicitados (Medicamentos e Insumos)
                             </h3>
                         </div>
 
                         <button type="button" id="btn_add_product"
-                            class="text-xs font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md transition-colors border border-teal-200">
+                            class="text-xs font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md transition-colors border border-teal-200 cursor-pointer">
                             + Agregar Producto
                         </button>
                     </div>
@@ -145,7 +195,7 @@
                         <div class="producto-item relative border border-slate-200 bg-white p-4 rounded-xl shadow-sm">
 
                             <button type="button"
-                                class="btn-remove-product hidden absolute top-3 right-3 text-slate-400 hover:text-rose-600 transition-colors"
+                                class="btn-remove-product hidden absolute top-3 right-3 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                                 title="Eliminar fila">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -154,26 +204,22 @@
                                 </svg>
                             </button>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Programa <span class="text-rose-500">*</span>
                                     </label>
 
                                     <select name="programa[]" required
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-programa">
                                         <option value="" disabled selected>
                                             Seleccione...
                                         </option>
-                                        <option value="Morbilidad General">
-                                            Morbilidad General
-                                        </option>
-                                        <option value="Cardiovascular">
-                                            Cardiovascular
-                                        </option>
-                                        <option value="IRA/ERA">
-                                            IRA/ERA
-                                        </option>
+                                        @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
+                                            <option value="{{ $progOpt }}">
+                                                {{ $progOpt }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="lg:col-span-2">
@@ -182,29 +228,41 @@
                                     </label>
 
                                     <select name="producto[]" required
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-producto">
 
                                         <option value="" disabled selected>
-                                            Buscar producto...
+                                            Buscar medicamento o insumo...
                                         </option>
 
-                                        @foreach ($products as $product)
-                                            <option value="{{ $product->id }}">
-                                                {{ $product->nombre }}
-                                            </option>
-                                        @endforeach
+                                        <optgroup label="Medicamentos e Insumos">
+                                            @foreach ($products as $product)
+                                                <option value="{{ $product->id }}"
+                                                    data-programa="{{ $product->programa_sugerido ?? '' }}"
+                                                    data-categoria="{{ $product->categoria_sugerida ?? '' }}">
+                                                    {{ $product->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
 
                                     </select>
                                 </div>
 
-                                <div>
+                                <div class="hidden">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Consumo mensual del mes anterior <span class="text-rose-500">*</span>
                                     </label>
 
+<<<<<<< HEAD
                                     <input type="number" name="stock_actual[]" min="1" required
                                         placeholder="Ej: 500"
                                         class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold">
+=======
+                                    <input type="number" name="consumo_anterior[]" min="0" readonly
+                                        value="0"
+                                        placeholder="Se calculará automáticamente"
+                                        class="w-full bg-slate-100 border border-slate-200 text-slate-700 rounded-lg py-2.5 px-3.5 text-[13px] font-bold cursor-not-allowed input-consumo-anterior">
+                                    <span class="block text-[10.5px] text-slate-400 mt-1 info-consumo-anterior">Calculado según despachos del mes anterior</span>
+>>>>>>> origin/cristobal
                                 </div>
 
                                 <div>
@@ -212,9 +270,10 @@
                                         Cantidad en stock actualmente <span class="text-rose-500">*</span>
                                     </label>
 
-                                    <input type="number" name="stock_actual[]" min="1" required
+                                    <input type="number" name="stock_actual[]" min="0" required
                                         placeholder="Ej: 20"
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold">
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold input-stock-actual">
+                                    <span class="block text-[10.5px] text-teal-600 font-medium mt-1 hidden info-ultimo-stock"></span>
                                 </div>
 
                                 <div>
@@ -289,7 +348,7 @@
                         </div>
 
                         <button type="button" onclick="signatureRecibe.clear()"
-                            class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500 transition-colors">
+                            class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500 transition-colors cursor-pointer">
                             Limpiar Firma
                         </button>
                     </div>
@@ -342,12 +401,12 @@
                     class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3">
 
                     <button type="reset" id="btn_limpiar"
-                        class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-100 transition-colors shadow-sm">
+                        class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-100 transition-colors shadow-sm cursor-pointer">
                         Limpiar Formulario
                     </button>
 
                     <button type="submit"
-                        class="w-full sm:w-auto px-5 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 flex items-center justify-center gap-2 transition-all shadow-sm">
+                        class="w-full sm:w-auto px-5 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer">
 
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M5 13l4 4L19 7">
@@ -362,16 +421,21 @@
         </div>
     </div>
 
+    @include('requests.partials.inventory_modal', [
+        'modalTitle' => 'Inventario de Establecimientos (Solicitudes)',
+        'modalSubtitle' => 'Directorio de medicamentos e insumos declarados por los establecimientos en sus solicitudes.',
+        'esVistaCesfam' => false,
+    ])
+
     <!-- libreria para las firmas -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 
     <script>
-        // instancias de firmas para que sean globales en la vista
         let signatureRecibe = null;
+        const consumoMapa = @json($consumoMapa ?? []);
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            // inicializar firma
             const padRecibeElem = document.getElementById('pad_recibe');
 
             const padOptions = {
@@ -381,10 +445,84 @@
 
             signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
 
-            // contenedor de productos
             const container = document.getElementById('productos_container');
+            const establecimientoSelect = document.getElementById('establecimiento_select');
 
-            // actualizar resumen
+            function actualizarConsumoFila(itemRow) {
+                const est = (establecimientoSelect?.value || '').trim();
+                const prodSelect = itemRow.querySelector('.select-producto');
+                const prodId = prodSelect ? prodSelect.value : '';
+                const progSelect = itemRow.querySelector('select[name="programa[]"]');
+                const inputConsumo = itemRow.querySelector('input[name="consumo_anterior[]"]');
+                const infoConsumo = itemRow.querySelector('.info-consumo-anterior');
+                const infoStock = itemRow.querySelector('.info-ultimo-stock');
+
+                if (prodSelect && progSelect && prodSelect.selectedIndex >= 0) {
+                    const selectedOpt = prodSelect.options[prodSelect.selectedIndex];
+                    const progSugerido = (selectedOpt?.getAttribute('data-programa') || '').trim();
+                    if (progSugerido) {
+                        let matchedProg = Array.from(progSelect.options).find(
+                            o => o.value && o.value.toLowerCase() === progSugerido.toLowerCase()
+                        );
+                        if (!matchedProg) {
+                            const newOpt = document.createElement('option');
+                            newOpt.value = progSugerido;
+                            newOpt.textContent = progSugerido;
+                            progSelect.appendChild(newOpt);
+                            matchedProg = newOpt;
+                        }
+                        progSelect.value = matchedProg.value;
+                    }
+                }
+
+                if (!inputConsumo) return;
+
+                if (!est || !prodId) {
+                    inputConsumo.value = 0;
+                    if (infoConsumo) infoConsumo.textContent = 'Seleccione establecimiento y producto';
+                    if (infoStock) {
+                        infoStock.classList.add('hidden');
+                        infoStock.textContent = '';
+                    }
+                    return;
+                }
+
+                const datos = (consumoMapa[est] && consumoMapa[est][prodId]) ? consumoMapa[est][prodId] : null;
+                const consumo = datos ? (parseInt(datos.consumo_anterior) || 0) : 0;
+                inputConsumo.value = consumo;
+
+                if (infoConsumo) {
+                    infoConsumo.textContent = consumo > 0
+                        ? `Consumo anterior registrado: ${consumo} uds.`
+                        : 'Sin despachos el mes anterior (0 uds.)';
+                }
+
+                if (infoStock) {
+                    if (datos && datos.ultimo_stock !== null && datos.ultimo_stock !== undefined) {
+                        infoStock.textContent = `Último stock declarado: ${datos.ultimo_stock} uds.`;
+                        infoStock.classList.remove('hidden');
+                    } else {
+                        infoStock.classList.add('hidden');
+                        infoStock.textContent = '';
+                    }
+                }
+            }
+
+            function actualizarTodosLosConsumos() {
+                container.querySelectorAll('.producto-item').forEach(item => actualizarConsumoFila(item));
+            }
+
+            if (establecimientoSelect) {
+                establecimientoSelect.addEventListener('change', actualizarTodosLosConsumos);
+            }
+
+            container.querySelectorAll('.select-producto').forEach(sel => {
+                sel.addEventListener('change', function() {
+                    const row = sel.closest('.producto-item');
+                    if (row) actualizarConsumoFila(row);
+                });
+            });
+
             function actualizarResumen() {
                 const items = container.querySelectorAll('.producto-item');
                 let totalUnidades = 0;
@@ -401,24 +539,28 @@
                 document.getElementById('total_unidades').innerText = totalUnidades;
             }
 
-            // actualizar resumen al cambiar cantidades
             document.querySelectorAll('input[name="cantidad_solicitada[]"]').forEach(input => {
                 input.addEventListener('input', actualizarResumen);
             });
 
-            // agregar producto
             document.getElementById('btn_add_product').addEventListener('click', function() {
 
                 const firstItem = container.querySelector('.producto-item');
                 const clone = firstItem.cloneNode(true);
 
                 clone.querySelectorAll('input').forEach(input => {
-                    input.value = '';
+                    input.value = input.name === 'consumo_anterior[]' ? '0' : '';
                 });
 
                 clone.querySelectorAll('select').forEach(select => {
                     select.selectedIndex = 0;
                 });
+
+                const infoStock = clone.querySelector('.info-ultimo-stock');
+                if (infoStock) {
+                    infoStock.classList.add('hidden');
+                    infoStock.textContent = '';
+                }
 
                 const btnRemove = clone.querySelector('.btn-remove-product');
 
@@ -429,15 +571,23 @@
                     actualizarResumen();
                 });
 
-                clone.querySelector('input[name="cantidad[]"]')
-                    .addEventListener('input', actualizarResumen);
+                const inputCant = clone.querySelector('input[name="cantidad_solicitada[]"]');
+                if (inputCant) {
+                    inputCant.addEventListener('input', actualizarResumen);
+                }
+
+                const selectProd = clone.querySelector('.select-producto');
+                if (selectProd) {
+                    selectProd.addEventListener('change', function() {
+                        actualizarConsumoFila(clone);
+                    });
+                }
 
                 container.appendChild(clone);
-
+                actualizarConsumoFila(clone);
                 actualizarResumen();
             });
 
-            // limpiar formulario
             document.getElementById('btn_limpiar').addEventListener('click', function() {
 
                 const items = container.querySelectorAll('.producto-item');
@@ -448,9 +598,13 @@
 
                 signatureRecibe.clear();
 
-                actualizarResumen();
+                setTimeout(() => {
+                    actualizarTodosLosConsumos();
+                    actualizarResumen();
+                }, 10);
             });
 
+<<<<<<< HEAD
             document.getElementById('requestForm').addEventListener('submit', function(e) {
                 if (signatureRecibe.isEmpty()) {
                     e.preventDefault();
@@ -460,6 +614,179 @@
 
                 document.getElementById('firma_recibe_input').value =
                     signatureRecibe.toDataURL('image/png');
+=======
+            function mostrarSweetAlertSolicitudExitosa(solData, recargarAlCerrar = false) {
+                if (!solData) return;
+
+                const htmlDetail = `
+                    <div class="text-left text-xs text-slate-700">
+                        <div class="p-3.5 bg-teal-50/70 border border-teal-200 rounded-xl mb-3 space-y-1.5">
+                            <div class="flex items-center justify-between pb-2 mb-1.5 border-b border-teal-200/80">
+                                <span class="font-extrabold text-teal-900 text-sm">Solicitud N° ${solData.numero_solicitud || ''}</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">SOLICITUD REGISTRADA CON ÉXITO</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
+                                <p><strong>Establecimiento:</strong> ${solData.establecimiento || 'N/A'}</p>
+                                <p><strong>Tipo:</strong> ${solData.tipo || 'Establecimiento'}</p>
+                                <p><strong>Fecha Solicitud:</strong> ${solData.fecha_solicitud || 'N/A'}</p>
+                                <p><strong>Responsable:</strong> ${solData.responsable || 'N/A'}${solData.cargo && solData.cargo !== 'N/A' ? ` (${solData.cargo})` : ''}</p>
+                                <p><strong>Total Productos:</strong> ${solData.total_items || 0} producto(s)</p>
+                                <p><strong>Total Unidades:</strong> <span class="font-bold text-teal-800">${Number(solData.total_unidades || 0).toLocaleString('es-CL')} unidades</span></p>
+                                ${solData.observaciones ? `<p class="col-span-1 sm:col-span-2 text-slate-500 italic mt-0.5"><strong>Obs:</strong> ${solData.observaciones}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Resumen de Productos Solicitados:</p>
+                        <div class="max-h-56 overflow-y-auto border border-slate-200 rounded-lg shadow-inner">
+                            <table class="w-full text-[11.5px] text-left">
+                                <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2">Producto</th>
+                                        <th class="p-2 text-center">Programa</th>
+                                        <th class="p-2 text-center">Consumo Ant.</th>
+                                        <th class="p-2 text-center">Stock Act.</th>
+                                        <th class="p-2 text-right">Cant. Solicitada</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 bg-white">
+                                    ${(solData.items || []).map(it => `
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
+                                            <td class="p-2 text-center text-slate-600 font-mono text-[11px]">${it.programa || 'General'}</td>
+                                            <td class="p-2 text-center text-slate-500">${Number(it.consumo_anterior || 0).toLocaleString('es-CL')}</td>
+                                            <td class="p-2 text-center text-slate-500">${Number(it.stock_actual || 0).toLocaleString('es-CL')}</td>
+                                            <td class="p-2 text-right font-bold text-teal-700">${Number(it.cantidad_solicitada || 0).toLocaleString('es-CL')} u.</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                Swal.fire({
+                    title: '¡Solicitud Creada con Éxito!',
+                    html: htmlDetail,
+                    icon: 'success',
+                    confirmButtonColor: '#0d9488',
+                    confirmButtonText: '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Aceptar y Finalizar',
+                    width: '660px',
+                    allowOutsideClick: false
+                }).then(() => {
+                    if (recargarAlCerrar) {
+                        window.location.href = "{{ route('requests.index') }}";
+                    }
+                });
+            }
+
+            @if (session('solicitud_success_detail'))
+                mostrarSweetAlertSolicitudExitosa(@json(session('solicitud_success_detail')), false);
+            @endif
+
+            document.getElementById('requestForm').addEventListener('submit', function(e) {
+                const form = this;
+
+                if (signatureRecibe.isEmpty()) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Firma obligatoria',
+                        text: 'Debes firmar la solicitud antes de enviarla.',
+                        confirmButtonColor: '#0d9488'
+                    });
+
+                    return;
+                }
+
+                if (!form.checkValidity()) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                const estSelect = document.getElementById('establecimiento_select');
+                const estNombre = estSelect && estSelect.selectedIndex >= 0 ? estSelect.options[estSelect.selectedIndex]?.text.trim() : 'Establecimiento';
+                const totalProds = document.getElementById('total_productos')?.textContent.trim() || '0';
+                const totalUnits = document.getElementById('total_unidades')?.textContent.trim() || '0';
+
+                Swal.fire({
+                    title: '¿Confirmar Envío de Solicitud?',
+                    html: `Se emitirá la solicitud para <strong>${estNombre}</strong> con <strong>${totalProds}</strong> producto(s) y un total de <strong>${totalUnits}</strong> unidad(es).`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0d9488',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, enviar solicitud',
+                    cancelButtonText: 'Revisar',
+                    reverseButtons: true
+                }).then(async (result) => {
+                    if (!result.isConfirmed) return;
+
+                    document.getElementById('firma_recibe_input').value = signatureRecibe.toDataURL('image/png');
+
+                    Swal.fire({
+                        title: 'Registrando Solicitud...',
+                        text: 'Por favor espere mientras se guarda la solicitud en el sistema.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    try {
+                        const formData = new FormData(form);
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        const contentType = response.headers.get('content-type') || '';
+
+                        if (contentType.includes('application/json')) {
+                            const data = await response.json();
+
+                            if (response.ok && data.ok) {
+                                mostrarSweetAlertSolicitudExitosa(data.detail, true);
+                                return;
+                            }
+
+                            let errorMsg = data.message || 'Verifica los datos ingresados.';
+                            if (data.errors) {
+                                const firstKey = Object.keys(data.errors)[0];
+                                if (firstKey && data.errors[firstKey][0]) {
+                                    errorMsg = data.errors[firstKey][0];
+                                }
+                            }
+
+                            Swal.fire({
+                                title: 'No se pudo registrar la solicitud',
+                                text: errorMsg,
+                                icon: 'error',
+                                confirmButtonColor: '#e11d48',
+                                confirmButtonText: 'Revisar formulario'
+                            });
+                        } else if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            throw new Error('Error en la respuesta del servidor.');
+                        }
+                    } catch (err) {
+                        Swal.fire({
+                            title: 'Error al enviar solicitud',
+                            text: 'Ocurrió un problema de conexión o validación. Intente nuevamente.',
+                            icon: 'error',
+                            confirmButtonColor: '#e11d48',
+                            confirmButtonText: 'Entendido'
+                        });
+                    }
+                });
+>>>>>>> origin/cristobal
             });
 
             actualizarResumen();
