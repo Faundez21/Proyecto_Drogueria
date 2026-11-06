@@ -159,10 +159,20 @@ class ReportController extends Controller
         @set_time_limit(300);
 
         $query = $this->buildInventoryQuery($request);
-        $inventories = $query->with(['aisle', 'shelf'])->get(); // Todos los resultados, sin paginar
 
-        $pdf = Pdf::loadView('reports.pdf', compact('inventories'));
-        $pdf->setPaper('A4', 'landscape'); // Formato horizontal para que quepan las columnas
+        // Salvaguarda DomPDF: la plantilla imprime la tabla en bloques de 100 filas, lo que permite
+        // generar el reporte completo con cerca de 350 MB por cada 1.300 lotes. Solo si el volumen
+        // supera este límite se recorta y se avisa en el PDF que use la versión Excel.
+        $limitePdf = 2500;
+        $totalItems = (clone $query)->count();
+        $isTruncated = $totalItems > $limitePdf;
+
+        $inventories = $query->with(['aisle', 'shelf'])
+            ->when($isTruncated, fn ($q) => $q->limit($limitePdf))
+            ->get();
+
+        $pdf = Pdf::loadView('reports.pdf', compact('inventories', 'totalItems', 'isTruncated'));
+        $pdf->setPaper('A4', 'landscape');
 
         return $pdf->download('reporte_inventario_'.date('Ymd_His').'.pdf');
     }
