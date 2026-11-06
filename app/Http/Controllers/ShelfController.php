@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\InventoryService;
+
 use Illuminate\Http\Request;
 use App\Models\Aisle;
 use App\Models\Level;
@@ -53,6 +55,10 @@ class ShelfController extends Controller
             'capacidad' => 'nullable|integer|min:0|max:1000000',
         ]);
 
+        if (Shelf::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($request->name))])->exists()) {
+            return redirect()->back()->withInput()->with('error', "Ya existe una estantería llamada «" . trim($request->name) . "». Cada estantería debe tener un nombre único.");
+        }
+
         $datos = $request->only(['name', 'description', 'aisle_id', 'capacidad']);
         $datos['capacidad'] = (int) ($datos['capacidad'] ?? 0);
 
@@ -91,6 +97,10 @@ class ShelfController extends Controller
             'capacidad' => 'nullable|integer|min:0|max:1000000',
         ]);
 
+        if (Shelf::where('id', '!=', $shelf->id)->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($request->name))])->exists()) {
+            return redirect()->back()->withInput()->with('error', "Ya existe otra estantería llamada «" . trim($request->name) . "». Cada estantería debe tener un nombre único.");
+        }
+
         $datos = $request->only(['name', 'description', 'aisle_id', 'capacidad']);
         $datos['capacidad'] = (int) ($datos['capacidad'] ?? 0);
 
@@ -110,7 +120,14 @@ class ShelfController extends Controller
      */
     public function destroy(string $id)
     {
-        Shelf::destroy($id);
+        $shelf = Shelf::findOrFail($id);
+
+        $lotes = InventoryService::lotesEnUbicacion('estante', $shelf);
+        if ($lotes > 0) {
+            return redirect()->route('shelf.index')->with('error', "No se puede eliminar la estantería «{$shelf->name}» porque todavía tiene {$lotes} lote(s) con stock. Primero reubica esos productos.");
+        }
+
+        $shelf->delete();
 
         return redirect()->route('shelf.index')->with('success', 'Estantería eliminada correctamente');
     }

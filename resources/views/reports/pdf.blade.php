@@ -141,6 +141,8 @@
         </tr>
     </table>
 
+    {{-- La tabla se divide en bloques de 100 filas: así el PDF usa la mitad de memoria y tiempo --}}
+    @if($totalRegistros == 0)
     <table class="items-table">
         <thead>
             <tr>
@@ -157,12 +159,31 @@
             </tr>
         </thead>
         <tbody>
-            @if($totalRegistros == 0)
                 <tr>
                     <td colspan="10" class="text-center" style="padding: 18px; color: #64748b;">No hay registros de inventario que coincidan con los filtros seleccionados.</td>
                 </tr>
-            @else
-                @foreach($inventories as $idx => $inv)
+        </tbody>
+    </table>
+    @else
+        @php $bloques = collect($inventories)->chunk(100); @endphp
+        @foreach($bloques as $numBloque => $bloque)
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width: 3.5%;" class="text-center">#</th>
+                <th style="width: 22%;">Producto Principal</th>
+                <th style="width: 11.5%;">Categoría</th>
+                <th style="width: 12%;">Programa</th>
+                <th style="width: 9.5%;">N° Lote</th>
+                <th style="width: 9.5%;" class="text-center">Vencimiento</th>
+                <th style="width: 11.5%;">Ubicación Física</th>
+                <th style="width: 6%;" class="text-center">Stock</th>
+                <th style="width: 6.5%;" class="text-right">V. Unit.</th>
+                <th style="width: 8%;" class="text-right">V. Total</th>
+            </tr>
+        </thead>
+        <tbody>
+                @foreach($bloque as $idx => $inv)
                     @php
                         $producto = is_object($inv->producto) ? ($inv->producto->nombre ?? 'S/N') : ($inv->producto ?? 'General');
                         $pasillo = $inv->pasillo_nombre ?? (is_object($inv->aisle ?? null) ? $inv->aisle->nombre ?? ($inv->aisle->name ?? 'S/A') : $inv->pasillo ?? 'S/A');
@@ -219,15 +240,18 @@
                         <td class="text-right font-bold" style="color: #0f766e;">${{ number_format($valorTotal, 0, ',', '.') }}</td>
                     </tr>
                 @endforeach
+                @if($loop->last)
                 <tr class="total-row">
                     <td colspan="7" class="text-right">TOTALES CONSOLIDADOS DEL REPORTE:</td>
                     <td class="text-center">{{ number_format($totalUnidadesReporte, 0, ',', '.') }}</td>
                     <td class="text-right">VALOR TOTAL:</td>
                     <td class="text-right" style="color: #0f766e;">${{ number_format($sumaTotalPdf, 0, ',', '.') }}</td>
                 </tr>
-            @endif
+                @endif
         </tbody>
     </table>
+        @endforeach
+    @endif
 
     <div class="footer">
         Reporte oficial generado por el Sistema de Control y Abastecimiento de Droguería DAS Talcahuano · Confidencial de Uso Interno.

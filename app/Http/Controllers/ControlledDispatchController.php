@@ -88,6 +88,7 @@ class ControlledDispatchController extends Controller
             'direccion_destino' => 'nullable|string|max:255',
             'condiciones_transporte' => 'nullable|string|max:500',
             'series_recetas' => 'nullable|string',
+            'firma_despacha' => 'nullable|string',
             'firma_recibe' => 'nullable|string',
             'productos' => 'required|array|min:1',
             'productos.*' => 'required|string|max:1000',
@@ -103,10 +104,39 @@ class ControlledDispatchController extends Controller
             'action' => 'nullable|string|in:save,save_only,save_and_download',
         ]);
 
-        $destino = $validated['establecimiento_destino'];
-        if ($validated['clasificacion'] === 'Externo') {
-            $destino = (! empty($validated['tipo_externo_despacho']) ? $validated['tipo_externo_despacho'] . ' - ' : '') . $validated['establecimiento_destino'];
+
+        // Validaciones de destino, solicitud y firmas
+        $errorDespacho = null;
+        $solicitudVinculada = ! empty($validated['establishment_request_id'])
+            ? EstablishmentRequest::find($validated['establishment_request_id'])
+            : null;
+        $estRegistrado = InventoryService::establecimientoRegistrado($validated['establecimiento_destino']);
+
+        if (! $solicitudVinculada) {
+            $errorDespacho = 'Los fármacos controlados solo se pueden despachar a partir de una solicitud de un CESFAM. Selecciona la solicitud en «Ver Solicitudes».';
+        } elseif (! $estRegistrado || ($estRegistrado['tipo'] ?? '') !== 'CESFAM') {
+            $errorDespacho = "Los fármacos controlados solo se pueden despachar a un CESFAM. «{$validated['establecimiento_destino']}» no es un CESFAM de la red.";
+        } elseif (! in_array($solicitudVinculada->estado, ['Pendiente', 'Asignada', 'Parcial'], true)) {
+            $errorDespacho = "La solicitud N° {$solicitudVinculada->id} ya está en estado «{$solicitudVinculada->estado}» y no admite más despachos.";
+        } elseif (mb_strtolower(trim($solicitudVinculada->establecimiento)) !== mb_strtolower(trim($validated['establecimiento_destino']))) {
+            $errorDespacho = "La solicitud N° {$solicitudVinculada->id} pertenece a «{$solicitudVinculada->establecimiento}», no a «{$validated['establecimiento_destino']}».";
+        } elseif (empty($validated['firma_despacha'])) {
+            $errorDespacho = 'Falta la firma de quien despacha (bodega).';
+        } elseif (empty($validated['firma_recibe']) && empty($solicitudVinculada->firma_solicitante)) {
+            $errorDespacho = 'Falta la firma de quien recibe el despacho.';
         }
+
+        if ($errorDespacho) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $errorDespacho], 422);
+            }
+
+            return redirect()->back()->withInput()->with('error', $errorDespacho);
+        }
+
+        // Los controlados siempre van a un CESFAM de la red (despacho interno)
+        $validated['clasificacion'] = 'Interno';
+        $destino = $estRegistrado['nombre'];
 
         DB::beginTransaction();
 
@@ -132,6 +162,7 @@ class ControlledDispatchController extends Controller
                 'direccion_destino' => $validated['direccion_destino'] ?? null,
                 'condiciones_transporte' => $validated['condiciones_transporte'] ?? null,
                 'series_recetas' => $validated['series_recetas'] ?? null,
+                'firma_despacha' => $validated['firma_despacha'] ?? null,
                 'firma_recibe' => $firmaRecibe,
             ]);
 

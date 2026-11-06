@@ -249,13 +249,13 @@ class ReceptionController extends Controller
         }
 
         $validated = $request->validate([
-            'fecha_recepcion' => ['required', 'date'],
+            'fecha_recepcion' => ['required', 'date', 'before_or_equal:today'],
             'tipo_documento' => ['required', 'string', 'max:255'],
             'numero_documento' => ['required', 'string', 'max:255'],
             'orden_compra' => ['nullable', 'string', 'max:255'],
             'origen' => ['required', 'string', 'max:255'],
             'provider_id' => ['required', Rule::exists('providers', 'id')->where('status', 'activo')],
-            'firma_receptor' => ['nullable', 'string'],
+            'firma_receptor' => ['required', 'string'],
             'action' => ['nullable', 'string', 'in:save,save_only,save_and_download'],
             'product_id' => ['required', 'array', 'min:1'],
             'product_id.*' => ['required', 'integer', 'exists:products,id'],
@@ -266,7 +266,7 @@ class ReceptionController extends Controller
             'lote' => ['nullable', 'array'],
             'lote.*' => ['nullable', 'string', 'max:255'],
             'fecha_vencimiento' => ['required', 'array', 'min:1'],
-            'fecha_vencimiento.*' => ['required', 'date'],
+            'fecha_vencimiento.*' => ['required', 'date', 'after_or_equal:today'],
             'tipo_producto' => ['nullable', 'array'],
             'tipo_producto.*' => ['nullable', 'string', 'max:500'],
             'programa' => ['nullable', 'array'],
@@ -283,7 +283,46 @@ class ReceptionController extends Controller
             'fecha_vencimiento.required' => 'Debes ingresar la fecha de vencimiento para cada producto.',
             'fecha_vencimiento.*.required' => 'La fecha de vencimiento es obligatoria para cada producto recepcionado.',
             'fecha_vencimiento.*.date' => 'La fecha de vencimiento ingresada no es válida.',
+            'fecha_vencimiento.*.after_or_equal' => 'Uno de los productos ya está vencido. No se puede recepcionar un lote vencido.',
+            'fecha_recepcion.before_or_equal' => 'La fecha de recepción no puede ser posterior a hoy.',
+            'firma_receptor.required' => 'Debes firmar el acta de recepción antes de confirmarla.',
+            'provider_id.exists' => 'El proveedor seleccionado no existe o está inactivo.',
         ]);
+
+        // Evitar ingresar dos veces el mismo documento (misma factura o guía del mismo proveedor)
+        $documentoDuplicado = Reception::where('provider_id', $validated['provider_id'])
+            ->whereRaw('LOWER(TRIM(tipo_documento)) = ?', [mb_strtolower(trim($validated['tipo_documento']))])
+            ->whereRaw('LOWER(TRIM(numero_documento)) = ?', [mb_strtolower(trim($validated['numero_documento']))])
+            ->first();
+
+        if ($documentoDuplicado) {
+            $msgError = "La {$validated['tipo_documento']} N° {$validated['numero_documento']} de este proveedor ya fue recepcionada (Acta N° {$documentoDuplicado->correlativo}). No se puede ingresar dos veces el mismo documento.";
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['ok' => false, 'message' => $msgError], 422);
+            }
+
+            return redirect()->back()->withInput()->with('error', $msgError);
+        }
+
+        // Validar que cada ubicación indicada exista en el mapa de bodega
+        foreach ($validated['product_id'] as $index => $prodId) {
+            $errorUbicacion = InventoryService::validarUbicacion(
+                $validated['pasillo'][$index] ?? null,
+                $validated['estante'][$index] ?? null,
+                $validated['nivel'][$index] ?? null,
+                $validated['posicion'][$index] ?? null
+            );
+
+            if ($errorUbicacion) {
+                $nomProd = Product::find($prodId)?->nombre ?? ('Producto #' . $prodId);
+                $msgError = "Ubicación inválida para «{$nomProd}»: {$errorUbicacion}";
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['ok' => false, 'message' => $msgError], 422);
+                }
+
+                return redirect()->back()->withInput()->with('error', $msgError);
+            }
+        }
 
         $provider = Provider::findOrFail($validated['provider_id']);
         $nombreProveedor = $provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor';

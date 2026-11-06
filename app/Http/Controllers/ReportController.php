@@ -153,8 +153,13 @@ class ReportController extends Controller
 
     public function exportPdf(Request $request)
     {
+        // Un reporte con todo el inventario (más de mil lotes) necesita más memoria y tiempo
+        // que el límite normal de PHP (128 MB). Se amplía solo para esta descarga.
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(300);
+
         $query = $this->buildInventoryQuery($request);
-        $inventories = $query->get(); // Extrae todos los resultados sin paginar
+        $inventories = $query->with(['aisle', 'shelf'])->get(); // Todos los resultados, sin paginar
 
         $pdf = Pdf::loadView('reports.pdf', compact('inventories'));
         $pdf->setPaper('A4', 'landscape'); // Formato horizontal para que quepan las columnas

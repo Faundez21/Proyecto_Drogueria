@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\InventoryService;
+
 use App\Models\Aisle;
 use App\Models\Level;
 use App\Models\Position;
@@ -42,6 +44,11 @@ class AisleController extends Controller
             'description' => 'nullable|string|max:255',
             'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
         ]);
+
+        if (Aisle::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($request->name))])->exists()) {
+            return redirect()->back()->withInput()->with('error', "Ya existe un pasillo llamado «" . trim($request->name) . "». Usa otro nombre.");
+        }
+
         Aisle::create([
             'name' => $request->name,
             'description' => $request->description,
@@ -79,6 +86,10 @@ class AisleController extends Controller
 
         ]);
 
+        if (Aisle::where('id', '!=', $aisle->id)->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($request->name))])->exists()) {
+            return redirect()->back()->withInput()->with('error', "Ya existe otro pasillo llamado «" . trim($request->name) . "». Usa otro nombre.");
+        }
+
         $aisle->update([
             'name' => $request->name,
             'description' => $request->description,
@@ -98,7 +109,14 @@ class AisleController extends Controller
      */
     public function destroy(string $id)
     {
-        Aisle::destroy($id);
+        $aisle = Aisle::findOrFail($id);
+
+        $lotes = InventoryService::lotesEnUbicacion('pasillo', $aisle);
+        if ($lotes > 0) {
+            return redirect()->route('aisle.index')->with('error', "No se puede eliminar el pasillo «{$aisle->name}» porque todavía tiene {$lotes} lote(s) con stock guardados en sus estantes. Primero reubica esos productos.");
+        }
+
+        $aisle->delete();
 
         return redirect()->route('aisle.index')->with('success', 'Pasillo eliminado exitosamente.');
     }

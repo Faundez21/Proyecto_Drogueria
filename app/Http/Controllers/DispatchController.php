@@ -113,7 +113,40 @@ class DispatchController extends Controller
             'action' => 'nullable|string|in:save,save_only,save_and_download',
         ]);
 
-        $destino = $validated['establecimiento_destino'];
+
+        // Validaciones de destino, solicitud y firmas
+        $errorDespacho = null;
+        $solicitudVinculada = ! empty($validated['establishment_request_id'])
+            ? EstablishmentRequest::find($validated['establishment_request_id'])
+            : null;
+        $estRegistrado = InventoryService::establecimientoRegistrado($validated['establecimiento_destino']);
+
+        if ($validated['clasificacion'] === 'Interno' && ! $estRegistrado) {
+            $errorDespacho = "El destino «{$validated['establecimiento_destino']}» no es un establecimiento de la red. Selecciónalo de la lista.";
+        } elseif ($solicitudVinculada) {
+            if (! in_array($solicitudVinculada->estado, ['Pendiente', 'Asignada', 'Parcial'], true)) {
+                $errorDespacho = "La solicitud N° {$solicitudVinculada->id} ya está en estado «{$solicitudVinculada->estado}» y no admite más despachos.";
+            } elseif (mb_strtolower(trim($solicitudVinculada->establecimiento)) !== mb_strtolower(trim($validated['establecimiento_destino']))) {
+                $errorDespacho = "La solicitud N° {$solicitudVinculada->id} pertenece a «{$solicitudVinculada->establecimiento}», no a «{$validated['establecimiento_destino']}».";
+            }
+        }
+
+        if (! $errorDespacho && empty($validated['firma_despacha'])) {
+            $errorDespacho = 'Falta la firma de quien despacha (bodega).';
+        }
+        if (! $errorDespacho && empty($validated['firma_recibe']) && empty($solicitudVinculada?->firma_solicitante)) {
+            $errorDespacho = 'Falta la firma de quien recibe el despacho.';
+        }
+
+        if ($errorDespacho) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $errorDespacho], 422);
+            }
+
+            return redirect()->back()->withInput()->with('error', $errorDespacho);
+        }
+
+        $destino = $estRegistrado['nombre'] ?? $validated['establecimiento_destino'];
         if ($validated['clasificacion'] === 'Externo') {
             $destino = (! empty($validated['tipo_externo_despacho']) ? $validated['tipo_externo_despacho'] . ' - ' : '') . $validated['establecimiento_destino'];
         }

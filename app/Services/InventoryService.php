@@ -13,6 +13,7 @@ use App\Models\ReceptionItem;
 use App\Models\Shelf;
 use App\Models\StockMovement;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class InventoryService
 {
@@ -223,6 +224,26 @@ class InventoryService
     public static function establecimientos(): array
     {
         return config('drogueria.establecimientos');
+    }
+
+    /**
+     * Busca un establecimiento de la red por su nombre exacto (sin importar mayúsculas)
+     * y devuelve sus datos (nombre, tipo, dirección), o null si no está registrado.
+     */
+    public static function establecimientoRegistrado(?string $nombre): ?array
+    {
+        $buscado = mb_strtolower(trim((string) $nombre));
+        if ($buscado === '') {
+            return null;
+        }
+
+        foreach (config('drogueria.establecimientos', []) as $est) {
+            if (mb_strtolower(trim($est['nombre'])) === $buscado) {
+                return $est;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -708,6 +729,132 @@ class InventoryService
         $sinPrefijo = trim((string) preg_replace('/^nivel\s*/i', '', $val));
 
         return $sinPrefijo !== '' ? $sinPrefijo : $val;
+    }
+
+    /**
+     * Cuenta los lotes con stock (cantidad > 0, en cualquier estado) guardados en una
+     * ubicación física. Se usa para impedir eliminar pasillos, estantes, niveles o
+     * posiciones que todavía tienen productos dentro.
+     *
+     * @param  string  $tipo  'pasillo' | 'estante' | 'nivel' | 'posicion'
+     */
+    public static function lotesEnUbicacion(string $tipo, $modelo): int
+    {
+        $query = Inventory::where('cantidad', '>', 0);
+        $lower = fn ($v) => mb_strtolower(trim((string) $v));
+
+        switch ($tipo) {
+            case 'pasillo':
+                $shelfIds = $modelo->shelves()->pluck('id');
+                $shelfNames = $modelo->shelves()->pluck('name')->map($lower)->all();
+                $query->where(function ($q) use ($modelo, $shelfIds, $shelfNames, $lower) {
+                    $q->where('aisle_id', $modelo->id)
+                        ->orWhereRaw('LOWER(TRIM(pasillo)) = ?', [$lower($modelo->name)])
+                        ->orWhereIn('shelf_id', $shelfIds);
+                    if (! empty($shelfNames)) {
+                        $q->orWhereIn(DB::raw('LOWER(TRIM(estante))'), $shelfNames);
+                    }
+                });
+                break;
+
+            case 'estante':
+                $query->where(function ($q) use ($modelo, $lower) {
+                    $q->where('shelf_id', $modelo->id)
+                        ->orWhereRaw('LOWER(TRIM(estante)) = ?', [$lower($modelo->name)]);
+                });
+                break;
+
+            case 'nivel':
+            case 'posicion':
+                $level = $tipo === 'nivel' ? $modelo : $modelo->level;
+                $shelf = $level?->shelf;
+                if (! $shelf) {
+                    return 0;
+                }
+                $nivelNum = $lower(self::normalizarNivel((string) $level->number));
+
+                $lotes = Inventory::where('cantidad', '>', 0)
+                    ->where(function ($q) use ($shelf, $lower) {
+                        $q->where('shelf_id', $shelf->id)
+                            ->orWhereRaw('LOWER(TRIM(estante)) = ?', [$lower($shelf->name)]);
+                    })
+                    ->get(['id', 'nivel', 'posicion', 'level_id', 'position_id']);
+
+                return $lotes->filter(function ($inv) use ($tipo, $level, $modelo, $nivelNum, $lower) {
+                    $mismoNivel = (int) $inv->level_id === (int) $level->id
+                        || $lower(self::normalizarNivel((string) $inv->nivel)) === $nivelNum;
+                    if (! $mismoNivel) {
+                        return false;
+                    }
+                    if ($tipo === 'nivel') {
+                        return true;
+                    }
+
+                    return (int) $inv->position_id === (int) $modelo->id
+                        || $lower(self::normalizarPosicion((string) $inv->posicion)) === $lower(self::normalizarPosicion((string) $modelo->name));
+                })->count();
+        }
+
+        return $query->count();
+    }
+
+    /**
+     * Verifica que una ubicación física exista en el mapa de bodega (Distribución).
+     *
+     * - Si no se indica estante (vacío o "P.A"), la ubicación queda "por asignar" y es válida.
+     * - Si se indica estante, debe existir; si además se indica pasillo, el estante debe pertenecer a ese pasillo.
+     * - Si se indica nivel y/o posición, deben existir dentro de ese estante / nivel.
+     *
+     * Devuelve null si la ubicación es válida, o un mensaje de error en español si no lo es.
+     */
+    public static function validarUbicacion(?string $pasillo, ?string $estante, ?string $nivel = null, ?string $posicion = null): ?string
+    {
+        $pasillo = trim((string) $pasillo);
+        $estante = trim((string) $estante);
+        $nivelNorm = self::normalizarNivel($nivel);
+        $posNorm = self::normalizarPosicion($posicion);
+
+        $sinPasillo = $pasillo === '' || strtoupper($pasillo) === 'P.A';
+        $sinEstante = $estante === '' || strtoupper($estante) === 'P.A';
+
+        if ($sinEstante) {
+            if (! $sinPasillo && ! Aisle::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower($pasillo)])->exists()) {
+                return "El pasillo «{$pasillo}» no existe en el mapa de bodega.";
+            }
+
+            return null;
+        }
+
+        $shelf = Shelf::with(['aisle', 'levels.positions'])
+            ->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower($estante)])
+            ->when(! $sinPasillo, fn ($q) => $q->whereHas('aisle', fn ($a) => $a->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower($pasillo)])))
+            ->first();
+
+        if (! $shelf) {
+            $existeEstante = Shelf::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower($estante)])->exists();
+
+            return $existeEstante
+                ? "El estante «{$estante}» no pertenece al pasillo «{$pasillo}»."
+                : "El estante «{$estante}» no existe en el mapa de bodega.";
+        }
+
+        if ($nivelNorm === '') {
+            return $posNorm === '' ? null : 'Para indicar una posición también debes indicar el nivel.';
+        }
+
+        $level = $shelf->levels->first(fn ($l) => mb_strtolower(self::normalizarNivel((string) $l->number)) === mb_strtolower($nivelNorm));
+        if (! $level) {
+            return "El nivel «{$nivelNorm}» no existe en el estante «{$shelf->name}».";
+        }
+
+        if ($posNorm !== '') {
+            $existePos = $level->positions->contains(fn ($p) => mb_strtolower(self::normalizarPosicion((string) $p->name)) === mb_strtolower($posNorm));
+            if (! $existePos) {
+                return "La posición «{$posNorm}» no existe en el nivel {$nivelNorm} del estante «{$shelf->name}».";
+            }
+        }
+
+        return null;
     }
 
     public static function normalizarPosicion(?string $posicion): string

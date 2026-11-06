@@ -1417,7 +1417,10 @@
 
             // 2. Poblar Estantes filtrados por Pasillo
             if (selectEstante) {
-                const prevEstante = estanteVal;
+                // Al abrir el modal el <select> aún no tiene opciones, así que su valor viene vacío:
+                // se usa la ubicación actual del lote para no perderla.
+                const estanteInicial = initialUbicacion ? this.normStr(initialUbicacion.estante) : '';
+                const prevEstante = estanteVal || (trigger === 'init' ? estanteInicial : '');
                 selectEstante.innerHTML = '<option value="">Seleccione Estante...</option>';
 
                 let estantesCandidatos = jerarquia.filter(
@@ -1448,13 +1451,24 @@
                     selectEstante.appendChild(opt);
                 });
 
+                // Si el estante actual del lote no aparece en la lista del pasillo, se agrega igual
+                // para que guardar sin tocar la ubicación nunca la borre.
+                const estanteEnLista = estantesCandidatos.some((item) => this.normKey(item.estante) === this.normKey(prevEstante));
+                if (trigger === 'init' && prevEstante && prevEstante.toUpperCase() !== 'P.A' && !estanteEnLista) {
+                    const optActual = document.createElement('option');
+                    optActual.value = prevEstante;
+                    optActual.textContent = `${prevEstante} (ubicación actual)`;
+                    optActual.selected = true;
+                    selectEstante.appendChild(optActual);
+                }
+
                 estanteVal = this.normStr(selectEstante.value);
                 infoEstante = this.buscarEstanteInfo(estanteVal);
             }
 
             // 3. Poblar Niveles exclusivos del Estante seleccionado
             if (selectNivel) {
-                const prevNivel = this.normNivel(selectNivel.value);
+                const prevNivel = this.normNivel(selectNivel.value) || (trigger === 'init' && initialUbicacion ? this.normNivel(initialUbicacion.nivel) : '');
                 selectNivel.innerHTML = '<option value="">Seleccione Nivel...</option>';
 
                 if (infoEstante && Array.isArray(infoEstante.niveles) && infoEstante.niveles.length > 0) {
@@ -1509,7 +1523,7 @@
             // 4. Poblar Posiciones exclusivas del (Estante + Nivel) seleccionado, deshabilitando las ocupadas
             const nivelVal = this.normNivel(selectNivel?.value);
             if (selectPosicion) {
-                const prevPos = this.normPos(selectPosicion.value);
+                const prevPos = this.normPos(selectPosicion.value) || (trigger === 'init' && initialUbicacion ? this.normPos(initialUbicacion.posicion) : '');
                 selectPosicion.innerHTML = '<option value="">Seleccione Posición...</option>';
 
                 let posicionesDelNivel = [];

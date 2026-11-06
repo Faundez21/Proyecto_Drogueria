@@ -511,7 +511,7 @@
                                 <label
                                     class="block text-[12.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">RUT
                                     <span class="text-red-500">*</span></label>
-                                <input type="text" id="provider-rut" required placeholder="76.543.210-K"
+                                <input type="text" id="provider-rut" required placeholder="96.756.540-7"
                                     maxlength="12" autocomplete="off" inputmode="text"
                                     class="w-full px-4 py-2.5 rounded-xl text-[13.5px] font-mono-das border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-sm">
                                 <p id="provider-rut-error" class="hidden text-[11.5px] font-medium text-red-600 mt-1.5">

@@ -169,7 +169,7 @@ class InventoryController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'correlativo_interno' => 'nullable|integer|min:1',
-            'fecha_recepcion' => 'required|date',
+            'fecha_recepcion' => 'required|date|before_or_equal:today',
             'tipo_documento' => 'required|string|max:255',
             'numero_documento' => 'required|string|max:255',
             'orden_compra' => 'nullable|string|max:255',
@@ -203,14 +203,39 @@ class InventoryController extends Controller
             'cantidad.required' => 'La cantidad a ingresar es obligatoria.',
             'cantidad.min' => 'La cantidad debe ser al menos 1 unidad.',
             'valor_neto_unitario.integer' => 'El Valor Neto Unitario debe ser un número entero sin decimales ($ CLP).',
+            'fecha_recepcion.before_or_equal' => 'La fecha de recepción no puede ser posterior a hoy.',
         ]);
+
+        // Un lote vencido solo puede ingresarse directamente como Merma
+        $validator->after(function ($v) use ($request) {
+            $vence = $request->input('fecha_vencimiento');
+            if (! empty($vence) && $request->input('estado') !== 'Merma') {
+                try {
+                    if (\Carbon\Carbon::parse($vence)->startOfDay()->lt(now()->startOfDay())) {
+                        $v->errors()->add('fecha_vencimiento', 'El lote está vencido. Solo puede ingresarse con estado Merma.');
+                    }
+                } catch (\Throwable $e) {
+                    // el formato inválido ya lo informa la regla 'date'
+                }
+            }
+
+            $errorUbicacion = InventoryService::validarUbicacion(
+                $request->input('pasillo'),
+                $request->input('estante'),
+                $request->input('nivel'),
+                $request->input('posicion')
+            );
+            if ($errorUbicacion) {
+                $v->errors()->add('estante', $errorUbicacion);
+            }
+        });
 
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput()
                 ->with('open_modal', 'deposit')
-                ->with('error', 'Por favor revise los campos obligatorios en el formulario de Ingreso Manual.');
+                ->with('error', $validator->errors()->first() ?: 'Por favor revise los campos obligatorios en el formulario de Ingreso Manual.');
         }
 
         $validated = $validator->validated();
@@ -349,6 +374,42 @@ class InventoryController extends Controller
         $posicionAnterior = $inventory->posicion;
 
         $data = $request->only(['estado', 'motivo']);
+
+        // Si el pasillo no cambió y el estante viene vacío, el usuario no tocó la ubicación:
+        // se conserva la ubicación actual completa en vez de dejar el lote "por asignar".
+        $pasilloIgual = mb_strtolower(trim((string) $request->input('pasillo'))) === mb_strtolower(trim((string) $inventory->pasillo));
+        $tieneEstanteActual = ! empty($inventory->estante) && strtoupper((string) $inventory->estante) !== 'P.A';
+        if ($request->has('pasillo') && $pasilloIgual && ! $request->filled('estante') && $tieneEstanteActual) {
+            $request->request->remove('pasillo');
+            $request->request->remove('estante');
+            $request->request->remove('nivel');
+            $request->request->remove('posicion');
+            $request->query->remove('pasillo');
+            $request->query->remove('estante');
+            $request->query->remove('nivel');
+            $request->query->remove('posicion');
+            $request->json()?->remove('pasillo');
+            $request->json()?->remove('estante');
+            $request->json()?->remove('nivel');
+            $request->json()?->remove('posicion');
+        }
+
+        // Si se indica una ubicación nueva, debe existir en el mapa de bodega
+        if ($request->filled('estante') || ($request->filled('pasillo') && ! $pasilloIgual)) {
+            $errorUbicacion = InventoryService::validarUbicacion(
+                $request->input('pasillo'),
+                $request->input('estante'),
+                $request->input('nivel'),
+                $request->input('posicion')
+            );
+            if ($errorUbicacion) {
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['ok' => false, 'message' => $errorUbicacion], 422);
+                }
+
+                return redirect()->back()->with('error', $errorUbicacion);
+            }
+        }
 
         if ($request->has('pasillo')) {
             $data['pasillo'] = $request->filled('pasillo') ? trim($request->pasillo) : 'P.A';
@@ -584,6 +645,10 @@ class InventoryController extends Controller
                 Excel::import($import, $file);
 
                 if ($import->importados() === 0) {
+                    $omitidasCero = $import->omitidas();
+                    if (! empty($omitidasCero)) {
+                        throw new \RuntimeException('No se cargó ningún lote. ' . self::resumenFilasOmitidas($omitidasCero));
+                    }
                     throw new \RuntimeException('El archivo seleccionado está vacío o no contiene filas con nombre de PRODUCTO bajo la fila de encabezados.');
                 }
 
@@ -592,6 +657,9 @@ class InventoryController extends Controller
                     'disponibles' => $import->disponibles(),
                     'cuarentena' => $import->enCuarentena(),
                     'merma' => $import->enMerma(),
+                    'omitidas' => $import->omitidas(),
+                    'vencidos' => $import->vencidosAMerma(),
+                    'ubicaciones' => $import->ubicacionesInvalidas(),
                 ];
             });
 
@@ -617,9 +685,28 @@ class InventoryController extends Controller
             }
             $textoDesglose = ! empty($detallesEstado) ? ' (' . implode(', ', $detallesEstado) . ')' : '';
 
+            $mensaje = "Carga masiva completada: {$total} lote(s) ingresados a bodega{$textoDesglose}.";
+            $avisos = [];
+            if ($resumen['vencidos'] > 0) {
+                $avisos[] = "{$resumen['vencidos']} lote(s) venían vencidos y se cargaron directamente como Merma.";
+            }
+            if (! empty($resumen['ubicaciones'])) {
+                $filasUb = implode(', ', array_slice($resumen['ubicaciones'], 0, 15)) . (count($resumen['ubicaciones']) > 15 ? '…' : '');
+                $avisos[] = count($resumen['ubicaciones']) . " lote(s) traían una ubicación que no existe en el mapa de bodega y quedaron por asignar (filas {$filasUb}).";
+            }
+            if (! empty($resumen['omitidas'])) {
+                $avisos[] = self::resumenFilasOmitidas($resumen['omitidas']);
+            }
+
+            if (! empty($avisos)) {
+                return redirect()->back()
+                    ->with('import_completed_ok', true)
+                    ->with('warning', $mensaje . ' ' . implode(' ', $avisos));
+            }
+
             return redirect()->back()
                 ->with('import_completed_ok', true)
-                ->with('success', "Carga masiva completada con éxito: {$total} lote(s) ingresados a bodega{$textoDesglose}.");
+                ->with('success', $mensaje);
         } catch (\RuntimeException $e) {
             return redirect()->back()
                 ->with('open_modal', 'import')
@@ -687,16 +774,16 @@ class InventoryController extends Controller
                         1500,
                         45,
                         date('d/m/Y'),
-                        'Factura Electrónica',
+                        'Factura',
                         '104590',
                         'OC-2026-881',
                         'CENABAST',
-                        '61.608.700-K',
+                        '61.608.700-2',
                         'CENTRAL DE ABASTECIMIENTO S.N.S.S.',
-                        'P1',
-                        'E1',
+                        'Pasillo 1',
+                        'A-1',
                         '1',
-                        'A1',
+                        'P1',
                         'Fondo de Farmacia (FOFAR)',
                     ],
                 ];
@@ -714,5 +801,28 @@ class InventoryController extends Controller
         };
 
         return Excel::download($export, 'Plantilla_Carga_Masiva_Inventario_DAS.xlsx');
+    }
+
+    /**
+     * Arma un texto corto con las filas omitidas de la carga masiva, agrupadas por motivo.
+     */
+    private static function resumenFilasOmitidas(array $omitidas): string
+    {
+        $porMotivo = [];
+        foreach ($omitidas as $fila => $motivo) {
+            $clave = preg_replace('/«[^»]*»/u', '', $motivo);
+            $porMotivo[$clave]['motivo'] = $motivo;
+            $porMotivo[$clave]['filas'][] = $fila;
+        }
+
+        $partes = [];
+        foreach ($porMotivo as $grupo) {
+            $filas = $grupo['filas'];
+            $listado = implode(', ', array_slice($filas, 0, 10)) . (count($filas) > 10 ? '…' : '');
+            $motivoTexto = count($filas) > 1 ? preg_replace('/«[^»]*»\s*/u', '', $grupo['motivo']) : $grupo['motivo'];
+            $partes[] = count($filas) . " fila(s) por {$motivoTexto} (filas {$listado})";
+        }
+
+        return count($omitidas) . ' fila(s) no se cargaron: ' . implode('; ', $partes) . '.';
     }
 }

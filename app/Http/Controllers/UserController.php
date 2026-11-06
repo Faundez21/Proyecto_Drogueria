@@ -159,6 +159,29 @@ class UserController extends Controller
             'role.exists' => 'El rol seleccionado no es válido.',
         ]);
 
+        // Un administrador no puede quitarse a sí mismo el rol ni desactivar su propia cuenta
+        if ($user->id === auth()->id()) {
+            if ($user->hasRole('Administrador') && $validated['role'] !== 'Administrador') {
+                return back()->withInput()->with('error', 'No puedes quitarte a ti mismo el rol de Administrador. Pídele a otro administrador que lo haga.');
+            }
+            if (($validated['status'] ?? 'activo') === 'inactivo') {
+                return back()->withInput()->with('error', 'No puedes desactivar tu propia cuenta.');
+            }
+        }
+
+        // Debe quedar siempre al menos un administrador activo en el sistema
+        $dejaDeSerAdminActivo = $user->hasRole('Administrador') && $user->status === 'activo'
+            && ($validated['role'] !== 'Administrador' || ($validated['status'] ?? 'activo') === 'inactivo');
+        if ($dejaDeSerAdminActivo) {
+            $otrosAdminsActivos = User::role('Administrador')
+                ->where('status', 'activo')
+                ->where('id', '!=', $user->id)
+                ->count();
+            if ($otrosAdminsActivos === 0) {
+                return back()->withInput()->with('error', 'Este es el único administrador activo. Debe existir al menos un administrador activo en el sistema.');
+            }
+        }
+
         $role = Role::where('name', $validated['role'])->first();
         if ($role && $role->name !== 'Administrador' && $role->permissions()->count() === 0) {
             return back()->withInput()->withErrors([
@@ -187,6 +210,12 @@ class UserController extends Controller
     {
         if ($user->id === auth()->id()) {
             return redirect()->route('users.index')->with('error', 'No puedes cambiar el estado de tu propia cuenta.');
+        }
+
+        // No se puede desactivar al último administrador activo
+        if ($user->status === 'activo' && $user->hasRole('Administrador')
+            && User::role('Administrador')->where('status', 'activo')->where('id', '!=', $user->id)->count() === 0) {
+            return redirect()->route('users.index')->with('error', 'No puedes desactivar al único administrador activo del sistema.');
         }
 
         // Alternar el estado
@@ -222,6 +251,12 @@ class UserController extends Controller
 
     public function updateRole(Request $request, Role $role)
     {
+        // El rol Administrador es del sistema: su nombre no se puede cambiar,
+        // porque el acceso total y el módulo de Usuarios dependen de él.
+        if ($role->name === 'Administrador' && trim((string) $request->input('name')) !== 'Administrador') {
+            return redirect()->route('users.index')->with('error', 'El rol «Administrador» es del sistema y no se puede renombrar.');
+        }
+
         $rules = [
             'name' => 'required|string|max:255|unique:roles,name,'.$role->id,
             'modulos' => 'required|array|min:1',
