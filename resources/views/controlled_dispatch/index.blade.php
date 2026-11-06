@@ -396,7 +396,7 @@
     <!-- plantilla oculta para generar nuevas filas de productos -->
     <template id="rowTemplate">
         <tr class="bg-white hover:bg-slate-50/80 transition-colors group">
-            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
+            <td data-label="Producto" class="col-producto px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="productos[]" required onchange="llenarDatosFila(this)"
                     class="w-full bg-white border border-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 rounded-lg px-2.5 py-2 text-[12.5px] font-bold text-slate-800 outline-none shadow-xs cursor-pointer transition-colors">
                     <option value="" disabled selected>Seleccione estupefaciente...</option>
@@ -410,17 +410,18 @@
                         </option>
                     @endforeach
                 </select>
+                <div class="producto-nombre-movil"></div>
             </td>
-            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
+            <td data-label="Lote" class="col-lote px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <input type="text" name="lotes[]" readonly placeholder="Auto..."
                     class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] font-mono font-bold text-slate-600 outline-none shadow-inner cursor-not-allowed text-center">
             </td>
-            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle relative">
+            <td data-label="Vencimiento (FEFO)" class="col-vence px-3.5 py-2.5 border-r border-slate-100 align-middle relative">
                 <input type="date" name="vencimientos[]" readonly
                     class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] text-slate-600 outline-none shadow-inner cursor-not-allowed">
                 <div class="fefo-container"></div>
             </td>
-            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
+            <td data-label="Programa" class="col-programa px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="programas[]" required
                     class="w-full bg-white border border-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
                     @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental', 'Cuidados Paliativos'] as $idxProg => $progOpt)
@@ -428,7 +429,7 @@
                     @endforeach
                 </select>
             </td>
-            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
+            <td data-label="Cantidad" class="col-cantidad px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <div class="space-y-1">
                     <input type="number" name="cantidades[]" placeholder="0" min="1" oninput="validarStock(this)"
                         required
@@ -439,7 +440,7 @@
                     </div>
                 </div>
             </td>
-            <td class="px-3.5 py-2.5 text-center align-middle">
+            <td data-label="" class="col-quitar px-3.5 py-2.5 text-center align-middle">
                 <button type="button" onclick="removeRow(this)"
                     class="p-2 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-lg transition-colors cursor-pointer shadow-xs"
                     title="Quitar Fila">
@@ -1782,6 +1783,8 @@
             if (!option || option.disabled) return;
 
             let tr = selectElement.closest('tr');
+            const nombreMovil = tr.querySelector('.producto-nombre-movil');
+            if (nombreMovil) nombreMovil.textContent = option.getAttribute('data-nombre-completo') || option.value || '';
             let loteInput = tr.querySelector('input[name="lotes[]"]');
             let venceInput = tr.querySelector('input[name="vencimientos[]"]');
             let cantInput = tr.querySelector('input[name="cantidades[]"]');
@@ -1842,6 +1845,8 @@
             } else {
                 let select = tr.querySelector('select');
                 select.selectedIndex = 0;
+                const nombreMovilVacio = tr.querySelector('.producto-nombre-movil');
+                if (nombreMovilVacio) nombreMovilVacio.textContent = '';
                 tr.querySelectorAll('input').forEach(i => i.value = '');
                 tr.querySelector('.stock-container').classList.add('hidden');
                 tr.querySelector('.fefo-container').innerHTML = '';
@@ -2118,6 +2123,28 @@
     </script>
 
     <style>
+        /* ===== Detalle de extracción en celular: cada fila se muestra como tarjeta ===== */
+        .producto-nombre-movil { display: none; }
+        @media (max-width: 767px) {
+            #productsTable { min-width: 0 !important; width: 100% !important; table-layout: auto !important; white-space: normal !important; }
+            #productsTable thead { display: none; }
+            #productsTable, #productsTable tbody { display: block; }
+            #productsTable tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 12px; padding: 14px; border-bottom: 1px solid rgba(148, 163, 184, .35); }
+            #productsTable tbody tr:last-child { border-bottom: 0; }
+            #productsTable tbody td { display: block; padding: 0 !important; border: 0 !important; max-width: none !important; min-width: 0; }
+            #productsTable tbody td::before { content: attr(data-label); display: block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: #64748b; margin-bottom: 4px; }
+            #productsTable tbody td.col-producto, #productsTable tbody td.col-quitar { grid-column: 1 / -1; }
+            #productsTable tbody td.col-quitar { text-align: right !important; }
+            #productsTable tbody td.col-quitar::before { display: none; }
+            #productsTable tbody td.col-vence .fefo-container span { top: auto !important; bottom: 6px; transform: none !important; }
+            #productsTable select, #productsTable input { min-width: 0; }
+            .producto-nombre-movil { display: block; font-size: 12px; font-weight: 700; line-height: 1.35; margin-top: 6px; white-space: normal; overflow-wrap: anywhere; }
+            .producto-nombre-movil:empty { display: none; }
+            /* Modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
+            #SolicitudesModal > div, #BandejaModal > div { overflow-y: auto !important; }
+            #SolicitudesModal .max-h-\[60vh\], #BandejaModal .max-h-\[60vh\] { max-height: none !important; flex-shrink: 0; }
+        }
+
         @keyframes scanLaserAnim {
             0% { top: 6%; opacity: 0.6; }
             50% { top: 88%; opacity: 1; }
