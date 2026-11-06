@@ -108,14 +108,12 @@
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">RUT Proveedor</label>
                             <input type="text" id="rut_proveedor_display" readonly placeholder="Auto-completado" class="w-full bg-slate-100 border border-slate-200 text-slate-600 rounded-lg block py-2.5 px-3.5 text-[13px] font-mono-das cursor-not-allowed">
                         </div>
-                        <div class="sm:col-span-2">
+                        <div class="sm:col-span-2 min-w-0">
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Razon Social / Nombre Proveedor <span class="text-rose-500">*</span></label>
-                            <select name="provider_id" id="provider_select" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                            <select name="provider_id" id="provider_select" required class="w-full max-w-full truncate bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione proveedor...</option>
                                 @foreach($providers as $provider)
-                                    <option value="{{ $provider->id }}" data-rut="{{ $provider->rut ?? $provider->nit ?? '' }}">
-                                        {{ $provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor' }}
-                                    </option>
+                                    <option value="{{ $provider->id }}" data-rut="{{ $provider->rut ?? $provider->nit ?? '' }}">{{ trim($provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor') }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -219,36 +217,39 @@
                             </button>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div class="lg:col-span-2">
+                                <div class="lg:col-span-2 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Producto <span class="text-rose-500">*</span></label>
-                                    <select name="product_id[]" required onchange="onProductoReceptionChange(this)" class="select-producto-recepcion w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                    <select name="product_id[]" required onchange="onProductoReceptionChange(this)" class="select-producto-recepcion w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" disabled selected>Buscar producto por grupo...</option>
                                         <optgroup label="Medicamentos (Fármacos)" data-optgroup="Medicamentos">
                                             @foreach($productosAgrupados['Medicamentos'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Medicamentos" data-categoria="{{ $product->categoria_sugerida ?? 'Medicamentos' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">
-                                                    {{ $product->nombre }}
-                                                </option>
+                                                @php $nomLimpio = trim(preg_replace('/\s+/', ' ', $product->nombre ?? '')); @endphp
+                                                @if($nomLimpio !== '')
+                                                    <option value="{{ $product->id }}" title="{{ $nomLimpio }}" data-nombre-completo="{{ $nomLimpio }}" data-grupo="Medicamentos" data-categoria="{{ $product->categoria_sugerida ?? 'Medicamentos' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">{{ \Illuminate\Support\Str::limit($nomLimpio, 85) }}</option>
+                                                @endif
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Insumos y Equipamiento" data-optgroup="Insumos">
                                             @foreach($productosAgrupados['Insumos'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Insumos" data-categoria="{{ $product->categoria_sugerida ?? 'Insumos' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">
-                                                    {{ $product->nombre }}
-                                                </option>
+                                                @php $nomLimpio = trim(preg_replace('/\s+/', ' ', $product->nombre ?? '')); @endphp
+                                                @if($nomLimpio !== '')
+                                                    <option value="{{ $product->id }}" title="{{ $nomLimpio }}" data-nombre-completo="{{ $nomLimpio }}" data-grupo="Insumos" data-categoria="{{ $product->categoria_sugerida ?? 'Insumos' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">{{ \Illuminate\Support\Str::limit($nomLimpio, 85) }}</option>
+                                                @endif
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Estupefacientes y Controlados" data-optgroup="Estupefacientes">
                                             @foreach($productosAgrupados['Estupefacientes'] ?? [] as $product)
-                                                <option value="{{ $product->id }}" data-grupo="Estupefacientes" data-categoria="{{ $product->categoria_sugerida ?? 'Estupefacientes' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">
-                                                    {{ $product->nombre }} (Controlado)
-                                                </option>
+                                                @php $nomLimpio = trim(preg_replace('/\s+/', ' ', $product->nombre ?? '')); @endphp
+                                                @if($nomLimpio !== '')
+                                                    <option value="{{ $product->id }}" title="{{ $nomLimpio }} (Controlado)" data-nombre-completo="{{ $nomLimpio }} (Controlado)" data-grupo="Estupefacientes" data-categoria="{{ $product->categoria_sugerida ?? 'Estupefacientes' }}" data-programa="{{ $product->programa_sugerido ?? '' }}">{{ \Illuminate\Support\Str::limit($nomLimpio, 72) }} (Controlado)</option>
+                                                @endif
                                             @endforeach
                                         </optgroup>
                                     </select>
                                 </div>
-                                <div class="lg:col-span-2">
+                                <div class="lg:col-span-2 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoría / Clasificación <span class="text-rose-500">*</span></label>
-                                    <select name="tipo_producto[]" required onchange="onCategoriaReceptionChange(this)" class="select-categoria-recepcion w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                    <select name="tipo_producto[]" required onchange="onCategoriaReceptionChange(this)" class="select-categoria-recepcion w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" disabled selected>Seleccione categoría...</option>
                                         <optgroup label="Medicamentos (Fármacos)" data-optgroup-cat="Medicamentos">
                                             @foreach($categoriasAgrupadas['Medicamentos'] ?? ['Medicamentos' => 'MEDICAMENTOS GENERALES', 'Fármacos' => 'FÁRMACOS', 'F-FOFAR' => 'FOFAR (FARMACIA)', 'F-PALIATIVOS' => 'CUIDADOS PALIATIVOS', 'F-PARO' => 'CARRO DE PARO'] as $catVal => $catLabel)
@@ -267,10 +268,10 @@
                                         </optgroup>
                                     </select>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Programa</label>
                                     <select name="programa[]"
-                                        class="select-programa-recepcion w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                        class="select-programa-recepcion w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" selected>Sin programa</option>
                                         @foreach($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
                                             <option value="{{ $progOpt }}">{{ $progOpt === 'IRA/ERA' ? 'Respiratorio (IRA/ERA)' : $progOpt }}</option>
@@ -580,6 +581,24 @@
 
     <script>
         const CONTROLADOS_LIST = @json($controlados ?? []);
+        let PLANTILLA_OPTGROUPS_PRODUCTOS = [];
+
+        function asegurarRespaldoOptgroups(selectProd) {
+            if (!selectProd) return;
+            if (!selectProd._optgroupsBackup) {
+                if (PLANTILLA_OPTGROUPS_PRODUCTOS.length > 0) {
+                    selectProd._optgroupsBackup = PLANTILLA_OPTGROUPS_PRODUCTOS.map(og => og.cloneNode(true));
+                } else {
+                    selectProd._optgroupsBackup = Array.from(selectProd.querySelectorAll('optgroup')).map(og => og.cloneNode(true));
+                    PLANTILLA_OPTGROUPS_PRODUCTOS = selectProd._optgroupsBackup.map(og => og.cloneNode(true));
+                }
+            }
+        }
+
+        function obtenerNombreCompletoOpcion(opt) {
+            if (!opt) return '';
+            return (opt.getAttribute('data-nombre-completo') || opt.getAttribute('title') || opt.textContent || '').trim();
+        }
 
         function clasificarItemJs(nombreProducto, tipoProducto) {
             const nom = (nombreProducto || '').trim().toLowerCase();
@@ -658,16 +677,26 @@
             });
 
             const selectProd = card.querySelector('.select-producto-recepcion');
-            selectProd.querySelectorAll('optgroup').forEach(og => {
-                const ogGrupo = og.getAttribute('data-optgroup');
-                const visible = (grupo === 'Todos' || ogGrupo === grupo);
-                og.disabled = !visible;
-                og.hidden = !visible;
-                og.querySelectorAll('option').forEach(opt => {
-                    opt.disabled = !visible;
-                    opt.hidden = !visible;
-                });
+            asegurarRespaldoOptgroups(selectProd);
+
+            const prevValue = selectProd.value;
+
+            // Eliminamos del DOM los optgroups actuales en lugar de usar .hidden para evitar espacios en blanco en el desplegable nativo
+            selectProd.querySelectorAll('optgroup').forEach(og => og.remove());
+
+            selectProd._optgroupsBackup.forEach(ogTemplate => {
+                const ogGrupo = ogTemplate.getAttribute('data-optgroup');
+                if (grupo === 'Todos' || ogGrupo === grupo) {
+                    selectProd.appendChild(ogTemplate.cloneNode(true));
+                }
             });
+
+            const optionStillExists = Array.from(selectProd.options).some(opt => opt.value === prevValue && prevValue !== '');
+            if (optionStillExists) {
+                selectProd.value = prevValue;
+            } else {
+                selectProd.selectedIndex = 0;
+            }
 
             const selectedOpt = selectProd.options[selectProd.selectedIndex];
             if (grupo !== 'Todos') {
@@ -789,6 +818,11 @@
             const firstItem = container.querySelector('.producto-item');
             const clone = firstItem.cloneNode(true);
 
+            const selectCloneProd = clone.querySelector('.select-producto-recepcion');
+            if (PLANTILLA_OPTGROUPS_PRODUCTOS.length > 0 && selectCloneProd) {
+                selectCloneProd._optgroupsBackup = PLANTILLA_OPTGROUPS_PRODUCTOS.map(og => og.cloneNode(true));
+            }
+
             clone.querySelectorAll('input').forEach(inp => inp.value = '');
             clone.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
 
@@ -827,7 +861,7 @@
         function obtenerConfigUbicacionFila(card) {
             const selProd = card.querySelector('.select-producto-recepcion');
             const prodText = selProd && selProd.selectedIndex >= 0 && selProd.value
-                ? selProd.options[selProd.selectedIndex].text.trim()
+                ? obtenerNombreCompletoOpcion(selProd.options[selProd.selectedIndex])
                 : '';
             const loteVal = (card.querySelector('input[name="lote[]"]')?.value || '').trim();
             return {
@@ -1022,6 +1056,10 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar copia maestra de los optgroups al cargar la vista
+            const firstProdSelect = document.querySelector('.select-producto-recepcion');
+            asegurarRespaldoOptgroups(firstProdSelect);
+
             // 1. logica autocompletar proveedor
             const providerSelect = document.getElementById('provider_select');
             const rutInput = document.getElementById('rut_proveedor_display');
@@ -1136,7 +1174,7 @@
                         totalUnidades += qty;
                         totalNeto += (qty * price);
 
-                        const rawNombre = prodSelect.options[prodSelect.selectedIndex]?.text.trim() || 'Producto';
+                        const rawNombre = obtenerNombreCompletoOpcion(prodSelect.options[prodSelect.selectedIndex]) || 'Producto';
                         const rawCat = catSelect && catSelect.selectedIndex >= 0 ? catSelect.options[catSelect.selectedIndex]?.text.trim() : '';
                         const rawProg = progSelect && progSelect.value ? progSelect.value.trim() : 'General DAS';
                         const rawVence = vencInput?.value ? vencInput.value.split('-').reverse().join('/') : 'N/A';

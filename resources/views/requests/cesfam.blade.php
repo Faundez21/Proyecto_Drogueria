@@ -5,6 +5,21 @@
 
 @section('actions')
     @role('Administrador')
+        <button type="button" onclick="openPendingRequestsCesfamModal()"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer border border-slate-700">
+            <svg class="w-4 h-4 text-teal-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+            </svg>
+            Solicitudes Pendientes CESFAM
+            @if(isset($pendientesCount) && $pendientesCount > 0)
+                <span class="px-2 py-0.5 text-[11px] font-extrabold bg-teal-500/20 text-teal-300 border border-teal-500/30 rounded-full">
+                    {{ $pendientesCount }}
+                </span>
+            @endif
+        </button>
+
         <button type="button" onclick="openRequestInventoryModal()"
             class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
             <svg class="w-4 h-4 text-teal-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,6 +249,7 @@
                                             @foreach ($products as $product)
                                                 @if (!in_array($product->nombre, $controlados))
                                                     <option value="{{ $product->id }}"
+                                                        title="{{ $product->nombre }}"
                                                         data-programa="{{ $product->programa_sugerido ?? '' }}"
                                                         data-categoria="{{ $product->categoria_sugerida ?? '' }}">
                                                         {{ $product->nombre }}
@@ -246,6 +262,7 @@
                                             @foreach ($products as $product)
                                                 @if (in_array($product->nombre, $controlados))
                                                     <option value="{{ $product->id }}"
+                                                        title="{{ $product->nombre }}"
                                                         data-programa="{{ $product->programa_sugerido ?? '' }}"
                                                         data-categoria="{{ $product->categoria_sugerida ?? 'Estupefacientes' }}">
                                                         {{ $product->nombre }}
@@ -430,6 +447,8 @@
         'modalSubtitle' => 'Directorio de medicamentos, insumos y estupefacientes declarados por los CESFAM en sus solicitudes.',
         'esVistaCesfam' => true,
     ])
+
+    @include('requests.partials.pending_cesfam_modal')
 
     <!-- libreria para las firmas -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
