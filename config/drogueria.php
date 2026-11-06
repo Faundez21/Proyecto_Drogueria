@@ -26,6 +26,33 @@ return [
         'Recetas Cheque Estupefacientes',
     ],
 
+    /*
+    | Principios activos sujetos a control legal (estupefacientes y psicotrópicos).
+    | Cualquier producto cuyo nombre contenga uno de estos principios (o una
+    | variante muy parecida, por ejemplo con un error de tipeo) se trata como
+    | fármaco controlado en todo el sistema, aunque su nombre no sea idéntico
+    | a los de la lista 'controlados'.
+    */
+    'principios_controlados' => [
+        'alprazolam',
+        'buprenorfina',
+        'clonazepam',
+        'diazepam',
+        'fenobarbital',
+        'lorazepam',
+        'metilfenidato',
+        'midazolam',
+        'morfina',
+        'petidina',
+        'zolpidem',
+    ],
+
+    // Frases que identifican a un controlado aunque no sea un principio activo.
+    'frases_controlados' => [
+        'receta cheque',
+        'recetas cheque',
+    ],
+
     'establecimientos' => [
         // CESFAM
         ['nombre' => 'CESFAM Los Cerros', 'tipo' => 'CESFAM', 'direccion' => 'Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano'],

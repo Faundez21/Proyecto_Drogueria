@@ -57,8 +57,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/notifications/mark-all-read', [GlobalSearchController::class, 'markAllAsRead'])->name('global.notifications.mark_all_read');
     Route::post('/api/notifications/unmark-read', [GlobalSearchController::class, 'unmarkAsRead'])->name('global.notifications.unmark_read');
 
-    //  GESTIÓN DE USUARIOS Y ROLES (acceso por permiso ver.usuarios; Administrador entra siempre vía Gate::before) 
-    Route::middleware('permission:ver.usuarios')->group(function () {
+    //  GESTIÓN DE USUARIOS Y ROLES (exclusivo del rol Administrador; ningún otro rol puede acceder)
+    Route::middleware('role:Administrador')->group(function () {
 
         // asignar contraseña por el administrador
         Route::post('/users/reset-password/{email}', [PasswordResetRequestController::class, 'resetPassword'])

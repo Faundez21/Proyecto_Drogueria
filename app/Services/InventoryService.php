@@ -11,25 +11,150 @@ use App\Models\Product;
 use App\Models\Provider;
 use App\Models\ReceptionItem;
 use App\Models\Shelf;
+use App\Models\StockMovement;
 use Illuminate\Support\Collection;
 
 class InventoryService
 {
+    /** Caché en memoria (por petición) de los resultados de esControlado(). */
+    private static array $cacheControlado = [];
+
+    /** Caché en memoria (por petición) de la lista ampliada de nombres controlados. */
+    private static ?array $cacheListaControlados = null;
+
+    /**
+     * Normaliza un texto para compararlo: minúsculas, sin tildes, sin la marca
+     * "(Controlado)" y con un solo espacio entre palabras.
+     */
+    public static function normalizarTexto(string $texto): string
+    {
+        $texto = mb_strtolower(trim($texto));
+        $texto = strtr($texto, [
+            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u',
+            'ä' => 'a', 'ë' => 'e', 'ï' => 'i', 'ö' => 'o', 'ü' => 'u', 'ñ' => 'n',
+        ]);
+        $texto = str_replace('(controlado)', ' ', $texto);
+        $texto = preg_replace('/\s+/', ' ', $texto);
+
+        return trim((string) $texto);
+    }
+
+    /**
+     * Indica si un producto es un fármaco controlado (estupefaciente o psicotrópico).
+     *
+     * Además de la coincidencia exacta con la lista oficial, detecta por similitud:
+     * basta con que el nombre contenga un principio activo controlado (por ejemplo
+     * "MORFINA CLORHIDRATO 10 MG/ML AMPOLLA" o "CLONAZEPAM 2.0 MG COMPRIMIDOS"),
+     * tolerando pequeños errores de tipeo ("CLONAZEPAN", "METILFENIDTO").
+     */
     public static function esControlado(string $producto): bool
     {
-        $nombreNorm = mb_strtolower(trim($producto));
+        $nombreNorm = self::normalizarTexto($producto);
+
+        if ($nombreNorm === '') {
+            return false;
+        }
+
+        if (array_key_exists($nombreNorm, self::$cacheControlado)) {
+            return self::$cacheControlado[$nombreNorm];
+        }
+
+        return self::$cacheControlado[$nombreNorm] = self::detectarControlado($nombreNorm);
+    }
+
+    private static function detectarControlado(string $nombreNorm): bool
+    {
+        // 1. Coincidencia exacta con la lista oficial de controlados
         foreach (config('drogueria.controlados', []) as $ctrl) {
-            if (mb_strtolower(trim($ctrl)) === $nombreNorm) {
+            if (self::normalizarTexto((string) $ctrl) === $nombreNorm) {
                 return true;
+            }
+        }
+
+        // 2. Frases que identifican un controlado (ej. "Recetas Cheque")
+        foreach (config('drogueria.frases_controlados', []) as $frase) {
+            $frase = self::normalizarTexto((string) $frase);
+            if ($frase !== '' && str_contains($nombreNorm, $frase)) {
+                return true;
+            }
+        }
+
+        // 3. Similitud por principio activo, palabra por palabra
+        $principios = array_map(
+            fn ($p) => self::normalizarTexto((string) $p),
+            config('drogueria.principios_controlados', [])
+        );
+        $palabras = preg_split('/[^a-z]+/', $nombreNorm, -1, PREG_SPLIT_NO_EMPTY);
+
+        foreach ($palabras as $palabra) {
+            if (strlen($palabra) < 6) {
+                continue;
+            }
+
+            foreach ($principios as $principio) {
+                if ($principio === '') {
+                    continue;
+                }
+
+                if ($palabra === $principio || str_starts_with($palabra, $principio)) {
+                    return true;
+                }
+
+                // Tolerancia a errores de tipeo: 1 letra en palabras cortas, 2 en largas
+                $tolerancia = strlen($principio) >= 9 ? 2 : 1;
+                if (abs(strlen($palabra) - strlen($principio)) <= $tolerancia
+                    && levenshtein($palabra, $principio) <= $tolerancia) {
+                    return true;
+                }
             }
         }
 
         return false;
     }
 
+    /**
+     * Lista oficial de controlados definida en config/drogueria.php.
+     */
+    public static function controladosOficiales(): array
+    {
+        return config('drogueria.controlados', []);
+    }
+
+    /**
+     * Lista ampliada de nombres de productos controlados: la lista oficial más todos
+     * los productos del catálogo e inventario que se detectan como controlados por
+     * similitud. Se usa en los filtros whereIn / whereNotIn de todo el sistema.
+     */
     public static function controlados(): array
     {
-        return config('drogueria.controlados');
+        if (self::$cacheListaControlados !== null) {
+            return self::$cacheListaControlados;
+        }
+
+        $nombres = collect(self::controladosOficiales());
+
+        try {
+            $nombres = $nombres
+                ->merge(Product::query()->pluck('nombre'))
+                ->merge(Inventory::query()->whereNotNull('producto')->distinct()->pluck('producto'));
+        } catch (\Throwable $e) {
+            // Si la base de datos aún no está disponible (ej. durante migraciones), usar solo la lista oficial
+        }
+
+        return self::$cacheListaControlados = $nombres
+            ->map(fn ($n) => trim((string) $n))
+            ->filter(fn ($n) => $n !== '' && self::esControlado($n))
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Limpia la caché de la lista ampliada (por ejemplo, después de crear productos nuevos).
+     */
+    public static function limpiarCacheControlados(): void
+    {
+        self::$cacheListaControlados = null;
     }
 
     /**
@@ -111,9 +236,17 @@ class InventoryService
     {
         $lote = self::normalizarLote($lote);
 
+        // Antes de despachar, cualquier lote vencido pasa automáticamente a Merma
+        self::moverVencidosAMerma();
+
         $lotes = Inventory::where('producto', $producto)
             ->whereIn('estado', $estadosPermitidos)
             ->where('cantidad', '>', 0)
+            // Nunca se despachan lotes vencidos (se permite el mismo día de vencimiento)
+            ->where(function ($q) {
+                $q->whereNull('fecha_vencimiento')
+                    ->orWhereDate('fecha_vencimiento', '>=', now()->toDateString());
+            })
             ->when($lote !== null, fn ($q) => $q->where('lote', $lote))
             ->orderByRaw('CASE WHEN fecha_vencimiento IS NULL THEN 1 ELSE 0 END ASC, fecha_vencimiento ASC, id ASC')
             ->lockForUpdate()
@@ -149,6 +282,58 @@ class InventoryService
         }
 
         return $asignaciones;
+    }
+
+    /** Evita revisar los vencimientos más de una vez en la misma petición. */
+    private static bool $vencidosRevisados = false;
+
+    /**
+     * Mueve automáticamente a Merma todos los lotes vencidos que sigan en
+     * Disponible o Cuarentena, y registra el cambio en el Kardex (trazabilidad).
+     * Un lote se considera vencido desde el día siguiente a su fecha de vencimiento.
+     *
+     * Devuelve la cantidad de lotes movidos.
+     */
+    public static function moverVencidosAMerma(bool $forzar = false): int
+    {
+        if (self::$vencidosRevisados && ! $forzar) {
+            return 0;
+        }
+        self::$vencidosRevisados = true;
+
+        $hoy = now()->toDateString();
+
+        $vencidos = Inventory::whereIn('estado', ['Disponible', 'Cuarentena'])
+            ->where('cantidad', '>', 0)
+            ->whereNotNull('fecha_vencimiento')
+            ->whereDate('fecha_vencimiento', '<', $hoy)
+            ->get();
+
+        foreach ($vencidos as $lote) {
+            $estadoAnterior = $lote->estado;
+            $fechaTxt = \Carbon\Carbon::parse($lote->fecha_vencimiento)->format('d/m/Y');
+
+            $lote->update([
+                'estado' => 'Merma',
+                'motivo' => "Producto vencido el {$fechaTxt}. Enviado a Merma automáticamente por el sistema.",
+            ]);
+
+            StockMovement::create([
+                'inventory_id' => $lote->id,
+                'user_id' => null,
+                'producto' => $lote->producto,
+                'lote' => $lote->lote,
+                'fecha_vencimiento' => $lote->fecha_vencimiento,
+                'tipo_movimiento' => 'Cambio de estado',
+                'cantidad' => $lote->cantidad,
+                'fecha_hora' => now(),
+                'origen_destino' => 'Desde: ' . $estadoAnterior . ' / Hacia: Merma',
+                'documento_respaldo' => "Vencimiento automático ({$fechaTxt})",
+                'estado_lote' => 'Merma',
+            ]);
+        }
+
+        return $vencidos->count();
     }
 
     /**
@@ -309,7 +494,7 @@ class InventoryService
      */
     public static function sincronizarProductosDesdeInventario(): void
     {
-        foreach (self::controlados() as $ctrlNombre) {
+        foreach (self::controladosOficiales() as $ctrlNombre) {
             $nom = trim((string) $ctrlNombre);
             if ($nom !== '') {
                 Product::firstOrCreate(['nombre' => $nom]);

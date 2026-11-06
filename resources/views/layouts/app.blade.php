@@ -327,7 +327,7 @@
                                     ->whereHas('items.product', fn ($q) => $q->whereIn('nombre', $controladosList))
                                     ->count();
                             }
-                            if (auth()->user()->can('ver.usuarios')) {
+                            if (auth()->user()->hasRole('Administrador')) {
                                 $sidebarClavesPendCount = \Illuminate\Support\Facades\DB::table('password_reset_tokens')
                                     ->where('status', 'pending')
                                     ->count();
@@ -559,7 +559,7 @@
                     @endcanany
 
                     <!-- Administración -->
-                    @can('ver.usuarios')
+                    @role('Administrador')
                         <div class="pt-6 pb-4 border-t border-slate-800">
                             <p class="text-[11.5px] font-semibold tracking-wide uppercase px-2 mb-2 text-slate-500">
                                 Configuración</p>
@@ -582,7 +582,7 @@
                                 </a>
                             </div>
                         </div>
-                    @endcan
+                    @endrole
                 </nav>
             </aside>
             <!-- Contenedor principal -->

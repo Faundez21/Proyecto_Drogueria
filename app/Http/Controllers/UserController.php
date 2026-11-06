@@ -23,7 +23,6 @@ class UserController extends Controller
         'despacho_controlado' => 'Despacho Controlado',
         'trazabilidad' => 'Trazabilidad',
         'reportes' => 'Reportes',
-        'usuarios' => 'Usuarios y Roles',
     ];
 
     public const MODULOS_GRUPOS = [
@@ -67,7 +66,6 @@ class UserController extends Controller
             'items' => [
                 'trazabilidad' => ['label' => 'Trazabilidad', 'desc' => 'Kardex histórico y línea de tiempo por lote'],
                 'reportes' => ['label' => 'Reportes', 'desc' => 'Exportación de informes en Excel y PDF'],
-                'usuarios' => ['label' => 'Usuarios y Roles', 'desc' => 'Administración de cuentas, roles y permisos por vista'],
             ],
         ],
     ];

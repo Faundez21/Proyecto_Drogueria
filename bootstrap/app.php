@@ -22,6 +22,12 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         ]);
 
+        // En cada petición web: bloquear usuarios desactivados y enviar a Merma los lotes vencidos
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\EnsureUserIsActive::class,
+            \App\Http\Middleware\MoverVencidosAMerma::class,
+        ]);
+
         // Alias de middlewares para usar en web.php
         $middleware->alias([
             'auth' => Authenticate::class,
@@ -49,7 +55,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
                     // Redirigir a la primera vista permitida para este usuario
                     $rutasModulos = [
-                        'ver.usuarios' => 'users.index',
                         'ver.inventario' => 'inventory.index',
                         'ver.recepcion' => 'reception.index',
                         'ver.cuarentena' => 'quarantine.index',

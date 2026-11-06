@@ -23,7 +23,7 @@ class ReceptionController extends Controller
 {
     public function index()
     {
-        foreach (InventoryService::controlados() as $ctrlNombre) {
+        foreach (InventoryService::controladosOficiales() as $ctrlNombre) {
             Product::firstOrCreate(['nombre' => $ctrlNombre]);
         }
 
