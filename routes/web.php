@@ -132,6 +132,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/requests', [EstablishmentRequestController::class, 'store'])
         ->middleware(['auth', 'permission:ver.solicitudes|ver.solicitudes_cesfam'])
         ->name('requests.store');
+    Route::get('/requests/pending/establecimientos/pdf', [EstablishmentRequestController::class, 'pendingEstablecimientosPdf'])
+        ->middleware(['auth', 'role:Administrador'])
+        ->name('requests.pending.establecimientos.pdf');
+    Route::get('/requests/pending/cesfam/pdf', [EstablishmentRequestController::class, 'pendingCesfamPdf'])
+        ->middleware(['auth', 'role:Administrador'])
+        ->name('requests.pending.cesfam.pdf');
     // modulo de recepcion
     Route::prefix('reception')->name('reception.')->middleware('permission:ver.recepcion')->group(function () {
         Route::get('/', [ReceptionController::class, 'index'])->name('index');
