@@ -15,6 +15,11 @@ class ControlledDispatchItem extends Model
         return $this->belongsTo(ControlledDispatch::class, 'controlled_dispatch_id');
     }
 
+    public function controlledDispatch()
+    {
+        return $this->belongsTo(ControlledDispatch::class, 'controlled_dispatch_id');
+    }
+
     public function inventory()
     {
         return $this->belongsTo(Inventory::class);
