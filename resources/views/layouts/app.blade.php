@@ -37,6 +37,30 @@
             z-index: 9999999 !important;
         }
 
+        /* Desplegable de búsqueda de productos con autocompletado (#searchDropdown) */
+        #searchDropdown {
+            min-width: 100% !important;
+            width: max-content !important;
+            max-width: min(750px, 94vw) !important;
+            white-space: normal !important;
+            z-index: 99999 !important;
+        }
+
+        .search-item {
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+            line-height: 1.4 !important;
+        }
+
+        .search-item span {
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+            line-height: 1.4 !important;
+            flex: 1 1 auto !important;
+        }
+
         :root {
             --sidebar-bg: #0F172A;
             --sidebar-hover: #1E293B;
@@ -1035,13 +1059,13 @@
 
                             html += `
                                 <a href="${item.url}" id="search-item-${index}" class="search-result-item flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 transition-all duration-200 border border-transparent mt-0.5 group">
-                                    <div class="flex items-center gap-3 overflow-hidden">
+                                    <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
                                         <span class="p-1.5 rounded-md bg-slate-100 text-slate-500 transition-colors group-hover:bg-teal-100/50 group-hover:text-teal-600 shrink-0">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg>
                                         </span>
-                                        <div class="flex flex-col min-w-0">
-                                            <span class="text-[13px] font-bold truncate">${highlightedTitle}</span>
-                                            <span class="text-[11px] text-slate-500 font-mono truncate">${highlightedSubtitle}</span>
+                                        <div class="flex flex-col min-w-0 flex-1">
+                                            <span class="text-[13px] font-bold leading-snug break-words">${highlightedTitle}</span>
+                                            <span class="text-[11px] text-slate-500 font-mono leading-tight break-words">${highlightedSubtitle}</span>
                                         </div>
                                     </div>
                                     <span class="go-icon text-[11px] font-mono-das text-teal-600 opacity-0 transition-opacity flex items-center gap-1.5 shrink-0 pl-2">

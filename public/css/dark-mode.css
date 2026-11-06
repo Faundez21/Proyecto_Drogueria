@@ -1115,5 +1115,129 @@ html.dark #SolicitudesModal tr[id^="solicitud-"] > td > div > div {
     border-color: #2E4057 !important;
 }
 
+/* Modales de Solicitudes Pendientes (Establecimientos y CESFAM) en Modo Oscuro */
+html.dark #PendingRequestsEstablecimientosModal > div,
+html.dark #PendingRequestsCesfamModal > div {
+    background-color: #0F172A !important;
+    border-color: #334155 !important;
+    color: #F8FAFC !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal select,
+html.dark #PendingRequestsEstablecimientosModal input,
+html.dark #PendingRequestsCesfamModal select,
+html.dark #PendingRequestsCesfamModal input {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+    color: #F8FAFC !important;
+    color-scheme: dark !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal select:focus,
+html.dark #PendingRequestsEstablecimientosModal input:focus,
+html.dark #PendingRequestsCesfamModal select:focus,
+html.dark #PendingRequestsCesfamModal input:focus {
+    border-color: #14B8A6 !important;
+    background-color: #0F172A !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal table,
+html.dark #PendingRequestsCesfamModal table {
+    border-color: #1E293B !important;
+    background-color: #0F172A !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal thead tr,
+html.dark #PendingRequestsCesfamModal thead tr {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+    color: #E2E8F0 !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal tbody tr,
+html.dark #PendingRequestsCesfamModal tbody tr {
+    border-color: #1E293B !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal tbody tr.pending-estab-row:hover,
+html.dark #PendingRequestsCesfamModal tbody tr.pending-cesfam-row:hover {
+    background-color: rgba(30, 41, 59, 0.7) !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal tr[id^="estab-detail-"],
+html.dark #PendingRequestsCesfamModal tr[id^="cesfam-detail-"] {
+    background-color: #0B1120 !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal tr[id^="estab-detail-"] > td > div,
+html.dark #PendingRequestsCesfamModal tr[id^="cesfam-detail-"] > td > div {
+    background-color: #131D31 !important;
+    border-color: #1E293B !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal tr[id^="estab-detail-"] table,
+html.dark #PendingRequestsCesfamModal tr[id^="cesfam-detail-"] table {
+    background-color: transparent !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal tr[id^="estab-detail-"] thead tr,
+html.dark #PendingRequestsCesfamModal tr[id^="cesfam-detail-"] thead tr {
+    background-color: transparent !important;
+    border-color: #334155 !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal tr[id^="estab-detail-"] tbody tr,
+html.dark #PendingRequestsCesfamModal tr[id^="cesfam-detail-"] tbody tr {
+    border-color: #1E293B !important;
+}
+
+/* Barra de métricas y notificaciones de descarga individual en Modo Oscuro */
+html.dark #PendingRequestsEstablecimientosModal .bg-slate-100\/90,
+html.dark #PendingRequestsCesfamModal .bg-slate-100\/90 {
+    background-color: #111C2E !important;
+    border-color: #1E293B !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal .bg-slate-100\/90 .shadow-xs,
+html.dark #PendingRequestsCesfamModal .bg-slate-100\/90 .shadow-xs {
+    background-color: #0F172A !important;
+    border-color: #2E4057 !important;
+}
+
+html.dark #PendingRequestsEstablecimientosModal .bg-teal-50,
+html.dark #PendingRequestsCesfamModal .bg-teal-50,
+html.dark #PendingRequestsEstablecimientosModal .bg-teal-500\/10,
+html.dark #PendingRequestsCesfamModal .bg-teal-500\/10 {
+    background-color: rgba(20, 184, 166, 0.12) !important;
+    border-color: rgba(20, 184, 166, 0.35) !important;
+    color: #5EEAD4 !important;
+}
+
+/* Desplegables de búsqueda de productos (#searchDropdown) en modo oscuro */
+html.dark #searchDropdown {
+    background-color: #0F172A !important;
+    border-color: #334155 !important;
+    color: #F8FAFC !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark #searchDropdown .search-item {
+    color: #E2E8F0 !important;
+    border-color: #1E293B !important;
+}
+
+html.dark #searchDropdown .search-item:hover {
+    background-color: #1E293B !important;
+    color: #38BDF8 !important;
+}
+
+/* Opciones de select para que no se corten en modo oscuro */
+html.dark select option {
+    background-color: #0F172A !important;
+    color: #F8FAFC !important;
+}
+
+
+
 
 
