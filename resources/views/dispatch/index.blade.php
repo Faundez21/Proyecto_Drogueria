@@ -243,11 +243,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
 
                     <!-- clasificacion interno/externo -->
-                    <div class="md:col-span-2">
+                    <div class="md:col-span-2 min-w-0">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Clasificacion del Despacho <span
                                 class="text-rose-500">*</span></label>
                         <select name="clasificacion" id="clasificacion_select" onchange="toggleClasificacion()" required
-                            class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                            class="w-full max-w-full truncate bg-slate-50 border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                             <option value="" disabled selected>Seleccione la clasificacion...</option>
                             <option value="Interno">Interno (Nivel Comunal / CESFAM)</option>
                             <option value="Externo">Externo (Traspasos, Prestamos, Donaciones, etc.)</option>
@@ -261,78 +261,52 @@
                             class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
                     </div>
 
-                    <div class="md:col-span-1">
+                    <div class="md:col-span-1 min-w-0">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Liberacion <span
                                 class="text-rose-500">*</span></label>
                         <select name="estado_liberacion" required
-                            class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                            class="w-full max-w-full truncate bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                             <option value="Liberada">Liberada / Aprobada</option>
                             <option value="Pendiente">Pendiente de V°B°</option>
                         </select>
                     </div>
 
                     <!-- div dinamico para destino interno -->
-                    <div id="div_interno" class="md:col-span-2 hidden">
+                    <div id="div_interno" class="md:col-span-2 hidden min-w-0">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Interno)
                             <span class="text-rose-500">*</span></label>
                         <select id="establecimiento_interno" onchange="actualizarDireccionInterna()"
-                            class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                            class="w-full max-w-full truncate bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                             <option value="" disabled selected>Seleccione el Establecimiento...</option>
-                            <option value="CESFAM LOS CERROS"
-                                data-direccion="Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano">CESFAM
-                                LOS CERROS</option>
-                            <option value="CESFAM PAULINA AVENDAÑO PEREDA"
-                                data-direccion="Calle Carlos Dittborn 4100, Villa San Martin, Talcahuano">CESFAM PAULINA
-                                AVENDAÑO PEREDA</option>
-                            <option value="CESFAM SAN VICENTE" data-direccion="Calle Brasil 360, San Vicente, Talcahuano">
-                                CESFAM SAN VICENTE</option>
-                            <option value="CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN"
-                                data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM ALCALDE
-                                LEOCÁN PORTUS GOVINDEN</option>
-                            <option value="CECOSF ESMERALDA"
-                                data-direccion="Calle San Miguel 546, Poblacion Patricio Lynch, Talcahuano">CECOSF
-                                ESMERALDA</option>
-                            <option value="CECOSF 8 DE MAYO"
-                                data-direccion="Calle Aysen 7370, poblacion Diego Portales, Talcahuano">CECOSF 8 DE MAYO
-                            </option>
-                            <option value="CECOSF LIBERTAD-GAETE"
-                                data-direccion="Calle Isla San Ambrosio 509, poblacion Libertad, Talcahuano">CECOSF
-                                LIBERTAD-GAETE</option>
-                            <option value="CECOSF LOS LOBOS-LA GLORIA"
-                                data-direccion="Calle Los Lobos 1960, poblacion Los Lobos, Talcahuano">CECOSF LOS LOBOS-LA
-                                GLORIA</option>
-                            <option value="CECOSF VILLA CENTINELA"
-                                data-direccion="Calle Punta Peñablanca 1301, poblacion Centinela, Talcahuano">CECOSF
-                                VILLA CENTINELA</option>
-                            <option value="POSTA RURAL TUMBES" data-direccion="Maryland s/n, Caleta Tumbes, Talcahuano">POSTA
-                                RURAL TUMBES</option>
-                            <option value="SAR SAN VICENTE" data-direccion="Juan de la Cruz Tapia s/n, Talcahuano">SAR SAN
-                                VICENTE</option>
-                            <option value="SAR LOS CERROS" data-direccion="Calle Coliumo S/N Nueva los Lobos, Talcahuano">
-                                SAR LOS CERROS</option>
+                            <option value="CESFAM LOS CERROS" data-direccion="Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano">CESFAM LOS CERROS</option>
+                            <option value="CESFAM PAULINA AVENDAÑO PEREDA" data-direccion="Calle Carlos Dittborn 4100, Villa San Martin, Talcahuano">CESFAM PAULINA AVENDAÑO PEREDA</option>
+                            <option value="CESFAM SAN VICENTE" data-direccion="Calle Brasil 360, San Vicente, Talcahuano">CESFAM SAN VICENTE</option>
+                            <option value="CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN" data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM ALCALDE LEOCÁN PORTUS GOVINDEN</option>
+                            <option value="CECOSF ESMERALDA" data-direccion="Calle San Miguel 546, Poblacion Patricio Lynch, Talcahuano">CECOSF ESMERALDA</option>
+                            <option value="CECOSF 8 DE MAYO" data-direccion="Calle Aysen 7370, poblacion Diego Portales, Talcahuano">CECOSF 8 DE MAYO</option>
+                            <option value="CECOSF LIBERTAD-GAETE" data-direccion="Calle Isla San Ambrosio 509, poblacion Libertad, Talcahuano">CECOSF LIBERTAD-GAETE</option>
+                            <option value="CECOSF LOS LOBOS-LA GLORIA" data-direccion="Calle Los Lobos 1960, poblacion Los Lobos, Talcahuano">CECOSF LOS LOBOS-LA GLORIA</option>
+                            <option value="CECOSF VILLA CENTINELA" data-direccion="Calle Punta Peñablanca 1301, poblacion Centinela, Talcahuano">CECOSF VILLA CENTINELA</option>
+                            <option value="POSTA RURAL TUMBES" data-direccion="Maryland s/n, Caleta Tumbes, Talcahuano">POSTA RURAL TUMBES</option>
+                            <option value="SAR SAN VICENTE" data-direccion="Juan de la Cruz Tapia s/n, Talcahuano">SAR SAN VICENTE</option>
+                            <option value="SAR LOS CERROS" data-direccion="Calle Coliumo S/N Nueva los Lobos, Talcahuano">SAR LOS CERROS</option>
                             <option value="UAPO" data-direccion="Calle Blanco Encalada 1142, Talcahuano">UAPO</option>
-                            <option value="Dental - CESFAM SAN VICENTE" data-direccion="Brasil 360, Talcahuano">Dental -
-                                CESFAM SAN VICENTE</option>
-                            <option value="Laboratorio - CESFAM SAN VICENTE" data-direccion="Brasil 360, Talcahuano">
-                                Laboratorio - CESFAM SAN VICENTE</option>
-                            <option value="MÓDULO DENTAL JUNAEB" data-direccion="Calle Blanco Encalada 455, Talcahuano">
-                                MÓDULO DENTAL JUNAEB</option>
-                            <option value="MÓVIL: LICEO POLIVALENTE Y LICEO COMERCIAL" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">
-                                MÓVIL: LICEO POLIVALENTE Y LICEO COMERCIAL</option>
-                            <option value="MÓVIL: LICEO INDUSTRIAL Y LICEO ASUNCIÓN" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">
-                                MÓVIL: LICEO INDUSTRIAL Y LICEO ASUNCIÓN</option>
-                            <option value="MÓVIL: LICEO A-21" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">
-                                MÓVIL: LICEO A-21</option>
+                            <option value="Dental - CESFAM SAN VICENTE" data-direccion="Brasil 360, Talcahuano">Dental - CESFAM SAN VICENTE</option>
+                            <option value="Laboratorio - CESFAM SAN VICENTE" data-direccion="Brasil 360, Talcahuano">Laboratorio - CESFAM SAN VICENTE</option>
+                            <option value="MÓDULO DENTAL JUNAEB" data-direccion="Calle Blanco Encalada 455, Talcahuano">MÓDULO DENTAL JUNAEB</option>
+                            <option value="MÓVIL: LICEO POLIVALENTE Y LICEO COMERCIAL" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">MÓVIL: LICEO POLIVALENTE Y LICEO COMERCIAL</option>
+                            <option value="MÓVIL: LICEO INDUSTRIAL Y LICEO ASUNCIÓN" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">MÓVIL: LICEO INDUSTRIAL Y LICEO ASUNCIÓN</option>
+                            <option value="MÓVIL: LICEO A-21" data-direccion="Unidad Móvil Salud Escolar, Talcahuano">MÓVIL: LICEO A-21</option>
                         </select>
                     </div>
 
                     <!-- div dinamico para destino externo -->
-                    <div id="div_externo" class="md:col-span-2 hidden">
+                    <div id="div_externo" class="md:col-span-2 hidden min-w-0">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo y Destino Externo <span
                                 class="text-rose-500">*</span></label>
                         <div class="flex flex-col sm:flex-row gap-3">
                             <select id="tipo_externo"
-                                class="w-full sm:w-2/5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                                class="w-full sm:w-2/5 max-w-full truncate bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                                 <option value="" disabled selected>Tipo...</option>
                                 <option value="Traspaso">Traspaso</option>
                                 <option value="Prestamo">Prestamo</option>
@@ -399,7 +373,7 @@
                 </div>
 
                 <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-xs bg-white">
-                    <table class="w-full text-left text-[13px] whitespace-nowrap" id="productsTable">
+                    <table class="w-full min-w-[780px] table-fixed text-left text-[13px] whitespace-nowrap" id="productsTable">
                         <thead
                             class="bg-slate-100/80 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10.5px]">
                             <tr>
@@ -489,18 +463,20 @@
     <!-- plantilla oculta para generar nuevas filas de productos -->
     <template id="rowTemplate">
         <tr class="bg-white hover:bg-slate-50/80 transition-colors group">
-            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle">
+            <td class="px-3.5 py-2.5 border-r border-slate-100 align-middle max-w-0">
                 <select name="productos[]" required onchange="llenarDatosFila(this)"
-                    class="w-full bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12.5px] font-bold text-slate-800 outline-none shadow-xs cursor-pointer transition-colors">
+                    class="w-full max-w-full truncate bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12.5px] font-bold text-slate-800 outline-none shadow-xs cursor-pointer transition-colors">
                     <option value="" disabled selected>Seleccione producto del inventario...</option>
                     @foreach ($inventarioDisponible as $inv)
-                        <option value="{{ $inv->producto }}"
-                            title="{{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})"
-                            data-lote="{{ $inv->lote ?? 'S/L' }}"
-                            data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $inv->cantidad ?? 0 }}"
-                            data-programa="{{ $inv->programa ?? '' }}">
-                            {{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})
-                        </option>
+                        @php
+                            $nomInv = trim(preg_replace('/\s+/', ' ', $inv->producto ?? ''));
+                            $loteInv = trim(preg_replace('/\s+/', ' ', $inv->lote ?? '')) ?: 'S/L';
+                            $cantInv = (int) ($inv->cantidad ?? 0);
+                            $progInv = trim(preg_replace('/\s+/', ' ', $inv->programa ?? ''));
+                        @endphp
+                        @if($nomInv !== '')
+                            <option value="{{ $nomInv }}" title="{{ $nomInv }} - Lote: {{ $loteInv }} (Disp: {{ $cantInv }})" data-nombre-completo="{{ $nomInv }}" data-lote="{{ $loteInv }}" data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $cantInv }}" data-programa="{{ $progInv }}">{{ \Illuminate\Support\Str::limit($nomInv, 62) }} - Lote: {{ $loteInv }} (Disp: {{ $cantInv }})</option>
+                        @endif
                     @endforeach
                 </select>
             </td>
@@ -513,11 +489,14 @@
                     class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[12px] text-slate-600 outline-none shadow-inner cursor-not-allowed">
                 <div class="fefo-container"></div>
             </td>
-            <td class="px-3 py-2.5 border-r border-slate-100 align-middle">
+            <td class="px-3 py-2.5 border-r border-slate-100 align-middle max-w-0">
                 <select name="programas[]" required
-                    class="w-full bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
+                    class="w-full max-w-full truncate bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
                     @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $idxProg => $progOpt)
-                        <option value="{{ $progOpt }}" {{ $idxProg === 0 ? 'selected' : '' }}>{{ $progOpt }}</option>
+                        @php $progLimpio = trim(preg_replace('/\s+/', ' ', $progOpt ?? '')); @endphp
+                        @if($progLimpio !== '')
+                            <option value="{{ $progLimpio }}" {{ $idxProg === 0 ? 'selected' : '' }}>{{ $progLimpio }}</option>
+                        @endif
                     @endforeach
                 </select>
             </td>
@@ -582,24 +561,24 @@
                             class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm">
                     </div>
 
-                    <div>
+                    <div class="min-w-0">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                             Tipo Origen
                         </label>
                         <select id="filtroSolicitudTipo" onchange="filtrarSolicitudesModal()"
-                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            class="w-full max-w-full truncate py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
                             <option value="">Todos (CESFAM y Establec.)</option>
                             <option value="cesfam">Solo CESFAM</option>
                             <option value="establecimiento">Solo Establecimientos</option>
                         </select>
                     </div>
 
-                    <div>
+                    <div class="min-w-0">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                             Estado
                         </label>
                         <select id="filtroSolicitudEstado" onchange="filtrarSolicitudesModal()"
-                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            class="w-full max-w-full truncate py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
                             <option value="activas" selected>Activas (Por despachar)</option>
                             <option value="">Todas (Incluye Despachadas)</option>
                             <option value="pendiente">Pendiente (Sin asignar)</option>
@@ -609,12 +588,12 @@
                         </select>
                     </div>
 
-                    <div>
+                    <div class="min-w-0">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                             Asignación
                         </label>
                         <select id="filtroSolicitudAsignacion" onchange="filtrarSolicitudesModal()"
-                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            class="w-full max-w-full truncate py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
                             <option value="">Todas</option>
                             <option value="mias">Asignadas a mí ({{ $totalMias }})</option>
                             <option value="sin_asignar">Sin asignar</option>
@@ -743,12 +722,13 @@
                                             <select
                                                 onfocus="this.dataset.prevVal = this.value"
                                                 onchange="asignarSolicitudUsuario({{ $solicitud->id }}, this.value, this)"
-                                                class="bg-slate-50 hover:bg-white border border-slate-300 text-slate-800 text-[12px] font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 cursor-pointer min-w-[185px]">
+                                                class="bg-slate-50 hover:bg-white border border-slate-300 text-slate-800 text-[12px] font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 cursor-pointer min-w-[185px] max-w-[230px] truncate">
                                                 <option value="">— Sin asignar —</option>
                                                 @foreach ($usuariosAsignables ?? [] as $usr)
-                                                    <option value="{{ $usr->id }}" {{ (int) $solicitud->assigned_user_id === (int) $usr->id ? 'selected' : '' }}>
-                                                        {{ $usr->name }} {{ $usr->last_name }}
-                                                    </option>
+                                                    @php $nomUsr = trim(($usr->name ?? '') . ' ' . ($usr->last_name ?? '')); @endphp
+                                                    @if($nomUsr !== '')
+                                                        <option value="{{ $usr->id }}" {{ (int) $solicitud->assigned_user_id === (int) $usr->id ? 'selected' : '' }}>{{ $nomUsr }}</option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                             <span id="assign-spinner-{{ $solicitud->id }}" class="hidden text-[11px] font-bold text-teal-600">
@@ -836,7 +816,7 @@
                                                     @foreach ($solicitud->items as $item)
                                                         @php
                                                             $nombreProdItem = $item->product->nombre ?? ('Producto #' . $item->product_id);
-                                                            $esItemControlado = in_array($nombreProdItem, $controlados);
+                                                            $esItemControlado = in_array($nombreProdItem, $controlados ?? []);
                                                             $pendienteItem = max(0, (int) $item->cantidad_solicitada - (int) ($item->cantidad_despachada ?? 0));
                                                         @endphp
                                                         <tr class="hover:bg-slate-50">
@@ -1004,11 +984,11 @@
                     </div>
 
                     <!-- filtro clasificacion -->
-                    <div>
+                    <div class="min-w-0">
                         <label
                             class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Clasificacion</label>
                         <select id="filtroClasificacion" onchange="filtrarBandeja()"
-                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            class="w-full max-w-full truncate py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
                             <option value="">Todas</option>
                             <option value="interno">Interno</option>
                             <option value="externo">Externo</option>
@@ -1046,11 +1026,11 @@
                     </div>
 
                     <!-- filtro estado -->
-                    <div>
+                    <div class="min-w-0">
                         <label
                             class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estado</label>
                         <select id="filtroEstadoBandeja" onchange="filtrarBandeja()"
-                            class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
+                            class="w-full max-w-full truncate py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
                             <option value="">Todos los estados</option>
                             <option value="aprobada">Aprobada</option>
                             <option value="pendiente">Pendiente</option>
@@ -1317,10 +1297,15 @@
         let signatureDespacha = null;
         let signatureRecibe = null;
         const solicitudes = @json($solicitudes);
-        const listaControlados = @json($controlados);
+        const listaControlados = @json($controlados ?? []);
 
         const esControladoJS = (nombre) => listaControlados.some(c => c.toLowerCase() === String(nombre ?? '').trim()
             .toLowerCase());
+
+        function obtenerNombreCompletoOpcionDespacho(opt) {
+            if (!opt) return '';
+            return (opt.getAttribute('data-nombre-completo') || opt.value || '').trim();
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             // inicializar pads de firmas si existen
@@ -1782,6 +1767,8 @@
                     .lote);
 
                 if (targetOption) {
+                    targetOption.selected = true;
+                    select.selectedIndex = targetOption.index;
                     select.value = targetOption.value;
                     llenarDatosFila(select);
                 }
@@ -2087,7 +2074,7 @@
                 const targetProdNorm = norm(prodTarget);
                 const targetLoteNorm = cleanLote(loteTarget);
                 targetOption = options.find(opt => {
-                    return norm(opt.value) === targetProdNorm && cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm;
+                    return norm(obtenerNombreCompletoOpcionDespacho(opt)) === targetProdNorm && cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm;
                 });
             }
 
@@ -2100,14 +2087,14 @@
             // 3. Coincidencia por Producto (primer lote disponible)
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
-                targetOption = options.find(opt => norm(opt.value) === targetProdNorm);
+                targetOption = options.find(opt => norm(obtenerNombreCompletoOpcionDespacho(opt)) === targetProdNorm);
             }
 
             // 4. Coincidencia parcial / difusa por Producto
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => {
-                    const optNorm = norm(opt.value);
+                    const optNorm = norm(obtenerNombreCompletoOpcionDespacho(opt));
                     return optNorm && targetProdNorm && (optNorm.includes(targetProdNorm) || targetProdNorm.includes(optNorm));
                 });
             }
@@ -2131,7 +2118,7 @@
                     toast: true,
                     position: 'top-end',
                     icon: 'success',
-                    title: `Producto cargado: ${targetOption.value}`,
+                    title: `Producto cargado: ${obtenerNombreCompletoOpcionDespacho(targetOption)}`,
                     text: `Lote: ${loteEncontrado} · Stock disp: ${stockDisp} uds.`,
                     showConfirmButton: false,
                     timer: 2500,
@@ -2421,17 +2408,19 @@
                 const itemNorm = normText(nombreItem);
 
                 let opcionProducto = Array.from(selectProducto.options).find(option =>
-                    normText(option.value) === itemNorm
+                    normText(obtenerNombreCompletoOpcionDespacho(option)) === itemNorm
                 );
 
                 if (!opcionProducto) {
                     opcionProducto = Array.from(selectProducto.options).find(option => {
-                        const optNorm = normText(option.value);
+                        const optNorm = normText(obtenerNombreCompletoOpcionDespacho(option));
                         return optNorm && itemNorm && (optNorm.includes(itemNorm) || itemNorm.includes(optNorm));
                     });
                 }
 
                 if (opcionProducto) {
+                    opcionProducto.selected = true;
+                    selectProducto.selectedIndex = opcionProducto.index;
                     selectProducto.value = opcionProducto.value;
 
                     // Llena la fila con lotes y límites
