@@ -494,7 +494,9 @@
                     class="w-full bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12.5px] font-bold text-slate-800 outline-none shadow-xs cursor-pointer transition-colors">
                     <option value="" disabled selected>Seleccione producto del inventario...</option>
                     @foreach ($inventarioDisponible as $inv)
-                        <option value="{{ $inv->producto }}" data-lote="{{ $inv->lote ?? 'S/L' }}"
+                        <option value="{{ $inv->producto }}"
+                            title="{{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})"
+                            data-lote="{{ $inv->lote ?? 'S/L' }}"
                             data-vence="{{ $inv->fecha_vencimiento ?? '' }}" data-stock="{{ $inv->cantidad ?? 0 }}"
                             data-programa="{{ $inv->programa ?? '' }}">
                             {{ $inv->producto }} - Lote: {{ $inv->lote ?? 'S/L' }} (Disp: {{ $inv->cantidad ?? 0 }})

@@ -56,7 +56,7 @@
         </div>
 
         <!-- Contenedor Principal Tabla Inventario -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm flex flex-col">
 
             <!-- Cabecera de la tabla y botón de filtros -->
             <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
@@ -100,13 +100,13 @@
                             class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
 
                         <div id="searchDropdown"
-                            class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100">
+                            class="hidden absolute left-0 top-full mt-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl z-[99999] max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700 min-w-full sm:min-w-[480px] md:min-w-[560px] w-auto max-w-[92vw] sm:max-w-2xl">
                             @if (isset($productosLista) && count($productosLista) > 0)
                                 @foreach ($productosLista as $prodNombre)
-                                    <div class="search-item px-3.5 py-2.5 text-[12.5px] font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-900 cursor-pointer transition-colors flex items-center justify-between"
+                                    <div class="search-item px-4 py-2.5 text-[12.5px] font-medium text-slate-700 dark:text-slate-200 hover:bg-teal-50 dark:hover:bg-slate-700 hover:text-teal-900 dark:hover:text-teal-300 cursor-pointer transition-colors flex items-center justify-between gap-3"
                                         onclick="selectSearchProduct('{{ $prodNombre }}')">
-                                        <span>{{ $prodNombre }}</span>
-                                        <svg class="w-3.5 h-3.5 text-slate-300 hover:text-teal-600" fill="none"
+                                        <span class="break-words leading-snug flex-1">{{ $prodNombre }}</span>
+                                        <svg class="w-3.5 h-3.5 text-slate-300 shrink-0 hover:text-teal-600" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                         </svg>
