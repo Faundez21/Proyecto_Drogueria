@@ -128,6 +128,8 @@ class DispatchController extends Controller
                 $errorDespacho = "La solicitud N° {$solicitudVinculada->id} ya está en estado «{$solicitudVinculada->estado}» y no admite más despachos.";
             } elseif (mb_strtolower(trim($solicitudVinculada->establecimiento)) !== mb_strtolower(trim($validated['establecimiento_destino']))) {
                 $errorDespacho = "La solicitud N° {$solicitudVinculada->id} pertenece a «{$solicitudVinculada->establecimiento}», no a «{$validated['establecimiento_destino']}».";
+            } else {
+                $errorDespacho = SolicitudService::excesoSobrePendiente($solicitudVinculada, $validated['productos'], $validated['cantidades']);
             }
         }
 
