@@ -45,6 +45,47 @@ class SolicitudService
     }
 
     /**
+     * Revisa que un despacho vinculado a una solicitud no entregue más unidades
+     * de las que aún faltan por despachar en ella. Suma las filas del mismo producto
+     * (un producto puede venir repartido en varios lotes).
+     * Devuelve el mensaje de error, o null si todo cuadra.
+     * Los productos que no están en la solicitud no se revisan aquí.
+     */
+    public static function excesoSobrePendiente(EstablishmentRequest $solicitud, array $productos, array $cantidades): ?string
+    {
+        $solicitud->loadMissing('items.product');
+
+        $aDespachar = [];
+        $nombres = [];
+        foreach ($productos as $i => $nombre) {
+            $clave = mb_strtolower(trim($nombre));
+            $aDespachar[$clave] = ($aDespachar[$clave] ?? 0) + (int) ($cantidades[$i] ?? 0);
+            $nombres[$clave] = trim($nombre);
+        }
+
+        $excesos = [];
+        foreach ($solicitud->items as $item) {
+            $clave = mb_strtolower(trim($item->product->nombre ?? ''));
+            if (! isset($aDespachar[$clave])) {
+                continue;
+            }
+
+            $pendiente = max(0, (int) $item->cantidad_solicitada - (int) $item->cantidad_despachada);
+            if ($aDespachar[$clave] > $pendiente) {
+                $excesos[] = "«{$nombres[$clave]}»: faltan {$pendiente} y se intentan despachar {$aDespachar[$clave]}";
+            }
+        }
+
+        if (empty($excesos)) {
+            return null;
+        }
+
+        $numero = $solicitud->numero_solicitud ?: ('N° ' . $solicitud->id);
+
+        return "No puedes despachar más de lo que falta en la solicitud {$numero}. " . implode('; ', $excesos) . '.';
+    }
+
+    /**
      * El estado se recalcula sobre TODOS los items de la solicitud,
      * sin importar desde qué módulo de despacho se cubrieron.
      * Estados posibles:

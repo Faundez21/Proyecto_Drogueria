@@ -65,16 +65,16 @@
                             </svg>
                             <span>Filtros Avanzados</span>
                             <span id="badgeActiveCesfamFilters" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-teal-600 text-white">0</span>
-                            <i class="fas fa-chevron-down text-[10px] text-slate-400 transition-transform duration-200" id="iconChevronCesfamAdvanced"></i>
+                            <svg id="iconChevronCesfamAdvanced" class="text-slate-400 transition-transform duration-200 inline-block shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
 
                         <!-- Menú Desplegable Unificado: Descargar Consolidado -->
                         <div class="relative">
                             <button type="button" onclick="togglePendingCesfamExportMenu()" id="btnPendingCesfamExport"
                                 class="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-[12.5px] font-bold shadow-sm hover:shadow transition-all cursor-pointer border border-slate-700">
-                                <i class="fas fa-file-pdf text-teal-400"></i>
+                                <svg class="text-teal-400 inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
                                 <span>Descargar Consolidado</span>
-                                <i class="fas fa-chevron-down text-[10px] ml-0.5"></i>
+                                <svg class="ml-0.5 inline-block shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                             </button>
 
                             <!-- Menú flotante -->
@@ -83,19 +83,19 @@
                                 <div class="py-1">
                                     <button type="button" onclick="viewPendingCesfamPdf(); closePendingCesfamExportMenu();"
                                         class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:text-teal-700 dark:hover:text-teal-300 transition-colors cursor-pointer font-medium">
-                                        <i class="fas fa-eye text-teal-600 dark:text-teal-400 w-4 text-center"></i>
+                                        <svg class="text-teal-600 dark:text-teal-400 text-center inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7C3.6 7.9 7.5 5 12 5s8.4 2.9 9.94 6.65a1 1 0 0 1 0 .7C20.4 16.1 16.5 19 12 19s-8.4-2.9-9.94-6.65"/><circle cx="12" cy="12" r="3"/></svg>
                                         <span>Ver Vista Previa</span>
                                     </button>
                                     <button type="button" onclick="downloadPendingCesfamPdf(); closePendingCesfamExportMenu();"
                                         class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:text-teal-700 dark:hover:text-teal-300 transition-colors cursor-pointer font-medium">
-                                        <i class="fas fa-download text-teal-600 dark:text-teal-400 w-4 text-center"></i>
+                                        <svg class="text-teal-600 dark:text-teal-400 text-center inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
                                         <span>Descargar PDF</span>
                                     </button>
                                 </div>
                                 <div class="py-1">
                                     <button type="button" onclick="printPendingCesfamPdf(); closePendingCesfamExportMenu();"
                                         class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:text-teal-700 dark:hover:text-teal-300 transition-colors cursor-pointer font-medium">
-                                        <i class="fas fa-print text-slate-500 dark:text-slate-400 w-4 text-center"></i>
+                                        <svg class="text-slate-500 dark:text-slate-400 text-center inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/></svg>
                                         <span>Imprimir Documento</span>
                                     </button>
                                 </div>
@@ -135,7 +135,7 @@
                                         @endforeach
                                     </select>
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
-                                        <i class="fas fa-chevron-down text-[10px]"></i>
+                                        <svg class=" inline-block shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                                     </div>
                                 </div>
                             </div>
@@ -214,7 +214,7 @@
 
                 <!-- Notificación destacada integrada al estilo de la plataforma -->
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 text-teal-800 dark:text-teal-300 font-medium text-[11.5px] shadow-xs">
-                    <i class="fas fa-file-signature text-teal-600 dark:text-teal-400 shrink-0"></i>
+                    <svg class="text-teal-600 dark:text-teal-400 shrink-0 inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 18c1.5-2 2.5-2 3 0s1.5 1 2.5-1 2 .5 2.5 1"/></svg>
                     <span>Cada solicitud puede ser visualizada, descargada e impresa de forma individual con la firma oficial de su solicitante.</span>
                 </div>
             </div>
@@ -284,7 +284,7 @@
                                             @if(!empty($sol->firma_solicitante))
                                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800"
                                                     title="Firma digital registrada">
-                                                    <i class="fas fa-signature text-[10px]"></i> Registrada
+                                                    <svg class=" inline-block shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M3 17c3-6 5-9 6-8s-2 8 0 8 3-5 5-5 1 5 3 5 2-2 4-2"/></svg> Registrada
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
@@ -308,21 +308,21 @@
                                                 <button type="button" onclick="viewSingleCesfamPdf({{ $sol->id }})"
                                                     class="p-1.5 text-teal-600 dark:text-teal-400 hover:text-white hover:bg-teal-600 rounded-md transition-colors cursor-pointer"
                                                     title="Ver PDF oficial de la Solicitud {{ $sol->numero_solicitud }}">
-                                                    <i class="fas fa-eye w-3.5 h-3.5"></i>
+                                                    <svg class=" inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7C3.6 7.9 7.5 5 12 5s8.4 2.9 9.94 6.65a1 1 0 0 1 0 .7C20.4 16.1 16.5 19 12 19s-8.4-2.9-9.94-6.65"/><circle cx="12" cy="12" r="3"/></svg>
                                                 </button>
 
                                                 <!-- Descargar Individual -->
                                                 <button type="button" onclick="downloadSingleCesfamPdf({{ $sol->id }})"
                                                     class="p-1.5 text-slate-600 dark:text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
                                                     title="Descargar PDF oficial de la Solicitud {{ $sol->numero_solicitud }}">
-                                                    <i class="fas fa-download w-3.5 h-3.5"></i>
+                                                    <svg class=" inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
                                                 </button>
 
                                                 <!-- Imprimir Individual -->
                                                 <button type="button" onclick="printSingleCesfamPdf({{ $sol->id }})"
                                                     class="p-1.5 text-slate-600 dark:text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
                                                     title="Imprimir directamente Solicitud {{ $sol->numero_solicitud }}">
-                                                    <i class="fas fa-print w-3.5 h-3.5"></i>
+                                                    <svg class=" inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/></svg>
                                                 </button>
                                             </div>
                                         </td>
@@ -333,7 +333,7 @@
                                                 id="btn-toggle-cesfam-{{ $sol->id }}"
                                                 class="p-1.5 text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer"
                                                 title="Ver detalle de productos solicitados">
-                                                <i class="fas fa-chevron-down transform transition-transform duration-200" id="icon-toggle-cesfam-{{ $sol->id }}"></i>
+                                                <svg id="icon-toggle-cesfam-{{ $sol->id }}" class="transform transition-transform duration-200 inline-block shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                                             </button>
                                         </td>
                                     </tr>

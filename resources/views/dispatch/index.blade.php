@@ -1302,6 +1302,12 @@
         const esControladoJS = (nombre) => listaControlados.some(c => c.toLowerCase() === String(nombre ?? '').trim()
             .toLowerCase());
 
+        // Normaliza nombres (sin mayúsculas, tildes ni símbolos) para comparar productos
+        const normTextDespacho = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+
+        // Unidades que faltan por despachar de la solicitud cargada, por producto (clave = nombre normalizado)
+        let pendientesSolicitudActiva = {};
+
         function obtenerNombreCompletoOpcionDespacho(opt) {
             if (!opt) return '';
             return (opt.getAttribute('data-nombre-completo') || opt.value || '').trim();
@@ -1454,6 +1460,34 @@
                     if (!form.checkValidity()) {
                         form.reportValidity();
                         return;
+                    }
+
+                    // no despachar más de lo que falta en la solicitud vinculada (sumando todos los lotes)
+                    const solicitudVinculadaId = document.getElementById('establishment_request_id')?.value;
+                    if (solicitudVinculadaId && Object.keys(pendientesSolicitudActiva).length > 0) {
+                        const sumaPorProducto = {};
+                        document.querySelectorAll('#productsBody tr').forEach(tr => {
+                            const sel = tr.querySelector('select[name="productos[]"]');
+                            const opt = sel ? sel.options[sel.selectedIndex] : null;
+                            if (!opt || !opt.value) return;
+                            const clave = normTextDespacho(obtenerNombreCompletoOpcionDespacho(opt));
+                            const cant = parseInt(tr.querySelector('input[name="cantidades[]"]')?.value) || 0;
+                            sumaPorProducto[clave] = (sumaPorProducto[clave] || 0) + cant;
+                        });
+
+                        const excesos = Object.entries(sumaPorProducto)
+                            .filter(([clave, total]) => pendientesSolicitudActiva[clave] && total > pendientesSolicitudActiva[clave].pendiente)
+                            .map(([clave, total]) => `<li><strong>${pendientesSolicitudActiva[clave].nombre}</strong>: faltan ${pendientesSolicitudActiva[clave].pendiente}, vas a despachar ${total}</li>`);
+
+                        if (excesos.length > 0) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Te pasas de lo solicitado',
+                                html: `<div style="font-size:13px;text-align:left;">No puedes despachar más de lo que falta en la solicitud. Ajusta las cantidades:<ul style="margin:8px 0 0 18px;list-style:disc;">${excesos.join('')}</ul></div>`,
+                                confirmButtonColor: '#0f968c'
+                            });
+                            return;
+                        }
                     }
 
                     const clasif = document.getElementById('clasificacion_select')?.value || 'Interno';
@@ -2310,6 +2344,7 @@
         function desvincularSolicitudActiva() {
             const requestInput = document.getElementById('establishment_request_id');
             if (requestInput) requestInput.value = '';
+            pendientesSolicitudActiva = {};
             const banner = document.getElementById('banner_solicitud_activa');
             if (banner) banner.classList.add('hidden');
         }
@@ -2402,6 +2437,8 @@
 
             let productosFaltantes = [];
             let productosControlados = [];
+            let productosParciales = [];
+            pendientesSolicitudActiva = {};
 
             // agregar los productos pendientes de la solicitud (los estupefacientes van al módulo controlado)
             solicitud.items.forEach(item => {
@@ -2420,28 +2457,62 @@
                 const tr = addRow();
                 const selectProducto = tr.querySelector('select[name="productos[]"]');
                 const itemNorm = normText(nombreItem);
+                const opcionesValidas = Array.from(selectProducto.options).filter(o => o.value && !o.disabled);
 
-                let opcionProducto = Array.from(selectProducto.options).find(option =>
-                    normText(obtenerNombreCompletoOpcionDespacho(option)) === itemNorm
+                // todos los lotes del producto (primero coincidencia exacta, si no la más parecida)
+                let lotesProducto = opcionesValidas.filter(o =>
+                    normText(obtenerNombreCompletoOpcionDespacho(o)) === itemNorm
                 );
-
-                if (!opcionProducto) {
-                    opcionProducto = Array.from(selectProducto.options).find(option => {
-                        const optNorm = normText(obtenerNombreCompletoOpcionDespacho(option));
+                if (lotesProducto.length === 0) {
+                    const aprox = opcionesValidas.find(o => {
+                        const optNorm = normText(obtenerNombreCompletoOpcionDespacho(o));
                         return optNorm && itemNorm && (optNorm.includes(itemNorm) || itemNorm.includes(optNorm));
                     });
+                    if (aprox) {
+                        const nombreAprox = obtenerNombreCompletoOpcionDespacho(aprox);
+                        lotesProducto = opcionesValidas.filter(o => obtenerNombreCompletoOpcionDespacho(o) === nombreAprox);
+                    }
                 }
 
-                if (opcionProducto) {
-                    opcionProducto.selected = true;
-                    selectProducto.selectedIndex = opcionProducto.index;
-                    selectProducto.value = opcionProducto.value;
+                // solo lotes con stock, ordenados FEFO (vence antes, sale primero)
+                lotesProducto = lotesProducto
+                    .filter(o => (parseInt(o.getAttribute('data-stock')) || 0) > 0)
+                    .sort((a, b) => (a.getAttribute('data-vence') || '9999-12-31').localeCompare(b.getAttribute('data-vence') || '9999-12-31'));
+
+                if (lotesProducto.length === 0) {
+                    // si el producto no tiene stock disponible, se elimina esta fila y lo guardamos
+                    tr.remove();
+                    productosFaltantes.push(nombreItem);
+                    return;
+                }
+
+                // recordar cuánto falta de este producto para no pasarse al confirmar
+                pendientesSolicitudActiva[normTextDespacho(obtenerNombreCompletoOpcionDespacho(lotesProducto[0]))] = {
+                    nombre: nombreItem,
+                    pendiente: pendiente
+                };
+
+                // repartir lo pendiente entre los lotes, una fila por lote, hasta cubrirlo
+                let restante = pendiente;
+                lotesProducto.forEach((opt, idx) => {
+                    if (restante <= 0) return;
+
+                    const fila = idx === 0 ? tr : addRow();
+                    const selFila = fila.querySelector('select[name="productos[]"]');
+                    const optFila = Array.from(selFila.options).find(o =>
+                        o.value === opt.value && o.getAttribute('data-lote') === opt.getAttribute('data-lote')
+                    );
+                    if (!optFila) return;
+
+                    // selectedIndex (y no value) porque varios lotes comparten el mismo nombre
+                    optFila.selected = true;
+                    selFila.selectedIndex = optFila.index;
 
                     // Llena la fila con lotes y límites
-                    llenarDatosFila(selectProducto);
+                    llenarDatosFila(selFila);
 
                     // Seleccionar programa si viene en la solicitud
-                    const selectPrograma = tr.querySelector('select[name="programas[]"]');
+                    const selectPrograma = fila.querySelector('select[name="programas[]"]');
                     if (selectPrograma && item.programa) {
                         const progNorm = normText(item.programa);
                         const optProg = Array.from(selectPrograma.options).find(o =>
@@ -2450,15 +2521,18 @@
                         if (optProg) selectPrograma.value = optProg.value;
                     }
 
-                    const cantidad = tr.querySelector('input[name="cantidades[]"]');
+                    const stockLote = parseInt(opt.getAttribute('data-stock')) || 0;
+                    const usar = Math.min(stockLote, restante);
+                    const cantidad = fila.querySelector('input[name="cantidades[]"]');
                     if (cantidad) {
-                        cantidad.value = pendiente;
+                        cantidad.value = usar;
                         validarStock(cantidad);
                     }
-                } else {
-                    // si el producto no tiene stock disponible, se elimina esta fila y lo guardamos
-                    tr.remove();
-                    productosFaltantes.push(nombreItem);
+                    restante -= usar;
+                });
+
+                if (restante > 0) {
+                    productosParciales.push(`${nombreItem}: se cargan ${pendiente - restante} de ${pendiente} pendientes`);
                 }
             });
 
@@ -2467,13 +2541,22 @@
                 addRow();
             }
 
-            // alerta para notificar productos sin stock
-            if (productosFaltantes.length > 0) {
+            // alerta para notificar productos sin stock o con stock insuficiente
+            if (productosFaltantes.length > 0 || productosParciales.length > 0) {
+                const escapar = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+                let htmlStock = '';
+                if (productosFaltantes.length > 0) {
+                    htmlStock += '<p style="margin-bottom:6px;">No se agregaron porque no hay stock Disponible en bodega:</p><ul style="text-align:left;margin:0 0 10px 18px;list-style:disc;">' +
+                        productosFaltantes.map(p => `<li>${escapar(p)}</li>`).join('') + '</ul>';
+                }
+                if (productosParciales.length > 0) {
+                    htmlStock += '<p style="margin-bottom:6px;">No alcanza el stock para todo lo pedido; se despacha lo disponible y la solicitud quedará <strong>Parcial</strong>:</p><ul style="text-align:left;margin:0 0 0 18px;list-style:disc;">' +
+                        productosParciales.map(p => `<li>${escapar(p)}</li>`).join('') + '</ul>';
+                }
                 Swal.fire({
                     icon: 'warning',
                     title: 'Falta de Stock',
-                    text: 'Los siguientes productos no se agregaron porque no hay stock Disponible en bodega: ' +
-                        productosFaltantes.join(', '),
+                    html: `<div style="font-size:13px;">${htmlStock}</div>`,
                     confirmButtonColor: '#0f968c'
                 });
             }
@@ -2530,7 +2613,7 @@
             closeSolicitudes();
 
             // Notificación de que se completaron los datos de la solicitud
-            if (typeof Swal !== 'undefined' && productosControlados.length === 0 && productosFaltantes.length === 0) {
+            if (typeof Swal !== 'undefined' && productosControlados.length === 0 && productosFaltantes.length === 0 && productosParciales.length === 0) {
                 Swal.fire({
                     toast: true,
                     position: 'top-end',
