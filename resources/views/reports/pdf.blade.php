@@ -141,6 +141,12 @@
         </tr>
     </table>
 
+    @if(!empty($isTruncated))
+        <div style="background-color: #fffbeb; border: 1px solid #fef3c7; color: #b45309; padding: 6px 10px; border-radius: 4px; font-size: 8px; margin-bottom: 10px; font-weight: 700;">
+            Aviso de volumen: Mostrando los primeros {{ count($inventories) }} registros de un total de {{ number_format($totalItems, 0, ',', '.') }}. Para obtener el consolidado completo de inventario sin restricciones de paginación, descargue la versión Excel.
+        </div>
+    @endif
+
     <table class="items-table">
         <thead>
             <tr>

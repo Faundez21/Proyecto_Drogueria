@@ -153,11 +153,23 @@ class ReportController extends Controller
 
     public function exportPdf(Request $request)
     {
-        $query = $this->buildInventoryQuery($request);
-        $inventories = $query->get(); // Extrae todos los resultados sin paginar
+        ini_set('memory_limit', '1024M');
+        ini_set('max_execution_time', '300');
 
-        $pdf = Pdf::loadView('reports.pdf', compact('inventories'));
-        $pdf->setPaper('A4', 'landscape'); // Formato horizontal para que quepan las columnas
+        $query = $this->buildInventoryQuery($request);
+        
+        // Salvaguarda DomPDF: Si el volumen total supera 500 ítems, limitar para prevenir agotamiento de memoria
+        $totalItems = (clone $query)->count();
+        $isTruncated = false;
+        if ($totalItems > 500) {
+            $inventories = $query->limit(500)->get();
+            $isTruncated = true;
+        } else {
+            $inventories = $query->get();
+        }
+
+        $pdf = Pdf::loadView('reports.pdf', compact('inventories', 'totalItems', 'isTruncated'));
+        $pdf->setPaper('A4', 'landscape');
 
         return $pdf->download('reporte_inventario_'.date('Ymd_His').'.pdf');
     }
