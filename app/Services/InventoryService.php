@@ -441,6 +441,19 @@ class InventoryService
             }
         }
 
+        // Si viene una ubicación nueva, se limpian las relaciones anteriores para que el lote
+        // no siga "amarrado" al estante viejo (ej. al moverlo a P.A). Abajo se vuelven a resolver.
+        if (array_key_exists('estante', $datos)) {
+            foreach (['shelf_id', 'level_id', 'position_id'] as $fk) {
+                if (! array_key_exists($fk, $datos)) {
+                    $datos[$fk] = null;
+                }
+            }
+        }
+        if ((array_key_exists('pasillo', $datos) || array_key_exists('estante', $datos)) && ! array_key_exists('aisle_id', $datos)) {
+            $datos['aisle_id'] = null;
+        }
+
         if (! empty($datos['estante']) && empty($datos['shelf_id'])) {
             $shelf = Shelf::with('aisle')->where('name', $datos['estante'])->first();
             if ($shelf) {
