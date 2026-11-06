@@ -114,7 +114,7 @@
                     <div class="flex items-center gap-2 mb-4">
                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011 1h2a1 1 0 011 1v5m-4 0h4">
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
                             </path>
                         </svg>
 
@@ -125,16 +125,19 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-                        <div class="lg:col-span-3">
+                        <div class="lg:col-span-3 min-w-0">
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                 Establecimiento <span class="text-rose-500">*</span>
                             </label>
 
                             <select name="establecimiento" id="establecimiento_select" required
-                                class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                class="w-full max-w-full truncate bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione establecimiento...</option>
                                 @foreach ($establecimientos as $est)
-                                    <option value="{{ $est['nombre'] }}">{{ $est['nombre'] }}</option>
+                                    @php $nomEst = trim(preg_replace('/\s+/', ' ', $est['nombre'] ?? '')); @endphp
+                                    @if($nomEst !== '')
+                                        <option value="{{ $nomEst }}">{{ $nomEst }}</option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>
@@ -216,46 +219,38 @@
                             </button>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                                <div>
+                                <div class="min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Programa <span class="text-rose-500">*</span>
                                     </label>
 
                                     <select name="programa[]" required
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-programa">
-                                        <option value="" disabled selected>
-                                            Seleccione...
-                                        </option>
+                                        class="w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-programa">
+                                        <option value="" disabled selected>Seleccione...</option>
                                         @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
-                                            <option value="{{ $progOpt }}">
-                                                {{ $progOpt }}
-                                            </option>
+                                            @php $progLimpio = trim(preg_replace('/\s+/', ' ', $progOpt ?? '')); @endphp
+                                            @if($progLimpio !== '')
+                                                <option value="{{ $progLimpio }}">{{ $progLimpio }}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="lg:col-span-2">
+                                <div class="lg:col-span-2 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Producto <span class="text-rose-500">*</span>
                                     </label>
 
                                     <select name="producto[]" required
-                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-producto">
-
-                                        <option value="" disabled selected>
-                                            Buscar medicamento o insumo...
-                                        </option>
-
+                                        class="w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-producto">
+                                        <option value="" disabled selected>Buscar medicamento o insumo...</option>
                                         <optgroup label="Medicamentos e Insumos">
                                             @foreach ($products as $product)
-                                                <option value="{{ $product->id }}"
-                                                    title="{{ $product->nombre }}"
-                                                    data-programa="{{ $product->programa_sugerido ?? '' }}"
-                                                    data-categoria="{{ $product->categoria_sugerida ?? '' }}">
-                                                    {{ $product->nombre }}
-                                                </option>
+                                                @php $nomLimpio = trim(preg_replace('/\s+/', ' ', $product->nombre ?? '')); @endphp
+                                                @if($nomLimpio !== '')
+                                                    <option value="{{ $product->id }}" title="{{ $nomLimpio }}" data-nombre-completo="{{ $nomLimpio }}" data-programa="{{ trim($product->programa_sugerido ?? '') }}" data-categoria="{{ trim($product->categoria_sugerida ?? '') }}">{{ \Illuminate\Support\Str::limit($nomLimpio, 85) }}</option>
+                                                @endif
                                             @endforeach
                                         </optgroup>
-
                                     </select>
                                 </div>
 
@@ -441,6 +436,11 @@
     <script>
         let signatureRecibe = null;
         const consumoMapa = @json($consumoMapa ?? []);
+
+        function obtenerNombreCompletoProducto(opt) {
+            if (!opt) return '';
+            return (opt.getAttribute('data-nombre-completo') || opt.getAttribute('title') || opt.textContent || '').trim();
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -707,6 +707,38 @@
                 const totalProds = document.getElementById('total_productos')?.textContent.trim() || '0';
                 const totalUnits = document.getElementById('total_unidades')?.textContent.trim() || '0';
 
+                // Resumen de respaldo por si el backend responde sin detail
+                const fallbackItems = [];
+                form.querySelectorAll('.producto-item').forEach(row => {
+                    const selProd = row.querySelector('.select-producto');
+                    const selProg = row.querySelector('.select-programa');
+                    const inpCons = row.querySelector('input[name="consumo_anterior[]"]');
+                    const inpStock = row.querySelector('input[name="stock_actual[]"]');
+                    const inpCant = row.querySelector('input[name="cantidad_solicitada[]"]');
+                    if (selProd && selProd.value) {
+                        fallbackItems.push({
+                            producto: obtenerNombreCompletoProducto(selProd.options[selProd.selectedIndex]) || 'Producto',
+                            programa: selProg && selProg.value ? selProg.value : 'General',
+                            consumo_anterior: parseInt(inpCons?.value) || 0,
+                            stock_actual: parseInt(inpStock?.value) || 0,
+                            cantidad_solicitada: parseInt(inpCant?.value) || 0
+                        });
+                    }
+                });
+
+                const fallbackDetail = {
+                    numero_solicitud: form.querySelector('input[name="numero_solicitud"]')?.value || '',
+                    establecimiento: estNombre,
+                    tipo: 'Establecimiento',
+                    fecha_solicitud: form.querySelector('input[name="fecha_solicitud"]')?.value || '',
+                    responsable: form.querySelector('input[name="responsable"]')?.value || 'N/A',
+                    cargo: form.querySelector('input[name="cargo"]')?.value || 'N/A',
+                    observaciones: form.querySelector('textarea[name="observaciones"]')?.value || '',
+                    total_items: fallbackItems.length || parseInt(totalProds) || 0,
+                    total_unidades: parseInt(totalUnits) || 0,
+                    items: fallbackItems
+                };
+
                 Swal.fire({
                     title: '¿Confirmar Envío de Solicitud?',
                     html: `Se emitirá la solicitud para <strong>${estNombre}</strong> con <strong>${totalProds}</strong> producto(s) y un total de <strong>${totalUnits}</strong> unidad(es).`,
@@ -749,7 +781,7 @@
                             const data = await response.json();
 
                             if (response.ok && data.ok) {
-                                mostrarSweetAlertSolicitudExitosa(data.detail, true);
+                                mostrarSweetAlertSolicitudExitosa(data.detail || fallbackDetail, true);
                                 return;
                             }
 
