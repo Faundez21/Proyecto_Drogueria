@@ -63,7 +63,7 @@
                         </div>
                         <div>
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Fecha de Recepcion <span class="text-rose-500">*</span></label>
-                            <input type="date" name="fecha_recepcion" value="{{ date('Y-m-d') }}" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                            <input type="date" name="fecha_recepcion" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                         </div>
                         <div>
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Tipo de Documento <span class="text-rose-500">*</span></label>
@@ -284,7 +284,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">F. Vencimiento <span class="text-rose-500">*</span></label>
-                                    <input type="date" name="fecha_vencimiento[]" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
+                                    <input type="date" name="fecha_vencimiento[]" min="{{ date('Y-m-d') }}" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
                                 </div>
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Cantidad <span class="text-rose-500">*</span></label>
@@ -398,8 +398,8 @@
     </div>
 
     <!-- modal 1: historial -->
-    <div id="historyModal" class="fixed inset-0 z-40 hidden bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-3 sm:p-4 transition-opacity" role="dialog" aria-modal="true">
-        <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col my-auto">
+    <div id="historyModal" style="z-index: 70;" class="fixed inset-0 hidden bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-3 sm:p-4 transition-opacity" role="dialog" aria-modal="true">
+        <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col my-auto">
 
                 <!-- cabecera historial -->
                 <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
@@ -445,15 +445,15 @@
                 </div>
 
                 <!-- tabla del historial -->
-                <div class="p-0 max-h-[50vh] overflow-y-auto bg-white">
-                    <table class="w-full text-left border-collapse">
+                <div class="p-0 flex-1 min-h-0 max-h-[60vh] bg-white" style="overflow: auto;">
+                    <table class="w-full min-w-[760px] text-left border-collapse">
                         <thead>
                             <tr class="bg-white border-b border-slate-200 text-[12px] uppercase text-slate-500 sticky top-0 shadow-sm z-10">
-                                <th class="px-6 py-3 font-semibold">N°</th>
-                                <th class="px-6 py-3 font-semibold">Fecha</th>
-                                <th class="px-6 py-3 font-semibold">Proveedor</th>
-                                <th class="px-6 py-3 font-semibold">Items</th>
-                                <th class="px-6 py-3 font-semibold text-center">Acciones</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap" style="width: 90px;">N°</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap" style="width: 120px;">Fecha</th>
+                                <th class="px-4 py-3 font-semibold">Proveedor</th>
+                                <th class="px-4 py-3 font-semibold" style="width: 220px;">Items</th>
+                                <th class="px-4 py-3 font-semibold text-center" style="width: 130px;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-[13px] text-slate-700">
@@ -470,10 +470,10 @@
                                 }
                             @endphp
                             <tr class="hover:bg-slate-50 fila-recepcion">
-                                <td class="px-6 py-4 font-bold text-slate-800">#{{ $rec->correlativo }}</td>
-                                <td class="px-6 py-4">{{ \Carbon\Carbon::parse($rec->fecha_recepcion)->format('d-m-Y') }}</td>
-                                <td class="px-6 py-4">{{ $rec->provider->name ?? $rec->provider->nombre ?? $rec->provider->razon_social ?? 'N/A' }}</td>
-                                <td class="px-6 py-4">
+                                <td class="px-4 py-3.5 font-bold text-slate-800 whitespace-nowrap">#{{ $rec->correlativo }}</td>
+                                <td class="px-4 py-3.5 whitespace-nowrap">{{ \Carbon\Carbon::parse($rec->fecha_recepcion)->format('d-m-Y') }}</td>
+                                <td class="px-4 py-3.5">{{ $rec->provider->name ?? $rec->provider->nombre ?? $rec->provider->razon_social ?? 'N/A' }}</td>
+                                <td class="px-4 py-3.5">
                                     <div class="flex flex-wrap items-center gap-1.5">
                                         <span class="font-bold text-slate-700 mr-1">{{ $rec->items->count() }} total:</span>
                                         @if($countMed > 0)
@@ -487,8 +487,8 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-center">
-                                    <button onclick="openDetailModal({{ json_encode($rec) }}, '{{ addslashes($rec->provider->name ?? $rec->provider->nombre ?? 'N/A') }}', '{{ $rec->provider->rut ?? 'N/A' }}', '{{ route('reception.pdf', $rec->id) }}')" class="text-teal-600 hover:text-teal-800 font-medium bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md text-xs cursor-pointer">
+                                <td class="px-4 py-3.5 text-center whitespace-nowrap">
+                                    <button onclick="openDetailModal({{ json_encode($rec) }}, '{{ addslashes($rec->provider->name ?? $rec->provider->nombre ?? 'N/A') }}', '{{ $rec->provider->rut ?? 'N/A' }}', '{{ route('reception.pdf', $rec->id) }}')" class="text-teal-600 hover:text-teal-800 font-medium bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md text-xs cursor-pointer whitespace-nowrap">
                                         Ver Detalle
                                     </button>
                                 </td>
@@ -506,7 +506,7 @@
     </div>
 
     <!-- modal 2: detalle -->
-    <div id="detailModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-3 sm:p-4 transition-opacity" role="dialog" aria-modal="true">
+    <div id="detailModal" style="z-index: 80;" class="fixed inset-0 hidden bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-3 sm:p-4 transition-opacity" role="dialog" aria-modal="true">
         <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col my-auto">
                 <div class="px-6 py-4 border-b border-slate-200 bg-slate-800 flex justify-between items-center">
                     <div>
@@ -1233,9 +1233,16 @@
                 }).then(async (result) => {
                     if (!result.isConfirmed) return;
 
-                    if (!signatureRec.isEmpty()) {
-                        document.getElementById('firma_receptor_input').value = signatureRec.toDataURL('image/png');
+                    if (signatureRec.isEmpty()) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Falta la firma',
+                            text: 'Debes firmar el acta de recepción en el recuadro de firma antes de confirmarla.',
+                            confirmButtonColor: '#0d9488'
+                        });
+                        return;
                     }
+                    document.getElementById('firma_receptor_input').value = signatureRec.toDataURL('image/png');
 
                     const actionInput = document.getElementById('reception_action_input');
                     if (actionInput) {
@@ -1310,10 +1317,17 @@
         });
 
         // 6. modales (historial y detalle)
-        function openHistoryModal() { document.getElementById('historyModal').classList.remove('hidden'); }
+        // Los modales se mueven al <body> al abrirse para que queden por encima del menú lateral
+        function llevarModalAlFrente(id) {
+            const el = document.getElementById(id);
+            if (el && el.parentElement !== document.body) document.body.appendChild(el);
+            return el;
+        }
+        function openHistoryModal() { llevarModalAlFrente('historyModal').classList.remove('hidden'); }
         function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); }
 
         function openDetailModal(data, providerName, providerRut, pdfUrl) {
+            llevarModalAlFrente('detailModal');
             document.getElementById('m_correlativo').innerText = '#' + data.correlativo;
             document.getElementById('m_doc').innerText = data.tipo_documento + ' #' + data.numero_documento;
             document.getElementById('m_fecha').innerText = data.fecha_recepcion;

@@ -12,34 +12,51 @@ class DistributionSeeder extends Seeder
 {
     public function run(): void
     {
+        // Estructura de bodega alineada con las ubicaciones del inventario inicial (InventorySeeder):
+        // Pasillo 1 (A-1, A-2), Pasillo 2 (B-1), Pasillo 3 de controlados (cajas fuertes),
+        // Pasillo 4 (C-3) y la zona de merma (M-1).
         $estructura = [
-            'Pasillo A' => [
+            'Pasillo 1' => [
                 'color' => '#f97316',
+                'descripcion' => 'Medicamentos de alta rotación',
                 'estanterias' => [
                     ['name' => 'A-1', 'x' => -28, 'z' => -8, 'capacidad' => 1500],
                     ['name' => 'A-2', 'x' => -28, 'z' => 2, 'capacidad' => 1500],
-                    ['name' => 'ESTANTERIA 1', 'x' => -28, 'z' => 12, 'capacidad' => 800],
+                    ['name' => 'A-3', 'x' => -28, 'z' => 12, 'capacidad' => 1500],
                 ],
             ],
-            'Pasillo B' => [
+            'Pasillo 2' => [
                 'color' => '#3b82f6',
+                'descripcion' => 'Insumos clínicos',
                 'estanterias' => [
                     ['name' => 'B-1', 'x' => -14, 'z' => -8, 'capacidad' => 1200],
+                    ['name' => 'B-2', 'x' => -14, 'z' => 2, 'capacidad' => 1200],
+                    ['name' => 'B-3', 'x' => -14, 'z' => 12, 'capacidad' => 1200],
                 ],
             ],
-            'Pasillo C' => [
-                'color' => '#22c55e',
-                'estanterias' => [
-                    ['name' => 'C-3', 'x' => -14, 'z' => 2, 'capacidad' => 3000],
-                    ['name' => 'M-1', 'x' => -14, 'z' => 12, 'capacidad' => 1000],
-                ],
-            ],
-            'Zona Controlados' => [
+            'Pasillo 3 (Controlados)' => [
                 'color' => '#a855f7',
+                'descripcion' => 'Estupefacientes y psicotrópicos bajo llave',
                 'estanterias' => [
                     ['name' => 'CAJA FUERTE 1', 'x' => 26, 'z' => -8, 'capacidad' => 600],
                     ['name' => 'CAJA FUERTE 2', 'x' => 26, 'z' => 2, 'capacidad' => 600],
                     ['name' => 'CAJA FUERTE 3', 'x' => 26, 'z' => 12, 'capacidad' => 600],
+                ],
+            ],
+            'Pasillo 4' => [
+                'color' => '#22c55e',
+                'descripcion' => 'Medicamentos de baja rotación e insumos odontológicos',
+                'estanterias' => [
+                    ['name' => 'C-1', 'x' => 0, 'z' => -8, 'capacidad' => 3000],
+                    ['name' => 'C-2', 'x' => 0, 'z' => 2, 'capacidad' => 3000],
+                    ['name' => 'C-3', 'x' => 0, 'z' => 12, 'capacidad' => 3000],
+                ],
+            ],
+            'Pasillo Merma' => [
+                'color' => '#ef4444',
+                'descripcion' => 'Productos dados de baja a la espera de destrucción',
+                'estanterias' => [
+                    ['name' => 'M-1', 'x' => 12, 'z' => 12, 'capacidad' => 1000],
                 ],
             ],
         ];
@@ -48,7 +65,7 @@ class DistributionSeeder extends Seeder
             $aisle = Aisle::firstOrCreate(
                 ['name' => $pasilloNombre],
                 [
-                    'description' => 'Pasillo generado automáticamente para la distribución física',
+                    'description' => $datos['descripcion'],
                     'color' => $datos['color'],
                 ]
             );

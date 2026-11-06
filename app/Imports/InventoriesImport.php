@@ -22,6 +22,15 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
     private bool $forceReimport = false;
     private array $seenRows = [];
 
+    /** Filas que no se cargaron: [fila => motivo] */
+    private array $omitidas = [];
+
+    /** Filas vencidas que se cargaron directamente como Merma */
+    private int $vencidosAMerma = 0;
+
+    /** Filas cuya ubicación no existe en el mapa de bodega y quedaron "por asignar" (P.A) */
+    private array $ubicacionesInvalidas = [];
+
     private const ESTADOS = [
         'disponible' => 'Disponible',
         'cuarentena' => 'Cuarentena',
@@ -72,7 +81,11 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             ? $categoriaRaw
             : InventoryService::clasificarGrupoProducto($producto);
 
-        $estadoRaw = mb_strtolower(trim((string) ($row['estado'] ?? '')));
+        // N° de fila tal como se ve en Excel (la fila 1 es el encabezado)
+        $filaExcel = $this->registro + 1;
+
+        $estadoTexto = trim((string) ($row['estado'] ?? ''));
+        $estadoRaw = mb_strtolower($estadoTexto);
         if ($estadoRaw === '') {
             $estadoKey = 'disponible';
         } elseif (isset(self::ESTADOS[$estadoRaw])) {
@@ -81,19 +94,52 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             $estadoKey = 'cuarentena';
         } elseif (str_contains($estadoRaw, 'merma') || str_contains($estadoRaw, 'vencid')) {
             $estadoKey = 'merma';
-        } else {
+        } elseif (str_contains($estadoRaw, 'disponible')) {
             $estadoKey = 'disponible';
+        } else {
+            $this->omitidas[$filaExcel] = "estado «{$estadoTexto}» no válido (usa Disponible, Cuarentena o Merma)";
+
+            return null;
         }
         $estadoFinal = self::ESTADOS[$estadoKey];
 
         $cantidadRaw = $row['cantidad'] ?? null;
         if ($cantidadRaw === null || trim((string) $cantidadRaw) === '') {
-            $cantidad = 0;
-        } else {
-            $cantidad = $this->entero($cantidadRaw);
-            if ($cantidad === null || $cantidad < 0) {
-                $cantidad = 0;
-            }
+            $this->omitidas[$filaExcel] = 'cantidad vacía';
+
+            return null;
+        }
+        if (! is_numeric($cantidadRaw) && ! preg_match('/^\d{1,3}(\.\d{3})+$/', trim((string) $cantidadRaw))) {
+            $this->omitidas[$filaExcel] = "cantidad «{$cantidadRaw}» no es un número";
+
+            return null;
+        }
+        $cantidad = (int) ($this->entero($cantidadRaw) ?? 0);
+        if ($cantidad <= 0) {
+            // Sin stock: no se crea un lote vacío, pero el producto queda registrado en el catálogo
+            InventoryService::productoId($producto);
+            $this->omitidas[$filaExcel] = 'cantidad 0 (el producto quedó en el catálogo, sin lote)';
+
+            return null;
+        }
+
+        // Un lote ya vencido entra directamente como Merma (existe físicamente y debe darse de baja)
+        $fechaVencimiento = $this->fecha($row['fecha_vencimiento'] ?? null);
+        $motivo = null;
+        if ($fechaVencimiento && $estadoFinal !== 'Merma' && Carbon::parse($fechaVencimiento)->startOfDay()->lt(now()->startOfDay())) {
+            $estadoFinal = 'Merma';
+            $motivo = 'Producto vencido el ' . Carbon::parse($fechaVencimiento)->format('d/m/Y') . '. Cargado directamente a Merma desde la carga masiva.';
+            $this->vencidosAMerma++;
+        }
+
+        // La ubicación debe existir en el mapa de bodega; si no, el lote queda "por asignar"
+        $pasillo = trim((string) ($row['pasillo'] ?? '')) ?: null;
+        $estante = trim((string) ($row['estante'] ?? '')) ?: null;
+        $nivel = trim((string) ($row['nivel'] ?? '')) ?: null;
+        $posicion = trim((string) ($row['posicion'] ?? '')) ?: null;
+        if (($pasillo || $estante) && InventoryService::validarUbicacion($pasillo, $estante, $nivel, $posicion)) {
+            $this->ubicacionesInvalidas[] = $filaExcel;
+            $pasillo = $estante = $nivel = $posicion = null;
         }
 
         // Campos opcionales con valores por defecto seguros cuando vienen vacíos en el Excel
@@ -116,14 +162,15 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             'producto' => $producto,
             'categoria' => $categoria,
             'estado' => $estadoFinal,
+            'motivo' => $motivo,
             'lote' => $lote,
-            'fecha_vencimiento' => $this->fecha($row['fecha_vencimiento'] ?? null),
+            'fecha_vencimiento' => $fechaVencimiento,
             'cantidad' => $cantidad,
             'valor_neto_unitario' => $valorNetoUnitario,
-            'pasillo' => trim((string) ($row['pasillo'] ?? '')) ?: null,
-            'estante' => trim((string) ($row['estante'] ?? '')) ?: null,
-            'nivel' => trim((string) ($row['nivel'] ?? '')) ?: null,
-            'posicion' => trim((string) ($row['posicion'] ?? '')) ?: null,
+            'pasillo' => $pasillo,
+            'estante' => $estante,
+            'nivel' => $nivel,
+            'posicion' => $posicion,
             'programa' => trim((string) ($row['programa'] ?? ($row['programa_ministerial'] ?? ($row['programas'] ?? '')))) ?: null,
         ]);
 
@@ -167,6 +214,23 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
     public function enMerma(): int
     {
         return $this->enMerma;
+    }
+
+    /** @return array<int, string> [fila => motivo] */
+    public function omitidas(): array
+    {
+        return $this->omitidas;
+    }
+
+    public function vencidosAMerma(): int
+    {
+        return $this->vencidosAMerma;
+    }
+
+    /** @return int[] filas con ubicación inexistente */
+    public function ubicacionesInvalidas(): array
+    {
+        return $this->ubicacionesInvalidas;
     }
 
     private function fecha(mixed $valor): ?string

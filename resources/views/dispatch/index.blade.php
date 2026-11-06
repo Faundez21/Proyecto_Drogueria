@@ -1501,6 +1501,19 @@
                         reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            const faltaFirmaDespacha = !signatureDespacha || signatureDespacha.isEmpty();
+                            const faltaFirmaRecibe = (!signatureRecibe || signatureRecibe.isEmpty()) && !document.getElementById('firma_recibe_input').value;
+                            if (faltaFirmaDespacha || faltaFirmaRecibe) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Faltan firmas',
+                                    text: faltaFirmaDespacha
+                                        ? 'Debe firmar quien despacha (bodega) antes de emitir la guía.'
+                                        : 'Debe firmar quien recibe el despacho antes de emitir la guía.',
+                                    confirmButtonColor: '#0f766e'
+                                });
+                                return;
+                            }
                             if (signatureDespacha && !signatureDespacha.isEmpty()) {
                                 document.getElementById('firma_despacha_input').value = signatureDespacha.toDataURL('image/png');
                             }

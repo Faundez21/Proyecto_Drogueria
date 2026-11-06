@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Provider;
+use App\Support\Rut;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Carbon;
 
 class ProviderController extends Controller
@@ -94,14 +96,45 @@ class ProviderController extends Controller
         ));
     }
 
+    /** Categorías de proveedor permitidas (las mismas del formulario). */
+    private const CATEGORIAS = [
+        'Fármacos y medicamentos',
+        'Insumos clínicos',
+        'Equipamiento mayor',
+        'Dispositivos médicos',
+    ];
+
+    /**
+     * Regla de validación del RUT: dígito verificador correcto y que no esté registrado
+     * en otro proveedor, aunque esté escrito con otro formato (con o sin puntos).
+     */
+    private function reglaRut(?int $ignorarId = null): array
+    {
+        return ['required', 'string', 'max:20', function ($attribute, $value, $fail) use ($ignorarId) {
+            if (! Rut::esValido($value)) {
+                $fail('El RUT ingresado no es válido (revisa el dígito verificador).');
+
+                return;
+            }
+            $limpio = Rut::limpiar($value);
+            $duplicado = Provider::query()
+                ->when($ignorarId, fn ($q) => $q->where('id', '!=', $ignorarId))
+                ->get(['id', 'rut'])
+                ->first(fn ($p) => Rut::limpiar($p->rut) === $limpio);
+            if ($duplicado) {
+                $fail('Este RUT ya está registrado en otro proveedor.');
+            }
+        }];
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'rut' => 'required|string|min:9|max:20|unique:providers,rut',
+            'rut' => $this->reglaRut(),
             'name' => 'required|string|max:255',
-            'category' => 'required|string',
+            'category' => ['required', 'string', Rule::in(self::CATEGORIAS)],
             'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|min:9|max:20',
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^\+?[0-9\s\-()]{8,20}$/'],
             'business_line' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
         ], [
@@ -113,7 +146,11 @@ class ProviderController extends Controller
             'category.required' => 'Debes seleccionar una categoría.',
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'Ingresa una dirección de correo electrónico válida.',
+            'category.in' => 'Selecciona una categoría válida de la lista.',
+            'phone.regex' => 'El teléfono solo puede contener números, espacios, guiones y el signo +.',
         ]);
+
+        $validated['rut'] = Rut::formatear($validated['rut']);
 
         Provider::create($validated);
         return response()->json(['success' => true]);
@@ -123,13 +160,16 @@ class ProviderController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'rut' => 'required|string|min:9|max:20|unique:providers,rut,' . $provider->id,
+            'rut' => $this->reglaRut($provider->id),
             'email' => 'required|email|max:255',
-            'category' => 'required|string',
-            'phone' => 'nullable|string|min:9|max:20',
+            'category' => ['required', 'string', Rule::in(self::CATEGORIAS)],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^\+?[0-9\s\-()]{8,20}$/'],
             'business_line' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
+            'status' => 'nullable|in:activo,inactivo',
         ], [
+            'category.in' => 'Selecciona una categoría válida de la lista.',
+            'phone.regex' => 'El teléfono solo puede contener números, espacios, guiones y el signo +.',
             'rut.required' => 'El RUT es obligatorio.',
             'rut.min' => 'El RUT debe tener al menos 9 caracteres.',
             'rut.unique' => 'Este RUT ya está registrado.',
@@ -138,6 +178,11 @@ class ProviderController extends Controller
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'Ingresa una dirección de correo electrónico válida.',
         ]);
+
+        $validated['rut'] = Rut::formatear($validated['rut']);
+        if (empty($validated['status'])) {
+            unset($validated['status']);
+        }
 
         $provider->update($validated);
         return response()->json(['success' => true]);

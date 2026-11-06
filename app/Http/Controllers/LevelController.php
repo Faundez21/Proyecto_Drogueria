@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\InventoryService;
+
 use Illuminate\Http\Request;
 use App\Models\Aisle;
 use App\Models\Shelf;
@@ -52,6 +54,10 @@ class LevelController extends Controller
             'shelf_id' => 'required|exists:shelves,id',
         ]);
 
+        if (Level::where('shelf_id', $request->shelf_id)->where('number', (int) $request->number)->exists()) {
+            return redirect()->back()->withInput()->with('error', "Esa estantería ya tiene un Nivel {$request->number}.");
+        }
+
         Level::create($request->all());
 
 
@@ -87,6 +93,10 @@ class LevelController extends Controller
             'shelf_id' => 'required|exists:shelves,id',
         ]);
 
+        if (Level::where('id', '!=', $level->id)->where('shelf_id', $request->shelf_id)->where('number', (int) $request->number)->exists()) {
+            return redirect()->back()->withInput()->with('error', "Esa estantería ya tiene un Nivel {$request->number}.");
+        }
+
         $level->update($request->all());
 
         return redirect()->route('level.index')->with('success', 'Nivel editado correctamente.');
@@ -99,7 +109,14 @@ class LevelController extends Controller
      */
     public function destroy(string $id)
     {
-        Level::destroy($id);
+        $level = Level::with('shelf')->findOrFail($id);
+
+        $lotes = InventoryService::lotesEnUbicacion('nivel', $level);
+        if ($lotes > 0) {
+            return redirect()->route('level.index')->with('error', "No se puede eliminar el Nivel {$level->number} de la estantería «" . ($level->shelf->name ?? '') . "» porque todavía tiene {$lotes} lote(s) con stock. Primero reubica esos productos.");
+        }
+
+        $level->delete();
 
         return redirect()->route('level.index')->with('success', 'Nivel eliminado correctamente');
     }
