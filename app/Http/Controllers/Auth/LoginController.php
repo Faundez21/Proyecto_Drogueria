@@ -66,11 +66,6 @@ class LoginController extends Controller
             return redirect()->route('dashboard.index');
         }
 
-        // Módulo de Usuarios y Roles
-        if ($user->can('ver.usuarios') || $user->can('ver.users')) {
-            return redirect()->route('users.index');
-        }
-
         // Inventario / Bodega
         if ($user->can('ver.inventario')) {
             return redirect()->route('inventory.index');

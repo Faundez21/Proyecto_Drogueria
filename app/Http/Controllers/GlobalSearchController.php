@@ -198,7 +198,7 @@ class GlobalSearchController extends Controller
                 }
             }
 
-            if ($user->can('ver.usuarios')) {
+            if ($user->hasRole('Administrador')) {
                 // Solicitudes pendientes de recuperación de clave para Usuarios y Permisos
                 $clavesPendientes = DB::table('password_reset_tokens')
                     ->where('status', 'pending')

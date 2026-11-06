@@ -55,6 +55,20 @@ class Inventory extends Model
         'minimo' => 'integer',
     ];
 
+    /**
+     * Todo lote de un fármaco controlado (detectado por similitud de nombre)
+     * queda siempre en la categoría "Fármacos Controlados", sin importar si
+     * entró por Recepción, Ingreso Manual o Carga Masiva.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (Inventory $inventory) {
+            if (! empty($inventory->producto) && \App\Services\InventoryService::esControlado((string) $inventory->producto)) {
+                $inventory->categoria = 'Fármacos Controlados';
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
