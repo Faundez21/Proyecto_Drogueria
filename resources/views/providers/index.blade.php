@@ -4,7 +4,7 @@
 @section('subtitle', 'Directorio y gestión de proveedores registrados.')
 
 @section('actions')
-    <!-- Botón Principal: Registrar -->
+    <!-- Botón principal: registrar -->
     <button type="button" id="btn-new-provider"
         class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -27,9 +27,8 @@
             <span class="font-medium text-slate-800">Proveedores</span>
         </div>
 
-        <!-- Tarjetas KPIs Uniformes -->
+        <!-- Tarjetas KPIs uniformes -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-            <!-- KPI: Total -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm transition-all hover:shadow-md">
                 <div class="flex items-start justify-between">
                     <div>
@@ -47,7 +46,6 @@
                 </div>
             </div>
 
-            <!-- KPI: Activos -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm transition-all hover:shadow-md">
                 <div class="flex items-start justify-between">
                     <div>
@@ -67,7 +65,6 @@
                         class="text-emerald-600 font-bold">{{ $porcentajeActivos ?? 0 }}%</span> del total filtrado</p>
             </div>
 
-            <!-- KPI: Mes -->
             <div
                 class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm sm:col-span-2 lg:col-span-1 transition-all hover:shadow-md">
                 <div class="flex items-start justify-between">
@@ -208,7 +205,7 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-[13px]">
                         @forelse ($providers ?? [] as $provider)
-                            <!-- IMPORTANTE: Todos los campos añadidos a los data-attributes -->
+                            <!-- los data-attributes llevan todos los campos que usa el modal de ficha -->
                             <tr class="provider-row hover:bg-slate-50 transition-colors group"
                                 data-id="{{ $provider->id }}" data-name="{{ $provider->name }}"
                                 data-rut="{{ $provider->rut }}" data-business-line="{{ $provider->business_line }}"
@@ -414,7 +411,7 @@
             </div>
 
             <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-                <!-- Sección: Información Comercial -->
+                <!-- Sección: información comercial -->
                 <div>
                     <h4 class="text-[13px] font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">Información
                         Comercial y Contacto</h4>
@@ -465,7 +462,7 @@
         </div>
     </div>
 
-    <!-- Modal 2: Formulario (Registrar/Editar) -->
+    <!-- Modal 2: formulario (Registrar/Editar) -->
     <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
             data-close="modal-edit"></div>
@@ -491,7 +488,7 @@
             <form class="p-6 space-y-6 overflow-y-auto" onsubmit="return false;" novalidate>
                 <input type="hidden" id="provider-id" value="">
 
-                <!-- SECCIÓN 1: DATOS GENERALES -->
+                <!-- seccion 1: datos generales -->
                 <div>
                     <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Datos Generales
                     </h4>
@@ -544,7 +541,7 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN 2: CONTACTO Y DIRECCIÓN -->
+                <!-- seccion 2: contacto y direccion -->
                 <div>
                     <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Contacto y
                         Ubicación</h4>
@@ -578,7 +575,7 @@
                     </div>
                 </div>
 
-                <!-- ESTADO (Sólo visible al editar) -->
+                <!-- estado, solo aparece al editar -->
                 <div id="status-container">
                     <h4 class="text-[13px] font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Estado del
                         Proveedor</h4>
@@ -619,7 +616,7 @@
             const csrfToken = '{{ csrf_token() }}';
             let selectedRow = null;
 
-            // VALIDACIONES: RUT CHILENO (módulo 11) Y TELÉFONO
+            // Validación del RUT chileno (módulo 11) y del teléfono
 
             // Deja sólo dígitos y K, en mayúscula
             function cleanRut(value) {
@@ -833,7 +830,7 @@
                 };
             }
 
-            // --- 1. Ver Ficha Técnica ---
+            // --- Ficha del proveedor ---
             document.querySelectorAll('.js-view-detail').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const row = e.currentTarget.closest('.provider-row');
@@ -869,7 +866,7 @@
                 });
             });
 
-            // --- 2. Formulario de Guardado ---
+            // --- Formulario de guardado ---
             function openEditForm(row = null) {
                 clearFieldErrors();
 
@@ -969,7 +966,7 @@
                     return;
                 }
 
-                // Aquí usamos /suppliers como prefijo para coincidir con web.php
+                // La ruta es /suppliers, no /providers (ver web.php)
                 const url = id ? `/suppliers/${id}` : '/suppliers';
                 const method = id ? 'PUT' : 'POST';
                 const btn = document.getElementById('modal-edit-action');
@@ -1032,7 +1029,7 @@
                 }
             });
 
-            // --- 3. Botón Activar/Desactivar con SweetAlert2 ---
+            // --- Botón activar / desactivar ---
             document.querySelectorAll('.js-toggle-status').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const row = e.currentTarget.closest('.provider-row');
@@ -1056,7 +1053,7 @@
                     }).then(async (result) => {
                         if (result.isConfirmed) {
                             try {
-                                // Aquí usamos /suppliers como prefijo para coincidir con web.php
+                                // La ruta es /suppliers, no /providers (ver web.php)
                                 const response = await fetch(
                                     `/suppliers/${p.id}/toggle-status`, {
                                         method: 'PATCH',

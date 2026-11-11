@@ -187,7 +187,7 @@
         <strong>Certificación de Requerimiento:</strong> El responsable solicitante certifica la veracidad de los consumos históricos y del stock físico declarado a la fecha de emisión para el oportuno abastecimiento en Bodega Central DAS.
     </div>
 
-    <!-- Única firma de quien hace la solicitud -->
+    <!-- firma de quien hace la solicitud -->
     <div class="signatures-wrapper">
         <table class="signatures-table" style="width: 60%; margin: 0 auto;">
             <tr>

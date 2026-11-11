@@ -19,7 +19,6 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. RECIBIR TODOS LOS FILTROS (Bodega + Establecimientos y CESFAM)
         $periodo = $request->get('periodo', 'mes');
         $categoria = $request->input('categoria');
         $programa = $request->input('programa');
@@ -32,7 +31,6 @@ class DashboardController extends Controller
         $fechaInicio = null;
         $fechaFin = Carbon::now()->endOfDay();
 
-        // 2. CONFIGURAR RANGO DE FECHAS
         if ($periodo === 'custom' && $fecha_desde && $fecha_hasta) {
             $fechaInicio = Carbon::parse($fecha_desde)->startOfDay();
             $fechaFin = Carbon::parse($fecha_hasta)->endOfDay();
@@ -62,7 +60,6 @@ class DashboardController extends Controller
             }
         }
 
-        // Catálogo de Establecimientos y CESFAM
         $catalogoEstablecimientos = InventoryService::establecimientos();
         $nombresCesfam = array_values(array_column(
             array_filter($catalogoEstablecimientos, fn ($e) => ($e['tipo'] ?? '') === 'CESFAM'),
@@ -73,7 +70,7 @@ class DashboardController extends Controller
             'nombre'
         ));
 
-        // Nombres de establecimientos filtrados según los selectores de Establecimiento / Tipo
+        // Nombres que quedan después de aplicar los selectores de establecimiento y tipo
         $establecimientosFiltro = null;
         if ($establecimiento) {
             $establecimientosFiltro = [$establecimiento];
@@ -83,7 +80,6 @@ class DashboardController extends Controller
             $establecimientosFiltro = $nombresNoCesfam;
         }
 
-        // 3. QUERY BASE DE INVENTARIO (Para KPIs que dependen de los filtros de producto)
         $invQuery = Inventory::query();
         if ($categoria) {
             $invQuery->where('categoria', $categoria);
@@ -92,7 +88,7 @@ class DashboardController extends Controller
             $invQuery->where('programa', $programa);
         }
 
-        // KPIs PRINCIPALES (Stock actual filtrado y disponible en Bodega Central)
+        // Stock disponible en bodega, ya filtrado
         $valorInventario = (clone $invQuery)
             ->where('estado', 'Disponible')
             ->where('cantidad', '>', 0)
@@ -105,7 +101,7 @@ class DashboardController extends Controller
             ->sum('cantidad');
         $productosCatalogo = Product::count();
 
-        // IDs de productos que coinciden con los filtros (null = sin filtro de producto)
+        // null significa que no hay filtro de producto aplicado
         $productosFiltradosIds = null;
         if ($categoria || $programa) {
             $productosFiltradosIds = (clone $invQuery)
@@ -116,7 +112,7 @@ class DashboardController extends Controller
                 ->all();
         }
 
-        // 4. MOVIMIENTOS FILTRADOS POR PERÍODO, PRODUCTOS Y ESTABLECIMIENTO/CESFAM
+        // Movimientos del período seleccionado
         $dispatchQuery = Dispatch::query();
         $controlledDispatchQuery = ControlledDispatch::query();
         $receptionQuery = Reception::query();
@@ -159,7 +155,7 @@ class DashboardController extends Controller
         $despachosPeriodo = $dispatchQuery->count() + $controlledDispatchQuery->count();
         $recepcionesPeriodo = $receptionQuery->count();
 
-        // Totales históricos (sin límite de fecha, conservando filtros de producto y establecimiento)
+        // Totales históricos: mismos filtros pero sin límite de fecha
         $dispatchTotalQuery = Dispatch::query();
         $controlledTotalQuery = ControlledDispatch::query();
         $receptionTotalQuery = Reception::query();
@@ -178,7 +174,6 @@ class DashboardController extends Controller
         $totalDespachos = $dispatchTotalQuery->count() + $controlledTotalQuery->count();
         $totalRecepciones = $receptionTotalQuery->count();
 
-        // 5. KPIs Y ESTADÍSTICAS DE ESTABLECIMIENTOS Y CESFAM
         $reqBaseQuery = EstablishmentRequest::with(['items.product', 'assignedUser']);
 
         if ($fechaInicio && $fechaFin) {
@@ -203,7 +198,7 @@ class DashboardController extends Controller
 
         $solicitudesFiltradas = $reqBaseQuery->orderBy('created_at', 'desc')->get();
 
-        // Separar métricas CESFAM vs Establecimientos (No-CESFAM)
+        // Los CESFAM se cuentan aparte del resto de establecimientos
         $solicitudesCesfam = $solicitudesFiltradas->filter(fn ($s) => in_array($s->establecimiento, $nombresCesfam));
         $solicitudesEstablecimientos = $solicitudesFiltradas->filter(fn ($s) => ! in_array($s->establecimiento, $nombresCesfam));
 
@@ -219,7 +214,6 @@ class DashboardController extends Controller
         $solicitudesAsignadasCount = $solicitudesFiltradas->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])->whereNotNull('assigned_user_id')->count();
         $solicitudesSinAsignarCount = $solicitudesPorDespacharCount - $solicitudesAsignadasCount;
 
-        // Unidades despachadas a CESFAM vs Establecimientos en el período
         $unidadesNormalesPorDest = DB::table('dispatches')
             ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id')
             ->when($fechaInicio && $fechaFin, fn ($q) => $q->whereBetween('dispatches.fecha_despacho', [$fechaInicio->toDateString(), $fechaFin->toDateString()]))
@@ -250,7 +244,6 @@ class DashboardController extends Controller
             $unidadesDespachadasEstablecimientos += (int) ($unidadesNormalesPorDest[$nomEst] ?? 0) + (int) ($unidadesCtrlPorDest[$nomEst] ?? 0);
         }
 
-        // Totales de stock declarado, consumo anterior y cumplimiento sobre las solicitudes filtradas
         $stockDeclaradoRed = 0;
         $totalUnidadesSolicitadas = 0;
         $totalUnidadesEntregadasSolicitudes = 0;
@@ -273,7 +266,7 @@ class DashboardController extends Controller
             ? round(($totalUnidadesEntregadasSolicitudes / $totalUnidadesSolicitadas) * 100, 1)
             : 0;
 
-        // Resumen detallado por cada Establecimiento / CESFAM para la tabla comparativa del Dashboard
+        // Resumen por establecimiento para la tabla comparativa
         $resumenEstablecimientos = collect($catalogoEstablecimientos)
             ->filter(function ($est) use ($establecimientosFiltro) {
                 return $establecimientosFiltro === null || in_array($est['nombre'], $establecimientosFiltro);
@@ -324,14 +317,14 @@ class DashboardController extends Controller
             ->sortByDesc(fn ($r) => ($r->total_solicitudes * 1000) + $r->unidades_despachadas)
             ->values();
 
-        // Solicitudes asignadas al usuario logueado (para que las vea apenas inicie sesión)
+        // Solicitudes asignadas al usuario, para que las vea apenas entra
         $misSolicitudesAsignadas = EstablishmentRequest::with(['items.product', 'assignedUser'])
             ->where('assigned_user_id', Auth::id())
             ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // 6. ALERTAS (Vencimientos y Cuarentenas - Respetando Filtros Base)
+        // Alertas de vencimiento y cuarentena
         $proximosVencer = (clone $invQuery)
             ->where('estado', 'Disponible')
             ->where('cantidad', '>', 0)
@@ -349,10 +342,10 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        // 7. TRAZABILIDAD RECIENTE (Últimos 6 movimientos combinados)
+        // Últimos movimientos para el panel de actividad
         $recentMovements = collect();
 
-        // Recepciones (si no se está filtrando por un establecimiento de destino específico)
+        // Las recepciones no aplican si se está filtrando por un destino
         if ($establecimientosFiltro === null) {
             $recBuilder = DB::table('receptions')
                 ->join('reception_items', 'receptions.id', '=', 'reception_items.reception_id')
@@ -387,7 +380,6 @@ class DashboardController extends Controller
             }
         }
 
-        // Despachos normales
         $dispBuilder = DB::table('dispatches')
             ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id');
 
@@ -420,7 +412,6 @@ class DashboardController extends Controller
             ]);
         }
 
-        // Despachos controlados
         $ctrlDispBuilder = DB::table('controlled_dispatches')
             ->join('controlled_dispatch_items', 'controlled_dispatches.id', '=', 'controlled_dispatch_items.controlled_dispatch_id');
 
@@ -455,7 +446,7 @@ class DashboardController extends Controller
 
         $recentMovements = $recentMovements->sortByDesc('fecha_hora')->take(6)->values();
 
-        // 8. ÚLTIMO LOTE INGRESADO A BODEGA (Para panel de rotulación QR)
+        // Último lote ingresado, para el panel de etiquetas QR
         $latestInventory = (clone $invQuery)->where('cantidad', '>', 0)
             ->orderByDesc('created_at')
             ->orderByDesc('id')
@@ -468,7 +459,7 @@ class DashboardController extends Controller
                 ->first();
         }
 
-        // 9. LISTAS PARA DROPDOWNS
+        // Listas para los selectores
         $categoriasLista = Inventory::whereNotNull('categoria')->where('categoria', '!=', '')->distinct()->orderBy('categoria')->pluck('categoria');
         $programasLista = Inventory::whereNotNull('programa')->where('programa', '!=', '')->distinct()->orderBy('programa')->pluck('programa')
             ->unique()

@@ -38,10 +38,9 @@
                 </button>
             </div>
 
-            <!-- Barra Superior: Buscador y Controles Principales (Estilo Filtros Avanzados) -->
+            <!-- buscador y controles de la barra superior -->
             <div class="p-4 sm:p-5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0 space-y-3">
                 <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-                    <!-- Buscador Principal -->
                     <div class="relative flex-1 max-w-lg">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,7 +54,6 @@
 
                     <!-- Controles: Filtros Avanzados y Menú Exportar Listado -->
                     <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                        <!-- Botón Toggle Filtros Avanzados -->
                         <button type="button" onclick="togglePendingCesfamAdvancedFilters()" id="btnToggleCesfamAdvanced"
                             class="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-700 rounded-lg text-[12.5px] font-semibold text-slate-700 dark:text-slate-200 transition-all cursor-pointer shadow-sm">
                             <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +66,7 @@
                             <svg id="iconChevronCesfamAdvanced" class="text-slate-400 transition-transform duration-200 inline-block shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
 
-                        <!-- Menú Desplegable Unificado: Descargar Consolidado -->
+                        <!-- menu para descargar el consolidado -->
                         <div class="relative">
                             <button type="button" onclick="togglePendingCesfamExportMenu()" id="btnPendingCesfamExport"
                                 class="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-[12.5px] font-bold shadow-sm hover:shadow transition-all cursor-pointer border border-slate-700">
@@ -77,7 +75,6 @@
                                 <svg class="ml-0.5 inline-block shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                             </button>
 
-                            <!-- Menú flotante -->
                             <div id="dropdownPendingCesfamExport"
                                 class="hidden absolute right-0 mt-1.5 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1.5 divide-y divide-slate-100 dark:divide-slate-700/60 animate-fade-in text-[12px]">
                                 <div class="py-1">
@@ -104,7 +101,7 @@
                     </div>
                 </div>
 
-                <!-- Panel Desplegable: Filtros Avanzados en Fila Horizontal -->
+                <!-- panel de filtros avanzados -->
                 <div id="pendingCesfamAdvancedPanel" class="hidden pt-3 border-t border-slate-200 dark:border-slate-800 animate-fade-in">
                     <div class="p-3.5 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-700/60 shadow-xs">
                         <div class="flex flex-col md:flex-row items-end gap-3 w-full">
@@ -140,7 +137,6 @@
                                 </div>
                             </div>
 
-                            <!-- Filtro Fecha Desde -->
                             <div class="w-full md:w-44 shrink-0">
                                 <label for="pendingCesfamFilterFechaDesde" class="block text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1.5 uppercase tracking-wider">
                                     Fecha Desde
@@ -156,7 +152,6 @@
                                 </div>
                             </div>
 
-                            <!-- Filtro Fecha Hasta -->
                             <div class="w-full md:w-44 shrink-0">
                                 <label for="pendingCesfamFilterFechaHasta" class="block text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1.5 uppercase tracking-wider">
                                     Fecha Hasta
@@ -172,7 +167,6 @@
                                 </div>
                             </div>
 
-                            <!-- Botón Limpiar Filtros en la misma fila -->
                             <div class="w-full md:w-auto shrink-0">
                                 <button type="button" onclick="resetPendingCesfamFilters()"
                                     class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-slate-700 rounded-lg text-[12.5px] font-semibold shadow-xs hover:shadow transition-all cursor-pointer group"
@@ -188,23 +182,20 @@
                 </div>
             </div>
 
-            <!-- Resumen Rápido de Métricas y Notificación de Descarga Individual -->
+            <!-- resumen de metricas y aviso de descarga -->
             <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-[12px]">
-                <!-- Métricas estilo Pills / Badges alineadas con la plataforma -->
+                <!-- metricas del encabezado -->
                 <div class="flex flex-wrap items-center gap-2">
-                    <!-- Solicitudes -->
                     <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
                         <span class="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wider font-semibold">Solicitudes:</span>
                         <span id="cesfamVisibleSolicitudesCount" class="font-extrabold text-teal-600 dark:text-teal-400 text-[13px]">{{ isset($solicitudesPendientesCesfam) ? $solicitudesPendientesCesfam->count() : 0 }}</span>
                     </div>
 
-                    <!-- Ítems Pendientes -->
                     <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
                         <span class="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wider font-semibold">Ítems Pendientes:</span>
                         <span id="cesfamVisibleItemsCount" class="font-extrabold text-slate-800 dark:text-slate-100 text-[13px]">{{ isset($itemsPendientesCesfam) ? $itemsPendientesCesfam->count() : 0 }}</span>
                     </div>
 
-                    <!-- Total Unidades -->
                     <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
                         <span class="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wider font-semibold">Unidades Pendientes:</span>
                         <span id="cesfamVisibleUnitsCount" class="font-extrabold text-teal-600 dark:text-teal-400 text-[13px]">{{ isset($itemsPendientesCesfam) ? number_format($itemsPendientesCesfam->sum('cantidad_pendiente'), 0, ',', '.') : 0 }}</span>
@@ -212,14 +203,14 @@
                     </div>
                 </div>
 
-                <!-- Notificación destacada integrada al estilo de la plataforma -->
+                <!-- aviso de descarga -->
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 text-teal-800 dark:text-teal-300 font-medium text-[11.5px] shadow-xs">
                     <svg class="text-teal-600 dark:text-teal-400 shrink-0 inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 18c1.5-2 2.5-2 3 0s1.5 1 2.5-1 2 .5 2.5 1"/></svg>
                     <span>Cada solicitud puede ser visualizada, descargada e impresa de forma individual con la firma oficial de su solicitante.</span>
                 </div>
             </div>
 
-            <!-- Listado Principal: Tabla de Solicitudes Pendientes Individuales -->
+            <!-- tabla de solicitudes pendientes -->
             <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
                 <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
                     <table class="w-full text-left text-[12.5px] border-collapse" id="pendingCesfamTable">
@@ -301,24 +292,21 @@
                                             </span>
                                         </td>
 
-                                        <!-- Acciones Individuales: Ver, Descargar, Imprimir -->
+                                        <!-- Acciones individuales: ver, descargar, imprimir -->
                                         <td class="py-3 px-3 text-center whitespace-nowrap">
                                             <div class="inline-flex items-center gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
-                                                <!-- Ver Individual (Ojo) -->
                                                 <button type="button" onclick="viewSingleCesfamPdf({{ $sol->id }})"
                                                     class="p-1.5 text-teal-600 dark:text-teal-400 hover:text-white hover:bg-teal-600 rounded-md transition-colors cursor-pointer"
                                                     title="Ver PDF oficial de la Solicitud {{ $sol->numero_solicitud }}">
                                                     <svg class=" inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7C3.6 7.9 7.5 5 12 5s8.4 2.9 9.94 6.65a1 1 0 0 1 0 .7C20.4 16.1 16.5 19 12 19s-8.4-2.9-9.94-6.65"/><circle cx="12" cy="12" r="3"/></svg>
                                                 </button>
 
-                                                <!-- Descargar Individual -->
                                                 <button type="button" onclick="downloadSingleCesfamPdf({{ $sol->id }})"
                                                     class="p-1.5 text-slate-600 dark:text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
                                                     title="Descargar PDF oficial de la Solicitud {{ $sol->numero_solicitud }}">
                                                     <svg class=" inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
                                                 </button>
 
-                                                <!-- Imprimir Individual -->
                                                 <button type="button" onclick="printSingleCesfamPdf({{ $sol->id }})"
                                                     class="p-1.5 text-slate-600 dark:text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
                                                     title="Imprimir directamente Solicitud {{ $sol->numero_solicitud }}">
@@ -327,7 +315,6 @@
                                             </div>
                                         </td>
 
-                                        <!-- Toggle Detalle -->
                                         <td class="py-3 px-3 text-center">
                                             <button type="button" onclick="toggleCesfamDetails({{ $sol->id }})"
                                                 id="btn-toggle-cesfam-{{ $sol->id }}"
@@ -427,7 +414,7 @@
         </div>
     </div>
 
-    <!-- Iframe invisible para imprimir PDF sin abandonar la vista -->
+    <!-- iframe oculto para imprimir el PDF sin salir de la vista -->
     <iframe id="pendingCesfamPrintIframe" class="hidden" style="display:none; width:0; height:0; border:0;"></iframe>
 
     <script>

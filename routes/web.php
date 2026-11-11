@@ -16,7 +16,7 @@ use App\Http\Controllers\PasswordResetRequestController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\QRController;
-//  Controladores de Estructura de Almacén (Mantenedores)
+// mantenedores de la estructura de bodega
 use App\Http\Controllers\QuarantineController;
 use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\ReportController;
@@ -28,10 +28,10 @@ use Illuminate\Support\Facades\Route;
 
 // rutas publicas. estas rutas son accesibles sin necesidad de iniciar sesion.
 
-// 1. redireccion principal al login
+// redireccion principal al login
 Route::redirect('/', '/login');
 
-// 2. rutas de login
+// rutas de login
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate'])->middleware('throttle:10,1');
 
@@ -57,7 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/notifications/mark-all-read', [GlobalSearchController::class, 'markAllAsRead'])->name('global.notifications.mark_all_read');
     Route::post('/api/notifications/unmark-read', [GlobalSearchController::class, 'unmarkAsRead'])->name('global.notifications.unmark_read');
 
-    //  GESTIÓN DE USUARIOS Y ROLES (exclusivo del rol Administrador; ningún otro rol puede acceder)
+    // usuarios y roles: solo entra el Administrador
     Route::middleware('role:Administrador')->group(function () {
 
         // asignar contraseña por el administrador
@@ -74,21 +74,21 @@ Route::middleware('auth')->group(function () {
         Route::delete('/roles/{role}', [UserController::class, 'destroyRole'])->name('roles.destroy');
     });
 
-    //  SOLO ADMINISTRADOR 
+    // solo administrador 
     Route::middleware('role:Administrador')->group(function () {
         // asignar solicitudes de establecimientos/cesfam a trabajadores desde Despacho
         Route::patch('/requests/{establishmentRequest}/assign', [EstablishmentRequestController::class, 'assign'])
             ->name('requests.assign');
     });
 
-    // modulo de despacho de controlados (acceso por permiso ver.despacho_controlado; Administrador entra siempre vía Gate::before)
+    // despacho de controlados, protegido por el permiso ver.despacho_controlado
     Route::middleware('permission:ver.despacho_controlado')->group(function () {
         Route::get('/controlled_dispatch', [ControlledDispatchController::class, 'index'])->name('controlled_dispatch.index');
         Route::post('/controlled_dispatch', [ControlledDispatchController::class, 'store'])->name('controlled_dispatch.store');
         Route::get('/controlled_dispatch/{id}/pdf', [ControlledDispatchController::class, 'pdf'])->name('controlled_dispatch.pdf');
     });
 
-    //  ACCESO POR PERMISO DE VISTA (definido en roles) 
+    // cada ruta pide el permiso ver.<modulo> que se asigna al rol desde Usuarios 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('permission:ver.dashboard')->name('dashboard.index');
 

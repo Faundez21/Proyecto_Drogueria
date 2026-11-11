@@ -91,7 +91,7 @@
             </div>
         </div>
 
-        <!-- Directorio Físico -->
+        <!-- Directorio físico -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col">
             <!-- Cabecera y Botón de Filtros -->
             <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white">
@@ -127,7 +127,7 @@
                         </div>
                     </div>
 
-                    <!-- Filtros Select -->
+                    <!-- Filtros select -->
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
                         <select name="categoria" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
@@ -181,7 +181,7 @@
                 </div>
             </form>
 
-            <!-- Alerta Filtros Activos -->
+            <!-- Alerta filtros activos -->
             @if (request()->filled('pasillo') || request()->filled('estante') || request()->filled('categoria') || request()->filled('programa') || request()->filled('search'))
                 <div id="activeFilterAlert" class="px-5 py-3 bg-amber-50 border-b border-amber-200 flex justify-between items-center text-xs text-amber-800 font-bold">
                     <span class="flex items-center gap-2">
@@ -407,7 +407,7 @@
         </div>
     </div>
 
-        <!-- MODAL: Etiqueta QR -->
+        <!-- modal de la etiqueta QR -->
         <style>
             @media print {
                 body * {
@@ -469,7 +469,7 @@
             </div>
         </div>
 
-        <!-- MODAL: Editar Estado de Lote -->
+        <!-- modal para cambiar el estado del lote -->
         <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-0 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
@@ -574,7 +574,7 @@
             </div>
         </div>
 
-        <!-- MODAL: Historial Avanzado -->
+        <!-- modal del historial -->
         <div id="HistoryModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
                 <div class="px-4 py-3 sm:px-6 sm:py-4 bg-slate-800 flex justify-between items-center shrink-0 border-b border-slate-700">
@@ -587,7 +587,7 @@
                     </button>
                 </div>
 
-                <!-- FILTROS AVANZADOS DEL HISTORIAL -->
+                <!-- filtros avanzados del historial -->
                 <div class="p-3 sm:px-6 sm:py-3.5 bg-slate-50 border-b border-slate-200 shrink-0">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-3 items-end">
                         <div class="sm:col-span-2 lg:col-span-4">
@@ -639,7 +639,7 @@
                     </div>
                 </div>
 
-                <!-- AVISO DESLIZAMIENTO MÓVIL -->
+                <!-- aviso de que la tabla se desliza en movil -->
                 <div class="sm:hidden px-3 py-1.5 bg-amber-50/70 border-b border-amber-200/60 text-[11px] text-amber-800 font-medium flex items-center justify-between shrink-0">
                     <span class="flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
@@ -752,7 +752,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
-        // Inicializar Filtros Avanzados
+        // Filtros avanzados
         document.addEventListener('DOMContentLoaded', () => {
             const btnToggleFilters = document.getElementById('toggle-filters-btn');
             const filtersPanel = document.getElementById('filters-panel');
@@ -778,7 +778,7 @@
             if (el) el.textContent = value;
         }
 
-        // Lógica de Filtros Frontend en Tabla de Directorio
+        // Filtrado de la tabla en el navegador
         function filterTableByLocation() {
             const pasilloVal = normalizeText(document.getElementById('pasilloSelect').value);
             const estanteVal = normalizeText(document.getElementById('estanteSelect').value);
@@ -859,7 +859,7 @@
             if (searchInput) searchInput.value = '';
         }
 
-        // Buscador Dropdown
+        // Buscador con desplegable
         function showSearchDropdown() { document.getElementById('searchDropdown')?.classList.remove('hidden'); }
         function selectSearchProduct(productName) {
             document.getElementById('searchInput').value = productName;
@@ -881,7 +881,7 @@
             }
         });
 
-        // Acordeón de tabla maestra
+        // Acordeón de la tabla
         function toggleLotes(key) {
             const row = document.getElementById('lotes-' + key);
             const arrow = document.getElementById('arrow-' + key);
@@ -939,7 +939,7 @@
             window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), trigger, false);
         }
 
-        // Modales (Edición Lote)
+        // Modal de edición de lote
         function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0, pasillo = '', estante = '', nivel = '', posicion = '') {
             const form = document.getElementById('editLoteForm');
             const pasClean = (pasillo && pasillo !== 'P.A') ? pasillo : '';
@@ -1036,7 +1036,7 @@
             return false;
         }
 
-        // Modal QR
+        // Modal del QR
         function openQRModal(id, producto, lote, vencimiento, stock, proveedor) {
             document.getElementById('qrModal').classList.remove('hidden');
             setText('qrProducto', producto);
@@ -1052,7 +1052,7 @@
         }
         function closeQRModal() { document.getElementById('qrModal').classList.add('hidden'); }
 
-        // Modal Historial y Filtros JS
+        // Modal del historial y sus filtros
         function openHistory() {
             const modal = document.getElementById('HistoryModal');
             if (modal) {

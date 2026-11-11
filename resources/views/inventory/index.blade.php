@@ -55,7 +55,7 @@
             <span class="font-medium text-slate-800">Inventario</span>
         </div>
 
-        <!-- Contenedor Principal Tabla Inventario -->
+        <!-- Contenedor principal tabla Inventario -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm flex flex-col">
 
             <!-- Cabecera de la tabla y botón de filtros -->
@@ -182,7 +182,7 @@
                 </div>
             </form>
 
-            <!-- Alerta Verde de Filtros Activos (Blade + JS) -->
+            <!-- aviso de filtros activos -->
             @if (request()->filled('pasillo') || request()->filled('estante') || request()->filled('categoria') || request()->filled('programa') || request()->filled('search'))
                 <div id="activeFilterAlert" class="px-5 py-3 bg-teal-50 border-b border-teal-200 flex justify-between items-center text-xs text-teal-800 font-bold">
                     <span class="flex items-center gap-2">
@@ -586,7 +586,7 @@
                                     $cant = data_get($itemObj, 'stock_total') ?? (data_get($itemObj, 'cantidad') ?? 0);
                                     $loteCodigo = data_get($itemObj, 'lote') ?? (data_get($itemObj, 'loteRef.lote') ?? 'S/L');
 
-                                    // FECHA Y HORA (Usamos created_at para el ingreso de inventario)
+                                    // Se usa created_at porque es la fecha en que el lote entró al inventario
                                     $rawDate = data_get($itemObj, 'created_at') ?? data_get($itemObj, 'updated_at');
                                     if ($rawDate) {
                                         try {
@@ -598,7 +598,7 @@
                                         $fechaFormateada = 'Sin Registro';
                                     }
 
-                                    // USUARIO RESPONSABLE
+                                    // Usuario responsable
                                     $uName = data_get($itemObj, 'user.name') ?? (data_get($itemObj, 'usuario.name') ?? data_get($itemObj, 'causer.name'));
                                     $uLast = data_get($itemObj, 'user.last_name') ?? (data_get($itemObj, 'usuario.last_name') ?? data_get($itemObj, 'causer.last_name'));
 
@@ -643,7 +643,7 @@
             </div>
         </div>
 
-        <!-- Pantalla de Carga Global para Procesamiento de Archivos Pesados -->
+        <!-- pantalla de carga para los archivos grandes -->
         <div id="importLoadingOverlay" class="hidden fixed inset-0 z-[10050] bg-slate-900/85 backdrop-blur-md flex flex-col items-center justify-center p-6 transition-all">
             <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 p-8 max-w-md w-full text-center relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1.5 bg-slate-100 overflow-hidden">
@@ -684,7 +684,7 @@
             </div>
         </div>
 
-        <!-- Modal: Importar Carga Masiva -->
+        <!-- Modal: importar carga masiva -->
         <div id="importModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-0 flex flex-col w-full max-w-lg max-h-[92vh] overflow-hidden my-auto">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
@@ -716,7 +716,7 @@
                         </div>
                     @endif
 
-                    <!-- Alerta dinámica JS (Formato inválido o Archivo Duplicado detectado en cliente) -->
+                    <!-- aviso de formato invalido o archivo repetido -->
                     <div id="clientImportAlert" class="hidden rounded-xl p-4 border shadow-sm">
                         <div class="flex items-start gap-3">
                             <svg id="clientImportAlertIcon" class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
@@ -767,7 +767,7 @@
                             </button>
                         </div>
 
-                        <!-- Opción de forzar reimportación cuando se detecta hash duplicado -->
+                        <!-- permite reimportar un Excel que ya se habia subido -->
                         <div id="forceReimportContainer" class="hidden w-full bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-left">
                             <label class="flex items-start gap-2 cursor-pointer">
                                 <input type="checkbox" name="force_reimport" id="forceReimportCheck" value="1" class="mt-0.5 rounded border-amber-400 text-teal-600 focus:ring-teal-500">
@@ -792,7 +792,7 @@
             </div>
         </div>
 
-        <!-- Modal: Ingreso Manual -->
+        <!-- Modal: ingreso manual -->
         <div id="DepositModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-0 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
@@ -992,7 +992,7 @@
             </div>
         </div>
 
-        <!-- Modal: Etiqueta QR -->
+        <!-- Modal: etiqueta QR -->
         <style>
             @media print {
                 body * {
@@ -1071,7 +1071,7 @@
             </div>
         </div>
 
-        <!-- Modal: Editar Lote -->
+        <!-- Modal: editar Lote -->
         <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 transition-all">
             <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-0 w-full max-w-lg max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden my-auto">
                 <div class="px-4 sm:px-6 py-4 bg-slate-800 flex justify-between items-center shrink-0 border-b border-slate-700">
@@ -1187,7 +1187,7 @@
             </div>
         </div>
 
-        <!-- Modal: Ver Mermas -->
+        <!-- Modal: ver mermas -->
         <div id="mermaModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
                 <div class="px-6 py-5 bg-rose-800 flex justify-between items-center shrink-0">
@@ -1205,7 +1205,7 @@
                     </button>
                 </div>
 
-                <!-- NUEVO: FILTROS AVANZADOS DE MERMAS -->
+                <!-- filtros avanzados de mermas -->
                 <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end z-20 shadow-inner shrink-0">
                     <div class="flex-1 min-w-[200px]">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Buscar Texto</label>
@@ -1761,7 +1761,7 @@
             document.getElementById('DepositModal').classList.add('hidden');
         }
 
-        //  LÓGICA FILTROS AVANZADOS MERMA 
+        // Lógica filtros avanzados merma
         function openMerma() {
             document.getElementById('mermaModal').classList.remove('hidden');
             filterMermas();
@@ -1785,17 +1785,17 @@
             let totalValue = 0;
 
             rows.forEach(row => {
-                // Validación Búsqueda
+                // Validación de la búsqueda
                 const searchables = row.querySelectorAll('.searchable');
                 let rowText = '';
                 searchables.forEach(td => rowText += normalizeText(td.textContent) + ' ');
                 const matchSearch = rowText.includes(search);
 
-                // Validación Usuario
+                // Validación del usuario
                 const rowUser = row.getAttribute('data-user') || '';
                 const matchUser = userFilter === '' || rowUser === userFilter;
 
-                // Validación Fechas
+                // Validación de las fechas
                 const rowDateStr = row.getAttribute('data-date'); // YYYY-MM-DD
                 let matchDate = true;
                 if (rowDateStr) {
@@ -1805,7 +1805,7 @@
                     matchDate = false; // Si no tiene fecha y hay filtro de fecha
                 }
 
-                // Aplicar Filtro Final
+                // Aplicar el filtro
                 if (matchSearch && matchUser && matchDate) {
                     row.style.display = '';
                     visibleCount++;
@@ -1815,7 +1815,7 @@
                 }
             });
 
-            // Manejo de UI de filas vacías
+            // Qué mostrar cuando no quedan filas
             if (rows.length > 0 && filteredEmptyRow) {
                 filteredEmptyRow.style.display = visibleCount === 0 ? '' : 'none';
             }
@@ -1987,7 +1987,7 @@
             const ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
             const allowed = ['xlsx', 'xls', 'csv'];
 
-            // 1. Validar formato del archivo inmediatamente
+            // Se valida el formato antes de subir nada
             if (!allowed.includes(ext)) {
                 input.value = '';
                 if (card) card.classList.add('hidden');
@@ -2008,7 +2008,7 @@
                 return;
             }
 
-            // 2. Validar tamaño máximo (20 MB)
+            // Tamaño máximo 20 MB
             const maxBytes = 20 * 1024 * 1024;
             if (file.size > maxBytes) {
                 input.value = '';
@@ -2018,7 +2018,7 @@
                 return;
             }
 
-            // 3. Mostrar tarjeta del archivo seleccionado
+            // Tarjeta con el archivo elegido
             if (label) {
                 label.textContent = 'Cambiar archivo seleccionado';
                 label.classList.add('text-teal-700');
@@ -2030,7 +2030,7 @@
                 if (sizeText) sizeText.textContent = formatBytes(file.size);
             }
 
-            // 4. Detectar si el usuario ya subió o seleccionó este mismo archivo recientemente (huella local)
+            // Avisa si ya se había subido este mismo archivo
             try {
                 const fileFingerprint = `${file.name}|${file.size}|${file.lastModified}`;
                 const historyRaw = localStorage.getItem('das_imported_files_history') || '{}';
@@ -2089,7 +2089,7 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Guardar huella pendiente; solo se confirmará en el historial si el servidor completa la importación con éxito
+                    // La huella del archivo solo se guarda si el servidor confirma la importación
                     try {
                         const fileFingerprint = `${file.name}|${file.size}|${file.lastModified}`;
                         const nowStr = new Date().toLocaleDateString('es-CL') + ' ' + new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
@@ -2099,7 +2099,7 @@
                         }));
                     } catch (e) {}
 
-                    // Activar Pantalla de Carga para archivos pesados
+                    // Pantalla de carga para los archivos grandes
                     const overlay = document.getElementById('importLoadingOverlay');
                     const fileNameEl = document.getElementById('loadingFileName');
                     const fileSizeEl = document.getElementById('loadingFileSize');

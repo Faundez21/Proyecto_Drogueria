@@ -97,7 +97,6 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
             try {
                 $fechaVencimiento = \Carbon\Carbon::parse($fechaVencimiento)->format('d/m/Y');
             } catch (\Exception $e) {
-                // Mantiene el valor original si falla
             }
         } else {
             $fechaVencimiento = 'N/A';
@@ -136,7 +135,7 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
                 $sheet = $event->sheet->getDelegate();
                 $highestRow = $sheet->getHighestRow();
 
-                // Encabezado Institucional en Filas 1 a 3 (con sangría para el logo favicon4 en A1)
+                // Encabezado en las filas 1 a 3; la celda A1 queda libre para el logo
                 $sheet->mergeCells('A1:K1');
                 $sheet->setCellValue('A1', 'DROGUERÍA COMUNAL DAS - I. MUNICIPALIDAD DE TALCAHUANO');
                 $sheet->getStyle('A1')->applyFromArray([
@@ -164,7 +163,6 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
                 $sheet->getRowDimension(4)->setRowHeight(26);
 
                 if ($highestRow >= 5) {
-                    // Bordes y alineación de filas de datos
                     $sheet->getStyle('A4:K' . $highestRow)->applyFromArray([
                         'borders' => [
                             'allBorders' => [
@@ -177,7 +175,7 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
                         ],
                     ]);
 
-                    // Zebra striping y alturas
+                    // Filas alternadas en gris para que se lean mejor
                     for ($r = 5; $r <= $highestRow; $r++) {
                         $sheet->getRowDimension($r)->setRowHeight(20);
                         if ($r % 2 === 0) {
@@ -187,17 +185,15 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
                         }
                     }
 
-                    // Alineaciones por columna
                     $sheet->getStyle("C5:F{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $sheet->getStyle("H5:H{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $sheet->getStyle("I5:J{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                     $sheet->getStyle("K5:K{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-                    // Formato numérico de Stock y Moneda
                     $sheet->getStyle("H5:H{$highestRow}")->getNumberFormat()->setFormatCode('#,##0');
                     $sheet->getStyle("I5:J{$highestRow}")->getNumberFormat()->setFormatCode('$#,##0');
 
-                    // Fila de Totales al final
+                    // Fila de totales al final
                     $totalRow = $highestRow + 1;
                     $sheet->mergeCells("A{$totalRow}:G{$totalRow}");
                     $sheet->setCellValue("A{$totalRow}", 'TOTAL GENERAL CONSOLIDADO DEL REPORTE:');

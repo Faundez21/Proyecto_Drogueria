@@ -14,7 +14,6 @@ class ProviderController extends Controller
     {
         $query = Provider::query();
 
-        // 1. Filtros de búsqueda
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
@@ -49,7 +48,6 @@ class ProviderController extends Controller
             $query->orderBy('created_at', 'desc');
         }
 
-        // 2. Cálculo de KPIs
         $total = $query->count();
         $activos = (clone $query)->where('status', 'activo')->count();
         $porcentajeActivos = $total > 0 ? round(($activos / $total) * 100) : 0;
@@ -76,11 +74,10 @@ class ProviderController extends Controller
         ];
         $nombreMesActual = $mesesNombres[$mesActual] . ' ' . $anioActual;
 
-        // 3. Paginación y registros por página (10 por defecto)
         $perPage = $request->input('per_page', 10);
         $providers = $query->paginate($perPage)->withQueryString();
 
-        // 4. Lista ligera para Autocomplete
+        // Lista reducida para el autocompletado del buscador
         $allProviders = Provider::select('name', 'rut')->get();
 
         return view('providers.index', compact(

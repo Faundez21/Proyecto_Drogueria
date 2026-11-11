@@ -245,7 +245,6 @@
                             data-role="{{ strtolower($nombreRolPrincipal) }}"
                             data-status="{{ $estadoUser }}">
 
-                            <!-- Funcionario -->
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3.5">
                                     <div class="w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-white text-[13px] shadow-xs shrink-0 {{ $esAdminUser ? 'bg-gradient-to-br from-teal-600 to-teal-700' : 'bg-gradient-to-br from-indigo-600 to-slate-700' }}">
@@ -263,7 +262,6 @@
                                 </div>
                             </td>
 
-                            <!-- Rol y Vistas -->
                             <td class="px-6 py-4">
                                 <div class="flex flex-col gap-1.5">
                                     <div class="flex flex-wrap items-center gap-1.5">
@@ -320,7 +318,7 @@
                                 </div>
                             </td>
 
-                            <!-- Solicitudes Asignadas -->
+                            <!-- Solicitudes asignadas -->
                             <td class="px-6 py-4 text-center">
                                 <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
                                     @if (($user->solicitudes_activas_count ?? 0) > 0)
@@ -342,7 +340,6 @@
                                 </div>
                             </td>
 
-                            <!-- Estado -->
                             <td class="px-6 py-4 text-center">
                                 @if (($user->status ?? 'activo') === 'activo')
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -357,7 +354,6 @@
                                 @endif
                             </td>
 
-                            <!-- Acciones -->
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-1.5">
                                     <button type="button" data-id="{{ $user->id }}" data-name="{{ $user->name }}"
@@ -736,7 +732,7 @@
         </div>
     </div>
 
-    <!-- Modal Crear / Editar Usuario -->
+    <!-- Modal crear / editar usuario -->
     <div id="UserModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
@@ -840,7 +836,7 @@
                             @endforeach
                         </select>
 
-                        <!-- Vista previa interactiva de las vistas que incluye el rol seleccionado -->
+                        <!-- muestra que vistas incluye el rol que se esta editando -->
                         <div class="mt-3 p-3.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Vistas incluidas en este rol:</span>
@@ -868,7 +864,6 @@
         </div>
     </div>
 
-    <!-- JS -->
     <script>
         const MAPA_ROLES_VISTAS = @json($mapaRolesVistas);
 

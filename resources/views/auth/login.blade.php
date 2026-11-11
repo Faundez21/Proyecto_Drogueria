@@ -21,7 +21,7 @@
     </script>
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}?v={{ @filemtime(public_path('css/dark-mode.css')) }}">
 
-    <!-- SweetAlert2 CDN -->
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
@@ -53,13 +53,13 @@
     <div
         class="w-full max-w-md lg:max-w-7xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col lg:flex-row overflow-hidden min-h-[80vh] lg:min-h-[85vh]">
 
-        <!-- VISTA MÓVIL - SOLO IMAGEN -->
+        <!-- en movil solo se muestra la imagen -->
         <div class="block lg:hidden w-full h-40 sm:h-48 relative bg-cover bg-center"
             style="background-image: url('{{ asset('images/bg-drogueria.png') }}');">
             <div class="absolute inset-0 bg-blue-900/10"></div>
         </div>
 
-        <!-- PANEL IZQUIERDO - DESKTOP -->
+        <!-- panel izquierdo, solo en escritorio -->
         <div class="hidden lg:flex w-1/2 relative bg-blue-900 flex-col justify-between p-12 text-white"
             style="background-image: url('{{ asset('images/bg-drogueria.png') }}'); background-size: cover; background-position: center;">
 
@@ -67,7 +67,7 @@
 
             <div class="relative z-10 flex flex-col h-full">
 
-                <!-- LOGO DESKTOP -->
+                <!-- logo en escritorio -->
                 <div class="flex items-center gap-4 mb-16">
                     <div class="flex items-center gap-2 font-bold text-2xl">
                         <div class="drop-shadow-md">
@@ -98,7 +98,6 @@
                 </div>
 
                 <div class="space-y-6 flex-1">
-                    <!-- 1. CONTROL TOTAL -->
                     <div class="flex items-start gap-4">
                         <div class="bg-blue-800/50 p-3 rounded-full border border-blue-600/30 shrink-0">
                             <svg class="w-6 h-6 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,7 +111,6 @@
                         </div>
                     </div>
 
-                    <!-- 2. REPORTES -->
                     <div class="flex items-start gap-4">
                         <div class="bg-blue-800/50 p-3 rounded-full border border-blue-600/30 shrink-0">
                             <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor"
@@ -128,7 +126,6 @@
                         </div>
                     </div>
 
-                    <!-- 3. TRAZABILIDAD -->
                     <div class="flex items-start gap-4">
                         <div class="bg-blue-800/50 p-3 rounded-full border border-blue-600/30 shrink-0">
                             <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor"
@@ -144,7 +141,6 @@
                         </div>
                     </div>
 
-                    <!-- 4. GENERADOR QR -->
                     <div class="flex items-start gap-4">
                         <div class="bg-blue-800/50 p-3 rounded-full border border-blue-600/30 shrink-0">
                             <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor"
@@ -160,7 +156,6 @@
                         </div>
                     </div>
 
-                    <!-- 5. RECEPCIÓN Y DESPACHO -->
                     <div class="flex items-start gap-4">
                         <div class="bg-blue-800/50 p-3 rounded-full border border-blue-600/30 shrink-0">
                             <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor"
@@ -175,7 +170,6 @@
                         </div>
                     </div>
 
-                    <!-- 6. ADMINISTRACIÓN -->
                     <div class="flex items-start gap-4">
                         <div class="bg-blue-800/50 p-3 rounded-full border border-blue-600/30 shrink-0">
                             <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,11 +187,11 @@
             </div>
         </div>
 
-        <!-- PANEL DERECHO DEL LOGIN -->
+        <!-- panel derecho con el formulario de login -->
         <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 sm:p-10 lg:p-16 relative">
             <div class="w-full max-w-md">
 
-                <!-- LOGO MÓVIL -->
+                <!-- logo en movil -->
                 <div class="flex lg:hidden items-center justify-center gap-2 font-bold text-2xl mb-6">
                     <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -337,12 +331,11 @@
         </div>
     </div>
 
-    <!-- MODAL 1: ¿OLVIDASTE TU CONTRASEÑA? -->
+    <!-- modal de recuperar contraseña -->
     <div id="forgotPasswordModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all"
         onclick="if(event.target === this) cerrarModalRecuperacion()">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto transform transition-all">
-            <!-- Cabecera -->
             <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-blue-950 text-white flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3.5">
                     <div class="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 shrink-0">
@@ -367,7 +360,7 @@
 
             <!-- Cuerpo del Modal (Formulario) -->
             <div id="forgotFormView" class="p-6 space-y-5 overflow-y-auto flex-1">
-                <!-- Flujo explicativo en 3 pasos -->
+                <!-- explicacion del flujo en 3 pasos -->
                 <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 space-y-2">
                     <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">¿Cómo funciona?</p>
                     <div class="space-y-1.5 text-xs text-slate-600">
@@ -450,12 +443,11 @@
         </div>
     </div>
 
-    <!-- MODAL 2: CONTACTAR AL ADMINISTRADOR -->
+    <!-- modal de contacto con el administrador -->
     <div id="contactAdminModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all"
         onclick="if(event.target === this) cerrarModalContacto()">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto transform transition-all">
-            <!-- Cabecera -->
             <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-blue-950 text-white flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3.5">
                     <div class="w-11 h-11 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300 shrink-0">
@@ -478,13 +470,12 @@
                 </button>
             </div>
 
-            <!-- Cuerpo -->
             <div class="p-6 space-y-4 overflow-y-auto flex-1">
                 <p class="text-xs text-slate-600 leading-relaxed">
                     El acceso a la plataforma es exclusivo para personal autorizado de Droguería y establecimientos de salud (CESFAM / Postas). Comunícate con el administrador para habilitar tu perfil:
                 </p>
 
-                <!-- Tarjeta de Correo con Botón Copiar -->
+                <!-- correo con boton para copiarlo -->
                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between gap-2">
                     <div class="min-w-0">
                         <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Correo de Administración</span>
@@ -504,7 +495,7 @@
                     </button>
                 </div>
 
-                <!-- Datos opcionales para armar el correo automáticamente -->
+                <!-- datos opcionales para armar el correo -->
                 <div class="space-y-3 pt-1">
                     <div>
                         <label for="contact_name" class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
@@ -560,7 +551,7 @@
             }
         }
 
-        // Detector de Bloq Mayús (Caps Lock) en el campo de contraseña
+        // Avisa si el bloqueo de mayúsculas está activado
         const loginPassInput = document.getElementById('login_password');
         const capsWarning = document.getElementById('caps_lock_warning');
         if (loginPassInput && capsWarning) {
@@ -613,7 +604,7 @@
                 if (submitSpinner) submitSpinner.classList.remove('hidden');
             }
 
-            // Fallback de seguridad: si no se redirige en 10s, restaurar el botón
+            // Si en 10 segundos no redirige, se vuelve a habilitar el botón
             setTimeout(resetLoginButton, 10000);
         });
 
@@ -644,11 +635,11 @@
                 (window.performance && window.performance.navigation && window.performance.navigation.type === 2);
 
             if (isBackForward) {
-                // Forzar recarga limpia para que el backend valide Auth::check() y redirija automáticamente al usuario a su módulo
+                // Se recarga para que el servidor revise la sesión y redirija al módulo que corresponda
                 window.location.reload();
             }
         });
-        // MODAL 1: RECUPERAR CONTRASEÑA
+        // Modal de recuperar contraseña
         function abrirModalRecuperacion(event) {
             if (event) event.preventDefault();
             const modal = document.getElementById('forgotPasswordModal');
@@ -737,7 +728,7 @@
             }
         }
 
-        // MODAL 2: CONTACTAR AL ADMINISTRADOR
+        // Modal de contacto con el administrador
         function contactarAdministrador() {
             const modal = document.getElementById('contactAdminModal');
             if (modal) modal.classList.remove('hidden');

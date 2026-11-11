@@ -23,7 +23,7 @@
                 </button>
             </div>
 
-            <!-- Barra de Directorio y Botón de Filtros Avanzados (igual a vista Inventario) -->
+            <!-- barra de directorio y filtros, igual que en Inventario -->
             <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center shrink-0">
                 <h3 class="text-[15px] font-bold text-slate-800">
                     Directorio de Productos ({{ $esVistaCesfam ? 'CESFAM' : 'Establecimientos' }})

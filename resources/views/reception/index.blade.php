@@ -558,7 +558,7 @@
                         </div>
                     </div>
 
-                    <!-- Firma Modal -->
+                    <!-- Firma modal -->
                     <div class="flex justify-center mt-4">
                         <div class="bg-white p-3 rounded-lg border border-slate-200 text-center h-24 w-64">
                             <p class="text-[11px] text-slate-500 font-semibold mb-1 uppercase">Firma Recepcion</p>
@@ -681,7 +681,7 @@
 
             const prevValue = selectProd.value;
 
-            // Eliminamos del DOM los optgroups actuales en lugar de usar .hidden para evitar espacios en blanco en el desplegable nativo
+            // Los optgroups se borran del DOM: con .hidden el desplegable nativo deja huecos en blanco
             selectProd.querySelectorAll('optgroup').forEach(og => og.remove());
 
             selectProd._optgroupsBackup.forEach(ogTemplate => {
@@ -968,7 +968,7 @@
             iframe.src = url;
         }
 
-        // SweetAlert de Éxito con Resumen Completo de la Recepción
+        // Aviso de éxito con el resumen de la recepción
         function mostrarSweetAlertRecepcionExitosa(recData, recargarAlCerrar = false) {
             if (!recData) return;
 
@@ -1277,7 +1277,7 @@
                             const data = await response.json();
 
                             if (response.ok && data.ok) {
-                                // Muestra inmediatamente el SweetAlert de Recepción Realizada con Éxito + su Resumen
+                                // Muestra el resumen apenas responde el servidor
                                 mostrarSweetAlertRecepcionExitosa(data.detail || fallbackSummary, true);
                                 return;
                             }

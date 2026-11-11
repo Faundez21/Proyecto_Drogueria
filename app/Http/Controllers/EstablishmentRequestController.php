@@ -464,7 +464,7 @@ class EstablishmentRequestController extends Controller
 
         $solicitudId = $request->input('solicitud_id') ?: $request->input('request_id');
 
-        // Si se solicita la descarga o visualización de una solicitud individual
+        // Descarga de una sola solicitud
         if ($solicitudId) {
             $solicitud = EstablishmentRequest::with(['items.product', 'assignedUser'])
                 ->whereIn('establecimiento', $nombresQuery)
@@ -490,7 +490,7 @@ class EstablishmentRequestController extends Controller
             return $pdf->stream($nombreArchivo);
         }
 
-        // Si es el listado consolidado / filtrado
+        // Listado consolidado
         $centroFiltro = trim((string) ($request->input('centro') ?: $request->input('establecimiento')));
         $fechaDesde = $request->input('fecha_desde');
         $fechaHasta = $request->input('fecha_hasta');

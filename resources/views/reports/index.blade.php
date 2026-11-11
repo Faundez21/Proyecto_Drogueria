@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <!-- Contenedor Principal Tabla Inventario -->
+        <!-- Contenedor principal tabla Inventario -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
 
             <!-- Cabecera de la tabla y botón de filtros -->

@@ -11,7 +11,7 @@ class QuarantineController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Consulta Principal para el Directorio Físico
+        // Lotes retenidos que se muestran en la tabla
         $query = Inventory::with(['product', 'user'])->where('estado', 'Cuarentena');
 
         $user = auth()->user();
@@ -22,7 +22,6 @@ class QuarantineController extends Controller
             $query->where('categoria', '!=', 'Fármacos Controlados');
         }
 
-        // Filtro de Búsqueda Global
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -32,7 +31,6 @@ class QuarantineController extends Controller
             });
         }
 
-        // Filtros Específicos Avanzados
         if ($request->filled('categoria')) {
             $catFiltro = trim($request->input('categoria'));
             // La categoría se compara tal cual viene en los datos; no hay equivalencias fijas en código.
@@ -51,7 +49,6 @@ class QuarantineController extends Controller
             $query->where('programa', $request->programa);
         }
 
-        // Ordenamiento Dinámico
         if ($request->filled('order_by')) {
             switch ($request->order_by) {
                 case 'nombre_asc':
@@ -75,14 +72,14 @@ class QuarantineController extends Controller
             $query->latest('updated_at'); // Por defecto
         }
 
-        // KPIs globales sobre el total filtrado
+        // Totales calculados sobre todo el resultado, no solo la página actual
         $totalLotesGlobal = (clone $query)->count();
         $totalUnidadesGlobal = (int) (clone $query)->sum('cantidad');
         $valorTotalRetenido = (float) ((clone $query)->selectRaw('SUM(cantidad * valor_neto_unitario) as total')->value('total') ?? 0);
 
         $inventories = $query->paginate(15)->withQueryString();
 
-        // 2. Consulta para el Historial Avanzado (Sin Paginación)
+        // Historial de retenciones, liberaciones y bajas
         $historial = StockMovement::with('user')
             ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('producto', $controladosLista))
             ->where(function ($q) {
@@ -102,7 +99,7 @@ class QuarantineController extends Controller
                 ->get();
         }
 
-        // 3. Generar listas para los Dropdowns de Filtros y Modales
+        // Listas para los selectores
         $baseDropdownQuery = Inventory::where('estado', 'Cuarentena')
             ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']));
 

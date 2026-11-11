@@ -18,7 +18,7 @@ class ReportController extends Controller
     {
         $query = Inventory::where('estado', 'Disponible');
 
-        // Restricción de Fármacos Controlados según rol/permiso
+        // Los controlados solo aparecen si el usuario tiene permiso para verlos
         $user = auth()->user();
         $puedeVerControlados = $user && ($user->hasRole('Administrador') || $user->can('ver.despacho_controlado'));
 
@@ -26,7 +26,6 @@ class ReportController extends Controller
             $query->whereNotIn('categoria', ['Fármacos Controlados', 'Controlado', 'Estupefacientes']);
         }
 
-        // 1. Filtro de Búsqueda (Texto general)
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -38,7 +37,7 @@ class ReportController extends Controller
             });
         }
 
-        // 2. Filtro de Categoría: se compara tal cual viene en los datos.
+        // La categoría se compara tal cual viene escrita en los datos
         if ($request->filled('categoria')) {
             $cat = trim((string) $request->input('categoria'));
             $esCatControlada = InventoryService::clasificarGrupoProducto('', $cat) === 'Estupefacientes';
@@ -48,22 +47,18 @@ class ReportController extends Controller
             }
         }
 
-        // 3. Filtro de Pasillo
         if ($request->filled('pasillo')) {
             $query->where('pasillo', $request->input('pasillo'));
         }
 
-        // 3b. Filtro de Programa
         if ($request->filled('programa')) {
             $query->where('programa', $request->input('programa'));
         }
 
-        // 4. Filtro de Estante
         if ($request->filled('estante')) {
             $query->where('estante', $request->input('estante'));
         }
 
-        // 5. Ordenamiento
         $orderBy = $request->input('order_by', 'recent');
         switch ($orderBy) {
             case 'nombre_asc':
@@ -141,16 +136,14 @@ class ReportController extends Controller
 
     public function exportPdf(Request $request)
     {
-        // Un reporte con todo el inventario (más de mil lotes) necesita más memoria y tiempo
-        // que el límite normal de PHP (128 MB). Se amplía solo para esta descarga.
+        // El inventario completo no cabe en los 128 MB que trae PHP por defecto,
+        // así que se amplía el límite solo mientras dura esta descarga.
         @ini_set('memory_limit', '1024M');
         @set_time_limit(300);
 
         $query = $this->buildInventoryQuery($request);
 
-        // Salvaguarda DomPDF: la plantilla imprime la tabla en bloques de 100 filas, lo que permite
-        // generar el reporte completo con cerca de 350 MB por cada 1.300 lotes. Solo si el volumen
-        // supera este límite se recorta y se avisa en el PDF que use la versión Excel.
+        // Si aun así son demasiados lotes, el PDF se recorta y avisa que descarguen el Excel.
         $limitePdf = 2500;
         $totalItems = (clone $query)->count();
         $isTruncated = $totalItems > $limitePdf;

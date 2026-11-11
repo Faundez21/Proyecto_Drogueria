@@ -77,6 +77,18 @@ class ControlledDispatchController extends Controller
         ));
     }
 
+    /**
+     * Emite una guía de despacho de estupefacientes y psicotrópicos.
+     *
+     * Funciona igual que el despacho normal, pero con tres restricciones que
+     * vienen de la normativa: solo acepta productos reconocidos como
+     * controlados, la solicitud tiene que venir de un CESFAM y el destino debe
+     * ser ese mismo CESFAM. Además permite anotar las series de las recetas
+     * cheque que respaldan la entrega.
+     *
+     * Sus guías llevan correlativo propio, GDC-AAAA-XXXX, separado del de las
+     * guías normales.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([

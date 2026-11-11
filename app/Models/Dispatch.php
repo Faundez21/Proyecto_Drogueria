@@ -4,6 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Una guía de despacho de productos normales (no controlados).
+ *
+ * El correlativo es anual y con formato GD-AAAA-XXXX. Si el despacho salió de
+ * una solicitud, queda enlazado a ella por establishment_request_id.
+ */
 class Dispatch extends Model
 {
     protected $fillable = [
