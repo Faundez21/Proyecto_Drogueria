@@ -252,17 +252,17 @@
                                     <select name="tipo_producto[]" required onchange="onCategoriaReceptionChange(this)" class="select-categoria-recepcion w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" disabled selected>Seleccione categoría...</option>
                                         <optgroup label="Medicamentos (Fármacos)" data-optgroup-cat="Medicamentos">
-                                            @foreach($categoriasAgrupadas['Medicamentos'] ?? ['Medicamentos' => 'MEDICAMENTOS GENERALES', 'Fármacos' => 'FÁRMACOS', 'F-FOFAR' => 'FOFAR (FARMACIA)', 'F-PALIATIVOS' => 'CUIDADOS PALIATIVOS', 'F-PARO' => 'CARRO DE PARO'] as $catVal => $catLabel)
+                                            @foreach($categoriasAgrupadas['Medicamentos'] ?? [] as $catVal => $catLabel)
                                                 <option value="{{ $catVal }}" data-grupo="Medicamentos">{{ $catLabel }}</option>
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Insumos Clínicos y Equipamiento" data-optgroup-cat="Insumos">
-                                            @foreach($categoriasAgrupadas['Insumos'] ?? ['Insumos' => 'INSUMOS CLÍNICOS GENERALES', 'Insumos Clínicos' => 'INSUMOS CLÍNICOS', 'Equipamiento' => 'EQUIPAMIENTO', 'I-CIRUGIA' => 'CIRUGÍA MENOR (INSUMOS)', 'I-URGENCIA' => 'URGENCIA CIRUGÍA (INSUMOS)', 'E-COMUNAL' => 'EQUIPAMIENTO COMUNAL'] as $catVal => $catLabel)
+                                            @foreach($categoriasAgrupadas['Insumos'] ?? [] as $catVal => $catLabel)
                                                 <option value="{{ $catVal }}" data-grupo="Insumos">{{ $catLabel }}</option>
                                             @endforeach
                                         </optgroup>
                                         <optgroup label="Estupefacientes y Psicotrópicos" data-optgroup-cat="Estupefacientes">
-                                            @foreach($categoriasAgrupadas['Estupefacientes'] ?? ['Estupefacientes' => 'ESTUPEFACIENTES / CONTROLADOS', 'Fármacos Controlados' => 'FÁRMACOS CONTROLADOS'] as $catVal => $catLabel)
+                                            @foreach($categoriasAgrupadas['Estupefacientes'] ?? [] as $catVal => $catLabel)
                                                 <option value="{{ $catVal }}" data-grupo="Estupefacientes">{{ $catLabel }}</option>
                                             @endforeach
                                         </optgroup>
@@ -273,8 +273,8 @@
                                     <select name="programa[]"
                                         class="select-programa-recepcion w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                         <option value="" selected>Sin programa</option>
-                                        @foreach($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
-                                            <option value="{{ $progOpt }}">{{ $progOpt === 'IRA/ERA' ? 'Respiratorio (IRA/ERA)' : $progOpt }}</option>
+                                        @foreach($programasLista ?? [] as $progOpt)
+                                            <option value="{{ $progOpt }}">{{ $progOpt }}</option>
                                         @endforeach
                                     </select>
                                 </div>

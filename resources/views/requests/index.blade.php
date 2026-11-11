@@ -227,7 +227,7 @@
                                     <select name="programa[]" required
                                         class="w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-programa">
                                         <option value="" disabled selected>Seleccione...</option>
-                                        @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
+                                        @foreach ($programasLista ?? [] as $progOpt)
                                             @php $progLimpio = trim(preg_replace('/\s+/', ' ', $progOpt ?? '')); @endphp
                                             @if($progLimpio !== '')
                                                 <option value="{{ $progLimpio }}">{{ $progLimpio }}</option>
@@ -252,6 +252,7 @@
                                             @endforeach
                                         </optgroup>
                                     </select>
+                                    <span class="block text-[10.5px] text-teal-600 font-medium mt-1 hidden aviso-programa"></span>
                                 </div>
 
                                 <div class="hidden">
@@ -442,6 +443,92 @@
             return (opt.getAttribute('data-nombre-completo') || opt.getAttribute('title') || opt.textContent || '').trim();
         }
 
+        // ---- Filtrado de productos según el Programa seleccionado ----
+        const PRODUCTOS_POR_PROGRAMA = @json($productosPorPrograma ?? []);
+        let OPCIONES_PRODUCTO_HTML = null;
+
+        function guardarOpcionesProducto(select) {
+            if (OPCIONES_PRODUCTO_HTML === null && select) {
+                OPCIONES_PRODUCTO_HTML = select.innerHTML;
+            }
+        }
+
+        function filtrarProductosPorPrograma(row) {
+            if (!row || OPCIONES_PRODUCTO_HTML === null) return;
+
+            const progSelect = row.querySelector('.select-programa');
+            const prodSelect = row.querySelector('.select-producto');
+            if (!progSelect || !prodSelect) return;
+
+            const seleccionado = prodSelect.value;
+            const prog = (progSelect.value || '').trim().toLowerCase();
+            const permitidos = PRODUCTOS_POR_PROGRAMA[prog];
+            const aviso = row.querySelector('.aviso-programa');
+
+            // se parte siempre del listado completo
+            prodSelect.innerHTML = OPCIONES_PRODUCTO_HTML;
+
+            if (prog && Array.isArray(permitidos) && permitidos.length) {
+                const permitidosSet = new Set(permitidos.map(String));
+
+                prodSelect.querySelectorAll('optgroup').forEach(grupo => {
+                    grupo.querySelectorAll('option').forEach(op => {
+                        if (op.value && !permitidosSet.has(String(op.value))) {
+                            op.remove();
+                        }
+                    });
+                    if (!grupo.querySelector('option')) {
+                        grupo.remove();
+                    }
+                });
+
+                const n = prodSelect.querySelectorAll('optgroup option').length;
+
+                if (n === 0) {
+                    // El programa existe pero ninguno de sus productos aplica en esta vista:
+                    // se vuelve al listado completo para no dejar el selector vacío.
+                    prodSelect.innerHTML = OPCIONES_PRODUCTO_HTML;
+                    if (aviso) {
+                        aviso.textContent = 'Ningún producto de este programa está disponible aquí: se muestran todos.';
+                        aviso.classList.remove('hidden');
+                    }
+                } else if (aviso) {
+                    aviso.textContent = n === 1
+                        ? '1 producto registrado en este programa'
+                        : n + ' productos registrados en este programa';
+                    aviso.classList.remove('hidden');
+                }
+            } else if (aviso) {
+                if (prog) {
+                    aviso.textContent = 'Este programa aún no tiene productos registrados: se muestran todos.';
+                    aviso.classList.remove('hidden');
+                } else {
+                    aviso.textContent = '';
+                    aviso.classList.add('hidden');
+                }
+            }
+
+            // se conserva la selección anterior si el producto sigue disponible
+            const sigueDisponible = seleccionado &&
+                Array.from(prodSelect.options).some(op => op.value === seleccionado);
+
+            if (sigueDisponible) {
+                prodSelect.value = seleccionado;
+            } else {
+                prodSelect.selectedIndex = 0;
+            }
+        }
+
+        function engancharFiltroPrograma(row) {
+            const progSelect = row ? row.querySelector('.select-programa') : null;
+            if (!progSelect || progSelect.dataset.filtroListo === '1') return;
+            progSelect.dataset.filtroListo = '1';
+            progSelect.addEventListener('change', function() {
+                filtrarProductosPorPrograma(row);
+            });
+        }
+
+
         document.addEventListener('DOMContentLoaded', function() {
 
             const padRecibeElem = document.getElementById('pad_recibe');
@@ -465,7 +552,7 @@
                 const infoConsumo = itemRow.querySelector('.info-consumo-anterior');
                 const infoStock = itemRow.querySelector('.info-ultimo-stock');
 
-                if (prodSelect && progSelect && prodSelect.selectedIndex >= 0) {
+                if (prodSelect && progSelect && prodSelect.selectedIndex >= 0 && !progSelect.value) {
                     const selectedOpt = prodSelect.options[prodSelect.selectedIndex];
                     const progSugerido = (selectedOpt?.getAttribute('data-programa') || '').trim();
                     if (progSugerido) {
@@ -524,12 +611,16 @@
                 establecimientoSelect.addEventListener('change', actualizarTodosLosConsumos);
             }
 
+            guardarOpcionesProducto(container.querySelector('.select-producto'));
+
             container.querySelectorAll('.select-producto').forEach(sel => {
                 sel.addEventListener('change', function() {
                     const row = sel.closest('.producto-item');
                     if (row) actualizarConsumoFila(row);
                 });
             });
+
+            container.querySelectorAll('.producto-item').forEach(row => engancharFiltroPrograma(row));
 
             function actualizarResumen() {
                 const items = container.querySelectorAll('.producto-item');
@@ -586,10 +677,27 @@
 
                 const selectProd = clone.querySelector('.select-producto');
                 if (selectProd) {
+                    if (OPCIONES_PRODUCTO_HTML !== null) {
+                        selectProd.innerHTML = OPCIONES_PRODUCTO_HTML;
+                        selectProd.selectedIndex = 0;
+                    }
                     selectProd.addEventListener('change', function() {
                         actualizarConsumoFila(clone);
                     });
                 }
+
+                const avisoClone = clone.querySelector('.aviso-programa');
+                if (avisoClone) {
+                    avisoClone.textContent = '';
+                    avisoClone.classList.add('hidden');
+                }
+
+                const progClone = clone.querySelector('.select-programa');
+                if (progClone) {
+                    delete progClone.dataset.filtroListo;
+                }
+
+                engancharFiltroPrograma(clone);
 
                 container.appendChild(clone);
                 actualizarConsumoFila(clone);

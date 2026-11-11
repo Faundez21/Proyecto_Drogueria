@@ -107,27 +107,12 @@ class ReceptionController extends Controller
                 : ($prod->grupo_recepcion === 'Estupefacientes' ? 'Estupefacientes' : ($prod->grupo_recepcion === 'Insumos' ? 'Insumos' : 'Medicamentos'));
         }
 
-        // Categorías base + todas las categorías existentes en Inventario y Carga Masiva agrupadas por clasificación
+        // Categorías existentes en Inventario y Carga Masiva, agrupadas por clasificación.
+        // No hay listas fijas en código: todo sale de los datos cargados.
         $categoriasAgrupadas = [
-            'Medicamentos' => [
-                'Medicamentos' => 'MEDICAMENTOS GENERALES',
-                'Fármacos' => 'FÁRMACOS',
-                'F-FOFAR' => 'FOFAR (FARMACIA)',
-                'F-PALIATIVOS' => 'CUIDADOS PALIATIVOS',
-                'F-PARO' => 'CARRO DE PARO',
-            ],
-            'Insumos' => [
-                'Insumos' => 'INSUMOS CLÍNICOS GENERALES',
-                'Insumos Clínicos' => 'INSUMOS CLÍNICOS',
-                'Equipamiento' => 'EQUIPAMIENTO',
-                'I-CIRUGIA' => 'CIRUGÍA MENOR (INSUMOS)',
-                'I-URGENCIA' => 'URGENCIA CIRUGÍA (INSUMOS)',
-                'E-COMUNAL' => 'EQUIPAMIENTO COMUNAL',
-            ],
-            'Estupefacientes' => [
-                'Estupefacientes' => 'ESTUPEFACIENTES / CONTROLADOS',
-                'Fármacos Controlados' => 'FÁRMACOS CONTROLADOS',
-            ],
+            'Medicamentos' => [],
+            'Insumos' => [],
+            'Estupefacientes' => [],
         ];
 
         $categoriasEnBD = Inventory::whereNotNull('categoria')
@@ -160,21 +145,18 @@ class ReceptionController extends Controller
             }
         }
 
-        // Programas base + todos los programas existentes en Inventario y Carga Masiva
-        $programasBase = collect([
-            'Morbilidad General',
-            'Fondo de Farmacia (FOFAR)',
-            'Cardiovascular',
-            'IRA/ERA',
-            'Salud Mental',
-        ]);
-        $programasEnBD = Inventory::whereNotNull('programa')
+        $categoriasAgrupadas = array_filter($categoriasAgrupadas, fn ($lista) => ! empty($lista));
+
+        // Programas existentes en Inventario y Carga Masiva (sin listas fijas en código)
+        $programasLista = Inventory::whereNotNull('programa')
             ->where('programa', '!=', '')
             ->distinct()
             ->pluck('programa')
             ->map(fn ($p) => trim((string) $p))
-            ->filter();
-        $programasLista = $programasBase->merge($programasEnBD)->unique()->values();
+            ->filter()
+            ->unique()
+            ->sort(SORT_NATURAL)
+            ->values();
 
         $productosAgrupados = [
             'Medicamentos' => $products->where('grupo_recepcion', 'Medicamentos')->values(),
@@ -416,9 +398,9 @@ class ReceptionController extends Controller
                     ? 'Estupefacientes'
                     : ($tipoSolicitado ?: $grupoProducto);
 
-                $categoriaInventario = $grupoProducto === 'Estupefacientes'
-                    ? 'Fármacos Controlados'
-                    : ($tipoSolicitado ?: ($grupoProducto === 'Insumos' ? 'Insumos Clínicos' : 'Fármacos'));
+                // El inventario guarda la misma categoría que la recepción:
+                // la que eligió el usuario o, si no eligió, su grupo de clasificación.
+                $categoriaInventario = $categoriaRecepcion;
 
                 $total_neto_recepcion += $subtotal;
 

@@ -81,7 +81,7 @@
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
                         <select name="categoria" onchange="this.form.submit()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todas</option>
-                            @foreach($categoriasUnicas ?? ['Fármacos', 'Insumos Clínicos'] as $cat)
+                            @foreach($categoriasUnicas ?? [] as $cat)
                                 <option value="{{ $cat }}" {{ request('categoria') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
                             @endforeach
                         </select>

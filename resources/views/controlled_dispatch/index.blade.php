@@ -424,7 +424,7 @@
             <td data-label="Programa" class="col-programa px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="programas[]" required
                     class="w-full bg-white border border-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
-                    @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental', 'Cuidados Paliativos'] as $idxProg => $progOpt)
+                    @foreach ($programasLista ?? [] as $idxProg => $progOpt)
                         <option value="{{ $progOpt }}" {{ $idxProg === 0 ? 'selected' : '' }}>{{ $progOpt }}</option>
                     @endforeach
                 </select>

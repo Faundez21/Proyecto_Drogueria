@@ -83,6 +83,7 @@ class EstablishmentRequestController extends Controller
 
         $programasLista = InventoryService::programasLista($inventarioSolicitudes->pluck('programa'));
         $categoriasLista = InventoryService::categoriasLista(false);
+        $productosPorPrograma = InventoryService::productosPorPrograma();
 
         $consumoMapa = SolicitudService::mapaConsumoYStock($nombresEstablecimientosQuery);
 
@@ -137,6 +138,7 @@ class EstablishmentRequestController extends Controller
             'productosLista',
             'programasLista',
             'categoriasLista',
+            'productosPorPrograma',
             'consumoMapa',
             'solicitudesPendientesEstablecimientos',
             'centrosPendientesEstablecimientos',
@@ -202,6 +204,7 @@ class EstablishmentRequestController extends Controller
 
         $programasLista = InventoryService::programasLista($inventarioSolicitudes->pluck('programa'));
         $categoriasLista = InventoryService::categoriasLista(true);
+        $productosPorPrograma = InventoryService::productosPorPrograma();
 
         $consumoMapa = SolicitudService::mapaConsumoYStock($nombresCesfamQuery);
 
@@ -252,6 +255,7 @@ class EstablishmentRequestController extends Controller
             'productosLista',
             'programasLista',
             'categoriasLista',
+            'productosPorPrograma',
             'consumoMapa',
             'solicitudesPendientesCesfam',
             'centrosPendientesCesfam',

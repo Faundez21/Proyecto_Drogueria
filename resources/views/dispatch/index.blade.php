@@ -493,7 +493,7 @@
             <td data-label="Programa" class="col-programa px-3 py-2.5 border-r border-slate-100 align-middle max-w-0">
                 <select name="programas[]" required
                     class="w-full max-w-full truncate bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
-                    @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $idxProg => $progOpt)
+                    @foreach ($programasLista ?? [] as $idxProg => $progOpt)
                         @php $progLimpio = trim(preg_replace('/\s+/', ' ', $progOpt ?? '')); @endphp
                         @if($progLimpio !== '')
                             <option value="{{ $progLimpio }}" {{ $idxProg === 0 ? 'selected' : '' }}>{{ $progLimpio }}</option>
