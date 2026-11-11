@@ -10,9 +10,9 @@ class DatabaseSeeder extends Seeder
      * Datos mínimos para que la plataforma funcione:
      * 1. Roles y permisos por vista.
      * 2. Un usuario Administrador para poder entrar al sistema.
-     * 3. Los proveedores habituales de la droguería.
+     * 3. La planta base de la bodega: 4 pasillos con 4 estanterías cada uno.
      *
-     * Productos, bodega e inventario se cargan desde la propia
+     * Proveedores, productos e inventario se cargan desde la propia
      * plataforma (o con la Carga Masiva de Inventario).
      */
     public function run()
@@ -20,5 +20,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleSeeder::class);
         $this->call(UserSeeder::class);
         $this->call(ProviderSeeder::class);
+        $this->call(DistributionSeeder::class);
     }
 }

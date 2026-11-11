@@ -103,7 +103,7 @@
                         <select id="reqFilterPrograma" onchange="applyReqInventoryFilters()"
                             class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todos</option>
-                            @foreach ($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $prog)
+                            @foreach ($programasLista ?? [] as $prog)
                                 <option value="{{ mb_strtolower(trim($prog)) }}">{{ $prog }}</option>
                             @endforeach
                         </select>
