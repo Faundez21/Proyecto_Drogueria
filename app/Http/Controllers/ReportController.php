@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
+use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\InventoryExport;
@@ -37,21 +38,13 @@ class ReportController extends Controller
             });
         }
 
-        // 2. Filtro de Categoría (con soporte para variantes de nombres en BD)
+        // 2. Filtro de Categoría: se compara tal cual viene en los datos.
         if ($request->filled('categoria')) {
             $cat = trim((string) $request->input('categoria'));
-            $esCatControlada = in_array($cat, ['Fármacos Controlados', 'Controlado', 'Estupefacientes'], true);
+            $esCatControlada = InventoryService::clasificarGrupoProducto('', $cat) === 'Estupefacientes';
 
             if (! $esCatControlada || $puedeVerControlados) {
-                if ($cat === 'Fármacos') {
-                    $query->whereIn('categoria', ['Fármacos', 'Medicamentos', 'F-FOFAR', 'F-PALIATIVOS', 'F-PARO']);
-                } elseif ($cat === 'Insumos Clínicos') {
-                    $query->whereIn('categoria', ['Insumos Clínicos', 'Insumos', 'I-CIRUGIA', 'I-URGENCIA', 'E-COMUNAL']);
-                } elseif ($cat === 'Fármacos Controlados') {
-                    $query->whereIn('categoria', ['Fármacos Controlados', 'Controlado', 'Estupefacientes']);
-                } else {
-                    $query->where('categoria', $cat);
-                }
+                $query->where('categoria', $cat);
             }
         }
 
@@ -106,11 +99,6 @@ class ReportController extends Controller
         $user = auth()->user();
         $puedeVerControlados = $user && ($user->hasRole('Administrador') || $user->can('ver.despacho_controlado'));
 
-        $categoriasBase = collect(['Fármacos', 'Insumos Clínicos']);
-        if ($puedeVerControlados) {
-            $categoriasBase->push('Fármacos Controlados');
-        }
-
         $categoriasBD = Inventory::where('estado', 'Disponible')
             ->whereNotNull('categoria')
             ->where('categoria', '!=', '')
@@ -119,7 +107,7 @@ class ReportController extends Controller
             ->orderBy('categoria')
             ->pluck('categoria');
 
-        $categoriasUnicas = $categoriasBase->merge($categoriasBD)->unique()->values();
+        $categoriasUnicas = $categoriasBD->unique()->values();
 
         $programasUnicos = Inventory::where('estado', 'Disponible')
             ->whereNotNull('programa')

@@ -132,7 +132,7 @@
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
                         <select name="categoria" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
                             <option value="">Todas</option>
-                            @foreach($categoriasLista ?? ['Fármacos', 'Insumos Clínicos'] as $catItem)
+                            @foreach($categoriasLista ?? [] as $catItem)
                                 @if($catItem !== 'Fármacos Controlados' || auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado'))
                                     <option value="{{ $catItem }}" {{ request('categoria') == $catItem ? 'selected' : '' }}>{{ $catItem }}</option>
                                 @endif

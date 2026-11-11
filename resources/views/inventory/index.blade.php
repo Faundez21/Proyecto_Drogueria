@@ -122,7 +122,7 @@
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
                         <select name="categoria" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
                             <option value="">Todas</option>
-                            @foreach ($categoriasLista ?? ['Fármacos', 'Medicamentos', 'Insumos Clínicos', 'Insumos', 'Equipamiento'] as $catOpt)
+                            @foreach ($categoriasLista ?? [] as $catOpt)
                                 <option value="{{ $catOpt }}" {{ request('categoria') == $catOpt ? 'selected' : '' }}>{{ $catOpt }}</option>
                             @endforeach
                         </select>
@@ -900,7 +900,7 @@
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Categoría <span class="text-rose-500">*</span></label>
                                 <select name="categoria" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
                                     <option value="" disabled {{ old('categoria') ? '' : 'selected' }}>Seleccionar...</option>
-                                    @foreach ($categoriasLista ?? ['Medicamentos', 'Fármacos', 'Insumos', 'Insumos Clínicos', 'Equipamiento'] as $catOpt)
+                                    @foreach ($categoriasLista ?? [] as $catOpt)
                                         <option value="{{ $catOpt }}" {{ old('categoria') == $catOpt ? 'selected' : '' }}>{{ $catOpt }}</option>
                                     @endforeach
                                 </select>
@@ -953,9 +953,9 @@
                             </div>
                             <div>
                                 <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa</label>
-                                <input type="text" name="programa" list="programasManualList" value="{{ old('programa') }}" placeholder="Ej. FOFAR / Morbilidad General" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
+                                <input type="text" name="programa" list="programasManualList" value="{{ old('programa') }}" placeholder="Programa de salud" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
                                 <datalist id="programasManualList">
-                                    @foreach($programasLista ?? ['Morbilidad General', 'Fondo de Farmacia (FOFAR)', 'Cardiovascular', 'IRA/ERA', 'Salud Mental'] as $progOpt)
+                                    @foreach($programasLista ?? [] as $progOpt)
                                         <option value="{{ $progOpt }}"></option>
                                     @endforeach
                                 </datalist>

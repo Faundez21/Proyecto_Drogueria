@@ -636,19 +636,55 @@ class InventoryService
     }
 
     /**
-     * Devuelve la lista consolidada y sin duplicados de todos los Programas (base + Inventario + Carga Masiva + Solicitudes).
+     * Mapa de Programa => IDs de los productos asociados a ese programa.
+     *
+     * Se arma con el Inventario y con el histórico de Solicitudes, de modo que un
+     * mismo producto puede aparecer en varios programas. La clave va en minúsculas
+     * para poder compararla sin importar cómo esté escrito el programa.
+     */
+    public static function productosPorPrograma(): array
+    {
+        $mapa = [];
+
+        $agregar = function ($programa, $productId) use (&$mapa) {
+            $prog = trim(preg_replace('/\s+/', ' ', (string) $programa));
+            $id = (int) $productId;
+
+            if ($prog === '' || $id <= 0) {
+                return;
+            }
+
+            $key = mb_strtolower($prog);
+            if (in_array($key, ['sin programa', 'n/a', 'general'], true)) {
+                return;
+            }
+
+            $mapa[$key][$id] = $id;
+        };
+
+        Inventory::select('product_id', 'programa')
+            ->whereNotNull('product_id')
+            ->whereNotNull('programa')
+            ->where('programa', '!=', '')
+            ->get()
+            ->each(fn ($reg) => $agregar($reg->programa, $reg->product_id));
+
+        EstablishmentItem::select('product_id', 'programa')
+            ->whereNotNull('product_id')
+            ->whereNotNull('programa')
+            ->where('programa', '!=', '')
+            ->get()
+            ->each(fn ($item) => $agregar($item->programa, $item->product_id));
+
+        return array_map(fn ($ids) => array_values($ids), $mapa);
+    }
+
+    /**
+     * Devuelve la lista consolidada y sin duplicados de todos los Programas.
+     * Sale únicamente de los datos reales: Inventario, Carga Masiva y Solicitudes.
      */
     public static function programasLista(iterable $extras = []): Collection
     {
-        $base = collect([
-            'Morbilidad General',
-            'Fondo de Farmacia (FOFAR)',
-            'Cardiovascular',
-            'IRA/ERA',
-            'Salud Mental',
-            'Cuidados Paliativos',
-        ]);
-
         $enInventario = Inventory::whereNotNull('programa')
             ->where('programa', '!=', '')
             ->distinct()
@@ -659,8 +695,7 @@ class InventoryService
             ->distinct()
             ->pluck('programa');
 
-        $todos = $base
-            ->merge($enInventario)
+        $todos = $enInventario
             ->merge($enSolicitudes)
             ->merge(collect($extras));
 
@@ -683,23 +718,11 @@ class InventoryService
     }
 
     /**
-     * Devuelve la lista consolidada de Categorías (base + Inventario + Carga Masiva + Recepciones).
+     * Devuelve la lista consolidada de Categorías.
+     * Sale únicamente de los datos reales: Inventario, Carga Masiva y Recepciones.
      */
     public static function categoriasLista(bool $incluirControlados = true): Collection
     {
-        $base = collect([
-            'Fármacos',
-            'Medicamentos',
-            'Insumos Clínicos',
-            'Insumos',
-            'Equipamiento',
-        ]);
-
-        if ($incluirControlados) {
-            $base->push('Fármacos Controlados');
-            $base->push('Estupefacientes');
-        }
-
         $enInventario = Inventory::whereNotNull('categoria')
             ->where('categoria', '!=', '')
             ->distinct()
@@ -710,7 +733,7 @@ class InventoryService
             ->distinct()
             ->pluck('tipo_producto');
 
-        $todos = $base->merge($enInventario)->merge($enRecepcion);
+        $todos = $enInventario->merge($enRecepcion);
 
         $vistos = [];
         $resultado = [];
