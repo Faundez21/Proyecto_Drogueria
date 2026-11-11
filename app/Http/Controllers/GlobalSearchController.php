@@ -28,7 +28,7 @@ class GlobalSearchController extends Controller
         $results = [];
         $searchTerm = '%' . $query . '%';
 
-        // 1. INVENTARIO (Busca en Bodega Físicamente - requiere permiso ver.inventario)
+        // Lotes en bodega (solo si el usuario tiene ver.inventario)
         if ($user->can('ver.inventario')) {
             try {
                 $inventario = DB::table('inventories')
@@ -56,7 +56,7 @@ class GlobalSearchController extends Controller
             } catch (\Exception $e) {
             }
 
-            // 2. CATÁLOGO MAESTRO (Productos registrados)
+            // Catálogo maestro de productos
             try {
                 $productos = DB::table('products')
                     ->where('nombre', 'LIKE', $searchTerm)
@@ -78,7 +78,7 @@ class GlobalSearchController extends Controller
             }
         }
 
-        // 3. PROVEEDORES (requiere permiso ver.proveedores)
+        // Proveedores (solo si el usuario tiene ver.proveedores)
         if ($user->can('ver.proveedores')) {
             try {
                 $proveedores = DB::table('providers')
@@ -103,7 +103,7 @@ class GlobalSearchController extends Controller
             }
         }
 
-        // 4. SOLICITUDES DE ESTABLECIMIENTOS Y CESFAM
+        // Solicitudes de establecimientos y CESFAM
         if ($user->can('ver.despacho') || $user->can('ver.solicitudes') || $user->can('ver.solicitudes_cesfam')) {
             try {
                 $solicitudes = DB::table('establishment_requests')
@@ -153,7 +153,7 @@ class GlobalSearchController extends Controller
 
             $puedeVerControlados = $user->hasRole('Administrador') || $user->can('ver.despacho_controlado');
 
-            // 0. SOLICITUDES ASIGNADAS AL USUARIO LOGUEADO (O PENDIENTES DE ASIGNAR PARA ADMIN)
+            // Solicitudes asignadas al usuario, o pendientes de asignar si es administrador
             if ($user->can('ver.despacho')) {
                 $misSolicitudes = DB::table('establishment_requests')
                     ->where('assigned_user_id', $user->id)
@@ -199,7 +199,7 @@ class GlobalSearchController extends Controller
             }
 
             if ($user->hasRole('Administrador')) {
-                // Solicitudes pendientes de recuperación de clave para Usuarios y Permisos
+                // Avisos de recuperación de clave, solo para el módulo de usuarios
                 $clavesPendientes = DB::table('password_reset_tokens')
                     ->where('status', 'pending')
                     ->count();
@@ -303,7 +303,6 @@ class GlobalSearchController extends Controller
                 }
             }
 
-            // Separar notificaciones pendientes y notificaciones vistas
             $readRecords = DB::table('user_read_notifications')
                 ->where('user_id', $user->id)
                 ->pluck('updated_at', 'notification_key')

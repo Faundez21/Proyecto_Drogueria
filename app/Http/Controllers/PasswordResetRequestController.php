@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class PasswordResetRequestController extends Controller
 {
-    // Guardar solicitud desde el SweetAlert2 del Login
+    // El usuario pide la recuperación desde la ventana del login
     public function store(Request $request)
     {
         $request->validate([
@@ -31,7 +31,7 @@ class PasswordResetRequestController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // Asignar nueva clave manualmente por el Administrador
+    // El administrador asigna la clave nueva a mano
     public function resetPassword(Request $request, $email)
     {
         $request->validate([
@@ -41,12 +41,10 @@ class PasswordResetRequestController extends Controller
         $user = User::where('email', $email)->firstOrFail();
         $resetToken = PasswordResetToken::where('email', $email)->firstOrFail();
 
-        // Actualizar la contraseña del usuario
         $user->update([
             'password' => Hash::make($request->password),
         ]);
 
-        // Marcar la solicitud como resuelta
         $resetToken->update([
             'status' => 'resolved',
         ]);

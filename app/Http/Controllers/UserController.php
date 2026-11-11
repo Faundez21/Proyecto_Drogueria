@@ -10,6 +10,15 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
+    /**
+     * Vistas de la plataforma que se pueden habilitar por rol.
+     *
+     * Por cada clave de este arreglo existe un permiso llamado ver.<clave>
+     * (ver.inventario, ver.despacho, etc.). Las rutas de web.php se protegen
+     * con el middleware permission:ver.<clave> y el menú lateral muestra solo
+     * los módulos cuyo permiso tiene el usuario. Agregar un módulo nuevo acá y
+     * volver a entrar a esta pantalla crea su permiso automáticamente.
+     */
     public const MODULOS = [
         'dashboard' => 'Panel Principal',
         'proveedores' => 'Proveedores',
@@ -25,6 +34,10 @@ class UserController extends Controller
         'reportes' => 'Reportes',
     ];
 
+    /**
+     * Los mismos módulos pero agrupados por etapa del proceso, con su icono y
+     * color. Es lo que se dibuja en la pantalla de permisos de un rol.
+     */
     public const MODULOS_GRUPOS = [
         'General' => [
             'icono' => 'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM14 11a1 1 0 011-1h4a1 1 0 011 1v8a1 1 0 01-1 1h-4a1 1 0 01-1-1v-8z',
@@ -218,7 +231,6 @@ class UserController extends Controller
             return redirect()->route('users.index')->with('error', 'No puedes desactivar al único administrador activo del sistema.');
         }
 
-        // Alternar el estado
         $user->status = ($user->status === 'activo') ? 'inactivo' : 'activo';
         $user->save();
 

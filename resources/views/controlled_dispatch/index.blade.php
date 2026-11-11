@@ -703,11 +703,11 @@
             </div>
         </div>
     </div>
-    <!-- MODAL DE ESCÁNER QR DE DESPACHO CONTROLADO (ESTILO DASHBOARD) -->
+    <!-- modal del escaner QR del despacho controlado -->
     <div id="scannerModal" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
         <div class="flex min-h-full items-center justify-center">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
-                <!-- Header limpio con acento institucional -->
+                <!-- cabecera del modal -->
                 <div class="px-5 py-4 bg-slate-800 text-white flex justify-between items-center shrink-0 border-b border-slate-700">
                     <div class="flex items-center gap-2.5">
                         <div class="w-8 h-8 rounded-lg bg-rose-500/20 border border-rose-400/30 text-rose-300 flex items-center justify-center">
@@ -727,13 +727,12 @@
                     </button>
                 </div>
 
-                <!-- Visor de Cámara adaptado a Modo Claro / Oscuro -->
+                <!-- visor de la camara -->
                 <div class="p-4 sm:p-5 flex flex-col items-center bg-slate-50/70 overflow-y-auto flex-1">
                     <div class="relative w-full max-w-[300px] sm:max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-black border-2 border-slate-300 shadow-md flex items-center justify-center" id="scannerVisualContainer">
-                        <!-- Elemento nativo de feed de cámara -->
                         <div id="reader-feed" class="w-full h-full object-cover"></div>
 
-                        <!-- HUD Overlay: 4 esquinas nítidas + línea láser en tono rose -->
+                        <!-- marco y linea de escaneo sobre la camara -->
                         <div class="pointer-events-none absolute inset-5 flex items-center justify-center" id="scannerHudOverlay">
                             <div class="absolute top-0 left-0 w-5 h-5 border-t-[3px] border-l-[3px] border-rose-400 rounded-tl-md"></div>
                             <div class="absolute top-0 right-0 w-5 h-5 border-t-[3px] border-r-[3px] border-rose-400 rounded-tr-md"></div>
@@ -743,7 +742,6 @@
                             <div class="scan-laser-bar-rose"></div>
                         </div>
 
-                        <!-- Mensaje de estado mientras conecta la cámara -->
                         <div id="scannerLoadingState" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center z-10 transition-opacity">
                             <div class="w-8 h-8 border-3 border-rose-400 border-t-transparent rounded-full animate-spin mb-2.5"></div>
                             <p class="text-[13px] font-bold text-white">Iniciando sensor de cámara...</p>
@@ -751,14 +749,12 @@
                         </div>
                     </div>
 
-                    <!-- Barra de control y estado -->
                     <div class="w-full max-w-[300px] sm:max-w-[320px] flex items-center justify-between mt-3.5 px-0.5">
                         <div class="flex items-center gap-2 text-[12px] text-slate-600 font-medium">
                             <span class="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
                             <span id="scannerStatusTxt">Buscando código QR...</span>
                         </div>
 
-                        <!-- Botón para alternar cámaras si hay más de una -->
                         <button type="button" id="btnSwitchCamera" onclick="switchScannerCamera()"
                             class="hidden px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold border border-slate-300 transition-colors items-center gap-1.5 cursor-pointer shadow-2xs">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -771,7 +767,6 @@
                     </p>
                 </div>
 
-                <!-- Footer modal -->
                 <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
                     <button type="button" onclick="closeScanner()" class="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-[12.5px] font-bold shadow-xs transition-colors cursor-pointer">
                         Cancelar Escaneo
@@ -982,10 +977,9 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-    <!-- IMPLEMENTACION SWEETALERT 2 -->
+    <!-- avisos con SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -996,7 +990,7 @@
         const esControladoJS = (nombre) => @json($controlados).some(c => c.toLowerCase() === String(nombre ?? '')
             .trim().toLowerCase());
 
-        //  SOLICITUDES (ESTUPEFACIENTES) 
+        // Solicitudes (estupefacientes)
         function openSolicitudesControlado() {
             filtrarSolicitudesControladoModal();
             document.getElementById('SolicitudesControladoModal').classList.remove('hidden');
@@ -1872,7 +1866,7 @@
             }
         }
 
-        // Inicialización y control del escáner óptico QR (Mismo motor y estética que Dashboard)
+        // Escáner QR
         let html5QrScanner = null;
         let availableCameras = [];
         let currentCameraIndex = 0;

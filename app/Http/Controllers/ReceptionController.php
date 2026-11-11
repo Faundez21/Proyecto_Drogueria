@@ -27,7 +27,7 @@ class ReceptionController extends Controller
             Product::firstOrCreate(['nombre' => $ctrlNombre]);
         }
 
-        // Sincronizar productos que hayan ingresado por Carga Masiva o Inventario Directo
+        // Los productos que entraron por carga masiva o ingreso directo también deben aparecer acá
         $productosEnInventario = Inventory::whereNotNull('producto')
             ->where('producto', '!=', '')
             ->distinct()
@@ -40,7 +40,7 @@ class ReceptionController extends Controller
         $providers = Provider::where('status', 'activo')->orderBy('name')->get();
         $products = Product::orderBy('nombre')->get();
 
-        // Mapear categoría y programa desde Inventario (incluyendo Carga Masiva) e Historial de Recepciones
+        // Categoría y programa sugeridos para cada producto, sacados de lo que ya está cargado
         $categoriasPorNombre = [];
         $categoriasPorId = [];
         $programasPorNombre = [];
@@ -185,7 +185,6 @@ class ReceptionController extends Controller
         $nextCorrelativo = (int) Reception::max('correlativo') + 1;
         $controlados = InventoryService::controlados();
 
-        // Extraer campos de distribución física y ubicaciones ocupadas
         $datosDist = InventoryService::datosDistribucionFisica();
         $pasillosLista = $datosDist['pasillosLista'];
         $estantesLista = $datosDist['estantesLista'];
@@ -214,7 +213,7 @@ class ReceptionController extends Controller
 
     public function store(Request $request)
     {
-        // Normalizar campos opcionales para evitar cadenas vacías que fallen en validación date o inserción SQL
+        // Los campos vacíos llegan como cadena vacía y hacen fallar las reglas de fecha, por eso se pasan a null
         if ($request->has('fecha_vencimiento') && is_array($request->fecha_vencimiento)) {
             $fechas = array_map(function ($val) {
                 if (is_string($val)) {
@@ -309,7 +308,7 @@ class ReceptionController extends Controller
         $provider = Provider::findOrFail($validated['provider_id']);
         $nombreProveedor = $provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor';
 
-        // Validar que ninguna ubicación física seleccionada esté ocupada en bodega ni duplicada entre productos distintos del acta
+        // Dos lotes no pueden quedar en la misma casilla, ni siquiera dentro de la misma acta
         $ubicacionesEnActa = [];
         foreach ($validated['product_id'] as $index => $prodId) {
             $estCheck = ! empty($validated['estante'][$index]) ? trim((string) $validated['estante'][$index]) : '';

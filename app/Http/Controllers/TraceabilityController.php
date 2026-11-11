@@ -86,7 +86,7 @@ class TraceabilityController extends Controller
             return response()->json(['timeline' => [], 'details' => null]);
         }
 
-        // Filtramos por lote y por producto para evitar colisiones
+        // Hay lotes con el mismo número en productos distintos, por eso se filtra por ambos
         $timeline = StockMovement::with('user')
             ->where('lote', $lote)
             ->where('producto', $producto)
@@ -102,7 +102,6 @@ class TraceabilityController extends Controller
                 'responsable' => $mov->user ? trim($mov->user->name . ' ' . ($mov->user->last_name ?? '')) : null,
             ]);
 
-        // Buscamos la ficha exacta del inventario cruzando lote y producto
         $inventory = Inventory::where('lote', $lote)
             ->where('producto', $producto)
             ->first();
@@ -139,7 +138,7 @@ class TraceabilityController extends Controller
         $html = '<meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">';
         $html .= '<table border="1" style="font-family: Calibri, Arial, sans-serif; border-collapse: collapse; border-color: #cbd5e1;">';
 
-        // Banner Institucional
+        // Encabezado del Excel
         $html .= '<tr>';
         $html .= '<td colspan="8" style="background-color: #0f766e; color: #ffffff; font-size: 16px; font-weight: bold; padding: 10px; text-align: left;">';
         $html .= 'DROGUERÍA COMUNAL DAS - I. MUNICIPALIDAD DE TALCAHUANO';
@@ -152,7 +151,7 @@ class TraceabilityController extends Controller
         $html .= '</td>';
         $html .= '</tr>';
 
-        // KPI Strip en Excel
+        // Fila de totales del encabezado
         $html .= '<tr style="background-color: #f8fafc; font-size: 11px; text-align: center; height: 26px;">';
         $html .= '<td colspan="2" style="padding: 6px;"><strong>Total Eventos:</strong> ' . number_format($totalMovimientos, 0, ',', '.') . '</td>';
         $html .= '<td colspan="2" style="padding: 6px; color: #047857;"><strong>Recepciones:</strong> ' . number_format($totalRecepciones, 0, ',', '.') . '</td>';
@@ -198,7 +197,7 @@ class TraceabilityController extends Controller
             $html .= '</tr>';
         }
 
-        // Fila Total al final
+        // Fila de totales al final
         $html .= '<tr style="background-color: #ccfbf1; color: #134e4a; font-weight: bold; font-size: 11px; height: 28px;">';
         $html .= '<td colspan="5" style="text-align: right; padding: 6px 10px;">TOTAL UNIDADES MOVILIZADAS EN EL PERIODO:</td>';
         $html .= '<td style="text-align: center; padding: 6px; mso-number-format:\'#,##0\';">' . (int) $totalUnidadesMovidas . '</td>';

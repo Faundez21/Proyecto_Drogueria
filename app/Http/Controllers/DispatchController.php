@@ -87,6 +87,23 @@ class DispatchController extends Controller
         return response()->json($solicitudes);
     }
 
+    /**
+     * Emite una guía de despacho y descuenta el stock.
+     *
+     * Antes de tocar el inventario se revisa que el destino sea un
+     * establecimiento de la red, que la solicitud vinculada corresponda a ese
+     * mismo destino, que no se despache más de lo que queda pendiente en ella
+     * y que estén las dos firmas.
+     *
+     * El descuento lo hace InventoryService::consumir dentro de una
+     * transacción: si un producto falla, no se guarda nada. Cuando no se
+     * indica un lote, se despacha primero el que vence antes (FEFO) y, si no
+     * alcanza, se reparte entre varios lotes siguiendo ese mismo orden.
+     *
+     * Al final se genera la guía con correlativo anual GD-AAAA-XXXX, se
+     * registra el movimiento en el Kardex y se recalcula el estado de la
+     * solicitud de origen.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([

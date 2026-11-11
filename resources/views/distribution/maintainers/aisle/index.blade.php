@@ -48,7 +48,7 @@
             <span class="font-medium text-slate-800">Pasillos</span>
         </div>
 
-        <!-- Barra de Navegación Jerárquica de Bodega -->
+        <!-- navegacion entre pasillos, estantes, niveles y posiciones -->
         @include('distribution.partials.nav_tabs', ['activeTab' => 'aisle'])
 
         @if (session('success'))
@@ -60,7 +60,7 @@
             </div>
         @endif
 
-        <!-- Contenedor Principal Tabla Pasillos -->
+        <!-- Contenedor principal tabla Pasillos -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
             <!-- Cabecera y buscador -->
             <div class="p-4 sm:p-5 border-b border-slate-200/80 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -87,7 +87,6 @@
                 </div>
             </div>
 
-            <!-- Tabla -->
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[700px] text-left text-[13px] text-slate-600">
                     <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-500 uppercase text-[11px] font-bold tracking-wider">
@@ -208,7 +207,7 @@
         </div>
     </div>
 
-    <!-- Modal Crear Pasillo -->
+    <!-- Modal crear Pasillo -->
     <div id="createModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -279,7 +278,7 @@
         </div>
     </div>
 
-    <!-- Modal Ver Pasillo -->
+    <!-- Modal ver Pasillo -->
     <div id="showModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -326,7 +325,7 @@
         </div>
     </div>
 
-    <!-- Modal Editar Pasillo -->
+    <!-- Modal editar Pasillo -->
     <div id="editModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-3 sm:p-5">
         <div class="flex min-h-full items-center justify-center py-4">
@@ -400,11 +399,10 @@
         </div>
     </div>
 
-    <!-- Modal de Historial de Pasillos -->
+    <!-- modal del historial de pasillos -->
     <div id="HistoryModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-            <!-- Encabezado -->
             <div class="px-5 py-4 sm:px-6 sm:py-4 bg-slate-900 flex justify-between items-center shrink-0 border-b border-slate-800">
                 <div class="flex items-center gap-3.5 min-w-0 pr-2">
                     <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-300 flex items-center justify-center shrink-0">
@@ -433,7 +431,7 @@
                 </button>
             </div>
 
-            <!-- Barra de Búsqueda y Filtros del Historial -->
+            <!-- buscador y filtros del historial -->
             <div class="p-3.5 sm:px-6 sm:py-3.5 bg-slate-50 border-b border-slate-200 shrink-0">
                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3 items-end">
                     <div class="sm:col-span-6">

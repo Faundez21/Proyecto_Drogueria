@@ -18,7 +18,7 @@
 @section('content')
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center p-8 md:p-12 min-h-[65vh] text-center border-t-[4px] border-t-rose-500 relative overflow-hidden">
         
-        <!-- Fondo sutil decorativo -->
+        <!-- fondo decorativo -->
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-rose-50 rounded-full blur-3xl opacity-60 z-0"></div>
 
         <div class="w-20 h-20 bg-rose-50 rounded-3xl flex items-center justify-center border border-rose-100 mb-6 shadow-inner relative z-10">

@@ -133,7 +133,6 @@ class ShelfController extends Controller
     }
     public function updatePosition(Request $request, $id)
     {
-        // Validamos que vengan coordenadas
         $request->validate([
             'pos_x' => 'required|numeric',
             'pos_z' => 'required|numeric',
@@ -143,7 +142,8 @@ class ShelfController extends Controller
         $posX = (float) $request->pos_x;
         $posZ = (float) $request->pos_z;
 
-        // Validar que no se superponga encima de otra estantería (ancho físico ~4.4 unidades)
+        // Una estantería mide poco más de 4 unidades de ancho, así que si otra está más
+                // cerca que eso en el plano se estarían pisando
         $minSeparacion = 4.5;
         $conflicto = Shelf::where('id', '!=', $shelf->id)
             ->whereNotNull('pos_x')
@@ -161,7 +161,6 @@ class ShelfController extends Controller
             ], 422);
         }
 
-        // Actualizamos sus coordenadas
         $shelf->update([
             'pos_x' => $posX,
             'pos_z' => $posZ,

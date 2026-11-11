@@ -48,7 +48,7 @@
             <span class="font-medium text-slate-800">Niveles</span>
         </div>
 
-        <!-- Barra de Navegación Jerárquica de Bodega -->
+        <!-- navegacion entre pasillos, estantes, niveles y posiciones -->
         @include('distribution.partials.nav_tabs', ['activeTab' => 'level'])
 
         @if (session('success'))
@@ -60,7 +60,7 @@
             </div>
         @endif
 
-        <!-- Contenedor Principal Tabla Niveles -->
+        <!-- Contenedor principal tabla Niveles -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
             <!-- Cabecera y filtros -->
             <div class="p-4 sm:p-5 border-b border-slate-200/80 bg-white flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -97,7 +97,6 @@
                 </div>
             </div>
 
-            <!-- Tabla -->
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[720px] text-left text-[13px] text-slate-600">
                     <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-500 uppercase text-[11px] font-bold tracking-wider">
@@ -208,7 +207,7 @@
         </div>
     </div>
 
-    <!-- Modal Crear Nivel -->
+    <!-- Modal crear Nivel -->
     <div id="createModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -283,7 +282,7 @@
         </div>
     </div>
 
-    <!-- Modal Ver Nivel -->
+    <!-- Modal ver Nivel -->
     <div id="showModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -331,7 +330,7 @@
         </div>
     </div>
 
-    <!-- Modal Editar Nivel -->
+    <!-- Modal editar Nivel -->
     <div id="editModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-3 sm:p-5">
         <div class="flex min-h-full items-center justify-center py-4">
@@ -408,11 +407,10 @@
         </div>
     </div>
 
-    <!-- Modal de Historial de Niveles -->
+    <!-- modal del historial de niveles -->
     <div id="HistoryModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-            <!-- Encabezado -->
             <div class="px-4 py-3 sm:px-6 sm:py-4 bg-slate-800 flex justify-between items-center shrink-0 border-b border-slate-700">
                 <div class="flex items-center gap-3 min-w-0 pr-2">
                     <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 text-purple-300 flex items-center justify-center shrink-0">
@@ -441,7 +439,7 @@
                 </button>
             </div>
 
-            <!-- Barra de Búsqueda y Filtros del Historial -->
+            <!-- buscador y filtros del historial -->
             <div class="p-4 sm:px-6 sm:py-4 bg-slate-50 border-b border-slate-200 shrink-0">
                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                     <div class="sm:col-span-6">

@@ -15,7 +15,7 @@
 
     <div class="w-full px-4 sm:px-6 pt-0 pb-6 space-y-5">
 
-        <!-- CABECERA COMPACTA -->
+        <!-- cabecera -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl font-black text-slate-900 tracking-tight">Panel Principal</h1>
@@ -43,7 +43,7 @@
             </div>
         </div>
 
-        <!-- BANNER: SOLICITUDES ASIGNADAS AL USUARIO LOGUEADO -->
+        <!-- solicitudes asignadas al usuario -->
         @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
             <div class="bg-gradient-to-r from-teal-50 via-white to-indigo-50 border border-teal-200 rounded-2xl p-4 shadow-sm">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
@@ -95,11 +95,10 @@
             </div>
         @endif
 
-        <!-- BARRA DE FILTROS SIMPLIFICADA Y AUTOMÁTICA -->
+        <!-- barra de filtros -->
         <form method="GET" action="{{ route('dashboard.index') }}" id="dashboardFilterForm"
             class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-                <!-- 1. Período -->
                 <div>
                     <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Período</label>
                     <select name="periodo" id="dash_periodo" onchange="onDashboardPeriodoChange(this.value)"
@@ -113,7 +112,6 @@
                     </select>
                 </div>
 
-                <!-- 2. Tipo de Red -->
                 <div>
                     <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Tipo de Red</label>
                     <select name="tipo_establecimiento" id="dash_tipo_est" onchange="filtrarOpcionesEstablecimientoDash(true)"
@@ -124,7 +122,6 @@
                     </select>
                 </div>
 
-                <!-- 3. Establecimiento / CESFAM -->
                 <div class="lg:col-span-2">
                     <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Centro de Salud (Establecimiento / CESFAM)</label>
                     <select name="establecimiento" id="dash_establecimiento" onchange="this.form.submit()"
@@ -147,7 +144,6 @@
                     </select>
                 </div>
 
-                <!-- 4. Programa y Botón Limpiar -->
                 <div class="flex items-end gap-2">
                     <div class="flex-1">
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Programa</label>
@@ -169,7 +165,7 @@
                 </div>
             </div>
 
-            <!-- Rango de fechas personalizadas (solo se muestra cuando Período == 'custom') -->
+            <!-- rango de fechas, solo aparece si el periodo es personalizado -->
             <div id="dashFechasPersonalizadas" class="{{ $periodo === 'custom' ? 'flex' : 'hidden' }} flex-wrap items-end gap-3 mt-3 pt-3 border-t border-slate-100">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Desde</label>
@@ -187,9 +183,8 @@
             </div>
         </form>
 
-        <!-- FILA 1: 4 KPIs PRINCIPALES DE BODEGA CENTRAL -->
+        <!-- KPIs de bodega central -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- 1. Valor y Stock Bodega -->
             <a href="{{ route('inventory.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
                 <div>
                     <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Inventario en Bodega</p>
@@ -203,7 +198,6 @@
                 </div>
             </a>
 
-            <!-- 2. Movimientos del Período (Recepciones y Despachos) -->
             <a href="{{ route('traceability.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
                 <div>
                     <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Actividad ({{ $periodoTexto }})</p>
@@ -217,7 +211,6 @@
                 </div>
             </a>
 
-            <!-- 3. Alertas de Vencimiento FEFO -->
             <a href="{{ route('inventory.index', ['order_by' => 'vencimiento']) }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-l-4 border-l-rose-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
                 <div>
                     <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Alerta FEFO (&le; 30 Días)</p>
@@ -231,7 +224,6 @@
                 </div>
             </a>
 
-            <!-- 4. Lotes en Cuarentena -->
             <a href="{{ route('quarantine.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-l-4 border-l-amber-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
                 <div>
                     <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">En Cuarentena</p>
@@ -246,9 +238,8 @@
             </a>
         </div>
 
-        <!-- FILA 2: 4 KPIs DE ESTABLECIMIENTOS Y CESFAM -->
+        <!-- KPIs de establecimientos y CESFAM -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- 1. Solicitudes y Despachos CESFAM -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-purple-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
                 title="Solicitudes de medicamentos generadas exclusivamente por centros CESFAM en este período. 'Pendientes' indica pedidos aún en preparación o entrega.">
                 <div>
@@ -265,7 +256,6 @@
                 </div>
             </div>
 
-            <!-- 2. Solicitudes y Despachos Establecimientos -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-teal-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
                 title="Solicitudes de medicamentos de otros centros de la red comunal (CECOSF, Postas Rurales, SAR).">
                 <div>
@@ -283,7 +273,6 @@
                 </div>
             </div>
 
-            <!-- 3. Cola de Despacho (Asignadas vs Sin Asignar) -->
             <a href="{{ route('dispatch.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-indigo-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
                 title="Pedidos de la red pendientes de ser surtidos o despachados en bodega central.">
                 <div>
@@ -300,7 +289,6 @@
                 </div>
             </a>
 
-            <!-- 4. Cumplimiento y Stock Declarado -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-emerald-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
                 title="Nivel de Servicio: porcentaje de unidades entregadas respecto al total solicitado en los pedidos de este período. 'Stock en centros' corresponde al saldo físico declarado por los centros al pedir.">
                 <div>
@@ -319,10 +307,10 @@
         </div>
         </div>
 
-        <!-- SECCIÓN PRINCIPAL EN 2 COLUMNAS: PANEL CON PESTAÑAS (IZQUIERDA) + QR Y ACCESOS (DERECHA) -->
+        <!-- dos columnas: pestañas a la izquierda, QR y accesos a la derecha -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <!-- COLUMNA IZQUIERDA (2/3): PESTAÑAS LIMPIAS (CENTROS / MOVIMIENTOS / CUARENTENA) -->
+            <!-- columna izquierda: pestañas de centros, movimientos y cuarentena -->
             <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
                 <!-- Barra de Pestañas -->
                 <div class="px-5 pt-4 pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
@@ -349,7 +337,7 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA 1: TABLA DE ESTABLECIMIENTOS Y CESFAM -->
+                <!-- pestaña 1: establecimientos y CESFAM -->
                 <div id="tabPanel_centros" class="overflow-x-auto max-h-[420px]">
                     <table class="w-full text-left text-[12px] text-slate-600 whitespace-nowrap">
                         <thead class="text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-200 bg-slate-50 sticky top-0 z-10">
@@ -419,7 +407,7 @@
                     </table>
                 </div>
 
-                <!-- PESTAÑA 2: ÚLTIMOS MOVIMIENTOS DE BODEGA -->
+                <!-- pestaña 2: ultimos movimientos de bodega -->
                 <div id="tabPanel_movimientos" class="hidden p-5 max-h-[420px] overflow-y-auto">
                     @if (count($recentMovements) > 0)
                         <div class="divide-y divide-slate-100">
@@ -463,7 +451,7 @@
                     @endif
                 </div>
 
-                <!-- PESTAÑA 3: LOTES EN CUARENTENA -->
+                <!-- pestaña 3: lotes en cuarentena -->
                 <div id="tabPanel_cuarentena" class="hidden overflow-x-auto max-h-[420px]">
                     <table class="w-full text-left text-[12px] text-slate-600">
                         <thead class="text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-200 bg-slate-50">
@@ -501,7 +489,7 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA (1/3): ÚLTIMO LOTE QR Y ACCESOS RÁPIDOS -->
+            <!-- columna derecha: ultimo lote con su QR y accesos rapidos -->
             <div class="flex flex-col gap-5">
                 <!-- Panel QR del Último Lote -->
                 <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 flex flex-col">
@@ -557,14 +545,13 @@
                     @endif
                 </div>
 
-                <!-- Accesos Directos -->
+                <!-- Accesos directos -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
                     <div class="flex items-center justify-between mb-3.5">
                         <h2 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Accesos Directos</h2>
                         <span class="text-[10.5px] font-semibold text-slate-400">Módulos</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2.5">
-                        <!-- 1. Recepción -->
                         <a href="{{ route('reception.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
                             <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -577,7 +564,6 @@
                             </div>
                         </a>
 
-                        <!-- 2. Despacho -->
                         <a href="{{ route('dispatch.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
                             <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -590,7 +576,6 @@
                             </div>
                         </a>
 
-                        <!-- 3. Inventario -->
                         <a href="{{ route('inventory.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
                             <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -603,7 +588,6 @@
                             </div>
                         </a>
 
-                        <!-- 4. Reportes -->
                         <a href="{{ route('reports.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
                             <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -621,11 +605,11 @@
         </div>
     </div>
 
-    <!-- MODAL DE ESCÁNER QR DE DIRECCIONAMIENTO CLÍNICO -->
+    <!-- modal del escaner QR -->
     <div id="scannerModalDashboard" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
         <div class="flex min-h-full items-center justify-center">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
-                <!-- Header limpio -->
+                <!-- cabecera del modal -->
                 <div class="px-5 py-4 bg-slate-800 text-white flex justify-between items-center shrink-0 border-b border-slate-700">
                     <div class="flex items-center gap-2.5">
                         <div class="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center">
@@ -645,13 +629,12 @@
                     </button>
                 </div>
 
-                <!-- Visor de Cámara adaptado a Modo Claro / Oscuro -->
+                <!-- visor de la camara -->
                 <div class="p-4 sm:p-5 flex flex-col items-center bg-slate-50/70 overflow-y-auto flex-1">
                     <div class="relative w-full max-w-[300px] sm:max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-black border-2 border-slate-300 shadow-md flex items-center justify-center" id="scannerVisualContainer">
-                        <!-- Elemento nativo de feed de cámara -->
                         <div id="reader-dashboard-feed" class="w-full h-full object-cover"></div>
 
-                        <!-- HUD Overlay: 4 esquinas nítidas + línea láser -->
+                        <!-- marco y linea de escaneo sobre la camara -->
                         <div class="pointer-events-none absolute inset-5 flex items-center justify-center" id="scannerHudOverlay">
                             <div class="absolute top-0 left-0 w-5 h-5 border-t-[3px] border-l-[3px] border-teal-400 rounded-tl-md"></div>
                             <div class="absolute top-0 right-0 w-5 h-5 border-t-[3px] border-r-[3px] border-teal-400 rounded-tr-md"></div>
@@ -661,7 +644,6 @@
                             <div class="scan-laser-bar"></div>
                         </div>
 
-                        <!-- Mensaje de estado mientras conecta la cámara -->
                         <div id="scannerLoadingState" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center z-10 transition-opacity">
                             <div class="w-8 h-8 border-3 border-teal-400 border-t-transparent rounded-full animate-spin mb-2.5"></div>
                             <p class="text-[13px] font-bold text-white">Iniciando sensor de cámara...</p>
@@ -669,14 +651,12 @@
                         </div>
                     </div>
 
-                    <!-- Barra de control y estado -->
                     <div class="w-full max-w-[300px] sm:max-w-[320px] flex items-center justify-between mt-3.5 px-0.5">
                         <div class="flex items-center gap-2 text-[12px] text-slate-600 font-medium">
                             <span class="inline-block w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
                             <span id="scannerStatusTxt">Buscando código QR...</span>
                         </div>
 
-                        <!-- Botón para alternar cámaras si hay más de una -->
                         <button type="button" id="btnSwitchCamera" onclick="switchScannerCamera()"
                             class="hidden px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold border border-slate-300 transition-colors items-center gap-1.5 cursor-pointer shadow-2xs">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -689,7 +669,6 @@
                     </p>
                 </div>
 
-                <!-- Footer modal -->
                 <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
                     <button type="button" onclick="closeDashboardScanner()" class="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-[12.5px] font-bold shadow-xs transition-colors cursor-pointer">
                         Cerrar Escáner

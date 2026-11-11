@@ -42,7 +42,7 @@ class InventoryController extends Controller
             $query->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']);
         }
 
-        // 1. Filtro de Búsqueda Global (Producto, Lote, Categoría)
+        // Búsqueda por producto, lote o categoría
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -54,7 +54,6 @@ class InventoryController extends Controller
             });
         }
 
-        // 2. Filtros Específicos
         if ($request->filled('categoria')) {
             $catFiltro = trim($request->input('categoria'));
             // La categoría se compara tal cual viene en los datos; no hay equivalencias fijas en código.
@@ -73,7 +72,6 @@ class InventoryController extends Controller
             $query->where('programa', $request->programa);
         }
 
-        // 3. Ordenamiento Dinámico
         if ($request->filled('order_by')) {
             switch ($request->order_by) {
                 case 'nombre_asc':
@@ -97,10 +95,9 @@ class InventoryController extends Controller
             $query->latest();
         }
 
-        // 4. Ejecución de la consulta con paginación
         $inventories = $query->paginate(15)->withQueryString();
 
-        // --- CONSULTAS INDEPENDIENTES PARA LOS MODALES ---
+        // Datos que usan los modales, independientes de los filtros de la tabla
         $mermas = Inventory::with('user')
             ->where('estado', 'Merma')
             ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']))
@@ -112,7 +109,7 @@ class InventoryController extends Controller
             ->limit(150)
             ->get();
 
-        // 5. Generar lista de productos únicos combinando Catálogo Maestro + Inventario
+        // Productos únicos, juntando el catálogo maestro con lo que hay en inventario
         InventoryService::sincronizarProductosDesdeInventario();
         $productosInv = Inventory::select('producto')
             ->whereNotNull('producto')
@@ -122,7 +119,7 @@ class InventoryController extends Controller
         $productosCat = Product::orderBy('nombre')->pluck('nombre');
         $productosLista = $productosInv->merge($productosCat)->unique()->sort(SORT_NATURAL)->values();
 
-        // 6. Listas para filtros y formularios combinando Mantenedores Físicos + Inventario
+        // Listas de los filtros y formularios: mantenedores de bodega más lo que ya está en inventario
         $programasLista = InventoryService::programasLista();
         $categoriasLista = InventoryService::categoriasLista($puedeVerControlados);
 
@@ -208,7 +205,6 @@ class InventoryController extends Controller
                         $v->errors()->add('fecha_vencimiento', 'El lote está vencido. Solo puede ingresarse con estado Merma.');
                     }
                 } catch (\Throwable $e) {
-                    // el formato inválido ya lo informa la regla 'date'
                 }
             }
 
@@ -276,7 +272,6 @@ class InventoryController extends Controller
                     }
                 }
 
-                // Asegurar que lote y valor_neto_unitario mantengan sus valores por defecto
                 $validated['lote'] = $validated['lote'] ?? 'S/L';
                 $validated['valor_neto_unitario'] = $validated['valor_neto_unitario'] ?? 0;
 
@@ -446,7 +441,6 @@ class InventoryController extends Controller
 
         $data['user_id'] = Auth::id();
 
-        // Resolver relaciones foráneas de ubicación física
         $data = InventoryService::resolverRelaciones($data);
 
         $inventory->update($data);
@@ -501,7 +495,6 @@ class InventoryController extends Controller
             ]);
         }
 
-        // Determinar tipo de movimiento y mensaje contextual
         if ($estadoAnterior === 'Merma' && $inventory->estado === 'Cuarentena') {
             $tipo = 'merma_a_cuarentena';
             $mensaje = "El lote {$inventory->lote} ha sido trasladado desde Merma a Cuarentena para reevaluación técnica.";
@@ -589,7 +582,7 @@ class InventoryController extends Controller
                 ->with('error', 'El archivo no pudo subirse correctamente. Verifique que no supere los 20 MB y no esté dañado.');
         }
 
-        // 1. Validar extensión del archivo explícitamente
+        // La extensión se valida aparte porque el navegador puede mandar un MIME genérico
         $ext = strtolower($file->getClientOriginalExtension());
         $allowedExtensions = ['xlsx', 'xls', 'csv'];
 
@@ -601,7 +594,6 @@ class InventoryController extends Controller
                 ->with('error', "El archivo «{$file->getClientOriginalName()}» posee un formato inválido (.{$extMostrar}). El sistema solo acepta planillas Excel (.xlsx, .xls) o archivos .csv con la estructura de la Plantilla Oficial.");
         }
 
-        // 2. Validar MIME y tamaño máximo (20 MB)
         $validator = Validator::make($request->all(), [
             'excel' => 'required|file|max:20480',
         ], [
@@ -615,8 +607,8 @@ class InventoryController extends Controller
                 ->with('error', $validator->errors()->first('excel'));
         }
 
-        // 3. Detectar si el archivo exacto ya fue importado (por Hash SHA-256)
-        // Si la tabla de inventario está vacía (ej. tras limpiar datos de prueba), reiniciar historial de hashes
+        // Se guarda el hash del archivo para avisar si suben dos veces el mismo Excel
+        // Si el inventario quedó vacío, el historial de hashes ya no sirve
         if (Inventory::count() === 0) {
             session()->forget('inventory_imported_hashes');
         }
@@ -658,7 +650,6 @@ class InventoryController extends Controller
 
             $total = $resumen['total'];
 
-            // Guardar huella del archivo importado en la sesión
             $importedHashes[$fileHash] = [
                 'nombre' => $file->getClientOriginalName(),
                 'fecha' => date('d/m/Y H:i'),

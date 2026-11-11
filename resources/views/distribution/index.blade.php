@@ -37,7 +37,6 @@
             <span class="font-medium text-slate-800">Distribución</span>
         </div>
 
-        <!-- Scripts requeridos -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -132,10 +131,10 @@
             }
         </style>
 
-        <!-- Barra de Navegación Jerárquica de Bodega -->
+        <!-- navegacion entre pasillos, estantes, niveles y posiciones -->
         @include('distribution.partials.nav_tabs', ['activeTab' => 'distribution'])
 
-        <!-- Visor 3D Interactivo -->
+        <!-- Visor 3D interactivo -->
         <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
@@ -163,19 +162,17 @@
             </div>
 
             <div class="p-3 sm:p-5 bg-slate-50/50">
-                <!-- Contenedor Wrapper para Three.js y Alpine.js -->
+                <!-- contenedor del visor Three.js -->
                 <div id="warehouse-wrapper" x-data="warehouseApp()"
                     class="h-[520px] sm:h-[620px] lg:h-[750px] rounded-xl overflow-hidden border border-slate-200/90 bg-[#eef2f6] select-none shadow-inner">
 
-                    <!-- Capa HTML para etiquetas (Markers) -->
+                    <!-- capa de etiquetas sobre el visor -->
                     <div id="labels-container"
                         class="absolute top-0 left-0 w-full h-full pointer-events-none z-10 overflow-hidden">
                     </div>
 
-                    <!-- Capa WebGL 3D -->
                     <div id="warehouse-3d-container"></div>
 
-                    <!-- Botonera Superior -->
                     <header
                         class="absolute top-0 left-0 w-full z-20 p-3 sm:p-5 pointer-events-none flex justify-between items-start gap-2">
                         <div class="pointer-events-auto flex flex-wrap items-center gap-2">
@@ -240,7 +237,7 @@
                         </div>
                     </header>
 
-                    <!-- Banner Flotante: Modo Mover Estantería -->
+                    <!-- aviso de modo mover estanteria -->
                     <div x-show="isMovingMode" x-transition
                         style="display: none;"
                         class="absolute top-16 sm:top-5 left-1/2 -translate-x-1/2 z-30 pointer-events-auto bg-slate-900/95 text-white border border-blue-500/60 rounded-xl px-4 py-2.5 shadow-2xl flex flex-wrap items-center gap-3 text-xs">
@@ -259,7 +256,7 @@
                         </button>
                     </div>
 
-                    <!-- Toast de confirmación de guardado -->
+                    <!-- aviso de que se guardo -->
                     <div x-show="toastMessage !== ''" x-transition
                         style="display: none;"
                         class="absolute top-16 sm:top-5 left-1/2 -translate-x-1/2 z-30 pointer-events-none bg-emerald-900/95 text-emerald-100 border border-emerald-500/50 rounded-xl px-4 py-2 shadow-xl flex items-center gap-2 text-xs font-bold">
@@ -269,7 +266,7 @@
                         <span x-text="toastMessage"></span>
                     </div>
 
-                    <!-- Sidebar Colapsable (Selector, Búsqueda y Leyenda) -->
+                    <!-- panel lateral: selector, busqueda y leyenda -->
                     <aside
                         class="absolute top-16 sm:top-24 left-3 sm:left-6 w-52 sm:w-64 glass-panel text-white rounded-xl shadow-2xl z-20 flex flex-col pointer-events-auto transition-all duration-300">
                         <div @click="sidebarOpen = !sidebarOpen"
@@ -292,11 +289,10 @@
                             </svg>
                         </div>
 
-                        <!-- Contenido interior del Sidebar -->
                         <div x-show="sidebarOpen" x-transition
                             class="p-3 sm:p-4 pt-0 border-t border-slate-700/50 mt-1 flex flex-col gap-2.5 max-h-[60vh] overflow-y-auto">
 
-                            <!-- Buscador Inteligente (Estante, Producto, Lote, Pasillo) -->
+                            <!-- buscador por estante, producto, lote o pasillo -->
                             <div class="relative mt-2">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
@@ -370,7 +366,7 @@
                                 </div>
                             </div>
 
-                            <!-- Selector de nivel (dinámico: se llena con los niveles reales) -->
+                            <!-- selector de nivel, se llena con los niveles que existen -->
                             <div class="relative">
                                 <select style="background-image: none;" x-model="selectedLevel" @change="changeLevel()"
                                     class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2 text-xs sm:text-[13px] text-white font-medium focus:outline-none focus:border-blue-500 cursor-pointer appearance-none">
@@ -389,7 +385,7 @@
                                 </div>
                             </div>
 
-                            <!-- Botón Filtro Rápido FEFO (Vencimientos) -->
+                            <!-- Botón filtro rápido FEFO (vencimientos) -->
                             <button type="button" @click="toggleFefoFilter()"
                                 :class="fefoOnly ? 'bg-rose-600/90 border-rose-400 text-white shadow-md' : 'bg-[#1e293b] border-slate-700 text-gray-300 hover:border-rose-500/60'"
                                 class="w-full flex items-center justify-between px-3 py-2 rounded-lg border text-xs font-semibold transition cursor-pointer">
@@ -422,7 +418,7 @@
                                 </div>
                             </div>
 
-                            <!-- Leyenda de vencimiento (color de la repisa bajo las cajas) -->
+                            <!-- leyenda de vencimiento: es el color de la repisa bajo las cajas -->
                             <div
                                 class="flex flex-col gap-2.5 pt-3 border-t border-slate-700/60 text-xs sm:text-sm font-medium text-gray-300">
                                 <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Vencimiento de las
@@ -445,7 +441,7 @@
                         </div>
                     </aside>
 
-                    <!-- Tooltip (Panel de Detalle Flotante) -->
+                    <!-- panel flotante con el detalle de la estanteria -->
                     <div x-show="tooltipVisible" x-transition:enter="transition ease-out duration-200"
                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                         x-transition:leave="transition ease-in duration-100"
@@ -470,7 +466,6 @@
                             <p class="font-medium text-white" x-text="rackData.aisle ? 'Pasillo: ' + rackData.aisle : ''">
                             </p>
 
-                            <!-- Ocupación -->
                             <div class="bg-slate-800/70 border border-slate-700 rounded-lg px-2.5 py-2">
                                 <div class="flex justify-between items-center text-[11px] font-bold text-gray-300">
                                     <span x-text="rackData.ocupacionLabel"></span>
@@ -490,7 +485,7 @@
                                 </p>
                             </div>
 
-                            <!-- Estructura: niveles y posiciones de la estantería -->
+                            <!-- niveles y posiciones de la estanteria -->
                             <template x-if="rackData.estructura && rackData.estructura.length > 0">
                                 <div>
                                     <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Niveles y
@@ -522,7 +517,7 @@
                                 </div>
                             </template>
 
-                            <!-- Productos almacenados (se muestra con 1 o más productos) -->
+                            <!-- productos guardados en la estanteria -->
                             <template x-if="rackData.items && rackData.items.length > 0">
                                 <div class="max-h-40 overflow-y-auto space-y-1.5 pr-1">
                                     <template x-for="(item, idx) in rackData.items" :key="idx">
@@ -581,7 +576,7 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Stats Bar (Dinámica con Alpine.js) -->
+                    <!-- barra de estadisticas inferior -->
                     <div
                         class="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] max-w-5xl glass-panel text-white rounded-xl p-3 sm:p-4 shadow-2xl z-20 hidden md:flex justify-between items-center px-4 xl:px-8 divide-x divide-gray-700">
                         <div
@@ -649,7 +644,7 @@
             </div>
         </div>
 
-        <!-- Script de Integración de Lógica (Alpine.js y Three.js) -->
+        <!-- logica del visor 3D -->
         <script>
             function warehouseApp() {
                 return {
@@ -826,7 +821,7 @@
                         }));
                     },
 
-                    // LÓGICA THREE.JS
+                    // Visor 3D de la bodega
                     initThreeJS() {
                         const wrapper = document.getElementById('warehouse-wrapper');
                         const container = document.getElementById('warehouse-3d-container');
@@ -881,7 +876,7 @@
                         dirLight.shadow.bias = -0.0004;
                         scene.add(dirLight);
 
-                        // --- ANIMACIÓN SUAVE DE CÁMARA ---
+                        // --- Animación de la cámara ---
                         let camAnim = null;
 
                         function animateCamera(toPos, toTarget, ms) {
@@ -927,7 +922,7 @@
                             animateCamera(target.clone().add(offset), target, 650);
                         }
 
-                        // --- ESTRUCTURA BASE (Suelo con cuadrícula y Paredes) ---
+                        // --- Estructura base: suelo con cuadrícula y paredes ---
                         const buildGroup = new THREE.Group();
 
                         // Textura de cuadrícula para el piso (celdas de 2 x 2 unidades)
@@ -1002,13 +997,13 @@
 
                         scene.add(buildGroup);
 
-                        // --- VARIABLES GLOBALES DE THREEJS ---
+                        // --- Variables globales de Three.js ---
                         const racks = [];
                         const markers = [];
                         const cajasMeshes = []; // todas las cajas (para el hover con detalle)
                         const pulsers = []; // materiales que "laten" (alertas de vencimiento, LED)
 
-                        // ZONA EXTERIOR DE DESPACHO Y AMBULANCIA 3D (FUERA DE BODEGA)
+                        // Zona exterior: andén de despacho y ambulancia
 
 
 
@@ -1151,7 +1146,7 @@
                         // Opciones del selector de niveles (se llenan al dibujar las estanterías)
                         const nivelesGlobales = new Map();
 
-                        // TEXTURAS PROCEDURALES (cartón, cinta, madera, etiquetas, acero)
+                        // Texturas generadas por código: cartón, cinta, madera, etiquetas y acero
 
                         // Placa con texto (alta resolución para que se lea de cerca)
                         function texturaTexto(texto, colorFondo, colorTexto, tamanoFuente) {
@@ -1758,7 +1753,7 @@
                             return tex;
                         }
 
-                        // ESTANTERÍA / CAJA FUERTE
+                        // Estantería o caja fuerte
                         function crearEstanteriaRealista(shelf, rackData, px, pz) {
                             const grupo = new THREE.Group();
 
@@ -1876,7 +1871,7 @@
                                     grupo.add(brace);
                                 });
                             } else {
-                                // ---- CUERPO DE LA CAJA FUERTE ----
+                                // --- Cuerpo de la caja fuerte ---
                                 const pared = (w, h, d, x, y, z, m) => {
                                     const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m || matAcero);
                                     mesh.position.set(x, y, z);
@@ -1961,7 +1956,7 @@
                                 luz.position.set(0, alturaTotal - 0.2, 1.4);
                                 grupo.add(luz);
 
-                                // ---- PUERTA ----
+                                // --- Puerta ---
                                 const doorW = 3.7;
                                 const doorH = alturaTotal - 0.45;
                                 const doorTex = texturaPuertaCajaFuerte(rackData.code, colorEstadoHex, doorW, doorH);
@@ -2313,7 +2308,7 @@
                                     grupo.add(slot);
                                     meshesNivel.push(slot);
 
-                                    // ---------- CAJAS, PALLET, FILM Y ZUNCHOS ----------
+                                    // --- Cajas, pallet, film y zunchos ---
                                     if (ocupado) {
                                         const sx = slot.position.x;
                                         const yTopeSlot = yRepisa + 0.19; // cara superior de la repisa de color
@@ -2703,7 +2698,7 @@
                                 return String(a.label).localeCompare(String(b.label));
                             });
 
-                        // --- FILTROS COMBINADOS (NIVEL, PASILLO, ALERTA FEFO y BÚSQUEDA) ---
+                        // --- Filtros combinados: nivel, pasillo, alerta FEFO y búsqueda ---
                         let filtroNivelActual = '';
                         let filtroPasilloActual = '';
                         let filtroFefoActual = false;
@@ -2770,7 +2765,7 @@
                             actualizarVisibilidadRacks();
                         });
 
-                        // --- RENDERIZADO DINÁMICO DE PASILLOS ---
+                        // --- Dibujado de los pasillos ---
                         let aisleMeshes = [];
                         let aisleMarkers = [];
 
@@ -2920,7 +2915,7 @@
                             mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
                         }
 
-                        // HOVER SOBRE CAJAS: detalle del producto + contorno
+                        // Al pasar el mouse por una caja se muestra el detalle del producto
                         const hoverBox = document.createElement('div');
                         hoverBox.className = 'glass-panel';
                         hoverBox.style.cssText =
@@ -3013,7 +3008,7 @@
 
                         wrapper.addEventListener('pointerleave', ocultarHoverCaja);
 
-                        // --- BÚSQUEDA INTELIGENTE (ESTANTE, PASILLO, PRODUCTO, LOTE, PROGRAMA) ---
+                        // --- Búsqueda por estante, pasillo, producto, lote o programa ---
                         let searchMatches = [];
                         let searchCurrentIdx = 0;
 
@@ -3156,7 +3151,7 @@
                             controls.target.z += dz;
                         });
 
-                        // --- LÓGICA DE MOVIMIENTO POR CLIC (CON LÍMITES DE PAREDES, SNAP, COLISIÓN Y CANCELAR) ---
+                        // --- Mover estanterías con el clic: límites de pared, encaje y colisión ---
                         let isMoving = false;
                         let snapGridEnabled = true;
                         let moveOriginPos = null;

@@ -7,7 +7,7 @@
     <title>Droguería DAS - @yield('title', 'Panel de Control')</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
 
-    <!-- Modo oscuro: se aplica antes de pintar para evitar parpadeo -->
+    <!-- el modo oscuro se aplica antes de pintar para que no parpadee -->
     <script>
         (function () {
             try {
@@ -24,9 +24,9 @@
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
 
-    <!-- SweetAlert2 CDN -->
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Gestión de estados de lote (Inventario / Cuarentena / Merma) con SweetAlert2 + AJAX -->
+    <!-- cambios de estado de lote: Disponible, Cuarentena y Merma -->
     <script src="{{ asset('js/lotes/lote-status.js') }}?v={{ @filemtime(public_path('js/lotes/lote-status.js')) }}"></script>
 
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}?v={{ @filemtime(public_path('css/dark-mode.css')) }}">
@@ -266,12 +266,10 @@
     @auth
         <div class="flex h-screen overflow-hidden">
 
-            <!-- Overlay móvil -->
             <div id="sidebar-overlay"
                 class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300"
                 onclick="toggleSidebar()"></div>
 
-            <!-- Sidebar -->
             <aside id="sidebar"
                 class="fixed inset-y-0 left-0 w-[260px] flex flex-col z-50 transform -translate-x-full lg:translate-x-0 lg:static lg:shrink-0 transition-transform duration-300 ease-in-out"
                 style="background-color: var(--sidebar-bg); box-shadow: 2px 0 8px rgba(0,0,0,0.15);">
@@ -387,7 +385,7 @@
 
                     @endcanany
 
-                    <!-- Paso 2: Almacenamiento -->
+                    <!-- Paso 2: almacenamiento -->
                     @canany(['ver.inventario', 'ver.distribucion', 'ver.cuarentena'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
@@ -441,7 +439,7 @@
 
                     @endcanany
 
-                    <!-- Paso 3: Salida -->
+                    <!-- Paso 3: salida -->
                     @canany(['ver.despacho', 'ver.despacho_controlado', 'ver.solicitudes', 'ver.solicitudes_cesfam'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
@@ -470,7 +468,7 @@
                                 </a>
                                 @endcan
                                 @can('ver.despacho_controlado')
-                                    <!-- Submenú Controlado -->
+                                    <!-- Submenú controlado -->
                                     <div class="relative pl-6">
                                         <div class="absolute left-3.5 top-0 bottom-4 w-px bg-slate-700/60"></div>
                                         <div class="absolute left-3.5 top-1/2 w-2.5 h-px bg-slate-700/60"></div>
@@ -522,7 +520,7 @@
                         </div>
                     </div>
                     @endcanany
-                    <!-- Paso 4: Control -->
+                    <!-- Paso 4: control -->
                     @canany(['ver.trazabilidad', 'ver.reportes'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
@@ -585,7 +583,6 @@
                     @endrole
                 </nav>
             </aside>
-            <!-- Contenedor principal -->
             <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
 
                 <!-- Barra superior -->
@@ -602,7 +599,7 @@
                         </button>
                     </div>
 
-                    <!-- Buscador Interactivo (Ctrl + K) -->
+                    <!-- Buscador interactivo (Ctrl + K) -->
                     <div class="flex-1 max-w-2xl mx-4">
                         <div onclick="openSearchModal()"
                             class="hidden sm:flex items-center justify-between w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white hover:border-teal-500/50 hover:shadow-md transition-all duration-200 text-slate-500 cursor-pointer group">
@@ -658,7 +655,7 @@
                             </svg>
                             <div class="text-[13px] font-mono-das tracking-tight" id="live-clock"></div>
                         </div>
-                        <!-- Notificaciones Dinámicas -->
+                        <!-- Notificaciones dinámicas -->
                         <div class="relative" id="notifications-menu-container">
                             <button onclick="toggleNotifications()" type="button"
                                 class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer">
@@ -702,19 +699,18 @@
                                     </button>
                                 </div>
 
-                                <!-- Lista Pendientes -->
+                                <!-- Lista pendientes -->
                                 <div id="notif-list" class="max-h-[340px] overflow-y-auto p-2 space-y-1 sidebar-scroll">
                                     <div class="p-4 text-center text-slate-400 text-xs">Cargando alertas...</div>
                                 </div>
 
-                                <!-- Lista Vistas -->
+                                <!-- Lista vistas -->
                                 <div id="notif-read-list" class="hidden max-h-[340px] overflow-y-auto p-2 space-y-1 sidebar-scroll bg-slate-50/30">
                                     <div class="p-4 text-center text-slate-400 text-xs">No hay notificaciones vistas.</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Perfil -->
                         <div class="relative" id="user-menu-container">
                             <button onclick="toggleUserMenu()" type="button"
                                 class="flex items-center gap-2.5 p-1 rounded-md hover:bg-slate-100 transition-colors">
@@ -758,7 +754,7 @@
                                     <form id="logout-form" method="POST" action="{{ route('logout') }}"
                                         class="w-full">
                                         @csrf
-                                        <!-- Botón de logout modificado para disparar SweetAlert -->
+                                        <!-- el boton de salir pide confirmacion antes -->
                                         <button type="button" onclick="confirmLogout()"
                                             class="flex w-full items-center gap-3 px-3 py-2 rounded-md text-[12.5px] font-medium text-left transition-colors hover:bg-rose-50 text-rose-600">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -776,12 +772,11 @@
                     </div>
                 </header>
 
-                <!-- Contenido principal -->
                 <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
                     <div class="max-w-[1600px] mx-auto space-y-6">
 
 
-                        <!-- ENCABEZADO DINÁMICO DE PÁGINA (Resuelve el problema de los botones) -->
+                        <!-- encabezado de la pagina, con su titulo y sus botones -->
 
                         @if (View::hasSection('title') || View::hasSection('actions'))
                             <div
@@ -812,7 +807,7 @@
                 </main>
             </div>
 
-            <!-- Modal de busqueda" (Navegación por Teclado) -->
+            <!-- modal de busqueda, se maneja con el teclado -->
 
             <div id="search-modal"
                 class="fixed inset-0 z-50 hidden flex items-start justify-center p-3 sm:p-4 pt-8 sm:pt-16 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-200"
@@ -830,7 +825,6 @@
                             onkeydown="handleSearchKeydown(event)" placeholder="Buscar Lote, Fármaco o RUT Proveedor..."
                             class="w-full px-3 py-4 text-[14px] bg-transparent border-0 focus:outline-none text-slate-800 placeholder-slate-400 font-medium pr-12">
 
-                        <!-- Botón Limpiar (X) -->
                         <button id="search-clear-btn" onclick="clearSearch()"
                             class="hidden absolute right-16 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-colors focus:outline-none">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -839,7 +833,6 @@
                             </svg>
                         </button>
 
-                        <!-- Loader -->
                         <div id="search-loader" class="hidden absolute right-16 loader"></div>
 
                         <kbd onclick="closeSearchModal()"
@@ -874,11 +867,11 @@
         </main>
     @endauth
 
-    <!-- SCRIPT MAESTRO DE FUNCIONALIDAD GLOBAL -->
+    <!-- scripts que usan todas las vistas -->
     <script>
-        // --- SWEETALERT2: CONFIGURACIÓN GLOBAL ---
+        // --- Configuración global de SweetAlert2 ---
 
-        // 1. Instancia global para notificaciones tipo Toast
+        // Instancia global para los avisos tipo toast
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -891,7 +884,7 @@
             }
         });
 
-        // 2. Interceptor de Flash Messages de Laravel con SweetAlert2 Modal
+        // Muestra los mensajes flash de Laravel como ventana
         @if (session('lote_status_success'))
             if (window.LoteStatus && window.LoteStatus.core) {
                 window.LoteStatus.core.mostrarExito(@json(session('lote_status_success')));
@@ -934,7 +927,7 @@
             });
         @endif
 
-        // 3. Confirmación de Cierre de Sesión con SweetAlert2
+        // Confirmación antes de cerrar sesión
         function confirmLogout() {
             // Cerramos el menú flotante para que no interfiera visualmente
             const userMenu = document.getElementById('user-menu');
@@ -1036,7 +1029,7 @@
 
                         let html = '';
                         let currentType = '';
-                        // Usar función escapeRegExp para prevenir errores con caracteres especiales
+                        // escapeRegExp evita que un carácter especial rompa la expresión regular
                         const safeQuery = escapeRegExp(cleanQuery);
                         const regex = new RegExp(`(${safeQuery})`, 'gi');
 
@@ -1051,7 +1044,7 @@
                                 currentType = item.type;
                             }
 
-                            // Resaltador Mágico Seguro
+                            // Resalta el texto buscado dentro de cada resultado
                             const highlightedTitle = item.title ? item.title.replace(regex,
                                 '<span class="highlight-text">$1</span>') : 'N/A';
                             const highlightedSubtitle = item.subtitle ? item.subtitle.replace(regex,
@@ -1092,7 +1085,7 @@
             }, 300); // 300ms de debounce es un estándar ideal
         }
 
-        // --- NAVEGACIÓN POR TECLADO EN BÚSQUEDA ---
+        // --- Navegación por teclado en la búsqueda ---
         function handleSearchKeydown(e) {
             if (searchResultsCount === 0) return;
 
@@ -1116,7 +1109,7 @@
                 const activeEl = document.getElementById(`search-item-${selectedSearchIndex}`);
                 if (activeEl) {
                     activeEl.classList.add('active');
-                    // Scroll inteligente centrado al navegar
+                    // Mantiene centrada la opción activa al navegar con el teclado
                     activeEl.scrollIntoView({
                         block: 'center',
                         behavior: 'smooth'
@@ -1125,7 +1118,7 @@
             }
         }
 
-        // --- NOTIFICACIONES AJAX ---
+        // --- Notificaciones ---
         let currentNotifKeys = [];
         let currentNotifTab = 'pendientes';
 
@@ -1169,7 +1162,7 @@
 
                     currentNotifKeys = (data.data || []).map(n => n.id).filter(Boolean);
 
-                    // 1. Contador del badge campana
+                    // Contador de la campana
                     if (data.count > 0) {
                         badge.classList.remove('hidden');
                         badge.textContent = data.count > 9 ? '9+' : data.count;
@@ -1178,11 +1171,11 @@
                         badge.textContent = '0';
                     }
 
-                    // 2. Contadores en las pestañas
+                    // Contadores de cada pestaña
                     if (count) count.textContent = data.count;
                     if (readCount) readCount.textContent = data.read_count || 0;
 
-                    // 3. Botón "Marcar todas"
+                    // Botón de marcar todas
                     if (btnMarcarTodas) {
                         if (data.count > 0 && currentNotifTab === 'pendientes') {
                             btnMarcarTodas.classList.remove('hidden');
@@ -1191,7 +1184,7 @@
                         }
                     }
 
-                    // 4. Renderizar lista PENDIENTES
+                    // Lista de pendientes
                     if (data.count > 0) {
                         let html = '';
                         data.data.forEach(n => {
@@ -1222,7 +1215,7 @@
                             '<div class="p-6 text-center text-slate-400 text-[12px] font-medium flex flex-col items-center justify-center gap-1.5"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>¡Estás al día! No hay alertas pendientes.</span></div>';
                     }
 
-                    // 5. Renderizar lista VISTAS (Apartado de Notificaciones Vistas)
+                    // Lista de las ya vistas
                     if (data.read_count > 0 && Array.isArray(data.read_data)) {
                         let htmlVistas = '';
                         data.read_data.forEach(n => {

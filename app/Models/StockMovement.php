@@ -4,6 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Un movimiento del Kardex: la historia de un lote.
+ *
+ * Se crea una fila cada vez que un lote se recibe, cambia de estado, se
+ * reubica o se despacha, guardando quién lo hizo, cuándo, cuánto y con qué
+ * documento de respaldo. De acá sale la vista de Trazabilidad.
+ */
 class StockMovement extends Model
 {
     protected $fillable = [

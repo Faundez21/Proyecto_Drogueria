@@ -5,6 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Un lote de un producto guardado en bodega.
+ *
+ * Es la tabla central del sistema: hay una fila por cada combinación de
+ * producto, lote y estado sanitario (Disponible, Cuarentena o Merma), con su
+ * stock, su fecha de vencimiento y su ubicación física en la bodega. Todo lo
+ * que entra o sale pasa por acá y queda registrado en StockMovement.
+ */
 class Inventory extends Model
 {
     use HasFactory;
