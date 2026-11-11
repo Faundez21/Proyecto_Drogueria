@@ -1,251 +1,1122 @@
 @extends('layouts.app')
-@section('title', 'Dashboard')
-
 @section('content')
-    <!-- Cabecera del Dashboard -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
-            <p class="text-sm text-slate-500">Resumen general del sistema</p>
-        </div>
-        <div class="flex gap-3 w-full sm:w-auto">
-            <button class="flex-1 sm:flex-none items-center justify-center gap-2 bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-50 flex transition-colors shadow-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                Escanear QR
-            </button>
-            <button class="flex-1 sm:flex-none items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 flex transition-colors shadow-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Nueva operación
-            </button>
-        </div>
-    </div>
+    @php
+        $periodoTexto = [
+            'hoy' => 'Hoy',
+            'semana' => 'Esta Semana',
+            'mes' => 'Este Mes',
+            'anio' => 'Este Año',
+            'historico' => 'Histórico',
+            'custom' => 'Rango Fechas',
+        ][$periodo] ?? 'Este Mes';
 
-    <!-- 1. Tarjetas de Métricas -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-        <!-- Tarjeta 1 -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="p-1.5 bg-blue-50 rounded-md text-blue-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <p class="text-xs font-medium text-slate-500">Valor inventario</p>
-            </div>
-            <h3 class="text-lg font-bold text-slate-800">$ 11,557.86</h3>
-            <p class="text-[10px] text-emerald-600 font-medium mt-1">+2.4% vs ayer</p>
-        </div>
-        <!-- Tarjeta 2 -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="p-1.5 bg-slate-50 rounded-md text-slate-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                </div>
-                <p class="text-xs font-medium text-slate-500">Órdenes hoy</p>
-            </div>
-            <h3 class="text-lg font-bold text-slate-800">156</h3>
-            <p class="text-[10px] text-slate-400 mt-1">Total despachos</p>
-        </div>
-        <!-- Tarjeta 3 -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="p-1.5 bg-emerald-50 rounded-md text-emerald-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                </div>
-                <p class="text-xs font-medium text-slate-500">Recepciones hoy</p>
-            </div>
-            <h3 class="text-lg font-bold text-slate-800">28</h3>
-            <p class="text-[10px] text-slate-400 mt-1">Total ingresos</p>
-        </div>
-        <!-- Tarjeta 4 -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-2 border-l-amber-500">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="p-1.5 bg-amber-50 rounded-md text-amber-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                </div>
-                <p class="text-xs font-medium text-slate-500">Alertas activas</p>
-            </div>
-            <h3 class="text-lg font-bold text-slate-800">7</h3>
-            <p class="text-[10px] text-amber-600 font-medium mt-1">Requieren atención</p>
-        </div>
-        <!-- Tarjeta 5 -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="p-1.5 bg-blue-50 rounded-md text-blue-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                </div>
-                <p class="text-xs font-medium text-slate-500">Productos</p>
-            </div>
-            <h3 class="text-lg font-bold text-slate-800">1,256</h3>
-            <p class="text-[10px] text-slate-400 mt-1">En catálogo</p>
-        </div>
-        <!-- Tarjeta 6 -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-2 border-l-red-500">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="p-1.5 bg-red-50 rounded-md text-red-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                </div>
-                <p class="text-xs font-medium text-slate-500">Próximos a vencer</p>
-            </div>
-            <h3 class="text-lg font-bold text-slate-800">23</h3>
-            <p class="text-[10px] text-red-500 font-medium mt-1">En 30 días</p>
-        </div>
-    </div>
+        $hayFiltrosActivos = !empty($establecimiento) || !empty($tipo_establecimiento) || !empty($programa) || !empty($categoria) || !empty($estado_solicitud) || ($periodo ?? 'mes') !== 'mes';
+    @endphp
 
-    <!-- 2. Sección Principal: Accesos, Trazabilidad y Cuarentena -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <!-- Accesos Rápidos -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-            <h2 class="text-sm font-bold text-slate-800 mb-4">Accesos Rápidos</h2>
-            <div class="grid grid-cols-2 gap-3">
-                <a href="#" class="flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-colors">
-                    <svg class="w-6 h-6 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                    <span class="text-xs font-medium text-slate-700">Recepción</span>
-                </a>
-                <a href="#" class="flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-colors">
-                    <svg class="w-6 h-6 text-indigo-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
-                    <span class="text-xs font-medium text-slate-700">Despacho</span>
-                </a>
-                <a href="#" class="flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-100 rounded-xl hover:bg-amber-50 hover:border-amber-200 transition-colors">
-                    <svg class="w-6 h-6 text-amber-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                    <span class="text-xs font-medium text-slate-700">Cuarentena</span>
-                </a>
-                <a href="#" class="flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 transition-colors">
-                    <svg class="w-6 h-6 text-emerald-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-                    <span class="text-xs font-medium text-slate-700">Trazabilidad</span>
-                </a>
-            </div>
-        </div>
+    <div class="w-full px-4 sm:px-6 pt-0 pb-6 space-y-5">
 
-        <!-- Trazabilidad Reciente -->
-        <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-sm font-bold text-slate-800">Trazabilidad Reciente</h2>
-                <a href="#" class="text-xs text-blue-600 hover:underline">Ver historial</a>
+        <!-- cabecera -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Panel Principal</h1>
+                <p class="text-[13px] font-medium text-slate-500 mt-0.5">Estado operativo de Droguería Central, Establecimientos y CESFAM</p>
             </div>
-            <div class="space-y-4">
-                <!-- Item Trazabilidad -->
-                <div class="flex gap-4">
-                    <div class="flex flex-col items-center">
-                        <div class="w-2.5 h-2.5 bg-blue-500 rounded-full mt-1.5"></div>
-                        <div class="w-px h-full bg-slate-200 my-1"></div>
-                    </div>
-                    <div class="pb-2">
-                        <p class="text-sm font-medium text-slate-800">Despacho a Clínica Santa María</p>
-                        <p class="text-xs text-slate-500">Paracetamol 500mg - Lote: LOT-12345</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">16/05/2026 - 10:15 AM</p>
-                    </div>
-                </div>
-                <!-- Item Trazabilidad -->
-                <div class="flex gap-4">
-                    <div class="flex flex-col items-center">
-                        <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full mt-1.5"></div>
-                        <div class="w-px h-full bg-slate-200 my-1"></div>
-                    </div>
-                    <div class="pb-2">
-                        <p class="text-sm font-medium text-slate-800">Recepción de Laboratorios Andinos</p>
-                        <p class="text-xs text-slate-500">Amoxicilina 500mg - Lote: LOT-99887</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">15/05/2026 - 08:30 AM</p>
-                    </div>
-                </div>
-                <!-- Item Trazabilidad -->
-                <div class="flex gap-4">
-                    <div class="flex flex-col items-center">
-                        <div class="w-2.5 h-2.5 bg-slate-300 rounded-full mt-1.5"></div>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-slate-800">Almacenamiento Bodega Principal</p>
-                        <p class="text-xs text-slate-500">Amoxicilina 500mg - Pasillo 3</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">15/05/2026 - 09:00 AM</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- 3. Panel Inferior: Sistema QR y Lotes en Cuarentena -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Panel Sistema QR -->
-        <div class="bg-[#0f172a] p-6 rounded-2xl shadow-md text-white flex flex-col sm:flex-row gap-6">
-            <div class="flex-shrink-0">
-                <h2 class="text-sm font-bold text-slate-300 mb-4">Sistema QR</h2>
-                <!-- Simulador de código QR -->
-                <div class="w-28 h-28 bg-white p-2 rounded-lg mb-3">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LOT-12345" alt="QR Code" class="w-full h-full object-cover rounded-md opacity-90">
-                </div>
-                <button class="w-full py-1.5 bg-blue-600 hover:bg-blue-700 rounded-md text-xs font-medium transition-colors">
-                    Imprimir etiqueta
+            <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                @can('ver.solicitudes_cesfam')
+                    <a href="{{ route('requests.cesfam') }}" class="px-3.5 py-2 rounded-xl text-[12px] font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors">
+                        + Solicitud CESFAM
+                    </a>
+                @endcan
+                @can('ver.solicitudes')
+                    <a href="{{ route('requests.index') }}" class="px-3.5 py-2 rounded-xl text-[12px] font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition-colors">
+                        + Solicitud Establecimiento
+                    </a>
+                @endcan
+                <button type="button" onclick="openDashboardScanner()"
+                    class="items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white dark:bg-teal-700 dark:hover:bg-teal-600 px-4 py-2 rounded-xl text-[12.5px] font-bold transition-all shadow-sm cursor-pointer inline-flex">
+                    <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                    </svg>
+                    Escanear QR
                 </button>
             </div>
-            <div class="flex-1">
-                <div class="border-b border-slate-700 pb-3 mb-3">
-                    <h3 class="font-bold text-lg text-white">Paracetamol 500mg</h3>
-                    <p class="text-xs text-slate-400">Lote: LOT-12345</p>
+        </div>
+
+        <!-- solicitudes asignadas al usuario -->
+        @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
+            <div class="bg-gradient-to-r from-teal-50 via-white to-indigo-50 border border-teal-200 rounded-2xl p-4 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-[13.5px] font-extrabold text-slate-800">
+                                Tienes {{ count($misSolicitudesAsignadas) }} solicitud(es) asignada(s) para despachar
+                            </h2>
+                            <p class="text-[11.5px] text-slate-500">
+                                Haz clic en "Despachar" para cargar automáticamente los productos solicitados.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="grid grid-cols-2 gap-y-3 text-sm">
-                    <div>
-                        <p class="text-slate-500 text-xs">Vencimiento</p>
-                        <p class="font-medium">30/06/2026</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                    @foreach ($misSolicitudesAsignadas as $miSol)
+                        @php
+                            $esCesfamMiSol = in_array($miSol->establecimiento, $nombresCesfam ?? []);
+                        @endphp
+                        <div class="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="font-mono font-extrabold text-[11.5px] text-slate-900">{{ $miSol->numero_solicitud }}</span>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $esCesfamMiSol ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700' }}">
+                                        {{ $esCesfamMiSol ? 'CESFAM' : 'Establecimiento' }}
+                                    </span>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-indigo-100 text-indigo-700">
+                                        {{ $miSol->estado }}
+                                    </span>
+                                </div>
+                                <p class="text-[12.5px] font-bold text-slate-800 truncate mt-0.5" title="{{ $miSol->establecimiento }}">
+                                    {{ $miSol->establecimiento }}
+                                </p>
+                            </div>
+                            <a href="{{ route('dispatch.index', ['solicitud_id' => $miSol->id]) }}"
+                                class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-teal-600 hover:bg-teal-700 text-white transition-colors shrink-0">
+                                Despachar &rarr;
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        <!-- barra de filtros -->
+        <form method="GET" action="{{ route('dashboard.index') }}" id="dashboardFilterForm"
+            class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+                <div>
+                    <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Período</label>
+                    <select name="periodo" id="dash_periodo" onchange="onDashboardPeriodoChange(this.value)"
+                        class="w-full bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-xl text-[12px] font-bold outline-none focus:border-teal-500 cursor-pointer">
+                        <option value="hoy" {{ $periodo == 'hoy' ? 'selected' : '' }}>Hoy</option>
+                        <option value="semana" {{ $periodo == 'semana' ? 'selected' : '' }}>Esta Semana</option>
+                        <option value="mes" {{ $periodo == 'mes' ? 'selected' : '' }}>Este Mes</option>
+                        <option value="anio" {{ $periodo == 'anio' ? 'selected' : '' }}>Este Año</option>
+                        <option value="historico" {{ $periodo == 'historico' ? 'selected' : '' }}>Histórico Total</option>
+                        <option value="custom" {{ $periodo == 'custom' ? 'selected' : '' }}>Personalizar Fechas...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Tipo de Red</label>
+                    <select name="tipo_establecimiento" id="dash_tipo_est" onchange="filtrarOpcionesEstablecimientoDash(true)"
+                        class="w-full bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-xl text-[12px] font-bold outline-none focus:border-teal-500 cursor-pointer">
+                        <option value="" {{ empty($tipo_establecimiento) ? 'selected' : '' }}>Toda la Red Comunal</option>
+                        <option value="cesfam" {{ ($tipo_establecimiento ?? '') === 'cesfam' ? 'selected' : '' }}>Solo CESFAM</option>
+                        <option value="establecimiento" {{ ($tipo_establecimiento ?? '') === 'establecimiento' ? 'selected' : '' }}>Solo Establecimientos</option>
+                    </select>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Centro de Salud (Establecimiento / CESFAM)</label>
+                    <select name="establecimiento" id="dash_establecimiento" onchange="this.form.submit()"
+                        class="w-full bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-xl text-[12px] font-bold outline-none focus:border-teal-500 cursor-pointer">
+                        <option value="">Todos los Centros de Salud</option>
+                        <optgroup label="CESFAM" id="optgroup_dash_cesfam">
+                            @foreach ($nombresCesfam ?? [] as $nomCesfam)
+                                <option value="{{ $nomCesfam }}" data-tipo-centro="cesfam" {{ ($establecimiento ?? '') === $nomCesfam ? 'selected' : '' }}>
+                                    {{ $nomCesfam }}
+                                </option>
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="Establecimientos (CECOSF / SAR / Postas)" id="optgroup_dash_estab">
+                            @foreach ($nombresNoCesfam ?? [] as $nomEst)
+                                <option value="{{ $nomEst }}" data-tipo-centro="establecimiento" {{ ($establecimiento ?? '') === $nomEst ? 'selected' : '' }}>
+                                    {{ $nomEst }}
+                                </option>
+                            @endforeach
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="flex items-end gap-2">
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Programa</label>
+                        <select name="programa" onchange="this.form.submit()"
+                            class="w-full bg-slate-50 border border-slate-200 text-slate-700 px-3 py-2 rounded-xl text-[12px] font-bold outline-none focus:border-teal-500 cursor-pointer">
+                            <option value="">Todos</option>
+                            @foreach ($programasLista as $prog)
+                                <option value="{{ $prog }}" {{ $programa == $prog ? 'selected' : '' }}>{{ $prog }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div>
-                        <p class="text-slate-500 text-xs">Ubicación</p>
-                        <p class="font-medium">B-02-01</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-500 text-xs">Stock actual</p>
-                        <p class="font-medium text-blue-400">350 uds</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-500 text-xs">Estado</p>
-                        <p class="font-medium text-emerald-400">Disponible</p>
-                    </div>
+                    @if ($hayFiltrosActivos)
+                        <a href="{{ route('dashboard.index') }}"
+                            title="Limpiar todos los filtros"
+                            class="px-3 py-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 text-[12px] font-bold transition-colors shrink-0">
+                            Limpiar
+                        </a>
+                    @endif
+                </div>
+            </div>
+
+            <!-- rango de fechas, solo aparece si el periodo es personalizado -->
+            <div id="dashFechasPersonalizadas" class="{{ $periodo === 'custom' ? 'flex' : 'hidden' }} flex-wrap items-end gap-3 mt-3 pt-3 border-t border-slate-100">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Desde</label>
+                    <input type="date" name="fecha_desde" value="{{ $fecha_desde }}"
+                        class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-[12px] font-bold outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hasta</label>
+                    <input type="date" name="fecha_hasta" value="{{ $fecha_hasta }}"
+                        class="bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-[12px] font-bold outline-none">
+                </div>
+                <button type="submit" class="px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-[12px] font-bold shadow-xs cursor-pointer">
+                    Filtrar Fechas
+                </button>
+            </div>
+        </form>
+
+        <!-- KPIs de bodega central -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="{{ route('inventory.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Inventario en Bodega</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">${{ number_format($valorInventario, 0, ',', '.') }}</h3>
+                    <p class="text-[11px] font-bold text-teal-600 mt-0.5">{{ number_format($unidadesTotales, 0, ',', '.') }} unidades disponibles</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
+            </a>
+
+            <a href="{{ route('traceability.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Actividad ({{ $periodoTexto }})</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($despachosPeriodo, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">despachos</span></h3>
+                    <p class="text-[11px] font-bold text-emerald-600 mt-0.5">{{ number_format($recepcionesPeriodo, 0, ',', '.') }} recepciones registradas</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                </div>
+            </a>
+
+            <a href="{{ route('inventory.index', ['order_by' => 'vencimiento']) }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-l-4 border-l-rose-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Alerta FEFO (&le; 30 Días)</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($proximosVencer, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">lotes</span></h3>
+                    <p class="text-[11px] font-bold text-rose-600 mt-0.5">Próximos a vencer o vencidos</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </a>
+
+            <a href="{{ route('quarantine.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-l-4 border-l-amber-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">En Cuarentena</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($cantidadCuarentena, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">lotes</span></h3>
+                    <p class="text-[11px] font-bold text-amber-600 mt-0.5">Retenidos para revisión técnica</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+            </a>
+        </div>
+
+        <!-- KPIs de establecimientos y CESFAM -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-purple-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
+                title="Solicitudes de medicamentos generadas exclusivamente por centros CESFAM en este período. 'Pendientes' indica pedidos aún en preparación o entrega.">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Red CESFAM ({{ $periodoTexto }})</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($solicitudesCesfamCount ?? 0, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">solicitudes</span></h3>
+                    <p class="text-[11px] font-bold text-purple-600 mt-0.5">
+                        {{ $cesfamActivasCount ?? 0 }} pendientes de entrega · {{ number_format($unidadesDespachadasCesfam ?? 0, 0, ',', '.') }} uds. desp.
+                    </p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-teal-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
+                title="Solicitudes de medicamentos de otros centros de la red comunal (CECOSF, Postas Rurales, SAR).">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">CECOSF / Postas ({{ $periodoTexto }})</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($solicitudesEstablecimientosCount ?? 0, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">solicitudes</span></h3>
+                    <p class="text-[11px] font-bold text-teal-600 mt-0.5">
+                        {{ $estabActivasCount ?? 0 }} pendientes de entrega · {{ number_format($unidadesDespachadasEstablecimientos ?? 0, 0, ',', '.') }} uds. desp.
+                    </p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+            </div>
+
+            <a href="{{ route('dispatch.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-indigo-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
+                title="Pedidos de la red pendientes de ser surtidos o despachados en bodega central.">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Pedidos por Surtir</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($solicitudesPorDespacharCount ?? 0, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">en cola</span></h3>
+                    <p class="text-[11px] font-bold text-indigo-600 mt-0.5">
+                        {{ $solicitudesAsignadasCount ?? 0 }} con bodeguero · {{ $solicitudesSinAsignarCount ?? 0 }} sin asignar
+                    </p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                    </svg>
+                </div>
+            </a>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-emerald-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
+                title="Nivel de Servicio: porcentaje de unidades entregadas respecto al total solicitado en los pedidos de este período. 'Stock en centros' corresponde al saldo físico declarado por los centros al pedir.">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Cumplimiento de Pedidos</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ $porcentajeCumplimientoRed ?? 0 }}% <span class="text-xs font-bold text-slate-500">abastecido</span></h3>
+                    <p class="text-[11px] font-bold text-emerald-600 mt-0.5">
+                        {{ number_format($totalUnidadesEntregadasSolicitudes ?? 0, 0, ',', '.') }} / {{ number_format($totalUnidadesSolicitadas ?? 0, 0, ',', '.') }} uds. <span class="text-slate-400 font-normal">| Centros: {{ number_format($stockDeclaradoRed ?? 0, 0, ',', '.') }} u.</span>
+                    </p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                 </div>
             </div>
         </div>
+        </div>
 
-        <!-- Lotes en Cuarentena -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-sm font-bold text-slate-800">Lotes en Cuarentena</h2>
-                <a href="#" class="text-xs text-blue-600 hover:underline">Ver todos</a>
+        <!-- dos columnas: pestañas a la izquierda, QR y accesos a la derecha -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- columna izquierda: pestañas de centros, movimientos y cuarentena -->
+            <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+                <!-- Barra de Pestañas -->
+                <div class="px-5 pt-4 pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
+                    <div class="inline-flex bg-slate-200/70 p-1 rounded-xl gap-1">
+                        <button type="button" id="tabBtn_centros" onclick="switchDashTab('centros')"
+                            class="px-3.5 py-1.5 rounded-lg text-[12px] font-extrabold bg-white text-slate-800 shadow-xs transition-all cursor-pointer">
+                            Establecimientos y CESFAM ({{ count($resumenEstablecimientos ?? []) }})
+                        </button>
+                        <button type="button" id="tabBtn_movimientos" onclick="switchDashTab('movimientos')"
+                            class="px-3.5 py-1.5 rounded-lg text-[12px] font-bold text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+                            Últimos Movimientos ({{ count($recentMovements ?? []) }})
+                        </button>
+                        <button type="button" id="tabBtn_cuarentena" onclick="switchDashTab('cuarentena')"
+                            class="px-3.5 py-1.5 rounded-lg text-[12px] font-bold text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+                            Cuarentena ({{ count($lotesCuarentenaDb ?? []) }})
+                        </button>
+                    </div>
+
+                    <!-- Buscador rápido para la pestaña de Centros -->
+                    <div id="dashSearchCentrosWrap" class="flex items-center gap-2">
+                        <input type="text" id="buscadorTablaCentros" oninput="filtrarTablaCentrosDash()"
+                            placeholder="Buscar CESFAM o centro..."
+                            class="bg-white border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-[12px] font-medium outline-none focus:border-teal-500 w-full sm:w-48">
+                    </div>
+                </div>
+
+                <!-- pestaña 1: establecimientos y CESFAM -->
+                <div id="tabPanel_centros" class="overflow-x-auto max-h-[420px]">
+                    <table class="w-full text-left text-[12px] text-slate-600 whitespace-nowrap">
+                        <thead class="text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-200 bg-slate-50 sticky top-0 z-10">
+                            <tr>
+                                <th class="px-4 py-3">Centro de Salud</th>
+                                <th class="px-3 py-3 text-center">Tipo</th>
+                                <th class="px-3 py-3 text-center">Solicitudes</th>
+                                <th class="px-3 py-3 text-center">Stock Declarado</th>
+                                <th class="px-3 py-3 text-center">Solic. / Desp.</th>
+                                <th class="px-4 py-3 text-center">Cumplimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100" id="tbodyResumenCentros">
+                            @forelse ($resumenEstablecimientos ?? [] as $rowCentro)
+                                <tr class="fila-centro-dash hover:bg-slate-50/80 transition-colors"
+                                    data-nombre="{{ mb_strtolower($rowCentro->nombre . ' ' . $rowCentro->tipo) }}">
+                                    <td class="px-4 py-3 font-bold text-slate-800">
+                                        <a href="{{ route('dashboard.index', ['establecimiento' => $rowCentro->nombre, 'periodo' => $periodo]) }}"
+                                            class="hover:text-teal-600 transition-colors">
+                                            {{ $rowCentro->nombre }}
+                                        </a>
+                                        @if ($rowCentro->ultima_solicitud)
+                                            <span class="block text-[10px] font-normal text-slate-400">
+                                                Últ. pedido: {{ \Carbon\Carbon::parse($rowCentro->ultima_solicitud)->format('d/m/Y') }}
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-3 py-3 text-center">
+                                        <span class="px-2 py-0.5 rounded text-[9.5px] font-extrabold uppercase {{ $rowCentro->es_cesfam ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-teal-50 text-teal-700 border border-teal-200' }}">
+                                            {{ $rowCentro->es_cesfam ? 'CESFAM' : $rowCentro->tipo }}
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-3 text-center">
+                                        <span class="font-extrabold text-slate-800">{{ $rowCentro->total_solicitudes }}</span>
+                                        @if ($rowCentro->activas > 0)
+                                            <span class="ml-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[9.5px] font-extrabold">
+                                                {{ $rowCentro->activas }} act.
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-3 py-3 text-center font-bold text-blue-700">
+                                        {{ number_format($rowCentro->stock_declarado, 0, ',', '.') }} uds.
+                                    </td>
+                                    <td class="px-3 py-3 text-center">
+                                        <span class="font-bold text-teal-700">{{ number_format($rowCentro->unidades_solicitadas, 0, ',', '.') }}</span>
+                                        <span class="text-slate-300 mx-0.5">/</span>
+                                        <span class="font-bold text-indigo-700">{{ number_format($rowCentro->unidades_despachadas, 0, ',', '.') }}</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <div class="w-14 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="h-full {{ $rowCentro->cumplimiento >= 80 ? 'bg-emerald-500' : ($rowCentro->cumplimiento >= 40 ? 'bg-amber-500' : 'bg-slate-300') }}"
+                                                    style="width: {{ $rowCentro->cumplimiento }}%"></div>
+                                            </div>
+                                            <span class="text-[11px] font-extrabold text-slate-700">{{ $rowCentro->cumplimiento }}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-4 py-10 text-center text-slate-400 font-medium">
+                                        No hay centros de salud que coincidan con el filtro seleccionado.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- pestaña 2: ultimos movimientos de bodega -->
+                <div id="tabPanel_movimientos" class="hidden p-5 max-h-[420px] overflow-y-auto">
+                    @if (count($recentMovements) > 0)
+                        <div class="divide-y divide-slate-100">
+                            @foreach ($recentMovements as $mov)
+                                @php
+                                    $isRec = $mov->tipo_movimiento === 'Recepción';
+                                    $badgeColor = $isRec ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200';
+                                @endphp
+                                <div class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-2 py-0.5 rounded text-[9.5px] font-extrabold uppercase border {{ $badgeColor }}">
+                                                {{ $mov->tipo_movimiento }}
+                                            </span>
+                                            <span class="text-[12.5px] font-bold text-slate-800 truncate">{{ $mov->producto }}</span>
+                                        </div>
+                                        <p class="text-[11.5px] text-slate-500 mt-0.5">
+                                            {{ $mov->origen_destino }} · <span class="font-mono">Lote: {{ $mov->lote }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <span class="text-[13px] font-black {{ $isRec ? 'text-emerald-600' : 'text-blue-600' }}">
+                                            {{ $isRec ? '+' : '-' }}{{ number_format($mov->cantidad, 0, ',', '.') }} uds.
+                                        </span>
+                                        <span class="block text-[10px] text-slate-400 font-mono">
+                                            {{ \Carbon\Carbon::parse($mov->fecha_hora)->diffForHumans() }}
+                                        </span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-100 text-right">
+                            <a href="{{ route('traceability.index') }}" class="text-[12px] font-bold text-teal-600 hover:text-teal-800">
+                                Ver historial completo en Trazabilidad &rarr;
+                            </a>
+                        </div>
+                    @else
+                        <div class="py-12 text-center text-slate-400">
+                            <p class="text-[13px] font-medium">No hay movimientos registrados en este período.</p>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- pestaña 3: lotes en cuarentena -->
+                <div id="tabPanel_cuarentena" class="hidden overflow-x-auto max-h-[420px]">
+                    <table class="w-full text-left text-[12px] text-slate-600">
+                        <thead class="text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-200 bg-slate-50">
+                            <tr>
+                                <th class="px-4 py-3">Producto</th>
+                                <th class="px-4 py-3">Lote</th>
+                                <th class="px-4 py-3 text-center">Tiempo Retenido</th>
+                                <th class="px-4 py-3 text-right">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @forelse ($lotesCuarentenaDb as $cuarentena)
+                                @php
+                                    $dias = (int) floor(\Carbon\Carbon::parse($cuarentena->created_at)->startOfDay()->diffInDays(now()->startOfDay()));
+                                @endphp
+                                <tr class="hover:bg-amber-50/40 transition-colors">
+                                    <td class="px-4 py-3 font-bold text-slate-800">{{ $cuarentena->producto }}</td>
+                                    <td class="px-4 py-3 font-mono font-bold text-slate-600">{{ $cuarentena->lote }}</td>
+                                    <td class="px-4 py-3 text-center font-bold text-amber-700">{{ $dias }} {{ $dias === 1 ? 'día' : 'días' }}</td>
+                                    <td class="px-4 py-3 text-right">
+                                        <a href="{{ route('quarantine.index') }}" class="text-[11.5px] font-bold text-amber-600 hover:text-amber-800 underline">
+                                            Revisar &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-4 py-10 text-center text-slate-400 font-medium">
+                                        No hay lotes retenidos en cuarentena actualmente.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="text-xs uppercase text-slate-400 border-b border-slate-100">
-                        <tr>
-                            <th class="pb-2 font-medium">Producto</th>
-                            <th class="pb-2 font-medium">Lote</th>
-                            <th class="pb-2 font-medium">Motivo</th>
-                            <th class="pb-2 font-medium">Días</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-50">
-                        <tr>
-                            <td class="py-3 font-medium text-slate-800">Cefalexina 500mg</td>
-                            <td class="py-3 text-xs">LOT-3333</td>
-                            <td class="py-3">
-                                <span class="px-2 py-1 bg-amber-50 text-amber-600 text-[10px] rounded-full">Doc. pendiente</span>
-                            </td>
-                            <td class="py-3 text-slate-800 font-medium">2</td>
-                        </tr>
-                        <tr>
-                            <td class="py-3 font-medium text-slate-800">Losartán 50mg</td>
-                            <td class="py-3 text-xs">LOT-4444</td>
-                            <td class="py-3">
-                                <span class="px-2 py-1 bg-red-50 text-red-600 text-[10px] rounded-full">Calidad</span>
-                            </td>
-                            <td class="py-3 text-slate-800 font-medium">5</td>
-                        </tr>
-                        <tr>
-                            <td class="py-3 font-medium text-slate-800">Azitromicina</td>
-                            <td class="py-3 text-xs">LOT-5555</td>
-                            <td class="py-3">
-                                <span class="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] rounded-full">Análisis</span>
-                            </td>
-                            <td class="py-3 text-slate-800 font-medium">4</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- columna derecha: ultimo lote con su QR y accesos rapidos -->
+            <div class="flex flex-col gap-5">
+                <!-- Panel QR del Último Lote -->
+                <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 flex flex-col">
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
+                        <h2 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                            <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                            </svg>
+                            Último Lote Ingresado
+                        </h2>
+                        <span class="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">Rotulación QR</span>
+                    </div>
+
+                    @if ($latestInventory)
+                        <div class="flex items-center gap-4">
+                            <div class="w-24 h-24 bg-white p-2 rounded-xl border border-slate-200 shrink-0 flex items-center justify-center shadow-2xs" id="qr-container">
+                                <img src="{{ route('qr.image', $latestInventory->id) }}?t={{ $latestInventory->updated_at?->timestamp ?? time() }}"
+                                    alt="Código QR Lote" class="w-full h-full object-contain bg-white rounded-lg">
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="font-extrabold text-[13px] text-slate-800 truncate" title="{{ $latestInventory->producto }}">
+                                    {{ $latestInventory->producto }}
+                                </h3>
+                                <p class="text-[11px] font-mono font-bold text-slate-500 mt-0.5">
+                                    Lote: <span class="text-slate-700">{{ $latestInventory->lote ?? 'S/L' }}</span>
+                                </p>
+                                <div class="flex items-center gap-2 mt-1.5 text-[11px]">
+                                    <span class="font-extrabold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded">{{ number_format($latestInventory->cantidad, 0, ',', '.') }} u.</span>
+                                    <span class="text-slate-400 font-medium">Ubicación: <strong>{{ $latestInventory->pasillo ?? 'S/P' }}-{{ $latestInventory->estante ?? 'S/E' }}</strong></span>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-1.5 mt-2.5">
+                                    <button type="button" onclick="printQR()"
+                                        class="py-1.5 px-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-all shadow-2xs cursor-pointer inline-flex items-center justify-center gap-1"
+                                        title="Imprimir etiqueta adhesiva para rotular la caja o pallet">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                        Imprimir Rótulo
+                                    </button>
+                                    <a href="{{ route('traceability.index', ['search' => $latestInventory->lote]) }}"
+                                        class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-bold transition-all cursor-pointer inline-flex items-center justify-center gap-1 text-center"
+                                        title="Ver trazabilidad completa de este lote en Kardex">
+                                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        Ver Kardex
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-2.5 text-center">Rótulo para identificación física de cajas y pallets recién ingresados a bodega.</p>
+                    @else
+                        <div class="py-6 text-center text-slate-400">
+                            <p class="text-[12px] font-medium">Sin lotes registrados aún.</p>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Accesos directos -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                    <div class="flex items-center justify-between mb-3.5">
+                        <h2 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Accesos Directos</h2>
+                        <span class="text-[10.5px] font-semibold text-slate-400">Módulos</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <a href="{{ route('reception.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-slate-800 block leading-tight">Recepción</span>
+                                <span class="text-[10px] text-slate-500 truncate block">Ingreso de stock</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('dispatch.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-slate-800 block leading-tight">Despacho</span>
+                                <span class="text-[10px] text-slate-500 truncate block">Salida de pedidos</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('inventory.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-slate-800 block leading-tight">Inventario</span>
+                                <span class="text-[10px] text-slate-500 truncate block">Kardex y stock</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('reports.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-slate-800 block leading-tight">Reportes</span>
+                                <span class="text-[10px] text-slate-500 truncate block">Actas y balances</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- modal del escaner QR -->
+    <div id="scannerModalDashboard" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
+        <div class="flex min-h-full items-center justify-center">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
+                <!-- cabecera del modal -->
+                <div class="px-5 py-4 bg-slate-800 text-white flex justify-between items-center shrink-0 border-b border-slate-700">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-[15px] font-bold text-white tracking-wide leading-tight">
+                                Escáner QR de Lotes
+                            </h2>
+                            <p class="text-[11px] text-teal-300 font-medium">Lectura óptica y consulta inmediata</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeDashboardScanner()" class="text-slate-400 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-lg cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <!-- visor de la camara -->
+                <div class="p-4 sm:p-5 flex flex-col items-center bg-slate-50/70 overflow-y-auto flex-1">
+                    <div class="relative w-full max-w-[300px] sm:max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-black border-2 border-slate-300 shadow-md flex items-center justify-center" id="scannerVisualContainer">
+                        <div id="reader-dashboard-feed" class="w-full h-full object-cover"></div>
+
+                        <!-- marco y linea de escaneo sobre la camara -->
+                        <div class="pointer-events-none absolute inset-5 flex items-center justify-center" id="scannerHudOverlay">
+                            <div class="absolute top-0 left-0 w-5 h-5 border-t-[3px] border-l-[3px] border-teal-400 rounded-tl-md"></div>
+                            <div class="absolute top-0 right-0 w-5 h-5 border-t-[3px] border-r-[3px] border-teal-400 rounded-tr-md"></div>
+                            <div class="absolute bottom-0 left-0 w-5 h-5 border-b-[3px] border-l-[3px] border-teal-400 rounded-bl-md"></div>
+                            <div class="absolute bottom-0 right-0 w-5 h-5 border-b-[3px] border-r-[3px] border-teal-400 rounded-br-md"></div>
+
+                            <div class="scan-laser-bar"></div>
+                        </div>
+
+                        <div id="scannerLoadingState" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center z-10 transition-opacity">
+                            <div class="w-8 h-8 border-3 border-teal-400 border-t-transparent rounded-full animate-spin mb-2.5"></div>
+                            <p class="text-[13px] font-bold text-white">Iniciando sensor de cámara...</p>
+                            <p class="text-[11px] text-slate-300 mt-0.5">Conceda permiso de acceso a la cámara en el navegador.</p>
+                        </div>
+                    </div>
+
+                    <div class="w-full max-w-[300px] sm:max-w-[320px] flex items-center justify-between mt-3.5 px-0.5">
+                        <div class="flex items-center gap-2 text-[12px] text-slate-600 font-medium">
+                            <span class="inline-block w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
+                            <span id="scannerStatusTxt">Buscando código QR...</span>
+                        </div>
+
+                        <button type="button" id="btnSwitchCamera" onclick="switchScannerCamera()"
+                            class="hidden px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold border border-slate-300 transition-colors items-center gap-1.5 cursor-pointer shadow-2xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Cambiar Cámara
+                        </button>
+                    </div>
+
+                    <p class="text-[11.5px] text-slate-500 mt-3 text-center leading-relaxed max-w-sm">
+                        Apunta la cámara al código QR de la caja o medicamento. Al detectarlo, el sistema abrirá automáticamente su Ficha de Trazabilidad y Kardex.
+                    </p>
+                </div>
+
+                <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
+                    <button type="button" onclick="closeDashboardScanner()" class="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-[12.5px] font-bold shadow-xs transition-colors cursor-pointer">
+                        Cerrar Escáner
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes scanLaserAnim {
+            0% { top: 6%; opacity: 0.6; }
+            50% { top: 88%; opacity: 1; }
+            100% { top: 6%; opacity: 0.6; }
+        }
+        .scan-laser-bar {
+            position: absolute;
+            left: 5%;
+            right: 5%;
+            height: 2.5px;
+            background: linear-gradient(90deg, transparent, #2dd4bf, #5eead4, #2dd4bf, transparent);
+            box-shadow: 0 0 12px 2px rgba(45, 212, 191, 0.9);
+            animation: scanLaserAnim 2s ease-in-out infinite;
+        }
+        #reader-dashboard-feed video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 1rem;
+        }
+    </style>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script>
+        let dashboardScanner = null;
+
+        function switchDashTab(tab) {
+            ['centros', 'movimientos', 'cuarentena'].forEach(t => {
+                const panel = document.getElementById('tabPanel_' + t);
+                const btn = document.getElementById('tabBtn_' + t);
+                if (panel) panel.classList.toggle('hidden', t !== tab);
+                if (btn) {
+                    btn.className = (t === tab)
+                        ? 'px-3.5 py-1.5 rounded-lg text-[12px] font-extrabold bg-white text-slate-800 shadow-xs transition-all cursor-pointer'
+                        : 'px-3.5 py-1.5 rounded-lg text-[12px] font-bold text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+                }
+            });
+
+            const searchWrap = document.getElementById('dashSearchCentrosWrap');
+            if (searchWrap) {
+                searchWrap.classList.toggle('hidden', tab !== 'centros');
+            }
+        }
+
+        function onDashboardPeriodoChange(val) {
+            const box = document.getElementById('dashFechasPersonalizadas');
+            if (val === 'custom') {
+                if (box) {
+                    box.classList.remove('hidden');
+                    box.classList.add('flex');
+                }
+            } else {
+                if (box) {
+                    box.classList.add('hidden');
+                    box.classList.remove('flex');
+                }
+                document.getElementById('dashboardFilterForm')?.submit();
+            }
+        }
+
+        function filtrarOpcionesEstablecimientoDash(autoSubmit = false) {
+            const tipoSel = document.getElementById('dash_tipo_est')?.value || '';
+            const estSelect = document.getElementById('dash_establecimiento');
+            const optCesfam = document.getElementById('optgroup_dash_cesfam');
+            const optEstab = document.getElementById('optgroup_dash_estab');
+
+            if (optCesfam) optCesfam.hidden = (tipoSel === 'establecimiento');
+            if (optEstab) optEstab.hidden = (tipoSel === 'cesfam');
+
+            if (estSelect && estSelect.value) {
+                const selectedOpt = estSelect.selectedOptions[0];
+                const optTipo = selectedOpt?.getAttribute('data-tipo-centro');
+                if (tipoSel && optTipo && tipoSel !== optTipo) {
+                    estSelect.value = '';
+                }
+            }
+
+            if (autoSubmit) {
+                document.getElementById('dashboardFilterForm')?.submit();
+            }
+        }
+
+        function filtrarTablaCentrosDash() {
+            const q = (document.getElementById('buscadorTablaCentros')?.value || '').toLowerCase().trim();
+            document.querySelectorAll('.fila-centro-dash').forEach(row => {
+                const nombre = row.getAttribute('data-nombre') || '';
+                row.classList.toggle('hidden', q !== '' && !nombre.includes(q));
+            });
+        }
+
+        let html5QrScanner = null;
+        let availableCameras = [];
+        let currentCameraIndex = 0;
+
+        function playScannerBeep() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            } catch(e) {}
+        }
+
+        async function openDashboardScanner() {
+            const modal = document.getElementById('scannerModalDashboard');
+            const loadingState = document.getElementById('scannerLoadingState');
+            const statusTxt = document.getElementById('scannerStatusTxt');
+            const btnSwitch = document.getElementById('btnSwitchCamera');
+
+            modal.classList.remove('hidden');
+            if (loadingState) {
+                loadingState.style.display = 'flex';
+                loadingState.style.opacity = '1';
+            }
+            if (statusTxt) statusTxt.textContent = 'Iniciando cámara...';
+
+            try {
+                if (!html5QrScanner) {
+                    html5QrScanner = new Html5Qrcode("reader-dashboard-feed");
+                }
+
+                // Detectar cámaras disponibles
+                try {
+                    availableCameras = await Html5Qrcode.getCameras();
+                    if (availableCameras && availableCameras.length > 1 && btnSwitch) {
+                        btnSwitch.classList.remove('hidden');
+                        btnSwitch.classList.add('inline-flex');
+                    }
+                } catch(camErr) {
+                    availableCameras = [];
+                }
+
+                startScannerWithCurrentCamera();
+            } catch (err) {
+                console.error("Error al iniciar lector:", err);
+                if (loadingState) {
+                    loadingState.innerHTML = `
+                        <div class="text-center p-4">
+                            <svg class="w-10 h-10 text-rose-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <p class="text-sm font-bold text-white">No se pudo acceder a la cámara</p>
+                            <p class="text-xs text-slate-400 mt-1">Verifica los permisos en tu navegador o conecta una cámara.</p>
+                        </div>
+                    `;
+                }
+                if (statusTxt) statusTxt.textContent = 'Error de cámara';
+            }
+        }
+
+        async function startScannerWithCurrentCamera() {
+            const loadingState = document.getElementById('scannerLoadingState');
+            const statusTxt = document.getElementById('scannerStatusTxt');
+
+            let cameraConfig = { facingMode: "environment" };
+            if (availableCameras.length > 0 && availableCameras[currentCameraIndex]) {
+                cameraConfig = availableCameras[currentCameraIndex].id;
+            }
+
+            const scanConfig = {
+                fps: 15,
+                qrbox: { width: 220, height: 220 },
+                aspectRatio: 1.0
+            };
+
+            if (html5QrScanner.isScanning) {
+                await html5QrScanner.stop();
+            }
+
+            html5QrScanner.start(
+                cameraConfig,
+                scanConfig,
+                onScanDashboardSuccess,
+                function() {}
+            ).then(() => {
+                if (loadingState) {
+                    loadingState.style.opacity = '0';
+                    setTimeout(() => { loadingState.style.display = 'none'; }, 200);
+                }
+                if (statusTxt) statusTxt.textContent = 'Enfoca el código QR en el visor';
+            }).catch(e => {
+                console.error("Fallo al iniciar cámara específica:", e);
+                if (statusTxt) statusTxt.textContent = 'Error al activar cámara';
+            });
+        }
+
+        async function switchScannerCamera() {
+            if (availableCameras.length <= 1) return;
+            currentCameraIndex = (currentCameraIndex + 1) % availableCameras.length;
+            const statusTxt = document.getElementById('scannerStatusTxt');
+            if (statusTxt) statusTxt.textContent = 'Cambiando de cámara...';
+            await startScannerWithCurrentCamera();
+        }
+
+        async function closeDashboardScanner() {
+            if (html5QrScanner && html5QrScanner.isScanning) {
+                try {
+                    await html5QrScanner.stop();
+                } catch(e) {}
+            }
+            document.getElementById('scannerModalDashboard').classList.add('hidden');
+        }
+
+        function onScanDashboardSuccess(decodedText) {
+            playScannerBeep();
+
+            let parsedData = {};
+            decodedText.split('|').forEach(chunk => {
+                let idx = chunk.indexOf(':');
+                if (idx === -1) return;
+                let key = chunk.substring(0, idx).trim();
+                let val = chunk.substring(idx + 1).trim();
+                if (key && val) parsedData[key] = val;
+            });
+
+            closeDashboardScanner();
+
+            const loteKey = parsedData.LOTE || decodedText.trim();
+            if (!loteKey) {
+                alert("El código QR no contiene información válida de Lote.");
+                return;
+            }
+            window.location.href = `/traceability?search=${encodeURIComponent(loteKey)}`;
+        }
+
+        function printQR() {
+            const qrImage = document.querySelector('#qr-container img');
+            if (!qrImage) return;
+
+            @php
+                $loteProdTxt = $latestInventory?->producto ?? '';
+                $loteNumTxt = $latestInventory?->lote ?? '';
+                $loteUbicTxt = ($latestInventory?->pasillo ?? 'S/P') . ' - ' . ($latestInventory?->estante ?? 'S/E');
+                $loteCantTxt = number_format($latestInventory?->cantidad ?? 0, 0, ',', '.');
+                $loteVencTxt = !empty($latestInventory?->fecha_vencimiento) ? date('d/m/Y', strtotime($latestInventory->fecha_vencimiento)) : 'N/A';
+            @endphp
+
+            const productoTxt = @json($loteProdTxt);
+            const loteTxt = @json($loteNumTxt);
+            const ubicacionTxt = @json($loteUbicTxt);
+            const cantidadTxt = @json($loteCantTxt);
+            const vencimientoTxt = @json($loteVencTxt);
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>Rótulo QR - Lote ${loteTxt}</title>
+                        <style>
+                            @page { size: auto; margin: 4mm; }
+                            * { box-sizing: border-box; }
+                            body {
+                                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                                margin: 0;
+                                padding: 8px;
+                                background: #ffffff;
+                                color: #000000;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                            }
+                            .qr-card {
+                                width: 330px;
+                                border: 2px solid #000000;
+                                border-radius: 14px;
+                                padding: 14px 16px;
+                                position: relative;
+                                background: #ffffff;
+                                text-align: center;
+                            }
+                            .dash-border {
+                                position: absolute;
+                                inset: 4px;
+                                border: 1.5px dashed #94a3b8;
+                                border-radius: 10px;
+                                pointer-events: none;
+                            }
+                            .card-header {
+                                border-bottom: 2px solid #000000;
+                                padding-bottom: 6px;
+                                margin-bottom: 10px;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .card-header h2 {
+                                margin: 0;
+                                font-size: 16px;
+                                font-weight: 900;
+                                letter-spacing: 2px;
+                                text-transform: uppercase;
+                                color: #000000;
+                            }
+                            .card-header span {
+                                font-size: 10px;
+                                font-weight: 700;
+                                letter-spacing: 1.5px;
+                                text-transform: uppercase;
+                                color: #334155;
+                                font-family: monospace;
+                                display: block;
+                                margin-top: 2px;
+                            }
+                            .qr-img-wrap {
+                                margin: 6px auto;
+                                width: 140px;
+                                height: 140px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .qr-img-wrap img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                            }
+                            .prod-title {
+                                font-size: 13.5px;
+                                font-weight: 900;
+                                text-transform: uppercase;
+                                line-height: 1.25;
+                                margin: 8px 0 10px 0;
+                                word-break: break-word;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .meta-table {
+                                width: 100%;
+                                border-top: 1px solid #000000;
+                                border-bottom: 1px solid #000000;
+                                padding: 6px 0;
+                                margin-bottom: 6px;
+                                display: flex;
+                                justify-content: space-between;
+                                text-align: left;
+                                font-family: monospace;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .meta-table .meta-item {
+                                display: flex;
+                                flex-col: column;
+                            }
+                            .meta-table .label {
+                                font-size: 9px;
+                                font-weight: 700;
+                                text-transform: uppercase;
+                                color: #475569;
+                                display: block;
+                            }
+                            .meta-table .val {
+                                font-size: 13px;
+                                font-weight: 900;
+                                color: #000000;
+                            }
+                            .footer-row {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-end;
+                                text-align: left;
+                                font-family: monospace;
+                                padding-top: 4px;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .footer-row .label {
+                                font-size: 9px;
+                                font-weight: 700;
+                                text-transform: uppercase;
+                                color: #475569;
+                                display: block;
+                            }
+                            .footer-row .val {
+                                font-size: 12px;
+                                font-weight: 800;
+                                color: #000000;
+                            }
+                            .footer-row .stock-val {
+                                font-size: 16px;
+                                font-weight: 900;
+                                color: #000000;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="qr-card">
+                            <div class="dash-border"></div>
+                            <div class="card-header">
+                                <h2>DROGUERÍA DAS</h2>
+                                <span>Control de Trazabilidad</span>
+                            </div>
+                            <div class="qr-img-wrap">
+                                <img src="${qrImage.src}" alt="QR Lote" />
+                            </div>
+                            <div class="prod-title">${productoTxt}</div>
+                            <div class="meta-table">
+                                <div class="meta-item">
+                                    <span class="label">Lote Identificador</span>
+                                    <span class="val">${loteTxt}</span>
+                                </div>
+                                <div class="meta-item" style="text-align: right;">
+                                    <span class="label">Fecha Vencimiento</span>
+                                    <span class="val">${vencimientoTxt}</span>
+                                </div>
+                            </div>
+                            <div class="footer-row">
+                                <div>
+                                    <span class="label">Ubicación Bodega</span>
+                                    <span class="val">${ubicacionTxt}</span>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span class="label">Stock Físico</span>
+                                    <span class="stock-val">${cantidadTxt} UNID.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                                setTimeout(() => window.close(), 600);
+                            };
+                        <\/script>
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            filtrarOpcionesEstablecimientoDash(false);
+        });
+    </script>
 @endsection
