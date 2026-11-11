@@ -123,15 +123,23 @@
 
         <!-- tabla principal -->
         <div class="overflow-x-auto w-full">
-            <table class="w-full text-left border-collapse min-w-[900px]">
+            <table class="w-full text-left border-collapse table-fixed" style="min-width:700px">
+                <colgroup>
+                    <col style="width: 29%">
+                    <col style="width: 14%">
+                    <col style="width: 20%">
+                    <col style="width: 11%">
+                    <col style="width: 12%">
+                    <col style="width: 14%">
+                </colgroup>
                 <thead>
                     <tr class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 bg-slate-50 border-b border-slate-200">
-                        <th class="px-6 py-4 whitespace-nowrap">Lote / Producto</th>
-                        <th class="px-6 py-4 whitespace-nowrap">Tipo Movimiento</th>
-                        <th class="px-6 py-4 whitespace-nowrap">Origen / Destino</th>
-                        <th class="px-6 py-4 whitespace-nowrap">Fecha / Hora</th>
-                        <th class="px-6 py-4 text-center whitespace-nowrap">Estado Lote</th>
-                        <th class="px-6 py-4 text-right whitespace-nowrap">Acciones</th>
+                        <th class="px-4 py-3 leading-tight">Lote / Producto</th>
+                        <th class="px-3 py-3 leading-tight">Tipo Movimiento</th>
+                        <th class="px-3 py-3 leading-tight">Origen / Destino</th>
+                        <th class="px-3 py-3 leading-tight">Fecha / Hora</th>
+                        <th class="px-3 py-3 text-center leading-tight">Estado Lote</th>
+                        <th class="px-3 py-3 text-right leading-tight">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-[13px]">
@@ -149,26 +157,26 @@
                                 $responsableMov = $mov->user ? trim($mov->user->name . ' ' . ($mov->user->last_name ?? '')) : null;
                             @endphp
                             <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-mono font-bold text-[11px] text-teal-700 bg-teal-50 shrink-0 border border-teal-100">
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-9 h-9 rounded-xl flex items-center justify-center font-mono font-bold text-[11px] text-teal-700 bg-teal-50 shrink-0 border border-teal-100">
                                             {{ Str::limit($mov->lote, 4, '') }}
                                         </div>
                                         <div class="min-w-0">
-                                            <p class="font-extrabold text-[14px] text-slate-800 truncate">{{ $mov->producto }}</p>
-                                            <p class="font-mono text-[11px] font-semibold text-slate-500 mt-0.5">Lote: {{ $mov->lote }} · Vence: {{ $mov->fecha_vencimiento ? \Carbon\Carbon::parse($mov->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</p>
+                                            <p class="font-extrabold text-[13px] leading-snug text-slate-800 truncate" title="{{ $mov->producto }}">{{ $mov->producto }}</p>
+                                            <p class="font-mono text-[10.5px] font-semibold text-slate-500 mt-0.5 truncate">Lote: {{ $mov->lote }} · Vence: {{ $mov->fecha_vencimiento ? \Carbon\Carbon::parse($mov->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wide {{ $badgeBg }} {{ $badgeText }} {{ $badgeBorder }} border whitespace-nowrap">
+                                <td class="px-3 py-3">
+                                    <span class="inline-flex px-2.5 py-1 rounded-lg text-[10px] leading-tight font-extrabold uppercase tracking-wide {{ $badgeBg }} {{ $badgeText }} {{ $badgeBorder }} border">
                                         {{ $mov->tipo_movimiento }} ({{ $mov->cantidad > 0 ? '+'.$mov->cantidad : $mov->cantidad }})
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex flex-col">
-                                        <span class="text-slate-800 font-bold text-[13px]">{{ $mov->origen_destino }}</span>
-                                        <span class="text-[11px] font-medium text-slate-500">
+                                <td class="px-3 py-3">
+                                    <div class="flex flex-col min-w-0">
+                                        <span class="text-slate-800 font-bold text-[12.5px] leading-snug">{{ $mov->origen_destino }}</span>
+                                        <span class="text-[10.5px] font-medium text-slate-500 leading-snug">
                                             {{ $mov->documento_respaldo }}
                                             @if($responsableMov)
                                                 · <span class="text-teal-700 font-semibold">Resp: {{ $responsableMov }}</span>
@@ -176,10 +184,11 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 font-mono text-[12px] font-semibold text-slate-600">
-                                    {{ \Carbon\Carbon::parse($mov->fecha_hora)->format('d/m/Y - H:i') }}
+                                <td class="px-3 py-3 font-mono text-[11.5px] font-semibold text-slate-600 leading-tight">
+                                    {{ \Carbon\Carbon::parse($mov->fecha_hora)->format('d/m/Y') }}
+                                    <span class="block text-[10.5px] text-slate-400">{{ \Carbon\Carbon::parse($mov->fecha_hora)->format('H:i') }} hrs</span>
                                 </td>
-                                <td class="px-6 py-4 text-center">
+                                <td class="px-3 py-3 text-center">
                                     @if(strtolower($mov->estado_lote) == 'cuarentena')
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-200">
                                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Cuarentena
@@ -194,10 +203,10 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 text-right">
-                                    <button type="button" onclick="openLotDetails('{{ $mov->lote }}', '{{ addslashes($mov->producto) }}')" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-teal-700 text-white rounded-xl text-[12px] font-bold transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer shadow-sm">
-                                        <svg class="w-4 h-4 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                        Ver Ficha Maestra
+                                <td class="px-3 py-3 text-right">
+                                    <button type="button" title="Ver ficha maestra del lote" onclick="openLotDetails('{{ $mov->lote }}', '{{ addslashes($mov->producto) }}')" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-800 hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer shadow-sm whitespace-nowrap">
+                                        <svg class="w-3.5 h-3.5 text-teal-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        Ver ficha
                                     </button>
                                 </td>
                             </tr>
