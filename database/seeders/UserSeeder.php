@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\Hash;
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Crea el usuario Administrador inicial, indispensable para entrar a la plataforma.
+     * Después del primer ingreso conviene cambiarle la contraseña.
      */
     public function run(): void
     {
-
-        $user1 = User::updateOrCreate(
+        $admin = User::updateOrCreate(
             [
                 'email' => 'pabloadmin@drogueriadas.com',
             ],
@@ -22,19 +22,10 @@ class UserSeeder extends Seeder
                 'name' => 'Pablo',
                 'last_name' => 'Cáceres',
                 'password' => Hash::make('12345678'),
+                'status' => 'activo',
             ]
         );
-$user2 = User::updateOrCreate(
-            [
-                'email' => 'usuario@drogueriadas.com',
-            ],
-            [
-                'name' => 'Juan',
-                'last_name' => 'Perez',
-                'password' => Hash::make('12345678'),
-            ]
-        );
-        $user1->assignRole('Administrador');
-        $user2->assignRole('Usuario');
+
+        $admin->assignRole('Administrador');
     }
 }
