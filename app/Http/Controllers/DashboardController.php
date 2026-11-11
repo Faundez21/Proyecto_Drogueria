@@ -471,7 +471,6 @@ class DashboardController extends Controller
         // 9. LISTAS PARA DROPDOWNS
         $categoriasLista = Inventory::whereNotNull('categoria')->where('categoria', '!=', '')->distinct()->orderBy('categoria')->pluck('categoria');
         $programasLista = Inventory::whereNotNull('programa')->where('programa', '!=', '')->distinct()->orderBy('programa')->pluck('programa')
-            ->merge(['Morbilidad General', 'Cardiovascular', 'IRA/ERA'])
             ->unique()
             ->sort()
             ->values();

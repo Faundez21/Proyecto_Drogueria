@@ -57,16 +57,9 @@ class InventoryController extends Controller
         // 2. Filtros Específicos
         if ($request->filled('categoria')) {
             $catFiltro = trim($request->input('categoria'));
-            $catLower = mb_strtolower($catFiltro);
-            if (in_array($catLower, ['fármacos', 'farmacos', 'medicamentos'])) {
-                $query->whereIn('categoria', ['Fármacos', 'Farmacos', 'Medicamentos']);
-            } elseif (in_array($catLower, ['insumos clínicos', 'insumos clinicos', 'insumos'])) {
-                $query->whereIn('categoria', ['Insumos Clínicos', 'Insumos Clinicos', 'Insumos']);
-            } elseif (in_array($catLower, ['fármacos controlados', 'farmacos controlados', 'estupefacientes'])) {
-                if ($puedeVerControlados) {
-                    $query->whereIn('categoria', ['Fármacos Controlados', 'Farmacos Controlados', 'Estupefacientes']);
-                }
-            } else {
+            // La categoría se compara tal cual viene en los datos; no hay equivalencias fijas en código.
+            $esControlada = InventoryService::clasificarGrupoProducto('', $catFiltro) === 'Estupefacientes';
+            if (! $esControlada || $puedeVerControlados) {
                 $query->where('categoria', $catFiltro);
             }
         }
