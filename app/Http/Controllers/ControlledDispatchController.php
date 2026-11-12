@@ -212,7 +212,7 @@ class ControlledDispatchController extends Controller
                         'cantidad' => -$asignacion['cantidad'],
                         'fecha_hora' => now(),
                         'origen_destino' => 'Hacia: ' . $destino,
-                        'documento_respaldo' => 'Guia Controlada N° ' . $correlativo,
+                        'documento_respaldo' => 'Guía Controlada N° ' . $correlativo,
                     ]);
 
                     $itemsControlados[] = [

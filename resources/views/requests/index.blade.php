@@ -314,7 +314,7 @@
                         </label>
 
                         <textarea name="observaciones" rows="4"
-                            placeholder="Indique alguna observacion, requerimiento especial o informacion adicional..."
+                            placeholder="Indique alguna observación, requerimiento especial o información adicional..."
                             class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] resize-none"></textarea>
                     </div>
                 </div>
@@ -338,7 +338,7 @@
                     <div class="flex flex-col items-center">
 
                         <p class="text-[12px] font-semibold text-slate-600 mb-2">
-                            Firma Quien Solicita (Establecimiento)
+                            Firma de quien solicita (Establecimiento)
                         </p>
 
                         <input type="hidden" name="firma_recibe" id="firma_recibe_input">
