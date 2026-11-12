@@ -310,6 +310,7 @@ class ReceptionController extends Controller
 
         // Dos lotes no pueden quedar en la misma casilla, ni siquiera dentro de la misma acta
         $ubicacionesEnActa = [];
+        $unidadesPorEstante = [];
         foreach ($validated['product_id'] as $index => $prodId) {
             $estCheck = ! empty($validated['estante'][$index]) ? trim((string) $validated['estante'][$index]) : '';
             $nivCheck = ! empty($validated['nivel'][$index]) ? InventoryService::normalizarNivel($validated['nivel'][$index]) : '';
@@ -340,6 +341,18 @@ class ReceptionController extends Controller
                 }
 
                 return redirect()->back()->withInput()->with('error', $msgError);
+            }
+
+            // Capacidad del estante: se suman las unidades de todas las filas que van al mismo estante
+            $estKeyCap = mb_strtolower($estCheck);
+            $unidadesPorEstante[$estKeyCap] = ($unidadesPorEstante[$estKeyCap] ?? 0) + (int) ($validated['cantidad_unitaria'][$index] ?? 0);
+            $msgCapacidad = InventoryService::verificarCapacidadEstante($estCheck, $unidadesPorEstante[$estKeyCap]);
+            if ($msgCapacidad) {
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['ok' => false, 'message' => $msgCapacidad], 422);
+                }
+
+                return redirect()->back()->withInput()->with('error', $msgCapacidad);
             }
 
             $slotKey = mb_strtolower($estCheck) . '|' . mb_strtolower($nivCheck) . '|' . mb_strtolower($posCheck);

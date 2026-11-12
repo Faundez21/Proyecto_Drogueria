@@ -250,6 +250,17 @@ class InventoryController extends Controller
             }
         }
 
+        // Capacidad del estante (en unidades); capacidad 0 = sin límite
+        if (($validated['estado'] ?? 'Disponible') !== 'Merma' && ! empty($validated['estante'])) {
+            $msgCapacidad = InventoryService::verificarCapacidadEstante($validated['estante'], (int) ($validated['cantidad'] ?? 0));
+            if ($msgCapacidad) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('open_modal', 'deposit')
+                    ->with('error', $msgCapacidad);
+            }
+        }
+
         try {
             $inventory = DB::transaction(function () use ($validated, $request) {
                 $validated['user_id'] = Auth::id();
@@ -436,6 +447,24 @@ class InventoryController extends Controller
                 }
 
                 return redirect()->back()->with('error', $msgOcupado);
+            }
+        }
+
+        // Si el lote cambia de estante, el estante nuevo debe tener capacidad para sus unidades
+        $estanteNuevo = trim((string) ($data['estante'] ?? $inventory->estante));
+        $cambiaDeEstante = mb_strtolower($estanteNuevo) !== mb_strtolower(trim((string) $inventory->estante));
+        if ($cambiaDeEstante && ($data['estado'] ?? $inventory->estado) !== 'Merma') {
+            $msgCapacidad = InventoryService::verificarCapacidadEstante(
+                $estanteNuevo,
+                (int) ($data['cantidad'] ?? $inventory->cantidad),
+                (int) $inventory->id
+            );
+            if ($msgCapacidad) {
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['ok' => false, 'message' => $msgCapacidad], 422);
+                }
+
+                return redirect()->back()->with('error', $msgCapacidad);
             }
         }
 

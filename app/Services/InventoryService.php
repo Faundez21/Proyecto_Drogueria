@@ -1060,8 +1060,13 @@ class InventoryService
     }
 
     /**
-     * Verifica si una ubicación física (Estante + Nivel + Posición) ya está ocupada por otro lote activo en bodega.
-     * Si el nivel no tiene posiciones definidas o no se envía posición, verifica ocupación a nivel de (Estante + Nivel).
+     * Verifica si una POSICIÓN física (Estante + Nivel + Posición) ya está ocupada por otro lote activo en bodega.
+     *
+     * Reglas:
+     * - Una posición la ocupa un solo lote (salvo que sea el mismo producto y lote, que acumula stock).
+     * - Un nivel sin posición indicada es un espacio compartido: varios lotes pueden quedar ahí,
+     *   y lo que limita es la capacidad del estante (ver verificarCapacidadEstante).
+     * - Un lote guardado sin posición ya NO bloquea las posiciones de su nivel.
      */
     public static function verificarUbicacionOcupada(
         ?string $estante,
@@ -1075,7 +1080,7 @@ class InventoryService
         $niv = self::normalizarNivel($nivel);
         $pos = self::normalizarPosicion($posicion);
 
-        if ($est === '' || strtoupper($est) === 'P.A' || $niv === '') {
+        if ($est === '' || strtoupper($est) === 'P.A' || $niv === '' || $pos === '') {
             return null;
         }
 
@@ -1089,37 +1094,56 @@ class InventoryService
 
         foreach ($candidatos as $cand) {
             if ($mismoProducto !== null && mb_strtolower(trim($cand->producto)) === mb_strtolower(trim($mismoProducto))) {
-                $candLote = self::normalizarLote($cand->lote);
-                if ($candLote === $loteNorm) {
+                if (self::normalizarLote($cand->lote) === $loteNorm) {
                     // Es el mismo producto y lote (acumulación de stock en el mismo lote), no hay conflicto
                     continue;
                 }
             }
 
-            $candNiv = self::normalizarNivel($cand->nivel);
-            $candPos = self::normalizarPosicion($cand->posicion);
-
-            if (mb_strtolower($candNiv) !== mb_strtolower($niv)) {
+            if (mb_strtolower(self::normalizarNivel($cand->nivel)) !== mb_strtolower($niv)) {
                 continue;
             }
 
-            // Si ambos tienen posición o se especificó posición, comparamos posición
-            if ($pos !== '') {
-                if ($candPos !== '' && mb_strtolower($candPos) === mb_strtolower($pos)) {
-                    return $cand;
-                }
-                // Si el lote existente ocupaba todo el nivel sin especificar posición
-                if ($candPos === '') {
-                    return $cand;
-                }
-            } else {
-                // Si se intenta asignar un nivel sin posición y el nivel ya tiene un ocupante sin posición
-                if ($candPos === '') {
-                    return $cand;
-                }
+            $candPos = self::normalizarPosicion($cand->posicion);
+            if ($candPos !== '' && mb_strtolower($candPos) === mb_strtolower($pos)) {
+                return $cand;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Revisa la capacidad máxima (en unidades) del estante. Capacidad 0 o vacía = sin límite.
+     * Devuelve un mensaje si al agregar $cantidad unidades se supera la capacidad, o null si cabe.
+     */
+    public static function verificarCapacidadEstante(?string $estante, int $cantidad, ?int $ignorarId = null): ?string
+    {
+        $est = trim((string) $estante);
+        if ($est === '' || strtoupper($est) === 'P.A' || $cantidad <= 0) {
+            return null;
+        }
+
+        $shelf = \App\Models\Shelf::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower($est)])->first();
+        $capacidad = (int) ($shelf->capacidad ?? 0);
+        if (! $shelf || $capacidad <= 0) {
+            return null;
+        }
+
+        $ocupadas = (int) Inventory::where('estado', '!=', 'Merma')
+            ->where('cantidad', '>', 0)
+            ->whereRaw('LOWER(TRIM(estante)) = ?', [mb_strtolower($est)])
+            ->when($ignorarId !== null, fn ($q) => $q->where('id', '!=', $ignorarId))
+            ->sum('cantidad');
+
+        if ($ocupadas + $cantidad <= $capacidad) {
+            return null;
+        }
+
+        $libres = max(0, $capacidad - $ocupadas);
+        $fmt = fn ($n) => number_format($n, 0, ',', '.');
+
+        return "El estante «{$shelf->name}» no tiene espacio suficiente: tiene {$fmt($ocupadas)} de {$fmt($capacidad)} unidades ocupadas "
+            . "(quedan {$fmt($libres)}) y este lote suma {$fmt($cantidad)}. Elija otro estante o aumente su capacidad en Distribución.";
     }
 }

@@ -1250,15 +1250,15 @@
             const posKey = this.normKey(this.normPos(posicion));
             if (!estante || !nivKey) return null;
 
+            // Un nivel sin posición es un espacio compartido: lo limita la capacidad del estante, no un lote.
+            if (!posKey) return null;
+
             const ocupantesEst = this.obtenerOcupantesEnEstante(estante, opts);
             for (const oc of ocupantesEst) {
                 if (this.normKey(oc.nivel) !== nivKey) continue;
-                const ocPosKey = this.normKey(oc.posicion);
-                if (posKey) {
-                    if (ocPosKey === posKey || ocPosKey === '') return oc;
-                } else {
-                    if (ocPosKey === '') return oc;
-                }
+                // Solo ocupa la posición el lote que está guardado en ESA posición
+                // (un lote sin posición ya no bloquea todas las posiciones del nivel)
+                if (this.normKey(oc.posicion) === posKey) return oc;
             }
             return null;
         },
@@ -1273,24 +1273,24 @@
             const listaPos = Array.isArray(posicionesNivel) ? posicionesNivel.map((p) => this.normPos(p)).filter(Boolean) : [];
 
             if (listaPos.length === 0) {
-                const ocupadoSinPos = ocupantesEst.length > 0;
+                // Nivel sin posiciones definidas: espacio compartido, varios lotes pueden quedar aquí
                 return {
                     nivel: nivStr,
                     totalPosiciones: 1,
-                    ocupadasCount: ocupadoSinPos ? 1 : 0,
-                    disponiblesCount: ocupadoSinPos ? 0 : 1,
-                    completamenteOcupado: ocupadoSinPos,
+                    ocupadasCount: 0,
+                    disponiblesCount: 1,
+                    completamenteOcupado: false,
+                    compartido: true,
                     ocupantes: ocupantesEst,
                     detallePosiciones: [],
                 };
             }
 
-            // Si un ocupante en este nivel no tiene posición específica, bloquea el nivel o cuenta como ocupado
-            const ocupanteNivelCompleto = ocupantesEst.find((o) => !this.normPos(o.posicion));
+            // Cada posición la ocupa solo el lote guardado en ella
             let ocupadasCount = 0;
             const detallePosiciones = listaPos.map((pos) => {
                 const posKey = this.normKey(pos);
-                const oc = ocupanteNivelCompleto || ocupantesEst.find((o) => this.normKey(o.posicion) === posKey) || null;
+                const oc = ocupantesEst.find((o) => this.normKey(o.posicion) === posKey) || null;
                 if (oc) ocupadasCount++;
                 return { posicion: pos, ocupante: oc };
             });
@@ -1303,7 +1303,10 @@
                 totalPosiciones,
                 ocupadasCount,
                 disponiblesCount,
-                completamenteOcupado: disponiblesCount === 0 && totalPosiciones > 0,
+                // El nivel no se bloquea entero: se puede dejar el lote en el nivel sin posición
+                // (espacio compartido) y las posiciones en uso aparecen bloqueadas una por una
+                completamenteOcupado: false,
+                sinPosicionesLibres: disponiblesCount === 0 && totalPosiciones > 0,
                 ocupantes: ocupantesEst,
                 detallePosiciones,
             };
@@ -1316,12 +1319,19 @@
             const nivelesRaw = Array.isArray(infoEstante.niveles) ? infoEstante.niveles : [];
             const ocupantes = this.obtenerOcupantesEnEstante(infoEstante.estante, opts);
 
+            const capacidadEst = parseInt(infoEstante.capacidad, 10) || 0;
+            const unidadesEst = ocupantes.reduce((a, o) => a + (parseInt(o.cantidad, 10) || 0), 0);
+
             if (nivelesRaw.length === 0) {
+                const sinCap = capacidadEst > 0 && unidadesEst >= capacidadEst;
                 return {
                     totalSlots: 0,
-                    ocupadosCount: ocupantes.length,
+                    ocupadosCount: 0,
                     disponiblesCount: 1,
-                    completamenteOcupado: false,
+                    capacidad: capacidadEst,
+                    unidades: unidadesEst,
+                    sinCapacidad: sinCap,
+                    completamenteOcupado: sinCap,
                     nivelesEval: [],
                     ocupantes,
                 };
@@ -1337,11 +1347,23 @@
             });
 
             const disponiblesCount = Math.max(0, totalSlots - ocupadosCount);
+
+            // Capacidad del estante en unidades (0 = sin límite)
+            const capacidad = parseInt(infoEstante.capacidad, 10) || 0;
+            const unidades = ocupantes.reduce((a, o) => a + (parseInt(o.cantidad, 10) || 0), 0);
+            const sinCapacidad = capacidad > 0 && unidades >= capacidad;
+            const sinPosiciones = totalSlots > 0 && disponiblesCount === 0;
+
             return {
                 totalSlots,
                 ocupadosCount,
                 disponiblesCount,
-                completamenteOcupado: totalSlots > 0 && disponiblesCount === 0,
+                capacidad,
+                unidades,
+                sinCapacidad,
+                sinPosiciones,
+                // El estante solo se bloquea por capacidad; las posiciones en uso se bloquean una por una
+                completamenteOcupado: sinCapacidad,
                 nivelesEval,
                 ocupantes,
             };
@@ -1436,13 +1458,15 @@
                     opt.value = item.estante;
 
                     const esMismoInicial = initialUbicacion && this.normKey(initialUbicacion.estante) === this.normKey(item.estante);
+                    const fmtU = (n) => Number(n || 0).toLocaleString('es-CL');
+                    const textoCap = evEst.capacidad > 0 ? ` · ${fmtU(evEst.unidades)}/${fmtU(evEst.capacidad)} u` : '';
                     if (evEst.completamenteOcupado && !esMismoInicial) {
                         opt.disabled = true;
-                        opt.textContent = `${item.estante} — ⛔ OCUPADO (${evEst.ocupadosCount}/${evEst.totalSlots} en uso)`;
-                    } else if (evEst.ocupadosCount > 0 && evEst.totalSlots > 0) {
-                        opt.textContent = `${item.estante} (${evEst.disponiblesCount} disp. / ${evEst.ocupadosCount} en uso)`;
+                        opt.textContent = `${item.estante} — ⛔ SIN CAPACIDAD (${fmtU(evEst.unidades)}/${fmtU(evEst.capacidad)} u)`;
+                    } else if (evEst.ocupadosCount > 0) {
+                        opt.textContent = `${item.estante} (${evEst.disponiblesCount} pos. libres${textoCap})`;
                     } else {
-                        opt.textContent = item.estante;
+                        opt.textContent = `${item.estante}${textoCap ? ` (${textoCap.slice(3)})` : ''}`;
                     }
 
                     if (this.normKey(item.estante) === this.normKey(prevEstante) && !opt.disabled) {
@@ -1486,8 +1510,14 @@
                             opt.disabled = true;
                             const resumenOc = evNiv.ocupantes.slice(0, 2).map((o) => `${o.producto} (Lote ${o.lote})`).join(', ');
                             opt.textContent = `Nivel ${nivStr} — ⛔ OCUPADO (${resumenOc || 'En uso'})`;
+                        } else if (evNiv.compartido) {
+                            opt.textContent = evNiv.ocupantes.length > 0
+                                ? `Nivel ${nivStr} (${evNiv.ocupantes.length} lote(s) aquí · espacio compartido)`
+                                : `Nivel ${nivStr} (Disponible)`;
                         } else if (evNiv.ocupadasCount > 0) {
-                            opt.textContent = `Nivel ${nivStr} (${evNiv.disponiblesCount} de ${evNiv.totalPosiciones} pos. libres)`;
+                            opt.textContent = evNiv.sinPosicionesLibres
+                                ? `Nivel ${nivStr} (todas las posiciones en uso)`
+                                : `Nivel ${nivStr} (${evNiv.disponiblesCount} de ${evNiv.totalPosiciones} pos. libres)`;
                         } else {
                             opt.textContent = `Nivel ${nivStr} (Disponible)`;
                         }
@@ -1564,19 +1594,12 @@
                     const evEst = this.evaluarEstante(infoEstante, opts);
                     if (evEst.completamenteOcupado) {
                         this.alertaUbicacionOcupada({
-                            titulo: 'Estante Completamente Ocupado',
-                            subtitulo: `Todos los niveles y posiciones del <strong>${esc(infoEstante.estante)}</strong> están actualmente en uso. Seleccione otro estante.`,
+                            titulo: 'Estante sin capacidad disponible',
+                            subtitulo: `El <strong>${esc(infoEstante.estante)}</strong> ya tiene <strong>${evEst.unidades.toLocaleString('es-CL')}</strong> de <strong>${evEst.capacidad.toLocaleString('es-CL')}</strong> unidades. Elija otro estante o aumente su capacidad en Distribución.`,
                             ocupantes: evEst.ocupantes,
                             estante: infoEstante.estante,
                         });
                         if (selectEstante) selectEstante.value = '';
-                    } else if (evEst.ocupadosCount > 0) {
-                        this.alertaUbicacionOcupada({
-                            titulo: 'Estante con Ubicaciones en Uso',
-                            subtitulo: `El <strong>${esc(infoEstante.estante)}</strong> tiene <strong>${evEst.ocupadosCount}</strong> ubicación(es) ocupada(s) y <strong>${evEst.disponiblesCount}</strong> disponible(s). Las posiciones ocupadas se han bloqueado en los desplegables.`,
-                            ocupantes: evEst.ocupantes,
-                            estante: infoEstante.estante,
-                        });
                     }
                 } else if (trigger === 'nivel' && estanteVal && nivelVal) {
                     const posList = (infoEstante?.niveles?.find((n) => this.normKey(this.normNivel(n.nivel)) === this.normKey(nivelVal))?.posiciones) || [];
@@ -1590,14 +1613,6 @@
                             nivel: nivelVal,
                         });
                         if (selectNivel) selectNivel.value = '';
-                    } else if (evNiv.ocupadasCount > 0) {
-                        this.alertaUbicacionOcupada({
-                            titulo: 'Nivel con Posiciones Ocupadas',
-                            subtitulo: `En <strong>${esc(estanteVal)} · Nivel ${esc(nivelVal)}</strong> hay <strong>${evNiv.ocupadasCount}</strong> posición(es) en uso y <strong>${evNiv.disponiblesCount}</strong> disponible(s). Las posiciones en uso aparecen deshabilitadas.`,
-                            ocupantes: evNiv.ocupantes,
-                            estante: estanteVal,
-                            nivel: nivelVal,
-                        });
                     }
                 } else if (trigger === 'posicion' && estanteVal && nivelVal && selectPosicion?.value) {
                     const posVal = this.normPos(selectPosicion.value);
