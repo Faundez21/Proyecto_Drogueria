@@ -211,7 +211,55 @@ class ReceptionController extends Controller
         ));
     }
 
+    // si una fila trae producto nuevo se crea en una transaccion que se revierte si falla la recepcion
     public function store(Request $request)
+    {
+        $productos = (array) $request->input('product_id', []);
+        $nombresNuevos = (array) $request->input('producto_nuevo', []);
+        $filasNuevas = array_keys(array_filter($productos, fn ($v) => $v === '__nuevo__'));
+
+        if (empty($filasNuevas)) {
+            return $this->guardarRecepcion($request);
+        }
+
+        foreach ($filasNuevas as $i) {
+            $nombre = trim(preg_replace('/\s+/', ' ', (string) ($nombresNuevos[$i] ?? '')));
+            if ($nombre === '' || mb_strlen($nombre) > 1000) {
+                $msg = 'Escribe el nombre del producto nuevo (fila ' . ($i + 1) . ').';
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['ok' => false, 'message' => $msg], 422);
+                }
+
+                return redirect()->back()->withInput()->with('error', $msg);
+            }
+            $nombresNuevos[$i] = $nombre;
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($filasNuevas as $i) {
+                // si ya existe un producto con ese nombre se reutiliza
+                $existente = Product::whereRaw('LOWER(TRIM(nombre)) = ?', [mb_strtolower($nombresNuevos[$i])])->value('id');
+                $productos[$i] = $existente ?? Product::create(['nombre' => $nombresNuevos[$i]])->id;
+            }
+            $request->merge(['product_id' => $productos]);
+
+            $respuesta = $this->guardarRecepcion($request);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+        $exito = $respuesta instanceof \Illuminate\Http\JsonResponse
+            ? ($respuesta->getStatusCode() < 400 && ($respuesta->getData(true)['ok'] ?? false))
+            : in_array('reception_success_detail', (array) $request->session()->get('_flash.new', []), true);
+
+        $exito ? DB::commit() : DB::rollBack();
+
+        return $respuesta;
+    }
+
+    private function guardarRecepcion(Request $request)
     {
         // Los campos vacíos llegan como cadena vacía y hacen fallar las reglas de fecha, por eso se pasan a null
         if ($request->has('fecha_vencimiento') && is_array($request->fecha_vencimiento)) {

@@ -357,9 +357,10 @@
                                 class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">01</span>
                             <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Abastecimiento</p>
                         </div>
+                        <p class="sidebar-hint px-2 -mt-1 mb-2 pl-[36px] text-[11px] text-slate-500/80">Lo que entra a la bodega</p>
                         <div class="flow-rail pl-[27px] space-y-0.5">
                             @can('ver.proveedores')
-                            <a href="{{ route('providers.index') }}"
+                            <a href="{{ route('providers.index') }}" title="Laboratorios y distribuidores que entregan mercadería"
                                 class="nav-row {{ request()->routeIs('providers.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -370,7 +371,7 @@
                             </a>
                             @endcan
                             @can('ver.recepcion')
-                            <a href="{{ route('reception.index') }}"
+                            <a href="{{ route('reception.index') }}" title="Registrar la mercadería que llega a bodega"
                                 class="nav-row {{ request()->routeIs('reception.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -393,44 +394,35 @@
                                 class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">02</span>
                             <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Almacenamiento</p>
                         </div>
+                        <p class="sidebar-hint px-2 -mt-1 mb-2 pl-[36px] text-[11px] text-slate-500/80">Dónde y cuánto hay</p>
                         <div class="flow-rail pl-[27px] space-y-0.5">
-                            @can('ver.inventario')
-                            <a href="{{ route('inventory.index') }}"
-                                class="nav-row {{ request()->routeIs('inventory.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
-                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {{-- inventario incluye cuarentena y mermas --}}
+                            @canany(['ver.inventario', 'ver.cuarentena'])
+                            <a href="{{ auth()->user()->can('ver.inventario') ? route('inventory.index') : route('quarantine.index') }}" title="Stock por producto y lote, cuarentena, mermas y etiquetas QR"
+                                class="nav-row {{ request()->routeIs('inventory.*') || request()->routeIs('quarantine.*') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
+                                <div class="flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                                         d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
                                     </path>
                                 </svg>
-                                Inventario
+                                    Inventario
+                                </div>
+                                @if ($sidebarCuarentenaCount > 0)
+                                    <span class="font-mono-das text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30" title="Lotes en cuarentena">
+                                        {{ $sidebarCuarentenaCount }}
+                                    </span>
+                                @endif
                             </a>
-                            @endcan
+                            @endcanany
                             @can('ver.distribucion')
-                            <a href="{{ route('distribution.index') }}"
+                            <a href="{{ route('distribution.index') }}" title="Mapa de bodega: pasillos, estanterías, niveles y posiciones"
                                 class="nav-row {{ request()->routeIs('distribution.*') || request()->routeIs('shelf.*') || request()->routeIs('aisle.*') || request()->routeIs('level.*') || request()->routeIs('position.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                                         d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                                 </svg>
                                 Distribución
-                            </a>
-                            @endcan
-                            @can('ver.cuarentena')
-                            <a href="{{ route('quarantine.index') }}"
-                                class="nav-row {{ request()->routeIs('quarantine.*') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
-                                <div class="flex items-center gap-2.5">
-                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                        </path>
-                                    </svg>
-                                    Cuarentena
-                                </div>
-                                @if ($sidebarCuarentenaCount > 0)
-                                    <span class="font-mono-das text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30" title="Lotes retenidos en cuarentena">
-                                        {{ $sidebarCuarentenaCount }}
-                                    </span>
-                                @endif
                             </a>
                             @endcan
                         </div>
@@ -447,10 +439,11 @@
                                 class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">03</span>
                             <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Salida</p>
                         </div>
+                        <p class="sidebar-hint px-2 -mt-1 mb-2 pl-[36px] text-[11px] text-slate-500/80">Pedidos y despachos a la red</p>
                         <div class="flow-rail pl-[27px] space-y-0.5">
                             <div class="flex flex-col space-y-0.5">
                                 @can('ver.despacho')
-                                <a href="{{ route('dispatch.index') }}"
+                                <a href="{{ route('dispatch.index') }}" title="Despachar medicamentos e insumos a los centros de salud"
                                     class="nav-row {{ request()->routeIs('dispatch.index') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
                                     <div class="flex items-center gap-2.5">
                                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
@@ -473,7 +466,7 @@
                                         <div class="absolute left-3.5 top-0 bottom-4 w-px bg-slate-700/60"></div>
                                         <div class="absolute left-3.5 top-1/2 w-2.5 h-px bg-slate-700/60"></div>
 
-                                        <a href="{{ route('controlled_dispatch.index') }}"
+                                        <a href="{{ route('controlled_dispatch.index') }}" title="Despachar estupefacientes a CESFAM"
                                             class="nav-row {{ request()->routeIs('controlled_dispatch.*') ? 'is-active' : '' }} flex items-center justify-between px-3 py-1.5 rounded-md text-[12px]">
                                             <div class="flex items-center gap-2.5">
                                                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor"
@@ -495,7 +488,7 @@
                             </div>
 
                             @can('ver.solicitudes')
-                                <a href="{{ route('requests.index') }}"
+                                <a href="{{ route('requests.index') }}" title="Pedidos de CECOSF, postas, SAR y otros establecimientos"
                                     class="nav-row {{ request()->routeIs('requests.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -507,14 +500,14 @@
                             @endcan
 
                             @can('ver.solicitudes_cesfam')
-                                <a href="{{ route('requests.cesfam') }}"
+                                <a href="{{ route('requests.cesfam') }}" title="Pedidos de los CESFAM, incluidos controlados"
                                     class="nav-row {{ request()->routeIs('requests.cesfam') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011 1h2a1 1 0 011 1v5m-4 0h4">
                                         </path>
                                     </svg>
-                                    Solicitudes Cesfam
+                                    Solicitudes CESFAM
                                 </a>
                             @endcan
                         </div>
@@ -528,9 +521,10 @@
                                 class="step-badge font-mono-das text-[10px] w-5 h-5 rounded flex items-center justify-center bg-slate-800 text-slate-400">04</span>
                             <p class="text-[11.5px] font-semibold tracking-wide uppercase text-slate-500">Control</p>
                         </div>
+                        <p class="sidebar-hint px-2 -mt-1 mb-2 pl-[36px] text-[11px] text-slate-500/80">Seguimiento e informes</p>
                         <div class="flow-rail pl-[27px] space-y-0.5">
                             @can('ver.trazabilidad')
-                            <a href="{{ route('traceability.index') }}"
+                            <a href="{{ route('traceability.index') }}" title="Historial de movimientos de cada lote"
                                 class="nav-row {{ request()->routeIs('traceability.*') || request()->routeIs('trazabilidad.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -541,7 +535,7 @@
                             </a>
                             @endcan
                             @can('ver.reportes')
-                            <a href="{{ route('reports.index') }}"
+                            <a href="{{ route('reports.index') }}" title="Stock valorizado exportable a Excel y PDF"
                                 class="nav-row {{ request()->routeIs('reports.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -562,7 +556,7 @@
                             <p class="text-[11.5px] font-semibold tracking-wide uppercase px-2 mb-2 text-slate-500">
                                 Configuración</p>
                             <div class="space-y-0.5">
-                                <a href="{{ route('users.index') }}"
+                                <a href="{{ route('users.index') }}" title="Cuentas, roles y permisos por vista"
                                     class="nav-row {{ request()->routeIs('users.*') || request()->routeIs('roles.*') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
                                     <div class="flex items-center gap-2.5">
                                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -779,11 +773,12 @@
                         <!-- encabezado de la pagina, con su titulo y sus botones -->
 
                         @if (View::hasSection('title') || View::hasSection('actions'))
+                            {{-- en pantallas medianas el titulo va arriba de los botones --}}
                             <div
-                                class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-5">
-                                <div>
+                                class="flex flex-col xl:flex-row xl:items-end justify-between gap-4 border-b border-slate-200 pb-5">
+                                <div class="min-w-0 xl:max-w-[50%]">
                                     @hasSection('title')
-                                        <h1 class="text-[22px] font-bold text-slate-800 tracking-tight leading-none">
+                                        <h1 class="text-[22px] font-bold text-slate-800 tracking-tight leading-tight">
                                             @yield('title')</h1>
                                     @endif
                                     @hasSection('subtitle')
@@ -792,12 +787,13 @@
                                 </div>
 
                                 @hasSection('actions')
-                                    <div class="flex items-center gap-3 shrink-0">
+                                    <div class="flex flex-wrap items-center gap-2.5 w-full xl:w-auto xl:justify-end">
                                         @yield('actions')
                                     </div>
                                 @endif
                             </div>
                         @endif
+
 
 
                         <div class="w-full">

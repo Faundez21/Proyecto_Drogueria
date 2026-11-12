@@ -452,14 +452,14 @@ class InventoryController extends Controller
         $cambioEstado = $estadoAnterior !== $inventory->estado;
 
         $ubicTxt = [];
-        if (!empty($inventory->pasillo) && $inventory->pasillo !== 'P.A') $ubicTxt[] = "Pasillo {$inventory->pasillo}";
+        if (!empty($inventory->pasillo) && $inventory->pasillo !== 'P.A') $ubicTxt[] = (preg_match('/^pasillo\s/i', (string) $inventory->pasillo) ? $inventory->pasillo : "Pasillo {$inventory->pasillo}");
         if (!empty($inventory->estante) && $inventory->estante !== 'P.A') $ubicTxt[] = "Estante {$inventory->estante}";
         if (!empty($inventory->nivel)) $ubicTxt[] = "Nivel {$inventory->nivel}";
         if (!empty($inventory->posicion)) $ubicTxt[] = "Posición {$inventory->posicion}";
         $detUbic = !empty($ubicTxt) ? implode(' · ', $ubicTxt) : 'Sin asignar (P.A)';
 
         $ubicAntTxt = [];
-        if (!empty($pasilloAnterior) && $pasilloAnterior !== 'P.A') $ubicAntTxt[] = "Pasillo {$pasilloAnterior}";
+        if (!empty($pasilloAnterior) && $pasilloAnterior !== 'P.A') $ubicAntTxt[] = (preg_match('/^pasillo\s/i', (string) $pasilloAnterior) ? $pasilloAnterior : "Pasillo {$pasilloAnterior}");
         if (!empty($estanteAnterior) && $estanteAnterior !== 'P.A') $ubicAntTxt[] = "Estante {$estanteAnterior}";
         if (!empty($nivelAnterior)) $ubicAntTxt[] = "Nivel {$nivelAnterior}";
         if (!empty($posicionAnterior)) $ubicAntTxt[] = "Posición {$posicionAnterior}";

@@ -1,19 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Inventario de Droguería')
-@section('subtitle', 'Gestión centralizada de productos, lotes y ubicaciones físicas.')
+@section('title', request('ver') === 'mermas' ? 'Inventario' : 'Inventario de Droguería')
+@section('subtitle', request('ver') === 'mermas' ? 'Lotes dados de baja: vencidos, dañados o descartados.' : 'Gestión centralizada de productos, lotes y ubicaciones físicas.')
 
 @section('actions')
     <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
-        <button type="button" onclick="openMerma()"
-            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-[13px] font-semibold hover:bg-rose-100 transition-all duration-200 shadow-sm hover:shadow cursor-pointer">
-            <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                </path>
-            </svg>
-            Ver Mermas
-        </button>
         @role('Administrador')
             <button type="button" onclick="openHistory()"
                 class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-[13px] font-semibold hover:bg-slate-50 hover:text-teal-700 transition-all duration-200 shadow-sm hover:shadow cursor-pointer">
@@ -24,21 +15,17 @@
                 Ver Historial
             </button>
         @endrole
+        {{-- sin carga desde excel en la pestana mermas --}}
+        @unless (request('ver') === 'mermas')
         <button type="button" onclick="openImport()"
             class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
             <svg class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
             </svg>
-            Carga Masiva
+            Cargar desde Excel
         </button>
-        <button type="button" onclick="openDeposit()"
-            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
-            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Ingreso Manual
-        </button>
+        @endunless
     </div>
 @endsection
 
@@ -52,24 +39,39 @@
             <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
-            <span class="font-medium text-slate-800">Inventario</span>
+            @php $vistaMermas = request('ver') === 'mermas'; @endphp
+            @if ($vistaMermas)
+                <span>Inventario</span>
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <span class="font-medium text-slate-800">Mermas</span>
+            @else
+                <span class="font-medium text-slate-800">Inventario</span>
+            @endif
         </div>
 
-        <!-- Contenedor principal tabla Inventario -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm flex flex-col">
+        <!-- pestanas por estado del lote -->
+        @include('inventory.partials.pestanas-estado', ['activa' => $vistaMermas ? 'mermas' : 'disponibles'])
+
+        <!-- tabla de inventario, oculta en mermas -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm flex flex-col {{ $vistaMermas ? 'hidden' : '' }}">
 
             <!-- Cabecera de la tabla y botón de filtros -->
-            <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
+            <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center flex-wrap gap-3">
                 <h3 class="text-[15px] font-bold text-slate-800">Directorio de Productos</h3>
-                <button type="button" id="toggle-filters-btn"
-                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                        </path>
-                    </svg>
-                    Filtros Avanzados
-                </button>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+                    @include('partials.busqueda-rapida', ['formulario' => 'filters-panel', 'placeholder' => 'Buscar producto o lote...'])
+                    <button type="button" id="toggle-filters-btn"
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                            </path>
+                        </svg>
+                        Más filtros
+                    </button>
+                </div>
             </div>
 
             @php
@@ -234,7 +236,7 @@
                 <table class="w-full text-left border-collapse min-w-[900px]">
                     <thead>
                         <tr class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
-                            <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
+                            <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Ver lotes</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Producto Principal</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Programa</th>
@@ -792,206 +794,6 @@
             </div>
         </div>
 
-        <!-- Modal: ingreso manual -->
-        <div id="DepositModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-0 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-bold text-white tracking-wide">Ingreso Manual Directo de Producto</h2>
-                            <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro individual con trazabilidad inmediata en bodega.</p>
-                        </div>
-                    </div>
-                    <button type="button" onclick="closeDeposit()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-
-                <div class="p-4 sm:p-6 sm:p-8 overflow-y-auto bg-slate-50/50 flex-1">
-                    @if(isset($errors) && $errors->any() && session('open_modal') !== 'import')
-                        <div class="mb-6 bg-rose-50 border-l-4 border-rose-600 border border-rose-200 rounded-xl p-4 shadow-sm">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                <div>
-                                    <h4 class="text-[13px] font-extrabold text-rose-900">No se pudo completar el ingreso manual:</h4>
-                                    <ul class="mt-1 list-disc list-inside text-[12px] text-rose-700 font-medium space-y-0.5">
-                                        @foreach($errors->all() as $err)
-                                            <li>{{ $err }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <datalist id="catalogoProductosManual">
-                        @foreach($productosLista ?? [] as $prodItem)
-                            <option value="{{ $prodItem }}"></option>
-                        @endforeach
-                    </datalist>
-
-                    <datalist id="catalogoProveedoresRutManual">
-                        @foreach($proveedoresActivos ?? [] as $provItem)
-                            <option value="{{ $provItem->rut }}">{{ $provItem->name }}</option>
-                        @endforeach
-                    </datalist>
-
-                    <datalist id="catalogoProveedoresNombreManual">
-                        @foreach($proveedoresActivos ?? [] as $provItem)
-                            <option value="{{ $provItem->name }}">{{ $provItem->rut }}</option>
-                        @endforeach
-                    </datalist>
-
-                    <form action="{{ Route::has('inventory.store') ? route('inventory.store') : '#' }}" method="POST" id="manualDepositForm" novalidate onsubmit="return validateIngresoDirecto(event)">
-                        @csrf
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-                            <div class="sm:col-span-2">
-                                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-1">
-                                    <span class="w-5 h-5 rounded-full bg-teal-600 text-white text-[11px] font-bold flex items-center justify-center">1</span>
-                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Datos del Documento y Proveedor</h4>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">N° Correlativo Interno</label>
-                                <input type="number" min="1" step="1" name="correlativo_interno" value="{{ old('correlativo_interno') }}" placeholder="Autogenerado si se deja vacío" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Fecha Recepción <span class="text-rose-500">*</span></label>
-                                <input type="date" name="fecha_recepcion" required value="{{ old('fecha_recepcion', date('Y-m-d')) }}" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Tipo Documento <span class="text-rose-500">*</span></label>
-                                <select name="tipo_documento" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="" disabled {{ old('tipo_documento') ? '' : 'selected' }}>Seleccione...</option>
-                                    <option value="Factura Electrónica" {{ old('tipo_documento') == 'Factura Electrónica' ? 'selected' : '' }}>Factura Electrónica</option>
-                                    <option value="Factura" {{ old('tipo_documento') == 'Factura' ? 'selected' : '' }}>Factura</option>
-                                    <option value="Guía de Despacho" {{ old('tipo_documento') == 'Guía de Despacho' ? 'selected' : '' }}>Guía de Despacho</option>
-                                    <option value="Orden de Compra" {{ old('tipo_documento') == 'Orden de Compra' ? 'selected' : '' }}>Orden de Compra</option>
-                                    <option value="Acta de Recepción" {{ old('tipo_documento') == 'Acta de Recepción' ? 'selected' : '' }}>Acta de Recepción / Traspaso</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">N° Documento <span class="text-rose-500">*</span></label>
-                                <input type="text" name="numero_documento" value="{{ old('numero_documento') }}" placeholder="Ej. 104590" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">RUT Proveedor</label>
-                                <input type="text" id="manualRutProveedor" name="rut_proveedor" list="catalogoProveedoresRutManual" oninput="syncManualProvider('rut', this.value)" value="{{ old('rut_proveedor') }}" placeholder="Ej. 61.608.700-2" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Razón Social Proveedor / Origen</label>
-                                <input type="text" id="manualRazonSocial" name="razon_social" list="catalogoProveedoresNombreManual" oninput="syncManualProvider('name', this.value)" value="{{ old('razon_social') }}" placeholder="Ej. CENABAST / Laboratorio Chile" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                            </div>
-
-                            <div class="sm:col-span-2 mt-3">
-                                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-1">
-                                    <span class="w-5 h-5 rounded-full bg-teal-600 text-white text-[11px] font-bold flex items-center justify-center">2</span>
-                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Detalle Técnico del Producto y Ubicación</h4>
-                                </div>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Producto / Principio Activo <span class="text-rose-500">*</span></label>
-                                <input type="text" name="producto" list="catalogoProductosManual" value="{{ old('producto') }}" placeholder="Escriba o seleccione del catálogo (Ej. PARACETAMOL 500MG COMPRIMIDOS)" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Categoría <span class="text-rose-500">*</span></label>
-                                <select name="categoria" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="" disabled {{ old('categoria') ? '' : 'selected' }}>Seleccionar...</option>
-                                    @foreach ($categoriasLista ?? [] as $catOpt)
-                                        <option value="{{ $catOpt }}" {{ old('categoria') == $catOpt ? 'selected' : '' }}>{{ $catOpt }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Estado de Ingreso <span class="text-rose-500">*</span></label>
-                                <select name="estado" id="manualEstadoSelect" onchange="toggleManualEstadoHelp(this.value)" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-semibold text-slate-800">
-                                    <option value="Disponible" {{ old('estado', 'Disponible') == 'Disponible' ? 'selected' : '' }}>Disponible (Visible en Inventario Principal)</option>
-                                    <option value="Cuarentena" {{ old('estado') == 'Cuarentena' ? 'selected' : '' }}>En Cuarentena (Enviar a Revisión Técnica)</option>
-                                </select>
-                                <p id="manualEstadoHelpText" class="hidden text-[11px] text-amber-700 font-semibold mt-1">
-                                    Nota: Los lotes en Cuarentena se gestionan en la vista "Cuarentena" hasta su liberación.
-                                </p>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Pasillo Ubicación</label>
-                                <select name="pasillo" id="manual_pasillo" onchange="onManualUbicacionChange('pasillo')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Pasillo...</option>
-                                    @foreach ($pasillosLista ?? [] as $pasillo)
-                                        <option value="{{ $pasillo }}" {{ old('pasillo') == $pasillo ? 'selected' : '' }}>{{ $pasillo }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Estante Ubicación</label>
-                                <select name="estante" id="manual_estante" onchange="onManualUbicacionChange('estante')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Estante...</option>
-                                    @foreach ($estantesLista ?? [] as $estante)
-                                        <option value="{{ $estante }}" {{ old('estante') == $estante ? 'selected' : '' }}>{{ $estante }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Nivel</label>
-                                <select name="nivel" id="manual_nivel" onchange="onManualUbicacionChange('nivel')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Nivel...</option>
-                                    @foreach ($nivelesLista ?? [] as $nivel)
-                                        <option value="{{ $nivel }}" {{ old('nivel') == $nivel ? 'selected' : '' }}>{{ $nivel }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Posición</label>
-                                <select name="posicion" id="manual_posicion" onchange="onManualUbicacionChange('posicion')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Posición...</option>
-                                    @foreach ($posicionesLista ?? [] as $posicion)
-                                        <option value="{{ $posicion }}" {{ old('posicion') == $posicion ? 'selected' : '' }}>{{ $posicion }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa</label>
-                                <input type="text" name="programa" list="programasManualList" value="{{ old('programa') }}" placeholder="Programa de salud" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                                <datalist id="programasManualList">
-                                    @foreach($programasLista ?? [] as $progOpt)
-                                        <option value="{{ $progOpt }}"></option>
-                                    @endforeach
-                                </datalist>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Lote / Serie</label>
-                                <input type="text" name="lote" value="{{ old('lote') }}" placeholder="Ej. L-4893 (o S/L)" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono font-bold" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Fecha Vencimiento</label>
-                                <input type="date" name="fecha_vencimiento" value="{{ old('fecha_vencimiento') }}" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Cantidad a Ingresar <span class="text-rose-500">*</span></label>
-                                <input type="number" name="cantidad" value="{{ old('cantidad') }}" placeholder="Ej. 500" min="1" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Valor Neto Unitario ($ CLP)</label>
-                                <div class="relative">
-                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-slate-400">$</span>
-                                    <input type="number" name="valor_neto_unitario" value="{{ old('valor_neto_unitario') ? (int) old('valor_neto_unitario') : '' }}" placeholder="0" min="0" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full rounded-lg border border-slate-300 bg-white pl-8 pr-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800 font-mono-das" />
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl shrink-0">
-                    <button type="button" onclick="closeDeposit()" class="px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar</button>
-                    <button type="submit" id="manualDepositSubmitBtn" form="manualDepositForm" class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm text-[13px] font-bold cursor-pointer inline-flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span id="manualDepositSubmitText">Confirmar Ingreso</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <!-- Modal: etiqueta QR -->
         <style>
             @media print {
@@ -1188,8 +990,82 @@
         </div>
 
         <!-- Modal: ver mermas -->
-        <div id="mermaModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
+        @if ($vistaMermas)
+            @php
+                $mermasLista = collect($mermas ?? []);
+                $mermasUnidades = $mermasLista->sum(fn ($m) => (float) (data_get($m, 'cantidad') ?? 0));
+                $mermasValor = $mermasLista->sum(fn ($m) => ((float) (data_get($m, 'cantidad') ?? 0)) * ((float) (data_get($m, 'valor_neto_unitario') ?? 0)));
+            @endphp
+            <!-- tarjetas de resumen de mermas -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6 mb-6">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
+                <div class="absolute right-0 top-0 w-24 h-24 bg-rose-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                <div class="relative flex items-start justify-between">
+                    <div>
+                        <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">Lotes dados de baja</p>
+                        <h4 id="kpiMermaLotes" class="text-3xl font-extrabold text-slate-800 font-mono-das">{{ number_format($mermasLista->count(), 0, ',', '.') }}</h4>
+                        <p class="text-[11px] text-slate-400 mt-1.5 font-medium">Lotes en merma (según filtros)</p>
+                    </div>
+                    <div class="p-3 bg-rose-600 text-white rounded-xl shadow-md shadow-rose-200 shrink-0">
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
+                <div class="absolute right-0 top-0 w-24 h-24 bg-slate-100 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                <div class="relative flex items-start justify-between">
+                    <div>
+                        <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">Unidades dadas de baja</p>
+                        <h4 id="kpiMermaUnidades" class="text-3xl font-extrabold text-slate-800 font-mono-das">{{ number_format($mermasUnidades, 0, ',', '.') }}</h4>
+                        <p class="text-[11px] text-slate-400 mt-1.5 font-medium">Total de unidades en merma</p>
+                    </div>
+                    <div class="p-3 bg-slate-700 text-white rounded-xl shadow-md shadow-slate-200 shrink-0">
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
+                <div class="absolute right-0 top-0 w-24 h-24 bg-rose-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                <div class="relative flex items-start justify-between">
+                    <div>
+                        <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">Valor perdido</p>
+                        <h4 id="kpiMermaValor" class="text-3xl font-extrabold text-slate-800 font-mono-das">$ {{ number_format($mermasValor, 0, ',', '.') }}</h4>
+                        <p class="text-[11px] text-slate-400 mt-1.5 font-medium">Valorización neta de lo dado de baja</p>
+                    </div>
+                    <div class="p-3 bg-rose-600 text-white rounded-xl shadow-md shadow-rose-200 shrink-0">
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                </div>
+            </div>
+            </div>
+        @endif
+
+        <div id="mermaModal" class="{{ $vistaMermas ? 'merma-en-pagina' : 'hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all' }}">
+            <div class="bg-white rounded-2xl border border-slate-200 w-full flex flex-col overflow-hidden {{ $vistaMermas ? 'shadow-sm' : 'shadow-2xl max-w-6xl max-h-[92vh] my-auto' }}">
+                @if ($vistaMermas)
+                <!-- cabecera de mermas -->
+                <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white flex-wrap gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </div>
+                        <h3 class="text-[15px] font-bold text-slate-800">Lotes dados de baja</h3>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+                        <div class="relative w-full sm:w-72">
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <input type="search" id="mermaSearchInput" oninput="filterMermas()" placeholder="Buscar producto, lote o motivo..." aria-label="Buscar en mermas" autocomplete="off"
+                                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        </div>
+                        <button type="button" onclick="document.getElementById('mermaFiltrosAvanzados').classList.toggle('hidden')"
+                            class="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            Más filtros
+                        </button>
+                    </div>
+                </div>
+
+                @else
                 <div class="px-6 py-5 bg-rose-800 flex justify-between items-center shrink-0">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-xl bg-rose-700 border border-rose-600 flex items-center justify-center text-white">
@@ -1200,17 +1076,21 @@
                             <p class="text-[12px] text-rose-200 mt-0.5 font-medium">Listado histórico de medicamentos e insumos dados de baja.</p>
                         </div>
                     </div>
-                    <button type="button" onclick="closeMerma()" class="text-rose-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-lg cursor-pointer">
+                    <button type="button" onclick="closeMerma()" class="{{ $vistaMermas ? 'hidden' : '' }} text-rose-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-lg cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
+                @endif
+
                 <!-- filtros avanzados de mermas -->
-                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end z-20 shadow-inner shrink-0">
+                <div id="mermaFiltrosAvanzados" class="{{ $vistaMermas ? 'hidden' : '' }} px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end z-20 shadow-inner shrink-0">
+                    @unless ($vistaMermas)
                     <div class="flex-1 min-w-[200px]">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Buscar Texto</label>
                         <input type="text" id="mermaSearchInput" onkeyup="filterMermas()" placeholder="Producto, lote o motivo..." class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
                     </div>
+                    @endunless
                     <div class="w-full sm:w-auto">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Desde</label>
                         <input type="date" id="mermaDateFrom" onchange="filterMermas()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
@@ -1243,7 +1123,140 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto flex-1 max-h-[55vh] bg-white">
+                @if ($vistaMermas)
+                <!-- mermas agrupadas por producto -->
+                @php
+                    $mermasAgrupadas = collect($mermas ?? [])->groupBy(fn ($m) => data_get($m, 'product.nombre') ?? (data_get($m, 'producto') ?? 'Desconocido'));
+                @endphp
+                <div class="overflow-x-auto flex-1 bg-white">
+                    <table class="w-full text-left text-sm whitespace-nowrap border-collapse min-w-[800px]">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-extrabold">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 w-14 text-center">Ver lotes</th>
+                                <th scope="col" class="px-6 py-4">Producto Principal</th>
+                                <th scope="col" class="px-6 py-4">Categoría</th>
+                                <th scope="col" class="px-6 py-4 text-center">Lotes dados de baja</th>
+                                <th scope="col" class="px-6 py-4 text-center">Unidades</th>
+                                <th scope="col" class="px-6 py-4 text-center">Valor perdido</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-[13px]" id="mermasTableBody">
+                            @forelse ($mermasAgrupadas as $nombreMerma => $lotesMerma)
+                                @php
+                                    $claveMerma = 'merma_' . md5($nombreMerma);
+                                    $unidadesGrupo = $lotesMerma->sum(fn ($m) => (float) (data_get($m, 'cantidad') ?? 0));
+                                    $valorGrupo = $lotesMerma->sum(fn ($m) => ((float) (data_get($m, 'cantidad') ?? 0)) * ((float) (data_get($m, 'valor_neto_unitario') ?? 0)));
+                                    $categoriaGrupo = data_get($lotesMerma->first(), 'categoria') ?? 'General';
+                                @endphp
+                                <tr class="merma-grupo product-master-row bg-white hover:bg-slate-50 transition-colors group cursor-pointer" data-merma-grupo="{{ $claveMerma }}" onclick="toggleLotes('{{ $claveMerma }}')">
+                                    <td class="px-6 py-4 text-center relative">
+                                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-rose-500 transition-colors"></div>
+                                        <span class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-rose-100 group-hover:text-rose-700 inline-flex items-center justify-center transition-all">
+                                            <svg class="w-4 h-4 transform transition-transform duration-300" id="arrow-{{ $claveMerma }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4"><span class="font-extrabold text-slate-800 text-[14px]">{{ $nombreMerma }}</span></td>
+                                    <td class="px-6 py-4"><span class="px-2.5 py-1 rounded bg-slate-100 text-slate-600 text-[11px] font-bold border border-slate-200">{{ $categoriaGrupo }}</span></td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="merma-grupo-lotes font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{{ $lotesMerma->count() }}</span>
+                                        <span class="text-slate-400 text-[11px] font-semibold uppercase">Lote(s)</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-rose-50 text-rose-800 border border-rose-200 shadow-sm">
+                                            <span class="merma-grupo-unidades">{{ number_format($unidadesGrupo, 0, ',', '.') }}</span> Unidades
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="merma-grupo-valor inline-flex items-center px-2 py-1 rounded-lg text-[12px] font-bold bg-white text-slate-700 border border-slate-200 font-mono-das">$ {{ number_format($valorGrupo, 0, ',', '.') }}</span>
+                                    </td>
+                                </tr>
+                                <tr id="lotes-{{ $claveMerma }}" class="lotes-subrow hidden bg-slate-50/80 shadow-inner">
+                                    <td colspan="6" class="p-0 border-b border-slate-300">
+                                        <div class="py-4 pr-6 pl-14">
+                                            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                                <div class="px-4 py-2 bg-slate-700 text-white">
+                                                    <span class="text-[10px] font-bold uppercase tracking-widest">Detalle de lotes dados de baja</span>
+                                                </div>
+                                                <div class="overflow-x-auto">
+                                                    <table class="w-full text-left text-xs whitespace-nowrap">
+                                                        <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 text-[10px] tracking-wider">
+                                                            <tr>
+                                                                <th class="px-4 py-3">Fecha baja</th>
+                                                                <th class="px-4 py-3">Lote</th>
+                                                                <th class="px-4 py-3">Responsable</th>
+                                                                <th class="px-4 py-3">Motivo</th>
+                                                                <th class="px-4 py-3 text-center">Cantidad</th>
+                                                                <th class="px-4 py-3 text-center">Valor</th>
+                                                                <th class="px-4 py-3 text-center">Acciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="divide-y divide-slate-100 text-slate-700">
+                                                            @foreach ($lotesMerma as $mItem)
+                                                                @php
+                                                                    $mObj = is_object($mItem) ? $mItem : (object) $mItem;
+                                                                    $rawDateMerma = data_get($mObj, 'updated_at') ?? data_get($mObj, 'created_at');
+                                                                    $fechaISO = '';
+                                                                    $fechaMerma = 'Sin Registro';
+                                                                    if ($rawDateMerma) {
+                                                                        try {
+                                                                            $cDate = \Carbon\Carbon::parse($rawDateMerma);
+                                                                            $fechaMerma = $cDate->format('d/m/Y H:i');
+                                                                            $fechaISO = $cDate->format('Y-m-d');
+                                                                        } catch (\Exception $e) {
+                                                                            $fechaMerma = 'Fecha Inválida';
+                                                                        }
+                                                                    }
+                                                                    $mStock = data_get($mObj, 'stock_total') ?? (data_get($mObj, 'cantidad') ?? 0);
+                                                                    $mLoteCodigo = data_get($mObj, 'lote') ?? 'S/L';
+                                                                    $mLoteId = data_get($mObj, 'id') ?? 0;
+                                                                    $uName = data_get($mObj, 'user.name') ?? data_get($mObj, 'usuario_nombre');
+                                                                    $uLast = data_get($mObj, 'user.last_name') ?? '';
+                                                                    $usuarioMerma = !empty($uName) ? trim($uName . ' ' . $uLast) : 'No registrado';
+                                                                    $mMotivo = data_get($mObj, 'motivo') ?? 'Sin motivo especificado';
+                                                                    $mValorUnitario = (float) (data_get($mObj, 'valor_neto_unitario') ?? 0);
+                                                                    $mValorTotal = ((float) $mStock) * $mValorUnitario;
+                                                                @endphp
+                                                                <tr class="merma-row hover:bg-slate-50 transition-colors" data-cantidad="{{ (float) $mStock }}" data-valor="{{ $mValorTotal }}" data-date="{{ $fechaISO }}" data-user="{{ $usuarioMerma }}">
+                                                                    <td class="px-4 py-3 text-slate-500 font-medium">{{ $fechaMerma }}<span class="searchable hidden">{{ $nombreMerma }}</span></td>
+                                                                    <td class="px-4 py-3 searchable"><span class="font-mono font-extrabold text-slate-800 text-[13px]">{{ $mLoteCodigo }}</span></td>
+                                                                    <td class="px-4 py-3 text-slate-700 font-semibold searchable">{{ $usuarioMerma }}</td>
+                                                                    <td class="px-4 py-3 italic text-rose-600 max-w-[220px] truncate searchable" title="{{ $mMotivo }}">{{ $mMotivo }}</td>
+                                                                    <td class="px-4 py-3 text-center"><span class="font-extrabold text-slate-800 text-[14px]">{{ number_format($mStock, 0, ',', '.') }}</span></td>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[12px] font-bold bg-rose-50 text-rose-800 border border-rose-200 font-mono-das">- $ {{ number_format($mValorTotal, 0, ',', '.') }}</span>
+                                                                    </td>
+                                                                    <td class="px-4 py-3 text-center">
+                                                                        <button type="button"
+                                                                            onclick="event.stopPropagation(); openEditLote('{{ e($mLoteId) }}', '{{ e($mLoteCodigo) }}', '{{ e($nombreMerma) }}', 'Merma', '{{ e($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}', '{{ e($mObj->categoria ?? 'General') }}', '{{ e($mObj->programa ?? '') }}', '{{ $mValorUnitario }}', '{{ $mStock }}', '{{ e(data_get($mObj, 'pasillo') ?? '') }}', '{{ e(data_get($mObj, 'estante') ?? '') }}', '{{ e(data_get($mObj, 'nivel') ?? '') }}', '{{ e(data_get($mObj, 'posicion') ?? '') }}')"
+                                                                            class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center justify-center" title="Editar Estado">
+                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr id="emptyMermasRow">
+                                    <td colspan="6" class="px-6 py-16 text-center">
+                                        <p class="text-[15px] font-bold text-slate-600">No hay lotes dados de baja</p>
+                                        <p class="text-[13px] text-slate-500 mt-1">Cuando un lote pase a Merma aparecerá aquí.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                            <tr id="filteredEmptyRow" class="hidden">
+                                <td colspan="6" class="px-6 py-12 text-center text-slate-400 font-medium">No se encontraron lotes con los filtros aplicados.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                @else
+                <div class="overflow-x-auto flex-1 bg-white {{ $vistaMermas ? '' : 'max-h-[55vh]' }}">
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
                         <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm z-10">
                             <tr>
@@ -1291,7 +1304,7 @@
                                     $mValorUnitario = (float) (data_get($mObj, 'valor_neto_unitario') ?? 0);
                                     $mValorTotal = ((float) $mStock) * $mValorUnitario;
                                 @endphp
-                                <tr class="merma-row hover:bg-rose-50/40 transition-colors" data-valor="{{ $mValorTotal }}" data-date="{{ $fechaISO }}" data-user="{{ $usuarioMerma }}">
+                                <tr class="merma-row hover:bg-rose-50/40 transition-colors" data-cantidad="{{ (float) $mStock }}" data-valor="{{ $mValorTotal }}" data-date="{{ $fechaISO }}" data-user="{{ $usuarioMerma }}">
                                     <td class="px-6 py-3.5 text-slate-500 font-medium">{{ $fechaMerma }}</td>
                                     <td class="px-6 py-3.5 font-bold text-slate-800 searchable">{{ $mNombre }}</td>
                                     <td class="px-6 py-3.5 text-center searchable">
@@ -1334,6 +1347,7 @@
                         </tbody>
                     </table>
                 </div>
+                @endif
 
                 <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center shrink-0">
                     <div class="text-[13px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-3">
@@ -1345,7 +1359,7 @@
                             </span>
                         </span>
                     </div>
-                    <button type="button" onclick="closeMerma()" class="px-6 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
+                    <button type="button" onclick="closeMerma()" class="{{ $vistaMermas ? 'hidden' : '' }} px-6 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
                         Cerrar Ventana
                     </button>
                 </div>
@@ -1754,11 +1768,12 @@
         }
 
         function openDeposit() {
-            document.getElementById('DepositModal').classList.remove('hidden');
+            // ingreso manual retirado
+            document.getElementById('DepositModal')?.classList.remove('hidden');
         }
 
         function closeDeposit() {
-            document.getElementById('DepositModal').classList.add('hidden');
+            document.getElementById('DepositModal')?.classList.add('hidden');
         }
 
         // Lógica filtros avanzados merma
@@ -1767,9 +1782,18 @@
             filterMermas();
         }
 
+        // en la pestana mermas la lista no se cierra
+        const VISTA_MERMAS = @json($vistaMermas);
+
         function closeMerma() {
+            if (VISTA_MERMAS) return;
             document.getElementById('mermaModal').classList.add('hidden');
         }
+
+        // calcula totales de mermas al cargar
+        document.addEventListener('DOMContentLoaded', function () {
+            if (VISTA_MERMAS) filterMermas();
+        });
 
         function filterMermas() {
             const search = normalizeText(document.getElementById('mermaSearchInput')?.value || '');
@@ -1783,6 +1807,7 @@
 
             let visibleCount = 0;
             let totalValue = 0;
+            let totalUnidadesMerma = 0;
 
             rows.forEach(row => {
                 // Validación de la búsqueda
@@ -1810,6 +1835,7 @@
                     row.style.display = '';
                     visibleCount++;
                     totalValue += parseFloat(row.getAttribute('data-valor')) || 0;
+                    totalUnidadesMerma += parseFloat(row.getAttribute('data-cantidad')) || 0;
                 } else {
                     row.style.display = 'none';
                 }
@@ -1826,6 +1852,34 @@
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             });
+
+            // muestra solo los lotes que coinciden con el filtro
+            const hayFiltro = search !== '' || dateFrom !== '' || dateTo !== '' || userFilter !== '';
+            document.querySelectorAll('.merma-grupo').forEach(grupo => {
+                const clave = grupo.dataset.mermaGrupo;
+                const detalle = document.getElementById('lotes-' + clave);
+                const visibles = [...(detalle?.querySelectorAll('.merma-row') || [])].filter(r => r.style.display !== 'none');
+                grupo.style.display = visibles.length ? '' : 'none';
+                if (detalle) {
+                    if (!visibles.length) detalle.style.display = 'none';
+                    else detalle.style.display = '';
+                    // abre los productos con coincidencias
+                    if (hayFiltro && visibles.length && detalle.classList.contains('hidden')) toggleLotes(clave);
+                }
+                const suma = (attr) => visibles.reduce((t, r) => t + (parseFloat(r.getAttribute(attr)) || 0), 0);
+                grupo.querySelector('.merma-grupo-lotes').textContent = visibles.length;
+                grupo.querySelector('.merma-grupo-unidades').textContent = Math.round(suma('data-cantidad')).toLocaleString('es-CL');
+                grupo.querySelector('.merma-grupo-valor').textContent = '$ ' + Math.round(suma('data-valor')).toLocaleString('es-CL');
+            });
+
+            // tarjetas de mermas
+            const fmt = n => Math.round(n).toLocaleString('es-CL');
+            const kLotes = document.getElementById('kpiMermaLotes');
+            if (kLotes) {
+                kLotes.textContent = fmt(visibleCount);
+                document.getElementById('kpiMermaUnidades').textContent = fmt(totalUnidadesMerma);
+                document.getElementById('kpiMermaValor').textContent = '$ ' + fmt(totalValue);
+            }
         }
 
         function clearMermaFilters() {

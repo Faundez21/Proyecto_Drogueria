@@ -1241,3 +1241,18 @@ html.dark select option {
 
 
 
+/* oculta el texto de ejemplo de los select en la lista desplegable */
+html.dark select option[value=""]:disabled {
+    display: none;
+}
+
+/* opciones desactivadas en gris legible */
+html.dark select option:disabled {
+    color: #94A3B8 !important;
+}
+
+/* titulos de grupo dentro de la lista */
+html.dark select optgroup {
+    background-color: #0F172A;
+    color: #CBD5E1;
+}
