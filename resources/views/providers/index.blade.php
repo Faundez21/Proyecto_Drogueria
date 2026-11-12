@@ -18,6 +18,14 @@
     <div class="space-y-6">
 
         <!-- Ruta de navegación -->
+        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
+            <span class="font-mono-das text-slate-400 font-semibold">01</span>
+            <span>Abastecimiento</span>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <span class="font-medium text-slate-800">Proveedores</span>
+        </div>
 
         <!-- Tarjetas KPIs uniformes -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">

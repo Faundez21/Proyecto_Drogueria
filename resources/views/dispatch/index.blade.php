@@ -4,7 +4,7 @@
 
 @section('actions')
     <button type="button" onclick="openBandeja()"
-        class="das-btn das-btn-secondary">
+        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
@@ -19,6 +19,15 @@
         $totalActivas = collect($solicitudes)->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])->count();
         $totalMias = isset($misSolicitudesAsignadas) ? count($misSolicitudesAsignadas) : 0;
     @endphp
+    <!-- migas de pan -->
+    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
+        <span class="text-slate-400 font-semibold">03</span>
+        <span>Salida</span>
+        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+        <span class="font-semibold text-slate-800">Despacho</span>
+    </div>
 
     <!-- notificaciones de alerta -->
     @if (session('error'))
@@ -40,51 +49,110 @@
         </div>
     @endif
 
-    <!-- Solicitudes asignadas al usuario: una fila compacta con un botón "Cargar" por solicitud -->
+    <!-- Solicitudes asignadas al usuario logueado -->
     @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
-        <div class="mb-4 flex flex-wrap items-center gap-2 px-3 py-2.5 bg-teal-50/70 border border-teal-200 rounded-xl">
-            <span class="text-[12.5px] font-semibold text-teal-900 mr-1">
-                Asignadas a usted ({{ count($misSolicitudesAsignadas) }}):
-            </span>
-            @foreach ($misSolicitudesAsignadas as $miSol)
-                @php
-                    $esCesfamMiSol = \App\Services\InventoryService::esCesfam($miSol->establecimiento);
-                @endphp
-                <span class="das-chip"
-                    title="{{ $miSol->establecimiento }} · {{ $esCesfamMiSol ? 'CESFAM' : 'Establecimiento' }} · {{ $miSol->estado }} · {{ $miSol->items->count() }} producto(s) · {{ \Carbon\Carbon::parse($miSol->fecha_solicitud)->format('d/m/Y') }}">
-                    <span class="font-mono">{{ $miSol->numero_solicitud }}</span>
-                    <span class="font-medium max-w-[220px] truncate">{{ $miSol->establecimiento }}</span>
-                    <button type="button" onclick="usarSolicitud({{ $miSol->id }})">Cargar</button>
-                </span>
-            @endforeach
-            <button type="button" onclick="openSolicitudes('mias')"
-                class="ml-auto text-[12.5px] font-semibold text-teal-800 hover:underline cursor-pointer">
-                Ver detalle de mis asignadas
-            </button>
+        <div class="mb-6 bg-gradient-to-r from-teal-50 via-white to-indigo-50 border border-teal-200 rounded-2xl p-4 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3 class="text-[13.5px] font-extrabold text-slate-800">
+                            Tiene {{ count($misSolicitudesAsignadas) }} solicitud(es) asignada(s) para despachar
+                        </h3>
+                        <p class="text-[11.5px] text-slate-500">
+                            Haga clic en "Cargar" para preparar el despacho automáticamente o revise el detalle en "Ver Solicitudes".
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="openSolicitudes('mias')"
+                    class="px-3.5 py-2 rounded-xl text-[12px] font-bold bg-white hover:bg-teal-50 text-teal-700 border border-teal-200 shadow-sm transition-colors cursor-pointer shrink-0">
+                    Ver mis asignadas
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                @foreach ($misSolicitudesAsignadas as $miSol)
+                    @php
+                        $esCesfamMiSol = \App\Services\InventoryService::esCesfam($miSol->establecimiento);
+                    @endphp
+                    <div class="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-mono font-extrabold text-[12px] text-slate-800">{{ $miSol->numero_solicitud }}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $esCesfamMiSol ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700' }}">
+                                    {{ $esCesfamMiSol ? 'CESFAM' : 'Establecimiento' }}
+                                </span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-indigo-100 text-indigo-700">
+                                    {{ $miSol->estado }}
+                                </span>
+                            </div>
+                            <p class="text-[12.5px] font-bold text-slate-800 truncate mt-0.5" title="{{ $miSol->establecimiento }}">
+                                {{ $miSol->establecimiento }}
+                            </p>
+                            <p class="text-[11px] text-slate-500">
+                                {{ $miSol->items->count() }} producto(s) · {{ \Carbon\Carbon::parse($miSol->fecha_solicitud)->format('d/m/Y') }}
+                            </p>
+                        </div>
+                        <button type="button" onclick="usarSolicitud({{ $miSol->id }})"
+                            class="px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-sm transition-colors cursor-pointer shrink-0">
+                            Cargar
+                        </button>
+                    </div>
+                @endforeach
+            </div>
         </div>
     @endif
 
-    <!-- indicadores: una sola fila; cada uno abre su lista -->
-    <div class="das-kpi-strip">
-        <div class="das-kpi">
-            <span class="das-kpi-value">{{ collect($dispatches)->where('fecha_despacho', date('Y-m-d'))->count() }}</span>
-            <span class="das-kpi-label">Despachos hoy</span>
+    <!-- indicadores de rendimiento -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Despachos Hoy</p>
+                <h3 class="text-2xl font-black text-slate-800 mt-1">
+                    {{ collect($dispatches)->where('fecha_despacho', date('Y-m-d'))->count() }}</h3>
+            </div>
+            <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+            </div>
         </div>
-        <button type="button" onclick="openSolicitudes()" class="das-kpi {{ $totalActivas > 0 ? 'is-warn' : '' }}" title="Ver solicitudes por despachar">
-            <span class="das-kpi-value">{{ $totalActivas }}</span>
-            <span class="das-kpi-label">Solicitudes por despachar</span>
-        </button>
-        <button type="button" onclick="openBandeja()" class="das-kpi" title="Abrir bandeja e historial">
-            <span class="das-kpi-value">{{ collect($dispatches)->count() }}</span>
-            <span class="das-kpi-label">Guías en el historial</span>
-        </button>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Solicitudes por Despachar</p>
+                <h3 class="text-2xl font-black text-amber-600 mt-1">{{ $totalActivas }}</h3>
+            </div>
+            <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Histórico Total</p>
+                <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ collect($dispatches)->count() }}</h3>
+            </div>
+            <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+        </div>
     </div>
 
     <!-- formulario principal de despacho -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
 
         <!-- cabecera de la tarjeta del formulario -->
-        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 rounded-t-2xl flex flex-wrap items-center gap-4">
+        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex items-center gap-4">
             <div class="w-10 h-10 bg-[#0f968c]/10 text-[#0f968c] rounded-xl flex items-center justify-center shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -98,14 +166,14 @@
                     despachar y firmas.</p>
             </div>
             <button type="button" onclick="openSolicitudes()"
-                class="das-btn das-btn-secondary">
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4"></path>
                 </svg>
                 Ver Solicitudes
                 @if ($totalActivas > 0)
-                    <span class="das-btn-count">
+                    <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold bg-white/20 text-white">
                         {{ $totalActivas }}
                     </span>
                 @endif
@@ -138,17 +206,33 @@
                 </button>
             </div>
 
-            <!-- remitente (fijo) y correlativo en una sola línea -->
-            <div class="px-6 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100">
-                <p class="text-[12.5px] text-slate-600">
-                    <span class="font-semibold text-slate-800">Remitente:</span>
-                    I. Municipalidad de Talcahuano · Droguería Comunal Central · Blanco Encalada 450, Talcahuano
-                </p>
-                <label class="flex items-center gap-2 text-[12.5px] font-semibold text-slate-600">
-                    N° correlativo
+            <!-- seccion de datos del remitente y correlativo -->
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
+                <div>
+                    <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Datos del Remitente</h4>
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm">
+                        <p class="text-[14px] font-extrabold text-slate-800">I. Municipalidad de Talcahuano</p>
+                        <p class="text-[12px] font-bold text-teal-700">Droguería Comunal Central</p>
+                        <p class="text-[11px] font-medium text-slate-500 mt-1 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Blanco Encalada 450, Talcahuano
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col justify-center items-end">
+                    <h4
+                        class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 w-full md:w-auto text-left md:text-right">
+                        N° Correlativo Automático</h4>
                     <input type="text" name="correlativo_despacho" value="{{ $correlativo }}" readonly
-                        class="w-40 bg-slate-100 border border-slate-300 text-slate-800 text-[14px] font-mono font-bold rounded-lg text-center py-1.5 focus:outline-none cursor-default">
-                </label>
+                        class="w-full md:w-48 bg-slate-100 border border-slate-300 text-slate-800 text-lg font-mono font-extrabold rounded-xl text-center py-2 focus:outline-none cursor-default shadow-inner">
+                </div>
             </div>
 
             <!-- seccion de destino y logistica con clasificacion -->
@@ -362,79 +446,31 @@
                 </div>
             </div>
 
-            <!-- barra inferior fija: resumen del despacho + acciones (siempre visible al bajar) -->
-            <div class="das-summary mx-4 mb-4">
-                <div class="das-summary-items" id="das_resumen_items" aria-live="polite"></div>
-                <div class="flex flex-wrap items-center gap-2">
+            <!-- botones inferiores del formulario -->
+            <div
+                class="px-6 py-5 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3 rounded-b-2xl">
                 <button type="button" id="btn_limpiar_form"
-                    class="das-btn das-btn-ghost">
+                    class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 transition-colors text-center shadow-sm cursor-pointer">
                     Limpiar Formulario
                 </button>
                 <button type="submit" name="action" value="save_and_download"
-                    class="das-btn das-btn-secondary">
+                    class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-xl text-[13px] font-bold hover:bg-blue-700 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
                     Guardar y Descargar PDF
                 </button>
                 <button type="submit" name="action" value="save_only"
-                    class="das-btn das-btn-primary" title="Atajo: Ctrl + Enter">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="w-full sm:w-auto px-6 py-2.5 bg-slate-800 text-white rounded-xl text-[13px] font-bold hover:bg-slate-900 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     Confirmar Despacho y Registrarlo
                 </button>
             </div>
-            </div>
         </form>
     </div>
-
-    <!-- resumen en vivo de la barra inferior + atajo Ctrl+Enter -->
-    <script>
-        (function () {
-            const form = document.getElementById('despachoForm');
-            const salida = document.getElementById('das_resumen_items');
-            if (!form || !salida) return;
-            const esc = (t) => String(t).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]);
-            const visible = (el) => el && el.offsetParent !== null;
-            function destino() {
-                const interno = document.getElementById('establecimiento_interno');
-                const externo = document.getElementById('establecimiento_externo');
-                if (visible(interno) && interno.value) return interno.options[interno.selectedIndex]?.text || interno.value;
-                if (visible(externo) && externo.value) return externo.value;
-                return '';
-            }
-            function firmaLista(pad, inputId) {
-                const input = document.getElementById(inputId);
-                return !!((pad && !pad.isEmpty()) || (input && input.value));
-            }
-            function render() {
-                const productos = [...form.querySelectorAll('select[name="productos[]"]')].filter(s => s.value).length;
-                const unidades = [...form.querySelectorAll('input[name="cantidades[]"]')].reduce((a, i) => a + (parseInt(i.value) || 0), 0);
-                const d = destino().trim();
-                const fd = firmaLista(typeof signatureDespacha !== 'undefined' ? signatureDespacha : null, 'firma_despacha_input');
-                const fr = firmaLista(typeof signatureRecibe !== 'undefined' ? signatureRecibe : null, 'firma_recibe_input');
-                const recibeOpcional = typeof esModoTraspasoInterno === 'function' && esModoTraspasoInterno();
-                salida.innerHTML =
-                    `<span class="${d ? 'is-done' : 'is-pending'}">Destino: <b>${d ? esc(d) : 'sin elegir'}</b></span>`
-                    + `<span>Productos: <b>${productos}</b></span>`
-                    + `<span>Unidades: <b>${unidades.toLocaleString('es-CL')}</b></span>`
-                    + `<span class="${fd ? 'is-done' : 'is-pending'}">Firma despacha: <b>${fd ? 'lista' : 'pendiente'}</b></span>`
-                    + `<span class="${fr ? 'is-done' : (recibeOpcional ? '' : 'is-pending')}">Firma recibe: <b>${fr ? 'lista' : (recibeOpcional ? 'opcional' : 'pendiente')}</b></span>`;
-            }
-            ['input', 'change'].forEach(ev => form.addEventListener(ev, render));
-            form.addEventListener('pointerup', () => setTimeout(render, 60));
-            setInterval(render, 1500); // también refleja lo que se carga desde una solicitud o por FEFO
-            document.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                    const btn = form.querySelector('button[type="submit"][value="save_only"]');
-                    if (btn) { e.preventDefault(); btn.click(); }
-                }
-            });
-            render();
-        })();
-    </script>
 
     <!-- plantilla oculta para generar nuevas filas de productos -->
     <template id="rowTemplate">
