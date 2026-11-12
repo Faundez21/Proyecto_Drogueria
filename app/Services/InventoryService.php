@@ -1103,20 +1103,9 @@ class InventoryService
                 continue;
             }
 
-            // Si ambos tienen posición o se especificó posición, comparamos posición
-            if ($pos !== '') {
-                if ($candPos !== '' && mb_strtolower($candPos) === mb_strtolower($pos)) {
-                    return $cand;
-                }
-                // Si el lote existente ocupaba todo el nivel sin especificar posición
-                if ($candPos === '') {
-                    return $cand;
-                }
-            } else {
-                // Si se intenta asignar un nivel sin posición y el nivel ya tiene un ocupante sin posición
-                if ($candPos === '') {
-                    return $cand;
-                }
+            // solo hay conflicto si otro lote esta en la misma posicion
+            if ($pos !== '' && $candPos !== '' && mb_strtolower($candPos) === mb_strtolower($pos)) {
+                return $cand;
             }
         }
 

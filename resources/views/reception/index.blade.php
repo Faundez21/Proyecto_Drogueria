@@ -126,90 +126,20 @@
                         <div class="flex items-center gap-2">
                             <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                             <div>
-                                <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">3. Detalle de Producto(s) (Medicamentos, Insumos y Estupefacientes)</h3>
-                                <p class="text-[11.5px] text-slate-500">Seleccione el grupo o agregue filas directamente clasificadas por tipo de producto.</p>
+                                <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">3. Productos recibidos</h3>
+                                <p class="text-[11.5px] text-slate-500">Agrega una fila por cada producto y lote que llegó.</p>
                             </div>
                         </div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <button type="button" onclick="agregarFilaPorGrupo('Medicamentos')" class="text-xs font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-lg transition-colors border border-teal-200 cursor-pointer inline-flex items-center gap-1.5 shadow-2xs">
-                                <span class="w-2 h-2 rounded-full bg-teal-500"></span>
-                                + Medicamento
-                            </button>
-                            <button type="button" onclick="agregarFilaPorGrupo('Insumos')" class="text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors border border-indigo-200 cursor-pointer inline-flex items-center gap-1.5 shadow-2xs">
-                                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                                + Insumo
-                            </button>
-                            <button type="button" onclick="agregarFilaPorGrupo('Estupefacientes')" class="text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-colors border border-rose-200 cursor-pointer inline-flex items-center gap-1.5 shadow-2xs">
-                                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-                                + Estupefaciente
-                            </button>
-                            <button type="button" id="btn_add_product" class="text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors border border-slate-300 cursor-pointer shadow-2xs">
-                                + Agregar Producto
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Resumen visual por grupo de productos en recepción -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-                        <div class="bg-teal-50/60 border border-teal-200 rounded-xl px-4 py-3 flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">MED</span>
-                                <div>
-                                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-teal-800">Medicamentos</p>
-                                    <p class="text-[11px] text-teal-600">{{ isset($productosAgrupados['Medicamentos']) ? $productosAgrupados['Medicamentos']->count() : 0 }} en catálogo</p>
-                                </div>
-                            </div>
-                            <span id="count_grupo_medicamentos" class="px-2.5 py-1 rounded-full text-[12px] font-black bg-white text-teal-700 border border-teal-200 shadow-2xs">0 ítem(s)</span>
-                        </div>
-
-                        <div class="bg-indigo-50/60 border border-indigo-200 rounded-xl px-4 py-3 flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">INS</span>
-                                <div>
-                                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-800">Insumos</p>
-                                    <p class="text-[11px] text-indigo-600">{{ isset($productosAgrupados['Insumos']) ? $productosAgrupados['Insumos']->count() : 0 }} en catálogo</p>
-                                </div>
-                            </div>
-                            <span id="count_grupo_insumos" class="px-2.5 py-1 rounded-full text-[12px] font-black bg-white text-indigo-700 border border-indigo-200 shadow-2xs">0 ítem(s)</span>
-                        </div>
-
-                        <div class="bg-rose-50/60 border border-rose-200 rounded-xl px-4 py-3 flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">EST</span>
-                                <div>
-                                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-800">Estupefacientes</p>
-                                    <p class="text-[11px] text-rose-600">{{ isset($productosAgrupados['Estupefacientes']) ? $productosAgrupados['Estupefacientes']->count() : 0 }} en catálogo</p>
-                                </div>
-                            </div>
-                            <span id="count_grupo_estupefacientes" class="px-2.5 py-1 rounded-full text-[12px] font-black bg-white text-rose-700 border border-rose-200 shadow-2xs">0 ítem(s)</span>
-                        </div>
+                        
                     </div>
 
                     <!-- contenedor dinamico -->
                     <div id="productos_container" class="space-y-4">
                         <!-- molde de producto -->
                         <div class="producto-item relative border border-slate-200 bg-slate-50/50 p-4 rounded-xl shadow-sm transition-colors duration-200" data-grupo-actual="Todos">
-                            <!-- Barra superior de clasificación visual por fila -->
-                            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-200/80 pr-8">
-                                <div class="flex flex-wrap items-center gap-1.5">
-                                    <span class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Filtrar catálogo:</span>
-                                    <button type="button" onclick="filtrarGrupoFila(this, 'Todos')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-800 text-white transition-all cursor-pointer" data-grupo="Todos">
-                                        Todos
-                                    </button>
-                                    <button type="button" onclick="filtrarGrupoFila(this, 'Medicamentos')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-white text-teal-700 border border-teal-200 hover:bg-teal-50 transition-all cursor-pointer" data-grupo="Medicamentos">
-                                        Medicamentos
-                                    </button>
-                                    <button type="button" onclick="filtrarGrupoFila(this, 'Insumos')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50 transition-all cursor-pointer" data-grupo="Insumos">
-                                        Insumos
-                                    </button>
-                                    <button type="button" onclick="filtrarGrupoFila(this, 'Estupefacientes')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-white text-rose-700 border border-rose-200 hover:bg-rose-50 transition-all cursor-pointer" data-grupo="Estupefacientes">
-                                        Estupefacientes
-                                    </button>
-                                </div>
-
-                                <span class="badge-grupo-producto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold uppercase tracking-wider bg-slate-200 text-slate-600">
-                                    Sin clasificar
-                                </span>
+                            <!-- grupo del producto elegido -->
+                            <div class="flex justify-end pr-8 min-h-[26px] mb-1">
+                                <span class="badge-grupo-producto hidden inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold uppercase tracking-wider bg-slate-200 text-slate-600"></span>
                             </div>
 
                             <button type="button" class="btn-remove-product hidden absolute top-3.5 right-3.5 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer" title="Eliminar fila">
@@ -219,8 +149,15 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div class="lg:col-span-2 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Producto <span class="text-rose-500">*</span></label>
-                                    <select name="product_id[]" required onchange="onProductoReceptionChange(this)" class="select-producto-recepcion w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                    <div class="buscador-producto relative">
+                                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-[13px] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                        <input type="text" class="input-buscar-producto w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none block py-2.5 pl-9 pr-3 text-[13px]"
+                                            placeholder="Escribe para buscar un producto..." autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-label="Buscar producto"
+                                            onfocus="abrirBuscadorProducto(this, true)" oninput="abrirBuscadorProducto(this, false)" onkeydown="teclaBuscadorProducto(event, this)" onblur="cerrarBuscadorProductoLuego(this)">
+                                        <ul class="lista-buscar-producto hidden absolute z-30 left-0 right-0 mt-1 max-h-72 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg py-1" role="listbox"></ul>
+                                    <select name="product_id[]" required onchange="onProductoReceptionChange(this)" tabindex="-1" aria-hidden="true" class="select-producto-recepcion sr-only">
                                         <option value="" disabled selected>Buscar producto por grupo...</option>
+                                        <option value="__nuevo__">＋ Producto nuevo (no está en la lista)</option>
                                         <optgroup label="Medicamentos (Fármacos)" data-optgroup="Medicamentos">
                                             @foreach($productosAgrupados['Medicamentos'] ?? [] as $product)
                                                 @php $nomLimpio = trim(preg_replace('/\s+/', ' ', $product->nombre ?? '')); @endphp
@@ -246,6 +183,15 @@
                                             @endforeach
                                         </optgroup>
                                     </select>
+                                    </div>
+                                    <!-- producto nuevo, se crea al confirmar -->
+                                    <div class="campo-producto-nuevo hidden mt-2">
+                                        <input type="text" name="producto_nuevo[]" maxlength="1000" autocomplete="off"
+                                            oninput="actualizarResumenNombreNuevo(this)"
+                                            placeholder="Escribe el nombre completo del producto nuevo"
+                                            class="input-producto-nuevo w-full bg-white border border-teal-300 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2.5 px-3.5 text-[13px] outline-none">
+                                        <p class="text-[11.5px] text-slate-500 mt-1">Se agregará al catálogo al confirmar la recepción. Elige también su categoría.</p>
+                                    </div>
                                 </div>
                                 <div class="lg:col-span-2 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoría / Clasificación <span class="text-rose-500">*</span></label>
@@ -353,11 +299,20 @@
                         </div>
                     </div>
 
+                    <!-- agregar otro producto -->
+                    <div class="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                        <button type="button" id="btn_add_product"
+                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-bold text-teal-700 bg-white border-2 border-dashed border-teal-300 hover:bg-teal-50 hover:border-teal-400 transition-colors cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Agregar otro producto
+                        </button>
+                    </div>
+
                     <!-- gran total recepcion -->
                     <div class="mt-4 bg-teal-50/80 border border-teal-200/80 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                         <div>
-                            <h4 class="text-[14px] font-bold text-teal-900">Gran Total Recepción (IVA Incluido)</h4>
-                            <p class="text-[12px] text-teal-600 mt-0.5">Suma de todos los productos ingresados + 19% IVA</p>
+                            <h4 class="text-[14px] font-bold text-teal-900">Total de la recepción (con IVA)</h4>
+                            <p class="text-[12px] text-teal-600 mt-0.5">Se calcula solo con las cantidades y valores ingresados, más 19% de IVA.</p>
                         </div>
                         <div class="relative w-full sm:w-52">
                             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-teal-700 font-bold">$</span>
@@ -370,7 +325,7 @@
                 <div class="p-6 bg-slate-50/40">
                     <div class="flex items-center gap-2 mb-4">
                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                        <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">4. Firma Digital</h3>
+                        <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">4. Firma de quien recibe</h3>
                     </div>
 
                     <div class="flex flex-col items-center justify-center max-w-md mx-auto">
@@ -385,12 +340,12 @@
 
                 <!-- botones finales -->
                 <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3">
-                    <button type="reset" id="btn_limpiar" class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-100 transition-colors shadow-sm cursor-pointer">Limpiar Formulario</button>
+                    <button type="reset" id="btn_limpiar" class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-100 transition-colors shadow-sm cursor-pointer">Limpiar formulario</button>
                     <button type="submit" data-action="save_and_download" class="btn-submit-reception w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-lg text-[13px] font-semibold hover:bg-blue-700 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Guardar y Descargar PDF
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Confirmar y descargar acta
                     </button>
                     <button type="submit" data-action="save_only" class="btn-submit-reception w-full sm:w-auto px-5 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Confirmar Recepcion
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Confirmar Recepción
                     </button>
                 </div>
             </form>
@@ -597,6 +552,10 @@
 
         function obtenerNombreCompletoOpcion(opt) {
             if (!opt) return '';
+            if (opt.value === '__nuevo__') {
+                const campo = opt.closest('.producto-item')?.querySelector('.input-producto-nuevo');
+                return (campo?.value || '').trim() || 'Producto nuevo';
+            }
             return (opt.getAttribute('data-nombre-completo') || opt.getAttribute('title') || opt.textContent || '').trim();
         }
 
@@ -649,8 +608,9 @@
                 badge.textContent = 'Estupefaciente / Controlado';
             } else {
                 card.classList.add('border-slate-200', 'bg-slate-50/50');
-                badge.classList.add('bg-slate-200', 'text-slate-600');
-                badge.textContent = 'Sin clasificar';
+                // sin producto elegido no hay etiqueta
+                badge.classList.add('hidden');
+                badge.textContent = '';
             }
 
             actualizarContadoresGrupos();
@@ -700,7 +660,7 @@
 
             const selectedOpt = selectProd.options[selectProd.selectedIndex];
             if (grupo !== 'Todos') {
-                if (!selectedOpt || !selectedOpt.value || selectedOpt.getAttribute('data-grupo') !== grupo) {
+                if (!selectedOpt || !selectedOpt.value || (selectedOpt.value !== '__nuevo__' && selectedOpt.getAttribute('data-grupo') !== grupo)) {
                     selectProd.selectedIndex = 0;
                     const selectCat = card.querySelector('.select-categoria-recepcion');
                     if (grupo === 'Estupefacientes') {
@@ -715,11 +675,165 @@
             } else if (!selectedOpt || !selectedOpt.value) {
                 actualizarEstiloCardGrupo(card, 'Todos');
             }
+            actualizarCampoProductoNuevo(card);
+        }
+
+        // muestra el campo de nombre si se eligio producto nuevo
+        function actualizarCampoProductoNuevo(card) {
+            const campo = card?.querySelector('.campo-producto-nuevo');
+            const input = card?.querySelector('.input-producto-nuevo');
+            const select = card?.querySelector('.select-producto-recepcion');
+            if (!campo || !input || !select) return;
+            const esNuevo = select.value === '__nuevo__';
+            campo.classList.toggle('hidden', !esNuevo);
+            input.required = esNuevo;
+            if (!esNuevo) input.value = '';
+        }
+
+        function actualizarResumenNombreNuevo(input) {
+            // revisa de nuevo la ubicacion al escribir el nombre
+            const card = input.closest('.producto-item');
+            if (card && window.LoteStatus && window.LoteStatus.Ubicacion) {
+                window.LoteStatus.Ubicacion.actualizarIndicadorVisual?.(obtenerConfigUbicacionFila(card));
+            }
+        }
+
+        /* buscador de producto: fija el selector original que se envia */
+        const normalizarBusqueda = t => (t || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+        const ETIQUETA_GRUPO = {
+            Medicamentos: ['Medicamento', 'bg-teal-50 text-teal-700 border-teal-200'],
+            Insumos: ['Insumo', 'bg-indigo-50 text-indigo-700 border-indigo-200'],
+            Estupefacientes: ['Controlado', 'bg-rose-50 text-rose-700 border-rose-200'],
+        };
+
+        function textoOpcionProducto(opt) {
+            return (opt.getAttribute('data-nombre-completo') || opt.textContent || '').replace(/\s*\(Controlado\)\s*$/, '').trim();
+        }
+
+        function sincronizarTextoBuscador(card) {
+            const input = card?.querySelector('.input-buscar-producto');
+            const select = card?.querySelector('.select-producto-recepcion');
+            if (!input || !select) return;
+            const opt = select.options[select.selectedIndex];
+            if (!opt || !opt.value) input.value = '';
+            else if (opt.value === '__nuevo__') input.value = '＋ Producto nuevo';
+            else input.value = textoOpcionProducto(opt);
+        }
+
+        function abrirBuscadorProducto(input, alEnfocar) {
+            const card = input.closest('.producto-item');
+            const select = card.querySelector('.select-producto-recepcion');
+            const lista = card.querySelector('.lista-buscar-producto');
+            if (alEnfocar) input.select();
+
+            // con producto elegido muestra la lista completa
+            const elegido = select.options[select.selectedIndex];
+            const texto = alEnfocar && elegido && elegido.value ? '' : input.value;
+            const q = normalizarBusqueda(texto);
+            const opciones = Array.from(select.querySelectorAll('optgroup option'));
+            const hallados = (q ? opciones.filter(o => normalizarBusqueda(textoOpcionProducto(o)).includes(q)) : opciones).slice(0, 60);
+
+            lista.replaceChildren();
+            const agregar = (texto, etiqueta, valor, nuevoNombre) => {
+                const li = document.createElement('li');
+                li.setAttribute('role', 'option');
+                li.dataset.valor = valor;
+                if (nuevoNombre) li.dataset.nuevoNombre = nuevoNombre;
+                li.className = 'opcion-producto flex items-center justify-between gap-3 px-3 py-2 text-[13px] text-slate-700 cursor-pointer hover:bg-teal-50';
+                const span = document.createElement('span');
+                span.className = 'min-w-0 truncate';
+                span.textContent = texto;
+                li.appendChild(span);
+                if (etiqueta) {
+                    const tag = document.createElement('span');
+                    tag.className = 'shrink-0 px-1.5 py-0.5 rounded border text-[10.5px] font-bold ' + etiqueta[1];
+                    tag.textContent = etiqueta[0];
+                    li.appendChild(tag);
+                }
+                // mousedown para elegir antes de perder el foco
+                li.addEventListener('mousedown', ev => { ev.preventDefault(); elegirProductoBuscador(card, valor, nuevoNombre); });
+                lista.appendChild(li);
+            };
+
+            hallados.forEach(o => agregar(textoOpcionProducto(o), ETIQUETA_GRUPO[o.getAttribute('data-grupo')] || null, o.value));
+            if (q && hallados.length === 0) {
+                const vacio = document.createElement('li');
+                vacio.className = 'px-3 py-2 text-[12.5px] text-slate-500';
+                vacio.textContent = 'No hay productos que coincidan con «' + texto.trim() + '».';
+                lista.appendChild(vacio);
+            }
+            agregar(q ? '＋ Agregar «' + texto.trim() + '» como producto nuevo' : '＋ Producto nuevo (no está en la lista)', null, '__nuevo__', q ? texto.trim() : '');
+
+            lista.classList.remove('hidden');
+            input.setAttribute('aria-expanded', 'true');
+            lista.dataset.activo = '-1';
+        }
+
+        function elegirProductoBuscador(card, valor, nuevoNombre) {
+            const select = card.querySelector('.select-producto-recepcion');
+            select.value = valor;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            if (valor === '__nuevo__' && nuevoNombre) {
+                const campo = card.querySelector('.input-producto-nuevo');
+                if (campo) campo.value = nuevoNombre;
+            }
+            cerrarBuscadorProducto(card);
+            sincronizarTextoBuscador(card);
+            if (valor === '__nuevo__') card.querySelector('.input-producto-nuevo')?.focus();
+        }
+
+        function cerrarBuscadorProducto(card) {
+            const lista = card.querySelector('.lista-buscar-producto');
+            lista?.classList.add('hidden');
+            card.querySelector('.input-buscar-producto')?.setAttribute('aria-expanded', 'false');
+        }
+
+        function cerrarBuscadorProductoLuego(input) {
+            const card = input.closest('.producto-item');
+            setTimeout(() => { cerrarBuscadorProducto(card); sincronizarTextoBuscador(card); }, 150);
+        }
+
+        function teclaBuscadorProducto(ev, input) {
+            const card = input.closest('.producto-item');
+            const lista = card.querySelector('.lista-buscar-producto');
+            const opciones = Array.from(lista.querySelectorAll('.opcion-producto'));
+            let activo = parseInt(lista.dataset.activo || '-1', 10);
+            if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+                ev.preventDefault();
+                if (lista.classList.contains('hidden')) abrirBuscadorProducto(input, false);
+                activo = ev.key === 'ArrowDown' ? Math.min(activo + 1, opciones.length - 1) : Math.max(activo - 1, 0);
+                opciones.forEach((o, i) => o.classList.toggle('bg-teal-50', i === activo));
+                opciones[activo]?.scrollIntoView({ block: 'nearest' });
+                lista.dataset.activo = String(activo);
+            } else if (ev.key === 'Enter') {
+                ev.preventDefault(); // no enviar el formulario
+                const elegida = opciones[activo >= 0 ? activo : 0];
+                if (elegida) elegirProductoBuscador(card, elegida.dataset.valor, elegida.dataset.nuevoNombre);
+            } else if (ev.key === 'Escape') {
+                cerrarBuscadorProducto(card);
+                sincronizarTextoBuscador(card);
+            }
         }
 
         function onProductoReceptionChange(selectProd) {
             const card = selectProd.closest('.producto-item');
             const opt = selectProd.options[selectProd.selectedIndex];
+            actualizarCampoProductoNuevo(card);
+            sincronizarTextoBuscador(card);
+            if (opt && opt.value === '__nuevo__') {
+                // sin categoria sugerida se usa el grupo del filtro
+                const grupoFiltro = card.getAttribute('data-grupo-actual') || 'Todos';
+                const selectCat = card.querySelector('.select-categoria-recepcion');
+                if (selectCat) {
+                    const primeraDelGrupo = grupoFiltro !== 'Todos'
+                        ? selectCat.querySelector(`optgroup[data-optgroup-cat="${grupoFiltro}"] option`)
+                        : null;
+                    selectCat.value = primeraDelGrupo ? primeraDelGrupo.value : '';
+                }
+                actualizarEstiloCardGrupo(card, grupoFiltro);
+                card.querySelector('.input-producto-nuevo')?.focus();
+                return;
+            }
             if (!opt || !opt.value) {
                 actualizarEstiloCardGrupo(card, 'Todos');
                 return;
@@ -782,6 +896,17 @@
             actualizarEstiloCardGrupo(card, grupo);
         }
 
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('.select-producto-recepcion')?.closest('form');
+            form?.addEventListener('reset', () => setTimeout(() => {
+                document.querySelectorAll('.producto-item').forEach(card => {
+                    actualizarCampoProductoNuevo(card);
+                    sincronizarTextoBuscador(card);
+                    actualizarEstiloCardGrupo(card, 'Todos');
+                });
+            }, 0));
+        });
+
         function actualizarContadoresGrupos() {
             let med = 0, ins = 0, est = 0;
             document.querySelectorAll('.producto-item').forEach(card => {
@@ -791,7 +916,7 @@
                 const optCat = selCat ? selCat.options[selCat.selectedIndex] : null;
 
                 let grp = null;
-                if (optProd && optProd.value) {
+                if (optProd && optProd.value && optProd.value !== '__nuevo__') {
                     grp = optProd.getAttribute('data-grupo');
                 } else if (optCat && optCat.value) {
                     grp = optCat.getAttribute('data-grupo');
@@ -825,6 +950,8 @@
 
             clone.querySelectorAll('input').forEach(inp => inp.value = '');
             clone.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
+            clone.querySelector('.lista-buscar-producto')?.replaceChildren();
+            actualizarCampoProductoNuevo(clone);
 
             const btnRemove = clone.querySelector('.btn-remove-product');
             btnRemove.classList.remove('hidden');

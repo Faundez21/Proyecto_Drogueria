@@ -15,15 +15,15 @@
             <span class="bg-amber-500 text-white text-[11px] px-1.5 py-0.5 rounded-full font-extrabold">{{ count($passwordRequests) }}</span>
         </button>
     @endif
-    <button type="button" onclick="openRoles()"
-        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 shadow-2xs transition-all duration-200 cursor-pointer">
+    @if (request('ver') === 'roles')
+    <button type="button" onclick="openRoleForm(null)"
+        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-            </path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
-        Roles y Accesos
+        Nuevo Rol
     </button>
+    @else
     <button type="button" onclick="openCreate()"
         class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,6 +31,7 @@
         </svg>
         Nuevo Usuario
     </button>
+    @endif
 @endsection
 
 @section('content')
@@ -59,6 +60,21 @@
         </svg>
         <span class="font-semibold text-slate-800">Usuarios y Permisos</span>
     </div>
+
+    @php $vistaRoles = request('ver') === 'roles'; @endphp
+    <!-- pestanas usuarios y roles -->
+    <nav class="mb-6 flex w-full sm:w-auto sm:inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200" aria-label="Usuarios y roles">
+        <a href="{{ route('users.index') }}" @unless ($vistaRoles) aria-current="page" @endunless
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-bold transition {{ $vistaRoles ? 'text-slate-600 hover:text-slate-900 hover:bg-white/60' : 'bg-white text-slate-900 shadow-sm' }}">
+            Usuarios
+            <span class="px-1.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 text-slate-600">{{ $totalUsuarios }}</span>
+        </a>
+        <a href="{{ route('users.index', ['ver' => 'roles']) }}" @if ($vistaRoles) aria-current="page" @endif
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-bold transition {{ $vistaRoles ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60' }}">
+            Roles
+            <span class="px-1.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 text-slate-600">{{ $roles->count() }}</span>
+        </a>
+    </nav>
 
     <!-- Alertas de sesión -->
     @if (session('success'))
@@ -91,7 +107,7 @@
     @endif
 
     <!-- Tarjetas KPI de Resumen -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 {{ $vistaRoles ? 'hidden' : '' }}">
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex items-center justify-between">
             <div>
                 <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Funcionarios</p>
@@ -151,7 +167,7 @@
     </div>
 
     <!-- Directorio y Filtros de Usuarios -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden {{ $vistaRoles ? 'hidden' : '' }}">
 
         <!-- Cabecera con buscador y filtros en vivo -->
         <div class="p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
@@ -294,7 +310,7 @@
                                             @endif
                                             @if (in_array('solicitudes_cesfam', $userSolPermisos))
                                                 <span class="px-2 py-0.5 bg-purple-50 text-purple-700 font-bold rounded text-[10px] border border-purple-200">
-                                                    Solicitudes Cesfam
+                                                    Solicitudes CESFAM
                                                 </span>
                                             @endif
                                             @php
@@ -428,10 +444,18 @@
 
     <!-- Modal Roles y Accesos -->
     <div id="RolesModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
+        class="{{ $vistaRoles ? 'roles-en-pagina' : 'hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all' }}">
         <div
-            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
+            class="bg-white rounded-2xl border border-slate-200 w-full flex flex-col overflow-hidden {{ $vistaRoles ? 'shadow-xs' : 'shadow-2xl max-w-4xl max-h-[92vh] my-auto' }}">
 
+            @if ($vistaRoles)
+            <!-- cabecera de la pestana roles -->
+            <div class="p-4 sm:p-5 border-b border-slate-200 bg-white">
+                <h2 class="text-[15px] font-bold text-slate-800">Roles</h2>
+                <p class="text-[12.5px] text-slate-500 mt-0.5">Cada rol define qué vistas puede usar un usuario. Crea primero el rol y luego asígnalo al crear el usuario.</p>
+            </div>
+
+            @else
             <!-- Cabecera del Modal -->
             <div class="px-6 py-5 bg-slate-900 text-white flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-3.5">
@@ -449,7 +473,7 @@
                                 {{ $roles->count() }} Roles · {{ count($modulos) }} Vistas
                             </span>
                         </div>
-                        <p class="text-[12px] text-slate-300 mt-0.5">Configura qué módulos y vistas (incluyendo Solicitudes Establecimientos y Solicitudes Cesfam) puede visualizar cada rol.</p>
+                        <p class="text-[12px] text-slate-300 mt-0.5">Configura qué módulos y vistas (incluyendo Solicitudes Establecimientos y Solicitudes CESFAM) puede visualizar cada rol.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeRoles()"
@@ -461,8 +485,9 @@
                 </button>
             </div>
 
+            @endif
             <!-- Cuerpo scrolleable -->
-            <div class="p-6 overflow-y-auto space-y-6 flex-1 bg-slate-50/50">
+            <div class="p-6 space-y-6 flex-1 bg-slate-50/50 {{ $vistaRoles ? '' : 'overflow-y-auto' }}">
 
                 <!-- Listado de roles -->
                 <div>
@@ -658,7 +683,7 @@
                 </button>
             </div>
 
-            <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end shrink-0">
+            <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end shrink-0 {{ $vistaRoles ? 'hidden' : '' }}">
                 <button type="button" onclick="closeRoles()"
                     class="px-6 py-2.5 text-[13px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors cursor-pointer">
                     Cerrar
@@ -818,19 +843,21 @@
                         </label>
                         <select id="role" name="role" required onchange="actualizarPreviewRolModal(this.value)"
                             class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-[13px] font-bold text-slate-800 cursor-pointer">
+                            {{-- sin rol preseleccionado --}}
+                            <option value="" disabled selected>Elige un rol...</option>
                             @foreach ($roles as $rol)
                                 @php
                                     $cantVistas = $rol->name === 'Administrador' ? count($modulos) : $rol->permissions->count();
                                     $sinVistas = $rol->name !== 'Administrador' && $cantVistas === 0;
                                 @endphp
-                                <option value="{{ $rol->name }}" class="{{ $sinVistas ? 'text-rose-600' : '' }}" {{ $sinVistas ? 'data-sin-vistas="true"' : '' }}>
+                                <option value="{{ $rol->name }}" class="{{ $sinVistas ? 'text-rose-600' : '' }}" {{ $sinVistas ? 'data-sin-vistas="true" disabled' : '' }}>
                                     {{ $rol->name }} —
                                     @if ($rol->name === 'Administrador')
                                         Acceso total ({{ count($modulos) }} vistas)
                                     @elseif ($cantVistas > 0)
                                         {{ $cantVistas }} vista(s) habilitada(s)
                                     @else
-                                        ⚠️ Sin vistas asignadas (No asignable)
+                                        sin vistas — asígnalas en la pestaña «Roles»
                                     @endif
                                 </option>
                             @endforeach
@@ -871,6 +898,11 @@
             const container = document.getElementById('previewVistasRolContainer');
             if (!container) return;
             container.innerHTML = '';
+
+            if (!roleName) {
+                container.innerHTML = '<span class="text-[11.5px] text-slate-500">Elige un rol para ver a qué vistas tendrá acceso.</span>';
+                return;
+            }
 
             const vistas = MAPA_ROLES_VISTAS[roleName] || [];
             if (roleName !== 'Administrador' && vistas.length === 0) {
@@ -944,11 +976,19 @@
             document.getElementById('RecoveryModal').classList.add('hidden');
         }
 
+        // los roles viven en su pestana (?ver=roles)
+        const VISTA_ROLES = @json($vistaRoles);
+
         function openRoles() {
-            document.getElementById('RolesModal').classList.remove('hidden');
+            if (!VISTA_ROLES) {
+                window.location.href = @json(route('users.index', ['ver' => 'roles']));
+                return;
+            }
+            document.getElementById('RolesModal').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function closeRoles() {
+            if (VISTA_ROLES) return;
             document.getElementById('RolesModal').classList.add('hidden');
         }
 
@@ -1325,7 +1365,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Rol sin vistas asignadas',
-                        text: `El rol "${selectedRole}" no tiene ninguna vista asignada. Asigna al menos 1 vista al rol en "Roles y Accesos" antes de asignarlo a un usuario.`,
+                        text: `El rol "${selectedRole}" no tiene ninguna vista asignada. Asigna al menos 1 vista al rol en la pestaña "Roles" antes de asignarlo a un usuario.`,
                         confirmButtonColor: '#0f968c'
                     });
                     return false;

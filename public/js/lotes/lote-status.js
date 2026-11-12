@@ -1254,11 +1254,8 @@
             for (const oc of ocupantesEst) {
                 if (this.normKey(oc.nivel) !== nivKey) continue;
                 const ocPosKey = this.normKey(oc.posicion);
-                if (posKey) {
-                    if (ocPosKey === posKey || ocPosKey === '') return oc;
-                } else {
-                    if (ocPosKey === '') return oc;
-                }
+                // solo bloquea la posicion exacta
+                if (posKey && ocPosKey === posKey) return oc;
             }
             return null;
         },
@@ -1272,25 +1269,24 @@
 
             const listaPos = Array.isArray(posicionesNivel) ? posicionesNivel.map((p) => this.normPos(p)).filter(Boolean) : [];
 
+            // un nivel sin posiciones nunca se bloquea entero
             if (listaPos.length === 0) {
-                const ocupadoSinPos = ocupantesEst.length > 0;
                 return {
                     nivel: nivStr,
-                    totalPosiciones: 1,
-                    ocupadasCount: ocupadoSinPos ? 1 : 0,
-                    disponiblesCount: ocupadoSinPos ? 0 : 1,
-                    completamenteOcupado: ocupadoSinPos,
+                    totalPosiciones: 0,
+                    ocupadasCount: 0,
+                    disponiblesCount: 0,
+                    completamenteOcupado: false,
                     ocupantes: ocupantesEst,
                     detallePosiciones: [],
                 };
             }
 
-            // Si un ocupante en este nivel no tiene posición específica, bloquea el nivel o cuenta como ocupado
-            const ocupanteNivelCompleto = ocupantesEst.find((o) => !this.normPos(o.posicion));
+            // una posicion esta ocupada solo si un lote esta en ella
             let ocupadasCount = 0;
             const detallePosiciones = listaPos.map((pos) => {
                 const posKey = this.normKey(pos);
-                const oc = ocupanteNivelCompleto || ocupantesEst.find((o) => this.normKey(o.posicion) === posKey) || null;
+                const oc = ocupantesEst.find((o) => this.normKey(o.posicion) === posKey) || null;
                 if (oc) ocupadasCount++;
                 return { posicion: pos, ocupante: oc };
             });
@@ -1570,13 +1566,6 @@
                             estante: infoEstante.estante,
                         });
                         if (selectEstante) selectEstante.value = '';
-                    } else if (evEst.ocupadosCount > 0) {
-                        this.alertaUbicacionOcupada({
-                            titulo: 'Estante con Ubicaciones en Uso',
-                            subtitulo: `El <strong>${esc(infoEstante.estante)}</strong> tiene <strong>${evEst.ocupadosCount}</strong> ubicación(es) ocupada(s) y <strong>${evEst.disponiblesCount}</strong> disponible(s). Las posiciones ocupadas se han bloqueado en los desplegables.`,
-                            ocupantes: evEst.ocupantes,
-                            estante: infoEstante.estante,
-                        });
                     }
                 } else if (trigger === 'nivel' && estanteVal && nivelVal) {
                     const posList = (infoEstante?.niveles?.find((n) => this.normKey(this.normNivel(n.nivel)) === this.normKey(nivelVal))?.posiciones) || [];
@@ -1590,14 +1579,6 @@
                             nivel: nivelVal,
                         });
                         if (selectNivel) selectNivel.value = '';
-                    } else if (evNiv.ocupadasCount > 0) {
-                        this.alertaUbicacionOcupada({
-                            titulo: 'Nivel con Posiciones Ocupadas',
-                            subtitulo: `En <strong>${esc(estanteVal)} · Nivel ${esc(nivelVal)}</strong> hay <strong>${evNiv.ocupadasCount}</strong> posición(es) en uso y <strong>${evNiv.disponiblesCount}</strong> disponible(s). Las posiciones en uso aparecen deshabilitadas.`,
-                            ocupantes: evNiv.ocupantes,
-                            estante: estanteVal,
-                            nivel: nivelVal,
-                        });
                     }
                 } else if (trigger === 'posicion' && estanteVal && nivelVal && selectPosicion?.value) {
                     const posVal = this.normPos(selectPosicion.value);

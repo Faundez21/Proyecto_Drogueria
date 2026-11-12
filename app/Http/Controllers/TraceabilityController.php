@@ -117,7 +117,9 @@ class TraceabilityController extends Controller
             'valor_unitario' => '$' . number_format($inventory->valor_neto_unitario ?? 0, 0, ',', '.'),
             'estado_actual' => $inventory->estado ?? 'Vigente',
             'stock_actual' => $inventory->cantidad ?? 0,
-            'ubicacion' => 'Pasillo ' . ($inventory->pasillo ?? 'N/A') . ' - Estante ' . ($inventory->estante ?? 'N/A'),
+            // evita repetir la palabra pasillo
+            'ubicacion' => (preg_match('/^pasillo\s/i', (string) $inventory->pasillo) ? $inventory->pasillo : 'Pasillo ' . ($inventory->pasillo ?? 'N/A'))
+                . ' - Estante ' . ($inventory->estante ?? 'N/A'),
         ] : null;
 
         return response()->json([
