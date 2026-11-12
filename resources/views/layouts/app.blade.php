@@ -14,7 +14,6 @@
                 var saved = localStorage.getItem('das-theme');
                 var prefers = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                 if (saved === 'dark' || (!saved && prefers)) document.documentElement.classList.add('dark');
-                if (localStorage.getItem('das-density') === 'compact') document.documentElement.classList.add('das-compact');
             } catch (e) {}
         })();
     </script>
@@ -31,8 +30,6 @@
     <script src="{{ asset('js/lotes/lote-status.js') }}?v={{ @filemtime(public_path('js/lotes/lote-status.js')) }}"></script>
 
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}?v={{ @filemtime(public_path('css/dark-mode.css')) }}">
-    <!-- sistema visual común (tipografía, botones, indicadores, estados) -->
-    <link rel="stylesheet" href="{{ asset('css/das-ui.css') }}?v={{ @filemtime(public_path('css/das-ui.css')) }}">
 
     <style>
         /* Asegurar que SweetAlert2 siempre esté por encima de cualquier modal, drawer o backdrop */
@@ -305,9 +302,6 @@
                     $sidebarDespachosPendCount = 0;
                     $sidebarDespachosControladosPendCount = 0;
                     $sidebarClavesPendCount = 0;
-                    $sidebarVencimientosCount = 0;
-                    $sidebarSolEstPendCount = 0;
-                    $sidebarSolCesfamPendCount = 0;
                     $rolUsuarioActual = 'Operador';
                     try {
                         if (auth()->check()) {
@@ -330,22 +324,6 @@
                                 $sidebarDespachosControladosPendCount = \App\Models\EstablishmentRequest::whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
                                     ->whereHas('items.product', fn ($q) => $q->whereIn('nombre', $controladosList))
                                     ->count();
-                            }
-                            if (auth()->user()->can('ver.inventario')) {
-                                // Lotes disponibles vencidos o que vencen en 30 días (mismo criterio que la alerta FEFO)
-                                $sidebarVencimientosCount = \Illuminate\Support\Facades\DB::table('inventories')
-                                    ->where('estado', 'Disponible')
-                                    ->where('cantidad', '>', 0)
-                                    ->whereNotNull('fecha_vencimiento')
-                                    ->where('fecha_vencimiento', '<=', now()->addDays(30)->toDateString())
-                                    ->count();
-                            }
-                            if (auth()->user()->can('ver.solicitudes') || auth()->user()->can('ver.solicitudes_cesfam')) {
-                                // Solicitudes que aún no tienen responsable asignado
-                                $sidebarSolCesfamPendCount = \App\Models\EstablishmentRequest::where('estado', 'Pendiente')
-                                    ->where('establecimiento', 'like', 'CESFAM%')->count();
-                                $sidebarSolEstPendCount = \App\Models\EstablishmentRequest::where('estado', 'Pendiente')
-                                    ->where('establecimiento', 'not like', 'CESFAM%')->count();
                             }
                             if (auth()->user()->hasRole('Administrador')) {
                                 $sidebarClavesPendCount = \Illuminate\Support\Facades\DB::table('password_reset_tokens')
@@ -418,20 +396,13 @@
                         <div class="flow-rail pl-[27px] space-y-0.5">
                             @can('ver.inventario')
                             <a href="{{ route('inventory.index') }}"
-                                class="nav-row {{ request()->routeIs('inventory.*') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
-                                <div class="flex items-center gap-2.5">
+                                class="nav-row {{ request()->routeIs('inventory.*') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                                         d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
                                     </path>
                                 </svg>
                                 Inventario
-                                </div>
-                                @if ($sidebarVencimientosCount > 0)
-                                    <span class="font-mono-das text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30" title="Lotes vencidos o que vencen en los próximos 30 días">
-                                        {{ $sidebarVencimientosCount }}
-                                    </span>
-                                @endif
                             </a>
                             @endcan
                             @can('ver.distribucion')
@@ -525,39 +496,25 @@
 
                             @can('ver.solicitudes')
                                 <a href="{{ route('requests.index') }}"
-                                    class="nav-row {{ request()->routeIs('requests.index') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
-                                    <div class="flex items-center gap-2.5">
+                                    class="nav-row {{ request()->routeIs('requests.index') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4">
                                         </path>
                                     </svg>
                                     Solicitudes Establecimientos
-                                    </div>
-                                    @if ($sidebarSolEstPendCount > 0)
-                                        <span class="font-mono-das text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30" title="Solicitudes de establecimientos sin responsable asignado">
-                                            {{ $sidebarSolEstPendCount }}
-                                        </span>
-                                    @endif
                                 </a>
                             @endcan
 
                             @can('ver.solicitudes_cesfam')
                                 <a href="{{ route('requests.cesfam') }}"
-                                    class="nav-row {{ request()->routeIs('requests.cesfam') ? 'is-active' : '' }} flex items-center justify-between px-3 py-2 rounded-md text-[13px]">
-                                    <div class="flex items-center gap-2.5">
+                                    class="nav-row {{ request()->routeIs('requests.cesfam') ? 'is-active' : '' }} flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px]">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
                                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011 1h2a1 1 0 011 1v5m-4 0h4">
                                         </path>
                                     </svg>
                                     Solicitudes CESFAM
-                                    </div>
-                                    @if ($sidebarSolCesfamPendCount > 0)
-                                        <span class="font-mono-das text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30" title="Solicitudes CESFAM sin responsable asignado">
-                                            {{ $sidebarSolCesfamPendCount }}
-                                        </span>
-                                    @endif
                                 </a>
                             @endcan
                         </div>
@@ -652,7 +609,9 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
-                                <span class="text-[13px] group-hover:text-slate-700 transition-colors">Buscar lotes, fármacos o ir a una acción...</span>
+                                <span class="text-[13px] group-hover:text-slate-700 transition-colors">Buscar en
+                                    inventario,
+                                    lotes o catálogo...</span>
                             </div>
                             <div class="flex items-center gap-1">
                                 <kbd
@@ -688,18 +647,11 @@
                             </svg>
                         </button>
 
-                        <!-- Botón de densidad de tablas (cómodo / compacto) -->
-                        <button onclick="toggleDensity()" type="button" class="das-density-btn shrink-0"
-                            title="Cambiar altura de filas de las tablas (cómodo / compacto)" aria-label="Cambiar altura de filas de las tablas">
-                            <svg class="das-icon-comfy w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 5h16M4 12h16M4 19h16"></path></svg>
-                            <svg class="das-icon-compact w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-                        </button>
-
                         <div class="hidden xl:flex items-center gap-2.5 pr-4 border-r border-slate-200">
                             <svg class="w-[18px] h-[18px]" style="color: var(--accent);" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             <div class="text-[13px] font-mono-das tracking-tight" id="live-clock"></div>
                         </div>
@@ -821,44 +773,26 @@
                 </header>
 
                 <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-                    <div class="max-w-[1600px] mx-auto space-y-5">
+                    <div class="max-w-[1600px] mx-auto space-y-6">
 
 
                         <!-- encabezado de la pagina, con su titulo y sus botones -->
 
-                        @php
-                            // Ruta de la página (grupo del menú) sobre el título: reemplaza las "migas de pan" de cada vista
-                            $dasCrumb = trim($__env->yieldContent('crumb'));
-                            if ($dasCrumb === '') {
-                                $dasRuta = (string) (request()->route()?->getName() ?? '');
-                                $dasEmpieza = fn (array $prefijos) => collect($prefijos)->contains(fn ($p) => str_starts_with($dasRuta, $p));
-                                $dasCrumb = match (true) {
-                                    $dasEmpieza(['reception.', 'providers.']) => 'Abastecimiento',
-                                    $dasEmpieza(['inventory.', 'distribution.', 'quarantine.', 'aisle.', 'shelf.', 'level.', 'position.']) => 'Almacenamiento',
-                                    $dasEmpieza(['dispatch.', 'controlled_dispatch.', 'requests.']) => 'Salida',
-                                    $dasEmpieza(['traceability.', 'reports.']) => 'Control',
-                                    $dasEmpieza(['users.']) => 'Configuración',
-                                    default => '',
-                                };
-                            }
-                        @endphp
-                        <!-- encabezado de la pagina: ruta, titulo, descripcion y botones (mismo formato en todas las vistas) -->
                         @if (View::hasSection('title') || View::hasSection('actions'))
-                            <div class="das-page-header border-b border-slate-200 pb-4">
-                                <div class="min-w-0">
-                                    @if ($dasCrumb !== '')
-                                        <p class="das-page-crumb">{!! $dasCrumb !!}</p>
-                                    @endif
+                            <div
+                                class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-5">
+                                <div>
                                     @hasSection('title')
-                                        <h1 class="das-page-title">@yield('title')</h1>
+                                        <h1 class="text-[22px] font-bold text-slate-800 tracking-tight leading-none">
+                                            @yield('title')</h1>
                                     @endif
                                     @hasSection('subtitle')
-                                        <p class="das-page-desc">@yield('subtitle')</p>
+                                        <p class="text-[13px] text-slate-500 mt-2 font-medium">@yield('subtitle')</p>
                                     @endif
                                 </div>
 
                                 @hasSection('actions')
-                                    <div class="das-page-actions">
+                                    <div class="flex items-center gap-3 shrink-0">
                                         @yield('actions')
                                     </div>
                                 @endif
@@ -933,27 +867,6 @@
         </main>
     @endauth
 
-    @php
-        $dasAcciones = collect([
-        ['perm' => 'ver.despacho', 'route' => 'dispatch.index', 'title' => 'Nuevo despacho', 'subtitle' => 'Emitir una guía de despacho', 'k' => 'despacho guia emitir salida nuevo'],
-        ['perm' => 'ver.despacho_controlado', 'route' => 'controlled_dispatch.index', 'title' => 'Despacho controlado', 'subtitle' => 'Guía de fármacos controlados para CESFAM', 'k' => 'controlado estupefaciente psicotropico despacho'],
-        ['perm' => 'ver.recepcion', 'route' => 'reception.index', 'title' => 'Registrar recepción', 'subtitle' => 'Ingreso de mercadería desde proveedor', 'k' => 'recepcion ingreso proveedor factura guia'],
-        ['perm' => 'ver.inventario', 'route' => 'inventory.index', 'params' => ['order_by' => 'vencimiento'], 'title' => 'Lotes por vencer', 'subtitle' => 'Inventario ordenado por fecha de vencimiento', 'k' => 'vencer vencimiento fefo inventario lotes'],
-        ['perm' => 'ver.inventario', 'route' => 'inventory.index', 'hash' => '#ingreso-manual', 'title' => 'Ingreso manual de producto', 'subtitle' => 'Registrar un lote nuevo en el inventario', 'k' => 'ingreso manual nuevo lote producto agregar'],
-        ['perm' => 'ver.inventario', 'route' => 'inventory.index', 'hash' => '#carga-masiva', 'title' => 'Carga masiva desde Excel', 'subtitle' => 'Importar lotes desde una planilla', 'k' => 'carga masiva excel importar planilla'],
-        ['perm' => 'ver.inventario', 'route' => 'inventory.index', 'title' => 'Ir a Inventario', 'subtitle' => 'Directorio de productos y lotes', 'k' => 'inventario stock productos lotes ingreso manual carga masiva'],
-        ['perm' => 'ver.cuarentena', 'route' => 'quarantine.index', 'title' => 'Ir a Cuarentena', 'subtitle' => 'Lotes retenidos para revisión', 'k' => 'cuarentena retenido revision merma'],
-        ['perm' => 'ver.solicitudes', 'route' => 'requests.index', 'title' => 'Solicitudes de establecimientos', 'subtitle' => 'Crear, asignar y revisar solicitudes', 'k' => 'solicitud establecimiento pedido nueva asignar'],
-        ['perm' => 'ver.solicitudes_cesfam', 'route' => 'requests.cesfam', 'title' => 'Solicitudes CESFAM', 'subtitle' => 'Crear, asignar y revisar solicitudes CESFAM', 'k' => 'solicitud cesfam pedido nueva asignar'],
-        ['perm' => 'ver.trazabilidad', 'route' => 'traceability.index', 'title' => 'Ir a Trazabilidad', 'subtitle' => 'Movimientos y kardex por lote', 'k' => 'trazabilidad kardex movimientos historial'],
-        ['perm' => 'ver.reportes', 'route' => 'reports.index', 'title' => 'Ir a Reportes', 'subtitle' => 'Informes y exportaciones', 'k' => 'reportes informe exportar excel pdf'],
-        ['perm' => 'ver.distribucion', 'route' => 'distribution.index', 'title' => 'Ir a Distribución', 'subtitle' => 'Pasillos, estantes y ubicaciones', 'k' => 'distribucion bodega pasillo estante ubicacion'],
-        ['perm' => 'ver.proveedores', 'route' => 'providers.index', 'title' => 'Ir a Proveedores', 'subtitle' => 'Directorio de proveedores', 'k' => 'proveedores rut empresa'],
-        ['perm' => 'ver.usuarios', 'route' => 'users.index', 'title' => 'Usuarios y permisos', 'subtitle' => 'Cuentas, roles y accesos', 'k' => 'usuarios permisos roles cuentas'],
-    ])->filter(fn ($a) => auth()->check() && auth()->user()->can($a['perm']) && \Illuminate\Support\Facades\Route::has($a['route']))
-      ->map(fn ($a) => ['title' => $a['title'], 'subtitle' => $a['subtitle'], 'k' => $a['k'], 'url' => route($a['route'], $a['params'] ?? []) . ($a['hash'] ?? '')])
-      ->values();
-    @endphp
     <!-- scripts que usan todas las vistas -->
     <script>
         // --- Configuración global de SweetAlert2 ---
@@ -970,27 +883,6 @@
                 toast.addEventListener('mouseleave', Swal.resumeTimer)
             }
         });
-
-        // Los avisos de éxito simples (sin botones, sin contenido HTML ni campos) se muestran
-        // como aviso breve en la esquina en lugar de bloquear la pantalla. Las confirmaciones,
-        // errores y advertencias siguen apareciendo como ventana, igual que antes.
-        (function () {
-            const fireOriginal = Swal.fire.bind(Swal);
-            Swal.fire = function (...args) {
-                try {
-                    let o = args[0];
-                    if (typeof o === 'string') o = { title: args[0], text: args[1], icon: args[2] };
-                    const simple = o && typeof o === 'object' && o.icon === 'success' && !o.toast
-                        && !o.showCancelButton && !o.showDenyButton && !o.input && !o.html
-                        && !o.confirmButtonText && !o.preConfirm && !o.footer && o.allowOutsideClick !== false;
-                    if (simple) {
-                        const titulo = o.title || o.text || 'Listo';
-                        return Toast.fire({ icon: 'success', title: titulo, text: o.title ? (o.text || '') : '' });
-                    }
-                } catch (e) {}
-                return fireOriginal(...args);
-            };
-        })();
 
         // Muestra los mensajes flash de Laravel como ventana
         @if (session('lote_status_success'))
@@ -1059,51 +951,6 @@
             });
         }
 
-
-        // --- Paleta de comandos (Ctrl + K): acciones rápidas además de la búsqueda ---
-        const DAS_ACCIONES = {!! json_encode($dasAcciones, JSON_HEX_TAG | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE) !!};
-
-        const DAS_ICONO_ACCION = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>';
-
-        function normalizarTexto(t) {
-            return (t || '').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-        }
-
-        function accionesQueCoinciden(query) {
-            const q = normalizarTexto(query).trim();
-            if (!q) return DAS_ACCIONES.slice();
-            const partes = q.split(/\s+/);
-            return DAS_ACCIONES.filter(a => {
-                const texto = normalizarTexto(a.title + ' ' + a.subtitle + ' ' + a.k);
-                return partes.every(p => texto.includes(p));
-            });
-        }
-
-        function htmlAcciones(lista, inicio) {
-            if (!lista.length) return '';
-            let html = `<div class="px-3 py-2 mt-1 flex items-center gap-2"><div class="h-px bg-slate-100 flex-1"></div><span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono-das">Acciones</span><div class="h-px bg-slate-100 flex-1"></div></div>`;
-            lista.forEach((a, i) => {
-                html += `
-                    <a href="${a.url}" id="search-item-${inicio + i}" class="search-result-item flex items-center justify-between px-3 py-2 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 transition-all duration-200 border border-transparent mt-0.5 group">
-                        <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
-                            <span class="p-1.5 rounded-md bg-teal-50 text-teal-700 shrink-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${DAS_ICONO_ACCION}</svg></span>
-                            <div class="flex flex-col min-w-0 flex-1">
-                                <span class="text-[13px] font-bold leading-snug">${a.title}</span>
-                                <span class="text-[11px] text-slate-500 leading-tight">${a.subtitle}</span>
-                            </div>
-                        </div>
-                        <span class="go-icon text-[11px] font-mono-das text-teal-600 opacity-0 transition-opacity flex items-center gap-1.5 shrink-0 pl-2"><kbd class="px-1.5 py-0.5 rounded border border-teal-200 bg-white">↵</kbd></span>
-                    </a>`;
-            });
-            return html;
-        }
-
-        // --- Densidad de tablas (cómodo / compacto), recordada en este navegador ---
-        function toggleDensity() {
-            const compacto = document.documentElement.classList.toggle('das-compact');
-            try { localStorage.setItem('das-density', compacto ? 'compact' : 'comfy'); } catch (e) {}
-        }
-
         // Busqueda Global 
         let searchTimeout = null;
         let selectedSearchIndex = -1;
@@ -1144,11 +991,8 @@
 
             if (cleanQuery.length < 2) {
                 loader.classList.add('hidden');
-                const acciones = accionesQueCoinciden(cleanQuery);
-                searchResultsCount = acciones.length;
                 resultsContainer.innerHTML =
-                    '<div class="das-cmd-hint">Escriba al menos 2 letras para buscar lotes, fármacos o proveedores, o elija una acción.</div>'
-                    + htmlAcciones(acciones, 0);
+                    '<div class="px-3 py-6 text-center text-[12px] text-slate-400">Escriba al menos 2 letras para iniciar la búsqueda.</div>';
                 return;
             }
 
@@ -1171,13 +1015,7 @@
                     .then(data => {
                         loader.classList.add('hidden');
                         clearBtn.classList.remove('hidden'); // Restaurar botón X
-                        const accionesEncontradas = accionesQueCoinciden(cleanQuery);
-                        searchResultsCount = data.length + accionesEncontradas.length;
-
-                        if (data.length === 0 && accionesEncontradas.length) {
-                            resultsContainer.innerHTML = htmlAcciones(accionesEncontradas, 0);
-                            return;
-                        }
+                        searchResultsCount = data.length;
 
                         if (data.length === 0) {
                             resultsContainer.innerHTML = `
@@ -1230,7 +1068,7 @@
                             `;
                         });
 
-                        resultsContainer.innerHTML = html + htmlAcciones(accionesEncontradas, data.length);
+                        resultsContainer.innerHTML = html;
                     })
                     .catch((error) => {
                         // Ignorar el error si la petición fue abortada por tipear rápido
@@ -1580,7 +1418,8 @@
                 card.classList.add('scale-100');
                 input.value = '';
                 clearBtn.classList.add('hidden');
-                performGlobalSearch('');
+                document.getElementById('search-results').innerHTML =
+                    '<div class="px-3 py-6 text-center text-[12px] text-slate-400">Escriba al menos 2 letras para buscar en toda la base de datos...</div>';
                 input.focus();
             }, 10);
         }
@@ -1645,14 +1484,18 @@
                 const day = now.getDate();
                 const month = months[now.getMonth()];
 
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
 
                 clockElement.innerHTML = `
-                    <span style="color: var(--text-main); font-weight: 600;">${dayName}, ${day} ${month}</span>
+                    <span style="color: var(--text-muted); margin-right: 6px;">${dayName}, ${day} ${month}</span>
+                    <span style="color: var(--border-light);">|</span>
+                    <span style="color: var(--text-main); font-weight: 600; margin-left: 6px;">${hours}:${minutes}:${seconds}</span>
                 `;
             }
         }
-        // Solo la fecha: se actualiza cada minuto (antes cambiaba cada segundo y distraía)
-        setInterval(updateClock, 60000);
+        setInterval(updateClock, 1000);
         updateClock();
     </script>
 </body>

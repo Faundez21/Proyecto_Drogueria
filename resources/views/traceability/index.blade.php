@@ -14,6 +14,13 @@
 
 @section('content')
 
+    <!-- migas de pan -->
+    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
+        <span class="text-slate-400 font-semibold">04</span>
+        <span>Control</span>
+        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        <span class="font-semibold text-slate-800">Trazabilidad de Lotes</span>
+    </div>
 
     <!-- tarjetas kpis -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 mb-6">
