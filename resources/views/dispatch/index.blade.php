@@ -250,7 +250,7 @@
                             class="w-full max-w-full truncate bg-slate-50 border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                             <option value="" disabled selected>Seleccione la clasificación...</option>
                             <option value="Interno">Interno (Nivel Comunal / CESFAM)</option>
-                            <option value="Externo">Externo (Traspasos, Préstamos, Donaciones, etc.)</option>
+                            <option value="Externo">Externo (Préstamos, Donaciones, Devoluciones, etc.)</option>
                         </select>
                     </div>
 
@@ -334,6 +334,17 @@
                         <input type="text" name="condiciones_transporte"
                             placeholder="Ej: Cadena de frío (2 °C a 8 °C). Referencia solicitud interna #342."
                             class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
+                    </div>
+
+                    <!-- traspaso interno: despacho a la red sin solicitud previa -->
+                    <div id="div_motivo_traspaso" class="md:col-span-4 hidden">
+                        <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl">
+                            <label for="motivo_traspaso" class="block text-[12px] font-bold text-amber-900 mb-1">Motivo del traspaso interno <span class="text-rose-500">*</span></label>
+                            <p class="text-[11.5px] text-amber-800 mb-2">Este despacho no viene de una solicitud. Indica el motivo. Si quien recibe no está presente, puede firmar después desde la bandeja de despachos y la guía quedará como «Pendiente de recepción».</p>
+                            <input type="text" name="motivo_traspaso" id="motivo_traspaso" maxlength="500"
+                                placeholder="Ej: Reposición urgente por quiebre de stock."
+                                class="w-full bg-white border border-amber-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -430,6 +441,7 @@
                         <button type="button" onclick="signatureRecibe.clear()"
                             class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500 transition-colors">Limpiar
                             Firma de Recepción</button>
+                        <p id="nota_firma_recibe_traspaso" class="hidden mt-1 text-[11px] text-amber-700 font-semibold text-center">Opcional en un traspaso interno: si no firma ahora, la guía queda «Pendiente de recepción».</p>
                     </div>
                 </div>
             </div>
@@ -1083,6 +1095,10 @@
                                     @if (strtolower($despacho->clasificacion) == 'interno')
                                         <span
                                             class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Interno</span>
+                                        @if ($despacho->esTraspasoInterno())
+                                            <span
+                                                class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-1 rounded text-[10px] uppercase">Traspaso</span>
+                                        @endif
                                     @else
                                         <span
                                             class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Externo' }}</span>
@@ -1090,6 +1106,12 @@
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-800">
                                     {{ $despacho->establecimiento_destino }}
+                                    @if ($despacho->esTraspasoInterno())
+                                        <p class="text-[11px] font-medium text-slate-500 mt-0.5 whitespace-normal">Motivo: {{ $despacho->motivo_traspaso }}</p>
+                                    @endif
+                                    @if ($despacho->pendienteRecepcion())
+                                        <span class="inline-block mt-1 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase">Pendiente de recepción</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     @if (strtolower($despacho->estado_liberacion) === 'liberada')
@@ -1111,6 +1133,13 @@
                                         </svg>
                                         VER PDF
                                     </a>
+                                    @if ($despacho->pendienteRecepcion())
+                                        <button type="button"
+                                            onclick="registrarRecepcion({{ $despacho->id }}, @js($despacho->correlativo))"
+                                            class="mt-1.5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-600 hover:text-white border border-amber-200 hover:border-amber-600 rounded-lg text-[11px] font-bold transition-colors cursor-pointer">
+                                            REGISTRAR RECEPCIÓN
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                             <!-- detalle de articulos y firmas oculto -->
@@ -1182,6 +1211,11 @@
                                                 @if (isset($despacho->firma_recibe) && $despacho->firma_recibe)
                                                     <img src="{{ $despacho->firma_recibe }}" class="mx-auto max-h-16"
                                                         alt="Firma Recepción">
+                                                    @if ($despacho->esTraspasoInterno() && $despacho->fecha_recepcion)
+                                                        <p class="text-[10px] text-slate-400 mt-1">Recibido el {{ $despacho->fecha_recepcion->format('d-m-Y H:i') }}</p>
+                                                    @endif
+                                                @elseif ($despacho->pendienteRecepcion())
+                                                    <p class="text-xs text-amber-700 font-semibold py-2">Pendiente de recepción</p>
                                                 @else
                                                     <p class="text-xs text-slate-400 italic py-2">No registrada</p>
                                                 @endif
@@ -1351,7 +1385,8 @@
                                 <span class="das-swal-badge-ok px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">DESPACHO CONFORME</span>
                             </div>
                             <p class="das-swal-meta"><strong>Destino:</strong> ${dispData.destino}</p>
-                            <p class="das-swal-meta"><strong>Clasificación:</strong> ${dispData.clasificacion}</p>
+                            <p class="das-swal-meta"><strong>Clasificación:</strong> ${dispData.clasificacion}${dispData.es_traspaso ? ' (traspaso interno)' : ''}</p>
+                            ${dispData.pendiente_recepcion ? '<p class="das-swal-meta font-semibold text-amber-700">Pendiente de recepción: quien recibe debe firmar desde la bandeja de despachos.</p>' : ''}
                             <p class="das-swal-meta"><strong>Fecha de Emisión:</strong> ${dispData.fecha}</p>
                             <p class="das-swal-meta"><strong>Total Unidades Despachadas:</strong> ${Number(dispData.total_unidades || 0).toLocaleString('es-CL')} uds. (${dispData.total_items} producto${dispData.total_items === 1 ? '' : 's'})</p>
                         </div>
@@ -1521,7 +1556,7 @@
 
                     Swal.fire({
                         title: '¿Confirmar Emisión de Despacho?',
-                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s)${textoUnidades}.<br><span class="text-[12px] text-slate-500 mt-1 block">El stock de los lotes asignados se rebajará según orden FEFO.</span>`,
+                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s)${textoUnidades}.<br><span class="text-[12px] text-slate-500 mt-1 block">El stock de los lotes asignados se rebajará según orden FEFO.</span>${esModoTraspasoInterno() ? `<span class="text-[12px] text-amber-700 font-semibold mt-2 block">Traspaso interno sin solicitud${(!signatureRecibe || signatureRecibe.isEmpty()) ? ': quedará «Pendiente de recepción» hasta que firme quien recibe.' : '.'}</span>` : ''}`,
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#0f766e',
@@ -1532,7 +1567,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const faltaFirmaDespacha = !signatureDespacha || signatureDespacha.isEmpty();
-                            const faltaFirmaRecibe = (!signatureRecibe || signatureRecibe.isEmpty()) && !document.getElementById('firma_recibe_input').value;
+                            const faltaFirmaRecibe = !esModoTraspasoInterno() && (!signatureRecibe || signatureRecibe.isEmpty()) && !document.getElementById('firma_recibe_input').value;
                             if (faltaFirmaDespacha || faltaFirmaRecibe) {
                                 Swal.fire({
                                     icon: 'warning',
@@ -1669,6 +1704,8 @@
                 inpDir.value = '';
                 inpDir.placeholder = 'Ingrese la dirección manualmente...';
             }
+
+            actualizarModoTraspaso();
         }
 
         // funcion para buscar la direccion del cesfam elegido y rellenar el input readonly
@@ -2347,6 +2384,86 @@
             pendientesSolicitudActiva = {};
             const banner = document.getElementById('banner_solicitud_activa');
             if (banner) banner.classList.add('hidden');
+            actualizarModoTraspaso();
+        }
+
+        // Traspaso interno = clasificación "Interno" sin solicitud vinculada
+        function esModoTraspasoInterno() {
+            const clasif = document.getElementById('clasificacion_select')?.value;
+            const solicitudId = document.getElementById('establishment_request_id')?.value;
+            return clasif === 'Interno' && !solicitudId;
+        }
+
+        function actualizarModoTraspaso() {
+            const activo = esModoTraspasoInterno();
+            const div = document.getElementById('div_motivo_traspaso');
+            const inp = document.getElementById('motivo_traspaso');
+            const nota = document.getElementById('nota_firma_recibe_traspaso');
+            if (div) div.classList.toggle('hidden', !activo);
+            if (nota) nota.classList.toggle('hidden', !activo);
+            if (inp) {
+                if (activo) {
+                    inp.setAttribute('required', 'true');
+                    inp.setAttribute('name', 'motivo_traspaso');
+                } else {
+                    inp.removeAttribute('required');
+                    inp.removeAttribute('name');
+                }
+            }
+        }
+
+        // Firma posterior de quien recibe, para guías "Pendiente de recepción"
+        function registrarRecepcion(dispatchId, correlativo) {
+            let pad = null;
+            Swal.fire({
+                title: 'Registrar recepción',
+                html: `<p class="text-[12.5px] text-slate-600 mb-3">Guía <strong>${correlativo}</strong>: firma de quien recibe el despacho.</p>
+                       <div class="border-2 border-dashed border-teal-300 rounded-lg bg-white overflow-hidden mx-auto" style="max-width:400px;">
+                           <canvas id="pad_recepcion_posterior" width="400" height="150" class="cursor-crosshair touch-none w-full"></canvas>
+                       </div>
+                       <button type="button" id="btn_limpiar_recepcion_posterior" class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500">Limpiar firma</button>`,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar recepción',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#0f766e',
+                reverseButtons: true,
+                didOpen: () => {
+                    const canvas = document.getElementById('pad_recepcion_posterior');
+                    pad = new SignaturePad(canvas, { penColor: 'rgb(15, 23, 42)', backgroundColor: 'rgba(255, 255, 255, 1)' });
+                    document.getElementById('btn_limpiar_recepcion_posterior').addEventListener('click', () => pad.clear());
+                },
+                preConfirm: async () => {
+                    if (!pad || pad.isEmpty()) {
+                        Swal.showValidationMessage('Falta la firma de quien recibe.');
+                        return false;
+                    }
+                    try {
+                        const res = await fetch(`{{ url('dispatch') }}/${dispatchId}/recepcion`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ firma_recibe: pad.toDataURL('image/png') })
+                        });
+                        const data = await res.json().catch(() => ({}));
+                        if (!res.ok || !data.success) {
+                            throw new Error(data.message || 'No se pudo registrar la recepción.');
+                        }
+                        return data;
+                    } catch (err) {
+                        Swal.showValidationMessage(err.message);
+                        return false;
+                    }
+                }
+            }).then(result => {
+                if (result.isConfirmed) {
+                    Swal.fire({ icon: 'success', title: 'Recepción registrada', text: result.value.message, confirmButtonColor: '#0f766e' })
+                        .then(() => window.location.reload());
+                }
+            });
         }
 
         // despliegue de detalles de una solicitud

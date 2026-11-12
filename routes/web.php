@@ -100,6 +100,8 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:ver.despacho')->name('dispatch.pdf');
     Route::get('/dispatch/solicitudes', [DispatchController::class, 'solicitudes'])
         ->middleware('permission:ver.despacho')->name('dispatch.solicitudes');
+    Route::post('/dispatch/{id}/recepcion', [DispatchController::class, 'registrarRecepcion'])
+        ->middleware('permission:ver.despacho')->name('dispatch.recepcion');
 
     Route::get('/traceability', [TraceabilityController::class, 'index'])
         ->middleware('permission:ver.trazabilidad')->name('traceability.index');
