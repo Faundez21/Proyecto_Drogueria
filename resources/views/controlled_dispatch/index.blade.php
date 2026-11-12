@@ -188,10 +188,9 @@
                                 class="text-rose-500">*</span></label>
                         <select name="clasificacion" id="clasificacion_select" onchange="toggleClasificacion()" required
                             class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
-                            <option value="" disabled selected>Seleccione la clasificación...</option>
-                            <option value="Interno">Interno (Nivel Comunal / CESFAM)</option>
-                            <option value="Externo">Externo (Traspasos, Préstamos, Donaciones, etc.)</option>
+                            <option value="Interno" selected>Interno (Nivel Comunal / CESFAM)</option>
                         </select>
+                        <p class="text-[11px] text-slate-500 mt-1">Los fármacos controlados solo se despachan a un CESFAM de la red, a partir de su solicitud.</p>
                     </div>
 
                     <div class="md:col-span-1">
@@ -230,24 +229,6 @@
                                 data-direccion="Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano">CESFAM ALCALDE
                                 LEOCÁN PORTUS GOVINDEN</option>
                         </select>
-                    </div>
-
-                    <!-- div dinamico para destino externo -->
-                    <div id="div_externo" class="md:col-span-2 hidden">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo y Destino Externo <span
-                                class="text-rose-500">*</span></label>
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <select id="tipo_externo"
-                                class="w-full sm:w-2/5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
-                                <option value="" disabled selected>Tipo...</option>
-                                <option value="Traspaso">Traspaso</option>
-                                <option value="Prestamo">Préstamo</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                            <input type="text" id="establecimiento_externo"
-                                placeholder="Nombre institución/destino..."
-                                class="w-full sm:w-3/5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
-                        </div>
                     </div>
 
                     <div class="md:col-span-2">
@@ -1157,13 +1138,12 @@
                 selectEst.value = opcionEst.value;
                 actualizarDireccionInterna();
             } else if (solicitud.establecimiento) {
-                const selectClasif = document.getElementById('clasificacion_select');
-                if (selectClasif) {
-                    selectClasif.value = 'Externo';
-                    toggleClasificacion();
-                    const inputExt = document.getElementById('establecimiento_externo');
-                    if (inputExt) inputExt.value = solicitud.establecimiento;
-                }
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Destino no válido para controlados',
+                    text: `La solicitud es de «${solicitud.establecimiento}», que no es un CESFAM de la red. Los fármacos controlados solo se despachan a un CESFAM.`,
+                    confirmButtonColor: '#e11d48'
+                });
             }
 
             // condiciones de transporte / observaciones
@@ -1301,6 +1281,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Los controlados siempre son despacho interno a un CESFAM
+            if (typeof toggleClasificacion === 'function') toggleClasificacion();
+
             const padDespachaElem = document.getElementById('pad_despacha');
             const padRecibeElem = document.getElementById('pad_recibe');
             const padOptions = {
@@ -1593,15 +1576,15 @@
 
             if (val === 'Interno') {
                 divInt.classList.remove('hidden');
-                divExt.classList.add('hidden');
+                divExt?.classList.add('hidden');
 
                 selInt.setAttribute('name', 'establecimiento_destino');
                 selInt.setAttribute('required', 'true');
 
-                selExtTipo.removeAttribute('name');
-                selExtTipo.removeAttribute('required');
-                inpExtDest.removeAttribute('name');
-                inpExtDest.removeAttribute('required');
+                selExtTipo?.removeAttribute('name');
+                selExtTipo?.removeAttribute('required');
+                inpExtDest?.removeAttribute('name');
+                inpExtDest?.removeAttribute('required');
 
                 inpDir.readOnly = true;
                 inpDir.classList.add('bg-slate-50', 'cursor-not-allowed');
@@ -1609,7 +1592,7 @@
                 inpDir.placeholder = "Se autocompletará al seleccionar destino...";
 
                 actualizarDireccionInterna();
-            } else if (val === 'Externo') {
+            } else if (val === 'Externo' && divExt) {
                 divInt.classList.add('hidden');
                 divExt.classList.remove('hidden');
 

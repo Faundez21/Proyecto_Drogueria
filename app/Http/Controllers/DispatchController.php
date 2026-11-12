@@ -117,6 +117,7 @@ class DispatchController extends Controller
             'firma_despacha' => 'nullable|string',
             'firma_recibe' => 'nullable|string',
             'establishment_request_id' => 'nullable|integer|exists:establishment_requests,id',
+            'motivo_traspaso' => 'nullable|string|max:500',
             'productos' => 'required|array|min:1',
             'productos.*' => 'required|string|max:1000',
             'lotes' => 'nullable|array',
@@ -138,6 +139,12 @@ class DispatchController extends Controller
             : null;
         $estRegistrado = InventoryService::establecimientoRegistrado($validated['establecimiento_destino']);
 
+        // Traspaso interno: despacho a un establecimiento de la red sin solicitud previa.
+        // Exige un motivo y permite emitir la guía sin la firma de quien recibe;
+        // en ese caso queda "Pendiente de recepción" hasta que se firme desde la bandeja.
+        $esTraspasoInterno = $validated['clasificacion'] === 'Interno' && ! $solicitudVinculada;
+        $motivoTraspaso = trim((string) ($validated['motivo_traspaso'] ?? ''));
+
         if ($validated['clasificacion'] === 'Interno' && ! $estRegistrado) {
             $errorDespacho = "El destino «{$validated['establecimiento_destino']}» no es un establecimiento de la red. Selecciónalo de la lista.";
         } elseif ($solicitudVinculada) {
@@ -150,10 +157,13 @@ class DispatchController extends Controller
             }
         }
 
+        if (! $errorDespacho && $esTraspasoInterno && $motivoTraspaso === '') {
+            $errorDespacho = 'Indica el motivo del traspaso interno.';
+        }
         if (! $errorDespacho && empty($validated['firma_despacha'])) {
             $errorDespacho = 'Falta la firma de quien despacha (bodega).';
         }
-        if (! $errorDespacho && empty($validated['firma_recibe']) && empty($solicitudVinculada?->firma_solicitante)) {
+        if (! $errorDespacho && ! $esTraspasoInterno && empty($validated['firma_recibe']) && empty($solicitudVinculada?->firma_solicitante)) {
             $errorDespacho = 'Falta la firma de quien recibe el despacho.';
         }
 
@@ -194,6 +204,9 @@ class DispatchController extends Controller
                 'condiciones_transporte' => $validated['condiciones_transporte'] ?? null,
                 'firma_despacha' => $validated['firma_despacha'] ?? null,
                 'firma_recibe' => $firmaRecibe,
+                'motivo_traspaso' => $esTraspasoInterno ? $motivoTraspaso : null,
+                'estado_recepcion' => $firmaRecibe ? 'Recibido' : 'Pendiente',
+                'fecha_recepcion' => $firmaRecibe ? now() : null,
             ]);
 
             $itemsDespachados = [];
@@ -278,6 +291,8 @@ class DispatchController extends Controller
                 'tiene_controlados_pendientes' => $controladosPendientesCount > 0,
                 'cant_controlados_pendientes' => $controladosPendientesCount,
                 'solicitud_id' => $solicitudOrigenId,
+                'es_traspaso' => $esTraspasoInterno,
+                'pendiente_recepcion' => ! $firmaRecibe,
                 'url_despacho_controlado' => $solicitudOrigenId ? route('controlled_dispatch.index', ['solicitud_id' => $solicitudOrigenId]) : null,
             ];
 
@@ -341,5 +356,38 @@ class DispatchController extends Controller
         $pdf = Pdf::loadView('dispatch.pdf', compact('despacho'));
 
         return $pdf->stream('Guia_Despacho_' . $despacho->correlativo . '.pdf');
+    }
+
+    /**
+     * Registra la firma de quien recibe una guía que quedó "Pendiente de
+     * recepción" (traspaso interno emitido sin la firma del receptor).
+     */
+    public function registrarRecepcion(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'firma_recibe' => 'required|string',
+        ], [
+            'firma_recibe.required' => 'Falta la firma de quien recibe.',
+        ]);
+
+        $dispatch = Dispatch::findOrFail($id);
+
+        if ($dispatch->estado_recepcion !== 'Pendiente') {
+            return response()->json([
+                'success' => false,
+                'message' => "La guía {$dispatch->correlativo} ya tiene registrada su recepción.",
+            ], 422);
+        }
+
+        $dispatch->update([
+            'firma_recibe' => $validated['firma_recibe'],
+            'estado_recepcion' => 'Recibido',
+            'fecha_recepcion' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Recepción de la guía {$dispatch->correlativo} registrada.",
+        ]);
     }
 }

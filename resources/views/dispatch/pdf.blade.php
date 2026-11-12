@@ -116,6 +116,12 @@
                 <th>Condición Transporte</th>
                 <td>{{ $despacho->condiciones_transporte ?: 'Transporte Temperatura Ambiente Controlada' }}</td>
             </tr>
+            @if (! empty($despacho->motivo_traspaso))
+                <tr>
+                    <th>Traspaso Interno</th>
+                    <td colspan="3">Sin solicitud previa. Motivo: {{ $despacho->motivo_traspaso }}</td>
+                </tr>
+            @endif
         </tbody>
     </table>
 
@@ -187,6 +193,8 @@
                     <div class="signature-image-container">
                         @if(isset($despacho->firma_recibe) && $despacho->firma_recibe)
                             <img src="{{ $despacho->firma_recibe }}" class="signature-img" alt="Firma Recibe">
+                        @elseif (($despacho->estado_recepcion ?? null) === 'Pendiente')
+                            <p style="font-size: 10px; color: #b45309; font-weight: bold; padding-top: 20px;">RECEPCIÓN PENDIENTE</p>
                         @endif
                     </div>
                     <div class="signature-line"></div>
