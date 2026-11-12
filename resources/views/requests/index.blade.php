@@ -33,15 +33,6 @@
 @endsection
 
 @section('content')
-    <!-- migas de pan -->
-    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
-        <span class="text-slate-400 font-semibold">03</span>
-        <span>Salida</span>
-        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-        </svg>
-        <span class="font-semibold text-slate-800">Solicitudes Establecimientos</span>
-    </div>
 
     <div class="space-y-6">
 
@@ -797,7 +788,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Firma obligatoria',
-                        text: 'Debes firmar la solicitud antes de enviarla.',
+                        text: 'Debe firmar la solicitud antes de enviarla.',
                         confirmButtonColor: '#0d9488'
                     });
 
@@ -893,7 +884,7 @@
                                 return;
                             }
 
-                            let errorMsg = data.message || 'Verifica los datos ingresados.';
+                            let errorMsg = data.message || 'Verifique los datos ingresados.';
                             if (data.errors) {
                                 const firstKey = Object.keys(data.errors)[0];
                                 if (firstKey && data.errors[firstKey][0]) {

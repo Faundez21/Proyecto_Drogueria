@@ -51,14 +51,6 @@
     @endphp
 
     <!-- Migas de pan -->
-    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
-        <span class="text-slate-400 font-semibold">04</span>
-        <span>Configuración</span>
-        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-        </svg>
-        <span class="font-semibold text-slate-800">Usuarios y Permisos</span>
-    </div>
 
     <!-- Alertas de sesión -->
     @if (session('success'))
@@ -79,7 +71,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <div>
-                    <p class="text-[13px] font-extrabold text-rose-900">Revisa los datos ingresados:</p>
+                    <p class="text-[13px] font-extrabold text-rose-900">Revise los datos ingresados:</p>
                     <ul class="mt-1 list-disc list-inside text-[12px] text-rose-700 font-medium">
                         @foreach ($errors->all() as $err)
                             <li>{{ $err }}</li>
@@ -163,7 +155,7 @@
                             {{ $totalUsuarios }} usuario(s)
                         </span>
                     </div>
-                    <p class="text-[12px] text-slate-500 mt-0.5">Filtra y gestiona los funcionarios según su rol asignado o estado de cuenta.</p>
+                    <p class="text-[12px] text-slate-500 mt-0.5">Filtre y gestione los funcionarios según su rol asignado o estado de cuenta.</p>
                 </div>
             </div>
 
@@ -294,7 +286,7 @@
                                             @endif
                                             @if (in_array('solicitudes_cesfam', $userSolPermisos))
                                                 <span class="px-2 py-0.5 bg-purple-50 text-purple-700 font-bold rounded text-[10px] border border-purple-200">
-                                                    Solicitudes Cesfam
+                                                    Solicitudes CESFAM
                                                 </span>
                                             @endif
                                             @php
@@ -372,7 +364,7 @@
 
                                     @if ($user->id === auth()->id())
                                         <button class="p-1.5 text-slate-300 bg-slate-50 border border-slate-200 cursor-not-allowed rounded-lg"
-                                            title="No puedes deshabilitar tu propia cuenta" disabled>
+                                            title="No puede deshabilitar su propia cuenta" disabled>
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
@@ -449,7 +441,7 @@
                                 {{ $roles->count() }} Roles · {{ count($modulos) }} Vistas
                             </span>
                         </div>
-                        <p class="text-[12px] text-slate-300 mt-0.5">Configura qué módulos y vistas (incluyendo Solicitudes Establecimientos y Solicitudes Cesfam) puede visualizar cada rol.</p>
+                        <p class="text-[12px] text-slate-300 mt-0.5">Configure qué módulos y vistas (incluyendo Solicitudes Establecimientos y Solicitudes CESFAM) puede visualizar cada rol.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeRoles()"
@@ -563,7 +555,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-100">
                         <div>
                             <h3 id="roleFormTitle" class="text-[15px] font-extrabold text-slate-800">Nuevo Rol</h3>
-                            <p class="text-[11.5px] text-slate-500">Marca las vistas a las que tendrán acceso los usuarios con este rol.</p>
+                            <p class="text-[11.5px] text-slate-500">Marque las vistas a las que tendrán acceso los usuarios con este rol.</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <span id="roleCountBadge" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 text-[11px] font-extrabold transition-colors">
@@ -746,7 +738,7 @@
                     </div>
                     <div>
                         <h1 id="userModalTitle" class="text-lg font-extrabold text-white">Crear Nuevo Usuario</h1>
-                        <p class="text-xs text-slate-300 mt-0.5">Completa los datos del funcionario y asigna su rol de acceso.</p>
+                        <p class="text-xs text-slate-300 mt-0.5">Complete los datos del funcionario y asigne su rol de acceso.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeUserModal()"
@@ -787,7 +779,7 @@
                         </label>
                         <input type="email" id="email" name="email" required
                             pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-                            oninvalid="this.setCustomValidity(this.value === '' ? 'Completa este campo' : 'Ingresa un correo válido con su dominio (ej. usuario@ejemplo.com)')"
+                            oninvalid="this.setCustomValidity(this.value === '' ? 'Complete este campo' : 'Ingrese un correo válido con su dominio (ej. usuario@ejemplo.com)')"
                             oninput="this.setCustomValidity('')" placeholder="ejemplo@drogueriadas.cl"
                             class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-[13px] font-medium">
                     </div>
@@ -879,7 +871,7 @@
                         <svg class="w-4 h-4 shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
-                        <span class="text-[11.5px] font-bold">Este rol no tiene vistas asignadas. Debes asignarle al menos 1 vista antes de poder asignarlo a un usuario.</span>
+                        <span class="text-[11.5px] font-bold">Este rol no tiene vistas asignadas. Debe asignarle al menos 1 vista antes de poder asignarlo a un usuario.</span>
                     </div>
                 `;
                 return;
@@ -1036,7 +1028,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Nombre obligatorio',
-                    text: 'Debes ingresar un nombre para el rol.',
+                    text: 'Debe ingresar un nombre para el rol.',
                     confirmButtonColor: '#4f46e5'
                 });
                 if (nameInput) nameInput.focus();
@@ -1049,7 +1041,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Vista obligatoria',
-                    text: 'Debes asignar al menos 1 vista a este rol para que los usuarios puedan utilizarlo.',
+                    text: 'Debe asignar al menos 1 vista a este rol para que los usuarios puedan utilizarlo.',
                     confirmButtonColor: '#4f46e5'
                 });
                 return false;
@@ -1082,7 +1074,7 @@
         function confirmDeleteRole(roleId, roleName) {
             Swal.fire({
                 title: '¿Eliminar Rol?',
-                html: `¿Estás seguro de que deseas eliminar el rol <strong>${roleName}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción no se puede deshacer.</span>`,
+                html: `¿Está seguro de que desea eliminar el rol <strong>${roleName}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción no se puede deshacer.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e11d48',
@@ -1158,7 +1150,7 @@
             event.preventDefault();
             Swal.fire({
                 title: '¿Eliminar Usuario?',
-                html: `¿Estás seguro de que deseas eliminar al usuario <strong>${nombre}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción no se puede deshacer.</span>`,
+                html: `¿Está seguro de que desea eliminar al usuario <strong>${nombre}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción no se puede deshacer.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e11d48',
@@ -1182,7 +1174,7 @@
             Swal.fire({
                 title: 'Asignar Nueva Contraseña',
                 html: `
-            <p class="text-[13px] text-slate-600 mb-4">Ingresa la nueva clave para <strong>${email}</strong>:</p>
+            <p class="text-[13px] text-slate-600 mb-4">Ingrese la nueva clave para <strong>${email}</strong>:</p>
             <div class="relative w-full max-w-xs mx-auto">
                 <input type="password" id="swal_password_input" minlength="8" maxlength="64" class="swal2-input !m-0 !w-full !pr-10 text-[13px]" placeholder="Entre 8 y 64 caracteres" style="box-sizing: border-box;">
                 <button type="button" id="toggle_swal_password" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors">
@@ -1224,7 +1216,7 @@
                 preConfirm: () => {
                     const value = document.getElementById('swal_password_input').value;
                     if (!value) {
-                        Swal.showValidationMessage('¡Debes ingresar una contraseña!');
+                        Swal.showValidationMessage('¡Debe ingresar una contraseña!');
                         return false;
                     }
                     if (value.length < 8 || value.length > 64) {
@@ -1249,7 +1241,7 @@
 
             if (nameInput && !nameInput.value.trim()) {
                 event.preventDefault();
-                nameInput.setCustomValidity('Completa este campo');
+                nameInput.setCustomValidity('Complete este campo');
                 nameInput.reportValidity();
                 nameInput.focus();
                 return false;
@@ -1258,7 +1250,7 @@
 
             if (lastNameInput && !lastNameInput.value.trim()) {
                 event.preventDefault();
-                lastNameInput.setCustomValidity('Completa este campo');
+                lastNameInput.setCustomValidity('Complete este campo');
                 lastNameInput.reportValidity();
                 lastNameInput.focus();
                 return false;
@@ -1271,7 +1263,7 @@
 
             if (emailInput && !emailRegex.test(emailValue)) {
                 event.preventDefault();
-                emailInput.setCustomValidity('Ingresa un correo válido con su dominio (ej. usuario@ejemplo.com o .cl)');
+                emailInput.setCustomValidity('Ingrese un correo válido con su dominio (ej. usuario@ejemplo.com o .cl)');
                 emailInput.reportValidity();
                 emailInput.focus();
                 return false;
@@ -1312,7 +1304,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Rol obligatorio',
-                    text: 'Debes seleccionar un rol para el usuario.',
+                    text: 'Debe seleccionar un rol para el usuario.',
                     confirmButtonColor: '#0f968c'
                 });
                 return false;
@@ -1325,7 +1317,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Rol sin vistas asignadas',
-                        text: `El rol "${selectedRole}" no tiene ninguna vista asignada. Asigna al menos 1 vista al rol en "Roles y Accesos" antes de asignarlo a un usuario.`,
+                        text: `El rol "${selectedRole}" no tiene ninguna vista asignada. Asigne al menos 1 vista al rol en "Roles y Accesos" antes de asignarlo a un usuario.`,
                         confirmButtonColor: '#0f968c'
                     });
                     return false;
@@ -1384,7 +1376,7 @@
 
             Swal.fire({
                 title: `¿${isActivo ? 'Desactivar' : 'Activar'} usuario?`,
-                html: `¿Estás seguro de que deseas ${actionText} a <strong>${userName}</strong>?`,
+                html: `¿Está seguro de que desea ${actionText} a <strong>${userName}</strong>?`,
                 icon: isActivo ? 'warning' : 'question',
                 showCancelButton: true,
                 confirmButtonColor: confirmButtonColor,

@@ -140,10 +140,10 @@ class ProviderController extends Controller
             'rut.min' => 'El RUT debe tener al menos 9 caracteres.',
             'rut.max' => 'El RUT no puede superar los 20 caracteres.',
             'name.required' => 'El nombre del proveedor es obligatorio.',
-            'category.required' => 'Debes seleccionar una categoría.',
+            'category.required' => 'Debe seleccionar una categoría.',
             'email.required' => 'El correo electrónico es obligatorio.',
-            'email.email' => 'Ingresa una dirección de correo electrónico válida.',
-            'category.in' => 'Selecciona una categoría válida de la lista.',
+            'email.email' => 'Ingrese una dirección de correo electrónico válida.',
+            'category.in' => 'Seleccione una categoría válida de la lista.',
             'phone.regex' => 'El teléfono solo puede contener números, espacios, guiones y el signo +.',
         ]);
 
@@ -165,15 +165,15 @@ class ProviderController extends Controller
             'address' => 'nullable|string|max:255',
             'status' => 'nullable|in:activo,inactivo',
         ], [
-            'category.in' => 'Selecciona una categoría válida de la lista.',
+            'category.in' => 'Seleccione una categoría válida de la lista.',
             'phone.regex' => 'El teléfono solo puede contener números, espacios, guiones y el signo +.',
             'rut.required' => 'El RUT es obligatorio.',
             'rut.min' => 'El RUT debe tener al menos 9 caracteres.',
             'rut.unique' => 'Este RUT ya está registrado.',
             'name.required' => 'El nombre del proveedor es obligatorio.',
-            'category.required' => 'Debes seleccionar una categoría.',
+            'category.required' => 'Debe seleccionar una categoría.',
             'email.required' => 'El correo electrónico es obligatorio.',
-            'email.email' => 'Ingresa una dirección de correo electrónico válida.',
+            'email.email' => 'Ingrese una dirección de correo electrónico válida.',
         ]);
 
         $validated['rut'] = Rut::formatear($validated['rut']);

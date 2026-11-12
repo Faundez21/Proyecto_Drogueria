@@ -18,14 +18,6 @@
     <div class="space-y-6">
 
         <!-- Ruta de navegación -->
-        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
-            <span class="font-mono-das text-slate-400 font-semibold">01</span>
-            <span>Abastecimiento</span>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="font-medium text-slate-800">Proveedores</span>
-        </div>
 
         <!-- Tarjetas KPIs uniformes -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
@@ -311,7 +303,7 @@
                                         </svg>
                                     </div>
                                     <p class="text-[14px] font-medium text-slate-600">No se encontraron proveedores.</p>
-                                    <p class="text-[13px] text-slate-400 mt-1">Intenta ajustando los filtros de búsqueda.
+                                    <p class="text-[13px] text-slate-400 mt-1">Intente ajustar los filtros de búsqueda.
                                     </p>
                                 </td>
                             </tr>
@@ -473,7 +465,7 @@
                 class="flex items-start justify-between p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white shrink-0">
                 <div>
                     <h3 id="modal-edit-title" class="text-[18px] font-bold text-slate-800">Proveedor</h3>
-                    <p class="text-[12.5px] font-medium text-slate-500 mt-1">Completa la información del proveedor.</p>
+                    <p class="text-[12.5px] font-medium text-slate-500 mt-1">Complete la información del proveedor.</p>
                 </div>
                 <button type="button"
                     class="js-modal-close p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
@@ -717,7 +709,7 @@
                     return false;
                 }
                 if (!validateRut(rutInput.value)) {
-                    setFieldError(rutInput, 'provider-rut-error', 'RUT inválido. Revisa el número y el dígito verificador.');
+                    setFieldError(rutInput, 'provider-rut-error', 'RUT inválido. Revise el número y el dígito verificador.');
                     return false;
                 }
                 setFieldError(rutInput, 'provider-rut-error', '');
@@ -736,7 +728,7 @@
 
             function checkEmailField() {
                 if (!emailInput.value.trim() || !validateEmail(emailInput.value.trim())) {
-                    setFieldError(emailInput, 'provider-email-error', 'Ingresa un correo electrónico válido.');
+                    setFieldError(emailInput, 'provider-email-error', 'Ingrese un correo electrónico válido.');
                     return false;
                 }
                 setFieldError(emailInput, 'provider-email-error', '');
@@ -940,7 +932,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Faltan datos',
-                        text: 'Completa los campos obligatorios.',
+                        text: 'Complete los campos obligatorios.',
                         confirmButtonColor: '#0d9488'
                     });
                     return;
@@ -1007,7 +999,7 @@
 
                         const errores = result.errors ?
                             Object.values(result.errors).flat().join('\n') :
-                            result.message || 'Verifica los datos ingresados.';
+                            result.message || 'Verifique los datos ingresados.';
 
                         Swal.fire({
                             icon: 'error',
@@ -1020,7 +1012,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error de red',
-                        text: 'Revisa tu conexión e inténtalo nuevamente.',
+                        text: 'Revise su conexión e inténtelo nuevamente.',
                         confirmButtonColor: '#0d9488'
                     });
                 } finally {
@@ -1042,8 +1034,8 @@
                     const confirmText = isActivo ? 'Sí, Desactivar' : 'Sí, Reactivar';
 
                     Swal.fire({
-                        title: '¿Confirmas la acción?',
-                        html: `¿Estás seguro de que deseas <b>${actionText}</b> a <br><strong>${p.name}</strong>?`,
+                        title: '¿Confirma la acción?',
+                        html: `¿Está seguro de que desea <b>${actionText}</b> a <br><strong>${p.name}</strong>?`,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: confirmColor,

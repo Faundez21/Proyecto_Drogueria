@@ -46,7 +46,7 @@ class AisleController extends Controller
         ]);
 
         if (Aisle::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($request->name))])->exists()) {
-            return redirect()->back()->withInput()->with('error', "Ya existe un pasillo llamado «" . trim($request->name) . "». Usa otro nombre.");
+            return redirect()->back()->withInput()->with('error', "Ya existe un pasillo llamado «" . trim($request->name) . "». Use otro nombre.");
         }
 
         Aisle::create([
@@ -87,7 +87,7 @@ class AisleController extends Controller
         ]);
 
         if (Aisle::where('id', '!=', $aisle->id)->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($request->name))])->exists()) {
-            return redirect()->back()->withInput()->with('error', "Ya existe otro pasillo llamado «" . trim($request->name) . "». Usa otro nombre.");
+            return redirect()->back()->withInput()->with('error', "Ya existe otro pasillo llamado «" . trim($request->name) . "». Use otro nombre.");
         }
 
         $aisle->update([

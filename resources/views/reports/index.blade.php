@@ -29,12 +29,6 @@
     <div class="space-y-6">
 
         <!-- Ruta de navegación -->
-        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
-            <span class="font-mono-das text-slate-400 font-semibold">04</span>
-            <span>Control</span>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            <span class="font-medium text-slate-800">Reportes</span>
-        </div>
 
         <!-- KPI de Valorización -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -194,7 +188,7 @@
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                     </div>
                                     <p class="text-[14px] font-medium text-slate-600">No se encontraron registros para reportes.</p>
-                                    <p class="text-[13px] text-slate-400 mt-1">Intenta ajustando los filtros de búsqueda.</p>
+                                    <p class="text-[13px] text-slate-400 mt-1">Intente ajustar los filtros de búsqueda.</p>
                                 </td>
                             </tr>
                         @else

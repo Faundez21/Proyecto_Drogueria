@@ -25,7 +25,7 @@ class EnsureUserIsActive
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            $mensaje = 'Tu cuenta se encuentra inactiva. Contacta al administrador.';
+            $mensaje = 'Su cuenta se encuentra inactiva. Contacte al administrador.';
 
             if ($request->expectsJson()) {
                 return response()->json(['message' => $mensaje], 403);

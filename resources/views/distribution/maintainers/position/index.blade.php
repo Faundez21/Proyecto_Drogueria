@@ -32,22 +32,12 @@
     </div>
 @endsection
 
+@section('crumb')
+    Almacenamiento / <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 underline-offset-2 hover:underline">Distribución</a>
+@endsection
+
 @section('content')
     <div class="space-y-6">
-        <!-- Ruta de navegación -->
-        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
-            <span class="font-mono-das text-slate-400 font-semibold">02</span>
-            <span>Almacenamiento</span>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 transition-colors">Distribución</a>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="font-medium text-slate-800">Posiciones</span>
-        </div>
-
         <!-- navegacion entre pasillos, estantes, niveles y posiciones -->
         @include('distribution.partials.nav_tabs', ['activeTab' => 'position'])
 
@@ -199,7 +189,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                     </svg>
                                     <p class="text-[13.5px] font-bold text-slate-600">No hay posiciones registradas</p>
-                                    <p class="text-[12px] text-slate-400 mt-0.5">Crea la primera posición dentro de un nivel.</p>
+                                    <p class="text-[12px] text-slate-400 mt-0.5">Cree la primera posición dentro de un nivel.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -222,7 +212,7 @@
                     </div>
                     <div>
                         <h2 class="text-[15px] sm:text-[16px] font-bold text-white leading-tight">Nueva Posición</h2>
-                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Registra una nueva posición dentro de un nivel.</p>
+                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Registre una nueva posición dentro de un nivel.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCreate()"
@@ -672,7 +662,7 @@
             if (!name) return;
             Swal.fire({
                 title: '¿Crear Posición?',
-                html: `¿Confirmas registrar la posición <strong>${name}</strong> en el nivel seleccionado?`,
+                html: `¿Confirma registrar la posición <strong>${name}</strong> en el nivel seleccionado?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0f766e',
@@ -693,7 +683,7 @@
             const name = document.getElementById('editName')?.value.trim();
             Swal.fire({
                 title: '¿Guardar Cambios?',
-                html: `¿Confirmas actualizar los datos de la posición <strong>${name}</strong>?`,
+                html: `¿Confirma actualizar los datos de la posición <strong>${name}</strong>?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0f766e',
@@ -711,7 +701,7 @@
         function confirmDeletePosition(id, name) {
             Swal.fire({
                 title: '¿Eliminar Posición?',
-                html: `¿Estás seguro de que deseas eliminar la posición <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará la posición física del mapa de distribución.</span>`,
+                html: `¿Está seguro de que desea eliminar la posición <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará la posición física del mapa de distribución.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e11d48',

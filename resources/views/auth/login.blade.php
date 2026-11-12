@@ -294,7 +294,7 @@
                             </label>
                             <a href="#" onclick="abrirModalRecuperacion(event)"
                                 class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium">
-                                ¿Olvidaste tu contraseña?
+                                ¿Olvidó su contraseña?
                             </a>
                         </div>
                     </div>
@@ -314,10 +314,10 @@
                 </form>
 
                 <p class="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-600">
-                    ¿No tienes una cuenta?
+                    ¿No tiene una cuenta?
                     <button type="button" onclick="contactarAdministrador()"
                         class="font-semibold text-blue-700 hover:text-blue-900 underline-offset-2 hover:underline focus:outline-none cursor-pointer">
-                        Contacta al administrador
+                        Contacte al administrador
                     </button>
                 </p>
 
@@ -366,7 +366,7 @@
                     <div class="space-y-1.5 text-xs text-slate-600">
                         <div class="flex items-start gap-2">
                             <span class="w-4 h-4 rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
-                            <span>Ingresa el correo institucional registrado en tu cuenta.</span>
+                            <span>Ingrese el correo institucional registrado en su cuenta.</span>
                         </div>
                         <div class="flex items-start gap-2">
                             <span class="w-4 h-4 rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
@@ -374,7 +374,7 @@
                         </div>
                         <div class="flex items-start gap-2">
                             <span class="w-4 h-4 rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
-                            <span>Se te asignará una nueva contraseña segura (mínimo 8 caracteres).</span>
+                            <span>Se le asignará una nueva contraseña segura (mínimo 8 caracteres).</span>
                         </div>
                     </div>
                 </div>
@@ -430,7 +430,7 @@
                 <div>
                     <h4 class="text-base font-extrabold text-slate-900">¡Solicitud registrada con éxito!</h4>
                     <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                        Notificamos al administrador sobre la cuenta <strong id="recovery_success_email" class="text-slate-800"></strong>. Pronto se actualizará tu clave de acceso.
+                        Notificamos al administrador sobre la cuenta <strong id="recovery_success_email" class="text-slate-800"></strong>. Pronto se actualizará su clave de acceso.
                     </p>
                 </div>
                 <div class="pt-2">
@@ -472,7 +472,7 @@
 
             <div class="p-6 space-y-4 overflow-y-auto flex-1">
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    El acceso a la plataforma es exclusivo para personal autorizado de Droguería y establecimientos de salud (CESFAM / Postas). Comunícate con el administrador para habilitar tu perfil:
+                    El acceso a la plataforma es exclusivo para personal autorizado de Droguería y establecimientos de salud (CESFAM / Postas). Comuníquese con el administrador para habilitar su perfil:
                 </p>
 
                 <!-- correo con boton para copiarlo -->
@@ -499,7 +499,7 @@
                 <div class="space-y-3 pt-1">
                     <div>
                         <label for="contact_name" class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            Tu Nombre y Apellido <span class="text-slate-400 font-normal normal-case">(opcional)</span>
+                            Su Nombre y Apellido <span class="text-slate-400 font-normal normal-case">(opcional)</span>
                         </label>
                         <input type="text" id="contact_name" placeholder="Ej. Camila Muñoz"
                             class="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
@@ -575,7 +575,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Correo inválido',
-                    text: 'Ingresa un correo electrónico válido.',
+                    text: 'Ingrese un correo electrónico válido.',
                     confirmButtonColor: '#2563eb'
                 });
                 return;

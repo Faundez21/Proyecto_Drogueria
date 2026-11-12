@@ -27,9 +27,9 @@
             </svg>
         </div>
         
-        <h2 class="text-xl font-black text-slate-800 mb-2 relative z-10">No tienes autorización</h2>
+        <h2 class="text-xl font-black text-slate-800 mb-2 relative z-10">No tiene autorización</h2>
         <p class="text-[13px] font-medium text-slate-500 max-w-md mx-auto mb-8 leading-relaxed relative z-10">
-            Tu rol actual de usuario no cuenta con los permisos necesarios para visualizar este módulo o ejecutar esta operación. Contacta a un administrador si crees que esto es un error.
+            Su rol actual de usuario no cuenta con los permisos necesarios para visualizar este módulo o ejecutar esta operación. Contacte a un administrador si cree que esto es un error.
         </p>
         
         <button type="button" onclick="window.history.back()" 

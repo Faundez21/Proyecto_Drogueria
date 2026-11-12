@@ -14,13 +14,6 @@
 @endsection
 
 @section('content')
-    <!-- migas de pan -->
-    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
-        <span class="text-slate-400 font-semibold">01</span>
-        <span>Abastecimiento</span>
-        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        <span class="font-semibold text-slate-800">Recepción</span>
-    </div>
 
     <div class="space-y-6">
         <!-- notificaciones de exito -->
@@ -306,7 +299,7 @@
                                         </svg>
                                         Distribución Física en Bodega (Ubicación)
                                     </span>
-                                    <span class="text-[11.5px] text-slate-500 font-medium">Asigna pasillo, estante y nivel para ordenar el stock de inmediato</span>
+                                    <span class="text-[11.5px] text-slate-500 font-medium">Asigne pasillo, estante y nivel para ordenar el stock de inmediato</span>
                                 </div>
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-1">
                                     <div>
@@ -390,7 +383,7 @@
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Guardar y Descargar PDF
                     </button>
                     <button type="submit" data-action="save_only" class="btn-submit-reception w-full sm:w-auto px-5 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Confirmar Recepcion
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Confirmar Recepción
                     </button>
                 </div>
             </form>
@@ -1194,7 +1187,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Fecha de vencimiento obligatoria',
-                        text: 'Debes ingresar la fecha de vencimiento para todos los productos a recepcionar.',
+                        text: 'Debe ingresar la fecha de vencimiento para todos los productos a recepcionar.',
                         confirmButtonColor: '#0d9488'
                     });
                     return;
@@ -1237,7 +1230,7 @@
                         Swal.fire({
                             icon: 'warning',
                             title: 'Falta la firma',
-                            text: 'Debes firmar el acta de recepción en el recuadro de firma antes de confirmarla.',
+                            text: 'Debe firmar el acta de recepción en el recuadro de firma antes de confirmarla.',
                             confirmButtonColor: '#0d9488'
                         });
                         return;
@@ -1283,7 +1276,7 @@
                             }
 
                             // Manejo de errores de validación o servidor
-                            let errorMsg = data.message || 'Verifica los datos ingresados.';
+                            let errorMsg = data.message || 'Verifique los datos ingresados.';
                             if (data.errors) {
                                 const firstKey = Object.keys(data.errors)[0];
                                 if (firstKey && data.errors[firstKey][0]) {

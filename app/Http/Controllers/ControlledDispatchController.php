@@ -125,7 +125,7 @@ class ControlledDispatchController extends Controller
         $estRegistrado = InventoryService::establecimientoRegistrado($validated['establecimiento_destino']);
 
         if (! $solicitudVinculada) {
-            $errorDespacho = 'Los fármacos controlados solo se pueden despachar a partir de una solicitud de un CESFAM. Selecciona la solicitud en «Ver Solicitudes».';
+            $errorDespacho = 'Los fármacos controlados solo se pueden despachar a partir de una solicitud de un CESFAM. Seleccione la solicitud en «Ver Solicitudes».';
         } elseif (! $estRegistrado || ($estRegistrado['tipo'] ?? '') !== 'CESFAM') {
             $errorDespacho = "Los fármacos controlados solo se pueden despachar a un CESFAM. «{$validated['establecimiento_destino']}» no es un CESFAM de la red.";
         } elseif (! in_array($solicitudVinculada->estado, ['Pendiente', 'Asignada', 'Parcial'], true)) {

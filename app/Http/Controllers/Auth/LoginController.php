@@ -44,7 +44,7 @@ class LoginController extends Controller
                 $request->session()->regenerateToken();
 
                 return back()->withErrors([
-                    'email' => 'Tu cuenta se encuentra inactiva. Contacta al administrador.',
+                    'email' => 'Su cuenta se encuentra inactiva. Contacte al administrador.',
                 ])->onlyInput('email');
             }
 
@@ -127,7 +127,7 @@ class LoginController extends Controller
         request()->session()->regenerateToken();
 
         return redirect()->route('login')->withErrors([
-            'email' => 'Tu usuario no tiene ninguna vista asignada en el sistema. Contacta a un administrador para que configure tus accesos.',
+            'email' => 'Su usuario no tiene ninguna vista asignada en el sistema. Contacte a un administrador para que configure sus accesos.',
         ]);
     }
 

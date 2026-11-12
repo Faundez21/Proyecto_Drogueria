@@ -80,7 +80,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     $request->session()->regenerateToken();
 
                     return redirect()->route('login')->withErrors([
-                        'email' => 'Tu usuario no tiene ninguna vista asignada en el sistema. Contacta a un administrador para que habilite tus accesos.',
+                        'email' => 'Su usuario no tiene ninguna vista asignada en el sistema. Contacte a un administrador para que habilite sus accesos.',
                     ]);
                 }
 

@@ -4,7 +4,7 @@
 
 @section('actions')
     <button type="button" onclick="openBandeja()"
-        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200">
+        class="das-btn das-btn-secondary">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
@@ -19,15 +19,6 @@
         $totalActivas = collect($solicitudes)->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])->count();
         $totalMias = isset($misSolicitudesAsignadas) ? count($misSolicitudesAsignadas) : 0;
     @endphp
-    <!-- migas de pan -->
-    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
-        <span class="text-slate-400 font-semibold">03</span>
-        <span>Salida</span>
-        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-        </svg>
-        <span class="font-semibold text-slate-800">Despacho</span>
-    </div>
 
     <!-- notificaciones de alerta -->
     @if (session('error'))
@@ -49,110 +40,51 @@
         </div>
     @endif
 
-    <!-- Solicitudes asignadas al usuario logueado -->
+    <!-- Solicitudes asignadas al usuario: una fila compacta con un botón "Cargar" por solicitud -->
     @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
-        <div class="mb-6 bg-gradient-to-r from-teal-50 via-white to-indigo-50 border border-teal-200 rounded-2xl p-4 shadow-sm">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                        </svg>
-                    </span>
-                    <div>
-                        <h3 class="text-[13.5px] font-extrabold text-slate-800">
-                            Tienes {{ count($misSolicitudesAsignadas) }} solicitud(es) asignada(s) para despachar
-                        </h3>
-                        <p class="text-[11.5px] text-slate-500">
-                            Haz clic en "Cargar en Formulario" para preparar el despacho automáticamente o revisa el detalle en "Ver Solicitudes".
-                        </p>
-                    </div>
-                </div>
-                <button type="button" onclick="openSolicitudes('mias')"
-                    class="px-3.5 py-2 rounded-xl text-[12px] font-bold bg-white hover:bg-teal-50 text-teal-700 border border-teal-200 shadow-sm transition-colors cursor-pointer shrink-0">
-                    Ver mis asignadas
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                @foreach ($misSolicitudesAsignadas as $miSol)
-                    @php
-                        $esCesfamMiSol = \App\Services\InventoryService::esCesfam($miSol->establecimiento);
-                    @endphp
-                    <div class="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs">
-                        <div class="min-w-0">
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                                <span class="font-mono font-extrabold text-[12px] text-slate-800">{{ $miSol->numero_solicitud }}</span>
-                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $esCesfamMiSol ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700' }}">
-                                    {{ $esCesfamMiSol ? 'CESFAM' : 'Establecimiento' }}
-                                </span>
-                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-indigo-100 text-indigo-700">
-                                    {{ $miSol->estado }}
-                                </span>
-                            </div>
-                            <p class="text-[12.5px] font-bold text-slate-800 truncate mt-0.5" title="{{ $miSol->establecimiento }}">
-                                {{ $miSol->establecimiento }}
-                            </p>
-                            <p class="text-[11px] text-slate-500">
-                                {{ $miSol->items->count() }} producto(s) · {{ \Carbon\Carbon::parse($miSol->fecha_solicitud)->format('d/m/Y') }}
-                            </p>
-                        </div>
-                        <button type="button" onclick="usarSolicitud({{ $miSol->id }})"
-                            class="px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-sm transition-colors cursor-pointer shrink-0">
-                            Cargar
-                        </button>
-                    </div>
-                @endforeach
-            </div>
+        <div class="mb-4 flex flex-wrap items-center gap-2 px-3 py-2.5 bg-teal-50/70 border border-teal-200 rounded-xl">
+            <span class="text-[12.5px] font-semibold text-teal-900 mr-1">
+                Asignadas a usted ({{ count($misSolicitudesAsignadas) }}):
+            </span>
+            @foreach ($misSolicitudesAsignadas as $miSol)
+                @php
+                    $esCesfamMiSol = \App\Services\InventoryService::esCesfam($miSol->establecimiento);
+                @endphp
+                <span class="das-chip"
+                    title="{{ $miSol->establecimiento }} · {{ $esCesfamMiSol ? 'CESFAM' : 'Establecimiento' }} · {{ $miSol->estado }} · {{ $miSol->items->count() }} producto(s) · {{ \Carbon\Carbon::parse($miSol->fecha_solicitud)->format('d/m/Y') }}">
+                    <span class="font-mono">{{ $miSol->numero_solicitud }}</span>
+                    <span class="font-medium max-w-[220px] truncate">{{ $miSol->establecimiento }}</span>
+                    <button type="button" onclick="usarSolicitud({{ $miSol->id }})">Cargar</button>
+                </span>
+            @endforeach
+            <button type="button" onclick="openSolicitudes('mias')"
+                class="ml-auto text-[12.5px] font-semibold text-teal-800 hover:underline cursor-pointer">
+                Ver detalle de mis asignadas
+            </button>
         </div>
     @endif
 
-    <!-- indicadores de rendimiento -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-            <div>
-                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Despachos Hoy</p>
-                <h3 class="text-2xl font-black text-slate-800 mt-1">
-                    {{ collect($dispatches)->where('fecha_despacho', date('Y-m-d'))->count() }}</h3>
-            </div>
-            <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-            </div>
+    <!-- indicadores: una sola fila; cada uno abre su lista -->
+    <div class="das-kpi-strip">
+        <div class="das-kpi">
+            <span class="das-kpi-value">{{ collect($dispatches)->where('fecha_despacho', date('Y-m-d'))->count() }}</span>
+            <span class="das-kpi-label">Despachos hoy</span>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-            <div>
-                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Solicitudes por Despachar</p>
-                <h3 class="text-2xl font-black text-amber-600 mt-1">{{ $totalActivas }}</h3>
-            </div>
-            <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-            </div>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-            <div>
-                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Histórico Total</p>
-                <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ collect($dispatches)->count() }}</h3>
-            </div>
-            <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-            </div>
-        </div>
+        <button type="button" onclick="openSolicitudes()" class="das-kpi {{ $totalActivas > 0 ? 'is-warn' : '' }}" title="Ver solicitudes por despachar">
+            <span class="das-kpi-value">{{ $totalActivas }}</span>
+            <span class="das-kpi-label">Solicitudes por despachar</span>
+        </button>
+        <button type="button" onclick="openBandeja()" class="das-kpi" title="Abrir bandeja e historial">
+            <span class="das-kpi-value">{{ collect($dispatches)->count() }}</span>
+            <span class="das-kpi-label">Guías en el historial</span>
+        </button>
     </div>
 
     <!-- formulario principal de despacho -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col">
 
         <!-- cabecera de la tarjeta del formulario -->
-        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex items-center gap-4">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 rounded-t-2xl flex flex-wrap items-center gap-4">
             <div class="w-10 h-10 bg-[#0f968c]/10 text-[#0f968c] rounded-xl flex items-center justify-center shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -166,20 +98,20 @@
                     despachar y firmas.</p>
             </div>
             <button type="button" onclick="openSolicitudes()"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
+                class="das-btn das-btn-secondary">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4"></path>
                 </svg>
                 Ver Solicitudes
                 @if ($totalActivas > 0)
-                    <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold bg-white/20 text-white">
+                    <span class="das-btn-count">
                         {{ $totalActivas }}
                     </span>
                 @endif
                 @if ($totalMias > 0)
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
-                        {{ $totalMias }} asignada(s) a ti
+                        {{ $totalMias }} asignada(s) a usted
                     </span>
                 @endif
             </button>
@@ -206,39 +138,23 @@
                 </button>
             </div>
 
-            <!-- seccion de datos del remitente y correlativo -->
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100">
-                <div>
-                    <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Datos del Remitente</h4>
-                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm">
-                        <p class="text-[14px] font-extrabold text-slate-800">I. Municipalidad de Talcahuano</p>
-                        <p class="text-[12px] font-bold text-teal-700">Droguería Comunal Central</p>
-                        <p class="text-[11px] font-medium text-slate-500 mt-1 flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            Blanco Encalada 450, Talcahuano
-                        </p>
-                    </div>
-                </div>
-
-                <div class="flex flex-col justify-center items-end">
-                    <h4
-                        class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 w-full md:w-auto text-left md:text-right">
-                        N° Correlativo Automatico</h4>
+            <!-- remitente (fijo) y correlativo en una sola línea -->
+            <div class="px-6 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100">
+                <p class="text-[12.5px] text-slate-600">
+                    <span class="font-semibold text-slate-800">Remitente:</span>
+                    I. Municipalidad de Talcahuano · Droguería Comunal Central · Blanco Encalada 450, Talcahuano
+                </p>
+                <label class="flex items-center gap-2 text-[12.5px] font-semibold text-slate-600">
+                    N° correlativo
                     <input type="text" name="correlativo_despacho" value="{{ $correlativo }}" readonly
-                        class="w-full md:w-48 bg-slate-100 border border-slate-300 text-slate-800 text-lg font-mono font-extrabold rounded-xl text-center py-2 focus:outline-none cursor-default shadow-inner">
-                </div>
+                        class="w-40 bg-slate-100 border border-slate-300 text-slate-800 text-[14px] font-mono font-bold rounded-lg text-center py-1.5 focus:outline-none cursor-default">
+                </label>
             </div>
 
             <!-- seccion de destino y logistica con clasificacion -->
             <div class="p-6 bg-white border-b border-slate-100">
                 <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide mb-4">1. Tipo, Destino y
-                    Logistica</h3>
+                    Logística</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
 
@@ -340,7 +256,7 @@
                     <div id="div_motivo_traspaso" class="md:col-span-4 hidden">
                         <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl">
                             <label for="motivo_traspaso" class="block text-[12px] font-bold text-amber-900 mb-1">Motivo del traspaso interno <span class="text-rose-500">*</span></label>
-                            <p class="text-[11.5px] text-amber-800 mb-2">Este despacho no viene de una solicitud. Indica el motivo. Si quien recibe no está presente, puede firmar después desde la bandeja de despachos y la guía quedará como «Pendiente de recepción».</p>
+                            <p class="text-[11.5px] text-amber-800 mb-2">Este despacho no viene de una solicitud. Indique el motivo. Si quien recibe no está presente, puede firmar después desde la bandeja de despachos y la guía quedará como «Pendiente de recepción».</p>
                             <input type="text" name="motivo_traspaso" id="motivo_traspaso" maxlength="500"
                                 placeholder="Ej: Reposición urgente por quiebre de stock."
                                 class="w-full bg-white border border-amber-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
@@ -357,7 +273,7 @@
                             2. Detalle de Extracción (Lotes en Stock)
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200 lowercase">criterio fefo</span>
                         </h3>
-                        <p class="text-[11.5px] text-slate-500 mt-0.5">Selecciona el producto o escanea el QR del lote para rebajar stock de bodega central.</p>
+                        <p class="text-[11.5px] text-slate-500 mt-0.5">Seleccione el producto o escanee el QR del lote para rebajar stock de bodega central.</p>
                     </div>
 
                     <div class="flex items-center gap-2.5">
@@ -446,31 +362,79 @@
                 </div>
             </div>
 
-            <!-- botones inferiores del formulario -->
-            <div
-                class="px-6 py-5 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-3 rounded-b-2xl">
+            <!-- barra inferior fija: resumen del despacho + acciones (siempre visible al bajar) -->
+            <div class="das-summary mx-4 mb-4">
+                <div class="das-summary-items" id="das_resumen_items" aria-live="polite"></div>
+                <div class="flex flex-wrap items-center gap-2">
                 <button type="button" id="btn_limpiar_form"
-                    class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-[13px] font-bold hover:bg-slate-50 transition-colors text-center shadow-sm cursor-pointer">
+                    class="das-btn das-btn-ghost">
                     Limpiar Formulario
                 </button>
                 <button type="submit" name="action" value="save_and_download"
-                    class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-xl text-[13px] font-bold hover:bg-blue-700 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
+                    class="das-btn das-btn-secondary">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
                     Guardar y Descargar PDF
                 </button>
                 <button type="submit" name="action" value="save_only"
-                    class="w-full sm:w-auto px-6 py-2.5 bg-slate-800 text-white rounded-xl text-[13px] font-bold hover:bg-slate-900 flex items-center justify-center gap-2 transition-all shadow-md hover:-translate-y-0.5 cursor-pointer">
-                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="das-btn das-btn-primary" title="Atajo: Ctrl + Enter">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     Confirmar Despacho y Registrarlo
                 </button>
             </div>
+            </div>
         </form>
     </div>
+
+    <!-- resumen en vivo de la barra inferior + atajo Ctrl+Enter -->
+    <script>
+        (function () {
+            const form = document.getElementById('despachoForm');
+            const salida = document.getElementById('das_resumen_items');
+            if (!form || !salida) return;
+            const esc = (t) => String(t).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]);
+            const visible = (el) => el && el.offsetParent !== null;
+            function destino() {
+                const interno = document.getElementById('establecimiento_interno');
+                const externo = document.getElementById('establecimiento_externo');
+                if (visible(interno) && interno.value) return interno.options[interno.selectedIndex]?.text || interno.value;
+                if (visible(externo) && externo.value) return externo.value;
+                return '';
+            }
+            function firmaLista(pad, inputId) {
+                const input = document.getElementById(inputId);
+                return !!((pad && !pad.isEmpty()) || (input && input.value));
+            }
+            function render() {
+                const productos = [...form.querySelectorAll('select[name="productos[]"]')].filter(s => s.value).length;
+                const unidades = [...form.querySelectorAll('input[name="cantidades[]"]')].reduce((a, i) => a + (parseInt(i.value) || 0), 0);
+                const d = destino().trim();
+                const fd = firmaLista(typeof signatureDespacha !== 'undefined' ? signatureDespacha : null, 'firma_despacha_input');
+                const fr = firmaLista(typeof signatureRecibe !== 'undefined' ? signatureRecibe : null, 'firma_recibe_input');
+                const recibeOpcional = typeof esModoTraspasoInterno === 'function' && esModoTraspasoInterno();
+                salida.innerHTML =
+                    `<span class="${d ? 'is-done' : 'is-pending'}">Destino: <b>${d ? esc(d) : 'sin elegir'}</b></span>`
+                    + `<span>Productos: <b>${productos}</b></span>`
+                    + `<span>Unidades: <b>${unidades.toLocaleString('es-CL')}</b></span>`
+                    + `<span class="${fd ? 'is-done' : 'is-pending'}">Firma despacha: <b>${fd ? 'lista' : 'pendiente'}</b></span>`
+                    + `<span class="${fr ? 'is-done' : (recibeOpcional ? '' : 'is-pending')}">Firma recibe: <b>${fr ? 'lista' : (recibeOpcional ? 'opcional' : 'pendiente')}</b></span>`;
+            }
+            ['input', 'change'].forEach(ev => form.addEventListener(ev, render));
+            form.addEventListener('pointerup', () => setTimeout(render, 60));
+            setInterval(render, 1500); // también refleja lo que se carga desde una solicitud o por FEFO
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    const btn = form.querySelector('button[type="submit"][value="save_only"]');
+                    if (btn) { e.preventDefault(); btn.click(); }
+                }
+            });
+            render();
+        })();
+    </script>
 
     <!-- plantilla oculta para generar nuevas filas de productos -->
     <template id="rowTemplate">
@@ -505,10 +469,11 @@
             <td data-label="Programa" class="col-programa px-3 py-2.5 border-r border-slate-100 align-middle max-w-0">
                 <select name="programas[]" required
                     class="w-full max-w-full truncate bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
+                    <option value="" selected>Seleccione programa...</option>
                     @foreach ($programasLista ?? [] as $idxProg => $progOpt)
                         @php $progLimpio = trim(preg_replace('/\s+/', ' ', $progOpt ?? '')); @endphp
                         @if($progLimpio !== '')
-                            <option value="{{ $progLimpio }}" {{ $idxProg === 0 ? 'selected' : '' }}>{{ $progLimpio }}</option>
+                            <option value="{{ $progLimpio }}">{{ $progLimpio }}</option>
                         @endif
                     @endforeach
                 </select>
@@ -752,7 +717,7 @@
                                         @if ($esMia)
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
-                                                Asignada a ti
+                                                Asignada a usted
                                             </span>
                                         @elseif ($solicitud->assignedUser)
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
@@ -1434,7 +1399,7 @@
                                             Esta solicitud aún tiene <strong>${dispData.cant_controlados_pendientes} fármaco(s) controlado(s)</strong> pendiente(s) por despachar en el módulo de Despacho Controlado.
                                         </p>
                                         <p class="das-swal-mixed-cta text-amber-900 font-semibold text-[11.5px] mt-1.5">
-                                            ¿Deseas emitir el Despacho Controlado ahora mismo?
+                                            ¿Desea emitir el Despacho Controlado ahora mismo?
                                         </p>
                                     </div>
                                 </div>
@@ -1513,8 +1478,8 @@
                         if (excesos.length > 0) {
                             Swal.fire({
                                 icon: 'warning',
-                                title: 'Te pasas de lo solicitado',
-                                html: `<div style="font-size:13px;text-align:left;">No puedes despachar más de lo que falta en la solicitud. Ajusta las cantidades:<ul style="margin:8px 0 0 18px;list-style:disc;">${excesos.join('')}</ul></div>`,
+                                title: 'Excede lo solicitado',
+                                html: `<div style="font-size:13px;text-align:left;">No puede despachar más de lo que falta en la solicitud. Ajuste las cantidades:<ul style="margin:8px 0 0 18px;list-style:disc;">${excesos.join('')}</ul></div>`,
                                 confirmButtonColor: '#0f968c'
                             });
                             return;
@@ -2008,7 +1973,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Aviso de Seguridad',
-                    text: 'Para usar la cámara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.',
+                    text: 'Para usar la cámara necesita acceder mediante localhost, 127.0.0.1 o HTTPS.',
                     confirmButtonColor: '#0f968c'
                 });
             }
@@ -2048,7 +2013,7 @@
                         <div class="text-center p-4">
                             <svg class="w-10 h-10 text-rose-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             <p class="text-sm font-bold text-white">No se pudo acceder a la cámara</p>
-                            <p class="text-xs text-slate-400 mt-1">Verifica los permisos en tu navegador o conecta una cámara.</p>
+                            <p class="text-xs text-slate-400 mt-1">Verifique los permisos en su navegador o conecte una cámara.</p>
                         </div>
                     `;
                 }
@@ -2283,7 +2248,7 @@
 
             const confirmTitle = userId ? '¿Asignar Solicitud?' : '¿Desasignar Solicitud?';
             const confirmHtml = userId
-                ? `¿Deseas asignar la atención de esta solicitud al funcionario <strong>${userName}</strong>?`
+                ? `¿Desea asignar la atención de esta solicitud al funcionario <strong>${userName}</strong>?`
                 : 'La solicitud volverá al estado <strong>Pendiente</strong> sin funcionario responsable asignado.';
             const confirmBtnText = userId ? 'Sí, asignar' : 'Sí, desasignar';
 
