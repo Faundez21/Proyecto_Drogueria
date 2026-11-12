@@ -14,13 +14,6 @@
 
 @section('content')
 
-    <!-- migas de pan -->
-    <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
-        <span class="text-slate-400 font-semibold">04</span>
-        <span>Control</span>
-        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        <span class="font-semibold text-slate-800">Trazabilidad de Lotes</span>
-    </div>
 
     <!-- tarjetas kpis -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 mb-6">
@@ -398,7 +391,7 @@
                             <div class="bg-slate-800 p-5 rounded-2xl shadow-inner flex items-center justify-between border border-slate-700">
                                 <div>
                                     <p class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Stock Físico Restante</p>
-                                    <p class="text-[11px] text-slate-500 mt-0.5">Ubicacion: ${data.details.ubicacion}</p>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Ubicación: ${data.details.ubicacion}</p>
                                 </div>
                                 <p class="text-[24px] font-black text-white font-mono">${data.details.stock_actual} <span class="text-[12px] text-teal-400">UNID.</span></p>
                             </div>
@@ -450,7 +443,7 @@
                 })
                 .catch(err => {
                     console.error("error al cargar informacion: ", err);
-                    timelineContainer.innerHTML = `<div class="text-center text-rose-600 py-5"><p class="font-bold">Error de Conexión</p><p class="text-xs text-slate-500">Revisa la consola para más detalles.</p></div>`;
+                    timelineContainer.innerHTML = `<div class="text-center text-rose-600 py-5"><p class="font-bold">Error de Conexión</p><p class="text-xs text-slate-500">Revise la consola para más detalles.</p></div>`;
                     detailsContainer.innerHTML = `<div class="text-center text-rose-600 py-5"><p class="font-bold">No se pudieron cargar los datos</p></div>`;
                 });
         }

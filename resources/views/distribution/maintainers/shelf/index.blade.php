@@ -32,22 +32,12 @@
     </div>
 @endsection
 
+@section('crumb')
+    Almacenamiento / <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 underline-offset-2 hover:underline">Distribución</a>
+@endsection
+
 @section('content')
     <div class="space-y-6">
-        <!-- Ruta de navegación -->
-        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
-            <span class="font-mono-das text-slate-400 font-semibold">02</span>
-            <span>Almacenamiento</span>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 transition-colors">Distribución</a>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="font-medium text-slate-800">Estanterías</span>
-        </div>
-
         <!-- navegacion entre pasillos, estantes, niveles y posiciones -->
         @include('distribution.partials.nav_tabs', ['activeTab' => 'shelf'])
 
@@ -202,7 +192,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16M6 4v16M18 4v16"></path>
                                     </svg>
                                     <p class="text-[13.5px] font-bold text-slate-600">No hay estanterías registradas</p>
-                                    <p class="text-[12px] text-slate-400 mt-0.5">Crea una nueva estantería asociada a un pasillo.</p>
+                                    <p class="text-[12px] text-slate-400 mt-0.5">Cree una nueva estantería asociada a un pasillo.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -225,7 +215,7 @@
                     </div>
                     <div>
                         <h2 class="text-[15px] sm:text-[16px] font-bold text-white leading-tight">Nueva Estantería</h2>
-                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Registra un nuevo rack dentro de un pasillo.</p>
+                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Registre un nuevo rack dentro de un pasillo.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCreate()"
@@ -271,7 +261,7 @@
                                 class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-[13px] text-slate-800 font-mono-das focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
                         </div>
                     </div>
-                    <p class="text-[11px] text-slate-400 -mt-2">Define la capacidad máxima para calcular el % de ocupación en el visor 3D (usa 0 si no tiene límite).</p>
+                    <p class="text-[11px] text-slate-400 -mt-2">Defina la capacidad máxima para calcular el % de ocupación en el visor 3D (use 0 si no tiene límite).</p>
 
                     <div>
                         <label for="description" class="block text-[12.5px] font-bold text-slate-700 mb-1.5">
@@ -702,7 +692,7 @@
             if (!name) return;
             Swal.fire({
                 title: '¿Crear Estantería?',
-                html: `¿Confirmas registrar la estantería <strong>${name}</strong> en el pasillo seleccionado?`,
+                html: `¿Confirma registrar la estantería <strong>${name}</strong> en el pasillo seleccionado?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0f766e',
@@ -723,7 +713,7 @@
             const name = document.getElementById('editName')?.value.trim();
             Swal.fire({
                 title: '¿Guardar Cambios?',
-                html: `¿Confirmas actualizar los datos de la estantería <strong>${name}</strong>?`,
+                html: `¿Confirma actualizar los datos de la estantería <strong>${name}</strong>?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0f766e',
@@ -741,7 +731,7 @@
         function confirmDeleteShelf(id, name) {
             Swal.fire({
                 title: '¿Eliminar Estantería?',
-                html: `¿Estás seguro de que deseas eliminar la estantería <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará la estantería y sus niveles asociados.</span>`,
+                html: `¿Está seguro de que desea eliminar la estantería <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará la estantería y sus niveles asociados.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e11d48',

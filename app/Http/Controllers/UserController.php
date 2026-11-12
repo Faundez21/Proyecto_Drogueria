@@ -27,7 +27,7 @@ class UserController extends Controller
         'cuarentena' => 'Cuarentena',
         'distribucion' => 'Distribución',
         'solicitudes' => 'Solicitudes Establecimientos',
-        'solicitudes_cesfam' => 'Solicitudes Cesfam',
+        'solicitudes_cesfam' => 'Solicitudes CESFAM',
         'despacho' => 'Despacho Normal',
         'despacho_controlado' => 'Despacho Controlado',
         'trazabilidad' => 'Trazabilidad',
@@ -68,7 +68,7 @@ class UserController extends Controller
             'color' => 'teal',
             'items' => [
                 'solicitudes' => ['label' => 'Solicitudes Establecimientos', 'desc' => 'Pedidos de medicamentos e insumos (no estupefacientes)'],
-                'solicitudes_cesfam' => ['label' => 'Solicitudes Cesfam', 'desc' => 'Pedidos de medicamentos, insumos y estupefacientes para CESFAM'],
+                'solicitudes_cesfam' => ['label' => 'Solicitudes CESFAM', 'desc' => 'Pedidos de medicamentos, insumos y estupefacientes para CESFAM'],
                 'despacho' => ['label' => 'Despacho Normal', 'desc' => 'Emisión de guías de despacho FEFO y atención de solicitudes'],
                 'despacho_controlado' => ['label' => 'Despacho Controlado', 'desc' => 'Despacho exclusivo de fármacos controlados y estupefacientes'],
             ],
@@ -128,14 +128,14 @@ class UserController extends Controller
             'status' => 'nullable|in:activo,inactivo',
         ], [
             'email.regex' => 'El correo debe tener una extensión válida (ej. .com, .cl).',
-            'role.required' => 'Debes seleccionar un rol para el usuario.',
+            'role.required' => 'Debe seleccionar un rol para el usuario.',
             'role.exists' => 'El rol seleccionado no es válido.',
         ]);
 
         $role = Role::where('name', $validated['role'])->first();
         if ($role && $role->name !== 'Administrador' && $role->permissions()->count() === 0) {
             return back()->withInput()->withErrors([
-                'role' => "El rol '{$role->name}' no tiene ninguna vista asignada. Asigna al menos 1 vista a este rol antes de asignarlo a un usuario."
+                'role' => "El rol '{$role->name}' no tiene ninguna vista asignada. Asigne al menos 1 vista a este rol antes de asignarlo a un usuario."
             ]);
         }
 
@@ -168,17 +168,17 @@ class UserController extends Controller
             'status' => 'nullable|in:activo,inactivo',
         ], [
             'email.regex' => 'El correo debe tener una extensión válida (ej. .com, .cl).',
-            'role.required' => 'Debes seleccionar un rol para el usuario.',
+            'role.required' => 'Debe seleccionar un rol para el usuario.',
             'role.exists' => 'El rol seleccionado no es válido.',
         ]);
 
         // Un administrador no puede quitarse a sí mismo el rol ni desactivar su propia cuenta
         if ($user->id === auth()->id()) {
             if ($user->hasRole('Administrador') && $validated['role'] !== 'Administrador') {
-                return back()->withInput()->with('error', 'No puedes quitarte a ti mismo el rol de Administrador. Pídele a otro administrador que lo haga.');
+                return back()->withInput()->with('error', 'No puede quitarse a sí mismo el rol de Administrador. Pida a otro administrador que lo haga.');
             }
             if (($validated['status'] ?? 'activo') === 'inactivo') {
-                return back()->withInput()->with('error', 'No puedes desactivar tu propia cuenta.');
+                return back()->withInput()->with('error', 'No puede desactivar su propia cuenta.');
             }
         }
 
@@ -198,7 +198,7 @@ class UserController extends Controller
         $role = Role::where('name', $validated['role'])->first();
         if ($role && $role->name !== 'Administrador' && $role->permissions()->count() === 0) {
             return back()->withInput()->withErrors([
-                'role' => "El rol '{$role->name}' no tiene ninguna vista asignada. Asigna al menos 1 vista a este rol antes de asignarlo a un usuario."
+                'role' => "El rol '{$role->name}' no tiene ninguna vista asignada. Asigne al menos 1 vista a este rol antes de asignarlo a un usuario."
             ]);
         }
 
@@ -222,13 +222,13 @@ class UserController extends Controller
     public function toggleStatus(User $user)
     {
         if ($user->id === auth()->id()) {
-            return redirect()->route('users.index')->with('error', 'No puedes cambiar el estado de tu propia cuenta.');
+            return redirect()->route('users.index')->with('error', 'No puede cambiar el estado de su propia cuenta.');
         }
 
         // No se puede desactivar al último administrador activo
         if ($user->status === 'activo' && $user->hasRole('Administrador')
             && User::role('Administrador')->where('status', 'activo')->where('id', '!=', $user->id)->count() === 0) {
-            return redirect()->route('users.index')->with('error', 'No puedes desactivar al único administrador activo del sistema.');
+            return redirect()->route('users.index')->with('error', 'No puede desactivar al único administrador activo del sistema.');
         }
 
         $user->status = ($user->status === 'activo') ? 'inactivo' : 'activo';
@@ -250,8 +250,8 @@ class UserController extends Controller
         ], [
             'name.required' => 'El nombre del rol es obligatorio.',
             'name.unique' => 'Ya existe un rol con este nombre.',
-            'modulos.required' => 'Debes asignar al menos 1 vista al rol.',
-            'modulos.min' => 'Debes asignar al menos 1 vista al rol.',
+            'modulos.required' => 'Debe asignar al menos 1 vista al rol.',
+            'modulos.min' => 'Debe asignar al menos 1 vista al rol.',
             'modulos.*.in' => 'Una de las vistas seleccionadas no es válida.',
         ]);
 
@@ -283,8 +283,8 @@ class UserController extends Controller
         $validated = $request->validate($rules, [
             'name.required' => 'El nombre del rol es obligatorio.',
             'name.unique' => 'Ya existe un rol con este nombre.',
-            'modulos.required' => 'Debes asignar al menos 1 vista al rol.',
-            'modulos.min' => 'Debes asignar al menos 1 vista al rol.',
+            'modulos.required' => 'Debe asignar al menos 1 vista al rol.',
+            'modulos.min' => 'Debe asignar al menos 1 vista al rol.',
             'modulos.*.in' => 'Una de las vistas seleccionadas no es válida.',
         ]);
 
@@ -306,7 +306,7 @@ class UserController extends Controller
         }
 
         if ($role->users()->count() > 0) {
-            return redirect()->route('users.index')->with('error', "El rol '{$role->name}' tiene usuarios asignados. Reasígnalos primero.");
+            return redirect()->route('users.index')->with('error', "El rol '{$role->name}' tiene usuarios asignados. Reasígnelos primero.");
         }
 
         $role->delete();

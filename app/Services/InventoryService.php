@@ -875,7 +875,7 @@ class InventoryService
         }
 
         if ($nivelNorm === '') {
-            return $posNorm === '' ? null : 'Para indicar una posición también debes indicar el nivel.';
+            return $posNorm === '' ? null : 'Para indicar una posición también debe indicar el nivel.';
         }
 
         $level = $shelf->levels->first(fn ($l) => mb_strtolower(self::normalizarNivel((string) $l->number)) === mb_strtolower($nivelNorm));

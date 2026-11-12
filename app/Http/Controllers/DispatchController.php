@@ -146,7 +146,7 @@ class DispatchController extends Controller
         $motivoTraspaso = trim((string) ($validated['motivo_traspaso'] ?? ''));
 
         if ($validated['clasificacion'] === 'Interno' && ! $estRegistrado) {
-            $errorDespacho = "El destino «{$validated['establecimiento_destino']}» no es un establecimiento de la red. Selecciónalo de la lista.";
+            $errorDespacho = "El destino «{$validated['establecimiento_destino']}» no es un establecimiento de la red. Selecciónelo de la lista.";
         } elseif ($solicitudVinculada) {
             if (! in_array($solicitudVinculada->estado, ['Pendiente', 'Asignada', 'Parcial'], true)) {
                 $errorDespacho = "La solicitud N° {$solicitudVinculada->id} ya está en estado «{$solicitudVinculada->estado}» y no admite más despachos.";
@@ -158,7 +158,7 @@ class DispatchController extends Controller
         }
 
         if (! $errorDespacho && $esTraspasoInterno && $motivoTraspaso === '') {
-            $errorDespacho = 'Indica el motivo del traspaso interno.';
+            $errorDespacho = 'Indique el motivo del traspaso interno.';
         }
         if (! $errorDespacho && empty($validated['firma_despacha'])) {
             $errorDespacho = 'Falta la firma de quien despacha (bodega).';

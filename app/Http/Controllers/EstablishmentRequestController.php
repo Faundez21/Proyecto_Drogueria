@@ -294,7 +294,7 @@ class EstablishmentRequestController extends Controller
             'cantidad_solicitada' => 'required|array',
             'cantidad_solicitada.*' => 'required|integer|min:1',
         ], [
-            'firma_recibe.required' => 'Debes firmar la solicitud antes de enviarla.',
+            'firma_recibe.required' => 'Debe firmar la solicitud antes de enviarla.',
         ]);
 
         $esCesfam = InventoryService::esCesfam($validated['establecimiento']);

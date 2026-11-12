@@ -19,14 +19,6 @@
     <div class="w-full space-y-6">
 
         <!-- Migas de pan -->
-        <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-2 px-1 pt-2">
-            <span class="text-slate-400 font-semibold">02</span>
-            <span>Almacenamiento</span>
-            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="font-semibold text-slate-800">Cuarentena</span>
-        </div>
 
         @php
             $totalLotes = $totalLotesGlobal ?? $inventories->total();
@@ -643,7 +635,7 @@
                 <div class="sm:hidden px-3 py-1.5 bg-amber-50/70 border-b border-amber-200/60 text-[11px] text-amber-800 font-medium flex items-center justify-between shrink-0">
                     <span class="flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                        Desliza horizontalmente para ver más columnas
+                        Deslice horizontalmente para ver más columnas
                     </span>
                     <span class="text-[10px] text-amber-600 font-semibold font-mono">6 cols</span>
                 </div>

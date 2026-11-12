@@ -32,22 +32,12 @@
     </div>
 @endsection
 
+@section('crumb')
+    Almacenamiento / <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 underline-offset-2 hover:underline">Distribución</a>
+@endsection
+
 @section('content')
     <div class="space-y-6">
-        <!-- Ruta de navegación -->
-        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
-            <span class="font-mono-das text-slate-400 font-semibold">02</span>
-            <span>Almacenamiento</span>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 transition-colors">Distribución</a>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="font-medium text-slate-800">Pasillos</span>
-        </div>
-
         <!-- navegacion entre pasillos, estantes, niveles y posiciones -->
         @include('distribution.partials.nav_tabs', ['activeTab' => 'aisle'])
 
@@ -197,7 +187,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2"></path>
                                     </svg>
                                     <p class="text-[13.5px] font-bold text-slate-600">No hay pasillos registrados</p>
-                                    <p class="text-[12px] text-slate-400 mt-0.5">Crea el primer pasillo para organizar tus estanterías.</p>
+                                    <p class="text-[12px] text-slate-400 mt-0.5">Cree el primer pasillo para organizar sus estanterías.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -220,7 +210,7 @@
                     </div>
                     <div>
                         <h2 class="text-[15px] sm:text-[16px] font-bold text-white leading-tight">Nuevo Pasillo</h2>
-                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Registra un nuevo pasillo físico en la bodega.</p>
+                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Registre un nuevo pasillo físico en la bodega.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCreate()"
@@ -339,7 +329,7 @@
                         </div>
                         <div>
                             <h2 class="text-[16px] font-bold text-white leading-tight">Editar Pasillo</h2>
-                            <p class="text-slate-400 text-[12px] mt-0.5">Actualiza los datos del pasillo seleccionado.</p>
+                            <p class="text-slate-400 text-[12px] mt-0.5">Actualice los datos del pasillo seleccionado.</p>
                         </div>
                     </div>
                     <button type="button" onclick="closeEdit()"
@@ -652,7 +642,7 @@
             if (!name) return;
             Swal.fire({
                 title: '¿Crear Pasillo?',
-                html: `¿Confirmas registrar el pasillo <strong>${name}</strong> en el sistema?`,
+                html: `¿Confirma registrar el pasillo <strong>${name}</strong> en el sistema?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0f766e',
@@ -673,7 +663,7 @@
             const name = document.getElementById('editName')?.value.trim();
             Swal.fire({
                 title: '¿Guardar Cambios?',
-                html: `¿Confirmas actualizar los datos del pasillo <strong>${name}</strong>?`,
+                html: `¿Confirma actualizar los datos del pasillo <strong>${name}</strong>?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0f766e',
@@ -691,7 +681,7 @@
         function confirmDeleteAisle(id, name) {
             Swal.fire({
                 title: '¿Eliminar Pasillo?',
-                html: `¿Estás seguro de que deseas eliminar el pasillo <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará el pasillo del mapa de distribución.</span>`,
+                html: `¿Está seguro de que desea eliminar el pasillo <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará el pasillo del mapa de distribución.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e11d48',

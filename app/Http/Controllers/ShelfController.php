@@ -157,7 +157,7 @@ class ShelfController extends Controller
         if ($conflicto) {
             return response()->json([
                 'success' => false,
-                'message' => "No se puede colocar la estantería {$shelf->name} encima de {$conflicto->name}. Selecciona un espacio libre.",
+                'message' => "No se puede colocar la estantería {$shelf->name} encima de {$conflicto->name}. Seleccione un espacio libre.",
             ], 422);
         }
 

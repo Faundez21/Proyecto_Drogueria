@@ -82,7 +82,7 @@ class SolicitudService
 
         $numero = $solicitud->numero_solicitud ?: ('N° ' . $solicitud->id);
 
-        return "No puedes despachar más de lo que falta en la solicitud {$numero}. " . implode('; ', $excesos) . '.';
+        return "No puede despachar más de lo que falta en la solicitud {$numero}. " . implode('; ', $excesos) . '.';
     }
 
     /**

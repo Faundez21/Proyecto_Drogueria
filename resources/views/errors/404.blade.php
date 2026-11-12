@@ -24,7 +24,7 @@
 
         <h2 class="text-xl font-black text-slate-800 mb-2">No encontramos lo que buscas</h2>
         <p class="text-[13px] font-medium text-slate-500 max-w-md mx-auto mb-8 leading-relaxed">
-            El enlace podría estar roto, el producto/lote fue eliminado del inventario o has ingresado a una dirección que no existe en la plataforma de la Droguería.
+            El enlace podría estar roto, el producto/lote fue eliminado del inventario o ha ingresado a una dirección que no existe en la plataforma de la Droguería.
         </p>
 
         <a href="{{ route('dashboard.index') }}"

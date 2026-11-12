@@ -261,12 +261,12 @@ class ReceptionController extends Controller
             'posicion' => ['nullable', 'array'],
             'posicion.*' => ['nullable', 'string', 'max:100'],
         ], [
-            'fecha_vencimiento.required' => 'Debes ingresar la fecha de vencimiento para cada producto.',
+            'fecha_vencimiento.required' => 'Debe ingresar la fecha de vencimiento para cada producto.',
             'fecha_vencimiento.*.required' => 'La fecha de vencimiento es obligatoria para cada producto recepcionado.',
             'fecha_vencimiento.*.date' => 'La fecha de vencimiento ingresada no es válida.',
             'fecha_vencimiento.*.after_or_equal' => 'Uno de los productos ya está vencido. No se puede recepcionar un lote vencido.',
             'fecha_recepcion.before_or_equal' => 'La fecha de recepción no puede ser posterior a hoy.',
-            'firma_receptor.required' => 'Debes firmar el acta de recepción antes de confirmarla.',
+            'firma_receptor.required' => 'Debe firmar el acta de recepción antes de confirmarla.',
             'provider_id.exists' => 'El proveedor seleccionado no existe o está inactivo.',
         ]);
 
@@ -346,7 +346,7 @@ class ReceptionController extends Controller
             $prodLoteKey = mb_strtolower(trim($nomProdCheck)) . '|' . mb_strtolower((string) InventoryService::normalizarLote($loteCheck));
             if ($posCheck !== '' && isset($ubicacionesEnActa[$slotKey]) && $ubicacionesEnActa[$slotKey]['prod_lote'] !== $prodLoteKey) {
                 $otro = $ubicacionesEnActa[$slotKey]['nombre'];
-                $msgError = "No puedes asignar la misma ubicación (Estante {$estCheck}, Nivel {$nivCheck}, Posición {$posCheck}) a dos lotes distintos en la misma recepción («{$otro}» y «{$nomProdCheck}»).";
+                $msgError = "No puede asignar la misma ubicación (Estante {$estCheck}, Nivel {$nivCheck}, Posición {$posCheck}) a dos lotes distintos en la misma recepción («{$otro}» y «{$nomProdCheck}»).";
                 if ($request->expectsJson() || $request->ajax()) {
                     return response()->json(['ok' => false, 'message' => $msgError], 422);
                 }

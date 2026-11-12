@@ -632,7 +632,7 @@
         await Swal.fire({
             icon: 'warning',
             title: 'Motivo requerido',
-            text: mensaje || `Debes indicar el motivo para cambiar el estado a ${ctx.estado}.`,
+            text: mensaje || `Debe indicar el motivo para cambiar el estado a ${ctx.estado}.`,
             showDenyButton: false,
             showCancelButton: false,
             confirmButtonColor: COLORS.teal,
@@ -695,7 +695,7 @@
         const body = isJson ? await response.json().catch(() => ({})) : null;
 
         if (!isJson) {
-            throw { status: response.status, message: 'Tu sesión pudo haber expirado. Recarga la página e inicia sesión nuevamente.' };
+            throw { status: response.status, message: 'Su sesión pudo haber expirado. Recargue la página e inicie sesión nuevamente.' };
         }
         if (!response.ok || body.ok === false) {
             throw { status: response.status, message: body.message, errors: body.errors };
@@ -706,10 +706,10 @@
     async function mostrarError(err) {
         injectStyles();
         let title = 'No se pudo completar la operación';
-        let html = `<p class="ls-confirm-lead">${esc(err?.message || 'Ocurrió un error inesperado. Intenta nuevamente.')}</p>`;
+        let html = `<p class="ls-confirm-lead">${esc(err?.message || 'Ocurrió un error inesperado. Intente nuevamente.')}</p>`;
 
         if (err?.status === 422 && err.errors) {
-            title = 'Revisa los datos ingresados';
+            title = 'Revise los datos ingresados';
             html = '<ul style="text-align:left;margin:0;padding-left:18px">' +
                 Object.values(err.errors).flat().map((m) => `<li>${esc(m)}</li>`).join('') + '</ul>';
         } else if (err?.status === 419) {
@@ -717,9 +717,9 @@
             html = '<p class="ls-confirm-lead">El token de seguridad expiró. Recarga la página e intenta nuevamente.</p>';
         } else if (err?.status === 403) {
             title = 'Acceso denegado';
-            html = '<p class="ls-confirm-lead">No tienes permisos para realizar este movimiento.</p>';
+            html = '<p class="ls-confirm-lead">No tiene permisos para realizar este movimiento.</p>';
         } else if (err instanceof TypeError) {
-            html = '<p class="ls-confirm-lead">No fue posible conectar con el servidor. Verifica tu conexión.</p>';
+            html = '<p class="ls-confirm-lead">No fue posible conectar con el servidor. Verifique su conexión.</p>';
         }
 
         await Swal.fire({
@@ -979,7 +979,7 @@
 
         async procesar(ctx) {
             const requiereMotivo = ctx.estado === 'Merma' || ctx.estado === 'Cuarentena';
-            if (!(await validarMotivo(ctx, requiereMotivo, 'Debes indicar el motivo de la merma (daño, vencimiento, rechazo, etc.).'))) return false;
+            if (!(await validarMotivo(ctx, requiereMotivo, 'Debe indicar el motivo de la merma (daño, vencimiento, rechazo, etc.).'))) return false;
             return procesar({ form: ctx.form, confirm: this.confirmConfig(ctx) });
         },
 
@@ -1040,7 +1040,7 @@
                     title: '¿Mover Ubicación de Lote en Cuarentena?',
                     html: `
                         <div class="ls-confirm-wrap ls-theme-teal">
-                            <p class="ls-confirm-lead">¿Confirmas el cambio de ubicación física en bodega para el lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>
+                            <p class="ls-confirm-lead">¿Confirma el cambio de ubicación física en bodega para el lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>
                             <div class="ls-confirm-card">
                                 ${ubicHtml}
                                 ${ctx.motivo ? `<div class="ls-confirm-row"><strong>Motivo:</strong><span>${esc(ctx.motivo)}</span></div>` : ''}
@@ -1064,7 +1064,7 @@
 
         async procesar(ctx) {
             const soloReubicacion = ctx.estado === ctx.estadoInicial && huboCambioUbicacion(ctx);
-            if (!soloReubicacion && !(await validarMotivo(ctx, true, 'Debes indicar la justificación u observación técnica correspondiente.'))) return false;
+            if (!soloReubicacion && !(await validarMotivo(ctx, true, 'Debe indicar la justificación u observación técnica correspondiente.'))) return false;
             if (ctx.estado !== 'Merma' && !(await Ubicacion.validarSeleccionEnModal(ctx))) return false;
             return procesar({ form: ctx.form, confirm: this.confirmConfig(ctx) });
         },
@@ -1093,7 +1093,7 @@
                     title: '¿Mover Ubicación de Producto en Bodega?',
                     html: `
                         <div class="ls-confirm-wrap ls-theme-teal">
-                            <p class="ls-confirm-lead">¿Confirmas el cambio de ubicación física en bodega para el lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>
+                            <p class="ls-confirm-lead">¿Confirma el cambio de ubicación física en bodega para el lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>
                             <div class="ls-confirm-card">
                                 <div class="ls-confirm-row"><strong>Ubicación Anterior:</strong><span>${badgeUbicacion(ubicacionTexto(ctx.ubicacionInicial))}</span></div>
                                 <div class="ls-confirm-row"><strong>Nueva Ubicación:</strong><span>${badgeUbicacion(ubicacionTexto(ctx.ubicacion))}</span></div>
@@ -1119,7 +1119,7 @@
             }
             return {
                 title: '¿Guardar Cambios?',
-                html: `<p class="ls-confirm-lead">¿Confirmas actualizar la información del lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>`,
+                html: `<p class="ls-confirm-lead">¿Confirma actualizar la información del lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>`,
                 icon: 'question', color: COLORS.emerald, confirmText: 'Sí, confirmar',
             };
         },

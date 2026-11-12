@@ -28,14 +28,6 @@
 @section('content')
     <div class="space-y-6">
         <!-- Ruta de navegación -->
-        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
-            <span class="font-mono-das text-slate-400 font-semibold">02</span>
-            <span>Almacenamiento</span>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="font-medium text-slate-800">Distribución</span>
-        </div>
 
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -145,7 +137,7 @@
                     </div>
                     <div>
                         <h2 class="text-[15px] font-bold text-slate-800 leading-tight">Plano Interactivo de Almacenamiento</h2>
-                        <p class="text-[12px] text-slate-500">Haz clic sobre una estantería o caja para inspeccionar su ocupación, lotes y vencimientos</p>
+                        <p class="text-[12px] text-slate-500">Haga clic sobre una estantería o caja para inspeccionar su ocupación, lotes y vencimientos</p>
                     </div>
                 </div>
                 <div class="hidden md:flex items-center gap-2 text-[11px] font-semibold text-slate-600">
@@ -245,7 +237,7 @@
                             <span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-ping"></span>
                             Moviendo <span class="text-white underline" x-text="movingRackCode"></span>
                         </span>
-                        <span class="hidden md:inline text-slate-300">Haz clic en el piso para guardar</span>
+                        <span class="hidden md:inline text-slate-300">Haga clic en el piso para guardar</span>
                         <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-200 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 cursor-pointer select-none">
                             <input type="checkbox" x-model="snapToGrid" @change="toggleSnapGrid()" class="rounded border-slate-600 text-blue-500 focus:ring-0 w-3.5 h-3.5">
                             <span>Ajustar a cuadrícula</span>
@@ -794,7 +786,7 @@
                                 position: 'top-end',
                                 icon: 'info',
                                 title: `Modo Reubicación: ${cod}`,
-                                text: 'Haz clic en el piso de la bodega para colocarla (Esc para cancelar).',
+                                text: 'Haga clic en el piso de la bodega para colocarla (Esc para cancelar).',
                                 showConfirmButton: false,
                                 timer: 3500,
                                 timerProgressBar: true
@@ -3365,7 +3357,7 @@
                                         Swal.fire({
                                             icon: 'warning',
                                             title: 'Ubicación Ocupada',
-                                            html: `No puedes colocar la estantería <strong>${selectedObject.userData.code}</strong> encima de <strong>${nombreOcupado}</strong>.<br><span class="text-xs text-slate-500">Selecciona un espacio libre en el piso de la bodega.</span>`,
+                                            html: `No puede colocar la estantería <strong>${selectedObject.userData.code}</strong> encima de <strong>${nombreOcupado}</strong>.<br><span class="text-xs text-slate-500">Seleccione un espacio libre en el piso de la bodega.</span>`,
                                             confirmButtonColor: '#0f766e',
                                             timer: 2600,
                                             timerProgressBar: true

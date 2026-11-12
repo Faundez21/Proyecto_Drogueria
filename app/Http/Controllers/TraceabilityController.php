@@ -199,7 +199,7 @@ class TraceabilityController extends Controller
 
         // Fila de totales al final
         $html .= '<tr style="background-color: #ccfbf1; color: #134e4a; font-weight: bold; font-size: 11px; height: 28px;">';
-        $html .= '<td colspan="5" style="text-align: right; padding: 6px 10px;">TOTAL UNIDADES MOVILIZADAS EN EL PERIODO:</td>';
+        $html .= '<td colspan="5" style="text-align: right; padding: 6px 10px;">TOTAL UNIDADES MOVILIZADAS EN EL PERÍODO:</td>';
         $html .= '<td style="text-align: center; padding: 6px; mso-number-format:\'#,##0\';">' . (int) $totalUnidadesMovidas . '</td>';
         $html .= '<td colspan="2" style="padding: 6px;"></td>';
         $html .= '</tr>';

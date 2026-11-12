@@ -32,22 +32,12 @@
     </div>
 @endsection
 
+@section('crumb')
+    Almacenamiento / <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 underline-offset-2 hover:underline">Distribución</a>
+@endsection
+
 @section('content')
     <div class="space-y-6">
-        <!-- Ruta de navegación -->
-        <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
-            <span class="font-mono-das text-slate-400 font-semibold">02</span>
-            <span>Almacenamiento</span>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <a href="{{ route('distribution.index') }}" class="hover:text-teal-700 transition-colors">Distribución</a>
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="font-medium text-slate-800">Niveles</span>
-        </div>
-
         <!-- navegacion entre pasillos, estantes, niveles y posiciones -->
         @include('distribution.partials.nav_tabs', ['activeTab' => 'level'])
 
@@ -197,7 +187,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2"></path>
                                     </svg>
                                     <p class="text-[13.5px] font-bold text-slate-600">No hay niveles registrados</p>
-                                    <p class="text-[12px] text-slate-400 mt-0.5">Crea el primer nivel dentro de una estantería.</p>
+                                    <p class="text-[12px] text-slate-400 mt-0.5">Cree el primer nivel dentro de una estantería.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -220,7 +210,7 @@
                     </div>
                     <div>
                         <h2 class="text-[15px] sm:text-[16px] font-bold text-white leading-tight">Nuevo Nivel</h2>
-                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Registra un nuevo nivel dentro de una estantería.</p>
+                        <p class="text-slate-400 text-[11px] sm:text-[12px] mt-0.5">Registre un nuevo nivel dentro de una estantería.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCreate()"
@@ -674,7 +664,7 @@
             if (!number) return;
             Swal.fire({
                 title: '¿Crear Nivel?',
-                html: `¿Confirmas registrar el <strong>Nivel ${number}</strong> en la estantería seleccionada?`,
+                html: `¿Confirma registrar el <strong>Nivel ${number}</strong> en la estantería seleccionada?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0f766e',
@@ -695,7 +685,7 @@
             const number = document.getElementById('editNumber')?.value.trim();
             Swal.fire({
                 title: '¿Guardar Cambios?',
-                html: `¿Confirmas actualizar los datos del <strong>Nivel ${number}</strong>?`,
+                html: `¿Confirma actualizar los datos del <strong>Nivel ${number}</strong>?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0f766e',
@@ -713,7 +703,7 @@
         function confirmDeleteLevel(id, name) {
             Swal.fire({
                 title: '¿Eliminar Nivel?',
-                html: `¿Estás seguro de que deseas eliminar el <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará el nivel y sus posiciones asociadas.</span>`,
+                html: `¿Está seguro de que desea eliminar el <strong>${name}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción eliminará el nivel y sus posiciones asociadas.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e11d48',

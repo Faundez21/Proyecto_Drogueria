@@ -168,8 +168,8 @@ class GlobalSearchController extends Controller
                         'color' => 'text-teal-600',
                         'bg' => 'bg-teal-100',
                         'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>',
-                        'title' => "Solicitud {$sol->numero_solicitud} asignada a ti",
-                        'message' => "{$sol->establecimiento} ({$sol->estado}). Haz clic para despachar.",
+                        'title' => "Solicitud {$sol->numero_solicitud} asignada a usted",
+                        'message' => "{$sol->establecimiento} ({$sol->estado}). Haga clic para despachar.",
                         'time' => 'Despachar',
                         'url' => route('dispatch.index', ['solicitud_id' => $sol->id]),
                     ];
@@ -218,87 +218,110 @@ class GlobalSearchController extends Controller
                 }
             }
 
+            // Las alertas de lotes se agrupan en un resumen por tipo (antes se mostraban solo algunos lotes sueltos
+            // y la campana no reflejaba el total). La clave incluye el conteo para que el aviso vuelva a aparecer
+            // como pendiente cuando cambia la cantidad de lotes afectados.
+            $iconoAlerta = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>';
+            $hoy = Carbon::now()->startOfDay();
+
             if ($user->can('ver.trazabilidad') || $user->can('ver.inventario')) {
-                $vencimientos = DB::table('inventories')
+                $baseVenc = DB::table('inventories')
                     ->where('estado', 'Disponible')
                     ->where('cantidad', '>', 0)
                     ->when(! $puedeVerControlados, function ($q) {
                         $q->where('categoria', '!=', 'Fármacos Controlados');
                     })
-                    ->whereNotNull('fecha_vencimiento')
-                    ->where('fecha_vencimiento', '<=', Carbon::now()->addDays(60))
-                    ->orderBy('fecha_vencimiento', 'asc')
-                    ->limit(5)
-                    ->get();
+                    ->whereNotNull('fecha_vencimiento');
 
-                foreach ($vencimientos as $vence) {
-                    $fechaVencCarbon = Carbon::parse($vence->fecha_vencimiento)->startOfDay();
-                    $hoyCarbon = Carbon::now()->startOfDay();
-                    $dias = (int) abs($hoyCarbon->diffInDays($fechaVencCarbon, false));
-                    $estado = $fechaVencCarbon->isPast() ? 'Vencido hace' : 'Vence en';
-                    $urlVenc = $user->can('ver.trazabilidad')
-                        ? route('traceability.index') . '?search=' . urlencode($vence->lote)
-                        : route('inventory.index') . '?search=' . urlencode($vence->lote);
+                $urlVencimientos = $user->can('ver.inventario')
+                    ? route('inventory.index', ['order_by' => 'vencimiento'])
+                    : route('traceability.index');
+
+                $vencidos = (clone $baseVenc)->where('fecha_vencimiento', '<', $hoy->toDateString())->count();
+                if ($vencidos > 0) {
+                    $notifications[] = [
+                        'id' => "fefo_vencidos_{$vencidos}",
+                        'color' => 'text-rose-700',
+                        'bg' => 'bg-rose-100',
+                        'icon' => $iconoAlerta,
+                        'title' => 'Lotes vencidos con stock',
+                        'message' => $vencidos === 1
+                            ? 'Hay 1 lote vencido que aún figura como disponible.'
+                            : "Hay {$vencidos} lotes vencidos que aún figuran como disponibles.",
+                        'time' => 'Ver lotes',
+                        'url' => $urlVencimientos,
+                    ];
+                }
+
+                // Mismo criterio que la tarjeta "Alerta FEFO (≤ 30 días)" del panel principal
+                $porVencerQuery = (clone $baseVenc)
+                    ->where('fecha_vencimiento', '>=', $hoy->toDateString())
+                    ->where('fecha_vencimiento', '<=', Carbon::now()->addDays(30)->toDateString());
+                $porVencer = (clone $porVencerQuery)->count();
+                if ($porVencer > 0) {
+                    $masProximo = (clone $porVencerQuery)->orderBy('fecha_vencimiento', 'asc')->first();
+                    $diasProx = (int) $hoy->diffInDays(Carbon::parse($masProximo->fecha_vencimiento)->startOfDay(), false);
+                    $cuando = $diasProx <= 0 ? 'vence hoy' : ($diasProx === 1 ? 'vence mañana' : "vence en {$diasProx} días");
 
                     $notifications[] = [
-                        'id' => "fefo_{$vence->id}_{$vence->lote}",
+                        'id' => "fefo_por_vencer_{$porVencer}",
                         'color' => 'text-rose-600',
                         'bg' => 'bg-rose-100',
-                        'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>',
-                        'title' => 'Alerta FEFO (Vencimiento)',
-                        'message' => "Lote {$vence->lote} de {$vence->producto}. {$estado} {$dias} días.",
-                        'time' => 'Crítico',
-                        'url' => $urlVenc,
+                        'icon' => $iconoAlerta,
+                        'title' => 'Alerta FEFO (≤ 30 días)',
+                        'message' => ($porVencer === 1 ? '1 lote vence' : "{$porVencer} lotes vencen") . " en los próximos 30 días. El más próximo: lote {$masProximo->lote} de {$masProximo->producto} ({$cuando}).",
+                        'time' => 'Ver lotes',
+                        'url' => $urlVencimientos,
                     ];
                 }
             }
 
             if ($user->can('ver.cuarentena')) {
-                $cuarentena = DB::table('inventories')
+                $baseCuar = DB::table('inventories')
                     ->where('estado', 'Cuarentena')
-                    ->where('cantidad', '>', 0)
-                    ->limit(3)->get();
+                    ->where('cantidad', '>', 0);
+                $enCuarentena = (clone $baseCuar)->count();
 
-                foreach ($cuarentena as $cuar) {
-                    $dias = (int) floor(Carbon::parse($cuar->updated_at ?? $cuar->created_at)->startOfDay()->diffInDays(now()->startOfDay()));
-
-                    $mensajeCuarentena = $dias == 0 ? "Lote {$cuar->lote} fue enviado a cuarentena hoy." : "Lote {$cuar->lote} lleva {$dias} días retenido.";
+                if ($enCuarentena > 0) {
+                    $masAntiguo = (clone $baseCuar)->orderByRaw('COALESCE(updated_at, created_at) asc')->first();
+                    $dias = (int) floor(Carbon::parse($masAntiguo->updated_at ?? $masAntiguo->created_at)->startOfDay()->diffInDays($hoy));
+                    $detalle = $dias == 0 ? 'enviado hoy' : "{$dias} días retenido";
 
                     $notifications[] = [
-                        'id' => "cuarentena_{$cuar->id}_{$cuar->lote}",
+                        'id' => "cuarentena_{$enCuarentena}",
                         'color' => 'text-amber-600',
                         'bg' => 'bg-amber-100',
-                        'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>',
-                        'title' => 'Lote en Cuarentena',
-                        'message' => $mensajeCuarentena,
-                        'time' => 'Revisión',
+                        'icon' => $iconoAlerta,
+                        'title' => 'Lotes en Cuarentena',
+                        'message' => ($enCuarentena === 1 ? 'Hay 1 lote retenido' : "Hay {$enCuarentena} lotes retenidos") . " para revisión. El más antiguo: lote {$masAntiguo->lote} ({$detalle}).",
+                        'time' => 'Revisar',
                         'url' => route('quarantine.index'),
                     ];
                 }
             }
 
             if ($user->can('ver.inventario')) {
-                $stockBajo = DB::table('inventories')
+                $baseBajo = DB::table('inventories')
                     ->where('estado', 'Disponible')
                     ->where('cantidad', '>', 0)
                     ->when(! $puedeVerControlados, function ($q) {
                         $q->where('categoria', '!=', 'Fármacos Controlados');
                     })
-                    ->whereRaw('cantidad <= CASE WHEN minimo > 0 THEN minimo ELSE 0 END')
-                    ->orderBy('cantidad', 'asc')
-                    ->limit(3)
-                    ->get();
+                    ->whereRaw('cantidad <= CASE WHEN minimo > 0 THEN minimo ELSE 0 END');
+                $stockBajo = (clone $baseBajo)->count();
 
-                foreach ($stockBajo as $bajo) {
+                if ($stockBajo > 0) {
+                    $masBajo = (clone $baseBajo)->orderBy('cantidad', 'asc')->first();
+
                     $notifications[] = [
-                        'id' => "stock_bajo_{$bajo->id}_{$bajo->producto}",
+                        'id' => "stock_bajo_{$stockBajo}",
                         'color' => 'text-orange-600',
                         'bg' => 'bg-orange-100',
                         'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
                         'title' => 'Stock Bajo',
-                        'message' => "{$bajo->producto} (Lote " . ($bajo->lote ?? 'S/L') . "): quedan {$bajo->cantidad} uds. (mínimo {$bajo->minimo}).",
+                        'message' => ($stockBajo === 1 ? '1 lote está' : "{$stockBajo} lotes están") . " en o bajo su stock mínimo. El más bajo: {$masBajo->producto} (quedan {$masBajo->cantidad} uds.).",
                         'time' => 'Reponer',
-                        'url' => route('inventory.index') . '?search=' . urlencode($bajo->producto),
+                        'url' => route('inventory.index', ['order_by' => 'stock_asc']),
                     ];
                 }
             }
