@@ -228,7 +228,7 @@ class DispatchController extends Controller
                         'cantidad' => -$asignacion['cantidad'],
                         'fecha_hora' => now(),
                         'origen_destino' => 'Hacia: ' . $destino,
-                        'documento_respaldo' => 'Guia N° ' . $correlativo,
+                        'documento_respaldo' => 'Guía N° ' . $correlativo,
                     ]);
 
                     $itemsDespachados[] = [

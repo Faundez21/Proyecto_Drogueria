@@ -40,7 +40,7 @@
             <!-- cabecera del formulario -->
             <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h2 class="text-[15px] font-bold text-slate-800">Registro de Ingreso de Mercaderia</h2>
+                    <h2 class="text-[15px] font-bold text-slate-800">Registro de Ingreso de Mercadería</h2>
                     <p class="text-[12px] text-slate-500 mt-0.5">Complete los datos del documento, proveedor y productos a recepcionar.</p>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                             <input type="text" id="correlativo_interno_display" value="{{ $nextCorrelativo ?? '1' }}" readonly class="w-full bg-slate-100 border border-slate-200 text-teal-700 font-bold rounded-lg block py-2.5 px-3.5 text-[13px] cursor-not-allowed">
                         </div>
                         <div>
-                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Fecha de Recepcion <span class="text-rose-500">*</span></label>
+                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Fecha de Recepción <span class="text-rose-500">*</span></label>
                             <input type="date" name="fecha_recepcion" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                         </div>
                         <div>
@@ -70,7 +70,7 @@
                             <select name="tipo_documento" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione...</option>
                                 <option value="Factura">Factura</option>
-                                <option value="Guia">Guia de Despacho</option>
+                                <option value="Guia">Guía de Despacho</option>
                             </select>
                         </div>
                         <div>
@@ -82,15 +82,15 @@
                             <input type="text" name="orden_compra" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Origen de la Mercaderia <span class="text-rose-500">*</span></label>
+                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Origen de la Mercadería <span class="text-rose-500">*</span></label>
                             <select name="origen" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione origen...</option>
                                 <option value="CENABAST">CENABAST</option>
                                 <option value="COMPRA DIRECTA DAS">COMPRA DIRECTA DAS</option>
                                 <option value="SSTHNO">SERVICIO DE SALUD TALCAHUANO</option>
                                 <option value="Traspaso">Traspaso</option>
-                                <option value="Donacion">Donacion</option>
-                                <option value="Prestamo">Prestamo</option>
+                                <option value="Donacion">Donación</option>
+                                <option value="Prestamo">Préstamo</option>
                                 <option value="Canje">Canje</option>
                             </select>
                         </div>
@@ -109,7 +109,7 @@
                             <input type="text" id="rut_proveedor_display" readonly placeholder="Auto-completado" class="w-full bg-slate-100 border border-slate-200 text-slate-600 rounded-lg block py-2.5 px-3.5 text-[13px] font-mono-das cursor-not-allowed">
                         </div>
                         <div class="sm:col-span-2 min-w-0">
-                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Razon Social / Nombre Proveedor <span class="text-rose-500">*</span></label>
+                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Razón Social / Nombre Proveedor <span class="text-rose-500">*</span></label>
                             <select name="provider_id" id="provider_select" required class="w-full max-w-full truncate bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione proveedor...</option>
                                 @foreach($providers as $provider)
@@ -356,7 +356,7 @@
                     <!-- gran total recepcion -->
                     <div class="mt-4 bg-teal-50/80 border border-teal-200/80 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                         <div>
-                            <h4 class="text-[14px] font-bold text-teal-900">Gran Total Recepcion (IVA Incluido)</h4>
+                            <h4 class="text-[14px] font-bold text-teal-900">Gran Total Recepción (IVA Incluido)</h4>
                             <p class="text-[12px] text-teal-600 mt-0.5">Suma de todos los productos ingresados + 19% IVA</p>
                         </div>
                         <div class="relative w-full sm:w-52">
@@ -375,7 +375,7 @@
 
                     <div class="flex flex-col items-center justify-center max-w-md mx-auto">
                         <!-- firma receptor unica -->
-                        <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma Quien Recibe (DAS)</p>
+                        <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma de quien recibe (DAS)</p>
                         <input type="hidden" name="firma_receptor" id="firma_receptor_input">
                         <div class="border-2 border-dashed border-teal-300 rounded-lg bg-white overflow-hidden shadow-sm w-full">
                             <canvas id="pad_receptor" width="400" height="150" class="cursor-crosshair touch-none w-full"></canvas>
@@ -412,7 +412,7 @@
                 <!-- filtros dinamicos del historial -->
                 <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros de Busqueda</span>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros de Búsqueda</span>
                         <button type="button" onclick="limpiarFiltrosRecepcion()" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 transition-colors">Limpiar Filtros</button>
                     </div>
 
@@ -425,7 +425,7 @@
 
                         <!-- filtro fecha -->
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Fecha Recepcion</label>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Fecha Recepción</label>
                             <input type="date" id="filtroFechaRec" oninput="filtrarRecepciones()" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors shadow-sm cursor-pointer">
                         </div>
 
@@ -452,7 +452,7 @@
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap" style="width: 90px;">N°</th>
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap" style="width: 120px;">Fecha</th>
                                 <th class="px-4 py-3 font-semibold">Proveedor</th>
-                                <th class="px-4 py-3 font-semibold" style="width: 220px;">Items</th>
+                                <th class="px-4 py-3 font-semibold" style="width: 220px;">Ítems</th>
                                 <th class="px-4 py-3 font-semibold text-center" style="width: 130px;">Acciones</th>
                             </tr>
                         </thead>
@@ -510,7 +510,7 @@
         <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col my-auto">
                 <div class="px-6 py-4 border-b border-slate-200 bg-slate-800 flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-bold text-white">Resumen de Recepcion</h3>
+                        <h3 class="text-lg font-bold text-white">Resumen de Recepción</h3>
                         <p class="text-slate-300 text-xs">Correlativo Interno: <span id="m_correlativo" class="font-bold text-teal-400"></span></p>
                     </div>
                     <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white">
@@ -520,7 +520,7 @@
                 <div class="p-6 bg-slate-50 overflow-y-auto">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div class="bg-white p-4 rounded-lg border border-slate-200">
-                            <h4 class="text-[11px] font-bold text-teal-600 uppercase mb-3">Informacion del Documento</h4>
+                            <h4 class="text-[11px] font-bold text-teal-600 uppercase mb-3">Información del Documento</h4>
                             <div class="space-y-2 text-[13px]">
                                 <div class="flex justify-between"><span class="text-slate-500">Documento:</span> <span class="font-medium text-slate-800" id="m_doc"></span></div>
                                 <div class="flex justify-between"><span class="text-slate-500">Fecha:</span> <span class="font-medium text-slate-800" id="m_fecha"></span></div>
@@ -531,7 +531,7 @@
                         <div class="bg-white p-4 rounded-lg border border-slate-200">
                             <h4 class="text-[11px] font-bold text-teal-600 uppercase mb-3">Proveedor</h4>
                             <div class="space-y-2 text-[13px]">
-                                <div class="flex flex-col"><span class="text-slate-500 text-xs">Razon Social:</span> <span class="font-bold text-slate-800" id="m_proveedor"></span></div>
+                                <div class="flex flex-col"><span class="text-slate-500 text-xs">Razón Social:</span> <span class="font-bold text-slate-800" id="m_proveedor"></span></div>
                                 <div class="flex flex-col mt-2"><span class="text-slate-500 text-xs">RUT:</span> <span class="font-medium text-slate-800 font-mono-das" id="m_rut_proveedor"></span></div>
                             </div>
                         </div>
@@ -561,7 +561,7 @@
                     <!-- Firma modal -->
                     <div class="flex justify-center mt-4">
                         <div class="bg-white p-3 rounded-lg border border-slate-200 text-center h-24 w-64">
-                            <p class="text-[11px] text-slate-500 font-semibold mb-1 uppercase">Firma Recepcion</p>
+                            <p class="text-[11px] text-slate-500 font-semibold mb-1 uppercase">Firma Recepción</p>
                             <img id="m_img_receptor" src="" class="hidden mx-auto max-h-12" alt="Firma">
                             <span id="m_no_firma_receptor" class="text-xs text-slate-400 italic">No registrada</span>
                         </div>

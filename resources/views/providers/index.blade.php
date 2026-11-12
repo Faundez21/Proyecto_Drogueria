@@ -1043,7 +1043,7 @@
 
                     Swal.fire({
                         title: '¿Confirmas la acción?',
-                        html: `¿Estás seguro que deseas <b>${actionText}</b> a <br><strong>${p.name}</strong>?`,
+                        html: `¿Estás seguro de que deseas <b>${actionText}</b> a <br><strong>${p.name}</strong>?`,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: confirmColor,

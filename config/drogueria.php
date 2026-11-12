@@ -56,16 +56,16 @@ return [
     'establecimientos' => [
         // CESFAM
         ['nombre' => 'CESFAM Los Cerros', 'tipo' => 'CESFAM', 'direccion' => 'Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano'],
-        ['nombre' => 'CESFAM Paulina Avendaño Pereda', 'tipo' => 'CESFAM', 'direccion' => 'Calle Carlos Dittborn 4100, Villa San Martin, Talcahuano'],
+        ['nombre' => 'CESFAM Paulina Avendaño Pereda', 'tipo' => 'CESFAM', 'direccion' => 'Calle Carlos Dittborn 4100, Villa San Martín, Talcahuano'],
         ['nombre' => 'CESFAM San Vicente', 'tipo' => 'CESFAM', 'direccion' => 'Calle Brasil 360, San Vicente, Talcahuano'],
         ['nombre' => 'CESFAM Alcalde Leocán Portus Govinden', 'tipo' => 'CESFAM', 'direccion' => 'Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano'],
 
         // CECOSF
-        ['nombre' => 'CECOSF Esmeralda', 'tipo' => 'Otros', 'direccion' => 'Calle San Miguel 546, Poblacion Patricio Lynch, Talcahuano'],
-        ['nombre' => 'CECOSF 8 de Mayo', 'tipo' => 'Otros', 'direccion' => 'Calle Aysen 7370, poblacion Diego Portales, Talcahuano'],
-        ['nombre' => 'CECOSF Libertad-Gaete', 'tipo' => 'Otros', 'direccion' => 'Calle Isla San Ambrosio 509, poblacion Libertad, Talcahuano'],
-        ['nombre' => 'CECOSF Los Lobos-La Gloria', 'tipo' => 'Otros', 'direccion' => 'Calle Los Lobos 1960, poblacion Los Lobos, Talcahuano'],
-        ['nombre' => 'CECOSF Villa Centinela', 'tipo' => 'Otros', 'direccion' => 'Calle Punta Peñablanca 1301, poblacion Centinela, Talcahuano'],
+        ['nombre' => 'CECOSF Esmeralda', 'tipo' => 'Otros', 'direccion' => 'Calle San Miguel 546, Población Patricio Lynch, Talcahuano'],
+        ['nombre' => 'CECOSF 8 de Mayo', 'tipo' => 'Otros', 'direccion' => 'Calle Aysén 7370, Población Diego Portales, Talcahuano'],
+        ['nombre' => 'CECOSF Libertad-Gaete', 'tipo' => 'Otros', 'direccion' => 'Calle Isla San Ambrosio 509, Población Libertad, Talcahuano'],
+        ['nombre' => 'CECOSF Los Lobos-La Gloria', 'tipo' => 'Otros', 'direccion' => 'Calle Los Lobos 1960, Población Los Lobos, Talcahuano'],
+        ['nombre' => 'CECOSF Villa Centinela', 'tipo' => 'Otros', 'direccion' => 'Calle Punta Peñablanca 1301, Población Centinela, Talcahuano'],
 
         // Otros Establecimientos
         ['nombre' => 'Posta Rural Tumbes', 'tipo' => 'Otros', 'direccion' => 'Maryland s/n, Caleta Tumbes, Talcahuano'],

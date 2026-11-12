@@ -80,7 +80,7 @@
                                     fill="#10b981" />
                             </svg>
                         </div>
-                        Drogueria <span class="text-blue-300">DAS</span>
+                        Droguería <span class="text-blue-300">DAS</span>
                     </div>
                     <div class="w-px h-8 bg-blue-400/30"></div>
                     <p class="text-sm text-blue-100 leading-tight">
@@ -201,7 +201,7 @@
                         <path d="M 20 12 L 28 12 A 4 4 0 0 1 32 16 A 4 4 0 0 1 28 20 L 20 20 Z" fill="#10b981" />
                     </svg>
                     <span class="text-gray-800">
-                        Drogueria <span class="text-blue-600">DAS</span>
+                        Droguería <span class="text-blue-600">DAS</span>
                     </span>
                 </div>
 
@@ -209,7 +209,7 @@
                     Bienvenido de nuevo
                 </h2>
                 <p class="text-sm sm:text-base text-gray-500 mb-6 sm:mb-8 text-center lg:text-left">
-                    Inicia sesión para continuar en <span class="font-semibold text-blue-700">Drogueria DAS</span>
+                    Inicia sesión para continuar en <span class="font-semibold text-blue-700">Droguería DAS</span>
                 </p>
 
                 <form method="POST" action="{{ route('login') }}" class="space-y-4 sm:space-y-5">
@@ -325,7 +325,7 @@
 
             <div class="mt-8 lg:absolute lg:bottom-8 w-full text-center">
                 <p class="text-[11px] sm:text-xs text-gray-400">
-                    &copy; {{ date('Y') }} Drogueria DAS. Todos los derechos reservados.
+                    &copy; {{ date('Y') }} Droguería DAS. Todos los derechos reservados.
                 </p>
             </div>
         </div>

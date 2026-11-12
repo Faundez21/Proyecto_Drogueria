@@ -168,7 +168,7 @@
                         @endif
                     </div>
                     <div class="signature-line"></div>
-                    <p class="signature-title">Firma Quien Despacha (Q.F)</p>
+                    <p class="signature-title">Firma de quien despacha (Q.F.)</p>
                     <p class="signature-subtitle">Bodega Central / DAS</p>
                 </td>
                 <td class="signature-box" style="width: 50%;">
@@ -178,7 +178,7 @@
                         @endif
                     </div>
                     <div class="signature-line"></div>
-                    <p class="signature-title">Firma Quien Recibe</p>
+                    <p class="signature-title">Firma de quien recibe</p>
                     <p class="signature-subtitle">Establecimiento Destino</p>
                 </td>
             </tr>

@@ -51,7 +51,7 @@
         <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm sm:col-span-2 lg:col-span-1">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Alertas Clinicas (FEFO)</p>
+                    <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Alertas Clínicas (FEFO)</p>
                     <p class="font-mono text-[28px] font-black {{ ($alertas ?? 0) > 0 ? 'text-amber-600' : 'text-slate-800' }} mt-1">{{ $alertas ?? 0 }}</p>
                 </div>
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-amber-50 text-amber-600 shrink-0">
@@ -320,7 +320,7 @@
                         Linea de Vida Fisica (Kardex)
                     </h4>
                     <div id="timeline-container" class="space-y-6">
-                        <div class="text-center text-slate-400 py-10 text-sm">Construyendo linea de tiempo...</div>
+                        <div class="text-center text-slate-400 py-10 text-sm">Construyendo línea de tiempo...</div>
                     </div>
                 </div>
 
@@ -378,7 +378,7 @@
                                 </div>
                                 <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                        <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Doc. Recepcion</p>
+                                        <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Doc. Recepción</p>
                                         <p class="text-[12px] font-bold text-slate-800 mt-0.5">${data.details.documento}</p>
                                     </div>
                                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -397,14 +397,14 @@
                             </div>
                             <div class="bg-slate-800 p-5 rounded-2xl shadow-inner flex items-center justify-between border border-slate-700">
                                 <div>
-                                    <p class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Stock Fisico Restante</p>
+                                    <p class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Stock Físico Restante</p>
                                     <p class="text-[11px] text-slate-500 mt-0.5">Ubicacion: ${data.details.ubicacion}</p>
                                 </div>
                                 <p class="text-[24px] font-black text-white font-mono">${data.details.stock_actual} <span class="text-[12px] text-teal-400">UNID.</span></p>
                             </div>
                         `;
                     } else {
-                        detailsContainer.innerHTML = `<div class="bg-white p-6 rounded-2xl border border-slate-200 text-center text-slate-500 text-[13px] font-medium shadow-sm">No se encontro la ficha de ingreso original para este lote. Es posible que haya sido un ingreso manual antiguo.</div>`;
+                        detailsContainer.innerHTML = `<div class="bg-white p-6 rounded-2xl border border-slate-200 text-center text-slate-500 text-[13px] font-medium shadow-sm">No se encontró la ficha de ingreso original para este lote. Es posible que haya sido un ingreso manual antiguo.</div>`;
                     }
 
                     // dibujar la linea de tiempo de movimientos en la columna derecha
@@ -450,7 +450,7 @@
                 })
                 .catch(err => {
                     console.error("error al cargar informacion: ", err);
-                    timelineContainer.innerHTML = `<div class="text-center text-rose-600 py-5"><p class="font-bold">Error de Conexion</p><p class="text-xs text-slate-500">Revisa la consola para mas detalles.</p></div>`;
+                    timelineContainer.innerHTML = `<div class="text-center text-rose-600 py-5"><p class="font-bold">Error de Conexión</p><p class="text-xs text-slate-500">Revisa la consola para más detalles.</p></div>`;
                     detailsContainer.innerHTML = `<div class="text-center text-rose-600 py-5"><p class="font-bold">No se pudieron cargar los datos</p></div>`;
                 });
         }
