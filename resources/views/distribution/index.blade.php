@@ -2,7 +2,7 @@
 
 @section('title', 'Distribución de la Droguería')
 
-@section('subtitle', 'Mapa interactivo 2D / 3D y administración jerárquica de pasillos, estanterías, niveles y posiciones.')
+@section('subtitle', 'Encuentra dónde está cada producto y organiza la estructura de la bodega.')
 
 @section('actions')
     <div class="flex flex-wrap items-center gap-2.5">
@@ -13,14 +13,6 @@
                     d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
             </svg>
             Ver Inventario
-        </a>
-        <a href="{{ route('shelf.index') }}"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all duration-200">
-            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16M6 4v16M18 4v16">
-                </path>
-            </svg>
-            Gestionar Estanterías
         </a>
     </div>
 @endsection
@@ -131,11 +123,89 @@
             }
         </style>
 
-        <!-- navegacion entre pasillos, estantes, niveles y posiciones -->
-        @include('distribution.partials.nav_tabs', ['activeTab' => 'distribution'])
+        @php
+            $estantesSinNiveles = collect($shelves)->filter(fn ($sh) => $sh->levels->isEmpty())->count();
+            $nivelesSinPosiciones = collect($shelves)->flatMap(fn ($sh) => $sh->levels)->filter(fn ($lv) => $lv->positions->isEmpty())->count();
+        @endphp
 
-        <!-- Visor 3D interactivo -->
-        <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
+        <!-- pestanas buscar y configurar -->
+        <div class="inline-flex w-full sm:w-auto bg-slate-100 p-1 rounded-xl border border-slate-200" role="tablist">
+            <button type="button" role="tab" data-tab-bodega="buscar" onclick="cambiarTabBodega('buscar')"
+                class="tab-bodega flex-1 sm:flex-none px-4 py-2 rounded-lg text-[13px] font-bold transition cursor-pointer">
+                Buscar en bodega
+            </button>
+            <button type="button" role="tab" data-tab-bodega="configurar" onclick="cambiarTabBodega('configurar')"
+                class="tab-bodega flex-1 sm:flex-none px-4 py-2 rounded-lg text-[13px] font-bold transition cursor-pointer inline-flex items-center justify-center gap-1.5">
+                Configurar bodega
+                @if ($estantesSinNiveles > 0 || $nivelesSinPosiciones > 0)
+                    <span class="w-2 h-2 rounded-full bg-amber-500" title="Hay estanterías sin niveles o niveles sin posiciones"></span>
+                @endif
+            </button>
+        </div>
+
+        <!-- pestana configurar bodega -->
+        <section id="panel-bodega-configurar" class="hidden space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                <h2 class="text-[15px] font-bold text-slate-800">Estructura de la bodega</h2>
+                <p class="text-[12.5px] text-slate-500 mt-0.5">Se arma en orden: primero los pasillos, luego sus estanterías, los niveles de cada estantería y las posiciones de cada nivel.</p>
+
+                @if ($estantesSinNiveles > 0 || $nivelesSinPosiciones > 0)
+                    <div class="mt-4 flex flex-col gap-2">
+                        @if ($estantesSinNiveles > 0)
+                            <a href="{{ route('level.index') }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-900 hover:bg-amber-100 transition-colors">
+                                <span><strong>{{ $estantesSinNiveles }} {{ $estantesSinNiveles === 1 ? 'estantería no tiene' : 'estanterías no tienen' }} niveles.</strong> Sin niveles no se puede indicar en qué repisa queda cada lote.</span>
+                                <span class="font-bold shrink-0">Crear niveles →</span>
+                            </a>
+                        @endif
+                        @if ($nivelesSinPosiciones > 0)
+                            <a href="{{ route('position.index') }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-900 hover:bg-amber-100 transition-colors">
+                                <span><strong>{{ $nivelesSinPosiciones }} {{ $nivelesSinPosiciones === 1 ? 'nivel no tiene' : 'niveles no tienen' }} posiciones.</strong></span>
+                                <span class="font-bold shrink-0">Crear posiciones →</span>
+                            </a>
+                        @endif
+                    </div>
+                @endif
+            </div>
+            @include('distribution.partials.nav_tabs', ['activeTab' => 'distribution', 'sinMapa' => true])
+        </section>
+
+        <!-- pestana buscar en bodega -->
+        <section id="panel-bodega-buscar" class="space-y-6">
+
+        <!-- buscador de productos en bodega -->
+        @php
+            $pasilloPorEstante = collect($shelves)->mapWithKeys(fn ($sh) => [mb_strtolower(trim((string) $sh->name)) => $sh->aisle->name ?? null]);
+            $ubicacionesBusqueda = collect($stock)->map(function ($it) use ($pasilloPorEstante) {
+                $estante = trim((string) ($it->estante ?? ''));
+                return [
+                    'producto' => (string) $it->producto,
+                    'lote' => (string) ($it->lote ?? ''),
+                    'programa' => (string) ($it->programa ?? ''),
+                    'cantidad' => (int) $it->cantidad,
+                    'vence' => $it->fecha_vencimiento ? \Carbon\Carbon::parse($it->fecha_vencimiento)->format('d/m/Y') : null,
+                    'dias' => $it->fecha_vencimiento ? (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($it->fecha_vencimiento)->startOfDay(), false) : null,
+                    'pasillo' => $pasilloPorEstante[mb_strtolower($estante)] ?? null,
+                    'estante' => $estante,
+                    'nivel' => (string) ($it->nivel ?? ''),
+                    'posicion' => (string) ($it->posicion ?? ''),
+                ];
+            })->values();
+        @endphp
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
+            <label for="buscador-bodega" class="block text-[15px] font-bold text-slate-800">¿Qué producto o lote buscas?</label>
+            <div class="relative mt-2.5">
+                <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="search" id="buscador-bodega" autocomplete="off"
+                    placeholder="Ej: paracetamol, L-100 o P1-A"
+                    class="w-full pl-11 pr-4 py-3 bg-white border border-slate-300 rounded-xl text-[14px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
+            </div>
+            <div id="resultados-bodega" class="mt-3 hidden"></div>
+        </div>
+
+        <!-- mapa de la bodega -->
+        <div id="mapa-bodega" x-data="warehouseApp()" class="scroll-mt-24 bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center shrink-0">
@@ -144,26 +214,89 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-[15px] font-bold text-slate-800 leading-tight">Plano Interactivo de Almacenamiento</h2>
-                        <p class="text-[12px] text-slate-500">Haga clic sobre una estantería o caja para inspeccionar su ocupación, lotes y vencimientos</p>
+                        <h2 class="text-[15px] font-bold text-slate-800 leading-tight">Mapa de la bodega</h2>
+                        <p class="text-[12px] text-slate-500">Haz clic en una estantería para ver qué contiene.</p>
                     </div>
-                </div>
-                <div class="hidden md:flex items-center gap-2 text-[11px] font-semibold text-slate-600">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> &lt; 50% Ocupación
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
-                        <span class="w-2 h-2 rounded-full bg-amber-500"></span> 50-79% Media
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
-                        <span class="w-2 h-2 rounded-full bg-rose-500"></span> &ge; 80% Crítica
-                    </span>
                 </div>
             </div>
 
             <div class="p-3 sm:p-5 bg-slate-50/50">
+                <!-- filtros y leyenda del mapa -->
+                <div class="mb-3 flex flex-col gap-3">
+                    <div class="grid grid-cols-2 lg:flex lg:flex-wrap items-center gap-2">
+                        <select x-model="selectedRackJump" @change="jumpToRack()" aria-label="Ir a una estantería"
+                            class="col-span-2 sm:col-span-1 lg:w-48 bg-white border border-slate-300 rounded-lg py-2 px-3 text-[13px] text-slate-800 font-medium focus:outline-none focus:border-teal-500 cursor-pointer">
+                            <option value="">Ir a estantería...</option>
+                            <template x-for="rk in rackOptions" :key="rk.code">
+                                <option :value="rk.code" x-text="rk.label"></option>
+                            </template>
+                        </select>
+                        <select x-model="selectedAisle" @change="changeAisle()" aria-label="Filtrar por pasillo"
+                            class="lg:w-44 bg-white border border-slate-300 rounded-lg py-2 px-3 text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 cursor-pointer">
+                            <option value="">Todos los pasillos</option>
+                            <template x-for="aisle in aisleOptions" :key="aisle">
+                                <option :value="aisle" x-text="aisle"></option>
+                            </template>
+                        </select>
+                        <select x-model="selectedLevel" @change="changeLevel()" aria-label="Filtrar por nivel"
+                            class="lg:w-44 bg-white border border-slate-300 rounded-lg py-2 px-3 text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 cursor-pointer">
+                            <option value="">Todos los niveles</option>
+                            <template x-for="lvl in levelOptions" :key="lvl.value">
+                                <option :value="lvl.value" x-text="lvl.label"></option>
+                            </template>
+                        </select>
+                        <button type="button" @click="toggleFefoFilter()"
+                            :class="fefoOnly ? 'bg-rose-600 border-rose-600 text-white' : 'bg-white border-slate-300 text-slate-700 hover:border-rose-400'"
+                            class="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-[13px] font-semibold transition cursor-pointer">
+                            <span class="w-2 h-2 rounded-full" :class="fefoOnly ? 'bg-white' : 'bg-rose-500'"></span>
+                            Solo por vencer (90 días)
+                            <span class="px-1.5 py-0.5 rounded text-[11px] font-bold"
+                                :class="fefoOnly ? 'bg-rose-800 text-white' : 'bg-rose-50 text-rose-700'"
+                                x-text="stats.conAlertaFefo"></span>
+                        </button>
+                    </div>
+                    {{-- la leyenda muestra solo lo que aplica --}}
+                    @php
+                        $hayCapacidad = collect($shelves)->contains(fn ($sh) => (int) $sh->capacidad > 0);
+                        $estantesMapa = collect($shelves)->map(fn ($sh) => mb_strtolower(trim((string) $sh->name)))->filter()->all();
+                        $hayLotesUbicados = collect($stock)->contains(fn ($it) => in_array(mb_strtolower(trim((string) $it->estante)), $estantesMapa, true));
+                        $faltantesMapa = array_values(array_filter([
+                            $hayCapacidad ? null : 'las estanterías no tienen capacidad definida',
+                            $hayLotesUbicados ? null : 'ningún lote tiene una ubicación asignada',
+                        ]));
+                    @endphp
+                    @if (count($faltantesMapa) > 0)
+                        <p class="text-[12.5px] text-slate-500">
+                            El mapa todavía no muestra colores porque {{ implode(' y ', $faltantesMapa) }}.
+                            <button type="button" onclick="cambiarTabBodega('configurar')" class="font-semibold text-teal-700 hover:underline cursor-pointer">Configurar bodega</button>
+                        </p>
+                    @endif
+                    @if ($hayCapacidad || $hayLotesUbicados)
+                        <details class="group text-[12px] text-slate-600">
+                            <summary class="list-none cursor-pointer select-none inline-flex items-center gap-1 font-semibold text-teal-700 hover:underline">
+                                ¿Qué significan los colores?
+                            </summary>
+                            <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                                @if ($hayCapacidad)
+                                    <span class="font-semibold text-slate-500">Estanterías:</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#22c55e]"></span>poco llenas (&lt; 50%)</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#f97316]"></span>a medias (50-79%)</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#ef4444]"></span>casi llenas (&ge; 80%)</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#3b82f6]"></span>sin capacidad definida</span>
+                                @endif
+                                @if ($hayLotesUbicados)
+                                    <span class="font-semibold text-slate-500 {{ $hayCapacidad ? 'sm:ml-2' : '' }}">Cajas:</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#10b981]"></span>vigentes</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#f59e0b]"></span>vencen en &le; 90 días</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#ef4444]"></span>vencidas o &le; 30 días</span>
+                                @endif
+                            </div>
+                        </details>
+                    @endif
+                </div>
+
                 <!-- contenedor del visor Three.js -->
-                <div id="warehouse-wrapper" x-data="warehouseApp()"
+                <div id="warehouse-wrapper"
                     class="h-[520px] sm:h-[620px] lg:h-[750px] rounded-xl overflow-hidden border border-slate-200/90 bg-[#eef2f6] select-none shadow-inner">
 
                     <!-- capa de etiquetas sobre el visor -->
@@ -182,21 +315,21 @@
                                     :class="viewMode === '2D' ? 'bg-teal-600 text-white shadow-sm' :
                                         'text-slate-600 hover:text-slate-900'"
                                     class="px-3 sm:px-4 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer"
-                                    title="Plano superior 2D (arrastra con clic izquierdo)">Planta 2D</button>
+                                    title="Plano visto desde arriba">Plano</button>
                                 <button @click="changeView('3D')"
                                     :class="viewMode === '3D' ? 'bg-teal-600 text-white shadow-sm' :
                                         'text-slate-600 hover:text-slate-900'"
                                     class="px-3 sm:px-4 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer"
-                                    title="Vista isométrica 3D">Isométrica 3D</button>
+                                    title="Vista en 3D">3D</button>
                                 <button @click="changeView('FRONT')"
                                     :class="viewMode === 'FRONT' ? 'bg-teal-600 text-white shadow-sm' :
                                         'text-slate-600 hover:text-slate-900'"
                                     class="px-3 sm:px-4 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer"
-                                    title="Vista frontal a nivel de pasillo">Frontal</button>
+                                    title="Vista de frente, a la altura del pasillo">Frente</button>
                             </div>
                             <span class="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 text-slate-200 text-[11px] font-medium backdrop-blur border border-slate-700/60">
-                                <span x-show="viewMode === '2D'">🖱️ Clic izq: Arrastrar plano · Rueda: Zoom</span>
-                                <span x-show="viewMode !== '2D'">🖱️ Clic izq: Girar · Clic der / Teclas WASD: Desplazar · Rueda: Zoom</span>
+                                <span x-show="viewMode === '2D'">Arrastra para moverte · rueda para acercar</span>
+                                <span x-show="viewMode !== '2D'">Arrastra para girar · clic derecho para moverte · rueda para acercar</span>
                             </span>
                         </div>
 
@@ -245,7 +378,7 @@
                             <span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-ping"></span>
                             Moviendo <span class="text-white underline" x-text="movingRackCode"></span>
                         </span>
-                        <span class="hidden md:inline text-slate-300">Haga clic en el piso para guardar</span>
+                        <span class="hidden md:inline text-slate-300">Haz clic en el piso para guardar</span>
                         <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-200 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 cursor-pointer select-none">
                             <input type="checkbox" x-model="snapToGrid" @change="toggleSnapGrid()" class="rounded border-slate-600 text-blue-500 focus:ring-0 w-3.5 h-3.5">
                             <span>Ajustar a cuadrícula</span>
@@ -266,180 +399,6 @@
                         <span x-text="toastMessage"></span>
                     </div>
 
-                    <!-- panel lateral: selector, busqueda y leyenda -->
-                    <aside
-                        class="absolute top-16 sm:top-24 left-3 sm:left-6 w-52 sm:w-64 glass-panel text-white rounded-xl shadow-2xl z-20 flex flex-col pointer-events-auto transition-all duration-300">
-                        <div @click="sidebarOpen = !sidebarOpen"
-                            class="flex justify-between items-center p-3 cursor-pointer hover:bg-slate-800/50 rounded-t-xl"
-                            :class="{ 'rounded-b-xl': !sidebarOpen }">
-                            <span class="text-xs sm:text-sm font-semibold flex items-center gap-2">
-                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                                    </path>
-                                </svg>
-                                Panel de Control
-                            </span>
-                            <svg :class="{ 'rotate-180': !sidebarOpen }"
-                                class="w-4 h-4 text-gray-400 transition-transform duration-300" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7">
-                                </path>
-                            </svg>
-                        </div>
-
-                        <div x-show="sidebarOpen" x-transition
-                            class="p-3 sm:p-4 pt-0 border-t border-slate-700/50 mt-1 flex flex-col gap-2.5 max-h-[60vh] overflow-y-auto">
-
-                            <!-- buscador por estante, producto, lote o pasillo -->
-                            <div class="relative mt-2">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </div>
-                                <input type="text" x-model="searchQuery" @input="handleSearch"
-                                    placeholder="Estante, producto o lote..."
-                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg py-2 pl-9 pr-7 text-xs sm:text-[13px] text-gray-200 focus:outline-none focus:border-blue-500 placeholder-gray-500 transition">
-                                <button x-show="searchQuery.length > 0" @click="searchQuery = ''; handleSearch()"
-                                    type="button"
-                                    class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-gray-400 hover:text-white cursor-pointer">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <!-- Navegador de resultados de búsqueda -->
-                            <div x-show="searchQuery.trim().length > 0" style="display: none;"
-                                class="flex items-center justify-between bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px]">
-                                <span class="text-slate-300 font-semibold"
-                                    x-text="searchMatchesCount > 0 ? (searchMatchIdx + 1) + ' de ' + searchMatchesCount + ' estante(s)' : 'Sin coincidencias'"></span>
-                                <div x-show="searchMatchesCount > 1" class="flex items-center gap-1">
-                                    <button type="button" @click="stepSearchMatch(-1)"
-                                        class="px-1.5 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold cursor-pointer"
-                                        title="Estante anterior">&lsaquo;</button>
-                                    <button type="button" @click="stepSearchMatch(1)"
-                                        class="px-1.5 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold cursor-pointer"
-                                        title="Siguiente estante">&rsaquo;</button>
-                                </div>
-                            </div>
-
-                            <!-- Selector directo: Ir a Estantería -->
-                            <div class="relative">
-                                <select style="background-image: none;" x-model="selectedRackJump" @change="jumpToRack()"
-                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2 text-xs sm:text-[13px] text-teal-300 font-semibold focus:outline-none focus:border-teal-500 cursor-pointer appearance-none">
-                                    <option value="">Ir directo a estante...</option>
-                                    <template x-for="rk in rackOptions" :key="rk.code">
-                                        <option :value="rk.code" x-text="rk.label"></option>
-                                    </template>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                    <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <!-- Selector de Pasillo -->
-                            <div class="relative">
-                                <select style="background-image: none;" x-model="selectedAisle" @change="changeAisle()"
-                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2 text-xs sm:text-[13px] text-white font-medium focus:outline-none focus:border-blue-500 cursor-pointer appearance-none">
-                                    <option value="">Todos los pasillos</option>
-                                    <template x-for="aisle in aisleOptions" :key="aisle">
-                                        <option :value="aisle" x-text="'Pasillo: ' + aisle"></option>
-                                    </template>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <!-- selector de nivel, se llena con los niveles que existen -->
-                            <div class="relative">
-                                <select style="background-image: none;" x-model="selectedLevel" @change="changeLevel()"
-                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2 text-xs sm:text-[13px] text-white font-medium focus:outline-none focus:border-blue-500 cursor-pointer appearance-none">
-                                    <option value="">Todos los niveles</option>
-                                    <template x-for="lvl in levelOptions" :key="lvl.value">
-                                        <option :value="lvl.value" x-text="lvl.label"></option>
-                                    </template>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <!-- Botón filtro rápido FEFO (vencimientos) -->
-                            <button type="button" @click="toggleFefoFilter()"
-                                :class="fefoOnly ? 'bg-rose-600/90 border-rose-400 text-white shadow-md' : 'bg-[#1e293b] border-slate-700 text-gray-300 hover:border-rose-500/60'"
-                                class="w-full flex items-center justify-between px-3 py-2 rounded-lg border text-xs font-semibold transition cursor-pointer">
-                                <span class="flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full" :class="fefoOnly ? 'bg-white animate-pulse' : 'bg-rose-500'"></span>
-                                    Alertas FEFO (&le; 90d)
-                                </span>
-                                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold"
-                                    :class="fefoOnly ? 'bg-rose-900/80 text-rose-100' : 'bg-slate-800 text-rose-400'"
-                                    x-text="stats.conAlertaFefo"></span>
-                            </button>
-
-                            <!-- Leyenda de ocupación -->
-                            <div class="flex flex-col gap-3 mt-2 text-xs sm:text-sm font-medium text-gray-300">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-3.5 h-3.5 rounded bg-[#22c55e]"></span>
-                                    Ocupación baja (&lt; 50%)
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="w-3.5 h-3.5 rounded bg-[#f97316]"></span>
-                                    Ocupación media (50-79%)
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="w-3.5 h-3.5 rounded bg-[#ef4444]"></span>
-                                    Ocupación crítica (&ge; 80%)
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span>
-                                    Sin capacidad definida
-                                </div>
-                            </div>
-
-                            <!-- leyenda de vencimiento: es el color de la repisa bajo las cajas -->
-                            <div
-                                class="flex flex-col gap-2.5 pt-3 border-t border-slate-700/60 text-xs sm:text-sm font-medium text-gray-300">
-                                <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Vencimiento de las
-                                    cajas</p>
-                                <div class="flex items-center gap-3">
-                                    <span class="w-3.5 h-3.5 rounded bg-[#10b981]"></span>
-                                    Vigente
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="w-3.5 h-3.5 rounded bg-[#f59e0b]"></span>
-                                    Vence en &le; 90 días
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="w-3.5 h-3.5 rounded bg-[#ef4444]"></span>
-                                    Vencido o &le; 30 días
-                                </div>
-                                <p class="text-[10px] text-gray-500 leading-snug">Pasa el mouse sobre una caja para ver su
-                                    producto, lote y vencimiento.</p>
-                            </div>
-                        </div>
-                    </aside>
 
                     <!-- panel flotante con el detalle de la estanteria -->
                     <div x-show="tooltipVisible" x-transition:enter="transition ease-out duration-200"
@@ -644,11 +603,118 @@
             </div>
         </div>
 
+        </section>
+
+        <!-- pestanas y buscador de ubicaciones -->
+        <script>
+            const UBICACIONES_BODEGA = @json($ubicacionesBusqueda);
+
+            function cambiarTabBodega(tab) {
+                document.getElementById('panel-bodega-buscar').classList.toggle('hidden', tab !== 'buscar');
+                document.getElementById('panel-bodega-configurar').classList.toggle('hidden', tab !== 'configurar');
+                document.querySelectorAll('.tab-bodega').forEach(btn => {
+                    const activa = btn.dataset.tabBodega === tab;
+                    btn.setAttribute('aria-selected', activa ? 'true' : 'false');
+                    btn.classList.toggle('bg-white', activa);
+                    btn.classList.toggle('text-teal-700', activa);
+                    btn.classList.toggle('shadow-sm', activa);
+                    btn.classList.toggle('text-slate-500', !activa);
+                });
+                try { history.replaceState(null, '', tab === 'configurar' ? '#configurar' : location.pathname + location.search); } catch (e) {}
+                // recalcula el mapa al volver a mostrarlo
+                if (tab === 'buscar') window.dispatchEvent(new Event('resize'));
+            }
+
+            (function () {
+                cambiarTabBodega(location.hash === '#configurar' ? 'configurar' : 'buscar');
+
+                const input = document.getElementById('buscador-bodega');
+                const caja = document.getElementById('resultados-bodega');
+                const normalizar = t => (t || '').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+                let espera = null;
+
+                function el(tag, clases, texto) {
+                    const n = document.createElement(tag);
+                    if (clases) n.className = clases;
+                    if (texto !== undefined) n.textContent = texto;
+                    return n;
+                }
+
+                function verEnMapa(estante) {
+                    document.getElementById('mapa-bodega').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setTimeout(() => window.dispatchEvent(new CustomEvent('jump-to-rack', { detail: estante })), 350);
+                }
+
+                function pintar(q) {
+                    caja.replaceChildren();
+                    if (!q) { caja.classList.add('hidden'); return; }
+                    caja.classList.remove('hidden');
+
+                    const nq = normalizar(q);
+                    const hallados = UBICACIONES_BODEGA.filter(u =>
+                        normalizar(u.producto).includes(nq) || normalizar(u.lote).includes(nq) ||
+                        normalizar(u.estante).includes(nq) || normalizar(u.pasillo).includes(nq));
+
+                    if (hallados.length === 0) {
+                        caja.appendChild(el('p', 'text-[13px] text-slate-500 py-2', 'No hay stock disponible que coincida con «' + q + '».'));
+                        return;
+                    }
+
+                    const max = 12;
+                    caja.appendChild(el('p', 'text-[12px] font-semibold text-slate-500 mb-2',
+                        hallados.length === 1 ? '1 lote encontrado' : hallados.length + ' lotes encontrados' + (hallados.length > max ? ' (se muestran los primeros ' + max + ')' : '')));
+
+                    const lista = el('ul', 'divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden');
+                    hallados.slice(0, max).forEach(u => {
+                        const li = el('li', 'flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 px-4 py-3 bg-white');
+                        const info = el('div', 'min-w-0 flex-1');
+                        info.appendChild(el('p', 'text-[13.5px] font-bold text-slate-800', u.producto));
+
+                        const detalle = el('p', 'text-[12px] text-slate-500 mt-0.5');
+                        detalle.textContent = 'Lote ' + (u.lote || 'S/L') + ' · ' + u.cantidad.toLocaleString('es-CL') + ' uds.';
+                        if (u.vence) {
+                            const vence = el('span', u.dias !== null && u.dias <= 30 ? 'text-rose-600 font-semibold' : (u.dias !== null && u.dias <= 90 ? 'text-amber-600 font-semibold' : ''),
+                                ' · vence ' + u.vence + (u.dias !== null && u.dias < 0 ? ' (vencido)' : ''));
+                            detalle.appendChild(vence);
+                        }
+                        info.appendChild(detalle);
+
+                        const ruta = [u.pasillo, u.estante ? 'Estantería ' + u.estante : null, u.nivel ? u.nivel : null, u.posicion ? 'Posición ' + u.posicion : null].filter(Boolean);
+                        info.appendChild(el('p', 'text-[12.5px] mt-1 font-semibold ' + (u.estante ? 'text-teal-700' : 'text-amber-700'),
+                            u.estante ? ruta.join(' › ') : 'Sin ubicación asignada'));
+                        li.appendChild(info);
+
+                        if (u.estante) {
+                            const btn = el('button', 'shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[12.5px] font-bold text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100 transition-colors cursor-pointer', 'Ver en el mapa');
+                            btn.type = 'button';
+                            btn.addEventListener('click', () => verEnMapa(u.estante));
+                            li.appendChild(btn);
+                        }
+                        lista.appendChild(li);
+                    });
+                    caja.appendChild(lista);
+                }
+
+                input.addEventListener('input', () => {
+                    clearTimeout(espera);
+                    espera = setTimeout(() => {
+                        const q = input.value.trim();
+                        pintar(q);
+                        // marca en el mapa las estanterias que coinciden
+                        window.dispatchEvent(new CustomEvent('search-rack', { detail: q }));
+                    }, 300);
+                });
+
+                // restablecer vista tambien limpia la busqueda
+                window.addEventListener('cam-reset', () => { input.value = ''; pintar(''); });
+            })();
+        </script>
+
         <!-- logica del visor 3D -->
         <script>
             function warehouseApp() {
                 return {
-                    viewMode: '3D',
+                    viewMode: '2D',
                     sidebarOpen: window.innerWidth >= 640,
                     tooltipVisible: false,
                     rackData: {},
@@ -676,6 +742,8 @@
                     },
                     init() {
                         this.initThreeJS();
+                        // abre en vista de plano
+                        setTimeout(() => this.changeView('2D'), 50);
 
                         window.addEventListener('rack-selected', (e) => {
                             this.rackData = e.detail;
@@ -738,7 +806,7 @@
                         }));
                     },
                     resetView() {
-                        this.viewMode = '3D';
+                        this.viewMode = '2D';
                         this.selectedRackJump = '';
                         this.selectedAisle = '';
                         this.selectedLevel = '';
@@ -755,6 +823,8 @@
                             detail: ''
                         }));
                         window.dispatchEvent(new Event('cam-reset'));
+                        // vuelve a la vista de plano
+                        window.dispatchEvent(new CustomEvent('update-camera-view', { detail: '2D' }));
                     },
                     zoomIn() {
                         window.dispatchEvent(new Event('cam-zoom-in'));
@@ -794,7 +864,7 @@
                                 position: 'top-end',
                                 icon: 'info',
                                 title: `Modo Reubicación: ${cod}`,
-                                text: 'Haga clic en el piso de la bodega para colocarla (Esc para cancelar).',
+                                text: 'Haz clic en el piso de la bodega para colocarla (Esc para cancelar).',
                                 showConfirmButton: false,
                                 timer: 3500,
                                 timerProgressBar: true
@@ -3365,7 +3435,7 @@
                                         Swal.fire({
                                             icon: 'warning',
                                             title: 'Ubicación Ocupada',
-                                            html: `No puede colocar la estantería <strong>${selectedObject.userData.code}</strong> encima de <strong>${nombreOcupado}</strong>.<br><span class="text-xs text-slate-500">Seleccione un espacio libre en el piso de la bodega.</span>`,
+                                            html: `No puedes colocar la estantería <strong>${selectedObject.userData.code}</strong> encima de <strong>${nombreOcupado}</strong>.<br><span class="text-xs text-slate-500">Selecciona un espacio libre en el piso de la bodega.</span>`,
                                             confirmButtonColor: '#0f766e',
                                             timer: 2600,
                                             timerProgressBar: true

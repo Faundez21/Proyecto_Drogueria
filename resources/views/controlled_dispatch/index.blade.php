@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Controlados')
+@section('title', 'Despacho Controlado')
 @section('subtitle', 'Directorio y gestión de guías de despacho de fármacos controlados.')
 
 @section('actions')
@@ -10,7 +10,7 @@
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
             </path>
         </svg>
-        Bandeja de Controlados
+        Historial de controlados
     </button>
 @endsection
 
@@ -88,30 +88,33 @@
             </div>
         </div>
     </div>
-    <!-- formulario principal de despacho -->
-    <div class="bg-white rounded-2xl border border-rose-200 shadow-sm overflow-hidden flex flex-col">
+    <!-- paso 1: solicitudes por despachar -->
+    @include('dispatch.partials.solicitudes-por-despachar', [
+        'solicitudesPanel' => $solicitudes,
+        'controlados' => true,
+        'fnUsar' => 'usarSolicitudControlado',
+        'fnVerTodas' => 'openSolicitudesControlado()',
+        'permitirSinSolicitud' => false,
+        'idFormulario' => 'formulario-despacho-controlado',
+    ])
+
+    <!-- paso 2: formulario de despacho -->
+    <div id="formulario-despacho-controlado" class="scroll-mt-24 bg-white rounded-2xl border border-rose-200 shadow-sm overflow-hidden flex flex-col transition-shadow">
 
         <!-- cabecera de la tarjeta del formulario -->
-        <div class="px-6 py-5 border-b border-rose-100 bg-rose-50 flex items-center gap-4">
-            <div class="w-10 h-10 bg-rose-600/10 text-rose-600 rounded-xl flex items-center justify-center shadow-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                    </path>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Despacho de Fármacos Controlados</h2>
-                <p class="text-[12px] text-slate-500 mt-0.5">Acceso restringido unicamente a estupefacientes y talonarios de
-                    recetas cheque. Solo solicitudes de CESFAM.</p>
+        <div class="px-6 py-5 border-b border-rose-100 bg-rose-50 flex flex-col sm:flex-row sm:items-center gap-4">
+            <span class="w-8 h-8 rounded-full bg-rose-600 text-white text-[14px] font-bold flex items-center justify-center shrink-0">2</span>
+            <div class="flex-1 min-w-0">
+                <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Completa y confirma el despacho controlado</h2>
+                <p class="text-[12px] text-slate-500 mt-0.5">Revisa el lote y las cantidades; luego firman el Q.F. o encargado y quien recibe.</p>
             </div>
             <button type="button" onclick="openSolicitudesControlado()"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition-all duration-200 cursor-pointer">
+                class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition-all duration-200 cursor-pointer">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4"></path>
                 </svg>
-                Ver Solicitudes (Estupefacientes)
+                Elegir otra solicitud
                 @if ($totalActivasCtrl > 0)
                     <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold bg-white/20 text-white">
                         {{ $totalActivasCtrl }}
@@ -119,7 +122,7 @@
                 @endif
                 @if ($totalMiasCtrl > 0)
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
-                        {{ $totalMiasCtrl }} asignada(s) a usted
+                        {{ $totalMiasCtrl }} asignada(s) a ti
                     </span>
                 @endif
             </button>
@@ -240,7 +243,7 @@
 
                     <!-- campo especial para recetas cheque -->
                     <div class="md:col-span-2">
-                        <label class="block text-[12px] font-bold text-rose-700 mb-1.5">Numeros de Serie - Recetas Cheque
+                        <label class="block text-[12px] font-bold text-rose-700 mb-1.5">Números de Serie - Recetas Cheque
                             (Opcional)</label>
                         <input type="text" name="series_recetas" placeholder="Ej: Serie 0001 al 0050"
                             class="w-full bg-rose-50 border border-rose-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
@@ -405,9 +408,12 @@
             <td data-label="Programa" class="col-programa px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="programas[]" required
                     class="w-full bg-white border border-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
-                    <option value="" selected>Seleccione programa...</option>
+                    {{-- general es el valor por defecto cuando el lote no tiene programa --}}
+                    <option value="General" selected>General (sin programa)</option>
                     @foreach ($programasLista ?? [] as $idxProg => $progOpt)
-                        <option value="{{ $progOpt }}">{{ $progOpt }}</option>
+                        @if (trim((string) $progOpt) !== '' && mb_strtolower(trim((string) $progOpt)) !== 'general')
+                            <option value="{{ $progOpt }}">{{ $progOpt }}</option>
+                        @endif
                     @endforeach
                 </select>
             </td>
@@ -444,7 +450,7 @@
 
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-bold text-white tracking-wide">Bandeja Histórica de Controlados</h2>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Historial de controlados</h2>
                     <p class="text-[12px] text-slate-300 mt-1 uppercase tracking-wider font-semibold">Trazabilidad estricta
                         de estupefacientes</p>
                 </div>
@@ -766,7 +772,7 @@
             <div class="px-6 py-5 bg-rose-700 flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-bold text-white tracking-wide">Solicitudes CESFAM con Estupefacientes</h2>
-                    <p class="text-[12px] text-rose-100 mt-0.5">Asigne solicitudes a los trabajadores y despache los fármacos controlados solicitados por los CESFAM.</p>
+                    <p class="text-[12px] text-rose-100 mt-0.5">Asigna solicitudes a los trabajadores y despacha los fármacos controlados solicitados por los CESFAM.</p>
                 </div>
                 <button type="button" onclick="closeSolicitudesControlado()"
                     class="text-rose-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-lg cursor-pointer">
@@ -1008,7 +1014,7 @@
 
             const confirmTitle = userId ? '¿Asignar Solicitud Controlada?' : '¿Desasignar Solicitud?';
             const confirmHtml = userId
-                ? `¿Desea asignar la atención de esta solicitud controlada a <strong>${userName}</strong>?`
+                ? `¿Deseas asignar la atención de esta solicitud controlada a <strong>${userName}</strong>?`
                 : 'La solicitud volverá al estado <strong>Pendiente</strong> sin responsable asignado.';
             const confirmBtnText = userId ? 'Sí, asignar' : 'Sí, desasignar';
 
@@ -1373,7 +1379,7 @@
                                             Esta solicitud aún tiene <strong>${ctrlData.cant_normales_pendientes} producto(s) normal(es)</strong> pendiente(s) por despachar en el módulo de Despacho Normal.
                                         </p>
                                         <p class="das-swal-mixed-cta font-semibold text-[11.5px] mt-1.5">
-                                            ¿Desea emitir el Despacho Normal ahora mismo?
+                                            ¿Deseas emitir el Despacho Normal ahora mismo?
                                         </p>
                                     </div>
                                 </div>
@@ -1875,7 +1881,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Aviso de Seguridad',
-                    text: 'Para usar la cámara necesita acceder mediante localhost, 127.0.0.1 o HTTPS.',
+                    text: 'Para usar la cámara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.',
                     confirmButtonColor: '#e11d48'
                 });
             }
@@ -1915,7 +1921,7 @@
                         <div class="text-center p-4">
                             <svg class="w-10 h-10 text-rose-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             <p class="text-sm font-bold text-white">No se pudo acceder a la cámara</p>
-                            <p class="text-xs text-slate-400 mt-1">Verifique los permisos en su navegador o conecte una cámara.</p>
+                            <p class="text-xs text-slate-400 mt-1">Verifica los permisos en tu navegador o conecta una cámara.</p>
                         </div>
                     `;
                 }
@@ -2079,7 +2085,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Sin Stock en Fármacos Controlados',
-                    html: `El producto o lote <strong>${nombreBuscado}</strong> no figura con stock disponible en la bodega de <strong>Fármacos Controlados</strong>.<br><br><span class="text-xs text-slate-500">Recuerde que este módulo es exclusivo para estupefacientes y recetas cheque. Si es un producto común, búsquelo en el módulo de Despacho general.</span>`,
+                    html: `El producto o lote <strong>${nombreBuscado}</strong> no figura con stock disponible en la bodega de <strong>Fármacos Controlados</strong>.<br><br><span class="text-xs text-slate-500">Recuerda que este módulo es exclusivo para estupefacientes y recetas cheque. Si es un producto común, búscalo en el módulo de Despacho general.</span>`,
                     confirmButtonColor: '#e11d48'
                 });
                 if (!emptySelect && tbody.children.length > 1) tr.remove();

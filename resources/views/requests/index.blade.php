@@ -12,7 +12,7 @@
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                 </path>
             </svg>
-            Solicitudes Pendientes Establecimientos
+            Solicitudes en espera
             @if(isset($pendientesCount) && $pendientesCount > 0)
                 <span class="px-2 py-0.5 text-[11px] font-extrabold bg-teal-500/20 text-teal-300 border border-teal-500/30 rounded-full">
                     {{ $pendientesCount }}
@@ -27,7 +27,7 @@
                     d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
                 </path>
             </svg>
-            Ver Inventario Establecimientos
+            Stock de los establecimientos
         </button>
     @endrole
 @endsection
@@ -193,14 +193,9 @@
                             </svg>
 
                             <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">
-                                2. Productos Solicitados (Medicamentos e Insumos)
+                                2. Productos que necesitan
                             </h3>
                         </div>
-
-                        <button type="button" id="btn_add_product"
-                            class="text-xs font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md transition-colors border border-teal-200 cursor-pointer">
-                            + Agregar Producto
-                        </button>
                     </div>
 
                     <!-- contenedor dinamico -->
@@ -227,9 +222,10 @@
                                     <select name="programa[]" required
                                         class="w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] select-programa">
                                         <option value="" disabled selected>Seleccione...</option>
+                                        <option value="General">General (sin programa)</option>
                                         @foreach ($programasLista ?? [] as $progOpt)
                                             @php $progLimpio = trim(preg_replace('/\s+/', ' ', $progOpt ?? '')); @endphp
-                                            @if($progLimpio !== '')
+                                            @if($progLimpio !== '' && mb_strtolower($progLimpio) !== 'general')
                                                 <option value="{{ $progLimpio }}">{{ $progLimpio }}</option>
                                             @endif
                                         @endforeach
@@ -269,7 +265,7 @@
 
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
-                                        Cantidad en stock actualmente <span class="text-rose-500">*</span>
+                                        ¿Cuánto tienen hoy en el establecimiento? <span class="text-rose-500">*</span>
                                     </label>
 
                                     <input type="number" name="stock_actual[]" min="0" required
@@ -280,7 +276,7 @@
 
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
-                                        Cantidad Solicitada <span class="text-rose-500">*</span>
+                                        ¿Cuánto necesitan? <span class="text-rose-500">*</span>
                                     </label>
 
                                     <input type="number" name="cantidad_solicitada[]" min="1" required
@@ -291,6 +287,12 @@
                             </div>
                         </div>
                     </div>
+                    <!-- agregar otro producto -->
+                    <button type="button" id="btn_add_product"
+                        class="mt-4 w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-bold text-teal-700 bg-white border-2 border-dashed border-teal-300 hover:bg-teal-50 hover:border-teal-400 transition-colors cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Agregar otro producto
+                    </button>
                 </div>
 
                 <!-- seccion 3: observaciones -->
@@ -304,7 +306,7 @@
                         </svg>
 
                         <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">
-                            3. Observaciones Generales
+                            3. Observaciones (opcional)
                         </h3>
                     </div>
 
@@ -330,7 +332,7 @@
                         </svg>
 
                         <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">
-                            4. Firma de Respaldo
+                            4. Firma de quien solicita
                         </h3>
                     </div>
 
@@ -338,7 +340,7 @@
                     <div class="flex flex-col items-center">
 
                         <p class="text-[12px] font-semibold text-slate-600 mb-2">
-                            Firma de quien solicita (Establecimiento)
+                            Firma en el recuadro con el mouse o con el dedo
                         </p>
 
                         <input type="hidden" name="firma_recibe" id="firma_recibe_input">
@@ -351,7 +353,7 @@
 
                         <button type="button" onclick="signatureRecibe.clear()"
                             class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500 transition-colors cursor-pointer">
-                            Limpiar Firma
+                            Borrar firma
                         </button>
                     </div>
                 </div>
@@ -404,7 +406,7 @@
 
                     <button type="reset" id="btn_limpiar"
                         class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-100 transition-colors shadow-sm cursor-pointer">
-                        Limpiar Formulario
+                        Limpiar formulario
                     </button>
 
                     <button type="submit"
