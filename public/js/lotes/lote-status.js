@@ -632,7 +632,7 @@
         await Swal.fire({
             icon: 'warning',
             title: 'Motivo requerido',
-            text: mensaje || `Debe indicar el motivo para cambiar el estado a ${ctx.estado}.`,
+            text: mensaje || `Debes indicar el motivo para cambiar el estado a ${ctx.estado}.`,
             showDenyButton: false,
             showCancelButton: false,
             confirmButtonColor: COLORS.teal,
@@ -695,7 +695,7 @@
         const body = isJson ? await response.json().catch(() => ({})) : null;
 
         if (!isJson) {
-            throw { status: response.status, message: 'Su sesión pudo haber expirado. Recargue la página e inicie sesión nuevamente.' };
+            throw { status: response.status, message: 'Tu sesión pudo haber expirado. Recarga la página e inicia sesión nuevamente.' };
         }
         if (!response.ok || body.ok === false) {
             throw { status: response.status, message: body.message, errors: body.errors };
@@ -706,10 +706,10 @@
     async function mostrarError(err) {
         injectStyles();
         let title = 'No se pudo completar la operación';
-        let html = `<p class="ls-confirm-lead">${esc(err?.message || 'Ocurrió un error inesperado. Intente nuevamente.')}</p>`;
+        let html = `<p class="ls-confirm-lead">${esc(err?.message || 'Ocurrió un error inesperado. Intenta nuevamente.')}</p>`;
 
         if (err?.status === 422 && err.errors) {
-            title = 'Revise los datos ingresados';
+            title = 'Revisa los datos ingresados';
             html = '<ul style="text-align:left;margin:0;padding-left:18px">' +
                 Object.values(err.errors).flat().map((m) => `<li>${esc(m)}</li>`).join('') + '</ul>';
         } else if (err?.status === 419) {
@@ -717,9 +717,9 @@
             html = '<p class="ls-confirm-lead">El token de seguridad expiró. Recarga la página e intenta nuevamente.</p>';
         } else if (err?.status === 403) {
             title = 'Acceso denegado';
-            html = '<p class="ls-confirm-lead">No tiene permisos para realizar este movimiento.</p>';
+            html = '<p class="ls-confirm-lead">No tienes permisos para realizar este movimiento.</p>';
         } else if (err instanceof TypeError) {
-            html = '<p class="ls-confirm-lead">No fue posible conectar con el servidor. Verifique su conexión.</p>';
+            html = '<p class="ls-confirm-lead">No fue posible conectar con el servidor. Verifica tu conexión.</p>';
         }
 
         await Swal.fire({
@@ -979,7 +979,7 @@
 
         async procesar(ctx) {
             const requiereMotivo = ctx.estado === 'Merma' || ctx.estado === 'Cuarentena';
-            if (!(await validarMotivo(ctx, requiereMotivo, 'Debe indicar el motivo de la merma (daño, vencimiento, rechazo, etc.).'))) return false;
+            if (!(await validarMotivo(ctx, requiereMotivo, 'Debes indicar el motivo de la merma (daño, vencimiento, rechazo, etc.).'))) return false;
             return procesar({ form: ctx.form, confirm: this.confirmConfig(ctx) });
         },
 
@@ -1040,7 +1040,7 @@
                     title: '¿Mover Ubicación de Lote en Cuarentena?',
                     html: `
                         <div class="ls-confirm-wrap ls-theme-teal">
-                            <p class="ls-confirm-lead">¿Confirma el cambio de ubicación física en bodega para el lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>
+                            <p class="ls-confirm-lead">¿Confirmas el cambio de ubicación física en bodega para el lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>
                             <div class="ls-confirm-card">
                                 ${ubicHtml}
                                 ${ctx.motivo ? `<div class="ls-confirm-row"><strong>Motivo:</strong><span>${esc(ctx.motivo)}</span></div>` : ''}
@@ -1064,7 +1064,7 @@
 
         async procesar(ctx) {
             const soloReubicacion = ctx.estado === ctx.estadoInicial && huboCambioUbicacion(ctx);
-            if (!soloReubicacion && !(await validarMotivo(ctx, true, 'Debe indicar la justificación u observación técnica correspondiente.'))) return false;
+            if (!soloReubicacion && !(await validarMotivo(ctx, true, 'Debes indicar la justificación u observación técnica correspondiente.'))) return false;
             if (ctx.estado !== 'Merma' && !(await Ubicacion.validarSeleccionEnModal(ctx))) return false;
             return procesar({ form: ctx.form, confirm: this.confirmConfig(ctx) });
         },
@@ -1093,7 +1093,7 @@
                     title: '¿Mover Ubicación de Producto en Bodega?',
                     html: `
                         <div class="ls-confirm-wrap ls-theme-teal">
-                            <p class="ls-confirm-lead">¿Confirma el cambio de ubicación física en bodega para el lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>
+                            <p class="ls-confirm-lead">¿Confirmas el cambio de ubicación física en bodega para el lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>
                             <div class="ls-confirm-card">
                                 <div class="ls-confirm-row"><strong>Ubicación Anterior:</strong><span>${badgeUbicacion(ubicacionTexto(ctx.ubicacionInicial))}</span></div>
                                 <div class="ls-confirm-row"><strong>Nueva Ubicación:</strong><span>${badgeUbicacion(ubicacionTexto(ctx.ubicacion))}</span></div>
@@ -1119,7 +1119,7 @@
             }
             return {
                 title: '¿Guardar Cambios?',
-                html: `<p class="ls-confirm-lead">¿Confirma actualizar la información del lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>`,
+                html: `<p class="ls-confirm-lead">¿Confirmas actualizar la información del lote <strong>${lote}</strong> de <strong>${prod}</strong>?</p>`,
                 icon: 'question', color: COLORS.emerald, confirmText: 'Sí, confirmar',
             };
         },
@@ -1250,15 +1250,12 @@
             const posKey = this.normKey(this.normPos(posicion));
             if (!estante || !nivKey) return null;
 
-            // Un nivel sin posición es un espacio compartido: lo limita la capacidad del estante, no un lote.
-            if (!posKey) return null;
-
             const ocupantesEst = this.obtenerOcupantesEnEstante(estante, opts);
             for (const oc of ocupantesEst) {
                 if (this.normKey(oc.nivel) !== nivKey) continue;
-                // Solo ocupa la posición el lote que está guardado en ESA posición
-                // (un lote sin posición ya no bloquea todas las posiciones del nivel)
-                if (this.normKey(oc.posicion) === posKey) return oc;
+                const ocPosKey = this.normKey(oc.posicion);
+                // solo bloquea la posicion exacta
+                if (posKey && ocPosKey === posKey) return oc;
             }
             return null;
         },
@@ -1272,21 +1269,20 @@
 
             const listaPos = Array.isArray(posicionesNivel) ? posicionesNivel.map((p) => this.normPos(p)).filter(Boolean) : [];
 
+            // un nivel sin posiciones nunca se bloquea entero
             if (listaPos.length === 0) {
-                // Nivel sin posiciones definidas: espacio compartido, varios lotes pueden quedar aquí
                 return {
                     nivel: nivStr,
-                    totalPosiciones: 1,
+                    totalPosiciones: 0,
                     ocupadasCount: 0,
-                    disponiblesCount: 1,
+                    disponiblesCount: 0,
                     completamenteOcupado: false,
-                    compartido: true,
                     ocupantes: ocupantesEst,
                     detallePosiciones: [],
                 };
             }
 
-            // Cada posición la ocupa solo el lote guardado en ella
+            // una posicion esta ocupada solo si un lote esta en ella
             let ocupadasCount = 0;
             const detallePosiciones = listaPos.map((pos) => {
                 const posKey = this.normKey(pos);
@@ -1303,10 +1299,7 @@
                 totalPosiciones,
                 ocupadasCount,
                 disponiblesCount,
-                // El nivel no se bloquea entero: se puede dejar el lote en el nivel sin posición
-                // (espacio compartido) y las posiciones en uso aparecen bloqueadas una por una
-                completamenteOcupado: false,
-                sinPosicionesLibres: disponiblesCount === 0 && totalPosiciones > 0,
+                completamenteOcupado: disponiblesCount === 0 && totalPosiciones > 0,
                 ocupantes: ocupantesEst,
                 detallePosiciones,
             };
@@ -1319,19 +1312,12 @@
             const nivelesRaw = Array.isArray(infoEstante.niveles) ? infoEstante.niveles : [];
             const ocupantes = this.obtenerOcupantesEnEstante(infoEstante.estante, opts);
 
-            const capacidadEst = parseInt(infoEstante.capacidad, 10) || 0;
-            const unidadesEst = ocupantes.reduce((a, o) => a + (parseInt(o.cantidad, 10) || 0), 0);
-
             if (nivelesRaw.length === 0) {
-                const sinCap = capacidadEst > 0 && unidadesEst >= capacidadEst;
                 return {
                     totalSlots: 0,
-                    ocupadosCount: 0,
+                    ocupadosCount: ocupantes.length,
                     disponiblesCount: 1,
-                    capacidad: capacidadEst,
-                    unidades: unidadesEst,
-                    sinCapacidad: sinCap,
-                    completamenteOcupado: sinCap,
+                    completamenteOcupado: false,
                     nivelesEval: [],
                     ocupantes,
                 };
@@ -1347,23 +1333,11 @@
             });
 
             const disponiblesCount = Math.max(0, totalSlots - ocupadosCount);
-
-            // Capacidad del estante en unidades (0 = sin límite)
-            const capacidad = parseInt(infoEstante.capacidad, 10) || 0;
-            const unidades = ocupantes.reduce((a, o) => a + (parseInt(o.cantidad, 10) || 0), 0);
-            const sinCapacidad = capacidad > 0 && unidades >= capacidad;
-            const sinPosiciones = totalSlots > 0 && disponiblesCount === 0;
-
             return {
                 totalSlots,
                 ocupadosCount,
                 disponiblesCount,
-                capacidad,
-                unidades,
-                sinCapacidad,
-                sinPosiciones,
-                // El estante solo se bloquea por capacidad; las posiciones en uso se bloquean una por una
-                completamenteOcupado: sinCapacidad,
+                completamenteOcupado: totalSlots > 0 && disponiblesCount === 0,
                 nivelesEval,
                 ocupantes,
             };
@@ -1458,15 +1432,13 @@
                     opt.value = item.estante;
 
                     const esMismoInicial = initialUbicacion && this.normKey(initialUbicacion.estante) === this.normKey(item.estante);
-                    const fmtU = (n) => Number(n || 0).toLocaleString('es-CL');
-                    const textoCap = evEst.capacidad > 0 ? ` · ${fmtU(evEst.unidades)}/${fmtU(evEst.capacidad)} u` : '';
                     if (evEst.completamenteOcupado && !esMismoInicial) {
                         opt.disabled = true;
-                        opt.textContent = `${item.estante} — ⛔ SIN CAPACIDAD (${fmtU(evEst.unidades)}/${fmtU(evEst.capacidad)} u)`;
-                    } else if (evEst.ocupadosCount > 0) {
-                        opt.textContent = `${item.estante} (${evEst.disponiblesCount} pos. libres${textoCap})`;
+                        opt.textContent = `${item.estante} — ⛔ OCUPADO (${evEst.ocupadosCount}/${evEst.totalSlots} en uso)`;
+                    } else if (evEst.ocupadosCount > 0 && evEst.totalSlots > 0) {
+                        opt.textContent = `${item.estante} (${evEst.disponiblesCount} disp. / ${evEst.ocupadosCount} en uso)`;
                     } else {
-                        opt.textContent = `${item.estante}${textoCap ? ` (${textoCap.slice(3)})` : ''}`;
+                        opt.textContent = item.estante;
                     }
 
                     if (this.normKey(item.estante) === this.normKey(prevEstante) && !opt.disabled) {
@@ -1510,14 +1482,8 @@
                             opt.disabled = true;
                             const resumenOc = evNiv.ocupantes.slice(0, 2).map((o) => `${o.producto} (Lote ${o.lote})`).join(', ');
                             opt.textContent = `Nivel ${nivStr} — ⛔ OCUPADO (${resumenOc || 'En uso'})`;
-                        } else if (evNiv.compartido) {
-                            opt.textContent = evNiv.ocupantes.length > 0
-                                ? `Nivel ${nivStr} (${evNiv.ocupantes.length} lote(s) aquí · espacio compartido)`
-                                : `Nivel ${nivStr} (Disponible)`;
                         } else if (evNiv.ocupadasCount > 0) {
-                            opt.textContent = evNiv.sinPosicionesLibres
-                                ? `Nivel ${nivStr} (todas las posiciones en uso)`
-                                : `Nivel ${nivStr} (${evNiv.disponiblesCount} de ${evNiv.totalPosiciones} pos. libres)`;
+                            opt.textContent = `Nivel ${nivStr} (${evNiv.disponiblesCount} de ${evNiv.totalPosiciones} pos. libres)`;
                         } else {
                             opt.textContent = `Nivel ${nivStr} (Disponible)`;
                         }
@@ -1594,8 +1560,8 @@
                     const evEst = this.evaluarEstante(infoEstante, opts);
                     if (evEst.completamenteOcupado) {
                         this.alertaUbicacionOcupada({
-                            titulo: 'Estante sin capacidad disponible',
-                            subtitulo: `El <strong>${esc(infoEstante.estante)}</strong> ya tiene <strong>${evEst.unidades.toLocaleString('es-CL')}</strong> de <strong>${evEst.capacidad.toLocaleString('es-CL')}</strong> unidades. Elija otro estante o aumente su capacidad en Distribución.`,
+                            titulo: 'Estante Completamente Ocupado',
+                            subtitulo: `Todos los niveles y posiciones del <strong>${esc(infoEstante.estante)}</strong> están actualmente en uso. Seleccione otro estante.`,
                             ocupantes: evEst.ocupantes,
                             estante: infoEstante.estante,
                         });
