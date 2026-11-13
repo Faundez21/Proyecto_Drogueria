@@ -8,8 +8,7 @@
     ];
 @endphp
 
-<div class="grid grid-cols-1 sm:grid-cols-2 {{ ($sinMapa ?? false) ? 'lg:grid-cols-4' : 'lg:grid-cols-5' }} gap-3.5">
-    @unless ($sinMapa ?? false)
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
     <!-- Mapa 3D Distribución -->
     <a href="{{ route('distribution.index') }}"
         class="group relative flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 shadow-sm {{ $activeTab === 'distribution' ? 'bg-slate-900 border-slate-900 text-white shadow-md ring-2 ring-teal-500/30' : 'bg-white border-slate-200/80 text-slate-700 hover:border-teal-300 hover:shadow-md' }}">
@@ -20,13 +19,12 @@
                 </svg>
             </div>
             <div class="min-w-0">
-                <span class="block text-[10px] font-mono-das uppercase tracking-widest font-semibold {{ $activeTab === 'distribution' ? 'text-teal-300' : 'text-slate-400' }}">Ver la bodega</span>
-                <h3 class="text-[14px] font-bold truncate {{ $activeTab === 'distribution' ? 'text-white' : 'text-slate-800 group-hover:text-teal-700' }}">Mapa y búsqueda</h3>
+                <span class="block text-[10px] font-mono-das uppercase tracking-widest font-semibold {{ $activeTab === 'distribution' ? 'text-teal-300' : 'text-slate-400' }}">Visor 2D / 3D</span>
+                <h3 class="text-[14px] font-bold truncate {{ $activeTab === 'distribution' ? 'text-white' : 'text-slate-800 group-hover:text-teal-700' }}">Mapa de Bodega</h3>
             </div>
         </div>
         <span class="w-2 h-2 rounded-full shrink-0 {{ $activeTab === 'distribution' ? 'bg-teal-400 pulse-dot' : 'bg-slate-200 group-hover:bg-teal-400' }}"></span>
     </a>
-    @endunless
 
     <!-- 1. Pasillos -->
     <a href="{{ route('aisle.index') }}"
@@ -38,7 +36,7 @@
                 </svg>
             </div>
             <div class="min-w-0">
-                <span class="block text-[10px] font-mono-das uppercase tracking-widest font-semibold {{ $activeTab === 'aisle' ? 'text-amber-300' : 'text-slate-400' }}">Paso 1</span>
+                <span class="block text-[10px] font-mono-das uppercase tracking-widest font-semibold {{ $activeTab === 'aisle' ? 'text-amber-300' : 'text-slate-400' }}">Nivel 01 · Zonas</span>
                 <h3 class="text-[14px] font-bold truncate {{ $activeTab === 'aisle' ? 'text-white' : 'text-slate-800 group-hover:text-teal-700' }}">Pasillos</h3>
             </div>
         </div>
@@ -57,7 +55,7 @@
                 </svg>
             </div>
             <div class="min-w-0">
-                <span class="block text-[10px] font-mono-das uppercase tracking-widest font-semibold {{ $activeTab === 'shelf' ? 'text-blue-300' : 'text-slate-400' }}">Paso 2</span>
+                <span class="block text-[10px] font-mono-das uppercase tracking-widest font-semibold {{ $activeTab === 'shelf' ? 'text-blue-300' : 'text-slate-400' }}">Nivel 02 · Racks</span>
                 <h3 class="text-[14px] font-bold truncate {{ $activeTab === 'shelf' ? 'text-white' : 'text-slate-800 group-hover:text-teal-700' }}">Estanterías</h3>
             </div>
         </div>
@@ -76,7 +74,7 @@
                 </svg>
             </div>
             <div class="min-w-0">
-                <span class="block text-[10px] font-mono-das uppercase tracking-widest font-semibold {{ $activeTab === 'level' ? 'text-purple-300' : 'text-slate-400' }}">Paso 3</span>
+                <span class="block text-[10px] font-mono-das uppercase tracking-widest font-semibold {{ $activeTab === 'level' ? 'text-purple-300' : 'text-slate-400' }}">Nivel 03 · Repisas</span>
                 <h3 class="text-[14px] font-bold truncate {{ $activeTab === 'level' ? 'text-white' : 'text-slate-800 group-hover:text-teal-700' }}">Niveles</h3>
             </div>
         </div>
@@ -96,7 +94,7 @@
                 </svg>
             </div>
             <div class="min-w-0">
-                <span class="block text-[10px] font-mono-das uppercase tracking-widest font-semibold {{ $activeTab === 'position' ? 'text-emerald-300' : 'text-slate-400' }}">Paso 4</span>
+                <span class="block text-[10px] font-mono-das uppercase tracking-widest font-semibold {{ $activeTab === 'position' ? 'text-emerald-300' : 'text-slate-400' }}">Nivel 04 · Casillas</span>
                 <h3 class="text-[14px] font-bold truncate {{ $activeTab === 'position' ? 'text-white' : 'text-slate-800 group-hover:text-teal-700' }}">Posiciones</h3>
             </div>
         </div>
