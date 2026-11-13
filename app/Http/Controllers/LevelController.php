@@ -12,9 +12,7 @@ use App\Models\Position;
 
 class LevelController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // display a listing of the resource
     public function index()
     {
         $levels = Level::with('shelf.aisle')
@@ -35,17 +33,13 @@ class LevelController extends Controller
         return view('distribution.maintainers.level.index', compact('levels', 'shelves', 'counts'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // show the form for creating a new resource
     public function create()
     {
-        //
+        // seccion
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // store a newly created resource in storage
     public function store(Request $request)
     {
         $request->validate([
@@ -64,25 +58,19 @@ class LevelController extends Controller
         return redirect()->route('level.index')->with('success', 'Nivel creado exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // display the specified resource
     public function show(string $id)
     {
-        //
+        // seccion
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // show the form for editing the specified resource
     public function edit(string $id)
     {
-        //
+        // seccion
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // update the specified resource in storage
     public function update(Request $request, string $id)
     {
         $level = Level::findOrFail($id);
@@ -104,9 +92,7 @@ class LevelController extends Controller
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // remove the specified resource from storage
     public function destroy(string $id)
     {
         $level = Level::with('shelf')->findOrFail($id);

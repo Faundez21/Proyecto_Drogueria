@@ -11,7 +11,7 @@ class QuarantineController extends Controller
 {
     public function index(Request $request)
     {
-        // Lotes retenidos que se muestran en la tabla
+        // lotes retenidos que se muestran en la tabla
         $query = Inventory::with(['product', 'user'])->where('estado', 'Cuarentena');
 
         $user = auth()->user();
@@ -33,7 +33,7 @@ class QuarantineController extends Controller
 
         if ($request->filled('categoria')) {
             $catFiltro = trim($request->input('categoria'));
-            // La categoría se compara tal cual viene en los datos; no hay equivalencias fijas en código.
+            // la categoria se compara tal cual viene en los datos; no hay equivalencias fijas en codigo
             $esControlada = InventoryService::clasificarGrupoProducto('', $catFiltro) === 'Estupefacientes';
             if (! $esControlada || $puedeVerControlados) {
                 $query->where('categoria', $catFiltro);
@@ -69,17 +69,17 @@ class QuarantineController extends Controller
                     break;
             }
         } else {
-            $query->latest('updated_at'); // Por defecto
+            $query->latest('updated_at'); // por defecto
         }
 
-        // Totales calculados sobre todo el resultado, no solo la página actual
+        // totales calculados sobre todo el resultado, no solo la pagina actual
         $totalLotesGlobal = (clone $query)->count();
         $totalUnidadesGlobal = (int) (clone $query)->sum('cantidad');
         $valorTotalRetenido = (float) ((clone $query)->selectRaw('SUM(cantidad * valor_neto_unitario) as total')->value('total') ?? 0);
 
         $inventories = $query->paginate(15)->withQueryString();
 
-        // Historial de retenciones, liberaciones y bajas
+        // historial de retenciones, liberaciones y bajas
         $historial = StockMovement::with('user')
             ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('producto', $controladosLista))
             ->where(function ($q) {
@@ -99,7 +99,7 @@ class QuarantineController extends Controller
                 ->get();
         }
 
-        // Listas para los selectores
+        // listas para los selectores
         $baseDropdownQuery = Inventory::where('estado', 'Cuarentena')
             ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']));
 

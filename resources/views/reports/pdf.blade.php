@@ -22,13 +22,13 @@
         .doc-title { font-size: 10.5px; font-weight: 900; color: #134e4a; text-transform: uppercase; margin: 0 0 2px 0; }
         .doc-date { font-size: 8.5px; color: #475569; margin: 0; font-weight: 600; }
 
-        /* KPI Strip */
+        /* kpi strip */
         .kpi-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
         .kpi-card { background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 10px; text-align: center; width: 25%; }
         .kpi-label { font-size: 7.5px; font-weight: 800; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 2px; letter-spacing: 0.3px; }
         .kpi-value { font-size: 11.5px; font-weight: 900; color: #0f766e; }
 
-        /* Tabla principal */
+        /* tabla principal */
         table.items-table {
             width: 100%;
             border-collapse: collapse;
@@ -147,7 +147,7 @@
         </div>
     @endif
 
-    {{-- La tabla se divide en bloques de 100 filas: así el PDF usa la mitad de memoria y tiempo --}}
+    {{-- la tabla se divide en bloques de 100 filas: asi el pdf usa la mitad de memoria y tiempo --}}
     @if($totalRegistros == 0)
     <table class="items-table">
         <thead>

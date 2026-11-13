@@ -132,7 +132,7 @@
             @csrf
             <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
 
-            <!-- Banner informativo cuando se carga una solicitud -->
+            <!-- banner informativo cuando se carga una solicitud -->
             <div id="banner_solicitud_activa" class="hidden mx-6 mt-5 p-4 bg-rose-50 border border-rose-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
@@ -191,7 +191,7 @@
                                 class="text-rose-500">*</span></label>
                         <select name="clasificacion" id="clasificacion_select" onchange="toggleClasificacion()" required
                             class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
-                            <option value="Interno" selected>Interno (Nivel Comunal / CESFAM)</option>
+                            <option value="Externo" selected>Externo (Nivel Comunal / CESFAM)</option>
                         </select>
                         <p class="text-[11px] text-slate-500 mt-1">Los fármacos controlados solo se despachan a un CESFAM de la red, a partir de su solicitud.</p>
                     </div>
@@ -215,7 +215,7 @@
 
                     <!-- div dinamico para destino interno -->
                     <div id="div_interno" class="md:col-span-2 hidden">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Interno)
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Externo)
                             <span class="text-rose-500">*</span></label>
                         <select id="establecimiento_interno" onchange="actualizarDireccionInterna()"
                             class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
@@ -295,11 +295,12 @@
                         <thead
                             class="bg-slate-100/80 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10.5px]">
                             <tr>
-                                <th class="px-4 py-3.5 w-[36%]">Fármaco Controlado en Stock</th>
-                                <th class="px-4 py-3.5 w-[14%]">Lote</th>
-                                <th class="px-4 py-3.5 w-[15%]">Vencimiento (FEFO)</th>
-                                <th class="px-4 py-3.5 w-[15%]">Programa</th>
-                                <th class="px-4 py-3.5 w-[15%] text-center">Cantidad a Despachar</th>
+                                <th class="px-4 py-3.5 w-[30%]">Fármaco Controlado en Stock</th>
+                                <th class="px-4 py-3.5 w-[12%]">Lote</th>
+                                <th class="px-4 py-3.5 w-[14%]">Vencimiento (FEFO)</th>
+                                <th class="px-4 py-3.5 w-[14%]">Programa</th>
+                                <th class="px-4 py-3.5 w-[11%] text-center whitespace-normal leading-tight">Consumo mensual</th>
+                                <th class="px-4 py-3.5 w-[14%] text-center">Cantidad a Despachar</th>
                                 <th class="px-3 py-3.5 w-[5%] text-center"></th>
                             </tr>
                         </thead>
@@ -416,6 +417,9 @@
                         @endif
                     @endforeach
                 </select>
+            </td>
+            <td data-label="Consumo mensual" class="col-consumo px-3 py-2.5 border-r border-slate-100 align-middle text-center">
+                <span class="consumo-mensual-despacho text-[13px] font-bold text-slate-400">—</span>
             </td>
             <td data-label="Cantidad" class="col-cantidad px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <div class="space-y-1">
@@ -558,12 +562,12 @@
                                     {{ \Carbon\Carbon::parse($despacho->fecha_despacho)->format('d-m-Y') }}
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-600">
-                                    @if (strtolower($despacho->clasificacion) == 'interno')
+                                    @if (strtolower($despacho->clasificacion) == 'externo')
                                         <span
-                                            class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Interno</span>
+                                            class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Externo</span>
                                     @else
                                         <span
-                                            class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Externo' }}</span>
+                                            class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Interno' }}</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-800">
@@ -691,7 +695,7 @@
             </div>
         </div>
     </div>
-    <!-- modal del escaner QR del despacho controlado -->
+    <!-- modal del escaner qr del despacho controlado -->
     <div id="scannerModal" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
         <div class="flex min-h-full items-center justify-center">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
@@ -783,7 +787,7 @@
                 </button>
             </div>
 
-            <!-- Filtros del modal controlado -->
+            <!-- filtros del modal controlado -->
             <div class="px-6 py-3.5 bg-slate-50 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div class="sm:col-span-2">
                     <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Buscar solicitud CESFAM</label>
@@ -967,7 +971,7 @@
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-    <!-- avisos con SweetAlert2 -->
+    <!-- avisos con sweetalert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -978,7 +982,7 @@
         const esControladoJS = (nombre) => @json($controlados).some(c => c.toLowerCase() === String(nombre ?? '')
             .trim().toLowerCase());
 
-        // Solicitudes (estupefacientes)
+        // solicitudes (estupefacientes)
         function openSolicitudesControlado() {
             filtrarSolicitudesControladoModal();
             document.getElementById('SolicitudesControladoModal').classList.remove('hidden');
@@ -1105,7 +1109,7 @@
             const solicitud = solicitudesControlado.find(s => s.id === id);
             if (!solicitud) return;
 
-            // Helper de normalización para matching insensible a mayúsculas, tildes y símbolos
+            // helper de normalizacion para matching insensible a mayusculas, tildes y simbolos
             const normText = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
 
             // marcar la solicitud de origen
@@ -1124,7 +1128,7 @@
 
             // clasificacion interna + establecimiento (matching insensible a mayusculas)
             const clasificacion = document.getElementById('clasificacion_select');
-            clasificacion.value = 'Interno';
+            clasificacion.value = 'Externo';
             toggleClasificacion();
 
             const selectEst = document.getElementById('establecimiento_interno');
@@ -1195,6 +1199,9 @@
                 if (opcion) {
                     selectProducto.value = opcion.value;
                     llenarDatosFila(selectProducto);
+                    // consumo mensual que informo el establecimiento en esta solicitud
+                    tr.dataset.consumoSolicitud = item.consumo_anterior ?? '';
+                    actualizarConsumoDespacho(tr);
                     const selectPrograma = tr.querySelector('select[name="programas[]"]');
                     if (selectPrograma && item.programa) {
                         const progNorm = normText(item.programa);
@@ -1232,7 +1239,7 @@
 
             closeSolicitudesControlado();
 
-            // Notificación toast de éxito al cargar
+            // notificacion toast de exito al cargar
             if (typeof Swal !== 'undefined' && normales.length === 0 && sinStock.length === 0) {
                 Swal.fire({
                     toast: true,
@@ -1288,7 +1295,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Los controlados siempre son despacho interno a un CESFAM
+            // los controlados siempre son despacho externo a un cesfam
             if (typeof toggleClasificacion === 'function') toggleClasificacion();
 
             const padDespachaElem = document.getElementById('pad_despacha');
@@ -1438,9 +1445,9 @@
                         return;
                     }
 
-                    const clasif = document.getElementById('clasificacion_select')?.value || 'Interno';
+                    const clasif = document.getElementById('clasificacion_select')?.value || 'Externo';
                     let destinatario = '';
-                    if (clasif === 'Externo') {
+                    if (clasif === 'Interno') {
                         const ext = (document.getElementById('establecimiento_externo')?.value || '').trim();
                         const tipoExt = (document.getElementById('tipo_externo')?.value || '').trim();
                         destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Externo');
@@ -1581,7 +1588,7 @@
             const inpExtDest = document.getElementById('establecimiento_externo');
             const inpDir = document.getElementById('direccion_destino');
 
-            if (val === 'Interno') {
+            if (val === 'Externo') {
                 divInt.classList.remove('hidden');
                 divExt?.classList.add('hidden');
 
@@ -1599,7 +1606,7 @@
                 inpDir.placeholder = "Se autocompletará al seleccionar destino...";
 
                 actualizarDireccionInterna();
-            } else if (val === 'Externo' && divExt) {
+            } else if (val === 'Interno' && divExt) {
                 divInt.classList.add('hidden');
                 divExt.classList.remove('hidden');
 
@@ -1620,7 +1627,7 @@
         }
 
         function actualizarDireccionInterna() {
-            if (document.getElementById('clasificacion_select').value !== 'Interno') return;
+            if (document.getElementById('clasificacion_select').value !== 'Externo') return;
 
             const select = document.getElementById('establecimiento_interno');
             const input = document.getElementById('direccion_destino');
@@ -1762,11 +1769,55 @@
             return tr;
         }
 
+        // ultimo consumo mensual informado por cada establecimiento, por producto
+        const normConsumo = t => (t || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+        const CONSUMO_DECLARADO = (() => {
+            const crudo = @json($consumoDeclarado ?? []);
+            const indice = {};
+            Object.keys(crudo).forEach(est => {
+                const porProducto = {};
+                Object.keys(crudo[est]).forEach(nom => { porProducto[normConsumo(nom)] = crudo[est][nom]; });
+                indice[normConsumo(est)] = porProducto;
+            });
+            return indice;
+        })();
+
+        // muestra en la fila el consumo mensual del establecimiento para ese producto
+        function actualizarConsumoDespacho(tr) {
+            const celda = tr?.querySelector('.consumo-mensual-despacho');
+            if (!celda) return;
+            let valor = tr.dataset.consumoSolicitud;
+            if (valor === undefined || valor === '') {
+                const haciaLaRed = document.getElementById('clasificacion_select')?.value === 'Externo';
+                const est = haciaLaRed ? (document.getElementById('establecimiento_interno')?.value || '') : '';
+                const sel = tr.querySelector('select[name="productos[]"]');
+                const opt = sel ? sel.options[sel.selectedIndex] : null;
+                const nombre = opt && opt.value ? (opt.getAttribute('data-nombre-completo') || opt.value) : '';
+                const porProducto = est ? CONSUMO_DECLARADO[normConsumo(est)] : null;
+                valor = porProducto && nombre ? porProducto[normConsumo(nombre)] : undefined;
+            }
+            const hay = valor !== undefined && valor !== null && valor !== '';
+            celda.textContent = hay ? Number(valor).toLocaleString('es-CL') + ' uds.' : '—';
+            celda.classList.toggle('text-slate-400', !hay);
+            celda.classList.toggle('text-slate-800', hay);
+        }
+
+        function actualizarConsumosDespacho() {
+            tbody.querySelectorAll('tr').forEach(actualizarConsumoDespacho);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('establecimiento_interno')?.addEventListener('change', actualizarConsumosDespacho);
+            document.getElementById('clasificacion_select')?.addEventListener('change', actualizarConsumosDespacho);
+        });
+
         function llenarDatosFila(selectElement) {
             let option = selectElement.options[selectElement.selectedIndex];
             if (!option || option.disabled) return;
 
             let tr = selectElement.closest('tr');
+            // al cambiar el producto deja de usarse el consumo de la solicitud
+            delete tr.dataset.consumoSolicitud;
             const nombreMovil = tr.querySelector('.producto-nombre-movil');
             if (nombreMovil) nombreMovil.textContent = option.getAttribute('data-nombre-completo') || option.value || '';
             let loteInput = tr.querySelector('input[name="lotes[]"]');
@@ -1819,6 +1870,7 @@
                 } catch (e) {}
             }
 
+            actualizarConsumoDespacho(tr);
             cantInput.focus();
         }
 
@@ -1856,7 +1908,7 @@
             }
         }
 
-        // Escáner QR
+        // escaner qr
         let html5QrScanner = null;
         let availableCameras = [];
         let currentCameraIndex = 0;
@@ -2025,7 +2077,7 @@
 
             let targetOption = null;
 
-            // 1. Coincidencia exacta de Producto Y Lote
+            // 1. coincidencia exacta de producto y lote
             if (prodTarget && loteTarget) {
                 const targetProdNorm = norm(prodTarget);
                 const targetLoteNorm = cleanLote(loteTarget);
@@ -2034,19 +2086,19 @@
                 });
             }
 
-            // 2. Coincidencia por Lote (si el lote es específico y distinto de S/L)
+            // 2. coincidencia por lote (si el lote es especifico y distinto de s/l)
             if (!targetOption && loteTarget && cleanLote(loteTarget) !== 'S/L') {
                 const targetLoteNorm = cleanLote(loteTarget);
                 targetOption = options.find(opt => cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm);
             }
 
-            // 3. Coincidencia por Producto (primer lote disponible)
+            // 3. coincidencia por producto (primer lote disponible)
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => norm(opt.value) === targetProdNorm);
             }
 
-            // 4. Coincidencia parcial / difusa por Producto
+            // 4. coincidencia parcial / difusa por producto
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => {
@@ -2056,7 +2108,7 @@
             }
 
             if (targetOption) {
-                // Seleccionar índice exacto para no colisionar con productos duplicados
+                // seleccionar indice exacto para no colisionar con productos duplicados
                 targetOption.selected = true;
                 select.selectedIndex = targetOption.index;
                 select.value = targetOption.value;
@@ -2093,7 +2145,7 @@
         }
 
         function onScanFailure(error) {
-            // Se ignora silenciosamente para no saturar la consola en cada frame fallido
+            // se ignora silenciosamente para no saturar la consola en cada frame fallido
         }
 
         @if (session('controlled_dispatch_success_detail'))
@@ -2107,7 +2159,7 @@
     </script>
 
     <style>
-        /* ===== Detalle de extracción en celular: cada fila se muestra como tarjeta ===== */
+        /* detalle de extraccion en celular: cada fila se muestra como tarjeta */
         .producto-nombre-movil { display: none; }
         @media (max-width: 767px) {
             #productsTable { min-width: 0 !important; width: 100% !important; table-layout: auto !important; white-space: normal !important; }
@@ -2124,7 +2176,7 @@
             #productsTable select, #productsTable input { min-width: 0; }
             .producto-nombre-movil { display: block; font-size: 12px; font-weight: 700; line-height: 1.35; margin-top: 6px; white-space: normal; overflow-wrap: anywhere; }
             .producto-nombre-movil:empty { display: none; }
-            /* Modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
+            /* modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
             #SolicitudesModal > div, #BandejaModal > div { overflow-y: auto !important; }
             #SolicitudesModal .max-h-\[60vh\], #BandejaModal .max-h-\[60vh\] { max-height: none !important; flex-shrink: 0; }
         }

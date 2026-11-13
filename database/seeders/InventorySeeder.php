@@ -6,14 +6,9 @@ use Illuminate\Database\Seeder;
 
 class InventorySeeder extends Seeder
 {
-    /**
-     * Inventario inicial por producto y lote.
-     *
-     * Vacío a propósito: estos datos se cargan desde la propia plataforma
-     * o mediante la Carga Masiva de Inventario.
-     */
+    // inventario inicial por producto y lote
     public function run(): void
     {
-        //
+        // seccion
     }
 }

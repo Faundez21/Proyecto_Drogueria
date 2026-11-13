@@ -8,10 +8,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Crea el usuario Administrador inicial, indispensable para entrar a la plataforma.
-     * Después del primer ingreso conviene cambiarle la contraseña.
-     */
+    // crea el usuario administrador inicial, indispensable para entrar a la plataforma. despues del primer ingreso conviene cambiarle la contrasena
     public function run(): void
     {
         $admin = User::updateOrCreate(

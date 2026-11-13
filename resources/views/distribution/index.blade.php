@@ -2,7 +2,7 @@
 
 @section('title', 'Distribución de la Droguería')
 
-@section('subtitle', 'Encuentra dónde está cada producto y organiza la estructura de la bodega.')
+@section('subtitle', 'Mapa interactivo 2D / 3D y administración jerárquica de pasillos, estanterías, niveles y posiciones.')
 
 @section('actions')
     <div class="flex flex-wrap items-center gap-2.5">
@@ -14,12 +14,20 @@
             </svg>
             Ver Inventario
         </a>
+        <a href="{{ route('shelf.index') }}"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all duration-200">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16M6 4v16M18 4v16">
+                </path>
+            </svg>
+            Gestionar Estanterías
+        </a>
     </div>
 @endsection
 
 @section('content')
     <div class="space-y-6">
-        <!-- Ruta de navegación -->
+        <!-- ruta de navegacion -->
         <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
             <span class="font-mono-das text-slate-400 font-semibold">02</span>
             <span>Almacenamiento</span>
@@ -55,7 +63,7 @@
                 border: 1px solid #1e293b;
             }
 
-            /* Etiquetas flotantes (se reposicionan solas para no solaparse) */
+            /* etiquetas flotantes (se reposicionan solas para no solaparse) */
             .rack-marker {
                 position: absolute;
                 transform: translate(-50%, -100%);
@@ -88,7 +96,7 @@
                 border-color: var(--marker-color, #64748b) transparent transparent transparent;
             }
 
-            /* Etiqueta de pasillo: estilo distinto al de las estanterías */
+            /* etiqueta de pasillo: estilo distinto al de las estanterias */
             .rack-marker.aisle-marker {
                 opacity: 0.92;
                 border-style: dashed;
@@ -96,7 +104,7 @@
                 cursor: default;
             }
 
-            /* Colores exactos */
+            /* colores exactos */
             .marker-green {
                 background-color: #22c55e;
                 color: white;
@@ -123,89 +131,11 @@
             }
         </style>
 
-        @php
-            $estantesSinNiveles = collect($shelves)->filter(fn ($sh) => $sh->levels->isEmpty())->count();
-            $nivelesSinPosiciones = collect($shelves)->flatMap(fn ($sh) => $sh->levels)->filter(fn ($lv) => $lv->positions->isEmpty())->count();
-        @endphp
+        <!-- navegacion entre pasillos, estantes, niveles y posiciones -->
+        @include('distribution.partials.nav_tabs', ['activeTab' => 'distribution'])
 
-        <!-- pestanas buscar y configurar -->
-        <div class="inline-flex w-full sm:w-auto bg-slate-100 p-1 rounded-xl border border-slate-200" role="tablist">
-            <button type="button" role="tab" data-tab-bodega="buscar" onclick="cambiarTabBodega('buscar')"
-                class="tab-bodega flex-1 sm:flex-none px-4 py-2 rounded-lg text-[13px] font-bold transition cursor-pointer">
-                Buscar en bodega
-            </button>
-            <button type="button" role="tab" data-tab-bodega="configurar" onclick="cambiarTabBodega('configurar')"
-                class="tab-bodega flex-1 sm:flex-none px-4 py-2 rounded-lg text-[13px] font-bold transition cursor-pointer inline-flex items-center justify-center gap-1.5">
-                Configurar bodega
-                @if ($estantesSinNiveles > 0 || $nivelesSinPosiciones > 0)
-                    <span class="w-2 h-2 rounded-full bg-amber-500" title="Hay estanterías sin niveles o niveles sin posiciones"></span>
-                @endif
-            </button>
-        </div>
-
-        <!-- pestana configurar bodega -->
-        <section id="panel-bodega-configurar" class="hidden space-y-4">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-                <h2 class="text-[15px] font-bold text-slate-800">Estructura de la bodega</h2>
-                <p class="text-[12.5px] text-slate-500 mt-0.5">Se arma en orden: primero los pasillos, luego sus estanterías, los niveles de cada estantería y las posiciones de cada nivel.</p>
-
-                @if ($estantesSinNiveles > 0 || $nivelesSinPosiciones > 0)
-                    <div class="mt-4 flex flex-col gap-2">
-                        @if ($estantesSinNiveles > 0)
-                            <a href="{{ route('level.index') }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-900 hover:bg-amber-100 transition-colors">
-                                <span><strong>{{ $estantesSinNiveles }} {{ $estantesSinNiveles === 1 ? 'estantería no tiene' : 'estanterías no tienen' }} niveles.</strong> Sin niveles no se puede indicar en qué repisa queda cada lote.</span>
-                                <span class="font-bold shrink-0">Crear niveles →</span>
-                            </a>
-                        @endif
-                        @if ($nivelesSinPosiciones > 0)
-                            <a href="{{ route('position.index') }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-900 hover:bg-amber-100 transition-colors">
-                                <span><strong>{{ $nivelesSinPosiciones }} {{ $nivelesSinPosiciones === 1 ? 'nivel no tiene' : 'niveles no tienen' }} posiciones.</strong></span>
-                                <span class="font-bold shrink-0">Crear posiciones →</span>
-                            </a>
-                        @endif
-                    </div>
-                @endif
-            </div>
-            @include('distribution.partials.nav_tabs', ['activeTab' => 'distribution', 'sinMapa' => true])
-        </section>
-
-        <!-- pestana buscar en bodega -->
-        <section id="panel-bodega-buscar" class="space-y-6">
-
-        <!-- buscador de productos en bodega -->
-        @php
-            $pasilloPorEstante = collect($shelves)->mapWithKeys(fn ($sh) => [mb_strtolower(trim((string) $sh->name)) => $sh->aisle->name ?? null]);
-            $ubicacionesBusqueda = collect($stock)->map(function ($it) use ($pasilloPorEstante) {
-                $estante = trim((string) ($it->estante ?? ''));
-                return [
-                    'producto' => (string) $it->producto,
-                    'lote' => (string) ($it->lote ?? ''),
-                    'programa' => (string) ($it->programa ?? ''),
-                    'cantidad' => (int) $it->cantidad,
-                    'vence' => $it->fecha_vencimiento ? \Carbon\Carbon::parse($it->fecha_vencimiento)->format('d/m/Y') : null,
-                    'dias' => $it->fecha_vencimiento ? (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($it->fecha_vencimiento)->startOfDay(), false) : null,
-                    'pasillo' => $pasilloPorEstante[mb_strtolower($estante)] ?? null,
-                    'estante' => $estante,
-                    'nivel' => (string) ($it->nivel ?? ''),
-                    'posicion' => (string) ($it->posicion ?? ''),
-                ];
-            })->values();
-        @endphp
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
-            <label for="buscador-bodega" class="block text-[15px] font-bold text-slate-800">¿Qué producto o lote buscas?</label>
-            <div class="relative mt-2.5">
-                <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-                <input type="search" id="buscador-bodega" autocomplete="off"
-                    placeholder="Ej: paracetamol, L-100 o P1-A"
-                    class="w-full pl-11 pr-4 py-3 bg-white border border-slate-300 rounded-xl text-[14px] text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all">
-            </div>
-            <div id="resultados-bodega" class="mt-3 hidden"></div>
-        </div>
-
-        <!-- mapa de la bodega -->
-        <div id="mapa-bodega" x-data="warehouseApp()" class="scroll-mt-24 bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
+        <!-- visor 3d interactivo -->
+        <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center shrink-0">
@@ -214,89 +144,26 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-[15px] font-bold text-slate-800 leading-tight">Mapa de la bodega</h2>
-                        <p class="text-[12px] text-slate-500">Haz clic en una estantería para ver qué contiene.</p>
+                        <h2 class="text-[15px] font-bold text-slate-800 leading-tight">Plano Interactivo de Almacenamiento</h2>
+                        <p class="text-[12px] text-slate-500">Haga clic sobre una estantería o caja para inspeccionar su ocupación, lotes y vencimientos</p>
                     </div>
+                </div>
+                <div class="hidden md:flex items-center gap-2 text-[11px] font-semibold text-slate-600">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> &lt; 50% Ocupación
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span> 50-79% Media
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span> &ge; 80% Crítica
+                    </span>
                 </div>
             </div>
 
             <div class="p-3 sm:p-5 bg-slate-50/50">
-                <!-- filtros y leyenda del mapa -->
-                <div class="mb-3 flex flex-col gap-3">
-                    <div class="grid grid-cols-2 lg:flex lg:flex-wrap items-center gap-2">
-                        <select x-model="selectedRackJump" @change="jumpToRack()" aria-label="Ir a una estantería"
-                            class="col-span-2 sm:col-span-1 lg:w-48 bg-white border border-slate-300 rounded-lg py-2 px-3 text-[13px] text-slate-800 font-medium focus:outline-none focus:border-teal-500 cursor-pointer">
-                            <option value="">Ir a estantería...</option>
-                            <template x-for="rk in rackOptions" :key="rk.code">
-                                <option :value="rk.code" x-text="rk.label"></option>
-                            </template>
-                        </select>
-                        <select x-model="selectedAisle" @change="changeAisle()" aria-label="Filtrar por pasillo"
-                            class="lg:w-44 bg-white border border-slate-300 rounded-lg py-2 px-3 text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 cursor-pointer">
-                            <option value="">Todos los pasillos</option>
-                            <template x-for="aisle in aisleOptions" :key="aisle">
-                                <option :value="aisle" x-text="aisle"></option>
-                            </template>
-                        </select>
-                        <select x-model="selectedLevel" @change="changeLevel()" aria-label="Filtrar por nivel"
-                            class="lg:w-44 bg-white border border-slate-300 rounded-lg py-2 px-3 text-[13px] text-slate-800 focus:outline-none focus:border-teal-500 cursor-pointer">
-                            <option value="">Todos los niveles</option>
-                            <template x-for="lvl in levelOptions" :key="lvl.value">
-                                <option :value="lvl.value" x-text="lvl.label"></option>
-                            </template>
-                        </select>
-                        <button type="button" @click="toggleFefoFilter()"
-                            :class="fefoOnly ? 'bg-rose-600 border-rose-600 text-white' : 'bg-white border-slate-300 text-slate-700 hover:border-rose-400'"
-                            class="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-[13px] font-semibold transition cursor-pointer">
-                            <span class="w-2 h-2 rounded-full" :class="fefoOnly ? 'bg-white' : 'bg-rose-500'"></span>
-                            Solo por vencer (90 días)
-                            <span class="px-1.5 py-0.5 rounded text-[11px] font-bold"
-                                :class="fefoOnly ? 'bg-rose-800 text-white' : 'bg-rose-50 text-rose-700'"
-                                x-text="stats.conAlertaFefo"></span>
-                        </button>
-                    </div>
-                    {{-- la leyenda muestra solo lo que aplica --}}
-                    @php
-                        $hayCapacidad = collect($shelves)->contains(fn ($sh) => (int) $sh->capacidad > 0);
-                        $estantesMapa = collect($shelves)->map(fn ($sh) => mb_strtolower(trim((string) $sh->name)))->filter()->all();
-                        $hayLotesUbicados = collect($stock)->contains(fn ($it) => in_array(mb_strtolower(trim((string) $it->estante)), $estantesMapa, true));
-                        $faltantesMapa = array_values(array_filter([
-                            $hayCapacidad ? null : 'las estanterías no tienen capacidad definida',
-                            $hayLotesUbicados ? null : 'ningún lote tiene una ubicación asignada',
-                        ]));
-                    @endphp
-                    @if (count($faltantesMapa) > 0)
-                        <p class="text-[12.5px] text-slate-500">
-                            El mapa todavía no muestra colores porque {{ implode(' y ', $faltantesMapa) }}.
-                            <button type="button" onclick="cambiarTabBodega('configurar')" class="font-semibold text-teal-700 hover:underline cursor-pointer">Configurar bodega</button>
-                        </p>
-                    @endif
-                    @if ($hayCapacidad || $hayLotesUbicados)
-                        <details class="group text-[12px] text-slate-600">
-                            <summary class="list-none cursor-pointer select-none inline-flex items-center gap-1 font-semibold text-teal-700 hover:underline">
-                                ¿Qué significan los colores?
-                            </summary>
-                            <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5">
-                                @if ($hayCapacidad)
-                                    <span class="font-semibold text-slate-500">Estanterías:</span>
-                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#22c55e]"></span>poco llenas (&lt; 50%)</span>
-                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#f97316]"></span>a medias (50-79%)</span>
-                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#ef4444]"></span>casi llenas (&ge; 80%)</span>
-                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#3b82f6]"></span>sin capacidad definida</span>
-                                @endif
-                                @if ($hayLotesUbicados)
-                                    <span class="font-semibold text-slate-500 {{ $hayCapacidad ? 'sm:ml-2' : '' }}">Cajas:</span>
-                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#10b981]"></span>vigentes</span>
-                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#f59e0b]"></span>vencen en &le; 90 días</span>
-                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#ef4444]"></span>vencidas o &le; 30 días</span>
-                                @endif
-                            </div>
-                        </details>
-                    @endif
-                </div>
-
-                <!-- contenedor del visor Three.js -->
-                <div id="warehouse-wrapper"
+                <!-- contenedor del visor three.js -->
+                <div id="warehouse-wrapper" x-data="warehouseApp()"
                     class="h-[520px] sm:h-[620px] lg:h-[750px] rounded-xl overflow-hidden border border-slate-200/90 bg-[#eef2f6] select-none shadow-inner">
 
                     <!-- capa de etiquetas sobre el visor -->
@@ -315,21 +182,21 @@
                                     :class="viewMode === '2D' ? 'bg-teal-600 text-white shadow-sm' :
                                         'text-slate-600 hover:text-slate-900'"
                                     class="px-3 sm:px-4 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer"
-                                    title="Plano visto desde arriba">Plano</button>
+                                    title="Plano superior 2D (arrastra con clic izquierdo)">Planta 2D</button>
                                 <button @click="changeView('3D')"
                                     :class="viewMode === '3D' ? 'bg-teal-600 text-white shadow-sm' :
                                         'text-slate-600 hover:text-slate-900'"
                                     class="px-3 sm:px-4 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer"
-                                    title="Vista en 3D">3D</button>
+                                    title="Vista isométrica 3D">Isométrica 3D</button>
                                 <button @click="changeView('FRONT')"
                                     :class="viewMode === 'FRONT' ? 'bg-teal-600 text-white shadow-sm' :
                                         'text-slate-600 hover:text-slate-900'"
                                     class="px-3 sm:px-4 py-1.5 text-xs sm:text-[13px] font-bold rounded-lg transition cursor-pointer"
-                                    title="Vista de frente, a la altura del pasillo">Frente</button>
+                                    title="Vista frontal a nivel de pasillo">Frontal</button>
                             </div>
                             <span class="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 text-slate-200 text-[11px] font-medium backdrop-blur border border-slate-700/60">
-                                <span x-show="viewMode === '2D'">Arrastra para moverte · rueda para acercar</span>
-                                <span x-show="viewMode !== '2D'">Arrastra para girar · clic derecho para moverte · rueda para acercar</span>
+                                <span x-show="viewMode === '2D'">🖱️ Clic izq: Arrastrar plano · Rueda: Zoom</span>
+                                <span x-show="viewMode !== '2D'">🖱️ Clic izq: Girar · Clic der / Teclas WASD: Desplazar · Rueda: Zoom</span>
                             </span>
                         </div>
 
@@ -378,7 +245,7 @@
                             <span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-ping"></span>
                             Moviendo <span class="text-white underline" x-text="movingRackCode"></span>
                         </span>
-                        <span class="hidden md:inline text-slate-300">Haz clic en el piso para guardar</span>
+                        <span class="hidden md:inline text-slate-300">Haga clic en el piso para guardar</span>
                         <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-200 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 cursor-pointer select-none">
                             <input type="checkbox" x-model="snapToGrid" @change="toggleSnapGrid()" class="rounded border-slate-600 text-blue-500 focus:ring-0 w-3.5 h-3.5">
                             <span>Ajustar a cuadrícula</span>
@@ -399,6 +266,180 @@
                         <span x-text="toastMessage"></span>
                     </div>
 
+                    <!-- panel lateral: selector, busqueda y leyenda -->
+                    <aside
+                        class="absolute top-16 sm:top-24 left-3 sm:left-6 w-52 sm:w-64 glass-panel text-white rounded-xl shadow-2xl z-20 flex flex-col pointer-events-auto transition-all duration-300">
+                        <div @click="sidebarOpen = !sidebarOpen"
+                            class="flex justify-between items-center p-3 cursor-pointer hover:bg-slate-800/50 rounded-t-xl"
+                            :class="{ 'rounded-b-xl': !sidebarOpen }">
+                            <span class="text-xs sm:text-sm font-semibold flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                                    </path>
+                                </svg>
+                                Panel de Control
+                            </span>
+                            <svg :class="{ 'rotate-180': !sidebarOpen }"
+                                class="w-4 h-4 text-gray-400 transition-transform duration-300" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7">
+                                </path>
+                            </svg>
+                        </div>
+
+                        <div x-show="sidebarOpen" x-transition
+                            class="p-3 sm:p-4 pt-0 border-t border-slate-700/50 mt-1 flex flex-col gap-2.5 max-h-[60vh] overflow-y-auto">
+
+                            <!-- buscador por estante, producto, lote o pasillo -->
+                            <div class="relative mt-2">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                                <input type="text" x-model="searchQuery" @input="handleSearch"
+                                    placeholder="Estante, producto o lote..."
+                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg py-2 pl-9 pr-7 text-xs sm:text-[13px] text-gray-200 focus:outline-none focus:border-blue-500 placeholder-gray-500 transition">
+                                <button x-show="searchQuery.length > 0" @click="searchQuery = ''; handleSearch()"
+                                    type="button"
+                                    class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-gray-400 hover:text-white cursor-pointer">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- navegador de resultados de busqueda -->
+                            <div x-show="searchQuery.trim().length > 0" style="display: none;"
+                                class="flex items-center justify-between bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px]">
+                                <span class="text-slate-300 font-semibold"
+                                    x-text="searchMatchesCount > 0 ? (searchMatchIdx + 1) + ' de ' + searchMatchesCount + ' estante(s)' : 'Sin coincidencias'"></span>
+                                <div x-show="searchMatchesCount > 1" class="flex items-center gap-1">
+                                    <button type="button" @click="stepSearchMatch(-1)"
+                                        class="px-1.5 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold cursor-pointer"
+                                        title="Estante anterior">&lsaquo;</button>
+                                    <button type="button" @click="stepSearchMatch(1)"
+                                        class="px-1.5 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold cursor-pointer"
+                                        title="Siguiente estante">&rsaquo;</button>
+                                </div>
+                            </div>
+
+                            <!-- selector directo: ir a estanteria -->
+                            <div class="relative">
+                                <select style="background-image: none;" x-model="selectedRackJump" @change="jumpToRack()"
+                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2 text-xs sm:text-[13px] text-teal-300 font-semibold focus:outline-none focus:border-teal-500 cursor-pointer appearance-none">
+                                    <option value="">Ir directo a estante...</option>
+                                    <template x-for="rk in rackOptions" :key="rk.code">
+                                        <option :value="rk.code" x-text="rk.label"></option>
+                                    </template>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                    <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7">
+                                        </path>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- selector de pasillo -->
+                            <div class="relative">
+                                <select style="background-image: none;" x-model="selectedAisle" @change="changeAisle()"
+                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2 text-xs sm:text-[13px] text-white font-medium focus:outline-none focus:border-blue-500 cursor-pointer appearance-none">
+                                    <option value="">Todos los pasillos</option>
+                                    <template x-for="aisle in aisleOptions" :key="aisle">
+                                        <option :value="aisle" x-text="'Pasillo: ' + aisle"></option>
+                                    </template>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7">
+                                        </path>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- selector de nivel, se llena con los niveles que existen -->
+                            <div class="relative">
+                                <select style="background-image: none;" x-model="selectedLevel" @change="changeLevel()"
+                                    class="w-full bg-[#1e293b] border border-slate-700 rounded-lg p-2 text-xs sm:text-[13px] text-white font-medium focus:outline-none focus:border-blue-500 cursor-pointer appearance-none">
+                                    <option value="">Todos los niveles</option>
+                                    <template x-for="lvl in levelOptions" :key="lvl.value">
+                                        <option :value="lvl.value" x-text="lvl.label"></option>
+                                    </template>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7">
+                                        </path>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- boton filtro rapido fefo (vencimientos) -->
+                            <button type="button" @click="toggleFefoFilter()"
+                                :class="fefoOnly ? 'bg-rose-600/90 border-rose-400 text-white shadow-md' : 'bg-[#1e293b] border-slate-700 text-gray-300 hover:border-rose-500/60'"
+                                class="w-full flex items-center justify-between px-3 py-2 rounded-lg border text-xs font-semibold transition cursor-pointer">
+                                <span class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full" :class="fefoOnly ? 'bg-white animate-pulse' : 'bg-rose-500'"></span>
+                                    Alertas FEFO (&le; 90d)
+                                </span>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold"
+                                    :class="fefoOnly ? 'bg-rose-900/80 text-rose-100' : 'bg-slate-800 text-rose-400'"
+                                    x-text="stats.conAlertaFefo"></span>
+                            </button>
+
+                            <!-- leyenda de ocupacion -->
+                            <div class="flex flex-col gap-3 mt-2 text-xs sm:text-sm font-medium text-gray-300">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#22c55e]"></span>
+                                    Ocupación baja (&lt; 50%)
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#f97316]"></span>
+                                    Ocupación media (50-79%)
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#ef4444]"></span>
+                                    Ocupación crítica (&ge; 80%)
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#3b82f6]"></span>
+                                    Sin capacidad definida
+                                </div>
+                            </div>
+
+                            <!-- leyenda de vencimiento: es el color de la repisa bajo las cajas -->
+                            <div
+                                class="flex flex-col gap-2.5 pt-3 border-t border-slate-700/60 text-xs sm:text-sm font-medium text-gray-300">
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Vencimiento de las
+                                    cajas</p>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#10b981]"></span>
+                                    Vigente
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#f59e0b]"></span>
+                                    Vence en &le; 90 días
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3.5 h-3.5 rounded bg-[#ef4444]"></span>
+                                    Vencido o &le; 30 días
+                                </div>
+                                <p class="text-[10px] text-gray-500 leading-snug">Pasa el mouse sobre una caja para ver su
+                                    producto, lote y vencimiento.</p>
+                            </div>
+                        </div>
+                    </aside>
 
                     <!-- panel flotante con el detalle de la estanteria -->
                     <div x-show="tooltipVisible" x-transition:enter="transition ease-out duration-200"
@@ -603,118 +644,11 @@
             </div>
         </div>
 
-        </section>
-
-        <!-- pestanas y buscador de ubicaciones -->
-        <script>
-            const UBICACIONES_BODEGA = @json($ubicacionesBusqueda);
-
-            function cambiarTabBodega(tab) {
-                document.getElementById('panel-bodega-buscar').classList.toggle('hidden', tab !== 'buscar');
-                document.getElementById('panel-bodega-configurar').classList.toggle('hidden', tab !== 'configurar');
-                document.querySelectorAll('.tab-bodega').forEach(btn => {
-                    const activa = btn.dataset.tabBodega === tab;
-                    btn.setAttribute('aria-selected', activa ? 'true' : 'false');
-                    btn.classList.toggle('bg-white', activa);
-                    btn.classList.toggle('text-teal-700', activa);
-                    btn.classList.toggle('shadow-sm', activa);
-                    btn.classList.toggle('text-slate-500', !activa);
-                });
-                try { history.replaceState(null, '', tab === 'configurar' ? '#configurar' : location.pathname + location.search); } catch (e) {}
-                // recalcula el mapa al volver a mostrarlo
-                if (tab === 'buscar') window.dispatchEvent(new Event('resize'));
-            }
-
-            (function () {
-                cambiarTabBodega(location.hash === '#configurar' ? 'configurar' : 'buscar');
-
-                const input = document.getElementById('buscador-bodega');
-                const caja = document.getElementById('resultados-bodega');
-                const normalizar = t => (t || '').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-                let espera = null;
-
-                function el(tag, clases, texto) {
-                    const n = document.createElement(tag);
-                    if (clases) n.className = clases;
-                    if (texto !== undefined) n.textContent = texto;
-                    return n;
-                }
-
-                function verEnMapa(estante) {
-                    document.getElementById('mapa-bodega').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    setTimeout(() => window.dispatchEvent(new CustomEvent('jump-to-rack', { detail: estante })), 350);
-                }
-
-                function pintar(q) {
-                    caja.replaceChildren();
-                    if (!q) { caja.classList.add('hidden'); return; }
-                    caja.classList.remove('hidden');
-
-                    const nq = normalizar(q);
-                    const hallados = UBICACIONES_BODEGA.filter(u =>
-                        normalizar(u.producto).includes(nq) || normalizar(u.lote).includes(nq) ||
-                        normalizar(u.estante).includes(nq) || normalizar(u.pasillo).includes(nq));
-
-                    if (hallados.length === 0) {
-                        caja.appendChild(el('p', 'text-[13px] text-slate-500 py-2', 'No hay stock disponible que coincida con «' + q + '».'));
-                        return;
-                    }
-
-                    const max = 12;
-                    caja.appendChild(el('p', 'text-[12px] font-semibold text-slate-500 mb-2',
-                        hallados.length === 1 ? '1 lote encontrado' : hallados.length + ' lotes encontrados' + (hallados.length > max ? ' (se muestran los primeros ' + max + ')' : '')));
-
-                    const lista = el('ul', 'divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden');
-                    hallados.slice(0, max).forEach(u => {
-                        const li = el('li', 'flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 px-4 py-3 bg-white');
-                        const info = el('div', 'min-w-0 flex-1');
-                        info.appendChild(el('p', 'text-[13.5px] font-bold text-slate-800', u.producto));
-
-                        const detalle = el('p', 'text-[12px] text-slate-500 mt-0.5');
-                        detalle.textContent = 'Lote ' + (u.lote || 'S/L') + ' · ' + u.cantidad.toLocaleString('es-CL') + ' uds.';
-                        if (u.vence) {
-                            const vence = el('span', u.dias !== null && u.dias <= 30 ? 'text-rose-600 font-semibold' : (u.dias !== null && u.dias <= 90 ? 'text-amber-600 font-semibold' : ''),
-                                ' · vence ' + u.vence + (u.dias !== null && u.dias < 0 ? ' (vencido)' : ''));
-                            detalle.appendChild(vence);
-                        }
-                        info.appendChild(detalle);
-
-                        const ruta = [u.pasillo, u.estante ? 'Estantería ' + u.estante : null, u.nivel ? u.nivel : null, u.posicion ? 'Posición ' + u.posicion : null].filter(Boolean);
-                        info.appendChild(el('p', 'text-[12.5px] mt-1 font-semibold ' + (u.estante ? 'text-teal-700' : 'text-amber-700'),
-                            u.estante ? ruta.join(' › ') : 'Sin ubicación asignada'));
-                        li.appendChild(info);
-
-                        if (u.estante) {
-                            const btn = el('button', 'shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-[12.5px] font-bold text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100 transition-colors cursor-pointer', 'Ver en el mapa');
-                            btn.type = 'button';
-                            btn.addEventListener('click', () => verEnMapa(u.estante));
-                            li.appendChild(btn);
-                        }
-                        lista.appendChild(li);
-                    });
-                    caja.appendChild(lista);
-                }
-
-                input.addEventListener('input', () => {
-                    clearTimeout(espera);
-                    espera = setTimeout(() => {
-                        const q = input.value.trim();
-                        pintar(q);
-                        // marca en el mapa las estanterias que coinciden
-                        window.dispatchEvent(new CustomEvent('search-rack', { detail: q }));
-                    }, 300);
-                });
-
-                // restablecer vista tambien limpia la busqueda
-                window.addEventListener('cam-reset', () => { input.value = ''; pintar(''); });
-            })();
-        </script>
-
-        <!-- logica del visor 3D -->
+        <!-- logica del visor 3d -->
         <script>
             function warehouseApp() {
                 return {
-                    viewMode: '2D',
+                    viewMode: '3D',
                     sidebarOpen: window.innerWidth >= 640,
                     tooltipVisible: false,
                     rackData: {},
@@ -742,8 +676,6 @@
                     },
                     init() {
                         this.initThreeJS();
-                        // abre en vista de plano
-                        setTimeout(() => this.changeView('2D'), 50);
 
                         window.addEventListener('rack-selected', (e) => {
                             this.rackData = e.detail;
@@ -766,7 +698,7 @@
                                 this.toastMessage = '';
                             }, 2600);
                         });
-                        // Escape cancela movimiento o cierra el panel de detalle
+                        // escape cancela movimiento o cierra el panel de detalle
                         window.addEventListener('keydown', (e) => {
                             if (e.key === 'Escape') {
                                 if (this.isMovingMode) {
@@ -806,7 +738,7 @@
                         }));
                     },
                     resetView() {
-                        this.viewMode = '2D';
+                        this.viewMode = '3D';
                         this.selectedRackJump = '';
                         this.selectedAisle = '';
                         this.selectedLevel = '';
@@ -823,8 +755,6 @@
                             detail: ''
                         }));
                         window.dispatchEvent(new Event('cam-reset'));
-                        // vuelve a la vista de plano
-                        window.dispatchEvent(new CustomEvent('update-camera-view', { detail: '2D' }));
                     },
                     zoomIn() {
                         window.dispatchEvent(new Event('cam-zoom-in'));
@@ -855,8 +785,8 @@
                             .code);
                     },
                     habilitarMovimiento() {
-                        this.tooltipVisible = false; // Ocultamos el panel
-                        window.dispatchEvent(new Event('start-moving')); // Avisamos a Three.js
+                        this.tooltipVisible = false; // ocultamos el panel
+                        window.dispatchEvent(new Event('start-moving')); // avisamos a three.js
                         if (typeof Swal !== 'undefined') {
                             const cod = this.rackData?.code || 'la estantería';
                             Swal.fire({
@@ -864,7 +794,7 @@
                                 position: 'top-end',
                                 icon: 'info',
                                 title: `Modo Reubicación: ${cod}`,
-                                text: 'Haz clic en el piso de la bodega para colocarla (Esc para cancelar).',
+                                text: 'Haga clic en el piso de la bodega para colocarla (Esc para cancelar).',
                                 showConfirmButton: false,
                                 timer: 3500,
                                 timerProgressBar: true
@@ -891,7 +821,7 @@
                         }));
                     },
 
-                    // Visor 3D de la bodega
+                    // visor 3d de la bodega
                     initThreeJS() {
                         const wrapper = document.getElementById('warehouse-wrapper');
                         const container = document.getElementById('warehouse-3d-container');
@@ -926,7 +856,7 @@
                         controls.panSpeed = 1.1;
                         controls.rotateSpeed = 0.85;
 
-                        // --- Iluminación ---
+                        // iluminacion
                         const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
                         const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 0.4);
                         scene.add(ambientLight);
@@ -936,7 +866,7 @@
                         dirLight.castShadow = true;
                         dirLight.shadow.mapSize.width = 2048;
                         dirLight.shadow.mapSize.height = 2048;
-                        // Área de sombras que cubre toda la bodega
+                        // area de sombras que cubre toda la bodega
                         dirLight.shadow.camera.left = -60;
                         dirLight.shadow.camera.right = 60;
                         dirLight.shadow.camera.top = 60;
@@ -946,7 +876,7 @@
                         dirLight.shadow.bias = -0.0004;
                         scene.add(dirLight);
 
-                        // --- Animación de la cámara ---
+                        // animacion de la camara
                         let camAnim = null;
 
                         function animateCamera(toPos, toTarget, ms) {
@@ -963,13 +893,13 @@
                         function stepCameraAnimation() {
                             if (!camAnim) return;
                             const t = Math.min(1, (performance.now() - camAnim.start) / camAnim.ms);
-                            const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // easeInOutQuad
+                            const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // easeinoutquad
                             camera.position.lerpVectors(camAnim.fromPos, camAnim.toPos, e);
                             controls.target.lerpVectors(camAnim.fromTarget, camAnim.toTarget, e);
                             if (t >= 1) camAnim = null;
                         }
 
-                        // Si el usuario toma el control, se cancela la animación
+                        // si el usuario toma el control, se cancela la animacion
                         controls.addEventListener('start', () => {
                             camAnim = null;
                         });
@@ -985,17 +915,17 @@
                                 return;
                             }
 
-                            // Ángulo frontal-isométrico despejado para ver bien las cajas y etiquetas del estante
+                            // angulo frontal-isometrico despejado para ver bien las cajas y etiquetas del estante
                             const offset = currentViewMode === 'FRONT'
                                 ? new THREE.Vector3(0, 5.5, 19)
                                 : new THREE.Vector3(9, 11, 20);
                             animateCamera(target.clone().add(offset), target, 650);
                         }
 
-                        // --- Estructura base: suelo con cuadrícula y paredes ---
+                        // estructura base: suelo con cuadricula y paredes
                         const buildGroup = new THREE.Group();
 
-                        // Textura de cuadrícula para el piso (celdas de 2 x 2 unidades)
+                        // textura de cuadricula para el piso (celdas de 2 x 2 unidades)
                         const gridCanvas = document.createElement('canvas');
                         gridCanvas.width = 64;
                         gridCanvas.height = 64;
@@ -1020,7 +950,7 @@
                         floor.receiveShadow = true;
                         buildGroup.add(floor);
 
-                        // --- Tema claro / oscuro del plano 3D ---
+                        // tema claro / oscuro del plano 3d
                         const applyMapTheme = (dark) => {
                             scene.background = new THREE.Color(dark ? '#1A2332' : '#f1f5f9');
                             gctx.fillStyle = dark ? '#2A3649' : '#dbe3ec';
@@ -1067,20 +997,19 @@
 
                         scene.add(buildGroup);
 
-                        // --- Variables globales de Three.js ---
+                        // variables globales de three.js
                         const racks = [];
                         const markers = [];
                         const cajasMeshes = []; // todas las cajas (para el hover con detalle)
-                        const pulsers = []; // materiales que "laten" (alertas de vencimiento, LED)
+                        const pulsers = []; // materiales que "laten" (alertas de vencimiento, led)
 
-                        // Zona exterior: andén de despacho y ambulancia
+                        // zona exterior: anden de despacho y ambulancia
 
 
 
-                        // --- Utilidades de texto / números ---
-                        // txt: texto normalizado ("Nivel 1 " -> "nivel 1")
+                        // utilidades de texto / numeros --- txt: texto normalizado ("nivel 1 " -> "nivel 1")
                         const txt = (s) => String(s ?? '').trim().toLowerCase();
-                        // norm: último número del texto sin ceros a la izquierda ("A-01" -> "1", "Nivel 2" -> "2")
+                        // norm: ultimo numero del texto sin ceros a la izquierda ("a-01" -> "1", "nivel 2" -> "2")
                         const norm = (s) => {
                             const m = String(s ?? '').match(/\d+/g);
                             return m ? String(parseInt(m[m.length - 1], 10)) : '';
@@ -1111,7 +1040,7 @@
                             return h >>> 0;
                         }
 
-                        // --- Vencimientos ---
+                        // vencimientos
                         function parseFecha(f) {
                             if (!f) return null;
                             const s = String(f);
@@ -1213,12 +1142,12 @@
                         const MAX_NIVELES = 8;
                         const MAX_POSICIONES = 8;
 
-                        // Opciones del selector de niveles (se llenan al dibujar las estanterías)
+                        // opciones del selector de niveles (se llenan al dibujar las estanterias)
                         const nivelesGlobales = new Map();
 
-                        // Texturas generadas por código: cartón, cinta, madera, etiquetas y acero
+                        // texturas generadas por codigo: carton, cinta, madera, etiquetas y acero
 
-                        // Placa con texto (alta resolución para que se lea de cerca)
+                        // placa con texto (alta resolucion para que se lea de cerca)
                         function texturaTexto(texto, colorFondo, colorTexto, tamanoFuente) {
                             const canvas = document.createElement('canvas');
                             canvas.width = 256;
@@ -1242,7 +1171,7 @@
                             });
                         }
 
-                        // --- Cartón kraft ---
+                        // carton kraft
                         function dibujarKraft(ctx, w, h, tono, semilla) {
                             const r = rng(semilla);
                             ctx.fillStyle = tono;
@@ -1263,7 +1192,7 @@
                             }
                         }
 
-                        // Bordes oscurecidos: simulan el bisel / arista de la caja
+                        // bordes oscurecidos: simulan el bisel / arista de la caja
                         function bordeSombra(ctx, w, h) {
                             const ancho = 20;
                             const col0 = 'rgba(60,35,10,0.38)';
@@ -1330,7 +1259,7 @@
                             };
 
                             kraftCache[t] = {
-                                // Laterales: cinta que baja desde la tapa + símbolos de embalaje
+                                // laterales: cinta que baja desde la tapa + simbolos de embalaje
                                 side: crear(ctx => {
                                     dibujarCinta(ctx, 104, 0, 48, 84);
                                     ctx.strokeStyle = 'rgba(70,45,15,0.45)';
@@ -1353,7 +1282,7 @@
                                     ctx.font = 'bold 24px Arial';
                                     ctx.fillText('FRÁGIL', 188, 191);
                                 }),
-                                // Tapa: junta de solapas + cinta de embalaje
+                                // tapa: junta de solapas + cinta de embalaje
                                 top: crear(ctx => {
                                     ctx.strokeStyle = 'rgba(70,45,15,0.6)';
                                     ctx.lineWidth = 3;
@@ -1373,7 +1302,7 @@
                             return kraftCache[t];
                         }
 
-                        // --- Madera de pallet ---
+                        // madera de pallet
                         let woodTex = null;
 
                         function getWood() {
@@ -1409,7 +1338,7 @@
                             return woodTex;
                         }
 
-                        // --- Texto en varias líneas con elipsis ---
+                        // texto en varias lineas con elipsis
                         function lineasTexto(ctx, texto, maxW, maxLineas) {
                             const palabras = String(texto ?? '').split(/\s+/).filter(Boolean);
                             const lineas = [];
@@ -1435,7 +1364,7 @@
                             });
                         }
 
-                        // --- Etiqueta del producto pegada en la caja ---
+                        // etiqueta del producto pegada en la caja
                         const labelCache = {};
 
                         function getLabelTex(prod) {
@@ -1452,14 +1381,14 @@
                             c.height = H;
                             const ctx = c.getContext('2d');
 
-                            // Fondo y marco
+                            // fondo y marco
                             ctx.fillStyle = '#f8fafc';
                             ctx.fillRect(0, 0, W, H);
                             ctx.strokeStyle = '#94a3b8';
                             ctx.lineWidth = 4;
                             ctx.strokeRect(2, 2, W - 4, H - 4);
 
-                            // Cabecera con el estado de vencimiento
+                            // cabecera con el estado de vencimiento
                             ctx.fillStyle = prod.venceColor || '#64748b';
                             ctx.fillRect(0, 0, W, 52);
                             ctx.fillStyle = '#ffffff';
@@ -1468,7 +1397,7 @@
                             ctx.textBaseline = 'middle';
                             ctx.fillText(String(prod.venceTexto || ''), 14, 28);
 
-                            // Programa (chip a la derecha)
+                            // programa (chip a la derecha)
                             if (prod.programa) {
                                 ctx.font = 'bold 20px Arial';
                                 const t = String(prod.programa).slice(0, 12).toUpperCase();
@@ -1480,7 +1409,7 @@
                                 ctx.fillText(t, W - 19, 27);
                             }
 
-                            // Nombre del producto (hasta 2 líneas)
+                            // nombre del producto (hasta 2 lineas)
                             ctx.fillStyle = '#0f172a';
                             ctx.font = 'bold 30px Arial';
                             ctx.textAlign = 'left';
@@ -1488,7 +1417,7 @@
                             lineasTexto(ctx, prod.producto, W - 28, 2).forEach((l, i) => ctx.fillText(l, 14, 92 + i *
                                 34));
 
-                            // Lote, cantidad y fecha
+                            // lote, cantidad y fecha
                             ctx.font = 'bold 22px monospace';
                             ctx.fillStyle = '#334155';
                             ctx.fillText('LOTE ' + String(prod.lote ?? '').slice(0, 14), 14, 154);
@@ -1501,7 +1430,7 @@
                                 ctx.fillText('VENCE ' + prod.vence, W - 14, 154);
                             }
 
-                            // Código de barras
+                            // codigo de barras
                             const r = rng(hashStr(key));
                             let x = 14;
                             let negro = true;
@@ -1524,7 +1453,7 @@
                             };
                         }
 
-                        // --- Perilla (dial) de la caja fuerte ---
+                        // perilla (dial) de la caja fuerte
                         let dialTex = null;
 
                         function getDialTex() {
@@ -1563,7 +1492,7 @@
                                 ctx.fillText(String(i * 10), S / 2 + Math.cos(a) * (S / 2 - 46), S / 2 + Math.sin(a) * (
                                     S / 2 - 46));
                             }
-                            // Tapa central
+                            // tapa central
                             const g2 = ctx.createRadialGradient(S / 2 - 8, S / 2 - 8, 4, S / 2, S / 2, 48);
                             g2.addColorStop(0, '#64748b');
                             g2.addColorStop(1, '#0f172a');
@@ -1571,7 +1500,7 @@
                             ctx.beginPath();
                             ctx.arc(S / 2, S / 2, 46, 0, Math.PI * 2);
                             ctx.fill();
-                            // Indicador rojo
+                            // indicador rojo
                             ctx.fillStyle = '#dc2626';
                             ctx.beginPath();
                             ctx.moveTo(S / 2, 6);
@@ -1585,7 +1514,7 @@
                             return dialTex;
                         }
 
-                        // --- Textura de acero para el cuerpo de la caja fuerte ---
+                        // textura de acero para el cuerpo de la caja fuerte
                         let aceroCuerpoTex = null;
 
                         function getAceroCuerpoTex() {
@@ -1606,7 +1535,7 @@
                                 ctx.fillStyle = r() > 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
                                 ctx.fillRect(0, r() * S, S, 1 + r() * 1.5);
                             }
-                            // Paneles remachados
+                            // paneles remachados
                             ctx.strokeStyle = 'rgba(0,0,0,0.4)';
                             ctx.lineWidth = 4;
                             ctx.strokeRect(16, 16, S - 32, S - 32);
@@ -1639,7 +1568,7 @@
                             return aceroCuerpoTex;
                         }
 
-                        // --- Franja de advertencia (amarillo/negro) ---
+                        // franja de advertencia (amarillo/negro)
                         let hazardTex = null;
 
                         function getHazardTex() {
@@ -1667,7 +1596,7 @@
                             return hazardTex;
                         }
 
-                        // --- Puerta de la caja fuerte ---
+                        // puerta de la caja fuerte
                         function texturaPuertaCajaFuerte(codigo, colorEstadoHex, w, h) {
                             const W = 512;
                             const H = Math.min(2048, Math.max(512, Math.round(512 * h / w)));
@@ -1676,7 +1605,7 @@
                             c.height = H;
                             const ctx = c.getContext('2d');
 
-                            // Acero cepillado
+                            // acero cepillado
                             const g = ctx.createLinearGradient(0, 0, W, 0);
                             g.addColorStop(0, '#5b6b80');
                             g.addColorStop(0.5, '#8696ab');
@@ -1689,7 +1618,7 @@
                                 ctx.fillRect(0, r() * H, W, 1 + r() * 1.5);
                             }
 
-                            // Marco biselado
+                            // marco biselado
                             ctx.strokeStyle = 'rgba(255,255,255,0.45)';
                             ctx.lineWidth = 6;
                             ctx.strokeRect(10, 10, W - 20, H - 20);
@@ -1697,7 +1626,7 @@
                             ctx.lineWidth = 4;
                             ctx.strokeRect(24, 24, W - 48, H - 48);
 
-                            // Remaches
+                            // remaches
                             [
                                 [42, 42],
                                 [W - 42, 42],
@@ -1718,7 +1647,7 @@
                                 ctx.stroke();
                             });
 
-                            // Placa con el nombre
+                            // placa con el nombre
                             const px = 56,
                                 py = 70,
                                 pw = W - 170,
@@ -1748,7 +1677,7 @@
                             }
                             ctx.fillText(cod, px + pw / 2, py + 94);
 
-                            // Banda de acceso restringido
+                            // banda de acceso restringido
                             const by = py + ph + 26;
                             ctx.fillStyle = '#7f1d1d';
                             ctx.fillRect(px, by, pw + 54, 56);
@@ -1756,7 +1685,7 @@
                             ctx.font = 'bold 26px Arial';
                             ctx.fillText('ACCESO RESTRINGIDO', px + (pw + 54) / 2, by + 29);
 
-                            // Alojamiento del LED (coincide con la esfera 3D)
+                            // alojamiento del led (coincide con la esfera 3d)
                             const ledX = (3.35 / 3.7) * W;
                             const ledY = (0.55 / h) * H;
                             ctx.fillStyle = '#0b1220';
@@ -1767,7 +1696,7 @@
                             ctx.lineWidth = 4;
                             ctx.stroke();
 
-                            // Alojamiento de la perilla (coincide con el dial 3D)
+                            // alojamiento de la perilla (coincide con el dial 3d)
                             const dialX = (2.75 / 3.7) * W;
                             const dialY = H / 2 + 0.08 * H;
                             ctx.strokeStyle = 'rgba(0,0,0,0.45)';
@@ -1781,7 +1710,7 @@
                             ctx.arc(dialX, dialY, (0.66 / 3.7) * W + 6, 0, Math.PI * 2);
                             ctx.stroke();
 
-                            // Teclado numérico grabado
+                            // teclado numerico grabado
                             const kx = 92;
                             const ky = dialY - 80;
                             ctx.fillStyle = 'rgba(0,0,0,0.28)';
@@ -1798,7 +1727,7 @@
                                 }
                             }
 
-                            // Franja de advertencia inferior
+                            // franja de advertencia inferior
                             const hy = H - 120;
                             ctx.save();
                             ctx.beginPath();
@@ -1823,24 +1752,24 @@
                             return tex;
                         }
 
-                        // Estantería o caja fuerte
+                        // estanteria o caja fuerte
                         function crearEstanteriaRealista(shelf, rackData, px, pz) {
                             const grupo = new THREE.Group();
 
-                            // Las estanterías llamadas "Caja Fuerte ..." se dibujan como cajas fuertes con puerta
+                            // las estanterias llamadas "caja fuerte ..." se dibujan como cajas fuertes con puerta
                             const esSafe = /caja\s*fuerte/i.test(String(shelf.name ?? ''));
 
-                            // Color de las vigas = color del pasillo (identifica el pasillo de un vistazo)
+                            // color de las vigas = color del pasillo (identifica el pasillo de un vistazo)
                             const colorPasillo = (shelf.aisle && shelf.aisle.color) ? shelf.aisle.color : '#f97316';
                             const colorEstado = colorOcupacion(rackData.pct);
                             const colorEstadoHex = '#' + colorEstado.toString(16).padStart(6, '0');
 
-                            // 1. Niveles reales de la BD (acepta "levels" o "niveles"), ordenados por número
+                            // 1. niveles reales de la bd (acepta "levels" o "niveles"), ordenados por numero
                             const ordenNivel = (l) => parseInt(norm(l.number ?? l.name) || '0', 10) || 0;
                             const nivelesRaw = [...(shelf.levels ?? shelf.niveles ?? [])].sort((a, b) => ordenNivel(a) -
                                 ordenNivel(b));
 
-                            // Si la estantería no tiene niveles configurados se muestran 3 de referencia
+                            // si la estanteria no tiene niveles configurados se muestran 3 de referencia
                             const base = nivelesRaw.length > 0 ?
                                 nivelesRaw.slice(0, MAX_NIVELES) :
                                 [1, 2, 3].map(n => ({
@@ -1848,7 +1777,7 @@
                                     positions: []
                                 }));
 
-                            // 2. Estructura normalizada: nivel -> posiciones
+                            // 2. estructura normalizada: nivel -> posiciones
                             const niveles = base.map((lv, idx) => {
                                 const number = lv.number ?? lv.name ?? (idx + 1);
                                 let posRaw = lv.positions ?? lv.posiciones ?? [];
@@ -1877,7 +1806,7 @@
                             const nNiveles = niveles.length;
                             const alturaTotal = nNiveles * ALTURA_NIVEL + 0.8;
 
-                            // Registrar niveles para el selector del panel
+                            // registrar niveles para el selector del panel
                             niveles.forEach(n => {
                                 if (!nivelesGlobales.has(n.key)) nivelesGlobales.set(n.key, n.label);
                             });
@@ -1907,7 +1836,7 @@
                                 metalness: 0.6
                             });
 
-                            // Pseudo-aleatorio estable (para que las cajas no cambien en cada carga)
+                            // pseudo-aleatorio estable (para que las cajas no cambien en cada carga)
                             const seed = (n) => {
                                 const x = Math.sin(n * 12.9898 + (Number(shelf.id) || 1) * 78.233) * 43758.5453;
                                 return x - Math.floor(x);
@@ -1916,7 +1845,7 @@
                             let doorPivot = null;
 
                             if (!esSafe) {
-                                // Postes
+                                // postes
                                 const postes = [
                                     [-1.85, -1.85],
                                     [1.85, -1.85],
@@ -1931,7 +1860,7 @@
                                     grupo.add(poste);
                                 });
 
-                                // Arriostres diagonales laterales (aspecto de rack industrial)
+                                // arriostres diagonales laterales (aspecto de rack industrial)
                                 [-1.85, 1.85].forEach(dx => {
                                     const largo = Math.sqrt(alturaTotal * alturaTotal + 3.7 * 3.7);
                                     const ang = Math.atan2(alturaTotal, 3.7);
@@ -1941,7 +1870,7 @@
                                     grupo.add(brace);
                                 });
                             } else {
-                                // --- Cuerpo de la caja fuerte ---
+                                // cuerpo de la caja fuerte
                                 const pared = (w, h, d, x, y, z, m) => {
                                     const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m || matAcero);
                                     mesh.position.set(x, y, z);
@@ -1958,9 +1887,9 @@
                                 pared(0.15, alturaTotal, 4, -1.925, alturaTotal / 2, 0, matCuerpo); // lateral izquierdo
                                 pared(0.15, alturaTotal, 4, 1.925, alturaTotal / 2, 0, matCuerpo); // lateral derecho
                                 pared(4, alturaTotal, 0.15, 0, alturaTotal / 2, -1.925, matCuerpo); // fondo
-                                pared(4.2, 0.22, 4.2, 0, 0.11, 0, matAceroOsc); // zócalo
+                                pared(4.2, 0.22, 4.2, 0, 0.11, 0, matAceroOsc); // zocalo
 
-                                // Franja de advertencia en el zócalo (frente)
+                                // franja de advertencia en el zocalo (frente)
                                 const franjaZocalo = new THREE.Mesh(
                                     new THREE.PlaneGeometry(4.0, 0.16),
                                     new THREE.MeshStandardMaterial({
@@ -1971,7 +1900,7 @@
                                 franjaZocalo.position.set(0, 0.11, 2.105);
                                 grupo.add(franjaZocalo);
 
-                                // Columnas de esquina reforzadas (las delanteras hacen de marco de la puerta)
+                                // columnas de esquina reforzadas (las delanteras hacen de marco de la puerta)
                                 [
                                     [-1.97, -1.97],
                                     [1.97, -1.97],
@@ -1983,13 +1912,13 @@
                                     col.castShadow = true;
                                     col.receiveShadow = true;
                                     grupo.add(col);
-                                    // Tapa cromada de la columna
+                                    // tapa cromada de la columna
                                     const tapa = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.05, 0.34), matCromo);
                                     tapa.position.set(cx, alturaTotal + 0.02, cz);
                                     grupo.add(tapa);
                                 });
 
-                                // Dintel superior del marco de la puerta + vivos cromados
+                                // dintel superior del marco de la puerta + vivos cromados
                                 const dintel = new THREE.Mesh(new THREE.BoxGeometry(4.24, 0.26, 0.3), matAceroOsc);
                                 dintel.position.set(0, alturaTotal - 0.07, 1.97);
                                 dintel.castShadow = true;
@@ -2000,7 +1929,7 @@
                                     grupo.add(vivo);
                                 });
 
-                                // Nervaduras horizontales en los laterales (aspecto blindado)
+                                // nervaduras horizontales en los laterales (aspecto blindado)
                                 [0.33, 0.66].forEach(f => {
                                     [-2.0, 2.0].forEach(sx => {
                                         const nerv = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.11, 3.5), matAceroOsc);
@@ -2009,7 +1938,7 @@
                                     });
                                 });
 
-                                // Placas identificatorias en ambos laterales
+                                // placas identificatorias en ambos laterales
                                 const matPlacaLateral = texturaTexto(String(rackData.code ?? '').toUpperCase(), '#0b1220', '#facc15', 26);
                                 [1, -1].forEach(lado => {
                                     const placaLat = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 0.5), matPlacaLateral);
@@ -2018,7 +1947,7 @@
                                     grupo.add(placaLat);
                                 });
 
-                                // Luz interior (tira LED bajo el techo)
+                                // luz interior (tira led bajo el techo)
                                 const luz = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.05, 0.25), new THREE
                                     .MeshBasicMaterial({
                                         color: '#fffbe6'
@@ -2026,7 +1955,7 @@
                                 luz.position.set(0, alturaTotal - 0.2, 1.4);
                                 grupo.add(luz);
 
-                                // --- Puerta ---
+                                // puerta
                                 const doorW = 3.7;
                                 const doorH = alturaTotal - 0.45;
                                 const doorTex = texturaPuertaCajaFuerte(rackData.code, colorEstadoHex, doorW, doorH);
@@ -2047,7 +1976,7 @@
                                 puerta.castShadow = true;
                                 doorPivot.add(puerta);
 
-                                // Bisagras
+                                // bisagras
                                 [-doorH * 0.38, 0, doorH * 0.38].forEach(yy => {
                                     const bisagra = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.5, 16),
                                         matCromo);
@@ -2055,7 +1984,7 @@
                                     doorPivot.add(bisagra);
                                 });
 
-                                // Perilla giratoria
+                                // perilla giratoria
                                 const dialY = -doorH * 0.08;
                                 const dialBase = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.6, 0.14, 40),
                                     matAceroOsc);
@@ -2074,7 +2003,7 @@
                                 dialCara.position.set(2.75, dialY, 0.16 + 0.145);
                                 doorPivot.add(dialCara);
 
-                                // Marco cromado alrededor de la perilla + bulones de cierre
+                                // marco cromado alrededor de la perilla + bulones de cierre
                                 const aroDial = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.05, 12, 48), matCromo);
                                 aroDial.position.set(2.75, dialY, 0.16 + 0.06);
                                 doorPivot.add(aroDial);
@@ -2085,7 +2014,7 @@
                                     doorPivot.add(bulon);
                                 });
 
-                                // Teclado físico (coincide con el grabado de la textura)
+                                // teclado fisico (coincide con el grabado de la textura)
                                 {
                                     const texW = 512;
                                     const texH = Math.min(2048, Math.max(512, Math.round(512 * doorH / doorW)));
@@ -2113,7 +2042,7 @@
                                     doorPivot.add(pantalla);
                                 }
 
-                                // Manilla de cierre
+                                // manilla de cierre
                                 [-0.5, 0.5].forEach(oy => {
                                     const soporte = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.22, 12),
                                         matCromo);
@@ -2131,7 +2060,7 @@
                                     doorPivot.add(remate);
                                 });
 
-                                // LED de estado (color = ocupación) que late suavemente
+                                // led de estado (color = ocupacion) que late suavemente
                                 const ledMat = new THREE.MeshStandardMaterial({
                                     color: colorEstado,
                                     emissive: colorEstado,
@@ -2154,7 +2083,7 @@
                                 grupo.userData.doorAngle = 0.6;
                             }
 
-                            // 3. Asignar cada producto a su nivel y posición reales
+                            // 3. asignar cada producto a su nivel y posicion reales
                             const buscarNivel = (item) => {
                                 const raw = item.nivel;
                                 if (raw === null || raw === undefined || String(raw).trim() === '') return -1;
@@ -2178,7 +2107,7 @@
                                 return idx;
                             };
 
-                            // ocupacionMapa["nivel-posicion"] = [productos en ese hueco]
+                            // ocupacionmapa["nivel-posicion"] = [productos en ese hueco]
                             const ocupacionMapa = {};
                             const primerHuecoLibre = (li) => {
                                 for (let j = 0; j < niveles[li].positions.length; j++) {
@@ -2192,7 +2121,7 @@
                                 let sj = -1;
 
                                 if (li === -1) {
-                                    // Sin nivel válido: se ubica en el primer hueco libre de la estantería
+                                    // sin nivel valido: se ubica en el primer hueco libre de la estanteria
                                     for (let i = 0; i < niveles.length; i++) {
                                         const j = primerHuecoLibre(i);
                                         if (j !== -1) {
@@ -2216,7 +2145,7 @@
                                 ocupacionMapa[key].push(item);
                             });
 
-                            // Helper: placa visible por delante (y por detrás en estanterías abiertas)
+                            // helper: placa visible por delante (y por detras en estanterias abiertas)
                             const agregarPlaca = (ancho, alto, material, x, y, z, lista, soloFrente) => {
                                 const frente = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), material);
                                 frente.position.set(x, y, z);
@@ -2238,7 +2167,7 @@
                                 danger: 3
                             };
 
-                            // 4. Dibujar repisas, vigas, huecos, pallets y cajas
+                            // 4. dibujar repisas, vigas, huecos, pallets y cajas
                             const levelMeshes = [];
                             const levelKeys = [];
 
@@ -2247,7 +2176,7 @@
                                 const yRepisa = 0.4 + i * ALTURA_NIVEL;
                                 const nivel = niveles[i];
 
-                                // Materiales propios de este nivel (permiten atenuarlo sin afectar a los demás)
+                                // materiales propios de este nivel (permiten atenuarlo sin afectar a los demas)
                                 const cache = {};
                                 const obtener = (k, fabrica) => cache[k] ?? (cache[k] = fabrica());
                                 const stdTex = (map) => new THREE.MeshStandardMaterial({
@@ -2290,7 +2219,7 @@
                                     })()
                                 };
 
-                                // Repisa de color según el vencimiento más crítico del hueco
+                                // repisa de color segun el vencimiento mas critico del hueco
                                 const matSlot = (estado) => obtener('slot-' + estado, () => {
                                     const col = estado === 'danger' ? '#ef4444' : (estado === 'warn' ?
                                         '#f59e0b' : '#10b981');
@@ -2300,7 +2229,7 @@
                                         emissive: estado === 'danger' ? '#ef4444' : '#000000',
                                         emissiveIntensity: estado === 'danger' ? 0.3 : 0
                                     });
-                                    // Los huecos con producto vencido "laten" para llamar la atención
+                                    // los huecos con producto vencido "laten" para llamar la atencion
                                     if (estado === 'danger') pulsers.push({
                                         mat: m,
                                         base: 0.25,
@@ -2310,7 +2239,7 @@
                                     return m;
                                 });
 
-                                // Materiales de caja por tono: [+x, -x, tapa, base, frente, fondo]
+                                // materiales de caja por tono: [+x, -x, tapa, base, frente, fondo]
                                 const matCaja = (t) => obtener('caja-' + t, () => {
                                     const k = getKraft(t);
                                     const lado = stdTex(k.side);
@@ -2324,7 +2253,7 @@
                                         roughness: 0.6
                                     }));
 
-                                // Repisa base
+                                // repisa base
                                 const repisa = new THREE.Mesh(new THREE.BoxGeometry(4, ESPESOR, 4), mats.repisa);
                                 repisa.position.set(0, yRepisa, 0);
                                 repisa.castShadow = true;
@@ -2332,7 +2261,7 @@
                                 grupo.add(repisa);
                                 meshesNivel.push(repisa);
 
-                                // Vigas frontal y trasera (color del pasillo)
+                                // vigas frontal y trasera (color del pasillo)
                                 [1.92, -1.92].forEach(zz => {
                                     const viga = new THREE.Mesh(new THREE.BoxGeometry(4, 0.18, 0.1), mats.viga);
                                     viga.position.set(0, yRepisa - 0.12, zz);
@@ -2341,7 +2270,7 @@
                                     meshesNivel.push(viga);
                                 });
 
-                                // Placa de nivel
+                                // placa de nivel
                                 const matPlacaNivel = texturaTexto('N' + (norm(nivel.number) || nivel.number),
                                     '#1e3a5f', '#ffffff', 30);
                                 if (esSafe) {
@@ -2359,7 +2288,7 @@
                                     const productosHueco = ocupacionMapa[i + '-' + j] ?? [];
                                     const ocupado = productosHueco.length > 0;
 
-                                    // Estado de vencimiento más crítico dentro del hueco
+                                    // estado de vencimiento mas critico dentro del hueco
                                     let peor = 'none';
                                     productosHueco.forEach(p => {
                                         if ((severidad[p.venceEstado] ?? 0) > severidad[peor]) peor = p
@@ -2378,13 +2307,13 @@
                                     grupo.add(slot);
                                     meshesNivel.push(slot);
 
-                                    // --- Cajas, pallet, film y zunchos ---
+                                    // cajas, pallet, film y zunchos
                                     if (ocupado) {
                                         const sx = slot.position.x;
                                         const yTopeSlot = yRepisa + 0.19; // cara superior de la repisa de color
                                         const anchoP = Math.max(0.4, anchoSlot - 0.3);
 
-                                        // Pallet de madera
+                                        // pallet de madera
                                         [-1, 0, 1].forEach(k => {
                                             const patin = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.07, 3.5),
                                                 mats.madera);
@@ -2404,7 +2333,7 @@
 
                                         const yCaja0 = yTopeSlot + 0.11;
 
-                                        // Cantidad de cajas: más cantidad / más productos = más cajas
+                                        // cantidad de cajas: mas cantidad / mas productos = mas cajas
                                         const cantTotal = productosHueco.reduce((a, x) => a + (x.cantidad || 0), 0);
                                         const totalCajas = Math.min(6, Math.max(productosHueco.length, Math.ceil(
                                             cantTotal / 100), 1));
@@ -2462,7 +2391,7 @@
                                             meshesNivel.push(caja);
                                             cajasMeshes.push(caja);
 
-                                            // Etiqueta del producto: adelante (columna frontal) y atrás (columna trasera)
+                                            // etiqueta del producto: adelante (columna frontal) y atras (columna trasera)
                                             const lt = getLabelTex(prod);
                                             const ponerEtiqueta = (lado) => {
                                                 let lw = Math.min(anchoCaja * 0.9, 0.95);
@@ -2486,7 +2415,7 @@
 
                                         const alturaPila = Math.max(...colH);
 
-                                        // Film plástico transparente sobre pilas grandes
+                                        // film plastico transparente sobre pilas grandes
                                         if (totalCajas >= 3) {
                                             const film = new THREE.Mesh(
                                                 new THREE.BoxGeometry(anchoCaja + 0.08, alturaPila + 0.06, 3.46),
@@ -2497,7 +2426,7 @@
                                             meshesNivel.push(film);
                                         }
 
-                                        // Zunchos (flejes) alrededor de pilas muy grandes
+                                        // zunchos (flejes) alrededor de pilas muy grandes
                                         if (totalCajas >= 4) {
                                             const gw = anchoCaja + 0.1;
                                             const gh = alturaPila + 0.1;
@@ -2517,7 +2446,7 @@
                                         }
                                     }
 
-                                    // Placa de posición
+                                    // placa de posicion
                                     const matPlacaPos = texturaTexto(nivel.positions[j].name, ocupado ? '#065f46' :
                                         '#64748b', '#ffffff', 22);
                                     agregarPlaca(
@@ -2536,7 +2465,7 @@
                                 levelKeys.push(nivel.key);
                             }
 
-                            // Techo + franja de estado (color según ocupación)
+                            // techo + franja de estado (color segun ocupacion)
                             const anchoTecho = esSafe ? 4.2 : 4;
                             const yTecho = esSafe ? alturaTotal + 0.07 : alturaTotal;
                             const techo = new THREE.Mesh(
@@ -2548,7 +2477,7 @@
                             grupo.add(techo);
 
                             if (esSafe) {
-                                // Remate cromado y rejillas de ventilación sobre el techo
+                                // remate cromado y rejillas de ventilacion sobre el techo
                                 const remateTecho = new THREE.Mesh(new THREE.BoxGeometry(4.34, 0.06, 4.34), matAceroOsc);
                                 remateTecho.position.set(0, yTecho + 0.14, 0);
                                 remateTecho.castShadow = true;
@@ -2577,7 +2506,7 @@
                                 grupo.add(franja);
                             });
 
-                            // Huella en el piso con el color de ocupación
+                            // huella en el piso con el color de ocupacion
                             const huella = new THREE.Mesh(
                                 new THREE.BoxGeometry(4.6, 0.06, 4.6),
                                 new THREE.MeshStandardMaterial({
@@ -2596,7 +2525,7 @@
                             grupo.userData.levelKeys = levelKeys;
                             scene.add(grupo);
 
-                            // 5. Estructura para el panel de detalle (niveles y posiciones)
+                            // 5. estructura para el panel de detalle (niveles y posiciones)
                             rackData.estructura = niveles.map((n, i) => ({
                                 label: n.label,
                                 posiciones: n.positions.map((p, j) => {
@@ -2623,7 +2552,7 @@
                             return grupo;
                         }
 
-                        // Calcular estadísticas globales
+                        // calcular estadisticas globales
                         let ubiTotal = 0;
                         let capTotal = 0;
                         let ocuTotal = 0;
@@ -2640,13 +2569,13 @@
                                 null;
                             const tieneAlertaFefo = items.some(i => i.venceEstado === 'danger' || i.venceEstado === 'warn');
 
-                            // Si la estantería aún no tiene posición guardada, se acomoda en una grilla
+                            // si la estanteria aun no tiene posicion guardada, se acomoda en una grilla
                             const tienePos = shelf.pos_x !== null && shelf.pos_x !== undefined && shelf.pos_z !==
                                 null && shelf.pos_z !== undefined;
                             let px = tienePos ? (Number(shelf.pos_x) || 0) : -30 + (idx % 6) * 12;
                             let pz = tienePos ? (Number(shelf.pos_z) || 0) : -12 + Math.floor(idx / 6) * 14;
 
-                            // Evitar que dos estanterías aparezcan superpuestas al cargar
+                            // evitar que dos estanterias aparezcan superpuestas al cargar
                             const MIN_INIT_SEP = 4.6;
                             let intentosSeparacion = 0;
                             while (
@@ -2683,7 +2612,7 @@
                                 items: items
                             };
 
-                            // Modelo visual + hitbox invisible
+                            // modelo visual + hitbox invisible
                             const visualGroup = crearEstanteriaRealista(shelf, rackData, px, pz);
 
                             const alturaHitbox = rackData.alturaTotal + 0.5;
@@ -2700,7 +2629,7 @@
                             const mesh = new THREE.Mesh(new THREE.BoxGeometry(4.4, alturaHitbox, 4.4), hitMat);
                             mesh.position.set(px, alturaHitbox / 2, pz);
                             mesh.userData = rackData;
-                            // La referencia al grupo visual se guarda fuera de userData para no pasarla a Alpine
+                            // la referencia al grupo visual se guarda fuera de userdata para no pasarla a alpine
                             mesh.visualGroup = visualGroup;
                             racks.push(mesh);
                             scene.add(mesh);
@@ -2722,11 +2651,11 @@
                             markers.push({
                                 element: markerDiv,
                                 rackCode: rackData.code,
-                                // La etiqueta queda justo encima de la estantería
+                                // la etiqueta queda justo encima de la estanteria
                                 pos3D: new THREE.Vector3(px, alturaHitbox + 0.8, pz)
                             });
 
-                            // Sumar a estadísticas
+                            // sumar a estadisticas
                             ubiTotal++;
                             capTotal += capacidad;
                             stockTotalGlobal += totalStock;
@@ -2734,7 +2663,7 @@
                             if (tieneAlertaFefo) fefoRacksCount++;
                         });
 
-                        // Actualizar Alpine Stats
+                        // actualizar alpine stats
                         this.stats.ubicaciones = ubiTotal;
                         this.stats.capacidadTotal = capTotal;
                         this.stats.ocupadas = ocuTotal;
@@ -2742,12 +2671,12 @@
                         this.stats.conAlertaFefo = fefoRacksCount;
                         this.stats.ocupacionPct = ubiTotal > 0 ? Math.round((ocuTotal / ubiTotal) * 100) : 0;
 
-                        // Llenar opciones de pasillos ordenadas naturalmente
+                        // llenar opciones de pasillos ordenadas naturalmente
                         this.aisleOptions = [...pasillosSet].sort((a, b) =>
                             String(a).localeCompare(String(b), 'es', { numeric: true })
                         );
 
-                        // Llenar opciones del selector directo de estanterías
+                        // llenar opciones del selector directo de estanterias
                         this.rackOptions = racks
                             .map(r => ({
                                 code: r.userData.code,
@@ -2755,7 +2684,7 @@
                             }))
                             .sort((a, b) => String(a.code).localeCompare(String(b.code), 'es', { numeric: true }));
 
-                        // Llenar el selector de niveles con los niveles reales
+                        // llenar el selector de niveles con los niveles reales
                         this.levelOptions = [...nivelesGlobales.entries()]
                             .map(([value, label]) => ({
                                 value,
@@ -2768,11 +2697,11 @@
                                 return String(a.label).localeCompare(String(b.label));
                             });
 
-                        // --- Filtros combinados: nivel, pasillo, alerta FEFO y búsqueda ---
+                        // filtros combinados: nivel, pasillo, alerta fefo y busqueda
                         let filtroNivelActual = '';
                         let filtroPasilloActual = '';
                         let filtroFefoActual = false;
-                        let codigosBusquedaActiva = null; // Set de códigos cuando hay búsqueda activa
+                        let codigosBusquedaActiva = null; // set de codigos cuando hay busqueda activa
 
                         function actualizarVisibilidadRacks() {
                             racks.forEach(rack => {
@@ -2785,7 +2714,7 @@
                                 const pasaBusqueda = !codigosBusquedaActiva || codigosBusquedaActiva.has(data.code);
                                 const estanteActivo = pasaPasillo && pasaFefo && pasaBusqueda;
 
-                                // Atenuar marcador HTML si el estante está filtrado
+                                // atenuar marcador html si el estante esta filtrado
                                 const matchingMarker = markers.find(m => m.rackCode === data.code);
                                 if (matchingMarker && matchingMarker.element) {
                                     matchingMarker.element.style.opacity = estanteActivo ? '1' : '0.18';
@@ -2835,12 +2764,12 @@
                             actualizarVisibilidadRacks();
                         });
 
-                        // --- Dibujado de los pasillos ---
+                        // dibujado de los pasillos
                         let aisleMeshes = [];
                         let aisleMarkers = [];
 
                         function renderAisles() {
-                            // 1. Limpiar mallas antiguas de los pasillos
+                            // 1. limpiar mallas antiguas de los pasillos
                             aisleMeshes.forEach(m => scene.remove(m));
                             aisleMeshes = [];
 
@@ -2851,7 +2780,7 @@
                             });
                             aisleMarkers = [];
 
-                            // 2. Recalcular dimensiones en base a la posición actual de los racks
+                            // 2. recalcular dimensiones en base a la posicion actual de los racks
                             const zonas = {};
                             racks.forEach(rack => {
                                 const data = rack.userData;
@@ -2874,7 +2803,7 @@
                                 }
                             });
 
-                            // 3. Dibujar de nuevo
+                            // 3. dibujar de nuevo
                             Object.entries(zonas).forEach(([nombre, zona]) => {
                                 const pisoMat = new THREE.MeshStandardMaterial({
                                     color: zona.color,
@@ -2929,7 +2858,7 @@
                             });
                         }
 
-                        renderAisles(); // Generar pasillos por primera vez
+                        renderAisles(); // generar pasillos por primera vez
 
                         const raycaster = new THREE.Raycaster();
                         const mouse = new THREE.Vector2();
@@ -2985,7 +2914,7 @@
                             mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
                         }
 
-                        // Al pasar el mouse por una caja se muestra el detalle del producto
+                        // al pasar el mouse por una caja se muestra el detalle del producto
                         const hoverBox = document.createElement('div');
                         hoverBox.className = 'glass-panel';
                         hoverBox.style.cssText =
@@ -3024,7 +2953,7 @@
                                 return;
                             }
 
-                            // Si otra estantería tapa la caja, no se muestra
+                            // si otra estanteria tapa la caja, no se muestra
                             const hitRack = raycaster.intersectObjects(racks)[0];
                             if (hitRack && hitRack.object.userData.code !== hit.object.userData.rackCode && hitRack
                                 .distance < hit.distance) {
@@ -3054,7 +2983,7 @@
                                         `<div style="margin-top:2px;color:#60a5fa;font-weight:600">${esc(inf.programa)}</div>` :
                                         '');
 
-                                // Contorno de la caja
+                                // contorno de la caja
                                 const d = caja.userData.dims;
                                 caja.updateWorldMatrix(true, false);
                                 outlineBox.position.setFromMatrixPosition(caja.matrixWorld);
@@ -3063,7 +2992,7 @@
                                 outlineBox.visible = true;
                             }
 
-                            // Posición del cuadro junto al mouse (dentro del visor)
+                            // posicion del cuadro junto al mouse (dentro del visor)
                             const rect = wrapper.getBoundingClientRect();
                             hoverBox.style.display = 'block';
                             let left = event.clientX - rect.left + 16;
@@ -3078,7 +3007,7 @@
 
                         wrapper.addEventListener('pointerleave', ocultarHoverCaja);
 
-                        // --- Búsqueda por estante, pasillo, producto, lote o programa ---
+                        // busqueda por estante, pasillo, producto, lote o programa
                         let searchMatches = [];
                         let searchCurrentIdx = 0;
 
@@ -3148,7 +3077,7 @@
                             enfocarResultadoBusqueda(searchCurrentIdx + dir);
                         });
 
-                        // --- Zoom animado ---
+                        // zoom animado
                         window.addEventListener('cam-zoom-in', () => {
                             const offset = camera.position.clone().sub(controls.target).multiplyScalar(0.7);
                             animateCamera(controls.target.clone().add(offset), controls.target, 400);
@@ -3169,12 +3098,12 @@
                             animateCamera(defaultCamPos, defaultTarget, 800);
                         });
 
-                        // --- Cambio 2D / 3D / FRONTAL animado ---
+                        // cambio 2d / 3d / frontal animado
                         window.addEventListener('update-camera-view', (e) => {
                             currentViewMode = e.detail || '3D';
                             if (currentViewMode === '2D') {
                                 controls.enableRotate = false;
-                                // En Vista 2D el clic izquierdo arrastra el plano como en Google Maps
+                                // en vista 2d el clic izquierdo arrastra el plano como en google maps
                                 controls.mouseButtons = {
                                     LEFT: THREE.MOUSE.PAN,
                                     MIDDLE: THREE.MOUSE.DOLLY,
@@ -3200,7 +3129,7 @@
                             }
                         });
 
-                        // --- Navegación suave con teclado (WASD o Flechas) ---
+                        // navegacion suave con teclado (wasd o flechas)
                         window.addEventListener('keydown', (e) => {
                             const tag = (document.activeElement?.tagName || '').toLowerCase();
                             if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
@@ -3221,7 +3150,7 @@
                             controls.target.z += dz;
                         });
 
-                        // --- Mover estanterías con el clic: límites de pared, encaje y colisión ---
+                        // mover estanterias con el clic: limites de pared, encaje y colision
                         let isMoving = false;
                         let snapGridEnabled = true;
                         let moveOriginPos = null;
@@ -3230,7 +3159,7 @@
                         const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -1.5);
                         const WALL_LIMIT_X = 36;
                         const WALL_LIMIT_Z = 21;
-                        const MIN_RACK_SEP = 4.6; // Ancho físico de cada estantería (4.4u) + margen de seguridad
+                        const MIN_RACK_SEP = 4.6; // ancho fisico de cada estanteria (4.4u) + margen de seguridad
 
                         function detectarColisionEstante(mesh, x, z) {
                             if (!mesh) return null;
@@ -3360,7 +3289,7 @@
                                         marcarAlertaColision(estanteEnConflicto);
                                         wrapper.style.cursor = 'not-allowed';
 
-                                        // Permitir deslizar por el eje libre sin montarse encima del otro estante
+                                        // permitir deslizar por el eje libre sin montarse encima del otro estante
                                         const curX = selectedObject.position.x;
                                         const curZ = selectedObject.position.z;
                                         if (!detectarColisionEstante(selectedObject, nx, curZ)) {
@@ -3396,11 +3325,11 @@
                                 wrapper.style.cursor = 'default';
                             }
 
-                            // Detalle de la caja bajo el mouse
+                            // detalle de la caja bajo el mouse
                             actualizarHoverCaja(event);
                         });
 
-                        // Detectar si el usuario arrastró el mouse (rotación/paneo) para no disparar clic accidental
+                        // detectar si el usuario arrastro el mouse (rotacion/paneo) para no disparar clic accidental
                         let pointerDownCoords = null;
                         wrapper.addEventListener('pointerdown', (event) => {
                             pointerDownCoords = {
@@ -3413,7 +3342,7 @@
                             if (event.target.closest('header') || event.target.closest('aside') || event.target.closest(
                                     '.z-30') || event.target.closest('.bottom-6') || event.target.closest('.bottom-4')) return;
 
-                            // Si el usuario arrastró el mouse (> 5px) para girar o mover la cámara, ignoramos el click
+                            // si el usuario arrastro el mouse (> 5px) para girar o mover la camara, ignoramos el click
                             if (!isMoving && pointerDownCoords) {
                                 const distMoved = Math.hypot(
                                     event.clientX - pointerDownCoords.x,
@@ -3435,7 +3364,7 @@
                                         Swal.fire({
                                             icon: 'warning',
                                             title: 'Ubicación Ocupada',
-                                            html: `No puedes colocar la estantería <strong>${selectedObject.userData.code}</strong> encima de <strong>${nombreOcupado}</strong>.<br><span class="text-xs text-slate-500">Selecciona un espacio libre en el piso de la bodega.</span>`,
+                                            html: `No puede colocar la estantería <strong>${selectedObject.userData.code}</strong> encima de <strong>${nombreOcupado}</strong>.<br><span class="text-xs text-slate-500">Seleccione un espacio libre en el piso de la bodega.</span>`,
                                             confirmButtonColor: '#0f766e',
                                             timer: 2600,
                                             timerProgressBar: true
@@ -3507,7 +3436,7 @@
                                         }
                                     });
 
-                                // Recreamos los rectángulos del pasillo para que se ajusten a la nueva posición
+                                // recreamos los rectangulos del pasillo para que se ajusten a la nueva posicion
                                 renderAisles();
 
                                 window.dispatchEvent(new CustomEvent('rack-selected', {
@@ -3528,7 +3457,7 @@
                             }
                         });
 
-                        // Auto-enfoque inicial si la URL trae ?estante=... o ?search=...
+                        // auto-enfoque inicial si la url trae ?estante=... o ?search=
                         const urlParams = new URLSearchParams(window.location.search);
                         const initialRackQuery = (urlParams.get('estante') || urlParams.get('search') || '').trim();
                         if (initialRackQuery) {
@@ -3540,7 +3469,7 @@
                             }, 250);
                         }
 
-                        // --- ETIQUETAS: posicionamiento, escala por distancia y anti-solapamiento ---
+                        // etiquetas: posicionamiento, escala por distancia y anti-solapamiento
                         function actualizarEtiquetas() {
                             const W = wrapper.clientWidth;
                             const H = wrapper.clientHeight;
@@ -3549,7 +3478,7 @@
                             markers.forEach(marker => {
                                 const vector = marker.pos3D.clone().project(camera);
 
-                                // Fuera del frustum (detrás de la cámara o muy lejos)
+                                // fuera del frustum (detras de la camara o muy lejos)
                                 if (vector.z > 1 || vector.z < -1) {
                                     marker.element.style.visibility = 'hidden';
                                     return;
@@ -3558,13 +3487,13 @@
                                 const x = (vector.x * 0.5 + 0.5) * W;
                                 const y = (vector.y * -0.5 + 0.5) * H;
 
-                                // Fuera de la pantalla
+                                // fuera de la pantalla
                                 if (x < -80 || x > W + 80 || y < -40 || y > H + 40) {
                                     marker.element.style.visibility = 'hidden';
                                     return;
                                 }
 
-                                // Tamaño base (se mide una sola vez)
+                                // tamano base (se mide una sola vez)
                                 if (!marker.w) {
                                     marker.w = marker.element.offsetWidth || 70;
                                     marker.h = marker.element.offsetHeight || 20;
@@ -3582,7 +3511,7 @@
                                 });
                             });
 
-                            // Las estanterías tienen prioridad sobre los pasillos; luego las más cercanas
+                            // las estanterias tienen prioridad sobre los pasillos; luego las mas cercanas
                             visibles.sort((a, b) => {
                                 const pa = a.marker.rackCode ? 0 : 1;
                                 const pb = b.marker.rackCode ? 0 : 1;
@@ -3599,7 +3528,7 @@
                                 let colocado = false;
                                 let rect;
 
-                                // Si choca con otra etiqueta, se sube hasta 3 veces; si aun así choca, se oculta
+                                // si choca con otra etiqueta, se sube hasta 3 veces; si aun asi choca, se oculta
                                 for (let intento = 0; intento < 4; intento++) {
                                     rect = {
                                         l: v.x - w / 2,
@@ -3627,13 +3556,13 @@
                             });
                         }
 
-                        // --- Animaciones por frame: puertas de cajas fuertes y alertas que laten ---
+                        // animaciones por frame: puertas de cajas fuertes y alertas que laten
                         function actualizarAnimaciones() {
                             racks.forEach(r => {
                                 const g = r.visualGroup;
                                 const pivot = g && g.userData.doorPivot;
                                 if (!pivot) return;
-                                // La puerta se abre al pasar el mouse o al seleccionar la caja fuerte
+                                // la puerta se abre al pasar el mouse o al seleccionar la caja fuerte
                                 const objetivo = (r === selectedObject || r === hoveredObject) ? 1.9 : 0.6;
                                 g.userData.doorAngle += (objetivo - g.userData.doorAngle) * 0.08;
                                 pivot.rotation.y = -g.userData.doorAngle;

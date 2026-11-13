@@ -34,7 +34,7 @@
 
 @section('content')
     <div class="space-y-6">
-        <!-- Ruta de navegación -->
+        <!-- ruta de navegacion -->
         <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
             <span class="font-mono-das text-slate-400 font-semibold">02</span>
             <span>Almacenamiento</span>
@@ -60,9 +60,9 @@
             </div>
         @endif
 
-        <!-- Contenedor principal tabla Pasillos -->
+        <!-- contenedor principal tabla pasillos -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
-            <!-- Cabecera y buscador -->
+            <!-- cabecera y buscador -->
             <div class="p-4 sm:p-5 border-b border-slate-200/80 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
@@ -153,7 +153,7 @@
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex justify-center items-center gap-1.5">
                                         <button type="button"
-                                            onclick='openShow({{ $aisle->id }}, @json($aisle->name), @json($aisle->description), {{ $shelvesCount }}, @json($colorHex))'
+                                            onclick='openShow({{ $aisle->id }}, {{ \Illuminate\Support\Js::from($aisle->name) }}, {{ \Illuminate\Support\Js::from($aisle->description) }}, {{ $shelvesCount }}, {{ \Illuminate\Support\Js::from($colorHex) }})'
                                             class="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                                             title="Ver detalle">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,7 +165,7 @@
                                         </button>
 
                                         <button type="button"
-                                            onclick='openEdit({{ $aisle->id }}, @json($aisle->name), @json($aisle->description), @json($colorHex))'
+                                            onclick='openEdit({{ $aisle->id }}, {{ \Illuminate\Support\Js::from($aisle->name) }}, {{ \Illuminate\Support\Js::from($aisle->description) }}, {{ \Illuminate\Support\Js::from($colorHex) }})'
                                             class="p-1.5 text-teal-600 hover:text-teal-800 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
                                             title="Editar pasillo">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,7 +207,7 @@
         </div>
     </div>
 
-    <!-- Modal crear Pasillo -->
+    <!-- modal crear pasillo -->
     <div id="createModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -278,7 +278,7 @@
         </div>
     </div>
 
-    <!-- Modal ver Pasillo -->
+    <!-- modal ver pasillo -->
     <div id="showModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -325,7 +325,7 @@
         </div>
     </div>
 
-    <!-- Modal editar Pasillo -->
+    <!-- modal editar pasillo -->
     <div id="editModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-3 sm:p-5">
         <div class="flex min-h-full items-center justify-center py-4">
@@ -466,7 +466,7 @@
                 </div>
             </div>
 
-            <!-- Tabla del Historial -->
+            <!-- tabla del historial -->
             <div class="overflow-x-auto flex-1 min-h-[220px] max-h-[58vh] bg-white">
                 <table class="w-full text-left text-[12.5px] sm:text-[13px] text-slate-600 whitespace-nowrap min-w-[760px]">
                     <thead class="bg-slate-50 text-slate-500 uppercase text-[10.5px] sm:text-[11px] font-bold tracking-wider border-b border-slate-200 sticky top-0 z-10 shadow-2xs">
@@ -547,7 +547,7 @@
                 </table>
             </div>
 
-            <!-- Pie del Modal -->
+            <!-- pie del modal -->
             <div class="px-5 py-3.5 sm:px-6 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-between items-center gap-3 shrink-0">
                 <span class="text-[12px] font-bold text-slate-500 uppercase tracking-wider">
                     Mostrando <strong id="historyAisleCount" class="text-teal-700 font-mono-das">{{ $aisles->count() }}</strong> de <strong class="font-mono-das text-slate-700">{{ $aisles->count() }}</strong> pasillos

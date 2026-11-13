@@ -1,5 +1,4 @@
-{{-- Etiqueta de estado con color e ícono fijos para cada significado.
-     Uso: <x-ui.estado :valor="$lote->estado" /> --}}
+{{-- etiqueta de estado con color e icono fijos para cada significado. uso: <x-ui.estado :valor="$lote->estado" /> --}}
 @props(['valor' => ''])
 @php
     $v = mb_strtolower(trim((string) $valor));

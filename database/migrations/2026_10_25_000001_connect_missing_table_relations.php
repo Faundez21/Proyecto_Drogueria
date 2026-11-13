@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Conectar inventories con providers, receptions y estructura de ubicaciones (aisles, shelves, levels, positions)
+        // 1. conectar inventories con providers, receptions y estructura de ubicaciones (aisles, shelves, levels, positions)
         Schema::table('inventories', function (Blueprint $table) {
             $table->foreignId('provider_id')->nullable()->after('user_id')->constrained('providers')->nullOnDelete();
             $table->foreignId('reception_id')->nullable()->after('provider_id')->constrained('receptions')->nullOnDelete();
@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('position_id')->nullable()->after('posicion')->constrained('positions')->nullOnDelete();
         });
 
-        // 2. Conectar dispatches y controlled_dispatches con establishment_requests y users
+        // 2. conectar dispatches y controlled_dispatches con establishment_requests y users
         Schema::table('dispatches', function (Blueprint $table) {
             $table->foreignId('establishment_request_id')->nullable()->after('id')->constrained('establishment_requests')->nullOnDelete();
             $table->foreignId('user_id')->nullable()->after('establishment_request_id')->constrained('users')->nullOnDelete();
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->after('establishment_request_id')->constrained('users')->nullOnDelete();
         });
 
-        // 3. Conectar dispatch_items y controlled_dispatch_items con products
+        // 3. conectar dispatch_items y controlled_dispatch_items con products
         Schema::table('dispatch_items', function (Blueprint $table) {
             $table->foreignId('product_id')->nullable()->after('inventory_id')->constrained('products')->nullOnDelete();
         });
@@ -39,7 +39,7 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->after('inventory_id')->constrained('products')->nullOnDelete();
         });
 
-        // 4. Agregar columna programa a establishment_items y usuario asignado a establishment_requests
+        // 4. agregar columna programa a establishment_items y usuario asignado a establishment_requests
         Schema::table('establishment_items', function (Blueprint $table) {
             $table->string('programa')->nullable()->after('product_id');
         });
@@ -49,7 +49,7 @@ return new class extends Migration
             $table->timestamp('assigned_at')->nullable()->after('assigned_user_id');
         });
 
-        // 5. Asegurar permisos de vistas (incluyendo Solicitudes Establecimientos y Solicitudes Cesfam)
+        // 5. asegurar permisos de vistas (incluyendo solicitudes establecimientos y solicitudes cesfam)
         if (Schema::hasTable('permissions')) {
             foreach (['solicitudes', 'solicitudes_cesfam'] as $permKey) {
                 $permName = 'ver.' . $permKey;
@@ -64,9 +64,9 @@ return new class extends Migration
             }
         }
 
-        //Backfill de relaciones sobre datos existentes 
+        // backfill de relaciones sobre datos existentes
 
-        // Backfill: inventories -> providers (por rut o nombre)
+        // backfill: inventories -> providers (por rut o nombre)
         $providersByRut = DB::table('providers')->pluck('id', 'rut');
         $providersByName = DB::table('providers')->pluck('id', 'name');
         $receptionsByCorrelativo = DB::table('receptions')->whereNotNull('correlativo')->pluck('id', 'correlativo');
@@ -124,7 +124,7 @@ return new class extends Migration
             }
         }
 
-        // Backfill: dispatch_items y controlled_dispatch_items -> products
+        // backfill: dispatch_items y controlled_dispatch_items -> products
         $productsByName = DB::table('products')->pluck('id', 'nombre');
         $inventoriesProductMap = DB::table('inventories')->whereNotNull('product_id')->pluck('product_id', 'id');
 
@@ -144,7 +144,7 @@ return new class extends Migration
             }
         }
 
-        // Backfill: stock_movements sin inventory_id
+        // backfill: stock_movements sin inventory_id
         foreach (DB::table('stock_movements')->whereNull('inventory_id')->get() as $mov) {
             $invId = DB::table('inventories')
                 ->where('producto', $mov->producto)

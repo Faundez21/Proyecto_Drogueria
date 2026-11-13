@@ -25,24 +25,22 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class InventoryController extends Controller
 {
-    /**
-     * Muestra la lista de inventario principal con sus filtros y búsqueda.
-     */
+    // muestra la lista de inventario principal con sus filtros y busqueda
     public function index(Request $request)
     {
         $query = Inventory::query();
 
-        // El directorio principal SOLO muestra productos Disponibles
+        // el directorio principal solo muestra productos disponibles
         $query->where('estado', 'Disponible');
 
-        // Solo el rol Administrador o quien tenga ver.despacho_controlado puede ver los productos de la categoría "Fármacos Controlados"
+        // solo el rol administrador o quien tenga ver.despacho_controlado puede ver los productos de la categoria "farmacos controlados"
         $puedeVerControlados = auth()->user()->hasRole('Administrador') || auth()->user()->can('ver.despacho_controlado');
 
         if (! $puedeVerControlados) {
             $query->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']);
         }
 
-        // Búsqueda por producto, lote o categoría
+        // busqueda por producto, lote o categoria
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -56,7 +54,7 @@ class InventoryController extends Controller
 
         if ($request->filled('categoria')) {
             $catFiltro = trim($request->input('categoria'));
-            // La categoría se compara tal cual viene en los datos; no hay equivalencias fijas en código.
+            // la categoria se compara tal cual viene en los datos; no hay equivalencias fijas en codigo
             $esControlada = InventoryService::clasificarGrupoProducto('', $catFiltro) === 'Estupefacientes';
             if (! $esControlada || $puedeVerControlados) {
                 $query->where('categoria', $catFiltro);
@@ -97,7 +95,7 @@ class InventoryController extends Controller
 
         $inventories = $query->paginate(15)->withQueryString();
 
-        // Datos que usan los modales, independientes de los filtros de la tabla
+        // datos que usan los modales, independientes de los filtros de la tabla
         $mermas = Inventory::with('user')
             ->where('estado', 'Merma')
             ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('categoria', ['Fármacos Controlados', 'Estupefacientes']))
@@ -109,7 +107,7 @@ class InventoryController extends Controller
             ->limit(150)
             ->get();
 
-        // Productos únicos, juntando el catálogo maestro con lo que hay en inventario
+        // productos unicos, juntando el catalogo maestro con lo que hay en inventario
         InventoryService::sincronizarProductosDesdeInventario();
         $productosInv = Inventory::select('producto')
             ->whereNotNull('producto')
@@ -119,7 +117,7 @@ class InventoryController extends Controller
         $productosCat = Product::orderBy('nombre')->pluck('nombre');
         $productosLista = $productosInv->merge($productosCat)->unique()->sort(SORT_NATURAL)->values();
 
-        // Listas de los filtros y formularios: mantenedores de bodega más lo que ya está en inventario
+        // listas de los filtros y formularios: mantenedores de bodega mas lo que ya esta en inventario
         $programasLista = InventoryService::programasLista();
         $categoriasLista = InventoryService::categoriasLista($puedeVerControlados);
 
@@ -152,9 +150,7 @@ class InventoryController extends Controller
         ));
     }
 
-    /**
-     * Guarda un ingreso manual desde el Modal "Ingreso Directo de Producto".
-     */
+    // guarda un ingreso manual desde el modal "ingreso directo de producto"
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -196,7 +192,7 @@ class InventoryController extends Controller
             'fecha_recepcion.before_or_equal' => 'La fecha de recepción no puede ser posterior a hoy.',
         ]);
 
-        // Un lote vencido solo puede ingresarse directamente como Merma
+        // un lote vencido solo puede ingresarse directamente como merma
         $validator->after(function ($v) use ($request) {
             $vence = $request->input('fecha_vencimiento');
             if (! empty($vence) && $request->input('estado') !== 'Merma') {
@@ -250,7 +246,7 @@ class InventoryController extends Controller
             }
         }
 
-        // Capacidad del estante (en unidades); capacidad 0 = sin límite
+        // capacidad del estante (en unidades); capacidad 0 = sin limite
         if (($validated['estado'] ?? 'Disponible') !== 'Merma' && ! empty($validated['estante'])) {
             $msgCapacidad = InventoryService::verificarCapacidadEstante($validated['estante'], (int) ($validated['cantidad'] ?? 0));
             if ($msgCapacidad) {
@@ -292,7 +288,7 @@ class InventoryController extends Controller
 
                 $validated = InventoryService::resolverRelaciones($validated);
 
-                // Si ya existe exactamente el mismo producto + lote + estado, acumulamos stock o creamos registro limpio
+                // si ya existe exactamente el mismo producto + lote + estado, acumulamos stock o creamos registro limpio
                 $existente = Inventory::where('producto', $validated['producto'])
                     ->where('lote', $validated['lote'])
                     ->where('estado', $validated['estado'])
@@ -351,9 +347,7 @@ class InventoryController extends Controller
         }
     }
 
-    /**
-     * Actualiza el estado (Mandar a Cuarentena, Merma o Disponible) o reasigna ubicación física desde el Modal.
-     */
+    // actualiza el estado (mandar a cuarentena, merma o disponible) o reasigna ubicacion fisica desde el modal
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -366,6 +360,31 @@ class InventoryController extends Controller
         ]);
 
         $inventory = Inventory::findOrFail($id);
+
+        $rechazar = function (string $mensaje, int $codigo = 422) use ($request) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['ok' => false, 'message' => $mensaje], $codigo);
+            }
+
+            return redirect()->back()->with('error', $mensaje);
+        };
+
+        // un farmaco controlado solo lo modifica quien puede verlos
+        $usuario = $request->user();
+        $puedeVerControlados = $usuario && ($usuario->hasRole('Administrador') || $usuario->can('ver.despacho_controlado'));
+        if (! $puedeVerControlados && InventoryService::esControlado($inventory->producto)) {
+            return $rechazar('No tiene permiso para modificar fármacos controlados.', 403);
+        }
+
+        // cuarentena y merma necesitan un motivo, y un lote vencido no puede volver a disponible
+        $estadoNuevo = $request->input('estado');
+        if ($estadoNuevo !== $inventory->estado && in_array($estadoNuevo, ['Cuarentena', 'Merma'], true) && trim((string) $request->input('motivo')) === '') {
+            return $rechazar("Indique el motivo para pasar el lote a {$estadoNuevo}.");
+        }
+        if ($estadoNuevo === 'Disponible' && $inventory->fecha_vencimiento && strtotime($inventory->fecha_vencimiento) < strtotime(date('Y-m-d'))) {
+            return $rechazar('El lote está vencido: no puede volver a Disponible.');
+        }
+
         $estadoAnterior = $inventory->estado;
         $pasilloAnterior = $inventory->pasillo;
         $estanteAnterior = $inventory->estante;
@@ -374,8 +393,7 @@ class InventoryController extends Controller
 
         $data = $request->only(['estado', 'motivo']);
 
-        // Si el pasillo no cambió y el estante viene vacío, el usuario no tocó la ubicación:
-        // se conserva la ubicación actual completa en vez de dejar el lote "por asignar".
+        // si el pasillo no cambio y el estante viene vacio se conserva la ubicacion actual del lote
         $pasilloIgual = mb_strtolower(trim((string) $request->input('pasillo'))) === mb_strtolower(trim((string) $inventory->pasillo));
         $tieneEstanteActual = ! empty($inventory->estante) && strtoupper((string) $inventory->estante) !== 'P.A';
         if ($request->has('pasillo') && $pasilloIgual && ! $request->filled('estante') && $tieneEstanteActual) {
@@ -393,7 +411,7 @@ class InventoryController extends Controller
             $request->json()?->remove('posicion');
         }
 
-        // Si se indica una ubicación nueva, debe existir en el mapa de bodega
+        // si se indica una ubicacion nueva, debe existir en el mapa de bodega
         if ($request->filled('estante') || ($request->filled('pasillo') && ! $pasilloIgual)) {
             $errorUbicacion = InventoryService::validarUbicacion(
                 $request->input('pasillo'),
@@ -450,7 +468,7 @@ class InventoryController extends Controller
             }
         }
 
-        // Si el lote cambia de estante, el estante nuevo debe tener capacidad para sus unidades
+        // si el lote cambia de estante, el estante nuevo debe tener capacidad para sus unidades
         $estanteNuevo = trim((string) ($data['estante'] ?? $inventory->estante));
         $cambiaDeEstante = mb_strtolower($estanteNuevo) !== mb_strtolower(trim((string) $inventory->estante));
         if ($cambiaDeEstante && ($data['estado'] ?? $inventory->estado) !== 'Merma') {
@@ -575,8 +593,7 @@ class InventoryController extends Controller
             'mensaje' => $mensaje,
         ];
 
-        // Petición AJAX (fetch/async): responder JSON para que el frontend muestre
-        // el SweetAlert2 de éxito SIN recargar la página (evita que la recarga lo interrumpa).
+        // peticion ajax: responde json para mostrar el aviso de exito sin recargar la pagina
         if ($request->expectsJson()) {
             return response()->json([
                 'ok' => true,
@@ -590,9 +607,7 @@ class InventoryController extends Controller
             ->with('lote_status_success', $statusPayload);
     }
 
-    /**
-     * Procesa el archivo Excel para carga masiva con validación de formato, duplicados y transacción atómica.
-     */
+    // procesa el archivo excel para carga masiva con validacion de formato, duplicados y transaccion atomica
     public function import(Request $request)
     {
         if (! $request->hasFile('excel')) {
@@ -611,7 +626,7 @@ class InventoryController extends Controller
                 ->with('error', 'El archivo no pudo subirse correctamente. Verifique que no supere los 20 MB y no esté dañado.');
         }
 
-        // La extensión se valida aparte porque el navegador puede mandar un MIME genérico
+        // la extension se valida aparte porque el navegador puede mandar un mime generico
         $ext = strtolower($file->getClientOriginalExtension());
         $allowedExtensions = ['xlsx', 'xls', 'csv'];
 
@@ -636,8 +651,7 @@ class InventoryController extends Controller
                 ->with('error', $validator->errors()->first('excel'));
         }
 
-        // Se guarda el hash del archivo para avisar si suben dos veces el mismo Excel
-        // Si el inventario quedó vacío, el historial de hashes ya no sirve
+        // se guarda el hash del archivo para avisar si suben dos veces el mismo excel si el inventario quedo vacio, el historial de hashes ya no sirve
         if (Inventory::count() === 0) {
             session()->forget('inventory_imported_hashes');
         }
@@ -744,9 +758,7 @@ class InventoryController extends Controller
         }
     }
 
-    /**
-     * Descarga la plantilla oficial de carga masiva con estado Disponible por defecto.
-     */
+    // descarga la plantilla oficial de carga masiva con estado disponible por defecto
     public function template()
     {
         $export = new class implements FromArray, WithHeadings, ShouldAutoSize, WithStyles {
@@ -816,9 +828,7 @@ class InventoryController extends Controller
         return Excel::download($export, 'Plantilla_Carga_Masiva_Inventario_DAS.xlsx');
     }
 
-    /**
-     * Arma un texto corto con las filas omitidas de la carga masiva, agrupadas por motivo.
-     */
+    // arma un texto corto con las filas omitidas de la carga masiva, agrupadas por motivo
     private static function resumenFilasOmitidas(array $omitidas): string
     {
         $porMotivo = [];

@@ -5,13 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * Traspasos internos: despachos a la red sin solicitud previa.
- * - motivo_traspaso: por qué se hizo el traspaso (solo traspasos).
- * - estado_recepcion: "Pendiente" si se emitió sin la firma de quien recibe,
- *   "Recibido" cuando ya está firmada.
- * - fecha_recepcion: cuándo se registró la firma de quien recibe.
- */
+// traspasos internos: despachos a la red sin solicitud previa
 return new class extends Migration
 {
     public function up(): void
@@ -22,7 +16,7 @@ return new class extends Migration
             $table->timestamp('fecha_recepcion')->nullable()->after('estado_recepcion');
         });
 
-        // Las guías existentes ya se emitieron con ambas firmas.
+        // las guias existentes ya se emitieron con ambas firmas
         DB::table('dispatches')->whereNull('fecha_recepcion')->update(['fecha_recepcion' => DB::raw('created_at')]);
     }
 

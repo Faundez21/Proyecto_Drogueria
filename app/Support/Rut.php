@@ -2,18 +2,16 @@
 
 namespace App\Support;
 
-/**
- * Utilidades para RUT chileno: limpiar, validar dígito verificador y dar formato.
- */
+// utilidades para rut chileno: limpiar, validar digito verificador y dar formato
 class Rut
 {
-    /** Deja solo números y K: "76.543.210-k" -> "76543210K". */
+    // deja solo numeros y k: "76.543.210-k" -> "76543210k"
     public static function limpiar(?string $rut): string
     {
         return strtoupper((string) preg_replace('/[^0-9kK]/', '', (string) $rut));
     }
 
-    /** Calcula el dígito verificador de un cuerpo numérico. */
+    // calcula el digito verificador de un cuerpo numerico
     public static function digitoVerificador(string $cuerpo): string
     {
         $suma = 0;
@@ -27,7 +25,7 @@ class Rut
         return $resto === 11 ? '0' : ($resto === 10 ? 'K' : (string) $resto);
     }
 
-    /** Indica si el RUT tiene un formato y dígito verificador válidos. */
+    // indica si el rut tiene un formato y digito verificador validos
     public static function esValido(?string $rut): bool
     {
         $limpio = self::limpiar($rut);
@@ -38,7 +36,7 @@ class Rut
         return self::digitoVerificador($m[1]) === $m[2];
     }
 
-    /** Formato estándar con puntos y guion: "76543210K" -> "76.543.210-K". */
+    // formato estandar con puntos y guion: "76543210k" -> "76.543.210-k"
     public static function formatear(?string $rut): string
     {
         $limpio = self::limpiar($rut);

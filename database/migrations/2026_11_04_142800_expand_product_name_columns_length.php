@@ -6,15 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    // run the migrations
     public function up(): void
     {
-        // 1. Ampliar products.nombre a 1000 caracteres
+        // 1. ampliar products.nombre a 1000 caracteres
         DB::statement("ALTER TABLE `products` MODIFY `nombre` VARCHAR(1000) NOT NULL");
 
-        // 2. Ajustar índice de inventories.producto a prefijo de 255 caracteres para permitir VARCHAR(1000) en utf8mb4
+        // 2. ajustar indice de inventories.producto a prefijo de 255 caracteres para permitir varchar(1000) en utf8mb4
         $hasInvIndex = collect(DB::select("SHOW INDEX FROM `inventories` WHERE Key_name = 'inventories_producto_index'"))->isNotEmpty();
         if ($hasInvIndex) {
             DB::statement("ALTER TABLE `inventories` DROP INDEX `inventories_producto_index`");
@@ -29,7 +27,7 @@ return new class extends Migration
             ADD INDEX `inventories_producto_index` (`producto`(255))
         ");
 
-        // 3. Ajustar índice compuesto en stock_movements para permitir VARCHAR(1000) en producto
+        // 3. ajustar indice compuesto en stock_movements para permitir varchar(1000) en producto
         $hasMovIndex = collect(DB::select("SHOW INDEX FROM `stock_movements` WHERE Key_name = 'stock_movements_producto_lote_index'"))->isNotEmpty();
         if ($hasMovIndex) {
             DB::statement("ALTER TABLE `stock_movements` DROP INDEX `stock_movements_producto_lote_index`");
@@ -42,7 +40,7 @@ return new class extends Migration
             ADD INDEX `stock_movements_producto_lote_index` (`producto`(255), `lote`)
         ");
 
-        // 4. Ampliar tablas de despachos y proveedores
+        // 4. ampliar tablas de despachos y proveedores
         DB::statement("ALTER TABLE `dispatch_items`
             MODIFY `producto` VARCHAR(1000) NOT NULL,
             MODIFY `programa` VARCHAR(500) NULL
@@ -58,9 +56,7 @@ return new class extends Migration
         }
     }
 
-    /**
-     * Reverse the migrations.
-     */
+    // reverse the migrations
     public function down(): void
     {
         DB::statement("ALTER TABLE `products` MODIFY `nombre` VARCHAR(255) NOT NULL");
