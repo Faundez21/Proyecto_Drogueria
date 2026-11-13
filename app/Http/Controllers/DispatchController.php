@@ -141,13 +141,13 @@ class DispatchController extends Controller
             : null;
         $estRegistrado = InventoryService::establecimientoRegistrado($validated['establecimiento_destino']);
 
-        // Traspaso interno: despacho a un establecimiento de la red sin solicitud previa.
+        // traspaso sin solicitud: despacho externo a un establecimiento de la red
         // Exige un motivo y permite emitir la guía sin la firma de quien recibe;
         // en ese caso queda "Pendiente de recepción" hasta que se firme desde la bandeja.
-        $esTraspasoInterno = $validated['clasificacion'] === 'Interno' && ! $solicitudVinculada;
+        $esTraspasoInterno = $validated['clasificacion'] === 'Externo' && ! $solicitudVinculada;
         $motivoTraspaso = trim((string) ($validated['motivo_traspaso'] ?? ''));
 
-        if ($validated['clasificacion'] === 'Interno' && ! $estRegistrado) {
+        if ($validated['clasificacion'] === 'Externo' && ! $estRegistrado) {
             $errorDespacho = "El destino «{$validated['establecimiento_destino']}» no es un establecimiento de la red. Selecciónelo de la lista.";
         } elseif ($solicitudVinculada) {
             if (! in_array($solicitudVinculada->estado, ['Pendiente', 'Asignada', 'Parcial'], true)) {
@@ -160,7 +160,7 @@ class DispatchController extends Controller
         }
 
         if (! $errorDespacho && $esTraspasoInterno && $motivoTraspaso === '') {
-            $errorDespacho = 'Indique el motivo del traspaso interno.';
+            $errorDespacho = 'Indique el motivo del traspaso sin solicitud.';
         }
         if (! $errorDespacho && empty($validated['firma_despacha'])) {
             $errorDespacho = 'Falta la firma de quien despacha (bodega).';
@@ -178,7 +178,7 @@ class DispatchController extends Controller
         }
 
         $destino = $estRegistrado['nombre'] ?? $validated['establecimiento_destino'];
-        if ($validated['clasificacion'] === 'Externo') {
+        if ($validated['clasificacion'] === 'Interno') {
             $destino = (! empty($validated['tipo_externo_despacho']) ? $validated['tipo_externo_despacho'] . ' - ' : '') . $validated['establecimiento_destino'];
         }
 

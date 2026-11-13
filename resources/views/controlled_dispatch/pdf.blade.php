@@ -91,7 +91,7 @@
             </td>
             <td class="doc-meta">
                 <div class="doc-box">
-                    <p class="doc-type-label">Guía Estupefacientes {{ strtoupper($despacho->clasificacion ?? 'INTERNA') }}</p>
+                    <p class="doc-type-label">Guía Estupefacientes {{ strtoupper($despacho->clasificacion ?? 'EXTERNA') }}</p>
                     <p class="doc-correlativo">N° {{ $despacho->correlativo }}</p>
                     <p class="doc-date">Fecha Emisión: {{ \Carbon\Carbon::parse($despacho->fecha_despacho)->format('d/m/Y') }}</p>
                 </div>

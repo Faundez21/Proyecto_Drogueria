@@ -249,8 +249,8 @@
                         <select name="clasificacion" id="clasificacion_select" onchange="toggleClasificacion()" required
                             class="w-full max-w-full truncate bg-slate-50 border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                             <option value="" disabled selected>Seleccione la clasificación...</option>
-                            <option value="Interno">Interno (Nivel Comunal / CESFAM)</option>
-                            <option value="Externo">Externo (Préstamos, Donaciones, Devoluciones, etc.)</option>
+                            <option value="Externo">Externo (Nivel Comunal / CESFAM)</option>
+                            <option value="Interno">Interno (Préstamos, Donaciones, Devoluciones, etc.)</option>
                         </select>
                     </div>
 
@@ -273,7 +273,7 @@
 
                     <!-- div dinamico para destino interno -->
                     <div id="div_interno" class="md:col-span-2 hidden min-w-0">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Interno)
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Externo)
                             <span class="text-rose-500">*</span></label>
                         <select id="establecimiento_interno" onchange="actualizarDireccionInterna()"
                             class="w-full max-w-full truncate bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
@@ -302,7 +302,7 @@
 
                     <!-- div dinamico para destino externo -->
                     <div id="div_externo" class="md:col-span-2 hidden min-w-0">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo y Destino Externo <span
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo y Destino Interno <span
                                 class="text-rose-500">*</span></label>
                         <div class="flex flex-col sm:flex-row gap-3">
                             <select id="tipo_externo"
@@ -336,10 +336,10 @@
                             class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
                     </div>
 
-                    <!-- traspaso interno: despacho a la red sin solicitud previa -->
+                    <!-- traspaso sin solicitud: despacho externo a la red sin solicitud previa -->
                     <div id="div_motivo_traspaso" class="md:col-span-4 hidden">
                         <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl">
-                            <label for="motivo_traspaso" class="block text-[12px] font-bold text-amber-900 mb-1">Motivo del traspaso interno <span class="text-rose-500">*</span></label>
+                            <label for="motivo_traspaso" class="block text-[12px] font-bold text-amber-900 mb-1">Motivo del traspaso sin solicitud <span class="text-rose-500">*</span></label>
                             <p class="text-[11.5px] text-amber-800 mb-2">Este despacho no viene de una solicitud. Indique el motivo. Si quien recibe no está presente, puede firmar después desde la bandeja de despachos y la guía quedará como «Pendiente de recepción».</p>
                             <input type="text" name="motivo_traspaso" id="motivo_traspaso" maxlength="500"
                                 placeholder="Ej: Reposición urgente por quiebre de stock."
@@ -442,7 +442,7 @@
                         <button type="button" onclick="signatureRecibe.clear()"
                             class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500 transition-colors">Limpiar
                             Firma de Recepción</button>
-                        <p id="nota_firma_recibe_traspaso" class="hidden mt-1 text-[11px] text-amber-700 font-semibold text-center">Opcional en un traspaso interno: si no firma ahora, la guía queda «Pendiente de recepción».</p>
+                        <p id="nota_firma_recibe_traspaso" class="hidden mt-1 text-[11px] text-amber-700 font-semibold text-center">Opcional en un traspaso sin solicitud: si no firma ahora, la guía queda «Pendiente de recepción».</p>
                     </div>
                 </div>
             </div>
@@ -1097,16 +1097,16 @@
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-600">
                                     <!-- badge de clasificacion -->
-                                    @if (strtolower($despacho->clasificacion) == 'interno')
+                                    @if (strtolower($despacho->clasificacion) == 'externo')
                                         <span
-                                            class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Interno</span>
+                                            class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Externo</span>
                                         @if ($despacho->esTraspasoInterno())
                                             <span
                                                 class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-1 rounded text-[10px] uppercase">Traspaso</span>
                                         @endif
                                     @else
                                         <span
-                                            class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Externo' }}</span>
+                                            class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Interno' }}</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-800">
@@ -1390,7 +1390,7 @@
                                 <span class="das-swal-badge-ok px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">DESPACHO CONFORME</span>
                             </div>
                             <p class="das-swal-meta"><strong>Destino:</strong> ${dispData.destino}</p>
-                            <p class="das-swal-meta"><strong>Clasificación:</strong> ${dispData.clasificacion}${dispData.es_traspaso ? ' (traspaso interno)' : ''}</p>
+                            <p class="das-swal-meta"><strong>Clasificación:</strong> ${dispData.clasificacion}${dispData.es_traspaso ? ' (traspaso sin solicitud)' : ''}</p>
                             ${dispData.pendiente_recepcion ? '<p class="das-swal-meta font-semibold text-amber-700">Pendiente de recepción: quien recibe debe firmar desde la bandeja de despachos.</p>' : ''}
                             <p class="das-swal-meta"><strong>Fecha de Emisión:</strong> ${dispData.fecha}</p>
                             <p class="das-swal-meta"><strong>Total Unidades Despachadas:</strong> ${Number(dispData.total_unidades || 0).toLocaleString('es-CL')} uds. (${dispData.total_items} producto${dispData.total_items === 1 ? '' : 's'})</p>
@@ -1526,17 +1526,17 @@
                         }
                     }
 
-                    const clasif = document.getElementById('clasificacion_select')?.value || 'Interno';
+                    const clasif = document.getElementById('clasificacion_select')?.value || 'Externo';
                     let destinatario = '';
-                    if (clasif === 'Externo') {
+                    if (clasif === 'Interno') {
                         const ext = (document.getElementById('establecimiento_externo')?.value || '').trim();
                         const tipoExt = (document.getElementById('tipo_externo')?.value || '').trim();
-                        destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Externo');
+                        destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Interno');
                     } else {
                         const selInt = document.getElementById('establecimiento_interno');
                         destinatario = selInt && selInt.selectedIndex >= 0 && selInt.value
                             ? selInt.options[selInt.selectedIndex].text.trim()
-                            : 'Establecimiento Interno';
+                            : 'Establecimiento de la red';
                     }
 
                     const rows = document.querySelectorAll('#productsBody tr');
@@ -1561,7 +1561,7 @@
 
                     Swal.fire({
                         title: '¿Confirmar Emisión de Despacho?',
-                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s)${textoUnidades}.<br><span class="text-[12px] text-slate-500 mt-1 block">El stock de los lotes asignados se rebajará según orden FEFO.</span>${esModoTraspasoInterno() ? `<span class="text-[12px] text-amber-700 font-semibold mt-2 block">Traspaso interno sin solicitud${(!signatureRecibe || signatureRecibe.isEmpty()) ? ': quedará «Pendiente de recepción» hasta que firme quien recibe.' : '.'}</span>` : ''}`,
+                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s)${textoUnidades}.<br><span class="text-[12px] text-slate-500 mt-1 block">El stock de los lotes asignados se rebajará según orden FEFO.</span>${esModoTraspasoInterno() ? `<span class="text-[12px] text-amber-700 font-semibold mt-2 block">Traspaso sin solicitud${(!signatureRecibe || signatureRecibe.isEmpty()) ? ': quedará «Pendiente de recepción» hasta que firme quien recibe.' : '.'}</span>` : ''}`,
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#0f766e',
@@ -1673,7 +1673,7 @@
             const inpExtDest = document.getElementById('establecimiento_externo');
             const inpDir = document.getElementById('direccion_destino');
 
-            if (val === 'Interno') {
+            if (val === 'Externo') {
                 divInt.classList.remove('hidden');
                 divExt.classList.add('hidden');
 
@@ -1691,7 +1691,7 @@
                 inpDir.placeholder = "Se autocompletará al seleccionar destino...";
 
                 actualizarDireccionInterna();
-            } else if (val === 'Externo') {
+            } else if (val === 'Interno') {
                 divInt.classList.add('hidden');
                 divExt.classList.remove('hidden');
 
@@ -1715,7 +1715,7 @@
 
         // funcion para buscar la direccion del cesfam elegido y rellenar el input readonly
         function actualizarDireccionInterna() {
-            if (document.getElementById('clasificacion_select').value !== 'Interno') return;
+            if (document.getElementById('clasificacion_select').value !== 'Externo') return;
 
             const select = document.getElementById('establecimiento_interno');
             const input = document.getElementById('direccion_destino');
@@ -1881,8 +1881,8 @@
             if (!celda) return;
             let valor = tr.dataset.consumoSolicitud;
             if (valor === undefined || valor === '') {
-                const interno = document.getElementById('clasificacion_select')?.value === 'Interno';
-                const est = interno ? (document.getElementById('establecimiento_interno')?.value || '') : '';
+                const haciaLaRed = document.getElementById('clasificacion_select')?.value === 'Externo';
+                const est = haciaLaRed ? (document.getElementById('establecimiento_interno')?.value || '') : '';
                 const sel = tr.querySelector('select[name="productos[]"]');
                 const opt = sel ? sel.options[sel.selectedIndex] : null;
                 const nombre = opt && opt.value ? (opt.getAttribute('data-nombre-completo') || opt.value) : '';
@@ -2436,11 +2436,11 @@
             actualizarModoTraspaso();
         }
 
-        // Traspaso interno = clasificación "Interno" sin solicitud vinculada
+        // traspaso sin solicitud: despacho externo a la red sin solicitud vinculada
         function esModoTraspasoInterno() {
             const clasif = document.getElementById('clasificacion_select')?.value;
             const solicitudId = document.getElementById('establishment_request_id')?.value;
-            return clasif === 'Interno' && !solicitudId;
+            return clasif === 'Externo' && !solicitudId;
         }
 
         function actualizarModoTraspaso() {
@@ -2556,7 +2556,7 @@
 
             // seleccionar clasificacion interna
             const clasificacion = document.getElementById('clasificacion_select');
-            clasificacion.value = 'Interno';
+            clasificacion.value = 'Externo';
             toggleClasificacion();
 
             // seleccionar establecimiento
@@ -2579,10 +2579,10 @@
                 selectEstablecimiento.value = opcionEstablecimiento.value;
                 actualizarDireccionInterna();
             } else if (solicitud.establecimiento) {
-                // Si es un destino externo que no figura en la lista interna
+                // si el destino no figura en la red se usa el despacho interno con destino escrito
                 const selectClasif = document.getElementById('clasificacion_select');
                 if (selectClasif) {
-                    selectClasif.value = 'Externo';
+                    selectClasif.value = 'Interno';
                     toggleClasificacion();
                     const inputExt = document.getElementById('establecimiento_externo');
                     if (inputExt) inputExt.value = solicitud.establecimiento;

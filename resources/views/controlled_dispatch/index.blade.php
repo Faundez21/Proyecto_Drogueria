@@ -188,7 +188,7 @@
                                 class="text-rose-500">*</span></label>
                         <select name="clasificacion" id="clasificacion_select" onchange="toggleClasificacion()" required
                             class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
-                            <option value="Interno" selected>Interno (Nivel Comunal / CESFAM)</option>
+                            <option value="Externo" selected>Externo (Nivel Comunal / CESFAM)</option>
                         </select>
                         <p class="text-[11px] text-slate-500 mt-1">Los fármacos controlados solo se despachan a un CESFAM de la red, a partir de su solicitud.</p>
                     </div>
@@ -212,7 +212,7 @@
 
                     <!-- div dinamico para destino interno -->
                     <div id="div_interno" class="md:col-span-2 hidden">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Interno)
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Externo)
                             <span class="text-rose-500">*</span></label>
                         <select id="establecimiento_interno" onchange="actualizarDireccionInterna()"
                             class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
@@ -556,12 +556,12 @@
                                     {{ \Carbon\Carbon::parse($despacho->fecha_despacho)->format('d-m-Y') }}
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-600">
-                                    @if (strtolower($despacho->clasificacion) == 'interno')
+                                    @if (strtolower($despacho->clasificacion) == 'externo')
                                         <span
-                                            class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Interno</span>
+                                            class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Externo</span>
                                     @else
                                         <span
-                                            class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Externo' }}</span>
+                                            class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Interno' }}</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-800">
@@ -1122,7 +1122,7 @@
 
             // clasificacion interna + establecimiento (matching insensible a mayusculas)
             const clasificacion = document.getElementById('clasificacion_select');
-            clasificacion.value = 'Interno';
+            clasificacion.value = 'Externo';
             toggleClasificacion();
 
             const selectEst = document.getElementById('establecimiento_interno');
@@ -1289,7 +1289,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Los controlados siempre son despacho interno a un CESFAM
+            // los controlados siempre son despacho externo a un cesfam
             if (typeof toggleClasificacion === 'function') toggleClasificacion();
 
             const padDespachaElem = document.getElementById('pad_despacha');
@@ -1439,9 +1439,9 @@
                         return;
                     }
 
-                    const clasif = document.getElementById('clasificacion_select')?.value || 'Interno';
+                    const clasif = document.getElementById('clasificacion_select')?.value || 'Externo';
                     let destinatario = '';
-                    if (clasif === 'Externo') {
+                    if (clasif === 'Interno') {
                         const ext = (document.getElementById('establecimiento_externo')?.value || '').trim();
                         const tipoExt = (document.getElementById('tipo_externo')?.value || '').trim();
                         destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Externo');
@@ -1582,7 +1582,7 @@
             const inpExtDest = document.getElementById('establecimiento_externo');
             const inpDir = document.getElementById('direccion_destino');
 
-            if (val === 'Interno') {
+            if (val === 'Externo') {
                 divInt.classList.remove('hidden');
                 divExt?.classList.add('hidden');
 
@@ -1600,7 +1600,7 @@
                 inpDir.placeholder = "Se autocompletará al seleccionar destino...";
 
                 actualizarDireccionInterna();
-            } else if (val === 'Externo' && divExt) {
+            } else if (val === 'Interno' && divExt) {
                 divInt.classList.add('hidden');
                 divExt.classList.remove('hidden');
 
@@ -1621,7 +1621,7 @@
         }
 
         function actualizarDireccionInterna() {
-            if (document.getElementById('clasificacion_select').value !== 'Interno') return;
+            if (document.getElementById('clasificacion_select').value !== 'Externo') return;
 
             const select = document.getElementById('establecimiento_interno');
             const input = document.getElementById('direccion_destino');
@@ -1782,8 +1782,8 @@
             if (!celda) return;
             let valor = tr.dataset.consumoSolicitud;
             if (valor === undefined || valor === '') {
-                const interno = document.getElementById('clasificacion_select')?.value === 'Interno';
-                const est = interno ? (document.getElementById('establecimiento_interno')?.value || '') : '';
+                const haciaLaRed = document.getElementById('clasificacion_select')?.value === 'Externo';
+                const est = haciaLaRed ? (document.getElementById('establecimiento_interno')?.value || '') : '';
                 const sel = tr.querySelector('select[name="productos[]"]');
                 const opt = sel ? sel.options[sel.selectedIndex] : null;
                 const nombre = opt && opt.value ? (opt.getAttribute('data-nombre-completo') || opt.value) : '';
