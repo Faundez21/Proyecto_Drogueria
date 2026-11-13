@@ -65,15 +65,12 @@
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
 
         <!-- Cabecera de la tabla y botón de filtros -->
-        <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center flex-wrap gap-3">
+        <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
             <h3 class="text-[15px] font-bold text-slate-800">Historial de Movimientos de Lotes</h3>
-            <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-                @include('partials.busqueda-rapida', ['formulario' => 'filterForm', 'placeholder' => 'Buscar lote, producto o documento...'])
-                <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-xs cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                    Más filtros
-                </button>
-            </div>
+            <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-xs cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                Filtros Avanzados
+            </button>
         </div>
 
         <!-- barra de busqueda y filtros -->
@@ -320,7 +317,7 @@
                 <div class="p-6 lg:p-8 bg-white">
                     <h4 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-widest mb-5 flex items-center gap-2">
                         <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Línea de Vida Física (Kárdex)
+                        Linea de Vida Fisica (Kardex)
                     </h4>
                     <div id="timeline-container" class="space-y-6">
                         <div class="text-center text-slate-400 py-10 text-sm">Construyendo línea de tiempo...</div>
@@ -401,7 +398,7 @@
                             <div class="bg-slate-800 p-5 rounded-2xl shadow-inner flex items-center justify-between border border-slate-700">
                                 <div>
                                     <p class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Stock Físico Restante</p>
-                                    <p class="text-[11px] text-slate-500 mt-0.5">Ubicación: ${data.details.ubicacion}</p>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Ubicacion: ${data.details.ubicacion}</p>
                                 </div>
                                 <p class="text-[24px] font-black text-white font-mono">${data.details.stock_actual} <span class="text-[12px] text-teal-400">UNID.</span></p>
                             </div>

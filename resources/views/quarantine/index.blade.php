@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Inventario')
-@section('subtitle', 'Lotes retenidos para revisión: no se pueden despachar hasta liberarlos.')
+@section('title', 'Productos en Cuarentena')
+@section('subtitle', 'Lista de medicamentos e insumos bloqueados o retenidos preventivamente.')
 
 @section('actions')
 @role('Administrador')
@@ -10,7 +10,7 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
-        Ver Historial
+        Ver Historial Avanzado
     </button>
 @endrole
 @endsection
@@ -25,15 +25,8 @@
             <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
-            <span>Inventario</span>
-            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
             <span class="font-semibold text-slate-800">Cuarentena</span>
         </div>
-
-        <!-- pestanas por estado del lote -->
-        @include('inventory.partials.pestanas-estado', ['activa' => 'cuarentena'])
 
         @php
             $totalLotes = $totalLotesGlobal ?? $inventories->total();
@@ -101,20 +94,17 @@
         <!-- Directorio físico -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col">
             <!-- Cabecera y Botón de Filtros -->
-            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white flex-wrap gap-3">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center">
                         <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
-                    <h3 class="text-[15px] font-bold text-slate-800">Lotes retenidos</h3>
+                    <h3 class="text-[15px] font-bold text-slate-800">Directorio Físico</h3>
                 </div>
-                <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-                    @include('partials.busqueda-rapida', ['formulario' => 'filters-panel', 'placeholder' => 'Buscar producto o lote...'])
-                    <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-amber-700 transition-colors cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                        Más filtros
-                    </button>
-                </div>
+                <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-amber-700 transition-colors cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    Filtros Avanzados
+                </button>
             </div>
 
             <!-- Panel de Filtros -->
@@ -235,7 +225,7 @@
                 <table class="w-full text-left text-sm whitespace-nowrap border-collapse min-w-[800px]">
                     <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-extrabold">
                         <tr>
-                            <th scope="col" class="px-6 py-4 w-14 text-center">Ver lotes</th>
+                            <th scope="col" class="px-6 py-4 w-14 text-center">Desglose</th>
                             <th scope="col" class="px-6 py-4">Producto Principal</th>
                             <th scope="col" class="px-6 py-4">Categoría</th>
                             <th scope="col" class="px-6 py-4 text-center">Lotes Retenidos</th>
