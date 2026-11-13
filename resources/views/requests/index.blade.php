@@ -218,8 +218,8 @@
                                 </svg>
                             </button>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                                <div class="min-w-0">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                                <div class="lg:col-span-2 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Programa <span class="text-rose-500">*</span>
                                     </label>
@@ -235,7 +235,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="lg:col-span-2 min-w-0">
+                                <div class="sm:col-span-2 lg:col-span-4 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Producto <span class="text-rose-500">*</span>
                                     </label>
@@ -255,19 +255,18 @@
                                     <span class="block text-[10.5px] text-teal-600 font-medium mt-1 hidden aviso-programa"></span>
                                 </div>
 
-                                <div class="hidden">
+                                <div class="lg:col-span-2">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
-                                        Consumo mensual del mes anterior <span class="text-rose-500">*</span>
+                                        Consumo mensual <span class="text-rose-500">*</span>
                                     </label>
 
-                                    <input type="number" name="consumo_anterior[]" min="0" readonly
-                                        value="0"
-                                        placeholder="Se calculará automáticamente"
-                                        class="w-full bg-slate-100 border border-slate-200 text-slate-700 rounded-lg py-2.5 px-3.5 text-[13px] font-bold cursor-not-allowed input-consumo-anterior">
-                                    <span class="block text-[10.5px] text-slate-400 mt-1 info-consumo-anterior">Calculado según despachos del mes anterior</span>
+                                    <input type="number" name="consumo_anterior[]" min="0" step="1" required
+                                        placeholder="Ej: 30"
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold input-consumo-anterior">
+                                    <span class="block text-[10.5px] text-teal-600 font-medium mt-1 hidden info-consumo-anterior"></span>
                                 </div>
 
-                                <div>
+                                <div class="lg:col-span-2">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Cantidad en stock actualmente <span class="text-rose-500">*</span>
                                     </label>
@@ -278,7 +277,7 @@
                                     <span class="block text-[10.5px] text-teal-600 font-medium mt-1 hidden info-ultimo-stock"></span>
                                 </div>
 
-                                <div>
+                                <div class="lg:col-span-2">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Cantidad Solicitada <span class="text-rose-500">*</span>
                                     </label>
@@ -573,8 +572,10 @@
                 if (!inputConsumo) return;
 
                 if (!est || !prodId) {
-                    inputConsumo.value = 0;
-                    if (infoConsumo) infoConsumo.textContent = 'Seleccione establecimiento y producto';
+                    if (infoConsumo) {
+                        infoConsumo.classList.add('hidden');
+                        infoConsumo.textContent = '';
+                    }
                     if (infoStock) {
                         infoStock.classList.add('hidden');
                         infoStock.textContent = '';
@@ -583,13 +584,15 @@
                 }
 
                 const datos = (consumoMapa[est] && consumoMapa[est][prodId]) ? consumoMapa[est][prodId] : null;
-                const consumo = datos ? (parseInt(datos.consumo_anterior) || 0) : 0;
-                inputConsumo.value = consumo;
-
+                // muestra el ultimo consumo mensual informado como referencia
                 if (infoConsumo) {
-                    infoConsumo.textContent = consumo > 0
-                        ? `Consumo anterior registrado: ${consumo} uds.`
-                        : 'Sin despachos el mes anterior (0 uds.)';
+                    if (datos && datos.ultimo_consumo !== null && datos.ultimo_consumo !== undefined) {
+                        infoConsumo.textContent = `Último consumo informado: ${datos.ultimo_consumo} uds.`;
+                        infoConsumo.classList.remove('hidden');
+                    } else {
+                        infoConsumo.classList.add('hidden');
+                        infoConsumo.textContent = '';
+                    }
                 }
 
                 if (infoStock) {
@@ -648,7 +651,7 @@
                 const clone = firstItem.cloneNode(true);
 
                 clone.querySelectorAll('input').forEach(input => {
-                    input.value = input.name === 'consumo_anterior[]' ? '0' : '';
+                    input.value = '';
                 });
 
                 clone.querySelectorAll('select').forEach(select => {
@@ -659,6 +662,11 @@
                 if (infoStock) {
                     infoStock.classList.add('hidden');
                     infoStock.textContent = '';
+                }
+                const infoConsumoClone = clone.querySelector('.info-consumo-anterior');
+                if (infoConsumoClone) {
+                    infoConsumoClone.classList.add('hidden');
+                    infoConsumoClone.textContent = '';
                 }
 
                 const btnRemove = clone.querySelector('.btn-remove-product');

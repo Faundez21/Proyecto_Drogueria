@@ -292,11 +292,12 @@
                         <thead
                             class="bg-slate-100/80 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10.5px]">
                             <tr>
-                                <th class="px-4 py-3.5 w-[36%]">Fármaco Controlado en Stock</th>
-                                <th class="px-4 py-3.5 w-[14%]">Lote</th>
-                                <th class="px-4 py-3.5 w-[15%]">Vencimiento (FEFO)</th>
-                                <th class="px-4 py-3.5 w-[15%]">Programa</th>
-                                <th class="px-4 py-3.5 w-[15%] text-center">Cantidad a Despachar</th>
+                                <th class="px-4 py-3.5 w-[30%]">Fármaco Controlado en Stock</th>
+                                <th class="px-4 py-3.5 w-[12%]">Lote</th>
+                                <th class="px-4 py-3.5 w-[14%]">Vencimiento (FEFO)</th>
+                                <th class="px-4 py-3.5 w-[14%]">Programa</th>
+                                <th class="px-4 py-3.5 w-[11%] text-center whitespace-normal leading-tight">Consumo mensual</th>
+                                <th class="px-4 py-3.5 w-[14%] text-center">Cantidad a Despachar</th>
                                 <th class="px-3 py-3.5 w-[5%] text-center"></th>
                             </tr>
                         </thead>
@@ -410,6 +411,9 @@
                         <option value="{{ $progOpt }}">{{ $progOpt }}</option>
                     @endforeach
                 </select>
+            </td>
+            <td data-label="Consumo mensual" class="col-consumo px-3 py-2.5 border-r border-slate-100 align-middle text-center">
+                <span class="consumo-mensual-despacho text-[13px] font-bold text-slate-400">—</span>
             </td>
             <td data-label="Cantidad" class="col-cantidad px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <div class="space-y-1">
@@ -1189,6 +1193,9 @@
                 if (opcion) {
                     selectProducto.value = opcion.value;
                     llenarDatosFila(selectProducto);
+                    // consumo mensual que informo el establecimiento en esta solicitud
+                    tr.dataset.consumoSolicitud = item.consumo_anterior ?? '';
+                    actualizarConsumoDespacho(tr);
                     const selectPrograma = tr.querySelector('select[name="programas[]"]');
                     if (selectPrograma && item.programa) {
                         const progNorm = normText(item.programa);
@@ -1756,11 +1763,55 @@
             return tr;
         }
 
+        // ultimo consumo mensual informado por cada establecimiento, por producto
+        const normConsumo = t => (t || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+        const CONSUMO_DECLARADO = (() => {
+            const crudo = @json($consumoDeclarado ?? []);
+            const indice = {};
+            Object.keys(crudo).forEach(est => {
+                const porProducto = {};
+                Object.keys(crudo[est]).forEach(nom => { porProducto[normConsumo(nom)] = crudo[est][nom]; });
+                indice[normConsumo(est)] = porProducto;
+            });
+            return indice;
+        })();
+
+        // muestra en la fila el consumo mensual del establecimiento para ese producto
+        function actualizarConsumoDespacho(tr) {
+            const celda = tr?.querySelector('.consumo-mensual-despacho');
+            if (!celda) return;
+            let valor = tr.dataset.consumoSolicitud;
+            if (valor === undefined || valor === '') {
+                const interno = document.getElementById('clasificacion_select')?.value === 'Interno';
+                const est = interno ? (document.getElementById('establecimiento_interno')?.value || '') : '';
+                const sel = tr.querySelector('select[name="productos[]"]');
+                const opt = sel ? sel.options[sel.selectedIndex] : null;
+                const nombre = opt && opt.value ? (opt.getAttribute('data-nombre-completo') || opt.value) : '';
+                const porProducto = est ? CONSUMO_DECLARADO[normConsumo(est)] : null;
+                valor = porProducto && nombre ? porProducto[normConsumo(nombre)] : undefined;
+            }
+            const hay = valor !== undefined && valor !== null && valor !== '';
+            celda.textContent = hay ? Number(valor).toLocaleString('es-CL') + ' uds.' : '—';
+            celda.classList.toggle('text-slate-400', !hay);
+            celda.classList.toggle('text-slate-800', hay);
+        }
+
+        function actualizarConsumosDespacho() {
+            tbody.querySelectorAll('tr').forEach(actualizarConsumoDespacho);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('establecimiento_interno')?.addEventListener('change', actualizarConsumosDespacho);
+            document.getElementById('clasificacion_select')?.addEventListener('change', actualizarConsumosDespacho);
+        });
+
         function llenarDatosFila(selectElement) {
             let option = selectElement.options[selectElement.selectedIndex];
             if (!option || option.disabled) return;
 
             let tr = selectElement.closest('tr');
+            // al cambiar el producto deja de usarse el consumo de la solicitud
+            delete tr.dataset.consumoSolicitud;
             const nombreMovil = tr.querySelector('.producto-nombre-movil');
             if (nombreMovil) nombreMovil.textContent = option.getAttribute('data-nombre-completo') || option.value || '';
             let loteInput = tr.querySelector('input[name="lotes[]"]');
@@ -1813,6 +1864,7 @@
                 } catch (e) {}
             }
 
+            actualizarConsumoDespacho(tr);
             cantInput.focus();
         }
 
