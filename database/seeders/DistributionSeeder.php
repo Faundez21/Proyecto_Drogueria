@@ -8,24 +8,10 @@ use Illuminate\Database\Seeder;
 
 class DistributionSeeder extends Seeder
 {
-    /**
-     * Estructura base de la bodega: 4 pasillos con 4 estanterías cada uno.
-     *
-     * Es la planta mínima para que la Droguería tenga dónde ubicar los lotes
-     * desde el primer día. Los niveles y posiciones de cada estantería se
-     * crean después desde el módulo de Distribución, según cómo quede
-     * armada físicamente la bodega.
-     *
-     * El seeder es idempotente: se puede volver a ejecutar sin duplicar
-     * pasillos ni estanterías, y respeta las coordenadas que un usuario haya
-     * ajustado a mano en el mapa 3D.
-     */
+    // estructura base de la bodega: 4 pasillos con 4 estanterias cada uno
     public function run(): void
     {
-        /*
-        | Cada pasillo define su nombre, color de identificación en el mapa 3D
-        | y la coordenada Z donde se dibuja su fila de estanterías.
-        */
+        // | cada pasillo define su nombre, color de identificacion en el mapa 3d | y la coordenada z donde se dibuja su fila de estanterias
         $pasillos = [
             ['name' => 'Pasillo 1', 'color' => '#0D9488', 'descripcion' => 'Pasillo 1 de la bodega central.', 'z' => -16],
             ['name' => 'Pasillo 2', 'color' => '#D97706', 'descripcion' => 'Pasillo 2 de la bodega central.', 'z' => -6],
@@ -33,10 +19,10 @@ class DistributionSeeder extends Seeder
             ['name' => 'Pasillo 4', 'color' => '#BE123C', 'descripcion' => 'Pasillo 4 de la bodega central.', 'z' => 14],
         ];
 
-        // Coordenada X de cada una de las 4 estanterías dentro del pasillo.
+        // coordenada x de cada una de las 4 estanterias dentro del pasillo
         $columnasX = [-27, -9, 9, 27];
 
-        // Sufijo de la estantería: Pasillo 1 => P1-A, P1-B, P1-C, P1-D.
+        // sufijo de la estanteria: pasillo 1 => p1-a, p1-b, p1-c, p1-d
         $letras = ['A', 'B', 'C', 'D'];
 
         foreach ($pasillos as $indicePasillo => $datosPasillo) {
@@ -49,8 +35,7 @@ class DistributionSeeder extends Seeder
             );
 
             foreach ($letras as $indiceEstante => $letra) {
-                // El nombre de la estantería es único en todo el sistema,
-                // por eso lleva el número del pasillo adelante.
+                // el nombre de la estanteria es unico en todo el sistema, por eso lleva el numero del pasillo adelante
                 $nombreEstante = 'P' . ($indicePasillo + 1) . '-' . $letra;
 
                 Shelf::firstOrCreate(

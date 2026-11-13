@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('inventories', function (Blueprint $table) {
-            // Agrega la columna de forma segura (nullable por si ya tienes datos viejos sin usuario)
+            // agrega la columna de forma segura (nullable por si ya tienes datos viejos sin usuario)
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
         });
     }

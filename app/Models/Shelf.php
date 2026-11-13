@@ -17,7 +17,7 @@ class Shelf extends Model
         'capacidad'
     ];
 
-    // relacion una estantería pertenece a un pasillo
+    // relacion una estanteria pertenece a un pasillo
     public function aisle()
     {
         return $this->belongsTo(Aisle::class);

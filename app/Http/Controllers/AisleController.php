@@ -32,7 +32,7 @@ class AisleController extends Controller
 
     public function create()
     {
-        //dirección del menú de crear pasillo
+        // direccion del menu de crear pasillo
 
     }
 
@@ -58,9 +58,7 @@ class AisleController extends Controller
         return redirect()->route('aisle.index')->with('success', 'Pasillo creado exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // display the specified resource
     public function show($id)
     {
 
@@ -72,9 +70,7 @@ class AisleController extends Controller
         return view('distribution.maintainers.aisle.edit');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // update the specified resource in storage
     public function update(Request $request, string $id)
     {
         $aisle = Aisle::findOrFail($id);
@@ -104,9 +100,7 @@ class AisleController extends Controller
             ->with('success', 'Pasillo actualizado exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // remove the specified resource from storage
     public function destroy(string $id)
     {
         $aisle = Aisle::findOrFail($id);

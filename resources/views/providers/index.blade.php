@@ -4,7 +4,7 @@
 @section('subtitle', 'Directorio y gestión de proveedores registrados.')
 
 @section('actions')
-    <!-- Botón principal: registrar -->
+    <!-- boton principal: registrar -->
     <button type="button" id="btn-new-provider"
         class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,7 +17,7 @@
 @section('content')
     <div class="space-y-6">
 
-        <!-- Ruta de navegación -->
+        <!-- ruta de navegacion -->
         <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
             <span class="font-mono-das text-slate-400 font-semibold">01</span>
             <span>Abastecimiento</span>
@@ -27,7 +27,7 @@
             <span class="font-medium text-slate-800">Proveedores</span>
         </div>
 
-        <!-- Tarjetas KPIs uniformes -->
+        <!-- tarjetas kpis uniformes -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
             <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm transition-all hover:shadow-md">
                 <div class="flex items-start justify-between">
@@ -85,10 +85,10 @@
             </div>
         </div>
 
-        <!-- Contenedor principal: Directorio y Tabla -->
+        <!-- contenedor principal: directorio y tabla -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
 
-            <!-- Cabecera de la tabla y botón de filtros -->
+            <!-- cabecera de la tabla y boton de filtros -->
             <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
                 <h3 class="text-[15px] font-bold text-slate-800">Directorio de Proveedores</h3>
                 <button type="button" id="toggle-filters-btn"
@@ -102,7 +102,7 @@
                 </button>
             </div>
 
-            <!-- Formulario de Filtros -->
+            <!-- formulario de filtros -->
             <form method="GET" action="{{ route('providers.index') }}" id="filters-panel"
                 class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
@@ -190,7 +190,7 @@
                 </div>
             </form>
 
-            <!-- Tabla principal -->
+            <!-- tabla principal -->
             <div class="overflow-x-auto w-full">
                 <table class="w-full text-left border-collapse min-w-[900px]">
                     <thead>
@@ -320,7 +320,7 @@
                 </table>
             </div>
 
-            <!-- Paginación -->
+            <!-- paginacion -->
             @if (isset($providers) && $providers->hasPages())
                 <div
                     class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 bg-white rounded-b-2xl">
@@ -383,7 +383,7 @@
         </div>
     </div>
 
-    <!-- Modal 1: Ficha técnica -->
+    <!-- modal 1: ficha tecnica -->
     <div id="modal-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
             data-close="modal-detail"></div>
@@ -411,7 +411,7 @@
             </div>
 
             <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-                <!-- Sección: información comercial -->
+                <!-- seccion: informacion comercial -->
                 <div>
                     <h4 class="text-[13px] font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">Información
                         Comercial y Contacto</h4>
@@ -462,7 +462,7 @@
         </div>
     </div>
 
-    <!-- Modal 2: formulario (Registrar/Editar) -->
+    <!-- modal 2: formulario (registrar/editar) -->
     <div id="modal-edit" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm js-modal-backdrop transition-opacity"
             data-close="modal-edit"></div>
@@ -609,35 +609,35 @@
         </div>
     </div>
 
-    <!-- Script de Lógica -->
+    <!-- script de logica -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const csrfToken = '{{ csrf_token() }}';
             let selectedRow = null;
 
-            // Validación del RUT chileno (módulo 11) y del teléfono
+            // validacion del rut chileno (modulo 11) y del telefono
 
-            // Deja sólo dígitos y K, en mayúscula
+            // deja solo digitos y k, en mayuscula
             function cleanRut(value) {
                 return String(value || '').replace(/[^0-9kK]/g, '').toUpperCase();
             }
 
-            // Formatea mientras se escribe: 12.345.678-5
+            // formatea mientras se escribe: 12.345.678-5
             function formatRut(value) {
                 let clean = cleanRut(value).slice(0, 9);
                 if (clean.length <= 1) return clean;
 
-                let body = clean.slice(0, -1).replace(/\D/g, ''); // la K sólo es válida al final
+                let body = clean.slice(0, -1).replace(/\D/g, ''); // la k solo es valida al final
                 const dv = clean.slice(-1);
                 body = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
                 return `${body}-${dv}`;
             }
 
-            // Valida largo, formato y dígito verificador
+            // valida largo, formato y digito verificador
             function validateRut(value) {
                 const clean = cleanRut(value);
-                if (clean.length < 8 || clean.length > 9) return false; // cuerpo de 7 u 8 dígitos + DV
+                if (clean.length < 8 || clean.length > 9) return false; // cuerpo de 7 u 8 digitos + dv
 
                 const body = clean.slice(0, -1);
                 const dv = clean.slice(-1);
@@ -656,7 +656,7 @@
                 return dv === expected;
             }
 
-            // Extrae los 9 dígitos nacionales (sin +56)
+            // extrae los 9 digitos nacionales (sin +56)
             function getPhoneDigits(value) {
                 let v = String(value || '').trim();
                 let digits;
@@ -670,7 +670,7 @@
                 return digits.slice(0, 9);
             }
 
-            // Formatea: +56 9 1234 5678
+            // formatea: +56 9 1234 5678
             function formatPhone(value) {
                 const d = getPhoneDigits(value);
                 if (!d) return '+56 ';
@@ -680,7 +680,7 @@
                 return out;
             }
 
-            // El teléfono es opcional; si se ingresa, debe tener 9 dígitos y comenzar en 2-9
+            // el telefono es opcional; si se ingresa, debe tener 9 digitos y comenzar en 2-9
             function validatePhone(value) {
                 const d = getPhoneDigits(value);
                 if (d.length === 0) return true;
@@ -691,7 +691,7 @@
                 return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
             }
 
-            // --- Helpers de error en campos ---
+            // helpers de error en campos
             const rutInput = document.getElementById('provider-rut');
             const phoneInput = document.getElementById('provider-phone');
             const emailInput = document.getElementById('provider-email');
@@ -749,7 +749,7 @@
                 setFieldError(emailInput, 'provider-email-error', '');
             }
 
-            // --- Eventos de los campos ---
+            // eventos de los campos
             rutInput.addEventListener('input', () => {
                 rutInput.value = formatRut(rutInput.value);
                 if (document.getElementById('provider-rut-error').textContent) checkRutField();
@@ -766,7 +766,7 @@
                 if (!phoneInput.value.trim()) phoneInput.value = '+56 ';
             });
             phoneInput.addEventListener('keydown', (e) => {
-                // Evita borrar el prefijo +56
+                // evita borrar el prefijo +56
                 if ((e.key === 'Backspace' || e.key === 'Delete') && getPhoneDigits(phoneInput.value).length === 0) {
                     e.preventDefault();
                 }
@@ -777,7 +777,7 @@
                 if (emailInput.value.trim()) checkEmailField();
             });
 
-            // --- Control del Panel de Filtros ---
+            // control del panel de filtros
             const btnToggleFilters = document.getElementById('toggle-filters-btn');
             const filtersPanel = document.getElementById('filters-panel');
 
@@ -791,7 +791,7 @@
                 filtersPanel.classList.toggle('hidden');
             });
 
-            // --- Control de Modales ---
+            // control de modales
             function openModal(id) {
                 const modal = document.getElementById(id);
                 const panel = document.getElementById(`${id}-panel`);
@@ -830,7 +830,7 @@
                 };
             }
 
-            // --- Ficha del proveedor ---
+            // ficha del proveedor
             document.querySelectorAll('.js-view-detail').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const row = e.currentTarget.closest('.provider-row');
@@ -866,7 +866,7 @@
                 });
             });
 
-            // --- Formulario de guardado ---
+            // formulario de guardado
             function openEditForm(row = null) {
                 clearFieldErrors();
 
@@ -926,15 +926,15 @@
                     category: document.getElementById('provider-category').value,
                     business_line: document.getElementById('provider-business-line').value.trim(),
                     email: emailInput.value.trim(),
-                    // Si no hay dígitos, se envía vacío; si no, formato estándar
+                    // si no hay digitos, se envia vacio; si no, formato estandar
                     phone: phoneDigits ? formatPhone(phoneInput.value) : '',
                     address: document.getElementById('provider-address').value.trim(),
                     status: document.querySelector('input[name="edit-status"]:checked').value
                 };
 
-                // Campos obligatorios
+                // campos obligatorios
                 if (!data.name || !data.rut || !data.category || !data.email) {
-                    // Marca los errores de RUT y correo si corresponde
+                    // marca los errores de rut y correo si corresponde
                     if (!data.rut) checkRutField();
                     if (!data.email) checkEmailField();
                     Swal.fire({
@@ -946,7 +946,7 @@
                     return;
                 }
 
-                // Validaciones de formato (RUT, correo y teléfono)
+                // validaciones de formato (rut, correo y telefono)
                 const rutOk = checkRutField();
                 const emailOk = checkEmailField();
                 const phoneOk = checkPhoneField();
@@ -966,7 +966,7 @@
                     return;
                 }
 
-                // La ruta es /suppliers, no /providers (ver web.php)
+                // la ruta es /suppliers, no /providers (ver web.php)
                 const url = id ? `/suppliers/${id}` : '/suppliers';
                 const method = id ? 'PUT' : 'POST';
                 const btn = document.getElementById('modal-edit-action');
@@ -998,7 +998,7 @@
                     } else {
                         const result = await response.json();
 
-                        // Muestra errores del servidor junto a los campos si existen
+                        // muestra errores del servidor junto a los campos si existen
                         if (result.errors) {
                             if (result.errors.rut) setFieldError(rutInput, 'provider-rut-error', result.errors.rut[0]);
                             if (result.errors.phone) setFieldError(phoneInput, 'provider-phone-error', result.errors.phone[0]);
@@ -1029,7 +1029,7 @@
                 }
             });
 
-            // --- Botón activar / desactivar ---
+            // boton activar / desactivar
             document.querySelectorAll('.js-toggle-status').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const row = e.currentTarget.closest('.provider-row');
@@ -1038,7 +1038,7 @@
                     const isActivo = p.status === 'activo';
 
                     const actionText = isActivo ? 'desactivar' : 'reactivar';
-                    const confirmColor = isActivo ? '#e11d48' : '#0d9488'; // Rose o Teal
+                    const confirmColor = isActivo ? '#e11d48' : '#0d9488'; // rose o teal
                     const confirmText = isActivo ? 'Sí, Desactivar' : 'Sí, Reactivar';
 
                     Swal.fire({
@@ -1053,7 +1053,7 @@
                     }).then(async (result) => {
                         if (result.isConfirmed) {
                             try {
-                                // La ruta es /suppliers, no /providers (ver web.php)
+                                // la ruta es /suppliers, no /providers (ver web.php)
                                 const response = await fetch(
                                     `/suppliers/${p.id}/toggle-status`, {
                                         method: 'PATCH',

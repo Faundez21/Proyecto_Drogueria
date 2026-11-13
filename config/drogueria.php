@@ -26,13 +26,7 @@ return [
         'Recetas Cheque Estupefacientes',
     ],
 
-    /*
-    | Principios activos sujetos a control legal (estupefacientes y psicotrópicos).
-    | Cualquier producto cuyo nombre contenga uno de estos principios (o una
-    | variante muy parecida, por ejemplo con un error de tipeo) se trata como
-    | fármaco controlado en todo el sistema, aunque su nombre no sea idéntico
-    | a los de la lista 'controlados'.
-    */
+    // | principios activos sujetos a control legal (estupefacientes y psicotropicos)
     'principios_controlados' => [
         'alprazolam',
         'buprenorfina',
@@ -47,27 +41,27 @@ return [
         'zolpidem',
     ],
 
-    // Frases que identifican a un controlado aunque no sea un principio activo.
+    // frases que identifican a un controlado aunque no sea un principio activo
     'frases_controlados' => [
         'receta cheque',
         'recetas cheque',
     ],
 
     'establecimientos' => [
-        // CESFAM
+        // cesfam
         ['nombre' => 'CESFAM Los Cerros', 'tipo' => 'CESFAM', 'direccion' => 'Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano'],
         ['nombre' => 'CESFAM Paulina Avendaño Pereda', 'tipo' => 'CESFAM', 'direccion' => 'Calle Carlos Dittborn 4100, Villa San Martín, Talcahuano'],
         ['nombre' => 'CESFAM San Vicente', 'tipo' => 'CESFAM', 'direccion' => 'Calle Brasil 360, San Vicente, Talcahuano'],
         ['nombre' => 'CESFAM Alcalde Leocán Portus Govinden', 'tipo' => 'CESFAM', 'direccion' => 'Calle Manuel Barros Borgoño 2645, Las Salinas, Talcahuano'],
 
-        // CECOSF
+        // cecosf
         ['nombre' => 'CECOSF Esmeralda', 'tipo' => 'Otros', 'direccion' => 'Calle San Miguel 546, Población Patricio Lynch, Talcahuano'],
         ['nombre' => 'CECOSF 8 de Mayo', 'tipo' => 'Otros', 'direccion' => 'Calle Aysén 7370, Población Diego Portales, Talcahuano'],
         ['nombre' => 'CECOSF Libertad-Gaete', 'tipo' => 'Otros', 'direccion' => 'Calle Isla San Ambrosio 509, Población Libertad, Talcahuano'],
         ['nombre' => 'CECOSF Los Lobos-La Gloria', 'tipo' => 'Otros', 'direccion' => 'Calle Los Lobos 1960, Población Los Lobos, Talcahuano'],
         ['nombre' => 'CECOSF Villa Centinela', 'tipo' => 'Otros', 'direccion' => 'Calle Punta Peñablanca 1301, Población Centinela, Talcahuano'],
 
-        // Otros Establecimientos
+        // otros establecimientos
         ['nombre' => 'Posta Rural Tumbes', 'tipo' => 'Otros', 'direccion' => 'Maryland s/n, Caleta Tumbes, Talcahuano'],
         ['nombre' => 'SAR San Vicente', 'tipo' => 'Otros', 'direccion' => 'Juan de la Cruz Tapia s/n, Talcahuano'],
         ['nombre' => 'SAR Los Cerros', 'tipo' => 'Otros', 'direccion' => 'Calle Coliumo S/N Nueva los Lobos, Talcahuano'],

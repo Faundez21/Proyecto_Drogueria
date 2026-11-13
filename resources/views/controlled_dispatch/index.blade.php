@@ -129,7 +129,7 @@
             @csrf
             <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
 
-            <!-- Banner informativo cuando se carga una solicitud -->
+            <!-- banner informativo cuando se carga una solicitud -->
             <div id="banner_solicitud_activa" class="hidden mx-6 mt-5 p-4 bg-rose-50 border border-rose-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
@@ -689,7 +689,7 @@
             </div>
         </div>
     </div>
-    <!-- modal del escaner QR del despacho controlado -->
+    <!-- modal del escaner qr del despacho controlado -->
     <div id="scannerModal" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
         <div class="flex min-h-full items-center justify-center">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
@@ -781,7 +781,7 @@
                 </button>
             </div>
 
-            <!-- Filtros del modal controlado -->
+            <!-- filtros del modal controlado -->
             <div class="px-6 py-3.5 bg-slate-50 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div class="sm:col-span-2">
                     <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Buscar solicitud CESFAM</label>
@@ -965,7 +965,7 @@
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-    <!-- avisos con SweetAlert2 -->
+    <!-- avisos con sweetalert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -976,7 +976,7 @@
         const esControladoJS = (nombre) => @json($controlados).some(c => c.toLowerCase() === String(nombre ?? '')
             .trim().toLowerCase());
 
-        // Solicitudes (estupefacientes)
+        // solicitudes (estupefacientes)
         function openSolicitudesControlado() {
             filtrarSolicitudesControladoModal();
             document.getElementById('SolicitudesControladoModal').classList.remove('hidden');
@@ -1103,7 +1103,7 @@
             const solicitud = solicitudesControlado.find(s => s.id === id);
             if (!solicitud) return;
 
-            // Helper de normalización para matching insensible a mayúsculas, tildes y símbolos
+            // helper de normalizacion para matching insensible a mayusculas, tildes y simbolos
             const normText = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
 
             // marcar la solicitud de origen
@@ -1233,7 +1233,7 @@
 
             closeSolicitudesControlado();
 
-            // Notificación toast de éxito al cargar
+            // notificacion toast de exito al cargar
             if (typeof Swal !== 'undefined' && normales.length === 0 && sinStock.length === 0) {
                 Swal.fire({
                     toast: true,
@@ -1902,7 +1902,7 @@
             }
         }
 
-        // Escáner QR
+        // escaner qr
         let html5QrScanner = null;
         let availableCameras = [];
         let currentCameraIndex = 0;
@@ -2071,7 +2071,7 @@
 
             let targetOption = null;
 
-            // 1. Coincidencia exacta de Producto Y Lote
+            // 1. coincidencia exacta de producto y lote
             if (prodTarget && loteTarget) {
                 const targetProdNorm = norm(prodTarget);
                 const targetLoteNorm = cleanLote(loteTarget);
@@ -2080,19 +2080,19 @@
                 });
             }
 
-            // 2. Coincidencia por Lote (si el lote es específico y distinto de S/L)
+            // 2. coincidencia por lote (si el lote es especifico y distinto de s/l)
             if (!targetOption && loteTarget && cleanLote(loteTarget) !== 'S/L') {
                 const targetLoteNorm = cleanLote(loteTarget);
                 targetOption = options.find(opt => cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm);
             }
 
-            // 3. Coincidencia por Producto (primer lote disponible)
+            // 3. coincidencia por producto (primer lote disponible)
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => norm(opt.value) === targetProdNorm);
             }
 
-            // 4. Coincidencia parcial / difusa por Producto
+            // 4. coincidencia parcial / difusa por producto
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => {
@@ -2102,7 +2102,7 @@
             }
 
             if (targetOption) {
-                // Seleccionar índice exacto para no colisionar con productos duplicados
+                // seleccionar indice exacto para no colisionar con productos duplicados
                 targetOption.selected = true;
                 select.selectedIndex = targetOption.index;
                 select.value = targetOption.value;
@@ -2139,7 +2139,7 @@
         }
 
         function onScanFailure(error) {
-            // Se ignora silenciosamente para no saturar la consola en cada frame fallido
+            // se ignora silenciosamente para no saturar la consola en cada frame fallido
         }
 
         @if (session('controlled_dispatch_success_detail'))
@@ -2153,7 +2153,7 @@
     </script>
 
     <style>
-        /* ===== Detalle de extracción en celular: cada fila se muestra como tarjeta ===== */
+        /* detalle de extraccion en celular: cada fila se muestra como tarjeta */
         .producto-nombre-movil { display: none; }
         @media (max-width: 767px) {
             #productsTable { min-width: 0 !important; width: 100% !important; table-layout: auto !important; white-space: normal !important; }
@@ -2170,7 +2170,7 @@
             #productsTable select, #productsTable input { min-width: 0; }
             .producto-nombre-movil { display: block; font-size: 12px; font-weight: 700; line-height: 1.35; margin-top: 6px; white-space: normal; overflow-wrap: anywhere; }
             .producto-nombre-movil:empty { display: none; }
-            /* Modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
+            /* modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
             #SolicitudesModal > div, #BandejaModal > div { overflow-y: auto !important; }
             #SolicitudesModal .max-h-\[60vh\], #BandejaModal .max-h-\[60vh\] { max-height: none !important; flex-shrink: 0; }
         }

@@ -7,13 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Bloquea en cada petición a los usuarios desactivados.
- *
- * Si un administrador desactiva una cuenta mientras está con la sesión abierta
- * (o con "Recordarme"), en su siguiente clic se le cierra la sesión y no puede
- * volver a entrar hasta que la cuenta se reactive.
- */
+// bloquea en cada peticion a los usuarios desactivados
 class EnsureUserIsActive
 {
     public function handle(Request $request, Closure $next): Response

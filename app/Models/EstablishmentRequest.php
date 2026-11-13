@@ -4,14 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * El pedido que hace un establecimiento a la droguería.
- *
- * El campo estado lo recalcula SolicitudService según lo que se haya
- * despachado: Pendiente, Asignada, Parcial o Despachado. Una misma solicitud
- * puede cubrirse con varias guías, e incluso repartirse entre el despacho
- * normal y el de controlados, por eso tiene las dos relaciones de despacho.
- */
+// el pedido que hace un establecimiento a la drogueria
 class EstablishmentRequest extends Model
 {
     protected $fillable = [

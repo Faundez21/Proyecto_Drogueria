@@ -17,7 +17,7 @@ return new class extends Migration
             });
         }
 
-        //  tabla de recepciones
+        // tabla de recepciones
         if (! Schema::hasTable('receptions')) {
             Schema::create('receptions', function (Blueprint $table) {
                 $table->id();

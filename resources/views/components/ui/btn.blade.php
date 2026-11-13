@@ -1,5 +1,4 @@
-{{-- Botón con las 4 variantes del sistema: primary | secondary | danger | ghost.
-     Con href se dibuja como enlace. Los demás atributos (id, onclick, type...) se conservan. --}}
+{{-- boton con 4 variantes: primary, secondary, danger y ghost; con href se dibuja como enlace --}}
 @props(['variant' => 'secondary', 'href' => null])
 @php $clases = 'das-btn das-btn-' . $variant; @endphp
 @if ($href)

@@ -10,15 +10,7 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    /**
-     * Vistas de la plataforma que se pueden habilitar por rol.
-     *
-     * Por cada clave de este arreglo existe un permiso llamado ver.<clave>
-     * (ver.inventario, ver.despacho, etc.). Las rutas de web.php se protegen
-     * con el middleware permission:ver.<clave> y el menú lateral muestra solo
-     * los módulos cuyo permiso tiene el usuario. Agregar un módulo nuevo acá y
-     * volver a entrar a esta pantalla crea su permiso automáticamente.
-     */
+    // vistas de la plataforma que se pueden habilitar por rol
     public const MODULOS = [
         'dashboard' => 'Panel Principal',
         'proveedores' => 'Proveedores',
@@ -34,10 +26,7 @@ class UserController extends Controller
         'reportes' => 'Reportes',
     ];
 
-    /**
-     * Los mismos módulos pero agrupados por etapa del proceso, con su icono y
-     * color. Es lo que se dibuja en la pantalla de permisos de un rol.
-     */
+    // los mismos modulos pero agrupados por etapa del proceso, con su icono y color. es lo que se dibuja en la pantalla de permisos de un rol
     public const MODULOS_GRUPOS = [
         'General' => [
             'icono' => 'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM14 11a1 1 0 011-1h4a1 1 0 011 1v8a1 1 0 01-1 1h-4a1 1 0 01-1-1v-8z',
@@ -172,7 +161,7 @@ class UserController extends Controller
             'role.exists' => 'El rol seleccionado no es válido.',
         ]);
 
-        // Un administrador no puede quitarse a sí mismo el rol ni desactivar su propia cuenta
+        // un administrador no puede quitarse a si mismo el rol ni desactivar su propia cuenta
         if ($user->id === auth()->id()) {
             if ($user->hasRole('Administrador') && $validated['role'] !== 'Administrador') {
                 return back()->withInput()->with('error', 'No puede quitarse a sí mismo el rol de Administrador. Pida a otro administrador que lo haga.');
@@ -182,7 +171,7 @@ class UserController extends Controller
             }
         }
 
-        // Debe quedar siempre al menos un administrador activo en el sistema
+        // debe quedar siempre al menos un administrador activo en el sistema
         $dejaDeSerAdminActivo = $user->hasRole('Administrador') && $user->status === 'activo'
             && ($validated['role'] !== 'Administrador' || ($validated['status'] ?? 'activo') === 'inactivo');
         if ($dejaDeSerAdminActivo) {
@@ -225,7 +214,7 @@ class UserController extends Controller
             return redirect()->route('users.index')->with('error', 'No puede cambiar el estado de su propia cuenta.');
         }
 
-        // No se puede desactivar al último administrador activo
+        // no se puede desactivar al ultimo administrador activo
         if ($user->status === 'activo' && $user->hasRole('Administrador')
             && User::role('Administrador')->where('status', 'activo')->where('id', '!=', $user->id)->count() === 0) {
             return redirect()->route('users.index')->with('error', 'No puede desactivar al único administrador activo del sistema.');
@@ -263,8 +252,7 @@ class UserController extends Controller
 
     public function updateRole(Request $request, Role $role)
     {
-        // El rol Administrador es del sistema: su nombre no se puede cambiar,
-        // porque el acceso total y el módulo de Usuarios dependen de él.
+        // el rol administrador es del sistema: su nombre no se puede cambiar, porque el acceso total y el modulo de usuarios dependen de el
         if ($role->name === 'Administrador' && trim((string) $request->input('name')) !== 'Administrador') {
             return redirect()->route('users.index')->with('error', 'El rol «Administrador» es del sistema y no se puede renombrar.');
         }
@@ -275,7 +263,7 @@ class UserController extends Controller
             'modulos.*' => 'string|in:'.implode(',', array_keys(self::MODULOS)),
         ];
 
-        // Si es el rol Administrador, siempre tiene todas las vistas
+        // si es el rol administrador, siempre tiene todas las vistas
         if ($role->name === 'Administrador') {
             $rules['modulos'] = 'nullable|array';
         }

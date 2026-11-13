@@ -5,14 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Un lote de un producto guardado en bodega.
- *
- * Es la tabla central del sistema: hay una fila por cada combinación de
- * producto, lote y estado sanitario (Disponible, Cuarentena o Merma), con su
- * stock, su fecha de vencimiento y su ubicación física en la bodega. Todo lo
- * que entra o sale pasa por acá y queda registrado en StockMovement.
- */
+// un lote de un producto guardado en bodega
 class Inventory extends Model
 {
     use HasFactory;
@@ -63,11 +56,7 @@ class Inventory extends Model
         'minimo' => 'integer',
     ];
 
-    /**
-     * Todo lote de un fármaco controlado (detectado por similitud de nombre)
-     * queda siempre en la categoría "Fármacos Controlados", sin importar si
-     * entró por Recepción, Ingreso Manual o Carga Masiva.
-     */
+    // todo lote de un farmaco controlado (detectado por similitud de nombre) queda siempre en la categoria "farmacos controlados", sin importar si entro
     protected static function booted(): void
     {
         static::saving(function (Inventory $inventory) {

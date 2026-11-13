@@ -49,7 +49,7 @@
         </div>
     @endif
 
-    <!-- Solicitudes asignadas al usuario logueado -->
+    <!-- solicitudes asignadas al usuario logueado -->
     @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
         <div class="mb-6 bg-gradient-to-r from-teal-50 via-white to-indigo-50 border border-teal-200 rounded-2xl p-4 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
@@ -189,7 +189,7 @@
             @csrf
             <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
 
-            <!-- Banner informativo cuando se carga una solicitud -->
+            <!-- banner informativo cuando se carga una solicitud -->
             <div id="banner_solicitud_activa" class="hidden mx-6 mt-5 p-4 bg-teal-50 border border-teal-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
@@ -301,7 +301,17 @@
                     </div>
 
                     <!-- div dinamico para destino externo -->
-                    <div id="div_externo" class="md:col-span-2 hidden min-w-0">
+                    <div id="div_externo" class="md:col-span-2 hidden min-w-0 space-y-3">
+                        <div>
+                            <label for="establecimiento_origen" class="block text-[12px] font-bold text-slate-700 mb-1.5">Sale del stock de <span class="text-rose-500">*</span></label>
+                            <select id="establecimiento_origen" onchange="aplicarOrigenProductos()" class="w-full max-w-full truncate bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                                <option value="" disabled selected>Seleccione el establecimiento de origen...</option>
+                                @foreach (\App\Services\InventoryService::establecimientos() as $estOrigen)
+                                    @php $conStock = count($stockEstablecimientos[$estOrigen['nombre']] ?? []); @endphp
+                                    <option value="{{ $estOrigen['nombre'] }}">{{ $estOrigen['nombre'] }}{{ $conStock ? " ({$conStock} productos con stock)" : ' (sin stock registrado)' }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo y Destino Interno <span
                                 class="text-rose-500">*</span></label>
                         <div class="flex flex-col sm:flex-row gap-3">
@@ -315,11 +325,17 @@
                                 <option value="Merma">Merma / Destrucción</option>
                                 <option value="Otro">Otro</option>
                             </select>
-                            <input type="text" id="establecimiento_externo"
+                            <input type="text" id="establecimiento_externo" list="destinos_red"
                                 placeholder="Nombre institución/destino..."
                                 class="w-full sm:w-3/5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
                         </div>
                     </div>
+
+                    <datalist id="destinos_red">
+                        @foreach (\App\Services\InventoryService::establecimientos() as $estRed)
+                            <option value="{{ $estRed['nombre'] }}">
+                        @endforeach
+                    </datalist>
 
                     <div class="md:col-span-2">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Dirección Destino</label>
@@ -1111,6 +1127,9 @@
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-800">
                                     {{ $despacho->establecimiento_destino }}
+                                    @if ($despacho->establecimiento_origen)
+                                        <p class="text-[11px] font-medium text-slate-500 mt-0.5 whitespace-normal">Desde: {{ $despacho->establecimiento_origen }}</p>
+                                    @endif
                                     @if ($despacho->esTraspasoInterno())
                                         <p class="text-[11px] font-medium text-slate-500 mt-0.5 whitespace-normal">Motivo: {{ $despacho->motivo_traspaso }}</p>
                                     @endif
@@ -1248,7 +1267,7 @@
         </div>
     </div>
 
-    <!-- modal del escaner QR -->
+    <!-- modal del escaner qr -->
     <div id="scannerModal" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
         <div class="flex min-h-full items-center justify-center">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
@@ -1324,7 +1343,7 @@
     <!-- librerias externas -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-    <!-- avisos con SweetAlert2 -->
+    <!-- avisos con sweetalert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -1337,10 +1356,10 @@
         const esControladoJS = (nombre) => listaControlados.some(c => c.toLowerCase() === String(nombre ?? '').trim()
             .toLowerCase());
 
-        // Normaliza nombres (sin mayúsculas, tildes ni símbolos) para comparar productos
+        // normaliza nombres (sin mayusculas, tildes ni simbolos) para comparar productos
         const normTextDespacho = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
 
-        // Unidades que faltan por despachar de la solicitud cargada, por producto (clave = nombre normalizado)
+        // unidades que faltan por despachar de la solicitud cargada, por producto (clave = nombre normalizado)
         let pendientesSolicitudActiva = {};
 
         function obtenerNombreCompletoOpcionDespacho(opt) {
@@ -1360,7 +1379,7 @@
             if (padDespachaElem) signatureDespacha = new SignaturePad(padDespachaElem, padOptions);
             if (padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
 
-            // asignacion de firmas a los inputs ocultos antes del submit con confirmación SweetAlert2 y AJAX
+            // asignacion de firmas a los inputs ocultos antes del submit con confirmacion sweetalert2 y ajax
             const form = document.getElementById('despachoForm');
             let despachoSubmitAction = 'save_only';
 
@@ -1382,6 +1401,8 @@
             }
 
             function showDispatchSuccessModal(dispData) {
+                // los textos escritos a mano se muestran como texto
+                const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
                 const htmlDetail = `
                     <div class="das-swal-container text-left text-xs text-slate-700">
                         <div class="das-swal-summary p-3.5 bg-slate-50 border border-slate-200 rounded-xl mb-3.5 space-y-1.5">
@@ -1389,7 +1410,7 @@
                                 <span class="das-swal-summary-title font-bold text-slate-900 text-sm">Guía N° ${dispData.correlativo}</span>
                                 <span class="das-swal-badge-ok px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">DESPACHO CONFORME</span>
                             </div>
-                            <p class="das-swal-meta"><strong>Destino:</strong> ${dispData.destino}</p>
+                            <p class="das-swal-meta"><strong>Destino:</strong> ${esc(dispData.destino)}${dispData.origen ? ' (sale del stock de ' + esc(dispData.origen) + ')' : ''}</p>
                             <p class="das-swal-meta"><strong>Clasificación:</strong> ${dispData.clasificacion}${dispData.es_traspaso ? ' (traspaso sin solicitud)' : ''}</p>
                             ${dispData.pendiente_recepcion ? '<p class="das-swal-meta font-semibold text-amber-700">Pendiente de recepción: quien recibe debe firmar desde la bandeja de despachos.</p>' : ''}
                             <p class="das-swal-meta"><strong>Fecha de Emisión:</strong> ${dispData.fecha}</p>
@@ -1409,8 +1430,8 @@
                                 <tbody class="divide-y divide-slate-100 bg-white">
                                     ${(dispData.items || []).map(it => `
                                         <tr class="hover:bg-slate-50">
-                                            <td class="p-2.5 font-medium text-slate-800">${it.producto}</td>
-                                            <td class="p-2.5 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
+                                            <td class="p-2.5 font-medium text-slate-800">${esc(it.producto)}</td>
+                                            <td class="p-2.5 text-center font-mono text-[11px] font-semibold text-slate-700">${esc(it.lote)}</td>
                                             <td class="p-2.5 text-center text-slate-600">${it.vencimiento}</td>
                                             <td class="p-2.5 text-right font-bold text-emerald-700 das-swal-qty">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
                                         </tr>
@@ -1498,7 +1519,7 @@
                         return;
                     }
 
-                    // no despachar más de lo que falta en la solicitud vinculada (sumando todos los lotes)
+                    // no despachar mas de lo que falta en la solicitud vinculada (sumando todos los lotes)
                     const solicitudVinculadaId = document.getElementById('establishment_request_id')?.value;
                     if (solicitudVinculadaId && Object.keys(pendientesSolicitudActiva).length > 0) {
                         const sumaPorProducto = {};
@@ -1531,13 +1552,17 @@
                     if (clasif === 'Interno') {
                         const ext = (document.getElementById('establecimiento_externo')?.value || '').trim();
                         const tipoExt = (document.getElementById('tipo_externo')?.value || '').trim();
-                        destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Interno');
+                        const origen = (document.getElementById('establecimiento_origen')?.value || '').trim();
+                        destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Interno') + (origen ? ' (sale del stock de ' + origen + ')' : '');
                     } else {
                         const selInt = document.getElementById('establecimiento_interno');
                         destinatario = selInt && selInt.selectedIndex >= 0 && selInt.value
                             ? selInt.options[selInt.selectedIndex].text.trim()
                             : 'Establecimiento de la red';
                     }
+
+                    // el destino escrito se muestra como texto
+                    destinatario = destinatario.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
                     const rows = document.querySelectorAll('#productsBody tr');
                     let itemsCount = 0;
@@ -1561,7 +1586,7 @@
 
                     Swal.fire({
                         title: '¿Confirmar Emisión de Despacho?',
-                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s)${textoUnidades}.<br><span class="text-[12px] text-slate-500 mt-1 block">El stock de los lotes asignados se rebajará según orden FEFO.</span>${esModoTraspasoInterno() ? `<span class="text-[12px] text-amber-700 font-semibold mt-2 block">Traspaso sin solicitud${(!signatureRecibe || signatureRecibe.isEmpty()) ? ': quedará «Pendiente de recepción» hasta que firme quien recibe.' : '.'}</span>` : ''}`,
+                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s)${textoUnidades}.<br><span class="text-[12px] text-slate-500 mt-1 block">${clasif === 'Interno' ? 'Se descontará del stock del establecimiento de origen; la bodega central no cambia.' : 'El stock de los lotes asignados se rebajará según orden FEFO.'}</span>${esModoTraspasoInterno() ? `<span class="text-[12px] text-amber-700 font-semibold mt-2 block">Traspaso sin solicitud${(!signatureRecibe || signatureRecibe.isEmpty()) ? ': quedará «Pendiente de recepción» hasta que firme quien recibe.' : '.'}</span>` : ''}`,
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#0f766e',
@@ -1672,6 +1697,7 @@
             const selExtTipo = document.getElementById('tipo_externo');
             const inpExtDest = document.getElementById('establecimiento_externo');
             const inpDir = document.getElementById('direccion_destino');
+            const selOrigen = document.getElementById('establecimiento_origen');
 
             if (val === 'Externo') {
                 divInt.classList.remove('hidden');
@@ -1684,6 +1710,8 @@
                 selExtTipo.removeAttribute('required');
                 inpExtDest.removeAttribute('name');
                 inpExtDest.removeAttribute('required');
+                selOrigen.removeAttribute('name');
+                selOrigen.removeAttribute('required');
 
                 inpDir.readOnly = true;
                 inpDir.classList.add('bg-slate-50', 'cursor-not-allowed');
@@ -1692,6 +1720,8 @@
 
                 actualizarDireccionInterna();
             } else if (val === 'Interno') {
+                // un despacho interno no atiende solicitudes
+                if (document.getElementById('establishment_request_id')?.value) desvincularSolicitudActiva();
                 divInt.classList.add('hidden');
                 divExt.classList.remove('hidden');
 
@@ -1700,6 +1730,8 @@
 
                 selExtTipo.setAttribute('name', 'tipo_externo_despacho');
                 selExtTipo.setAttribute('required', 'true');
+                selOrigen.setAttribute('name', 'establecimiento_origen');
+                selOrigen.setAttribute('required', 'true');
                 inpExtDest.setAttribute('name', 'establecimiento_destino');
                 inpExtDest.setAttribute('required', 'true');
 
@@ -1711,6 +1743,50 @@
             }
 
             actualizarModoTraspaso();
+            // el interno ofrece productos del establecimiento de origen, el externo los de bodega
+            if (val !== modoProductosActual) aplicarOrigenProductos();
+        }
+
+        // stock real de cada establecimiento, para el despacho interno
+        const STOCK_ESTABLECIMIENTOS = @json($stockEstablecimientos ?? []);
+        let modoProductosActual = '';
+        let opcionesBodega = null;
+
+        function aplicarOrigenProductos() {
+            const modo = document.getElementById('clasificacion_select').value;
+            const plantilla = document.getElementById('rowTemplate').content.querySelector('select[name="productos[]"]');
+            if (!opcionesBodega) opcionesBodega = Array.from(plantilla.options).map(o => o.cloneNode(true));
+
+            if (modo === 'Interno') {
+                const origen = document.getElementById('establecimiento_origen').value;
+                const items = origen ? (STOCK_ESTABLECIMIENTOS[origen] || []) : [];
+                const vacia = document.createElement('option');
+                vacia.value = '';
+                vacia.disabled = true;
+                vacia.selected = true;
+                vacia.textContent = !origen ? 'Primero elija de qué establecimiento sale...'
+                    : (items.length ? 'Seleccione producto del establecimiento...' : 'Este establecimiento no tiene stock registrado');
+                const opciones = [vacia, ...items.map(it => {
+                    const o = document.createElement('option');
+                    o.value = it.producto;
+                    o.textContent = it.producto + ' (Disp: ' + it.cantidad + ')';
+                    o.title = o.textContent;
+                    o.setAttribute('data-nombre-completo', it.producto);
+                    o.setAttribute('data-lote', 'S/L');
+                    o.setAttribute('data-vence', '');
+                    o.setAttribute('data-stock', it.cantidad);
+                    o.setAttribute('data-programa', '');
+                    return o;
+                })];
+                plantilla.replaceChildren(...opciones);
+            } else {
+                plantilla.replaceChildren(...opcionesBodega.map(o => o.cloneNode(true)));
+            }
+
+            // las filas se reinician porque cambian los productos disponibles
+            modoProductosActual = modo;
+            while (tbody.children.length > 0) tbody.children[0].remove();
+            addRow();
         }
 
         // funcion para buscar la direccion del cesfam elegido y rellenar el input readonly
@@ -2032,7 +2108,7 @@
             }
         }
 
-        // Escáner QR
+        // escaner qr
         let html5QrScanner = null;
         let availableCameras = [];
         let currentCameraIndex = 0;
@@ -2203,7 +2279,7 @@
 
             let targetOption = null;
 
-            // 1. Coincidencia exacta de Producto Y Lote
+            // 1. coincidencia exacta de producto y lote
             if (prodTarget && loteTarget) {
                 const targetProdNorm = norm(prodTarget);
                 const targetLoteNorm = cleanLote(loteTarget);
@@ -2212,19 +2288,19 @@
                 });
             }
 
-            // 2. Coincidencia por Lote (si el lote es específico y distinto de S/L)
+            // 2. coincidencia por lote (si el lote es especifico y distinto de s/l)
             if (!targetOption && loteTarget && cleanLote(loteTarget) !== 'S/L') {
                 const targetLoteNorm = cleanLote(loteTarget);
                 targetOption = options.find(opt => cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm);
             }
 
-            // 3. Coincidencia por Producto (primer lote disponible)
+            // 3. coincidencia por producto (primer lote disponible)
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => norm(obtenerNombreCompletoOpcionDespacho(opt)) === targetProdNorm);
             }
 
-            // 4. Coincidencia parcial / difusa por Producto
+            // 4. coincidencia parcial / difusa por producto
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => {
@@ -2234,7 +2310,7 @@
             }
 
             if (targetOption) {
-                // Seleccionar índice exacto para no colisionar con productos de mismo nombre y diferente lote
+                // seleccionar indice exacto para no colisionar con productos de mismo nombre y diferente lote
                 targetOption.selected = true;
                 select.selectedIndex = targetOption.index;
                 select.value = targetOption.value;
@@ -2377,7 +2453,7 @@
                     throw new Error(data.message || 'No se pudo asignar la solicitud');
                 }
 
-                // Actualizar estado visual del badge y atributos de la fila
+                // actualizar estado visual del badge y atributos de la fila
                 const badge = document.getElementById('badge-estado-solicitud-' + solicitudId);
                 if (badge && data.estado) {
                     badge.textContent = data.estado;
@@ -2461,7 +2537,7 @@
             }
         }
 
-        // Firma posterior de quien recibe, para guías "Pendiente de recepción"
+        // firma posterior de quien recibe, para guias "pendiente de recepcion"
         function registrarRecepcion(dispatchId, correlativo) {
             let pad = null;
             Swal.fire({
@@ -2532,7 +2608,7 @@
         // funcion para usar una solicitud y rellenar el formulario de despacho
         function usarSolicitud(id) {
 
-            // Buscar la solicitud por su ID en la variable global
+            // buscar la solicitud por su id en la variable global
             const solicitud = solicitudes.find(s => s.id === id);
 
             if (!solicitud) return;
@@ -2541,7 +2617,7 @@
             const requestInput = document.getElementById('establishment_request_id');
             if (requestInput) requestInput.value = solicitud.id;
 
-            // Mostrar banner de solicitud activa
+            // mostrar banner de solicitud activa
             const banner = document.getElementById('banner_solicitud_activa');
             const bannerTitulo = document.getElementById('banner_solicitud_titulo');
             const bannerSubtitulo = document.getElementById('banner_solicitud_subtitulo');
@@ -2551,7 +2627,7 @@
                 banner.classList.remove('hidden');
             }
 
-            // Helper de normalización para matching insensible a mayúsculas, tildes y símbolos
+            // helper de normalizacion para matching insensible a mayusculas, tildes y simbolos
             const normText = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
 
             // seleccionar clasificacion interna
@@ -2579,14 +2655,15 @@
                 selectEstablecimiento.value = opcionEstablecimiento.value;
                 actualizarDireccionInterna();
             } else if (solicitud.establecimiento) {
-                // si el destino no figura en la red se usa el despacho interno con destino escrito
-                const selectClasif = document.getElementById('clasificacion_select');
-                if (selectClasif) {
-                    selectClasif.value = 'Interno';
-                    toggleClasificacion();
-                    const inputExt = document.getElementById('establecimiento_externo');
-                    if (inputExt) inputExt.value = solicitud.establecimiento;
-                }
+                // una solicitud solo se atiende con despacho externo a un establecimiento de la red
+                desvincularSolicitudActiva();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Establecimiento no registrado',
+                    text: 'La solicitud es de «' + solicitud.establecimiento + '», que no está en la lista de establecimientos de la red. Agréguelo a la configuración antes de despacharla.',
+                    confirmButtonColor: '#0d9488'
+                });
+                return;
             }
 
             // rellenar observaciones con referencia clara
@@ -2606,7 +2683,7 @@
             let productosParciales = [];
             pendientesSolicitudActiva = {};
 
-            // agregar los productos pendientes de la solicitud (los estupefacientes van al módulo controlado)
+            // agregar los productos pendientes de la solicitud (los estupefacientes van al modulo controlado)
             solicitud.items.forEach(item => {
                 const nombreItem = item.product?.nombre ?? ('Producto #' + item.product_id);
                 const pendiente = Math.max(0, (parseInt(item.cantidad_solicitada) || 0) - (parseInt(item.cantidad_despachada) || 0));
@@ -2625,7 +2702,7 @@
                 const itemNorm = normText(nombreItem);
                 const opcionesValidas = Array.from(selectProducto.options).filter(o => o.value && !o.disabled);
 
-                // todos los lotes del producto (primero coincidencia exacta, si no la más parecida)
+                // todos los lotes del producto (primero coincidencia exacta, si no la mas parecida)
                 let lotesProducto = opcionesValidas.filter(o =>
                     normText(obtenerNombreCompletoOpcionDespacho(o)) === itemNorm
                 );
@@ -2640,7 +2717,7 @@
                     }
                 }
 
-                // solo lotes con stock, ordenados FEFO (vence antes, sale primero)
+                // solo lotes con stock, ordenados fefo (vence antes, sale primero)
                 lotesProducto = lotesProducto
                     .filter(o => (parseInt(o.getAttribute('data-stock')) || 0) > 0)
                     .sort((a, b) => (a.getAttribute('data-vence') || '9999-12-31').localeCompare(b.getAttribute('data-vence') || '9999-12-31'));
@@ -2652,7 +2729,7 @@
                     return;
                 }
 
-                // recordar cuánto falta de este producto para no pasarse al confirmar
+                // recordar cuanto falta de este producto para no pasarse al confirmar
                 pendientesSolicitudActiva[normTextDespacho(obtenerNombreCompletoOpcionDespacho(lotesProducto[0]))] = {
                     nombre: nombreItem,
                     pendiente: pendiente
@@ -2670,17 +2747,17 @@
                     );
                     if (!optFila) return;
 
-                    // selectedIndex (y no value) porque varios lotes comparten el mismo nombre
+                    // selectedindex (y no value) porque varios lotes comparten el mismo nombre
                     optFila.selected = true;
                     selFila.selectedIndex = optFila.index;
 
-                    // Llena la fila con lotes y límites
+                    // llena la fila con lotes y limites
                     llenarDatosFila(selFila);
                     // consumo mensual que informo el establecimiento en esta solicitud
                     fila.dataset.consumoSolicitud = item.consumo_anterior ?? '';
                     actualizarConsumoDespacho(fila);
 
-                    // Seleccionar programa si viene en la solicitud
+                    // seleccionar programa si viene en la solicitud
                     const selectPrograma = fila.querySelector('select[name="programas[]"]');
                     if (selectPrograma && item.programa) {
                         const progNorm = normText(item.programa);
@@ -2705,7 +2782,7 @@
                 }
             });
 
-            // Si nos quedamos sin filas, dejar 1 fila lista para usar
+            // si nos quedamos sin filas, dejar 1 fila lista para usar
             if (tbody.children.length === 0) {
                 addRow();
             }
@@ -2730,7 +2807,7 @@
                 });
             }
 
-            // alerta: los estupefacientes de esta solicitud van por Despacho Controlado
+            // alerta: los estupefacientes de esta solicitud van por despacho controlado
             if (productosControlados.length > 0) {
                 Swal.fire({
                     icon: 'info',
@@ -2781,7 +2858,7 @@
             // cerrar modal de solicitudes
             closeSolicitudes();
 
-            // Notificación de que se completaron los datos de la solicitud
+            // notificacion de que se completaron los datos de la solicitud
             if (typeof Swal !== 'undefined' && productosControlados.length === 0 && productosFaltantes.length === 0 && productosParciales.length === 0) {
                 Swal.fire({
                     toast: true,
@@ -2818,7 +2895,7 @@
     </script>
 
     <style>
-        /* ===== Detalle de extracción en celular: cada fila se muestra como tarjeta ===== */
+        /* detalle de extraccion en celular: cada fila se muestra como tarjeta */
         .producto-nombre-movil { display: none; }
         @media (max-width: 767px) {
             #productsTable { min-width: 0 !important; width: 100% !important; table-layout: auto !important; white-space: normal !important; }
@@ -2835,7 +2912,7 @@
             #productsTable select, #productsTable input { min-width: 0; }
             .producto-nombre-movil { display: block; font-size: 12px; font-weight: 700; line-height: 1.35; margin-top: 6px; white-space: normal; overflow-wrap: anywhere; }
             .producto-nombre-movil:empty { display: none; }
-            /* Modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
+            /* modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
             #SolicitudesModal > div, #BandejaModal > div { overflow-y: auto !important; }
             #SolicitudesModal .max-h-\[60vh\], #BandejaModal .max-h-\[60vh\] { max-height: none !important; flex-shrink: 0; }
         }

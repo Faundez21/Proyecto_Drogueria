@@ -4,17 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Una guía de despacho de productos normales (no controlados).
- *
- * El correlativo es anual y con formato GD-AAAA-XXXX. Si el despacho salió de
- * una solicitud, queda enlazado a ella por establishment_request_id.
- */
+// una guia de despacho de productos normales (no controlados)
 class Dispatch extends Model
 {
     protected $fillable = [
         'establishment_request_id', 'user_id',
-        'correlativo', 'fecha_despacho', 'clasificacion', 'estado_liberacion', 
+        'correlativo', 'fecha_despacho', 'clasificacion', 'establecimiento_origen', 'estado_liberacion', 
         'establecimiento_destino', 'direccion_destino', 'condiciones_transporte',
         'firma_despacha', 'firma_recibe',
         'motivo_traspaso', 'estado_recepcion', 'fecha_recepcion',
@@ -24,13 +19,13 @@ class Dispatch extends Model
         'fecha_recepcion' => 'datetime',
     ];
 
-    /** Traspaso interno: despacho a la red sin solicitud previa. */
+    // traspaso interno: despacho a la red sin solicitud previa
     public function esTraspasoInterno(): bool
     {
         return ! empty($this->motivo_traspaso);
     }
 
-    /** La guía se emitió sin la firma de quien recibe y aún no se registra la recepción. */
+    // la guia se emitio sin la firma de quien recibe y aun no se registra la recepcion
     public function pendienteRecepcion(): bool
     {
         return $this->estado_recepcion === 'Pendiente';

@@ -11,17 +11,13 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     */
+    // display the login view
     public function create(): View
     {
         return view('auth.login');
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
+    // handle an incoming authentication request
   public function store(LoginRequest $request): RedirectResponse
 {
     $request->authenticate();
@@ -40,7 +36,7 @@ class AuthenticatedSessionController extends Controller
 
     $request->session()->regenerate();
 
-    // Redirección si tiene acceso a Solicitudes
+    // redireccion si tiene acceso a solicitudes
     if ($user->can('ver.solicitudes') || $user->can('ver.requests')) {
         return redirect()->route('requests.index');
     }
@@ -55,9 +51,7 @@ class AuthenticatedSessionController extends Controller
     return redirect()->route('requests.index');
 }
 
-    /**
-     * Destroy an authenticated session.
-     */
+    // destroy an authenticated session
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();

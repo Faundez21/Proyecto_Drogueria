@@ -64,7 +64,7 @@
     <!-- contenedor de tabla de movimientos -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
 
-        <!-- Cabecera de la tabla y botón de filtros -->
+        <!-- cabecera de la tabla y boton de filtros -->
         <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
             <h3 class="text-[15px] font-bold text-slate-800">Historial de Movimientos de Lotes</h3>
             <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-xs cursor-pointer">
@@ -96,6 +96,7 @@
                             <option value="Despacho Controlado" {{ request('tipo_movimiento') == 'Despacho Controlado' ? 'selected' : '' }}>Despacho Controlado</option>
                         @endif
                         <option value="Cambio de estado" {{ request('tipo_movimiento') == 'Cambio de estado' ? 'selected' : '' }}>Cambio de Estado (Cuarentena / Merma)</option>
+                        <option value="Despacho interno" {{ request('tipo_movimiento') == 'Despacho interno' ? 'selected' : '' }}>Despacho interno (desde establecimiento)</option>
                         <option value="Edición de recepción" {{ request('tipo_movimiento') == 'Edición de recepción' ? 'selected' : '' }}>Edición de recepción</option>
                     </select>
                 </div>
@@ -154,6 +155,8 @@
                                     $badgeBg = 'bg-blue-50'; $badgeText = 'text-blue-700'; $badgeBorder = 'border-blue-200';
                                 } elseif($mov->tipo_movimiento == 'Despacho Controlado') {
                                     $badgeBg = 'bg-rose-50'; $badgeText = 'text-rose-700'; $badgeBorder = 'border-rose-200';
+                                } elseif($mov->tipo_movimiento == 'Despacho interno') {
+                                    $badgeBg = 'bg-indigo-50'; $badgeText = 'text-indigo-700'; $badgeBorder = 'border-indigo-200';
                                 } elseif($mov->tipo_movimiento == 'Edición de recepción') {
                                     $badgeBg = 'bg-violet-50'; $badgeText = 'text-violet-700'; $badgeBorder = 'border-violet-200';
                                 }
@@ -196,6 +199,10 @@
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-200">
                                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Cuarentena
                                         </span>
+                                    @elseif(strtolower($mov->estado_lote) == 'establecimiento')
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Establecimiento
+                                        </span>
                                     @elseif(strtolower($mov->estado_lote) == 'merma')
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-rose-100 text-rose-800 border border-rose-200">
                                             <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Merma
@@ -207,10 +214,15 @@
                                     @endif
                                 </td>
                                 <td class="px-3 py-3 text-right">
-                                    <button type="button" title="Ver ficha maestra del lote" onclick="openLotDetails('{{ $mov->lote }}', '{{ addslashes($mov->producto) }}')" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-800 hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer shadow-sm whitespace-nowrap">
+                                    @if($mov->tipo_movimiento === 'Despacho interno')
+                                        {{-- sale del stock de un establecimiento: no hay lote de bodega que mostrar --}}
+                                        <span class="text-[13px] text-slate-400 font-bold px-2" title="Salió del stock de un establecimiento: no hay lote de bodega">—</span>
+                                    @else
+                                    <button type="button" title="Ver ficha maestra del lote" onclick="openLotDetails({{ \Illuminate\Support\Js::from($mov->lote) }}, {{ \Illuminate\Support\Js::from($mov->producto) }})" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-800 hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer shadow-sm whitespace-nowrap">
                                         <svg class="w-3.5 h-3.5 text-teal-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                         Ver ficha
                                     </button>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -376,34 +388,34 @@
                             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                                 <div>
                                     <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Proveedor Origen</p>
-                                    <p class="text-[15px] font-black text-slate-800 mt-0.5">${data.details.proveedor}</p>
-                                    <p class="text-[11px] font-bold text-slate-500 font-mono mt-0.5">RUT: ${data.details.rut_proveedor}</p>
+                                    <p class="text-[15px] font-black text-slate-800 mt-0.5">${escHtmlGlobal(data.details.proveedor)}</p>
+                                    <p class="text-[11px] font-bold text-slate-500 font-mono mt-0.5">RUT: ${escHtmlGlobal(data.details.rut_proveedor)}</p>
                                 </div>
                                 <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                         <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Doc. Recepción</p>
-                                        <p class="text-[12px] font-bold text-slate-800 mt-0.5">${data.details.documento}</p>
+                                        <p class="text-[12px] font-bold text-slate-800 mt-0.5">${escHtmlGlobal(data.details.documento)}</p>
                                     </div>
                                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                         <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Orden de Compra</p>
-                                        <p class="text-[12px] font-bold text-slate-800 mt-0.5 font-mono">${data.details.orden_compra}</p>
+                                        <p class="text-[12px] font-bold text-slate-800 mt-0.5 font-mono">${escHtmlGlobal(data.details.orden_compra)}</p>
                                     </div>
                                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                         <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Fecha Ingreso</p>
-                                        <p class="text-[12px] font-bold text-slate-800 mt-0.5">${data.details.fecha_recepcion}</p>
+                                        <p class="text-[12px] font-bold text-slate-800 mt-0.5">${escHtmlGlobal(data.details.fecha_recepcion)}</p>
                                     </div>
                                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                         <p class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Valor Neto Unidad</p>
-                                        <p class="text-[14px] font-black text-emerald-600 mt-0.5">${data.details.valor_unitario}</p>
+                                        <p class="text-[14px] font-black text-emerald-600 mt-0.5">${escHtmlGlobal(data.details.valor_unitario)}</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="bg-slate-800 p-5 rounded-2xl shadow-inner flex items-center justify-between border border-slate-700">
                                 <div>
                                     <p class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Stock Físico Restante</p>
-                                    <p class="text-[11px] text-slate-500 mt-0.5">Ubicación: ${data.details.ubicacion}</p>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Ubicación: ${escHtmlGlobal(data.details.ubicacion)}</p>
                                 </div>
-                                <p class="text-[24px] font-black text-white font-mono">${data.details.stock_actual} <span class="text-[12px] text-teal-400">UNID.</span></p>
+                                <p class="text-[24px] font-black text-white font-mono">${escHtmlGlobal(data.details.stock_actual)} <span class="text-[12px] text-teal-400">UNID.</span></p>
                             </div>
                         `;
                     } else {
@@ -443,7 +455,7 @@
                             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                                 <div class="flex justify-between items-start mb-2">
                                     <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${badgeBg} border">
-                                        ${mov.tipo} (${mov.cantidad > 0 ? '+'+mov.cantidad : mov.cantidad})
+                                        ${escHtmlGlobal(mov.tipo)} (${mov.cantidad > 0 ? '+'+mov.cantidad : mov.cantidad})
                                     </span>
                                     <p class="font-mono text-[11px] font-bold text-slate-400">${mov.fecha}</p>
                                 </div>

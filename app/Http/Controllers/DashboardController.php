@@ -70,7 +70,7 @@ class DashboardController extends Controller
             'nombre'
         ));
 
-        // Nombres que quedan después de aplicar los selectores de establecimiento y tipo
+        // nombres que quedan despues de aplicar los selectores de establecimiento y tipo
         $establecimientosFiltro = null;
         if ($establecimiento) {
             $establecimientosFiltro = [$establecimiento];
@@ -88,7 +88,7 @@ class DashboardController extends Controller
             $invQuery->where('programa', $programa);
         }
 
-        // Stock disponible en bodega, ya filtrado
+        // stock disponible en bodega, ya filtrado
         $valorInventario = (clone $invQuery)
             ->where('estado', 'Disponible')
             ->where('cantidad', '>', 0)
@@ -112,8 +112,8 @@ class DashboardController extends Controller
                 ->all();
         }
 
-        // Movimientos del período seleccionado
-        $dispatchQuery = Dispatch::query();
+        // movimientos del periodo seleccionado los despachos internos salen de un establecimiento, no de bodega
+        $dispatchQuery = Dispatch::query()->whereNull('establecimiento_origen');
         $controlledDispatchQuery = ControlledDispatch::query();
         $receptionQuery = Reception::query();
 
@@ -155,8 +155,8 @@ class DashboardController extends Controller
         $despachosPeriodo = $dispatchQuery->count() + $controlledDispatchQuery->count();
         $recepcionesPeriodo = $receptionQuery->count();
 
-        // Totales históricos: mismos filtros pero sin límite de fecha
-        $dispatchTotalQuery = Dispatch::query();
+        // totales historicos: mismos filtros pero sin limite de fecha
+        $dispatchTotalQuery = Dispatch::query()->whereNull('establecimiento_origen');
         $controlledTotalQuery = ControlledDispatch::query();
         $receptionTotalQuery = Reception::query();
 
@@ -198,7 +198,7 @@ class DashboardController extends Controller
 
         $solicitudesFiltradas = $reqBaseQuery->orderBy('created_at', 'desc')->get();
 
-        // Los CESFAM se cuentan aparte del resto de establecimientos
+        // los cesfam se cuentan aparte del resto de establecimientos
         $solicitudesCesfam = $solicitudesFiltradas->filter(fn ($s) => in_array($s->establecimiento, $nombresCesfam));
         $solicitudesEstablecimientos = $solicitudesFiltradas->filter(fn ($s) => ! in_array($s->establecimiento, $nombresCesfam));
 
@@ -216,6 +216,7 @@ class DashboardController extends Controller
 
         $unidadesNormalesPorDest = DB::table('dispatches')
             ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id')
+            ->whereNull('dispatches.establecimiento_origen')
             ->when($fechaInicio && $fechaFin, fn ($q) => $q->whereBetween('dispatches.fecha_despacho', [$fechaInicio->toDateString(), $fechaFin->toDateString()]))
             ->when($establecimientosFiltro !== null, fn ($q) => $q->whereIn('dispatches.establecimiento_destino', $establecimientosFiltro))
             ->when($programa, fn ($q) => $q->where('dispatch_items.programa', $programa))
@@ -266,7 +267,7 @@ class DashboardController extends Controller
             ? round(($totalUnidadesEntregadasSolicitudes / $totalUnidadesSolicitadas) * 100, 1)
             : 0;
 
-        // Resumen por establecimiento para la tabla comparativa
+        // resumen por establecimiento para la tabla comparativa
         $resumenEstablecimientos = collect($catalogoEstablecimientos)
             ->filter(function ($est) use ($establecimientosFiltro) {
                 return $establecimientosFiltro === null || in_array($est['nombre'], $establecimientosFiltro);
@@ -317,14 +318,14 @@ class DashboardController extends Controller
             ->sortByDesc(fn ($r) => ($r->total_solicitudes * 1000) + $r->unidades_despachadas)
             ->values();
 
-        // Solicitudes asignadas al usuario, para que las vea apenas entra
+        // solicitudes asignadas al usuario, para que las vea apenas entra
         $misSolicitudesAsignadas = EstablishmentRequest::with(['items.product', 'assignedUser'])
             ->where('assigned_user_id', Auth::id())
             ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Alertas de vencimiento y cuarentena
+        // alertas de vencimiento y cuarentena
         $proximosVencer = (clone $invQuery)
             ->where('estado', 'Disponible')
             ->where('cantidad', '>', 0)
@@ -342,10 +343,10 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        // Últimos movimientos para el panel de actividad
+        // ultimos movimientos para el panel de actividad
         $recentMovements = collect();
 
-        // Las recepciones no aplican si se está filtrando por un destino
+        // las recepciones no aplican si se esta filtrando por un destino
         if ($establecimientosFiltro === null) {
             $recBuilder = DB::table('receptions')
                 ->join('reception_items', 'receptions.id', '=', 'reception_items.reception_id')
@@ -398,17 +399,19 @@ class DashboardController extends Controller
             'dispatch_items.lote',
             'dispatch_items.cantidad',
             'dispatches.created_at as fecha',
-            'dispatches.establecimiento_destino as destino'
+            'dispatches.establecimiento_destino as destino',
+            'dispatches.clasificacion',
+            'dispatches.establecimiento_origen'
         )->orderBy('dispatches.created_at', 'desc')->take(6)->get();
 
         foreach ($lastDispatches as $disp) {
             $recentMovements->push((object) [
-                'tipo_movimiento' => 'Despacho',
+                'tipo_movimiento' => $disp->establecimiento_origen ? 'Despacho interno' : 'Despacho',
                 'producto' => $disp->producto ?? 'S/N',
                 'lote' => $disp->lote ?? 'S/L',
                 'cantidad' => $disp->cantidad,
                 'fecha_hora' => $disp->fecha,
-                'origen_destino' => 'A: ' . ($disp->destino ?? 'Destino'),
+                'origen_destino' => ($disp->establecimiento_origen ? 'De: ' . ($disp->establecimiento_origen ?? 'Establecimiento') . ' · ' : '') . 'A: ' . ($disp->destino ?? 'Destino'),
             ]);
         }
 
@@ -433,6 +436,15 @@ class DashboardController extends Controller
             'controlled_dispatches.establecimiento_destino as destino'
         )->orderBy('controlled_dispatches.created_at', 'desc')->take(6)->get();
 
+        // los controlados solo los ve quien tiene permiso para ellos
+        $usuarioPanel = auth()->user();
+        $puedeVerControlados = $usuarioPanel && ($usuarioPanel->hasRole('Administrador') || $usuarioPanel->can('ver.despacho_controlado'));
+        $controladosLista = $puedeVerControlados ? [] : InventoryService::controlados();
+        if (! $puedeVerControlados) {
+            $lastCtrlDispatches = collect();
+            $recentMovements = $recentMovements->reject(fn ($m) => in_array($m->producto, $controladosLista, true))->values();
+        }
+
         foreach ($lastCtrlDispatches as $cdisp) {
             $recentMovements->push((object) [
                 'tipo_movimiento' => 'Despacho Controlado',
@@ -446,20 +458,22 @@ class DashboardController extends Controller
 
         $recentMovements = $recentMovements->sortByDesc('fecha_hora')->take(6)->values();
 
-        // Último lote ingresado, para el panel de etiquetas QR
+        // ultimo lote ingresado, para el panel de etiquetas qr
         $latestInventory = (clone $invQuery)->where('cantidad', '>', 0)
+            ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('producto', $controladosLista))
             ->orderByDesc('created_at')
             ->orderByDesc('id')
             ->first();
 
         if (! $latestInventory) {
             $latestInventory = Inventory::where('cantidad', '>', 0)
+                ->when(! $puedeVerControlados, fn ($q) => $q->whereNotIn('producto', $controladosLista))
                 ->orderByDesc('created_at')
                 ->orderByDesc('id')
                 ->first();
         }
 
-        // Listas para los selectores
+        // listas para los selectores
         $categoriasLista = Inventory::whereNotNull('categoria')->where('categoria', '!=', '')->distinct()->orderBy('categoria')->pluck('categoria');
         $programasLista = Inventory::whereNotNull('programa')->where('programa', '!=', '')->distinct()->orderBy('programa')->pluck('programa')
             ->unique()

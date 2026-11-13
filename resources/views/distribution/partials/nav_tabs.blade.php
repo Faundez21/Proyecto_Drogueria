@@ -9,7 +9,7 @@
 @endphp
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-    <!-- Mapa 3D Distribución -->
+    <!-- mapa 3d distribucion -->
     <a href="{{ route('distribution.index') }}"
         class="group relative flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 shadow-sm {{ $activeTab === 'distribution' ? 'bg-slate-900 border-slate-900 text-white shadow-md ring-2 ring-teal-500/30' : 'bg-white border-slate-200/80 text-slate-700 hover:border-teal-300 hover:shadow-md' }}">
         <div class="flex items-center gap-3.5 min-w-0">
@@ -26,7 +26,7 @@
         <span class="w-2 h-2 rounded-full shrink-0 {{ $activeTab === 'distribution' ? 'bg-teal-400 pulse-dot' : 'bg-slate-200 group-hover:bg-teal-400' }}"></span>
     </a>
 
-    <!-- 1. Pasillos -->
+    <!-- 1. pasillos -->
     <a href="{{ route('aisle.index') }}"
         class="group relative flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 shadow-sm {{ $activeTab === 'aisle' ? 'bg-slate-900 border-slate-900 text-white shadow-md ring-2 ring-teal-500/30' : 'bg-white border-slate-200/80 text-slate-700 hover:border-teal-300 hover:shadow-md' }}">
         <div class="flex items-center gap-3.5 min-w-0">
@@ -45,7 +45,7 @@
         </span>
     </a>
 
-    <!-- 2. Estanterías -->
+    <!-- 2. estanterias -->
     <a href="{{ route('shelf.index') }}"
         class="group relative flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 shadow-sm {{ $activeTab === 'shelf' ? 'bg-slate-900 border-slate-900 text-white shadow-md ring-2 ring-teal-500/30' : 'bg-white border-slate-200/80 text-slate-700 hover:border-teal-300 hover:shadow-md' }}">
         <div class="flex items-center gap-3.5 min-w-0">
@@ -64,7 +64,7 @@
         </span>
     </a>
 
-    <!-- 3. Niveles -->
+    <!-- 3. niveles -->
     <a href="{{ route('level.index') }}"
         class="group relative flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 shadow-sm {{ $activeTab === 'level' ? 'bg-slate-900 border-slate-900 text-white shadow-md ring-2 ring-teal-500/30' : 'bg-white border-slate-200/80 text-slate-700 hover:border-teal-300 hover:shadow-md' }}">
         <div class="flex items-center gap-3.5 min-w-0">
@@ -83,7 +83,7 @@
         </span>
     </a>
 
-    <!-- 4. Posiciones -->
+    <!-- 4. posiciones -->
     <a href="{{ route('position.index') }}"
         class="group relative flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 shadow-sm {{ $activeTab === 'position' ? 'bg-slate-900 border-slate-900 text-white shadow-md ring-2 ring-teal-500/30' : 'bg-white border-slate-200/80 text-slate-700 hover:border-teal-300 hover:shadow-md' }}">
         <div class="flex items-center gap-3.5 min-w-0">

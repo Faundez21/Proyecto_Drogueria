@@ -1,33 +1,15 @@
-/**
- * ============================================================================
- *  LoteStatus — Gestión de estados de lote con SweetAlert2 + AJAX (async/await)
- * ============================================================================
- *  Escenarios:
- *    - LoteStatus.Inventario  -> Cambio de estado / reubicación desde Inventario
- *    - LoteStatus.Cuarentena  -> Bloqueo preventivo y control técnico
- *    - LoteStatus.Merma       -> Declaración formal de merma (y salida de merma)
- *
- *  Flujo común:
- *    1) Validación local          (Swal warning)
- *    2) Confirmación previa       (await Swal.fire -> isConfirmed)
- *    3) Envío AJAX con fetch      (PUT /inventory/{id}, Accept: application/json)
- *    4) Alerta de éxito           (await Swal.fire -> comprobante del movimiento)
- *    5) Refresco de datos SOLO después de que el usuario cierre la alerta
- *
- *  Incluye diseño adaptable a Modo Claro y Modo Oscuro (html.dark).
- * ============================================================================
- */
+// lotestatus — gestion de estados de lote con sweetalert2 + ajax (async/await)
 (function (window, document) {
     'use strict';
 
-     //1. INYECCIÓN DE ESTILOS ADAPTATIVOS (LIGHT MODE + DARK MODE)
+     // 1. inyeccion de estilos adaptativos (light mode + dark mode)
     function injectStyles() {
         if (document.getElementById('lote-status-swal-styles')) return;
 
         const style = document.createElement('style');
         style.id = 'lote-status-swal-styles';
         style.textContent = `
-            /* Variables base (Modo Claro) */
+            // variables base (modo claro)
             :root {
                 --ls-popup-bg: #ffffff;
                 --ls-popup-border: #e2e8f0;
@@ -46,7 +28,7 @@
                 --ls-chip-text: #334155;
                 --ls-chip-border: #cbd5e1;
 
-                /* Variantes de color en Modo Claro */
+                // variantes de color en modo claro
                 --ls-amber-bg: #fffbeb;
                 --ls-amber-bg-soft: rgba(245, 158, 11, 0.10);
                 --ls-amber-border: #fde68a;
@@ -80,7 +62,7 @@
                 --ls-teal-badge-text: #0f766e;
             }
 
-            /* Variables para Modo Oscuro (html.dark) */
+            // variables para modo oscuro (html.dark)
             html.dark {
                 --ls-popup-bg: #1e293b;
                 --ls-popup-border: #334155;
@@ -99,7 +81,7 @@
                 --ls-chip-text: #e2e8f0;
                 --ls-chip-border: #3b4f6e;
 
-                /* Variantes de color en Modo Oscuro */
+                // variantes de color en modo oscuro
                 --ls-amber-bg: rgba(245, 158, 11, 0.12);
                 --ls-amber-bg-soft: rgba(245, 158, 11, 0.18);
                 --ls-amber-border: rgba(245, 158, 11, 0.38);
@@ -133,7 +115,7 @@
                 --ls-teal-badge-text: #5eead4;
             }
 
-            /* Contenedor general del Popup SweetAlert2 */
+            // contenedor general del popup sweetalert2
             .swal2-popup.ls-swal-popup {
                 background: var(--ls-popup-bg) !important;
                 color: var(--ls-text) !important;
@@ -144,7 +126,7 @@
                 font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif !important;
             }
 
-            /* Solución al parche blanco del icono success de SweetAlert2 en Dark Mode */
+            // solucion al parche blanco del icono success de sweetalert2 en dark mode
             .swal2-popup.ls-swal-popup .swal2-success-circular-line-left,
             .swal2-popup.ls-swal-popup .swal2-success-circular-line-right,
             .swal2-popup.ls-swal-popup .swal2-success-fix {
@@ -212,7 +194,7 @@
                 box-shadow: none !important;
             }
 
-            /* Paletas temáticas aplicadas por clase (.ls-theme-amber | rose | emerald | teal) */
+            // paletas tematicas aplicadas por clase (.ls-theme-amber | rose | emerald | teal)
             .ls-theme-amber {
                 --t-bg: var(--ls-amber-bg);
                 --t-bg-soft: var(--ls-amber-bg-soft);
@@ -250,7 +232,7 @@
                 --t-badge-text: var(--ls-teal-badge-text);
             }
 
-            /* --- Estructura del Comprobante de Éxito --- */
+            // estructura del comprobante de exito
             .ls-receipt {
                 text-align: left;
                 color: var(--ls-text);
@@ -351,7 +333,7 @@
                 font-weight: 800;
             }
 
-            /* Ficha / Tabla del lote actualizado */
+            // ficha / tabla del lote actualizado
             .ls-section-label {
                 font-size: 0.68rem;
                 font-weight: 800;
@@ -425,7 +407,7 @@
                 border: 1px solid var(--ls-chip-border);
             }
 
-            /* Badges de Estado (Disponible, Cuarentena, Merma) */
+            // badges de estado (disponible, cuarentena, merma)
             .ls-status-badge {
                 display: inline-flex;
                 align-items: center;
@@ -477,7 +459,7 @@
                 border: 1px solid var(--ls-chip-border);
             }
 
-            /* Caja de Motivo / Justificación */
+            // caja de motivo / justificacion
             .ls-reason-box {
                 background: var(--ls-card-bg);
                 border: 1px solid var(--ls-card-border);
@@ -500,7 +482,7 @@
                 margin: 0.1rem 0 0;
             }
 
-            /* --- Estilos para Modales de Confirmación Previa --- */
+            // estilos para modales de confirmacion previa
             .ls-confirm-wrap {
                 text-align: left;
                 display: flex;
@@ -553,7 +535,7 @@
     } else {
         injectStyles();
     }
-     //  CORE: utilidades compartidas
+     // core: utilidades compartidas
 
     const COLORS = {
         cancel: '#64748b',
@@ -584,7 +566,7 @@
         );
     }
 
-    /** Lee el contexto del modal de edición de lote (compartido por Inventario y Cuarentena). */
+    // lee el contexto del modal de edicion de lote (compartido por inventario y cuarentena)
     function leerContexto(form) {
         return {
             form,
@@ -625,7 +607,7 @@
         return a.pasillo !== b.pasillo || a.estante !== b.estante || a.nivel !== b.nivel || a.posicion !== b.posicion;
     }
 
-    /** Valida que exista motivo cuando corresponde. Devuelve true si es válido. */
+    // valida que exista motivo cuando corresponde. devuelve true si es valido
     async function validarMotivo(ctx, requerido, mensaje) {
         if (!requerido || ctx.motivo) return true;
         injectStyles();
@@ -642,7 +624,7 @@
         return false;
     }
 
-    /** Paso 2: confirmación previa. Devuelve true si el usuario confirma. */
+    // paso 2: confirmacion previa. devuelve true si el usuario confirma
     async function confirmar({ title, html, icon = 'question', confirmText = 'Sí, confirmar', color = COLORS.teal }) {
         injectStyles();
         const { isConfirmed } = await Swal.fire({
@@ -678,7 +660,7 @@
         });
     }
 
-    /** Paso 3: envío AJAX del formulario (PUT simulado con _method). */
+    // paso 3: envio ajax del formulario (put simulado con _method)
     async function enviar(form) {
         const response = await fetch(form.action, {
             method: 'POST',
@@ -733,7 +715,7 @@
         });
     }
 
-     // Comprobante de éxito (compatible con Light Mode y Dark Mode)
+     // comprobante de exito (compatible con light mode y dark mode)
 
     const THEMES = {
         a_merma:                  { title: '¡Merma Declarada con Éxito!',            badge: 'MERMA DEFINITIVA',         op: 'Declaración de Merma (Baja de Stock)',  theme: 'ls-theme-rose',    c: COLORS.rose },
@@ -780,7 +762,7 @@
 
         return `
             <div class="ls-receipt ${t.theme}">
-                <!-- Banner del comprobante -->
+                <!-- banner del comprobante -->
                 <div class="ls-banner">
                     <div class="ls-banner-header">
                         <div class="ls-folio-wrap">
@@ -812,7 +794,7 @@
                     </div>
                 ` : ''}
 
-                <!-- Tabla Resumen del Lote -->
+                <!-- tabla resumen del lote -->
                 <div class="ls-section-label">Resumen del Lote Actualizado</div>
                 <div class="ls-table-wrap">
                     <table class="ls-table">
@@ -852,7 +834,7 @@
             </div>`;
     }
 
-    /** Paso 4: alerta de éxito. Se espera (await) a que el usuario la cierre. */
+    // paso 4: alerta de exito. se espera (await) a que el usuario la cierre
     async function mostrarExito(payload) {
         injectStyles();
         const t =
@@ -874,9 +856,7 @@
         });
     }
 
-    /**
-     * Orquestador común a los tres escenarios.
-     */
+    // orquestador comun a los tres escenarios
     async function procesar({ form, confirm, onSuccess, refresh = true }) {
         if (enProceso) return false;
 
@@ -889,7 +869,7 @@
         try {
             const { data } = await enviar(form);
 
-            // Cerrar modales del sistema ANTES de mostrar el éxito
+            // cerrar modales del sistema antes de mostrar el exito
             if (typeof window.closeEditLote === 'function') window.closeEditLote();
             if (typeof window.closeMerma === 'function') window.closeMerma();
 
@@ -907,7 +887,7 @@
         }
     }
 
-    //  ESCENARIO 3: MERMA
+    // escenario 3: merma
     const Merma = {
         aplica(ctx) {
             return ctx.estado === 'Merma' || ctx.estadoInicial === 'Merma';
@@ -959,7 +939,7 @@
                 };
             }
 
-            // Envío formal a merma
+            // envio formal a merma
             const desdeCuarentena = ctx.estadoInicial === 'Cuarentena';
             return {
                 title: desdeCuarentena ? '¿Declarar Merma desde Cuarentena?' : '¿Declarar Merma de Lote?',
@@ -992,7 +972,7 @@
         },
     };
 
-     // ESCENARIO 2: CUARENTENA (bloqueo preventivo y control técnico)
+     // escenario 2: cuarentena (bloqueo preventivo y control tecnico)
 
     const Cuarentena = {
         confirmConfig(ctx) {
@@ -1080,7 +1060,7 @@
         },
     };
 
-     // ESCENARIO 1: INVENTARIO (cambio de estado / reubicación)
+     // escenario 1: inventario (cambio de estado / reubicacion)
     const Inventario = {
         confirmConfig(ctx) {
             const prod = esc(ctx.producto);
@@ -1139,7 +1119,7 @@
         },
     };
 
-    // GESTIÓN JERÁRQUICA DE UBICACIONES FÍSICAS Y DETECCIÓN DE POSICIONES/NIVELES EN USO
+    // gestion jerarquica de ubicaciones fisicas y deteccion de posiciones/niveles en uso
     const Ubicacion = {
         normStr(v) {
             const s = String(v ?? '').trim();
@@ -1169,11 +1149,7 @@
             if (!key) return null;
             return this.getJerarquia().find((e) => this.normKey(e.estante) === key) || null;
         },
-        /**
-         * Devuelve todos los ocupantes activos en un estante (y opcionalmente nivel / posición),
-         * excluyendo el lote que se está editando (`ignoreLoteId`) o el mismo producto+lote,
-         * e incluyendo otras filas activas en un formulario multi-fila (ej. Recepción).
-         */
+        // devuelve todos los ocupantes activos en un estante (y opcionalmente nivel / posicion), excluyendo el lote que se esta editando (`ignoreloteid`) o el
         obtenerOcupantesEnEstante(estanteNombre, opts = {}) {
             const estKey = this.normKey(estanteNombre);
             if (!estKey) return [];
@@ -1206,7 +1182,7 @@
                 });
             }
 
-            // Verificar también otras filas del formulario de Recepción si aplica
+            // verificar tambien otras filas del formulario de recepcion si aplica
             if (opts.rowElement) {
                 const todasFilas = document.querySelectorAll('#productos_container .producto-item');
                 todasFilas.forEach((fila, idx) => {
@@ -1250,14 +1226,13 @@
             const posKey = this.normKey(this.normPos(posicion));
             if (!estante || !nivKey) return null;
 
-            // Un nivel sin posición es un espacio compartido: lo limita la capacidad del estante, no un lote.
+            // un nivel sin posicion es un espacio compartido: lo limita la capacidad del estante, no un lote
             if (!posKey) return null;
 
             const ocupantesEst = this.obtenerOcupantesEnEstante(estante, opts);
             for (const oc of ocupantesEst) {
                 if (this.normKey(oc.nivel) !== nivKey) continue;
-                // Solo ocupa la posición el lote que está guardado en ESA posición
-                // (un lote sin posición ya no bloquea todas las posiciones del nivel)
+                // solo ocupa la posicion el lote que esta guardado en esa posicion (un lote sin posicion ya no bloquea todas las posiciones del nivel)
                 if (this.normKey(oc.posicion) === posKey) return oc;
             }
             return null;
@@ -1273,7 +1248,7 @@
             const listaPos = Array.isArray(posicionesNivel) ? posicionesNivel.map((p) => this.normPos(p)).filter(Boolean) : [];
 
             if (listaPos.length === 0) {
-                // Nivel sin posiciones definidas: espacio compartido, varios lotes pueden quedar aquí
+                // nivel sin posiciones definidas: espacio compartido, varios lotes pueden quedar aqui
                 return {
                     nivel: nivStr,
                     totalPosiciones: 1,
@@ -1286,7 +1261,7 @@
                 };
             }
 
-            // Cada posición la ocupa solo el lote guardado en ella
+            // cada posicion la ocupa solo el lote guardado en ella
             let ocupadasCount = 0;
             const detallePosiciones = listaPos.map((pos) => {
                 const posKey = this.normKey(pos);
@@ -1303,8 +1278,7 @@
                 totalPosiciones,
                 ocupadasCount,
                 disponiblesCount,
-                // El nivel no se bloquea entero: se puede dejar el lote en el nivel sin posición
-                // (espacio compartido) y las posiciones en uso aparecen bloqueadas una por una
+                // el nivel no se bloquea entero: se puede usar sin posicion y las posiciones en uso se bloquean una por una
                 completamenteOcupado: false,
                 sinPosicionesLibres: disponiblesCount === 0 && totalPosiciones > 0,
                 ocupantes: ocupantesEst,
@@ -1348,7 +1322,7 @@
 
             const disponiblesCount = Math.max(0, totalSlots - ocupadosCount);
 
-            // Capacidad del estante en unidades (0 = sin límite)
+            // capacidad del estante en unidades (0 = sin limite)
             const capacidad = parseInt(infoEstante.capacidad, 10) || 0;
             const unidades = ocupantes.reduce((a, o) => a + (parseInt(o.cantidad, 10) || 0), 0);
             const sinCapacidad = capacidad > 0 && unidades >= capacidad;
@@ -1362,7 +1336,7 @@
                 unidades,
                 sinCapacidad,
                 sinPosiciones,
-                // El estante solo se bloquea por capacidad; las posiciones en uso se bloquean una por una
+                // el estante solo se bloquea por capacidad; las posiciones en uso se bloquean una por una
                 completamenteOcupado: sinCapacidad,
                 nivelesEval,
                 ocupantes,
@@ -1405,10 +1379,7 @@
             });
         },
 
-        /**
-         * Actualiza los <option> de Pasillo, Estante, Nivel y Posición manteniendo relación jerárquica estricta
-         * y deshabilitando cualquier posición o nivel que ya esté ocupado en bodega.
-         */
+        // actualiza los <option> de pasillo, estante, nivel y posicion manteniendo relacion jerarquica estricta y deshabilitando cualquier posicion o nivel que
         sincronizarSelectores(cfg, trigger = 'init', silentAlert = true) {
             const {
                 selectPasillo,
@@ -1426,7 +1397,7 @@
             const opts = { ignoreLoteId, rowElement, producto, lote };
             const jerarquia = this.getJerarquia();
 
-            // 1. Si cambió el Estante, auto-asignar su Pasillo correspondiente
+            // 1. si cambio el estante, auto-asignar su pasillo correspondiente
             let estanteVal = this.normStr(selectEstante?.value);
             let infoEstante = this.buscarEstanteInfo(estanteVal);
 
@@ -1437,10 +1408,9 @@
             const pasilloVal = this.normStr(selectPasillo?.value);
             const pasilloKey = this.normKey(pasilloVal);
 
-            // 2. Poblar Estantes filtrados por Pasillo
+            // 2. poblar estantes filtrados por pasillo
             if (selectEstante) {
-                // Al abrir el modal el <select> aún no tiene opciones, así que su valor viene vacío:
-                // se usa la ubicación actual del lote para no perderla.
+                // al abrir el modal el <select> aun no tiene opciones, asi que su valor viene vacio: se usa la ubicacion actual del lote para no perderla
                 const estanteInicial = initialUbicacion ? this.normStr(initialUbicacion.estante) : '';
                 const prevEstante = estanteVal || (trigger === 'init' ? estanteInicial : '');
                 selectEstante.innerHTML = '<option value="">Seleccione Estante...</option>';
@@ -1475,8 +1445,7 @@
                     selectEstante.appendChild(opt);
                 });
 
-                // Si el estante actual del lote no aparece en la lista del pasillo, se agrega igual
-                // para que guardar sin tocar la ubicación nunca la borre.
+                // si el estante actual del lote no aparece en la lista del pasillo, se agrega igual para que guardar sin tocar la ubicacion nunca la borre
                 const estanteEnLista = estantesCandidatos.some((item) => this.normKey(item.estante) === this.normKey(prevEstante));
                 if (trigger === 'init' && prevEstante && prevEstante.toUpperCase() !== 'P.A' && !estanteEnLista) {
                     const optActual = document.createElement('option');
@@ -1490,7 +1459,7 @@
                 infoEstante = this.buscarEstanteInfo(estanteVal);
             }
 
-            // 3. Poblar Niveles exclusivos del Estante seleccionado
+            // 3. poblar niveles exclusivos del estante seleccionado
             if (selectNivel) {
                 const prevNivel = this.normNivel(selectNivel.value) || (trigger === 'init' && initialUbicacion ? this.normNivel(initialUbicacion.nivel) : '');
                 selectNivel.innerHTML = '<option value="">Seleccione Nivel...</option>';
@@ -1550,7 +1519,7 @@
                 }
             }
 
-            // 4. Poblar Posiciones exclusivas del (Estante + Nivel) seleccionado, deshabilitando las ocupadas
+            // 4. poblar posiciones exclusivas del (estante + nivel) seleccionado, deshabilitando las ocupadas
             const nivelVal = this.normNivel(selectNivel?.value);
             if (selectPosicion) {
                 const prevPos = this.normPos(selectPosicion.value) || (trigger === 'init' && initialUbicacion ? this.normPos(initialUbicacion.posicion) : '');
@@ -1588,7 +1557,7 @@
                 });
             }
 
-            // 5. Alertas SweetAlert2 cuando el usuario selecciona un Estante o Nivel con ubicaciones ocupadas
+            // 5. alertas sweetalert2 cuando el usuario selecciona un estante o nivel con ubicaciones ocupadas
             if (!silentAlert) {
                 if (trigger === 'estante' && infoEstante) {
                     const evEst = this.evaluarEstante(infoEstante, opts);
@@ -1631,7 +1600,7 @@
                 }
             }
 
-            // 6. Actualizar indicador visual de estado de ubicación debajo de los desplegables
+            // 6. actualizar indicador visual de estado de ubicacion debajo de los desplegables
             this.actualizarIndicadorVisual(cfg);
         },
 
@@ -1726,7 +1695,7 @@
         },
     };
 
-   // API pública
+   // api publica
     window.LoteStatus = {
         Inventario,
         Cuarentena,

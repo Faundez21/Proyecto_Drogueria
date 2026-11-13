@@ -4,13 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Una guía de despacho de estupefacientes y psicotrópicos.
- *
- * Va separada de Dispatch porque estos productos tienen control legal propio:
- * su correlativo es GDC-AAAA-XXXX, solo pueden despacharse a un CESFAM y
- * permiten registrar las series de las recetas cheque.
- */
+// una guia de despacho de estupefacientes y psicotropicos
 class ControlledDispatch extends Model
 {
     protected $fillable = [
