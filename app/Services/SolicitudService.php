@@ -10,10 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class SolicitudService
 {
-    /**
-     * Registra las cantidades despachadas de una solicitud y recalcula su estado.
-     * Lo usan tanto el despacho normal como el despacho controlado.
-     */
+    // registra las cantidades despachadas de una solicitud y recalcula su estado. lo usan tanto el despacho normal como el despacho controlado
     public static function registrarDespacho(int $solicitudId, array $productos, array $cantidades): void
     {
         $solicitud = EstablishmentRequest::with('items.product')->find($solicitudId);
@@ -29,28 +26,27 @@ class SolicitudService
             $entregadoPorProducto[$clave] = ($entregadoPorProducto[$clave] ?? 0) + (int) ($cantidades[$i] ?? 0);
         }
 
+        // si un producto aparece en varias lineas, lo entregado se reparte en orden hasta agotarlo
         foreach ($solicitud->items as $item) {
-            $nombreItem = $item->product->nombre ?? '';
-            $aporte = $entregadoPorProducto[mb_strtolower(trim($nombreItem))] ?? 0;
+            $clave = mb_strtolower(trim($item->product->nombre ?? ''));
+            $aporte = $entregadoPorProducto[$clave] ?? 0;
 
             if ($aporte <= 0) {
                 continue;
             }
 
-            $nuevoDespachado = min($item->cantidad_solicitada, $item->cantidad_despachada + $aporte);
-            $item->update(['cantidad_despachada' => $nuevoDespachado]);
+            $pendiente = max(0, (int) $item->cantidad_solicitada - (int) $item->cantidad_despachada);
+            $usar = min($pendiente, $aporte);
+            if ($usar > 0) {
+                $item->update(['cantidad_despachada' => (int) $item->cantidad_despachada + $usar]);
+                $entregadoPorProducto[$clave] = $aporte - $usar;
+            }
         }
 
         self::actualizarEstado($solicitud->id);
     }
 
-    /**
-     * Revisa que un despacho vinculado a una solicitud no entregue más unidades
-     * de las que aún faltan por despachar en ella. Suma las filas del mismo producto
-     * (un producto puede venir repartido en varios lotes).
-     * Devuelve el mensaje de error, o null si todo cuadra.
-     * Los productos que no están en la solicitud no se revisan aquí.
-     */
+    // revisa que un despacho vinculado a una solicitud no entregue mas unidades de las que aun faltan por despachar en ella
     public static function excesoSobrePendiente(EstablishmentRequest $solicitud, array $productos, array $cantidades): ?string
     {
         $solicitud->loadMissing('items.product');
@@ -63,16 +59,22 @@ class SolicitudService
             $nombres[$clave] = trim($nombre);
         }
 
-        $excesos = [];
+        // pendiente total por producto (un producto puede venir en varias lineas)
+        $pendientePorProducto = [];
         foreach ($solicitud->items as $item) {
             $clave = mb_strtolower(trim($item->product->nombre ?? ''));
-            if (! isset($aDespachar[$clave])) {
+            $pendientePorProducto[$clave] = ($pendientePorProducto[$clave] ?? 0)
+                + max(0, (int) $item->cantidad_solicitada - (int) $item->cantidad_despachada);
+        }
+
+        $excesos = [];
+        foreach ($aDespachar as $clave => $cantidad) {
+            if (! array_key_exists($clave, $pendientePorProducto)) {
+                $excesos[] = "«{$nombres[$clave]}» no está en la solicitud";
                 continue;
             }
-
-            $pendiente = max(0, (int) $item->cantidad_solicitada - (int) $item->cantidad_despachada);
-            if ($aDespachar[$clave] > $pendiente) {
-                $excesos[] = "«{$nombres[$clave]}»: faltan {$pendiente} y se intentan despachar {$aDespachar[$clave]}";
+            if ($cantidad > $pendientePorProducto[$clave]) {
+                $excesos[] = "«{$nombres[$clave]}»: faltan {$pendientePorProducto[$clave]} y se intentan despachar {$cantidad}";
             }
         }
 
@@ -82,18 +84,10 @@ class SolicitudService
 
         $numero = $solicitud->numero_solicitud ?: ('N° ' . $solicitud->id);
 
-        return "No puede despachar más de lo que falta en la solicitud {$numero}. " . implode('; ', $excesos) . '.';
+        return "El despacho no calza con la solicitud {$numero}: " . implode('; ', $excesos) . '.';
     }
 
-    /**
-     * El estado se recalcula sobre TODOS los items de la solicitud,
-     * sin importar desde qué módulo de despacho se cubrieron.
-     * Estados posibles:
-     * - 'Pendiente': sin despachos y sin trabajador asignado
-     * - 'Asignada': sin despachos pero con trabajador asignado para despacharla
-     * - 'Parcial': algunos productos/unidades despachados pero faltan otros
-     * - 'Despachado': todos los productos solicitados fueron despachados
-     */
+    // el estado se recalcula sobre todos los items de la solicitud, sin importar desde que modulo de despacho se cubrieron
     public static function actualizarEstado(int $solicitudId): string
     {
         $solicitud = EstablishmentRequest::with('items')->find($solicitudId);
@@ -131,11 +125,7 @@ class SolicitudService
         return $estado;
     }
 
-    /**
-     * Calcula el mapa de consumo mensual anterior y último stock declarado por establecimiento y producto.
-     * Combina los despachos reales (normales y controlados) realizados hacia el establecimiento
-     * en el mes anterior / últimos 30 días, y como respaldo las cantidades despachadas en solicitudes previas.
-     */
+    // calcula el mapa de consumo mensual anterior y ultimo stock declarado por establecimiento y producto
     public static function mapaConsumoYStock(array $nombresEstablecimientos = []): array
     {
         $inicioMesAnterior = Carbon::now()->subMonthNoOverflow()->startOfMonth()->toDateString();
@@ -148,7 +138,7 @@ class SolicitudService
 
         $mapa = [];
 
-        // 1. Despachos normales hacia los establecimientos (mes calendario anterior o últimos 30 días)
+        // 1. despachos normales hacia los establecimientos (mes calendario anterior o ultimos 30 dias)
         $despachosNormales = DB::table('dispatches')
             ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id')
             ->when(! empty($nombresEstablecimientos), fn ($q) => $q->whereIn('dispatches.establecimiento_destino', $nombresEstablecimientos))
@@ -161,7 +151,7 @@ class SolicitudService
             )
             ->get();
 
-        // 2. Despachos controlados hacia los establecimientos
+        // 2. despachos controlados hacia los establecimientos
         $despachosControlados = DB::table('controlled_dispatches')
             ->join('controlled_dispatch_items', 'controlled_dispatches.id', '=', 'controlled_dispatch_items.controlled_dispatch_id')
             ->when(! empty($nombresEstablecimientos), fn ($q) => $q->whereIn('controlled_dispatches.establecimiento_destino', $nombresEstablecimientos))
@@ -203,7 +193,7 @@ class SolicitudService
             $mapa[$est][$prodId]['consumo_historico_reciente'] += $cant;
         }
 
-        // 3. Historial de solicitudes previas (para obtener último stock declarado y respaldo de consumo)
+        // 3. historial de solicitudes previas (para obtener ultimo stock declarado y respaldo de consumo)
         $itemsPrevios = EstablishmentItem::with('request')
             ->whereHas('request', function ($q) use ($nombresEstablecimientos) {
                 if (! empty($nombresEstablecimientos)) {
@@ -230,6 +220,11 @@ class SolicitudService
                 ];
             }
 
+            // consumo mensual informado en la solicitud mas reciente
+            if (! array_key_exists('ultimo_consumo_declarado', $mapa[$est][$prodId]) && $item->consumo_anterior !== null) {
+                $mapa[$est][$prodId]['ultimo_consumo_declarado'] = (int) $item->consumo_anterior;
+            }
+
             if ($mapa[$est][$prodId]['ultimo_stock_declarado'] === null && $item->stock_actual !== null) {
                 $mapa[$est][$prodId]['ultimo_stock_declarado'] = (int) $item->stock_actual;
             }
@@ -240,7 +235,7 @@ class SolicitudService
             }
         }
 
-        // Consolidar valor final de consumo_anterior por (establecimiento, product_id)
+        // consolidar valor final de consumo_anterior por (establecimiento, product_id)
         $resultado = [];
         foreach ($mapa as $est => $productos) {
             foreach ($productos as $prodId => $datos) {
@@ -253,6 +248,7 @@ class SolicitudService
                 $resultado[$est][$prodId] = [
                     'consumo_anterior' => (int) $consumo,
                     'ultimo_stock' => $datos['ultimo_stock_declarado'],
+                    'ultimo_consumo' => $datos['ultimo_consumo_declarado'] ?? null,
                 ];
             }
         }
@@ -260,9 +256,28 @@ class SolicitudService
         return $resultado;
     }
 
-    /**
-     * Calcula el consumo mensual anterior para un establecimiento y producto específico.
-     */
+    // ultimo consumo mensual informado por establecimiento y nombre de producto
+    public static function consumoDeclaradoPorNombre(): array
+    {
+        $resultado = [];
+        $items = EstablishmentItem::with(['request:id,establecimiento', 'product:id,nombre'])
+            ->whereNotNull('consumo_anterior')
+            ->orderByDesc('id')
+            ->get();
+
+        foreach ($items as $item) {
+            $est = trim((string) ($item->request->establecimiento ?? ''));
+            $nombre = trim(preg_replace('/\s+/', ' ', (string) ($item->product->nombre ?? '')));
+            if ($est === '' || $nombre === '' || isset($resultado[$est][$nombre])) {
+                continue;
+            }
+            $resultado[$est][$nombre] = (int) $item->consumo_anterior;
+        }
+
+        return $resultado;
+    }
+
+    // calcula el consumo mensual anterior para un establecimiento y producto especifico
     public static function calcularConsumoAnterior(string $establecimiento, int $productId): int
     {
         $mapa = self::mapaConsumoYStock([$establecimiento]);
@@ -270,10 +285,7 @@ class SolicitudService
         return (int) ($mapa[trim($establecimiento)][$productId]['consumo_anterior'] ?? 0);
     }
 
-    /**
-     * Separa los items de una solicitud según el módulo de despacho
-     * que corresponde a cada producto (controlados -> despacho controlado).
-     */
+    // separa los items de una solicitud segun el modulo de despacho que corresponde a cada producto (controlados -> despacho controlado)
     public static function separarItems($solicitud): array
     {
         $normales = [];

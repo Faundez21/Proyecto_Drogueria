@@ -9,7 +9,7 @@ class Product extends Model
 {
     use HasFactory;
 
-    // Permitimos que el seeder pueda llenar el nombre
+    // permitimos que el seeder pueda llenar el nombre
     protected $fillable = [
         'nombre',
     ];

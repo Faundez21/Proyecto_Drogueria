@@ -15,15 +15,15 @@
             <span class="bg-amber-500 text-white text-[11px] px-1.5 py-0.5 rounded-full font-extrabold">{{ count($passwordRequests) }}</span>
         </button>
     @endif
-    @if (request('ver') === 'roles')
-    <button type="button" onclick="openRoleForm(null)"
-        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
+    <button type="button" onclick="openRoles()"
+        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 shadow-2xs transition-all duration-200 cursor-pointer">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+            </path>
         </svg>
-        Nuevo Rol
+        Roles y Accesos
     </button>
-    @else
     <button type="button" onclick="openCreate()"
         class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +31,6 @@
         </svg>
         Nuevo Usuario
     </button>
-    @endif
 @endsection
 
 @section('content')
@@ -51,7 +50,7 @@
         }
     @endphp
 
-    <!-- Migas de pan -->
+    <!-- migas de pan -->
     <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
         <span class="text-slate-400 font-semibold">04</span>
         <span>Configuración</span>
@@ -61,22 +60,7 @@
         <span class="font-semibold text-slate-800">Usuarios y Permisos</span>
     </div>
 
-    @php $vistaRoles = request('ver') === 'roles'; @endphp
-    <!-- pestanas usuarios y roles -->
-    <nav class="mb-6 flex w-full sm:w-auto sm:inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200" aria-label="Usuarios y roles">
-        <a href="{{ route('users.index') }}" @unless ($vistaRoles) aria-current="page" @endunless
-            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-bold transition {{ $vistaRoles ? 'text-slate-600 hover:text-slate-900 hover:bg-white/60' : 'bg-white text-slate-900 shadow-sm' }}">
-            Usuarios
-            <span class="px-1.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 text-slate-600">{{ $totalUsuarios }}</span>
-        </a>
-        <a href="{{ route('users.index', ['ver' => 'roles']) }}" @if ($vistaRoles) aria-current="page" @endif
-            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-bold transition {{ $vistaRoles ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60' }}">
-            Roles
-            <span class="px-1.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 text-slate-600">{{ $roles->count() }}</span>
-        </a>
-    </nav>
-
-    <!-- Alertas de sesión -->
+    <!-- alertas de sesion -->
     @if (session('success'))
         <div class="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-xl shadow-xs flex items-center justify-between gap-3">
             <div class="flex items-center gap-3">
@@ -95,7 +79,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <div>
-                    <p class="text-[13px] font-extrabold text-rose-900">Revisa los datos ingresados:</p>
+                    <p class="text-[13px] font-extrabold text-rose-900">Revise los datos ingresados:</p>
                     <ul class="mt-1 list-disc list-inside text-[12px] text-rose-700 font-medium">
                         @foreach ($errors->all() as $err)
                             <li>{{ $err }}</li>
@@ -106,8 +90,8 @@
         </div>
     @endif
 
-    <!-- Tarjetas KPI de Resumen -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 {{ $vistaRoles ? 'hidden' : '' }}">
+    <!-- tarjetas kpi de resumen -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex items-center justify-between">
             <div>
                 <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Funcionarios</p>
@@ -166,10 +150,10 @@
         </div>
     </div>
 
-    <!-- Directorio y Filtros de Usuarios -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden {{ $vistaRoles ? 'hidden' : '' }}">
+    <!-- directorio y filtros de usuarios -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
 
-        <!-- Cabecera con buscador y filtros en vivo -->
+        <!-- cabecera con buscador y filtros en vivo -->
         <div class="p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
@@ -179,7 +163,7 @@
                             {{ $totalUsuarios }} usuario(s)
                         </span>
                     </div>
-                    <p class="text-[12px] text-slate-500 mt-0.5">Filtra y gestiona los funcionarios según su rol asignado o estado de cuenta.</p>
+                    <p class="text-[12px] text-slate-500 mt-0.5">Filtre y gestione los funcionarios según su rol asignado o estado de cuenta.</p>
                 </div>
             </div>
 
@@ -334,7 +318,7 @@
                                 </div>
                             </td>
 
-                            <!-- Solicitudes asignadas -->
+                            <!-- solicitudes asignadas -->
                             <td class="px-6 py-4 text-center">
                                 <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
                                     @if (($user->solicitudes_activas_count ?? 0) > 0)
@@ -388,7 +372,7 @@
 
                                     @if ($user->id === auth()->id())
                                         <button class="p-1.5 text-slate-300 bg-slate-50 border border-slate-200 cursor-not-allowed rounded-lg"
-                                            title="No puedes deshabilitar tu propia cuenta" disabled>
+                                            title="No puede deshabilitar su propia cuenta" disabled>
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
@@ -442,21 +426,13 @@
         </div>
     </div>
 
-    <!-- Modal Roles y Accesos -->
+    <!-- modal roles y accesos -->
     <div id="RolesModal"
-        class="{{ $vistaRoles ? 'roles-en-pagina' : 'hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all' }}">
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
-            class="bg-white rounded-2xl border border-slate-200 w-full flex flex-col overflow-hidden {{ $vistaRoles ? 'shadow-xs' : 'shadow-2xl max-w-4xl max-h-[92vh] my-auto' }}">
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
 
-            @if ($vistaRoles)
-            <!-- cabecera de la pestana roles -->
-            <div class="p-4 sm:p-5 border-b border-slate-200 bg-white">
-                <h2 class="text-[15px] font-bold text-slate-800">Roles</h2>
-                <p class="text-[12.5px] text-slate-500 mt-0.5">Cada rol define qué vistas puede usar un usuario. Crea primero el rol y luego asígnalo al crear el usuario.</p>
-            </div>
-
-            @else
-            <!-- Cabecera del Modal -->
+            <!-- cabecera del modal -->
             <div class="px-6 py-5 bg-slate-900 text-white flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-3.5">
                     <div class="w-11 h-11 bg-indigo-500/20 border border-indigo-400/30 rounded-xl flex items-center justify-center text-indigo-300 shadow-sm shrink-0">
@@ -473,7 +449,7 @@
                                 {{ $roles->count() }} Roles · {{ count($modulos) }} Vistas
                             </span>
                         </div>
-                        <p class="text-[12px] text-slate-300 mt-0.5">Configura qué módulos y vistas (incluyendo Solicitudes Establecimientos y Solicitudes CESFAM) puede visualizar cada rol.</p>
+                        <p class="text-[12px] text-slate-300 mt-0.5">Configure qué módulos y vistas (incluyendo Solicitudes Establecimientos y Solicitudes CESFAM) puede visualizar cada rol.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeRoles()"
@@ -485,11 +461,10 @@
                 </button>
             </div>
 
-            @endif
-            <!-- Cuerpo scrolleable -->
-            <div class="p-6 space-y-6 flex-1 bg-slate-50/50 {{ $vistaRoles ? '' : 'overflow-y-auto' }}">
+            <!-- cuerpo scrolleable -->
+            <div class="p-6 overflow-y-auto space-y-6 flex-1 bg-slate-50/50">
 
-                <!-- Listado de roles -->
+                <!-- listado de roles -->
                 <div>
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest">Roles Configurados en el Sistema</h3>
@@ -583,12 +558,12 @@
                     </div>
                 </div>
 
-                <!-- Formulario de rol (crear/editar) -->
+                <!-- formulario de rol (crear/editar) -->
                 <div id="roleFormBox" class="hidden bg-white border-2 border-indigo-200 rounded-2xl p-5 shadow-md">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-100">
                         <div>
                             <h3 id="roleFormTitle" class="text-[15px] font-extrabold text-slate-800">Nuevo Rol</h3>
-                            <p class="text-[11.5px] text-slate-500">Marca las vistas a las que tendrán acceso los usuarios con este rol.</p>
+                            <p class="text-[11.5px] text-slate-500">Marque las vistas a las que tendrán acceso los usuarios con este rol.</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <span id="roleCountBadge" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 text-[11px] font-extrabold transition-colors">
@@ -673,7 +648,7 @@
                     </form>
                 </div>
 
-                <!-- Botón para crear rol nuevo -->
+                <!-- boton para crear rol nuevo -->
                 <button type="button" id="btnNewRole" onclick="openRoleForm(null)"
                     class="w-full py-3.5 border-2 border-dashed border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50/40 text-indigo-600 font-bold text-[13px] rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-2 bg-white">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -683,7 +658,7 @@
                 </button>
             </div>
 
-            <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end shrink-0 {{ $vistaRoles ? 'hidden' : '' }}">
+            <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end shrink-0">
                 <button type="button" onclick="closeRoles()"
                     class="px-6 py-2.5 text-[13px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors cursor-pointer">
                     Cerrar
@@ -692,7 +667,7 @@
         </div>
     </div>
 
-    <!-- Modal Solicitudes de Recuperación -->
+    <!-- modal solicitudes de recuperacion -->
     <div id="RecoveryModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -757,7 +732,7 @@
         </div>
     </div>
 
-    <!-- Modal crear / editar usuario -->
+    <!-- modal crear / editar usuario -->
     <div id="UserModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
@@ -771,7 +746,7 @@
                     </div>
                     <div>
                         <h1 id="userModalTitle" class="text-lg font-extrabold text-white">Crear Nuevo Usuario</h1>
-                        <p class="text-xs text-slate-300 mt-0.5">Completa los datos del funcionario y asigna su rol de acceso.</p>
+                        <p class="text-xs text-slate-300 mt-0.5">Complete los datos del funcionario y asigne su rol de acceso.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeUserModal()"
@@ -812,7 +787,7 @@
                         </label>
                         <input type="email" id="email" name="email" required
                             pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-                            oninvalid="this.setCustomValidity(this.value === '' ? 'Completa este campo' : 'Ingresa un correo válido con su dominio (ej. usuario@ejemplo.com)')"
+                            oninvalid="this.setCustomValidity(this.value === '' ? 'Complete este campo' : 'Ingrese un correo válido con su dominio (ej. usuario@ejemplo.com)')"
                             oninput="this.setCustomValidity('')" placeholder="ejemplo@drogueriadas.cl"
                             class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-[13px] font-medium">
                     </div>
@@ -843,21 +818,19 @@
                         </label>
                         <select id="role" name="role" required onchange="actualizarPreviewRolModal(this.value)"
                             class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-[13px] font-bold text-slate-800 cursor-pointer">
-                            {{-- sin rol preseleccionado --}}
-                            <option value="" disabled selected>Elige un rol...</option>
                             @foreach ($roles as $rol)
                                 @php
                                     $cantVistas = $rol->name === 'Administrador' ? count($modulos) : $rol->permissions->count();
                                     $sinVistas = $rol->name !== 'Administrador' && $cantVistas === 0;
                                 @endphp
-                                <option value="{{ $rol->name }}" class="{{ $sinVistas ? 'text-rose-600' : '' }}" {{ $sinVistas ? 'data-sin-vistas="true" disabled' : '' }}>
+                                <option value="{{ $rol->name }}" class="{{ $sinVistas ? 'text-rose-600' : '' }}" {{ $sinVistas ? 'data-sin-vistas="true"' : '' }}>
                                     {{ $rol->name }} —
                                     @if ($rol->name === 'Administrador')
                                         Acceso total ({{ count($modulos) }} vistas)
                                     @elseif ($cantVistas > 0)
                                         {{ $cantVistas }} vista(s) habilitada(s)
                                     @else
-                                        sin vistas — asígnalas en la pestaña «Roles»
+                                        ⚠️ Sin vistas asignadas (No asignable)
                                     @endif
                                 </option>
                             @endforeach
@@ -899,11 +872,6 @@
             if (!container) return;
             container.innerHTML = '';
 
-            if (!roleName) {
-                container.innerHTML = '<span class="text-[11.5px] text-slate-500">Elige un rol para ver a qué vistas tendrá acceso.</span>';
-                return;
-            }
-
             const vistas = MAPA_ROLES_VISTAS[roleName] || [];
             if (roleName !== 'Administrador' && vistas.length === 0) {
                 container.innerHTML = `
@@ -911,7 +879,7 @@
                         <svg class="w-4 h-4 shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
-                        <span class="text-[11.5px] font-bold">Este rol no tiene vistas asignadas. Debes asignarle al menos 1 vista antes de poder asignarlo a un usuario.</span>
+                        <span class="text-[11.5px] font-bold">Este rol no tiene vistas asignadas. Debe asignarle al menos 1 vista antes de poder asignarlo a un usuario.</span>
                     </div>
                 `;
                 return;
@@ -976,19 +944,11 @@
             document.getElementById('RecoveryModal').classList.add('hidden');
         }
 
-        // los roles viven en su pestana (?ver=roles)
-        const VISTA_ROLES = @json($vistaRoles);
-
         function openRoles() {
-            if (!VISTA_ROLES) {
-                window.location.href = @json(route('users.index', ['ver' => 'roles']));
-                return;
-            }
-            document.getElementById('RolesModal').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('RolesModal').classList.remove('hidden');
         }
 
         function closeRoles() {
-            if (VISTA_ROLES) return;
             document.getElementById('RolesModal').classList.add('hidden');
         }
 
@@ -1076,7 +1036,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Nombre obligatorio',
-                    text: 'Debes ingresar un nombre para el rol.',
+                    text: 'Debe ingresar un nombre para el rol.',
                     confirmButtonColor: '#4f46e5'
                 });
                 if (nameInput) nameInput.focus();
@@ -1089,7 +1049,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Vista obligatoria',
-                    text: 'Debes asignar al menos 1 vista a este rol para que los usuarios puedan utilizarlo.',
+                    text: 'Debe asignar al menos 1 vista a este rol para que los usuarios puedan utilizarlo.',
                     confirmButtonColor: '#4f46e5'
                 });
                 return false;
@@ -1122,7 +1082,7 @@
         function confirmDeleteRole(roleId, roleName) {
             Swal.fire({
                 title: '¿Eliminar Rol?',
-                html: `¿Estás seguro de que deseas eliminar el rol <strong>${roleName}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción no se puede deshacer.</span>`,
+                html: `¿Está seguro de que desea eliminar el rol <strong>${roleName}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción no se puede deshacer.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e11d48',
@@ -1198,7 +1158,7 @@
             event.preventDefault();
             Swal.fire({
                 title: '¿Eliminar Usuario?',
-                html: `¿Estás seguro de que deseas eliminar al usuario <strong>${nombre}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción no se puede deshacer.</span>`,
+                html: `¿Está seguro de que desea eliminar al usuario <strong>${nombre}</strong>?<br><span class="text-[12px] text-slate-500 mt-1 block">Esta acción no se puede deshacer.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e11d48',
@@ -1222,7 +1182,7 @@
             Swal.fire({
                 title: 'Asignar Nueva Contraseña',
                 html: `
-            <p class="text-[13px] text-slate-600 mb-4">Ingresa la nueva clave para <strong>${email}</strong>:</p>
+            <p class="text-[13px] text-slate-600 mb-4">Ingrese la nueva clave para <strong>${email}</strong>:</p>
             <div class="relative w-full max-w-xs mx-auto">
                 <input type="password" id="swal_password_input" minlength="8" maxlength="64" class="swal2-input !m-0 !w-full !pr-10 text-[13px]" placeholder="Entre 8 y 64 caracteres" style="box-sizing: border-box;">
                 <button type="button" id="toggle_swal_password" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors">
@@ -1264,7 +1224,7 @@
                 preConfirm: () => {
                     const value = document.getElementById('swal_password_input').value;
                     if (!value) {
-                        Swal.showValidationMessage('¡Debes ingresar una contraseña!');
+                        Swal.showValidationMessage('¡Debe ingresar una contraseña!');
                         return false;
                     }
                     if (value.length < 8 || value.length > 64) {
@@ -1289,7 +1249,7 @@
 
             if (nameInput && !nameInput.value.trim()) {
                 event.preventDefault();
-                nameInput.setCustomValidity('Completa este campo');
+                nameInput.setCustomValidity('Complete este campo');
                 nameInput.reportValidity();
                 nameInput.focus();
                 return false;
@@ -1298,7 +1258,7 @@
 
             if (lastNameInput && !lastNameInput.value.trim()) {
                 event.preventDefault();
-                lastNameInput.setCustomValidity('Completa este campo');
+                lastNameInput.setCustomValidity('Complete este campo');
                 lastNameInput.reportValidity();
                 lastNameInput.focus();
                 return false;
@@ -1311,7 +1271,7 @@
 
             if (emailInput && !emailRegex.test(emailValue)) {
                 event.preventDefault();
-                emailInput.setCustomValidity('Ingresa un correo válido con su dominio (ej. usuario@ejemplo.com o .cl)');
+                emailInput.setCustomValidity('Ingrese un correo válido con su dominio (ej. usuario@ejemplo.com o .cl)');
                 emailInput.reportValidity();
                 emailInput.focus();
                 return false;
@@ -1343,7 +1303,7 @@
                 passwordInput.setCustomValidity('');
             }
 
-            // Validar que el rol tenga al menos 1 vista asignada
+            // validar que el rol tenga al menos 1 vista asignada
             const roleSelect = document.getElementById('role');
             const selectedRole = roleSelect ? roleSelect.value : '';
 
@@ -1352,7 +1312,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Rol obligatorio',
-                    text: 'Debes seleccionar un rol para el usuario.',
+                    text: 'Debe seleccionar un rol para el usuario.',
                     confirmButtonColor: '#0f968c'
                 });
                 return false;
@@ -1365,7 +1325,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Rol sin vistas asignadas',
-                        text: `El rol "${selectedRole}" no tiene ninguna vista asignada. Asigna al menos 1 vista al rol en la pestaña "Roles" antes de asignarlo a un usuario.`,
+                        text: `El rol "${selectedRole}" no tiene ninguna vista asignada. Asigne al menos 1 vista al rol en "Roles y Accesos" antes de asignarlo a un usuario.`,
                         confirmButtonColor: '#0f968c'
                     });
                     return false;
@@ -1398,7 +1358,7 @@
             return false;
         }
 
-        // Compatibilidad por si se llama con el nombre anterior
+        // compatibilidad por si se llama con el nombre anterior
         const validateUserEmail = validateUserModal;
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1424,7 +1384,7 @@
 
             Swal.fire({
                 title: `¿${isActivo ? 'Desactivar' : 'Activar'} usuario?`,
-                html: `¿Estás seguro de que deseas ${actionText} a <strong>${userName}</strong>?`,
+                html: `¿Está seguro de que desea ${actionText} a <strong>${userName}</strong>?`,
                 icon: isActivo ? 'warning' : 'question',
                 showCancelButton: true,
                 confirmButtonColor: confirmButtonColor,

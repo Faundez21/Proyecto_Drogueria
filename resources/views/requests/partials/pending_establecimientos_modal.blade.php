@@ -1,11 +1,11 @@
-{{-- Modal: Solicitudes Pendientes para Establecimientos (Solo Administrador) --}}
+{{-- modal: solicitudes pendientes para establecimientos (solo administrador) --}}
 @role('Administrador')
     <div id="PendingRequestsEstablecimientosModal"
         class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 transition-all"
         onclick="if(event.target === this) closePendingRequestsEstablecimientosModal()">
         <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-7xl max-h-[94vh] flex flex-col overflow-hidden my-auto animate-fade-in text-slate-800 dark:text-slate-100">
 
-            <!-- Cabecera del Modal -->
+            <!-- cabecera del modal -->
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-teal-400 shrink-0">
@@ -52,7 +52,7 @@
                             class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-[13px] text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all shadow-sm">
                     </div>
 
-                    <!-- Controles: Filtros Avanzados y Menú Exportar Listado -->
+                    <!-- controles: filtros avanzados y menu exportar listado -->
                     <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
                         <button type="button" onclick="togglePendingEstabAdvancedFilters()" id="btnToggleEstabAdvanced"
                             class="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-700 rounded-lg text-[12.5px] font-semibold text-slate-700 dark:text-slate-200 transition-all cursor-pointer shadow-sm">
@@ -105,7 +105,7 @@
                 <div id="pendingEstabAdvancedPanel" class="hidden pt-3 border-t border-slate-200 dark:border-slate-800 animate-fade-in">
                     <div class="p-3.5 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-700/60 shadow-xs">
                         <div class="flex flex-col md:flex-row items-end gap-3 w-full">
-                            <!-- Filtro Establecimiento -->
+                            <!-- filtro establecimiento -->
                             <div class="flex-1 w-full md:w-auto min-w-0 md:min-w-[260px]">
                                 <label for="pendingEstabFilterCentro" class="block text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1.5 uppercase tracking-wider">
                                     Establecimiento Solicitante
@@ -292,7 +292,7 @@
                                             </span>
                                         </td>
 
-                                        <!-- Acciones individuales: ver, descargar, imprimir -->
+                                        <!-- acciones individuales: ver, descargar, imprimir -->
                                         <td class="py-3 px-3 text-center whitespace-nowrap">
                                             <div class="inline-flex items-center gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
                                                 <button type="button" onclick="viewSingleEstabPdf({{ $sol->id }})"
@@ -325,7 +325,7 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Fila Desplegable con Detalle de Productos -->
+                                    <!-- fila desplegable con detalle de productos -->
                                     <tr id="estab-detail-{{ $sol->id }}" class="hidden bg-slate-50/60 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800">
                                         <td colspan="9" class="p-3 sm:p-4">
                                             <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 sm:p-4 shadow-inner">
@@ -401,7 +401,7 @@
                 </div>
             </div>
 
-            <!-- Pie del Modal -->
+            <!-- pie del modal -->
             <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/90 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center shrink-0">
                 <span class="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium">
                     Red de Salud DAS Talcahuano · Solicitudes de Pedido Oficiales
@@ -414,7 +414,7 @@
         </div>
     </div>
 
-    <!-- iframe oculto para imprimir el PDF sin salir de la vista -->
+    <!-- iframe oculto para imprimir el pdf sin salir de la vista -->
     <iframe id="pendingEstabPrintIframe" class="hidden" style="display:none; width:0; height:0; border:0;"></iframe>
 
     <script>
@@ -609,7 +609,7 @@
             return qs ? ('?' + qs) : '';
         }
 
-        // Acciones Individuales
+        // acciones individuales
         function viewSingleEstabPdf(solicitudId) {
             const url = "{{ route('requests.pending.establecimientos.pdf') }}?solicitud_id=" + solicitudId;
             window.open(url, '_blank');
@@ -638,7 +638,7 @@
             }
         }
 
-        // Acciones Globales Batch
+        // acciones globales batch
         function viewPendingEstabPdf() {
             const url = "{{ route('requests.pending.establecimientos.pdf') }}" + buildPendingEstabQueryString();
             window.open(url, '_blank');

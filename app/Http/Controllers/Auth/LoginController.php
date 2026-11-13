@@ -23,7 +23,7 @@ class LoginController extends Controller
 
     public function authenticate(Request $request)
     {
-        // Validar inputs del formulario de login
+        // validar inputs del formulario de login
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string', 'min:8', 'max:64'],
@@ -34,7 +34,7 @@ class LoginController extends Controller
 
         $remember = $request->boolean('remember');
 
-        // Intentar autenticar credenciales
+        // intentar autenticar credenciales
         if (Auth::attempt($credentials, $remember)) {
             $user = Auth::user();
 
@@ -53,7 +53,7 @@ class LoginController extends Controller
             return $this->redirectAuthenticatedUser($user);
         }
 
-        //  Si falla el login
+        // si falla el login
         return back()->withErrors([
             'email' => 'El correo o la contraseña son incorrectos.',
         ])->onlyInput('email');
@@ -61,67 +61,67 @@ class LoginController extends Controller
 
     protected function redirectAuthenticatedUser($user)
     {
-        // Administrador o permiso de Dashboard
+        // administrador o permiso de dashboard
         if ($user->hasRole('Administrador') || $user->can('ver.dashboard')) {
             return redirect()->route('dashboard.index');
         }
 
-        // Inventario / Bodega
+        // inventario / bodega
         if ($user->can('ver.inventario')) {
             return redirect()->route('inventory.index');
         }
 
-        // Recepción
+        // recepcion
         if ($user->can('ver.recepcion') || $user->can('ver.reception')) {
             return redirect()->route('reception.index');
         }
 
-        // Cuarentena
+        // cuarentena
         if ($user->can('ver.cuarentena') || $user->can('ver.quarantine')) {
             return redirect()->route('quarantine.index');
         }
 
-        // Despacho Normal
+        // despacho normal
         if ($user->can('ver.despacho')) {
             return redirect()->route('dispatch.index');
         }
 
-        // Despacho Controlado
+        // despacho controlado
         if ($user->can('ver.despacho_controlado') || $user->can('ver.controlled_dispatch')) {
             return redirect()->route('controlled_dispatch.index');
         }
 
-        // Distribución
+        // distribucion
         if ($user->can('ver.distribucion') || $user->can('ver.distribution')) {
             return redirect()->route('distribution.index');
         }
 
-        // Solicitudes Establecimientos
+        // solicitudes establecimientos
         if ($user->can('ver.solicitudes') || $user->can('ver.requests')) {
             return redirect()->route('requests.index');
         }
 
-        // Solicitudes CESFAM
+        // solicitudes cesfam
         if ($user->can('ver.solicitudes_cesfam')) {
             return redirect()->route('requests.cesfam');
         }
 
-        // Proveedores
+        // proveedores
         if ($user->can('ver.proveedores') || $user->can('ver.providers')) {
             return redirect()->route('providers.index');
         }
 
-        // Trazabilidad
+        // trazabilidad
         if ($user->can('ver.trazabilidad')) {
             return redirect()->route('traceability.index');
         }
 
-        // Reportes
+        // reportes
         if ($user->can('ver.reportes')) {
             return redirect()->route('reports.index');
         }
 
-        // Si el usuario no tiene ninguna vista asignada, cerramos la sesión para evitar el bucle infinito
+        // si el usuario no tiene ninguna vista asignada, cerramos la sesion para evitar el bucle infinito
         Auth::logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();

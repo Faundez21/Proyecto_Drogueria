@@ -11,12 +11,12 @@ return new class extends Migration
         Schema::create('providers', function (Blueprint $table) {
             $table->id();
             $table->string('rut')->unique();
-            $table->string('name'); // Razón Social
-            $table->string('business_line')->nullable(); // Giro Comercial
+            $table->string('name'); // razon social
+            $table->string('business_line')->nullable(); // giro comercial
             $table->string('category');
             $table->string('email');
             $table->string('phone')->nullable();
-            $table->string('address')->nullable(); // Dirección
+            $table->string('address')->nullable(); // direccion
             $table->enum('status', ['activo', 'inactivo'])->default('activo');
             $table->timestamps();
         });

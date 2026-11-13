@@ -10,7 +10,7 @@
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
             </path>
         </svg>
-        Historial de despachos
+        Bandeja de Despachos e Historial
     </button>
 @endsection
 
@@ -46,6 +46,65 @@
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <p class="text-sm font-bold text-emerald-800">{{ session('success') }}</p>
+        </div>
+    @endif
+
+    <!-- solicitudes asignadas al usuario logueado -->
+    @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
+        <div class="mb-6 bg-gradient-to-r from-teal-50 via-white to-indigo-50 border border-teal-200 rounded-2xl p-4 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3 class="text-[13.5px] font-extrabold text-slate-800">
+                            Tiene {{ count($misSolicitudesAsignadas) }} solicitud(es) asignada(s) para despachar
+                        </h3>
+                        <p class="text-[11.5px] text-slate-500">
+                            Haga clic en "Cargar" para preparar el despacho automáticamente o revise el detalle en "Ver Solicitudes".
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="openSolicitudes('mias')"
+                    class="px-3.5 py-2 rounded-xl text-[12px] font-bold bg-white hover:bg-teal-50 text-teal-700 border border-teal-200 shadow-sm transition-colors cursor-pointer shrink-0">
+                    Ver mis asignadas
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                @foreach ($misSolicitudesAsignadas as $miSol)
+                    @php
+                        $esCesfamMiSol = \App\Services\InventoryService::esCesfam($miSol->establecimiento);
+                    @endphp
+                    <div class="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-mono font-extrabold text-[12px] text-slate-800">{{ $miSol->numero_solicitud }}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $esCesfamMiSol ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700' }}">
+                                    {{ $esCesfamMiSol ? 'CESFAM' : 'Establecimiento' }}
+                                </span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-indigo-100 text-indigo-700">
+                                    {{ $miSol->estado }}
+                                </span>
+                            </div>
+                            <p class="text-[12.5px] font-bold text-slate-800 truncate mt-0.5" title="{{ $miSol->establecimiento }}">
+                                {{ $miSol->establecimiento }}
+                            </p>
+                            <p class="text-[11px] text-slate-500">
+                                {{ $miSol->items->count() }} producto(s) · {{ \Carbon\Carbon::parse($miSol->fecha_solicitud)->format('d/m/Y') }}
+                            </p>
+                        </div>
+                        <button type="button" onclick="usarSolicitud({{ $miSol->id }})"
+                            class="px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-sm transition-colors cursor-pointer shrink-0">
+                            Cargar
+                        </button>
+                    </div>
+                @endforeach
+            </div>
         </div>
     @endif
 
@@ -89,33 +148,30 @@
         </div>
     </div>
 
-    <!-- paso 1: solicitudes por despachar -->
-    @include('dispatch.partials.solicitudes-por-despachar', [
-        'solicitudesPanel' => $solicitudes,
-        'controlados' => false,
-        'fnUsar' => 'usarSolicitud',
-        'fnVerTodas' => 'openSolicitudes()',
-        'permitirSinSolicitud' => true,
-        'idFormulario' => 'formulario-despacho',
-    ])
-
-    <!-- paso 2: formulario de despacho -->
-    <div id="formulario-despacho" class="scroll-mt-24 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col transition-shadow">
+    <!-- formulario principal de despacho -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
 
         <!-- cabecera de la tarjeta del formulario -->
-        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row sm:items-center gap-4">
-            <span class="w-8 h-8 rounded-full bg-teal-600 text-white text-[14px] font-bold flex items-center justify-center shrink-0">2</span>
-            <div class="flex-1 min-w-0">
-                <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Completa y confirma el despacho</h2>
-                <p class="text-[12px] text-slate-500 mt-0.5">Revisa destino, productos y cantidades; luego firman quien despacha y quien recibe.</p>
+        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex items-center gap-4">
+            <div class="w-10 h-10 bg-[#0f968c]/10 text-[#0f968c] rounded-xl flex items-center justify-center shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Registro de Despacho</h2>
+                <p class="text-[12px] text-slate-500 mt-0.5">Complete los datos del documento, cliente, productos a
+                    despachar y firmas.</p>
             </div>
             <button type="button" onclick="openSolicitudes()"
-                class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4"></path>
                 </svg>
-                Elegir otra solicitud
+                Ver Solicitudes
                 @if ($totalActivas > 0)
                     <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold bg-white/20 text-white">
                         {{ $totalActivas }}
@@ -123,7 +179,7 @@
                 @endif
                 @if ($totalMias > 0)
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
-                        {{ $totalMias }} asignada(s) a ti
+                        {{ $totalMias }} asignada(s) a usted
                     </span>
                 @endif
             </button>
@@ -133,7 +189,7 @@
             @csrf
             <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
 
-            <!-- Banner informativo cuando se carga una solicitud -->
+            <!-- banner informativo cuando se carga una solicitud -->
             <div id="banner_solicitud_activa" class="hidden mx-6 mt-5 p-4 bg-teal-50 border border-teal-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
@@ -193,8 +249,8 @@
                         <select name="clasificacion" id="clasificacion_select" onchange="toggleClasificacion()" required
                             class="w-full max-w-full truncate bg-slate-50 border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                             <option value="" disabled selected>Seleccione la clasificación...</option>
-                            <option value="Interno">Interno (Nivel Comunal / CESFAM)</option>
-                            <option value="Externo">Externo (Préstamos, Donaciones, Devoluciones, etc.)</option>
+                            <option value="Externo">Externo (Nivel Comunal / CESFAM)</option>
+                            <option value="Interno">Interno (Préstamos, Donaciones, Devoluciones, etc.)</option>
                         </select>
                     </div>
 
@@ -217,7 +273,7 @@
 
                     <!-- div dinamico para destino interno -->
                     <div id="div_interno" class="md:col-span-2 hidden min-w-0">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Interno)
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Externo)
                             <span class="text-rose-500">*</span></label>
                         <select id="establecimiento_interno" onchange="actualizarDireccionInterna()"
                             class="w-full max-w-full truncate bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
@@ -245,8 +301,18 @@
                     </div>
 
                     <!-- div dinamico para destino externo -->
-                    <div id="div_externo" class="md:col-span-2 hidden min-w-0">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo y Destino Externo <span
+                    <div id="div_externo" class="md:col-span-2 hidden min-w-0 space-y-3">
+                        <div>
+                            <label for="establecimiento_origen" class="block text-[12px] font-bold text-slate-700 mb-1.5">Sale del stock de <span class="text-rose-500">*</span></label>
+                            <select id="establecimiento_origen" onchange="aplicarOrigenProductos()" class="w-full max-w-full truncate bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                                <option value="" disabled selected>Seleccione el establecimiento de origen...</option>
+                                @foreach (\App\Services\InventoryService::establecimientos() as $estOrigen)
+                                    @php $conStock = count($stockEstablecimientos[$estOrigen['nombre']] ?? []); @endphp
+                                    <option value="{{ $estOrigen['nombre'] }}">{{ $estOrigen['nombre'] }}{{ $conStock ? " ({$conStock} productos con stock)" : ' (sin stock registrado)' }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo y Destino Interno <span
                                 class="text-rose-500">*</span></label>
                         <div class="flex flex-col sm:flex-row gap-3">
                             <select id="tipo_externo"
@@ -259,11 +325,17 @@
                                 <option value="Merma">Merma / Destrucción</option>
                                 <option value="Otro">Otro</option>
                             </select>
-                            <input type="text" id="establecimiento_externo"
+                            <input type="text" id="establecimiento_externo" list="destinos_red"
                                 placeholder="Nombre institución/destino..."
                                 class="w-full sm:w-3/5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
                         </div>
                     </div>
+
+                    <datalist id="destinos_red">
+                        @foreach (\App\Services\InventoryService::establecimientos() as $estRed)
+                            <option value="{{ $estRed['nombre'] }}">
+                        @endforeach
+                    </datalist>
 
                     <div class="md:col-span-2">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Dirección Destino</label>
@@ -280,11 +352,11 @@
                             class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
                     </div>
 
-                    <!-- traspaso interno: despacho a la red sin solicitud previa -->
+                    <!-- traspaso sin solicitud: despacho externo a la red sin solicitud previa -->
                     <div id="div_motivo_traspaso" class="md:col-span-4 hidden">
                         <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl">
-                            <label for="motivo_traspaso" class="block text-[12px] font-bold text-amber-900 mb-1">Motivo del traspaso interno <span class="text-rose-500">*</span></label>
-                            <p class="text-[11.5px] text-amber-800 mb-2">Este despacho no viene de una solicitud. Indica el motivo. Si quien recibe no está presente, puede firmar después desde «Historial de despachos» y la guía quedará como «Pendiente de recepción».</p>
+                            <label for="motivo_traspaso" class="block text-[12px] font-bold text-amber-900 mb-1">Motivo del traspaso sin solicitud <span class="text-rose-500">*</span></label>
+                            <p class="text-[11.5px] text-amber-800 mb-2">Este despacho no viene de una solicitud. Indique el motivo. Si quien recibe no está presente, puede firmar después desde la bandeja de despachos y la guía quedará como «Pendiente de recepción».</p>
                             <input type="text" name="motivo_traspaso" id="motivo_traspaso" maxlength="500"
                                 placeholder="Ej: Reposición urgente por quiebre de stock."
                                 class="w-full bg-white border border-amber-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
@@ -301,7 +373,7 @@
                             2. Detalle de Extracción (Lotes en Stock)
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200 lowercase">criterio fefo</span>
                         </h3>
-                        <p class="text-[11.5px] text-slate-500 mt-0.5">Selecciona el producto o escanea el QR del lote para rebajar stock de bodega central.</p>
+                        <p class="text-[11.5px] text-slate-500 mt-0.5">Seleccione el producto o escanee el QR del lote para rebajar stock de bodega central.</p>
                     </div>
 
                     <div class="flex items-center gap-2.5">
@@ -328,15 +400,16 @@
                 </div>
 
                 <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-xs bg-white">
-                    <table class="w-full min-w-[780px] table-fixed text-left text-[13px] whitespace-nowrap" id="productsTable">
+                    <table class="w-full min-w-[860px] table-fixed text-left text-[13px] whitespace-nowrap" id="productsTable">
                         <thead
                             class="bg-slate-100/80 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10.5px]">
                             <tr>
-                                <th class="px-4 py-3.5 w-[36%]">Producto en Stock</th>
-                                <th class="px-4 py-3.5 w-[14%]">Lote</th>
-                                <th class="px-4 py-3.5 w-[15%]">Vencimiento (FEFO)</th>
-                                <th class="px-4 py-3.5 w-[15%]">Programa</th>
-                                <th class="px-4 py-3.5 w-[15%] text-center">Cantidad a Despachar</th>
+                                <th class="px-4 py-3.5 w-[30%]">Producto en Stock</th>
+                                <th class="px-4 py-3.5 w-[12%]">Lote</th>
+                                <th class="px-4 py-3.5 w-[14%]">Vencimiento (FEFO)</th>
+                                <th class="px-4 py-3.5 w-[14%]">Programa</th>
+                                <th class="px-4 py-3.5 w-[11%] text-center whitespace-normal leading-tight">Consumo mensual</th>
+                                <th class="px-4 py-3.5 w-[14%] text-center">Cantidad a Despachar</th>
                                 <th class="px-3 py-3.5 w-[5%] text-center"></th>
                             </tr>
                         </thead>
@@ -385,7 +458,7 @@
                         <button type="button" onclick="signatureRecibe.clear()"
                             class="mt-2 text-[11px] font-bold text-slate-400 hover:text-rose-500 transition-colors">Limpiar
                             Firma de Recepción</button>
-                        <p id="nota_firma_recibe_traspaso" class="hidden mt-1 text-[11px] text-amber-700 font-semibold text-center">Opcional en un traspaso interno: si no firma ahora, la guía queda «Pendiente de recepción».</p>
+                        <p id="nota_firma_recibe_traspaso" class="hidden mt-1 text-[11px] text-amber-700 font-semibold text-center">Opcional en un traspaso sin solicitud: si no firma ahora, la guía queda «Pendiente de recepción».</p>
                     </div>
                 </div>
             </div>
@@ -449,15 +522,17 @@
             <td data-label="Programa" class="col-programa px-3 py-2.5 border-r border-slate-100 align-middle max-w-0">
                 <select name="programas[]" required
                     class="w-full max-w-full truncate bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
-                    {{-- general es el valor por defecto cuando el lote no tiene programa --}}
-                    <option value="General" selected>General (sin programa)</option>
+                    <option value="" selected>Seleccione programa...</option>
                     @foreach ($programasLista ?? [] as $idxProg => $progOpt)
                         @php $progLimpio = trim(preg_replace('/\s+/', ' ', $progOpt ?? '')); @endphp
-                        @if($progLimpio !== '' && mb_strtolower($progLimpio) !== 'general')
+                        @if($progLimpio !== '')
                             <option value="{{ $progLimpio }}">{{ $progLimpio }}</option>
                         @endif
                     @endforeach
                 </select>
+            </td>
+            <td data-label="Consumo mensual" class="col-consumo px-3 py-2.5 border-r border-slate-100 align-middle text-center">
+                <span class="consumo-mensual-despacho text-[13px] font-bold text-slate-400">—</span>
             </td>
             <td data-label="Cantidad" class="col-cantidad px-3 py-2.5 border-r border-slate-100 align-middle">
                 <div class="space-y-1">
@@ -698,7 +773,7 @@
                                         @if ($esMia)
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
-                                                Asignada a ti
+                                                Asignada a usted
                                             </span>
                                         @elseif ($solicitud->assignedUser)
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
@@ -897,7 +972,7 @@
             <!-- cabecera de modal historico -->
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-bold text-white tracking-wide">Historial de despachos</h2>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Bandeja Histórica de Despachos</h2>
                     <p class="text-[12px] text-slate-300 mt-1 uppercase tracking-wider font-semibold">Trazabilidad de guías
                         emitidas y stock rebajado</p>
                 </div>
@@ -1038,20 +1113,23 @@
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-600">
                                     <!-- badge de clasificacion -->
-                                    @if (strtolower($despacho->clasificacion) == 'interno')
+                                    @if (strtolower($despacho->clasificacion) == 'externo')
                                         <span
-                                            class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Interno</span>
+                                            class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Externo</span>
                                         @if ($despacho->esTraspasoInterno())
                                             <span
                                                 class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-1 rounded text-[10px] uppercase">Traspaso</span>
                                         @endif
                                     @else
                                         <span
-                                            class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Externo' }}</span>
+                                            class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Interno' }}</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-800">
                                     {{ $despacho->establecimiento_destino }}
+                                    @if ($despacho->establecimiento_origen)
+                                        <p class="text-[11px] font-medium text-slate-500 mt-0.5 whitespace-normal">Desde: {{ $despacho->establecimiento_origen }}</p>
+                                    @endif
                                     @if ($despacho->esTraspasoInterno())
                                         <p class="text-[11px] font-medium text-slate-500 mt-0.5 whitespace-normal">Motivo: {{ $despacho->motivo_traspaso }}</p>
                                     @endif
@@ -1189,7 +1267,7 @@
         </div>
     </div>
 
-    <!-- modal del escaner QR -->
+    <!-- modal del escaner qr -->
     <div id="scannerModal" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
         <div class="flex min-h-full items-center justify-center">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
@@ -1265,7 +1343,7 @@
     <!-- librerias externas -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-    <!-- avisos con SweetAlert2 -->
+    <!-- avisos con sweetalert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -1278,10 +1356,10 @@
         const esControladoJS = (nombre) => listaControlados.some(c => c.toLowerCase() === String(nombre ?? '').trim()
             .toLowerCase());
 
-        // Normaliza nombres (sin mayúsculas, tildes ni símbolos) para comparar productos
+        // normaliza nombres (sin mayusculas, tildes ni simbolos) para comparar productos
         const normTextDespacho = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
 
-        // Unidades que faltan por despachar de la solicitud cargada, por producto (clave = nombre normalizado)
+        // unidades que faltan por despachar de la solicitud cargada, por producto (clave = nombre normalizado)
         let pendientesSolicitudActiva = {};
 
         function obtenerNombreCompletoOpcionDespacho(opt) {
@@ -1301,7 +1379,7 @@
             if (padDespachaElem) signatureDespacha = new SignaturePad(padDespachaElem, padOptions);
             if (padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
 
-            // asignacion de firmas a los inputs ocultos antes del submit con confirmación SweetAlert2 y AJAX
+            // asignacion de firmas a los inputs ocultos antes del submit con confirmacion sweetalert2 y ajax
             const form = document.getElementById('despachoForm');
             let despachoSubmitAction = 'save_only';
 
@@ -1323,6 +1401,8 @@
             }
 
             function showDispatchSuccessModal(dispData) {
+                // los textos escritos a mano se muestran como texto
+                const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
                 const htmlDetail = `
                     <div class="das-swal-container text-left text-xs text-slate-700">
                         <div class="das-swal-summary p-3.5 bg-slate-50 border border-slate-200 rounded-xl mb-3.5 space-y-1.5">
@@ -1330,9 +1410,9 @@
                                 <span class="das-swal-summary-title font-bold text-slate-900 text-sm">Guía N° ${dispData.correlativo}</span>
                                 <span class="das-swal-badge-ok px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">DESPACHO CONFORME</span>
                             </div>
-                            <p class="das-swal-meta"><strong>Destino:</strong> ${dispData.destino}</p>
-                            <p class="das-swal-meta"><strong>Clasificación:</strong> ${dispData.clasificacion}${dispData.es_traspaso ? ' (traspaso interno)' : ''}</p>
-                            ${dispData.pendiente_recepcion ? '<p class="das-swal-meta font-semibold text-amber-700">Pendiente de recepción: quien recibe debe firmar desde «Historial de despachos».</p>' : ''}
+                            <p class="das-swal-meta"><strong>Destino:</strong> ${esc(dispData.destino)}${dispData.origen ? ' (sale del stock de ' + esc(dispData.origen) + ')' : ''}</p>
+                            <p class="das-swal-meta"><strong>Clasificación:</strong> ${dispData.clasificacion}${dispData.es_traspaso ? ' (traspaso sin solicitud)' : ''}</p>
+                            ${dispData.pendiente_recepcion ? '<p class="das-swal-meta font-semibold text-amber-700">Pendiente de recepción: quien recibe debe firmar desde la bandeja de despachos.</p>' : ''}
                             <p class="das-swal-meta"><strong>Fecha de Emisión:</strong> ${dispData.fecha}</p>
                             <p class="das-swal-meta"><strong>Total Unidades Despachadas:</strong> ${Number(dispData.total_unidades || 0).toLocaleString('es-CL')} uds. (${dispData.total_items} producto${dispData.total_items === 1 ? '' : 's'})</p>
                         </div>
@@ -1350,8 +1430,8 @@
                                 <tbody class="divide-y divide-slate-100 bg-white">
                                     ${(dispData.items || []).map(it => `
                                         <tr class="hover:bg-slate-50">
-                                            <td class="p-2.5 font-medium text-slate-800">${it.producto}</td>
-                                            <td class="p-2.5 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote}</td>
+                                            <td class="p-2.5 font-medium text-slate-800">${esc(it.producto)}</td>
+                                            <td class="p-2.5 text-center font-mono text-[11px] font-semibold text-slate-700">${esc(it.lote)}</td>
                                             <td class="p-2.5 text-center text-slate-600">${it.vencimiento}</td>
                                             <td class="p-2.5 text-right font-bold text-emerald-700 das-swal-qty">${Number(it.cantidad).toLocaleString('es-CL')} u.</td>
                                         </tr>
@@ -1380,7 +1460,7 @@
                                             Esta solicitud aún tiene <strong>${dispData.cant_controlados_pendientes} fármaco(s) controlado(s)</strong> pendiente(s) por despachar en el módulo de Despacho Controlado.
                                         </p>
                                         <p class="das-swal-mixed-cta text-amber-900 font-semibold text-[11.5px] mt-1.5">
-                                            ¿Deseas emitir el Despacho Controlado ahora mismo?
+                                            ¿Desea emitir el Despacho Controlado ahora mismo?
                                         </p>
                                     </div>
                                 </div>
@@ -1439,7 +1519,7 @@
                         return;
                     }
 
-                    // no despachar más de lo que falta en la solicitud vinculada (sumando todos los lotes)
+                    // no despachar mas de lo que falta en la solicitud vinculada (sumando todos los lotes)
                     const solicitudVinculadaId = document.getElementById('establishment_request_id')?.value;
                     if (solicitudVinculadaId && Object.keys(pendientesSolicitudActiva).length > 0) {
                         const sumaPorProducto = {};
@@ -1459,26 +1539,30 @@
                         if (excesos.length > 0) {
                             Swal.fire({
                                 icon: 'warning',
-                                title: 'Te pasas de lo solicitado',
-                                html: `<div style="font-size:13px;text-align:left;">No puedes despachar más de lo que falta en la solicitud. Ajusta las cantidades:<ul style="margin:8px 0 0 18px;list-style:disc;">${excesos.join('')}</ul></div>`,
+                                title: 'Excede lo solicitado',
+                                html: `<div style="font-size:13px;text-align:left;">No puede despachar más de lo que falta en la solicitud. Ajuste las cantidades:<ul style="margin:8px 0 0 18px;list-style:disc;">${excesos.join('')}</ul></div>`,
                                 confirmButtonColor: '#0f968c'
                             });
                             return;
                         }
                     }
 
-                    const clasif = document.getElementById('clasificacion_select')?.value || 'Interno';
+                    const clasif = document.getElementById('clasificacion_select')?.value || 'Externo';
                     let destinatario = '';
-                    if (clasif === 'Externo') {
+                    if (clasif === 'Interno') {
                         const ext = (document.getElementById('establecimiento_externo')?.value || '').trim();
                         const tipoExt = (document.getElementById('tipo_externo')?.value || '').trim();
-                        destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Externo');
+                        const origen = (document.getElementById('establecimiento_origen')?.value || '').trim();
+                        destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Interno') + (origen ? ' (sale del stock de ' + origen + ')' : '');
                     } else {
                         const selInt = document.getElementById('establecimiento_interno');
                         destinatario = selInt && selInt.selectedIndex >= 0 && selInt.value
                             ? selInt.options[selInt.selectedIndex].text.trim()
-                            : 'Establecimiento Interno';
+                            : 'Establecimiento de la red';
                     }
+
+                    // el destino escrito se muestra como texto
+                    destinatario = destinatario.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
                     const rows = document.querySelectorAll('#productsBody tr');
                     let itemsCount = 0;
@@ -1502,7 +1586,7 @@
 
                     Swal.fire({
                         title: '¿Confirmar Emisión de Despacho?',
-                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s)${textoUnidades}.<br><span class="text-[12px] text-slate-500 mt-1 block">El stock de los lotes asignados se rebajará según orden FEFO.</span>${esModoTraspasoInterno() ? `<span class="text-[12px] text-amber-700 font-semibold mt-2 block">Traspaso interno sin solicitud${(!signatureRecibe || signatureRecibe.isEmpty()) ? ': quedará «Pendiente de recepción» hasta que firme quien recibe.' : '.'}</span>` : ''}`,
+                        html: `Se emitirá la guía de despacho para <strong>${destinatario}</strong> con <strong>${itemsCount}</strong> producto(s)${textoUnidades}.<br><span class="text-[12px] text-slate-500 mt-1 block">${clasif === 'Interno' ? 'Se descontará del stock del establecimiento de origen; la bodega central no cambia.' : 'El stock de los lotes asignados se rebajará según orden FEFO.'}</span>${esModoTraspasoInterno() ? `<span class="text-[12px] text-amber-700 font-semibold mt-2 block">Traspaso sin solicitud${(!signatureRecibe || signatureRecibe.isEmpty()) ? ': quedará «Pendiente de recepción» hasta que firme quien recibe.' : '.'}</span>` : ''}`,
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#0f766e',
@@ -1613,8 +1697,9 @@
             const selExtTipo = document.getElementById('tipo_externo');
             const inpExtDest = document.getElementById('establecimiento_externo');
             const inpDir = document.getElementById('direccion_destino');
+            const selOrigen = document.getElementById('establecimiento_origen');
 
-            if (val === 'Interno') {
+            if (val === 'Externo') {
                 divInt.classList.remove('hidden');
                 divExt.classList.add('hidden');
 
@@ -1625,6 +1710,8 @@
                 selExtTipo.removeAttribute('required');
                 inpExtDest.removeAttribute('name');
                 inpExtDest.removeAttribute('required');
+                selOrigen.removeAttribute('name');
+                selOrigen.removeAttribute('required');
 
                 inpDir.readOnly = true;
                 inpDir.classList.add('bg-slate-50', 'cursor-not-allowed');
@@ -1632,7 +1719,9 @@
                 inpDir.placeholder = "Se autocompletará al seleccionar destino...";
 
                 actualizarDireccionInterna();
-            } else if (val === 'Externo') {
+            } else if (val === 'Interno') {
+                // un despacho interno no atiende solicitudes
+                if (document.getElementById('establishment_request_id')?.value) desvincularSolicitudActiva();
                 divInt.classList.add('hidden');
                 divExt.classList.remove('hidden');
 
@@ -1641,6 +1730,8 @@
 
                 selExtTipo.setAttribute('name', 'tipo_externo_despacho');
                 selExtTipo.setAttribute('required', 'true');
+                selOrigen.setAttribute('name', 'establecimiento_origen');
+                selOrigen.setAttribute('required', 'true');
                 inpExtDest.setAttribute('name', 'establecimiento_destino');
                 inpExtDest.setAttribute('required', 'true');
 
@@ -1652,11 +1743,55 @@
             }
 
             actualizarModoTraspaso();
+            // el interno ofrece productos del establecimiento de origen, el externo los de bodega
+            if (val !== modoProductosActual) aplicarOrigenProductos();
+        }
+
+        // stock real de cada establecimiento, para el despacho interno
+        const STOCK_ESTABLECIMIENTOS = @json($stockEstablecimientos ?? []);
+        let modoProductosActual = '';
+        let opcionesBodega = null;
+
+        function aplicarOrigenProductos() {
+            const modo = document.getElementById('clasificacion_select').value;
+            const plantilla = document.getElementById('rowTemplate').content.querySelector('select[name="productos[]"]');
+            if (!opcionesBodega) opcionesBodega = Array.from(plantilla.options).map(o => o.cloneNode(true));
+
+            if (modo === 'Interno') {
+                const origen = document.getElementById('establecimiento_origen').value;
+                const items = origen ? (STOCK_ESTABLECIMIENTOS[origen] || []) : [];
+                const vacia = document.createElement('option');
+                vacia.value = '';
+                vacia.disabled = true;
+                vacia.selected = true;
+                vacia.textContent = !origen ? 'Primero elija de qué establecimiento sale...'
+                    : (items.length ? 'Seleccione producto del establecimiento...' : 'Este establecimiento no tiene stock registrado');
+                const opciones = [vacia, ...items.map(it => {
+                    const o = document.createElement('option');
+                    o.value = it.producto;
+                    o.textContent = it.producto + ' (Disp: ' + it.cantidad + ')';
+                    o.title = o.textContent;
+                    o.setAttribute('data-nombre-completo', it.producto);
+                    o.setAttribute('data-lote', 'S/L');
+                    o.setAttribute('data-vence', '');
+                    o.setAttribute('data-stock', it.cantidad);
+                    o.setAttribute('data-programa', '');
+                    return o;
+                })];
+                plantilla.replaceChildren(...opciones);
+            } else {
+                plantilla.replaceChildren(...opcionesBodega.map(o => o.cloneNode(true)));
+            }
+
+            // las filas se reinician porque cambian los productos disponibles
+            modoProductosActual = modo;
+            while (tbody.children.length > 0) tbody.children[0].remove();
+            addRow();
         }
 
         // funcion para buscar la direccion del cesfam elegido y rellenar el input readonly
         function actualizarDireccionInterna() {
-            if (document.getElementById('clasificacion_select').value !== 'Interno') return;
+            if (document.getElementById('clasificacion_select').value !== 'Externo') return;
 
             const select = document.getElementById('establecimiento_interno');
             const input = document.getElementById('direccion_destino');
@@ -1804,11 +1939,54 @@
 
         // llena los campos restringidos de acuerdo al producto seleccionado
 
+        // ultimo consumo mensual informado por cada establecimiento, por producto
+        const CONSUMO_DECLARADO = (() => {
+            const crudo = @json($consumoDeclarado ?? []);
+            const indice = {};
+            Object.keys(crudo).forEach(est => {
+                const porProducto = {};
+                Object.keys(crudo[est]).forEach(nom => { porProducto[normTextDespacho(nom)] = crudo[est][nom]; });
+                indice[normTextDespacho(est)] = porProducto;
+            });
+            return indice;
+        })();
+
+        // muestra en la fila el consumo mensual del establecimiento para ese producto
+        function actualizarConsumoDespacho(tr) {
+            const celda = tr?.querySelector('.consumo-mensual-despacho');
+            if (!celda) return;
+            let valor = tr.dataset.consumoSolicitud;
+            if (valor === undefined || valor === '') {
+                const haciaLaRed = document.getElementById('clasificacion_select')?.value === 'Externo';
+                const est = haciaLaRed ? (document.getElementById('establecimiento_interno')?.value || '') : '';
+                const sel = tr.querySelector('select[name="productos[]"]');
+                const opt = sel ? sel.options[sel.selectedIndex] : null;
+                const nombre = opt && opt.value ? (opt.getAttribute('data-nombre-completo') || opt.value) : '';
+                const porProducto = est ? CONSUMO_DECLARADO[normTextDespacho(est)] : null;
+                valor = porProducto && nombre ? porProducto[normTextDespacho(nombre)] : undefined;
+            }
+            const hay = valor !== undefined && valor !== null && valor !== '';
+            celda.textContent = hay ? Number(valor).toLocaleString('es-CL') + ' uds.' : '—';
+            celda.classList.toggle('text-slate-400', !hay);
+            celda.classList.toggle('text-slate-800', hay);
+        }
+
+        function actualizarConsumosDespacho() {
+            tbody.querySelectorAll('tr').forEach(actualizarConsumoDespacho);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('establecimiento_interno')?.addEventListener('change', actualizarConsumosDespacho);
+            document.getElementById('clasificacion_select')?.addEventListener('change', actualizarConsumosDespacho);
+        });
+
         function llenarDatosFila(selectElement) {
             let option = selectElement.options[selectElement.selectedIndex];
             if (!option || option.disabled) return;
 
             let tr = selectElement.closest('tr');
+            // al cambiar el producto deja de usarse el consumo de la solicitud
+            delete tr.dataset.consumoSolicitud;
             const nombreMovil = tr.querySelector('.producto-nombre-movil');
             if (nombreMovil) nombreMovil.textContent = option.getAttribute('data-nombre-completo') || option.value || '';
             let loteInput = tr.querySelector('input[name="lotes[]"]');
@@ -1889,6 +2067,7 @@
                 }
             }
 
+            actualizarConsumoDespacho(tr);
             cantInput.focus();
         }
 
@@ -1929,7 +2108,7 @@
             }
         }
 
-        // Escáner QR
+        // escaner qr
         let html5QrScanner = null;
         let availableCameras = [];
         let currentCameraIndex = 0;
@@ -1954,7 +2133,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Aviso de Seguridad',
-                    text: 'Para usar la cámara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.',
+                    text: 'Para usar la cámara necesita acceder mediante localhost, 127.0.0.1 o HTTPS.',
                     confirmButtonColor: '#0f968c'
                 });
             }
@@ -1994,7 +2173,7 @@
                         <div class="text-center p-4">
                             <svg class="w-10 h-10 text-rose-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             <p class="text-sm font-bold text-white">No se pudo acceder a la cámara</p>
-                            <p class="text-xs text-slate-400 mt-1">Verifica los permisos en tu navegador o conecta una cámara.</p>
+                            <p class="text-xs text-slate-400 mt-1">Verifique los permisos en su navegador o conecte una cámara.</p>
                         </div>
                     `;
                 }
@@ -2100,7 +2279,7 @@
 
             let targetOption = null;
 
-            // 1. Coincidencia exacta de Producto Y Lote
+            // 1. coincidencia exacta de producto y lote
             if (prodTarget && loteTarget) {
                 const targetProdNorm = norm(prodTarget);
                 const targetLoteNorm = cleanLote(loteTarget);
@@ -2109,19 +2288,19 @@
                 });
             }
 
-            // 2. Coincidencia por Lote (si el lote es específico y distinto de S/L)
+            // 2. coincidencia por lote (si el lote es especifico y distinto de s/l)
             if (!targetOption && loteTarget && cleanLote(loteTarget) !== 'S/L') {
                 const targetLoteNorm = cleanLote(loteTarget);
                 targetOption = options.find(opt => cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm);
             }
 
-            // 3. Coincidencia por Producto (primer lote disponible)
+            // 3. coincidencia por producto (primer lote disponible)
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => norm(obtenerNombreCompletoOpcionDespacho(opt)) === targetProdNorm);
             }
 
-            // 4. Coincidencia parcial / difusa por Producto
+            // 4. coincidencia parcial / difusa por producto
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => {
@@ -2131,7 +2310,7 @@
             }
 
             if (targetOption) {
-                // Seleccionar índice exacto para no colisionar con productos de mismo nombre y diferente lote
+                // seleccionar indice exacto para no colisionar con productos de mismo nombre y diferente lote
                 targetOption.selected = true;
                 select.selectedIndex = targetOption.index;
                 select.value = targetOption.value;
@@ -2229,7 +2408,7 @@
 
             const confirmTitle = userId ? '¿Asignar Solicitud?' : '¿Desasignar Solicitud?';
             const confirmHtml = userId
-                ? `¿Deseas asignar la atención de esta solicitud al funcionario <strong>${userName}</strong>?`
+                ? `¿Desea asignar la atención de esta solicitud al funcionario <strong>${userName}</strong>?`
                 : 'La solicitud volverá al estado <strong>Pendiente</strong> sin funcionario responsable asignado.';
             const confirmBtnText = userId ? 'Sí, asignar' : 'Sí, desasignar';
 
@@ -2274,7 +2453,7 @@
                     throw new Error(data.message || 'No se pudo asignar la solicitud');
                 }
 
-                // Actualizar estado visual del badge y atributos de la fila
+                // actualizar estado visual del badge y atributos de la fila
                 const badge = document.getElementById('badge-estado-solicitud-' + solicitudId);
                 if (badge && data.estado) {
                     badge.textContent = data.estado;
@@ -2333,11 +2512,11 @@
             actualizarModoTraspaso();
         }
 
-        // Traspaso interno = clasificación "Interno" sin solicitud vinculada
+        // traspaso sin solicitud: despacho externo a la red sin solicitud vinculada
         function esModoTraspasoInterno() {
             const clasif = document.getElementById('clasificacion_select')?.value;
             const solicitudId = document.getElementById('establishment_request_id')?.value;
-            return clasif === 'Interno' && !solicitudId;
+            return clasif === 'Externo' && !solicitudId;
         }
 
         function actualizarModoTraspaso() {
@@ -2358,7 +2537,7 @@
             }
         }
 
-        // Firma posterior de quien recibe, para guías "Pendiente de recepción"
+        // firma posterior de quien recibe, para guias "pendiente de recepcion"
         function registrarRecepcion(dispatchId, correlativo) {
             let pad = null;
             Swal.fire({
@@ -2429,7 +2608,7 @@
         // funcion para usar una solicitud y rellenar el formulario de despacho
         function usarSolicitud(id) {
 
-            // Buscar la solicitud por su ID en la variable global
+            // buscar la solicitud por su id en la variable global
             const solicitud = solicitudes.find(s => s.id === id);
 
             if (!solicitud) return;
@@ -2438,7 +2617,7 @@
             const requestInput = document.getElementById('establishment_request_id');
             if (requestInput) requestInput.value = solicitud.id;
 
-            // Mostrar banner de solicitud activa
+            // mostrar banner de solicitud activa
             const banner = document.getElementById('banner_solicitud_activa');
             const bannerTitulo = document.getElementById('banner_solicitud_titulo');
             const bannerSubtitulo = document.getElementById('banner_solicitud_subtitulo');
@@ -2448,12 +2627,12 @@
                 banner.classList.remove('hidden');
             }
 
-            // Helper de normalización para matching insensible a mayúsculas, tildes y símbolos
+            // helper de normalizacion para matching insensible a mayusculas, tildes y simbolos
             const normText = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
 
             // seleccionar clasificacion interna
             const clasificacion = document.getElementById('clasificacion_select');
-            clasificacion.value = 'Interno';
+            clasificacion.value = 'Externo';
             toggleClasificacion();
 
             // seleccionar establecimiento
@@ -2469,21 +2648,22 @@
                 opcionEstablecimiento = Array.from(selectEstablecimiento.options).find(option => {
                     const optNorm = normText(option.value);
                     return optNorm && estSolicitudNorm && (optNorm.includes(estSolicitudNorm) || estSolicitudNorm.includes(optNorm));
-                });
+                 });
             }
 
             if (opcionEstablecimiento) {
                 selectEstablecimiento.value = opcionEstablecimiento.value;
                 actualizarDireccionInterna();
             } else if (solicitud.establecimiento) {
-                // Si es un destino externo que no figura en la lista interna
-                const selectClasif = document.getElementById('clasificacion_select');
-                if (selectClasif) {
-                    selectClasif.value = 'Externo';
-                    toggleClasificacion();
-                    const inputExt = document.getElementById('establecimiento_externo');
-                    if (inputExt) inputExt.value = solicitud.establecimiento;
-                }
+                // una solicitud solo se atiende con despacho externo a un establecimiento de la red
+                desvincularSolicitudActiva();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Establecimiento no registrado',
+                    text: 'La solicitud es de «' + solicitud.establecimiento + '», que no está en la lista de establecimientos de la red. Agréguelo a la configuración antes de despacharla.',
+                    confirmButtonColor: '#0d9488'
+                });
+                return;
             }
 
             // rellenar observaciones con referencia clara
@@ -2503,7 +2683,7 @@
             let productosParciales = [];
             pendientesSolicitudActiva = {};
 
-            // agregar los productos pendientes de la solicitud (los estupefacientes van al módulo controlado)
+            // agregar los productos pendientes de la solicitud (los estupefacientes van al modulo controlado)
             solicitud.items.forEach(item => {
                 const nombreItem = item.product?.nombre ?? ('Producto #' + item.product_id);
                 const pendiente = Math.max(0, (parseInt(item.cantidad_solicitada) || 0) - (parseInt(item.cantidad_despachada) || 0));
@@ -2522,7 +2702,7 @@
                 const itemNorm = normText(nombreItem);
                 const opcionesValidas = Array.from(selectProducto.options).filter(o => o.value && !o.disabled);
 
-                // todos los lotes del producto (primero coincidencia exacta, si no la más parecida)
+                // todos los lotes del producto (primero coincidencia exacta, si no la mas parecida)
                 let lotesProducto = opcionesValidas.filter(o =>
                     normText(obtenerNombreCompletoOpcionDespacho(o)) === itemNorm
                 );
@@ -2537,7 +2717,7 @@
                     }
                 }
 
-                // solo lotes con stock, ordenados FEFO (vence antes, sale primero)
+                // solo lotes con stock, ordenados fefo (vence antes, sale primero)
                 lotesProducto = lotesProducto
                     .filter(o => (parseInt(o.getAttribute('data-stock')) || 0) > 0)
                     .sort((a, b) => (a.getAttribute('data-vence') || '9999-12-31').localeCompare(b.getAttribute('data-vence') || '9999-12-31'));
@@ -2549,7 +2729,7 @@
                     return;
                 }
 
-                // recordar cuánto falta de este producto para no pasarse al confirmar
+                // recordar cuanto falta de este producto para no pasarse al confirmar
                 pendientesSolicitudActiva[normTextDespacho(obtenerNombreCompletoOpcionDespacho(lotesProducto[0]))] = {
                     nombre: nombreItem,
                     pendiente: pendiente
@@ -2567,14 +2747,17 @@
                     );
                     if (!optFila) return;
 
-                    // selectedIndex (y no value) porque varios lotes comparten el mismo nombre
+                    // selectedindex (y no value) porque varios lotes comparten el mismo nombre
                     optFila.selected = true;
                     selFila.selectedIndex = optFila.index;
 
-                    // Llena la fila con lotes y límites
+                    // llena la fila con lotes y limites
                     llenarDatosFila(selFila);
+                    // consumo mensual que informo el establecimiento en esta solicitud
+                    fila.dataset.consumoSolicitud = item.consumo_anterior ?? '';
+                    actualizarConsumoDespacho(fila);
 
-                    // Seleccionar programa si viene en la solicitud
+                    // seleccionar programa si viene en la solicitud
                     const selectPrograma = fila.querySelector('select[name="programas[]"]');
                     if (selectPrograma && item.programa) {
                         const progNorm = normText(item.programa);
@@ -2599,7 +2782,7 @@
                 }
             });
 
-            // Si nos quedamos sin filas, dejar 1 fila lista para usar
+            // si nos quedamos sin filas, dejar 1 fila lista para usar
             if (tbody.children.length === 0) {
                 addRow();
             }
@@ -2624,7 +2807,7 @@
                 });
             }
 
-            // alerta: los estupefacientes de esta solicitud van por Despacho Controlado
+            // alerta: los estupefacientes de esta solicitud van por despacho controlado
             if (productosControlados.length > 0) {
                 Swal.fire({
                     icon: 'info',
@@ -2675,7 +2858,7 @@
             // cerrar modal de solicitudes
             closeSolicitudes();
 
-            // Notificación de que se completaron los datos de la solicitud
+            // notificacion de que se completaron los datos de la solicitud
             if (typeof Swal !== 'undefined' && productosControlados.length === 0 && productosFaltantes.length === 0 && productosParciales.length === 0) {
                 Swal.fire({
                     toast: true,
@@ -2712,7 +2895,7 @@
     </script>
 
     <style>
-        /* ===== Detalle de extracción en celular: cada fila se muestra como tarjeta ===== */
+        /* detalle de extraccion en celular: cada fila se muestra como tarjeta */
         .producto-nombre-movil { display: none; }
         @media (max-width: 767px) {
             #productsTable { min-width: 0 !important; width: 100% !important; table-layout: auto !important; white-space: normal !important; }
@@ -2729,7 +2912,7 @@
             #productsTable select, #productsTable input { min-width: 0; }
             .producto-nombre-movil { display: block; font-size: 12px; font-weight: 700; line-height: 1.35; margin-top: 6px; white-space: normal; overflow-wrap: anywhere; }
             .producto-nombre-movil:empty { display: none; }
-            /* Modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
+            /* modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
             #SolicitudesModal > div, #BandejaModal > div { overflow-y: auto !important; }
             #SolicitudesModal .max-h-\[60vh\], #BandejaModal .max-h-\[60vh\] { max-height: none !important; flex-shrink: 0; }
         }

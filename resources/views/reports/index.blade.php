@@ -5,7 +5,7 @@
 
 @section('actions')
     <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
-        <!-- Botón Exportar a Excel -->
+        <!-- boton exportar a excel -->
         <button type="button" onclick="exportarReporte('excel')"
             class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -14,7 +14,7 @@
             Exportar a Excel
         </button>
 
-        <!-- Botón Exportar a PDF -->
+        <!-- boton exportar a pdf -->
         <button type="button" onclick="exportarReporte('pdf')"
             class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto">
             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -28,7 +28,7 @@
 @section('content')
     <div class="space-y-6">
 
-        <!-- Ruta de navegación -->
+        <!-- ruta de navegacion -->
         <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
             <span class="font-mono-das text-slate-400 font-semibold">04</span>
             <span>Control</span>
@@ -36,7 +36,7 @@
             <span class="font-medium text-slate-800">Reportes</span>
         </div>
 
-        <!-- KPI de Valorización -->
+        <!-- kpi de valorizacion -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="sm:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shrink-0">
@@ -56,22 +56,19 @@
             </div>
         </div>
 
-        <!-- Contenedor principal tabla Inventario -->
+        <!-- contenedor principal tabla inventario -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
 
-            <!-- Cabecera de la tabla y botón de filtros -->
-            <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center flex-wrap gap-3">
+            <!-- cabecera de la tabla y boton de filtros -->
+            <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
                 <h3 class="text-[15px] font-bold text-slate-800">Reporte Consolidado de Stock</h3>
-                <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-                    @include('partials.busqueda-rapida', ['formulario' => 'filters-panel', 'placeholder' => 'Buscar producto o lote...'])
-                    <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                        Más filtros
-                    </button>
-                </div>
+                <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    Filtros Avanzados
+                </button>
             </div>
 
-            <!-- Formulario de Filtros -->
+            <!-- formulario de filtros -->
             <form method="GET" action="{{ route('reports.index') }}" id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                     <div class="xl:col-span-2">
@@ -179,7 +176,7 @@
                 <table class="w-full text-left border-collapse min-w-[900px]">
                     <thead>
                         <tr class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
-                            <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Ver lotes</th>
+                            <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Producto Principal</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
                             <th scope="col" class="px-6 py-4 whitespace-nowrap">Programa</th>
@@ -414,7 +411,7 @@
                 </table>
             </div>
 
-            <!-- Paginación -->
+            <!-- paginacion -->
             @if(isset($inventories) && method_exists($inventories, 'hasPages') && $inventories->hasPages())
             <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 bg-white rounded-b-2xl">
                 <div class="text-[13px] text-slate-500 text-center sm:text-left font-medium">
@@ -468,7 +465,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Lógica visual para mostrar filtros si hay búsquedas activas
+            // logica visual para mostrar filtros si hay busquedas activas
             const btnToggleFilters = document.getElementById('toggle-filters-btn');
             const filtersPanel = document.getElementById('filters-panel');
 
@@ -483,7 +480,7 @@
             }
         });
 
-        // Lógica visual para el acordeón de Lotes
+        // logica visual para el acordeon de lotes
         function toggleLotes(key) {
             const row = document.getElementById('lotes-' + key);
             const arrow = document.getElementById('arrow-' + key);
@@ -508,7 +505,7 @@
             }
         }
 
-        // Función que atrapa los filtros actuales para enviarlos a Excel/PDF
+        // funcion que atrapa los filtros actuales para enviarlos a excel/pdf
         function exportarReporte(tipo) {
             const urlExcel = "{{ route('reports.excel') }}";
             const urlPdf = "{{ route('reports.pdf') }}";

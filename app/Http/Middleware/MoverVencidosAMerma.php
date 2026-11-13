@@ -10,13 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Envía automáticamente a Merma los lotes vencidos.
- *
- * Se ejecuta mientras alguien usa la plataforma (como máximo una vez cada
- * 5 minutos), así no depende de que el servidor tenga tareas programadas.
- * Si algo falla, solo se registra en el log y la página carga igual.
- */
+// envia automaticamente a merma los lotes vencidos
 class MoverVencidosAMerma
 {
     private const INTERVALO_MINUTOS = 5;

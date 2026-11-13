@@ -1,5 +1,4 @@
-{{-- Indicador compacto para la tira de indicadores (<div class="das-kpi-strip">).
-     tone: ok | warn | crit | info | null.  href: si se indica, el indicador es un enlace. --}}
+{{-- indicador compacto para la tira de indicadores (<div class="das-kpi-strip">) --}}
 @props(['label', 'value', 'hint' => null, 'tone' => null, 'href' => null])
 @php $clases = 'das-kpi' . ($tone ? ' is-' . $tone : ''); @endphp
 @if ($href)

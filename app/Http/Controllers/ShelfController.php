@@ -12,9 +12,7 @@ use App\Models\Shelf;
 
 class ShelfController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // display a listing of the resource
     public function index()
     {
         $shelves = Shelf::with('aisle')
@@ -35,17 +33,13 @@ class ShelfController extends Controller
         return view('distribution.maintainers.shelf.index', compact('shelves', 'aisles', 'counts'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // show the form for creating a new resource
     public function create()
     {
-        //
+        // seccion
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // store a newly created resource in storage
     public function store(Request $request)
     {
         $request->validate([
@@ -67,25 +61,19 @@ class ShelfController extends Controller
         return redirect()->route('shelf.index')->with('success', 'Estantería creada exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // display the specified resource
     public function show(string $id)
     {
-        //
+        // seccion
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // show the form for editing the specified resource
     public function edit(string $id)
     {
-        //
+        // seccion
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // update the specified resource in storage
     public function update(Request $request, string $id)
     {
         $shelf = Shelf::findOrFail($id);
@@ -115,9 +103,7 @@ class ShelfController extends Controller
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // remove the specified resource from storage
     public function destroy(string $id)
     {
         $shelf = Shelf::findOrFail($id);
@@ -142,8 +128,8 @@ class ShelfController extends Controller
         $posX = (float) $request->pos_x;
         $posZ = (float) $request->pos_z;
 
-        // Una estantería mide poco más de 4 unidades de ancho, así que si otra está más
-                // cerca que eso en el plano se estarían pisando
+        // una estanteria mide poco mas de 4 unidades de ancho, asi que si otra esta mas
+                // cerca que eso en el plano se estarian pisando
         $minSeparacion = 4.5;
         $conflicto = Shelf::where('id', '!=', $shelf->id)
             ->whereNotNull('pos_x')

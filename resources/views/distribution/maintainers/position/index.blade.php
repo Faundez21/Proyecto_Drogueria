@@ -34,7 +34,7 @@
 
 @section('content')
     <div class="space-y-6">
-        <!-- Ruta de navegación -->
+        <!-- ruta de navegacion -->
         <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
             <span class="font-mono-das text-slate-400 font-semibold">02</span>
             <span>Almacenamiento</span>
@@ -60,9 +60,9 @@
             </div>
         @endif
 
-        <!-- Contenedor principal tabla Posiciones -->
+        <!-- contenedor principal tabla posiciones -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
-            <!-- Cabecera y filtros -->
+            <!-- cabecera y filtros -->
             <div class="p-4 sm:p-5 border-b border-slate-200/80 bg-white flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
@@ -155,7 +155,7 @@
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex justify-center items-center gap-1.5">
                                         <button type="button"
-                                            onclick='openShow({{ $position->id }}, @json($position->name), @json($lvlNumber ?? "Sin nivel"), @json($position->description), @json($shelfName))'
+                                            onclick='openShow({{ $position->id }}, {{ \Illuminate\Support\Js::from($position->name) }}, {{ \Illuminate\Support\Js::from($lvlNumber ?? "Sin nivel") }}, {{ \Illuminate\Support\Js::from($position->description) }}, {{ \Illuminate\Support\Js::from($shelfName) }})'
                                             class="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                                             title="Ver posición">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -167,7 +167,7 @@
                                         </button>
 
                                         <button type="button"
-                                            onclick='openEdit({{ $position->id }}, @json($position->name), {{ $position->level_id }}, @json($position->description))'
+                                            onclick='openEdit({{ $position->id }}, {{ \Illuminate\Support\Js::from($position->name) }}, {{ $position->level_id }}, {{ \Illuminate\Support\Js::from($position->description) }})'
                                             class="p-1.5 text-teal-600 hover:text-teal-800 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
                                             title="Editar posición">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +209,7 @@
         </div>
     </div>
 
-    <!-- Modal crear Posición -->
+    <!-- modal crear posicion -->
     <div id="createModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -282,7 +282,7 @@
         </div>
     </div>
 
-    <!-- Modal ver Posición -->
+    <!-- modal ver posicion -->
     <div id="showModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -330,7 +330,7 @@
         </div>
     </div>
 
-    <!-- Modal editar Posición -->
+    <!-- modal editar posicion -->
     <div id="editModal"
         class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-3 sm:p-5">
         <div class="flex min-h-full items-center justify-center py-4">
@@ -475,7 +475,7 @@
                 </div>
             </div>
 
-            <!-- Tabla del Historial -->
+            <!-- tabla del historial -->
             <div class="overflow-x-auto flex-1 min-h-[180px] bg-white">
                 <table class="w-full text-left text-[12.5px] sm:text-[13px] text-slate-600 whitespace-nowrap min-w-[720px] lg:min-w-full">
                     <thead class="bg-slate-100 text-slate-600 uppercase text-[10.5px] sm:text-[11px] font-bold tracking-wider border-b border-slate-200 sticky top-0 z-10 shadow-sm">
@@ -564,7 +564,7 @@
                 </table>
             </div>
 
-            <!-- Pie del Modal -->
+            <!-- pie del modal -->
             <div class="px-4 py-3 sm:px-6 sm:py-4 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-between items-center gap-3 shrink-0">
                 <span class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">
                     Mostrando <strong id="historyPositionCount" class="text-teal-700 font-mono-das">{{ $positions->count() }}</strong> de <strong class="font-mono-das text-slate-700">{{ $positions->count() }}</strong> posiciones

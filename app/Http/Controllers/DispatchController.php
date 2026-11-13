@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Dispatch;
 use App\Models\DispatchItem;
+use App\Models\StockMovement;
 use App\Models\EstablishmentRequest;
 use App\Models\Inventory;
 use App\Models\User;
 use App\Services\InventoryService;
+use App\Services\EstablishmentStockService;
 use App\Services\SolicitudService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -41,7 +43,7 @@ class DispatchController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Asegurar que cada item tenga su consumo_anterior calculado incluso si fue creado antes
+        // asegurar que cada item tenga su consumo_anterior calculado incluso si fue creado antes
         $consumoMapa = SolicitudService::mapaConsumoYStock();
         foreach ($solicitudes as $sol) {
             $est = trim((string) $sol->establecimiento);
@@ -64,8 +66,12 @@ class DispatchController extends Controller
 
         $establecimientos = InventoryService::establecimientos();
         $programasLista = InventoryService::programasLista();
+        $consumoDeclarado = SolicitudService::consumoDeclaradoPorNombre();
+        $stockEstablecimientos = EstablishmentStockService::disponiblePorEstablecimiento();
 
         return view('dispatch.index', compact(
+            'consumoDeclarado',
+            'stockEstablecimientos',
             'correlativo',
             'dispatches',
             'inventarioDisponible',
@@ -87,23 +93,7 @@ class DispatchController extends Controller
         return response()->json($solicitudes);
     }
 
-    /**
-     * Emite una guía de despacho y descuenta el stock.
-     *
-     * Antes de tocar el inventario se revisa que el destino sea un
-     * establecimiento de la red, que la solicitud vinculada corresponda a ese
-     * mismo destino, que no se despache más de lo que queda pendiente en ella
-     * y que estén las dos firmas.
-     *
-     * El descuento lo hace InventoryService::consumir dentro de una
-     * transacción: si un producto falla, no se guarda nada. Cuando no se
-     * indica un lote, se despacha primero el que vence antes (FEFO) y, si no
-     * alcanza, se reparte entre varios lotes siguiendo ese mismo orden.
-     *
-     * Al final se genera la guía con correlativo anual GD-AAAA-XXXX, se
-     * registra el movimiento en el Kardex y se recalcula el estado de la
-     * solicitud de origen.
-     */
+    // emite una guia de despacho y descuenta el stock
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -112,6 +102,7 @@ class DispatchController extends Controller
             'estado_liberacion' => 'required|string|max:255',
             'establecimiento_destino' => 'required|string|max:255',
             'tipo_externo_despacho' => 'nullable|string|max:255',
+            'establecimiento_origen' => 'nullable|string|max:255',
             'direccion_destino' => 'nullable|string|max:255',
             'condiciones_transporte' => 'nullable|string|max:500',
             'firma_despacha' => 'nullable|string',
@@ -132,20 +123,29 @@ class DispatchController extends Controller
         ]);
 
 
-        // Validaciones de destino, solicitud y firmas
+        // validaciones de destino, solicitud y firmas
         $errorDespacho = null;
         $solicitudVinculada = ! empty($validated['establishment_request_id'])
             ? EstablishmentRequest::find($validated['establishment_request_id'])
             : null;
         $estRegistrado = InventoryService::establecimientoRegistrado($validated['establecimiento_destino']);
 
-        // Traspaso interno: despacho a un establecimiento de la red sin solicitud previa.
-        // Exige un motivo y permite emitir la guía sin la firma de quien recibe;
-        // en ese caso queda "Pendiente de recepción" hasta que se firme desde la bandeja.
-        $esTraspasoInterno = $validated['clasificacion'] === 'Interno' && ! $solicitudVinculada;
+        // traspaso sin solicitud: exige motivo y puede emitirse sin firma de quien recibe (queda pendiente de recepcion)
+        $esTraspasoInterno = $validated['clasificacion'] === 'Externo' && ! $solicitudVinculada;
         $motivoTraspaso = trim((string) ($validated['motivo_traspaso'] ?? ''));
 
-        if ($validated['clasificacion'] === 'Interno' && ! $estRegistrado) {
+        // despacho interno: sale del stock de un establecimiento de la red
+        $origenRegistrado = $validated['clasificacion'] === 'Interno'
+            ? InventoryService::establecimientoRegistrado($validated['establecimiento_origen'] ?? null)
+            : null;
+
+        if ($validated['clasificacion'] === 'Interno' && $solicitudVinculada) {
+            $errorDespacho = 'Una solicitud se atiende con un despacho externo desde la bodega, no con un despacho interno.';
+        } elseif ($validated['clasificacion'] === 'Interno' && ! $origenRegistrado) {
+            $errorDespacho = 'Seleccione el establecimiento desde donde sale el despacho interno.';
+        } elseif ($origenRegistrado && $estRegistrado && mb_strtolower($origenRegistrado['nombre']) === mb_strtolower($estRegistrado['nombre'])) {
+            $errorDespacho = 'El establecimiento de origen y el de destino no pueden ser el mismo.';
+        } elseif ($validated['clasificacion'] === 'Externo' && ! $estRegistrado) {
             $errorDespacho = "El destino «{$validated['establecimiento_destino']}» no es un establecimiento de la red. Selecciónelo de la lista.";
         } elseif ($solicitudVinculada) {
             if (! in_array($solicitudVinculada->estado, ['Pendiente', 'Asignada', 'Parcial'], true)) {
@@ -158,7 +158,7 @@ class DispatchController extends Controller
         }
 
         if (! $errorDespacho && $esTraspasoInterno && $motivoTraspaso === '') {
-            $errorDespacho = 'Indique el motivo del traspaso interno.';
+            $errorDespacho = 'Indique el motivo del traspaso sin solicitud.';
         }
         if (! $errorDespacho && empty($validated['firma_despacha'])) {
             $errorDespacho = 'Falta la firma de quien despacha (bodega).';
@@ -176,7 +176,7 @@ class DispatchController extends Controller
         }
 
         $destino = $estRegistrado['nombre'] ?? $validated['establecimiento_destino'];
-        if ($validated['clasificacion'] === 'Externo') {
+        if ($validated['clasificacion'] === 'Interno') {
             $destino = (! empty($validated['tipo_externo_despacho']) ? $validated['tipo_externo_despacho'] . ' - ' : '') . $validated['establecimiento_destino'];
         }
 
@@ -190,6 +190,18 @@ class DispatchController extends Controller
                     ->value('firma_solicitante');
             }
 
+            // se bloquea la solicitud y se revisa de nuevo para que dos despachos simultaneos no la sobrepasen
+            if ($solicitudVinculada) {
+                $solicitudBloqueada = EstablishmentRequest::with('items.product')->lockForUpdate()->find($solicitudVinculada->id);
+                if (! $solicitudBloqueada || ! in_array($solicitudBloqueada->estado, ['Pendiente', 'Asignada', 'Parcial'], true)) {
+                    throw new \RuntimeException('La solicitud ya fue despachada por otro usuario. Recargue la página.');
+                }
+                $exceso = SolicitudService::excesoSobrePendiente($solicitudBloqueada, $validated['productos'], $validated['cantidades']);
+                if ($exceso) {
+                    throw new \RuntimeException($exceso);
+                }
+            }
+
             $correlativo = $this->generarCorrelativo();
 
             $dispatch = Dispatch::create([
@@ -198,6 +210,7 @@ class DispatchController extends Controller
                 'correlativo' => $correlativo,
                 'fecha_despacho' => $validated['fecha_despacho'],
                 'clasificacion' => $validated['clasificacion'],
+                'establecimiento_origen' => $origenRegistrado['nombre'] ?? null,
                 'estado_liberacion' => $validated['estado_liberacion'],
                 'establecimiento_destino' => $destino,
                 'direccion_destino' => $validated['direccion_destino'] ?? null,
@@ -213,6 +226,59 @@ class DispatchController extends Controller
             foreach ($validated['productos'] as $index => $nombreProducto) {
                 if (InventoryService::esControlado($nombreProducto)) {
                     throw new \RuntimeException("El producto '{$nombreProducto}' es controlado y no puede procesarse por esta vía.");
+                }
+
+                $cantidadFila = (int) $validated['cantidades'][$index];
+                $productoId = InventoryService::productoId($nombreProducto);
+
+                // interno: se descuenta del establecimiento de origen, la bodega central no se toca
+                if ($origenRegistrado) {
+                    EstablishmentStockService::retirar(
+                        $origenRegistrado['nombre'], $productoId, $nombreProducto, $cantidadFila,
+                        "Guía N° {$correlativo} hacia {$destino}", $dispatch->id
+                    );
+                    if ($estRegistrado) {
+                        EstablishmentStockService::ingresar(
+                            $estRegistrado['nombre'], $productoId, $nombreProducto, $cantidadFila,
+                            "Guía N° {$correlativo} desde {$origenRegistrado['nombre']}", $dispatch->id
+                        );
+                    }
+
+                    // queda en trazabilidad aunque no salga de un lote de bodega
+                    StockMovement::create([
+                        'inventory_id' => null,
+                        'user_id' => Auth::id(),
+                        'producto' => $nombreProducto,
+                        'lote' => 'S/L',
+                        'fecha_vencimiento' => null,
+                        'tipo_movimiento' => 'Despacho interno',
+                        'cantidad' => -$cantidadFila,
+                        'fecha_hora' => now(),
+                        'origen_destino' => mb_substr("Desde: {$origenRegistrado['nombre']} · Hacia: {$destino}", 0, 500),
+                        'documento_respaldo' => 'Guía N° ' . $correlativo,
+                        'estado_lote' => 'Establecimiento',
+                    ]);
+
+                    DispatchItem::create([
+                        'dispatch_id' => $dispatch->id,
+                        'inventory_id' => null,
+                        'product_id' => $productoId,
+                        'producto' => $nombreProducto,
+                        'lote' => 'S/L',
+                        'fecha_vencimiento' => null,
+                        'programa' => $validated['programas'][$index] ?? 'General',
+                        'cantidad' => $cantidadFila,
+                    ]);
+
+                    $itemsDespachados[] = [
+                        'producto' => $nombreProducto,
+                        'lote' => 'S/L',
+                        'cantidad' => $cantidadFila,
+                        'vencimiento' => 'N/A',
+                        'programa' => $validated['programas'][$index] ?? 'General',
+                    ];
+
+                    continue;
                 }
 
                 $asignaciones = InventoryService::consumir(
@@ -244,6 +310,14 @@ class DispatchController extends Controller
                         'documento_respaldo' => 'Guía N° ' . $correlativo,
                     ]);
 
+                    // el establecimiento que recibe suma estas unidades a su stock
+                    if ($validated['clasificacion'] === 'Externo' && $estRegistrado) {
+                        EstablishmentStockService::ingresar(
+                            $estRegistrado['nombre'], $batch->product_id ?? $productoId, $nombreProducto, (int) $asignacion['cantidad'],
+                            "Guía N° {$correlativo} desde la droguería", $dispatch->id
+                        );
+                    }
+
                     $itemsDespachados[] = [
                         'producto' => $nombreProducto,
                         'lote' => $batch->lote ?? 'S/L',
@@ -265,7 +339,7 @@ class DispatchController extends Controller
                     $validated['cantidades']
                 );
 
-                // Comprobar si la solicitud aún tiene fármacos controlados con cantidad pendiente
+                // comprobar si la solicitud aun tiene farmacos controlados con cantidad pendiente
                 $reqModel = EstablishmentRequest::with('items.product')->find($solicitudOrigenId);
                 if ($reqModel) {
                     $controladosPendientesCount = $reqModel->items->filter(function ($it) {
@@ -281,6 +355,7 @@ class DispatchController extends Controller
             $dispatchDetail = [
                 'correlativo' => $correlativo,
                 'destino' => $destino,
+                'origen' => $origenRegistrado['nombre'] ?? null,
                 'clasificacion' => $validated['clasificacion'],
                 'fecha' => !empty($validated['fecha_despacho']) ? date('d/m/Y', strtotime($validated['fecha_despacho'])) : date('d/m/Y'),
                 'total_items' => count($itemsDespachados),
@@ -296,16 +371,20 @@ class DispatchController extends Controller
                 'url_despacho_controlado' => $solicitudOrigenId ? route('controlled_dispatch.index', ['solicitud_id' => $solicitudOrigenId]) : null,
             ];
 
+            $mensajeOk = $origenRegistrado
+                ? "Despacho N° {$correlativo} generado: se descontó del stock de {$origenRegistrado['nombre']}."
+                : "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.";
+
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => true,
-                    'message' => "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.",
+                    'message' => $mensajeOk,
                     'detail' => $dispatchDetail,
                 ]);
             }
 
             return redirect()->back()
-                ->with('success', "Despacho N° {$correlativo} generado con FEFO y stock descontado con éxito.")
+                ->with('success', $mensajeOk)
                 ->with('dispatch_success_detail', $dispatchDetail);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -358,10 +437,7 @@ class DispatchController extends Controller
         return $pdf->stream('Guia_Despacho_' . $despacho->correlativo . '.pdf');
     }
 
-    /**
-     * Registra la firma de quien recibe una guía que quedó "Pendiente de
-     * recepción" (traspaso interno emitido sin la firma del receptor).
-     */
+    // registra la firma de quien recibe una guia que quedo "pendiente de recepcion" (traspaso interno emitido sin la firma del receptor)
     public function registrarRecepcion(Request $request, string $id)
     {
         $validated = $request->validate([

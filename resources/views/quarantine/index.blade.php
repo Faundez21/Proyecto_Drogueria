@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Inventario')
-@section('subtitle', 'Lotes retenidos para revisión: no se pueden despachar hasta liberarlos.')
+@section('title', 'Productos en Cuarentena')
+@section('subtitle', 'Lista de medicamentos e insumos bloqueados o retenidos preventivamente.')
 
 @section('actions')
 @role('Administrador')
@@ -10,7 +10,7 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
-        Ver Historial
+        Ver Historial Avanzado
     </button>
 @endrole
 @endsection
@@ -18,22 +18,15 @@
 @section('content')
     <div class="w-full space-y-6">
 
-        <!-- Migas de pan -->
+        <!-- migas de pan -->
         <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-2 px-1 pt-2">
             <span class="text-slate-400 font-semibold">02</span>
             <span>Almacenamiento</span>
             <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
-            <span>Inventario</span>
-            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
             <span class="font-semibold text-slate-800">Cuarentena</span>
         </div>
-
-        <!-- pestanas por estado del lote -->
-        @include('inventory.partials.pestanas-estado', ['activa' => 'cuarentena'])
 
         @php
             $totalLotes = $totalLotesGlobal ?? $inventories->total();
@@ -41,7 +34,7 @@
             $valorRetenido = $valorTotalRetenido ?? 0;
         @endphp
 
-        <!-- Tarjetas de Resumen -->
+        <!-- tarjetas de resumen -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
             <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden group">
                 <div class="absolute right-0 top-0 w-24 h-24 bg-amber-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
@@ -98,29 +91,26 @@
             </div>
         </div>
 
-        <!-- Directorio físico -->
+        <!-- directorio fisico -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-            <!-- Cabecera y Botón de Filtros -->
-            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white flex-wrap gap-3">
+            <!-- cabecera y boton de filtros -->
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center">
                         <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
-                    <h3 class="text-[15px] font-bold text-slate-800">Lotes retenidos</h3>
+                    <h3 class="text-[15px] font-bold text-slate-800">Directorio Físico</h3>
                 </div>
-                <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-                    @include('partials.busqueda-rapida', ['formulario' => 'filters-panel', 'placeholder' => 'Buscar producto o lote...'])
-                    <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-amber-700 transition-colors cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                        Más filtros
-                    </button>
-                </div>
+                <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-amber-700 transition-colors cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    Filtros Avanzados
+                </button>
             </div>
 
-            <!-- Panel de Filtros -->
+            <!-- panel de filtros -->
             <form method="GET" action="{{ route('quarantine.index') }}" id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                    <!-- Buscador -->
+                    <!-- buscador -->
                     <div class="xl:col-span-2 relative" id="searchContainer">
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Buscar Producto / Lote</label>
                         <input type="text" name="search" id="searchInput" value="{{ request('search') }}" placeholder="Producto, categoría o lote..." autocomplete="off" onfocus="showSearchDropdown()" oninput="filterSearchDropdown()"
@@ -137,7 +127,7 @@
                         </div>
                     </div>
 
-                    <!-- Filtros select -->
+                    <!-- filtros select -->
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
                         <select name="categoria" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-800 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
@@ -191,7 +181,7 @@
                 </div>
             </form>
 
-            <!-- Alerta filtros activos -->
+            <!-- alerta filtros activos -->
             @if (request()->filled('pasillo') || request()->filled('estante') || request()->filled('categoria') || request()->filled('programa') || request()->filled('search'))
                 <div id="activeFilterAlert" class="px-5 py-3 bg-amber-50 border-b border-amber-200 flex justify-between items-center text-xs text-amber-800 font-bold">
                     <span class="flex items-center gap-2">
@@ -235,7 +225,7 @@
                 <table class="w-full text-left text-sm whitespace-nowrap border-collapse min-w-[800px]">
                     <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-extrabold">
                         <tr>
-                            <th scope="col" class="px-6 py-4 w-14 text-center">Ver lotes</th>
+                            <th scope="col" class="px-6 py-4 w-14 text-center">Desglose</th>
                             <th scope="col" class="px-6 py-4">Producto Principal</th>
                             <th scope="col" class="px-6 py-4">Categoría</th>
                             <th scope="col" class="px-6 py-4 text-center">Lotes Retenidos</th>
@@ -389,7 +379,7 @@
                                                                         <button type="button" onclick="openQRModal('{{ addslashes($loteId) }}', '{{ addslashes($nombreProducto) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($textoVencimiento) }}', '{{ $stockLote }}', 'Droguería DAS')" class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Generar Etiqueta QR">
                                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                                                         </button>
-                                                                        <button type="button" onclick="openEditLote('{{ addslashes($loteId) }}', '{{ addslashes($loteCodigo) }}', '{{ addslashes($nombreProducto) }}', 'Cuarentena', '{{ addslashes($loteMotivo) }}', '{{ addslashes($loteCategoria) }}', '{{ addslashes($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}', '{{ addslashes($pasilloVal) }}', '{{ addslashes($estanteVal) }}', '{{ addslashes($nivelVal) }}', '{{ addslashes($posicionVal) }}')" class="p-1.5 text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded-lg transition-all border border-amber-200 shadow-sm cursor-pointer" title="Cambiar Estado / Ubicación">
+                                                                        <button type="button" onclick="openEditLote({{ \Illuminate\Support\Js::from($loteId) }}, {{ \Illuminate\Support\Js::from($loteCodigo) }}, {{ \Illuminate\Support\Js::from($nombreProducto) }}, 'Cuarentena', {{ \Illuminate\Support\Js::from($loteMotivo) }}, {{ \Illuminate\Support\Js::from($loteCategoria) }}, {{ \Illuminate\Support\Js::from($lotePrograma) }}, '{{ $valorUnitarioLote }}', '{{ $stockLote }}', {{ \Illuminate\Support\Js::from($pasilloVal) }}, {{ \Illuminate\Support\Js::from($estanteVal) }}, {{ \Illuminate\Support\Js::from($nivelVal) }}, {{ \Illuminate\Support\Js::from($posicionVal) }})" class="p-1.5 text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded-lg transition-all border border-amber-200 shadow-sm cursor-pointer" title="Cambiar Estado / Ubicación">
                                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                                         </button>
                                                                     </td>
@@ -408,7 +398,7 @@
                 </table>
             </div>
 
-            <!-- Paginación -->
+            <!-- paginacion -->
             <div class="px-6 py-4 border-t border-slate-200 bg-white">
                 @if (isset($inventories) && method_exists($inventories, 'links'))
                     {{ $inventories->links() }}
@@ -417,7 +407,7 @@
         </div>
     </div>
 
-        <!-- modal de la etiqueta QR -->
+        <!-- modal de la etiqueta qr -->
         <style>
             @media print {
                 body * {
@@ -758,11 +748,11 @@
             </div>
         </div>
 
-    <!-- Scripts de interactividad -->
+    <!-- scripts de interactividad -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
-        // Filtros avanzados
+        // filtros avanzados
         document.addEventListener('DOMContentLoaded', () => {
             const btnToggleFilters = document.getElementById('toggle-filters-btn');
             const filtersPanel = document.getElementById('filters-panel');
@@ -782,13 +772,13 @@
             return (text || '').toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
         }
 
-        // Helper seguro: evita errores si un elemento no existe
+        // helper seguro: evita errores si un elemento no existe
         function setText(id, value) {
             const el = document.getElementById(id);
             if (el) el.textContent = value;
         }
 
-        // Filtrado de la tabla en el navegador
+        // filtrado de la tabla en el navegador
         function filterTableByLocation() {
             const pasilloVal = normalizeText(document.getElementById('pasilloSelect').value);
             const estanteVal = normalizeText(document.getElementById('estanteSelect').value);
@@ -869,7 +859,7 @@
             if (searchInput) searchInput.value = '';
         }
 
-        // Buscador con desplegable
+        // buscador con desplegable
         function showSearchDropdown() { document.getElementById('searchDropdown')?.classList.remove('hidden'); }
         function selectSearchProduct(productName) {
             document.getElementById('searchInput').value = productName;
@@ -891,7 +881,7 @@
             }
         });
 
-        // Acordeón de la tabla
+        // acordeon de la tabla
         function toggleLotes(key) {
             const row = document.getElementById('lotes-' + key);
             const arrow = document.getElementById('arrow-' + key);
@@ -916,7 +906,7 @@
             }
         }
 
-        // Datos de jerarquía y ocupación de bodega para LoteStatus.Ubicacion
+        // datos de jerarquia y ocupacion de bodega para lotestatus.ubicacion
         window.distribucionJerarquia = @json($distribucionJerarquia ?? []);
         window.ubicacionesOcupadas = @json($ubicacionesOcupadas ?? []);
         window.todosLosPasillos = @json(collect($pasillosLista ?? [])->values());
@@ -949,7 +939,7 @@
             window.LoteStatus.Ubicacion.sincronizarSelectores(obtenerConfigModalEditUbicacion(), trigger, false);
         }
 
-        // Modal de edición de lote
+        // modal de edicion de lote
         function openEditLote(id, lote, producto, estado, motivo = '', categoria = '', programa = '', valorUnitario = 0, cantidad = 0, pasillo = '', estante = '', nivel = '', posicion = '') {
             const form = document.getElementById('editLoteForm');
             const pasClean = (pasillo && pasillo !== 'P.A') ? pasillo : '';
@@ -1035,18 +1025,13 @@
             else motivoInput.placeholder = "Justificación para mantener inmovilizado...";
         }
 
-        /**
-         * Escenario CUARENTENA: bloqueo preventivo / control técnico / liberación,
-         * con confirmación previa, envío AJAX y SweetAlert2 de éxito.
-         * Si la decisión es "Merma", delega en LoteStatus.Merma.
-         * Lógica en: public/js/lotes/lote-status.js
-         */
+        /* cuarentena: bloqueo, control tecnico o liberacion por ajax; la merma se delega en lote-status.js */
         function confirmDecisionCuarentena(event) {
             LoteStatus.Cuarentena.onSubmit(event);
             return false;
         }
 
-        // Modal del QR
+        // modal del qr
         function openQRModal(id, producto, lote, vencimiento, stock, proveedor) {
             document.getElementById('qrModal').classList.remove('hidden');
             setText('qrProducto', producto);
@@ -1062,7 +1047,7 @@
         }
         function closeQRModal() { document.getElementById('qrModal').classList.add('hidden'); }
 
-        // Modal del historial y sus filtros
+        // modal del historial y sus filtros
         function openHistory() {
             const modal = document.getElementById('HistoryModal');
             if (modal) {
@@ -1079,7 +1064,7 @@
             }
         }
 
-        // Cerrar modal al hacer clic en el backdrop exterior o tecla Escape
+        // cerrar modal al hacer clic en el backdrop exterior o tecla escape
         document.getElementById('HistoryModal')?.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeHistory();

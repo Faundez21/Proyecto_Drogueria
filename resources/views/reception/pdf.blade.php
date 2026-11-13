@@ -7,7 +7,7 @@
         @page { margin: 28px 36px 45px 36px; }
         body { font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif; font-size: 10.5px; color: #1e293b; line-height: 1.4; }
         
-        /* Cabecera Institucional */
+        /* cabecera institucional */
         .top-accent { height: 5px; background-color: #0d9488; width: 100%; margin-bottom: 12px; border-radius: 2px; }
         .header-table { width: 100%; border-bottom: 2px solid #0d9488; padding-bottom: 12px; margin-bottom: 14px; border-collapse: collapse; }
         .logo-container { width: 55%; vertical-align: middle; }
@@ -22,19 +22,19 @@
         .doc-correlativo { font-size: 14px; font-weight: 900; color: #134e4a; margin: 0 0 3px 0; font-family: 'Courier New', monospace; }
         .doc-date { font-size: 8.5px; color: #475569; margin: 0; font-weight: 600; }
 
-        /* Secciones y Tablas de Información */
+        /* secciones y tablas de informacion */
         .section-header { background-color: #f1f5f9; color: #0f766e; font-size: 9.5px; font-weight: 800; text-transform: uppercase; padding: 5px 10px; margin: 12px 0 5px 0; border-left: 4px solid #0d9488; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; letter-spacing: 0.5px; }
         .info-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
         .info-table th { background-color: #f8fafc; color: #475569; font-size: 8.5px; font-weight: 800; text-transform: uppercase; text-align: left; padding: 6px 8px; border: 1px solid #cbd5e1; width: 20%; letter-spacing: 0.3px; }
         .info-table td { font-size: 10px; color: #0f172a; font-weight: 600; padding: 6px 8px; border: 1px solid #cbd5e1; width: 30%; }
 
-        /* KPI Strip Resumen */
+        /* kpi strip resumen */
         .kpi-table { width: 100%; border-collapse: collapse; margin: 10px 0 8px 0; }
         .kpi-card { background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 10px; text-align: center; width: 33.33%; }
         .kpi-label { font-size: 8px; font-weight: 800; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 2px; }
         .kpi-value { font-size: 12px; font-weight: 900; color: #0f766e; }
 
-        /* Tabla de Artículos */
+        /* tabla de articulos */
         .items-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
         .items-table th { background-color: #0f766e; color: #ffffff; font-size: 8.5px; font-weight: 800; text-transform: uppercase; text-align: center; padding: 7px 6px; border: 1px solid #115e59; letter-spacing: 0.3px; }
         .items-table td { font-size: 9.5px; color: #1e293b; padding: 6px 6px; border: 1px solid #cbd5e1; text-align: center; vertical-align: middle; }
@@ -45,13 +45,13 @@
         .badge { display: inline-block; padding: 2px 5px; font-size: 8px; font-weight: 700; border-radius: 3px; background-color: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
         .badge-teal { background-color: #f0fdfa; color: #0f766e; border-color: #99f6e4; }
 
-        /* Totales */
+        /* totales */
         .subtotal-row td { background-color: #f8fafc !important; font-size: 9.5px; font-weight: 700; color: #475569; padding: 5px 8px; }
         .total-row td { background-color: #ccfbf1 !important; border-top: 2px solid #0d9488; padding: 7px 8px; }
         .total-label { font-size: 10px; font-weight: 900; color: #134e4a; text-transform: uppercase; }
         .total-amount { font-size: 12px; font-weight: 900; color: #0f766e; }
 
-        /* Firmas */
+        /* firmas */
         .signatures-wrapper { margin-top: 32px; width: 100%; page-break-inside: avoid; }
         .signatures-table { width: 100%; border-collapse: collapse; }
         .signature-box { width: 45%; text-align: center; vertical-align: bottom; padding: 6px; }
@@ -61,7 +61,7 @@
         .signature-title { font-size: 9.5px; font-weight: 800; color: #0f172a; margin: 0; text-transform: uppercase; }
         .signature-subtitle { font-size: 8.5px; color: #64748b; margin: 2px 0 0 0; }
 
-        /* Pie de página */
+        /* pie de pagina */
         .footer { position: fixed; bottom: -25px; left: 0; right: 0; height: 22px; text-align: left; font-size: 8px; color: #64748b; border-top: 1px solid #cbd5e1; padding-top: 4px; }
     </style>
 </head>

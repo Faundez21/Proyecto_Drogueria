@@ -21,7 +21,7 @@
     </script>
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}?v={{ @filemtime(public_path('css/dark-mode.css')) }}">
 
-    <!-- SweetAlert2 -->
+    <!-- sweetalert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
@@ -331,7 +331,7 @@
         </div>
     </div>
 
-    <!-- modal de recuperar contraseña -->
+    <!-- modal de recuperar contrasena -->
     <div id="forgotPasswordModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all"
         onclick="if(event.target === this) cerrarModalRecuperacion()">
@@ -358,7 +358,7 @@
                 </button>
             </div>
 
-            <!-- Cuerpo del Modal (Formulario) -->
+            <!-- cuerpo del modal (formulario) -->
             <div id="forgotFormView" class="p-6 space-y-5 overflow-y-auto flex-1">
                 <!-- explicacion del flujo en 3 pasos -->
                 <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 space-y-2">
@@ -420,7 +420,7 @@
                 </form>
             </div>
 
-            <!-- Vista de Éxito -->
+            <!-- vista de exito -->
             <div id="forgotSuccessView" class="hidden p-6 text-center space-y-4">
                 <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -513,7 +513,7 @@
                     </div>
                 </div>
 
-                <!-- Botones de Acción -->
+                <!-- botones de accion -->
                 <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 shrink-0">
                     <button type="button" onclick="cerrarModalContacto()"
                         class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer">
@@ -534,7 +534,7 @@
     </div>
 
     <script>
-        // Mostrar/ocultar contraseña
+        // mostrar/ocultar contrasena
         function togglePassword() {
             const input = document.getElementById('login_password');
             const eyeOpen = document.getElementById('eye_open');
@@ -551,7 +551,7 @@
             }
         }
 
-        // Avisa si el bloqueo de mayúsculas está activado
+        // avisa si el bloqueo de mayusculas esta activado
         const loginPassInput = document.getElementById('login_password');
         const capsWarning = document.getElementById('caps_lock_warning');
         if (loginPassInput && capsWarning) {
@@ -565,7 +565,7 @@
             loginPassInput.addEventListener('blur', () => capsWarning.classList.add('hidden'));
         }
 
-        // Validaciones básicas en cliente antes de enviar
+        // validaciones basicas en cliente antes de enviar
         document.getElementById('login_password').closest('form').addEventListener('submit', function(e) {
             const email = this.querySelector('input[name="email"]').value.trim();
             const password = document.getElementById('login_password').value;
@@ -592,7 +592,7 @@
                 return;
             }
 
-            // Estado de carga para evitar doble envío
+            // estado de carga para evitar doble envio
             const submitBtn = document.getElementById('btn_submit_login');
             const submitText = document.getElementById('btn_submit_text');
             const submitArrow = document.getElementById('btn_submit_arrow');
@@ -604,11 +604,11 @@
                 if (submitSpinner) submitSpinner.classList.remove('hidden');
             }
 
-            // Si en 10 segundos no redirige, se vuelve a habilitar el botón
+            // si en 10 segundos no redirige, se vuelve a habilitar el boton
             setTimeout(resetLoginButton, 10000);
         });
 
-        // Restaurar estado del botón de inicio de sesión
+        // restaurar estado del boton de inicio de sesion
         function resetLoginButton() {
             const submitBtn = document.getElementById('btn_submit_login');
             const submitText = document.getElementById('btn_submit_text');
@@ -622,11 +622,11 @@
             }
         }
 
-        // Manejar retroceso en el navegador (bfcache / back button)
+        // manejar retroceso en el navegador (bfcache / back button)
         window.addEventListener('pageshow', function(event) {
             resetLoginButton();
 
-            // Si la página fue restaurada desde el historial o bfcache tras iniciar sesión
+            // si la pagina fue restaurada desde el historial o bfcache tras iniciar sesion
             const navEntries = (window.performance && typeof performance.getEntriesByType === 'function')
                 ? performance.getEntriesByType('navigation')
                 : [];
@@ -635,11 +635,11 @@
                 (window.performance && window.performance.navigation && window.performance.navigation.type === 2);
 
             if (isBackForward) {
-                // Se recarga para que el servidor revise la sesión y redirija al módulo que corresponda
+                // se recarga para que el servidor revise la sesion y redirija al modulo que corresponda
                 window.location.reload();
             }
         });
-        // Modal de recuperar contraseña
+        // modal de recuperar contrasena
         function abrirModalRecuperacion(event) {
             if (event) event.preventDefault();
             const modal = document.getElementById('forgotPasswordModal');
@@ -715,7 +715,7 @@
                     throw new Error(validationMsg);
                 }
 
-                // Mostrar vista de éxito dentro del modal
+                // mostrar vista de exito dentro del modal
                 document.getElementById('recovery_success_email').textContent = email;
                 document.getElementById('forgotFormView').classList.add('hidden');
                 document.getElementById('forgotSuccessView').classList.remove('hidden');
@@ -728,7 +728,7 @@
             }
         }
 
-        // Modal de contacto con el administrador
+        // modal de contacto con el administrador
         function contactarAdministrador() {
             const modal = document.getElementById('contactAdminModal');
             if (modal) modal.classList.remove('hidden');
@@ -780,7 +780,7 @@
             window.location.href = `mailto:drogueriatalcahuano@gmail.com?subject=${subject}&body=${body}`;
         }
 
-        // Cerrar modales con tecla Escape
+        // cerrar modales con tecla escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 cerrarModalRecuperacion();

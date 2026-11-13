@@ -13,12 +13,12 @@ return new class extends Migration
             $table->string('producto');
             $table->string('lote');
             $table->date('fecha_vencimiento')->nullable();
-            $table->string('tipo_movimiento'); // 'Recepción', 'Despacho', 'Ajuste'
-            $table->integer('cantidad'); // Positiva o negativa
+            $table->string('tipo_movimiento'); // 'recepcion', 'despacho', 'ajuste'
+            $table->integer('cantidad'); // positiva o negativa
             $table->dateTime('fecha_hora');
-            $table->string('origen_destino'); // Ej: 'Laboratorio X' o 'CESFAM Y'
-            $table->string('documento_respaldo'); // Ej: 'Factura 123' o 'GD-2026-001'
-            $table->string('estado_lote')->default('Vigente'); // Vigente, Cuarentena, Vencido
+            $table->string('origen_destino'); // ej: 'laboratorio x' o 'cesfam y'
+            $table->string('documento_respaldo'); // ej: 'factura 123' o 'gd-2026-001'
+            $table->string('estado_lote')->default('Vigente'); // vigente, cuarentena, vencido
             $table->timestamps();
         });
     }

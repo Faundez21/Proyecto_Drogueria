@@ -22,13 +22,13 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
     private bool $forceReimport = false;
     private array $seenRows = [];
 
-    /** Filas que no se cargaron: [fila => motivo] */
+    // filas que no se cargaron: [fila => motivo]
     private array $omitidas = [];
 
-    /** Filas vencidas que se cargaron directamente como Merma */
+    // filas vencidas que se cargaron directamente como merma
     private int $vencidosAMerma = 0;
 
-    /** Filas cuya ubicación no existe en el mapa de bodega y quedaron "por asignar" (P.A) */
+    // filas cuya ubicacion no existe en el mapa de bodega y quedaron "por asignar" (p.a)
     private array $ubicacionesInvalidas = [];
 
     private const ESTADOS = [
@@ -51,7 +51,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
     {
         $this->registro++;
 
-        // 1. Validar que el archivo tenga al menos la columna PRODUCTO
+        // 1. validar que el archivo tenga al menos la columna producto
         if (! $this->headersValidated) {
             $missingColumns = [];
             foreach (self::REQUIRED_COLUMNS as $slug => $label) {
@@ -70,7 +70,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             $this->headersValidated = true;
         }
 
-        // Ignorar filas vacías o de relleno al final del Excel donde PRODUCTO esté en blanco
+        // ignorar filas vacias o de relleno al final del excel donde producto este en blanco
         $producto = trim((string) ($row['producto'] ?? ''));
         if ($producto === '') {
             return null;
@@ -81,7 +81,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             ? $categoriaRaw
             : InventoryService::clasificarGrupoProducto($producto);
 
-        // N° de fila tal como se ve en Excel (la fila 1 es el encabezado)
+        // n° de fila tal como se ve en excel (la fila 1 es el encabezado)
         $filaExcel = $this->registro + 1;
 
         $estadoTexto = trim((string) ($row['estado'] ?? ''));
@@ -116,14 +116,14 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         }
         $cantidad = (int) ($this->entero($cantidadRaw) ?? 0);
         if ($cantidad <= 0) {
-            // Sin stock: no se crea un lote vacío, pero el producto queda registrado en el catálogo
+            // sin stock: no se crea un lote vacio, pero el producto queda registrado en el catalogo
             InventoryService::productoId($producto);
             $this->omitidas[$filaExcel] = 'cantidad 0 (el producto quedó en el catálogo, sin lote)';
 
             return null;
         }
 
-        // Un lote ya vencido entra directamente como Merma (existe físicamente y debe darse de baja)
+        // un lote ya vencido entra directamente como merma (existe fisicamente y debe darse de baja)
         $fechaVencimiento = $this->fecha($row['fecha_vencimiento'] ?? null);
         $motivo = null;
         if ($fechaVencimiento && $estadoFinal !== 'Merma' && Carbon::parse($fechaVencimiento)->startOfDay()->lt(now()->startOfDay())) {
@@ -132,7 +132,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             $this->vencidosAMerma++;
         }
 
-        // La ubicación debe existir en el mapa de bodega; si no, el lote queda "por asignar"
+        // la ubicacion debe existir en el mapa de bodega; si no, el lote queda "por asignar"
         $pasillo = trim((string) ($row['pasillo'] ?? '')) ?: null;
         $estante = trim((string) ($row['estante'] ?? '')) ?: null;
         $nivel = trim((string) ($row['nivel'] ?? '')) ?: null;
@@ -142,7 +142,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             $pasillo = $estante = $nivel = $posicion = null;
         }
 
-        // Campos opcionales con valores por defecto seguros cuando vienen vacíos en el Excel
+        // campos opcionales con valores por defecto seguros cuando vienen vacios en el excel
         $fechaRecepcion = $this->fecha($row['fecha_recepcion'] ?? null) ?? now()->format('Y-m-d');
         $tipoDocumento = trim((string) ($row['tipo_documento'] ?? '')) ?: 'Carga Masiva';
         $numeroDocumento = trim((string) ($row['numero_documento'] ?? '')) ?: 'S/N';
@@ -216,7 +216,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         return $this->enMerma;
     }
 
-    /** @return array<int, string> [fila => motivo] */
+    // @return array<int, string> [fila => motivo]
     public function omitidas(): array
     {
         return $this->omitidas;
@@ -227,7 +227,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         return $this->vencidosAMerma;
     }
 
-    /** @return int[] filas con ubicación inexistente */
+    // @return int[] filas con ubicacion inexistente
     public function ubicacionesInvalidas(): array
     {
         return $this->ubicacionesInvalidas;
@@ -249,21 +249,21 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             return null;
         }
 
-        // Textos que indican "sin fecha / no aplica"
+        // textos que indican "sin fecha / no aplica"
         $upper = mb_strtoupper($valor);
         if (in_array($upper, ['N/A', 'NA', 'S/V', 'SV', 'S/F', 'SF', 'SIN VENCIMIENTO', 'SIN FECHA', 'NO APLICA', '-', '--', '0'], true)) {
             return null;
         }
 
-        // Normalizar espacios alrededor de separadores: '1 .2030' -> '1.2030', '13 / 10 / 2027' -> '13/10/2027'
+        // normalizar espacios alrededor de separadores: '1 .2030' -> '1.2030', '13 / 10 / 2027' -> '13/10/2027'
         $limpio = preg_replace('/\s*([\/\-\.])\s*/', '$1', $valor);
         $limpio = preg_replace('/\s+/', ' ', trim((string) $limpio));
 
-        // 0. Fechas escritas como números puros sin separadores (ej: '29042028' -> 29/04/2028, '102028' -> 10/2028)
+        // 0. fechas escritas como numeros puros sin separadores (ej: '29042028' -> 29/04/2028, '102028' -> 10/2028)
         if (preg_match('/^\d{5,8}$/', $limpio)) {
             $len = strlen($limpio);
             if ($len === 8) {
-                // DDMMYYYY (ej: 29042028)
+                // ddmmyyyy (ej: 29042028)
                 $d = (int) substr($limpio, 0, 2);
                 $mes = (int) substr($limpio, 2, 2);
                 $anio = (int) substr($limpio, 4, 4);
@@ -273,7 +273,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                 if ($anio >= 1990 && $anio <= 2100 && checkdate($mes, $d, $anio)) {
                     return sprintf('%04d-%02d-%02d', $anio, $mes, $d);
                 }
-                // YYYYMMDD (ej: 20280429)
+                // yyyymmdd (ej: 20280429)
                 $anioYmd = (int) substr($limpio, 0, 4);
                 $mesYmd = (int) substr($limpio, 4, 2);
                 $dYmd = (int) substr($limpio, 6, 2);
@@ -281,14 +281,14 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                     return sprintf('%04d-%02d-%02d', $anioYmd, $mesYmd, $dYmd);
                 }
             } elseif ($len === 7) {
-                // DMMYYYY (ej: 5042028 -> 05/04/2028)
+                // dmmyyyy (ej: 5042028 -> 05/04/2028)
                 $d1 = (int) substr($limpio, 0, 1);
                 $mes1 = (int) substr($limpio, 1, 2);
                 $anio1 = (int) substr($limpio, 3, 4);
                 if ($anio1 >= 1990 && $anio1 <= 2100 && checkdate($mes1, $d1, $anio1)) {
                     return sprintf('%04d-%02d-%02d', $anio1, $mes1, $d1);
                 }
-                // DDMYYYY (ej: 2942028 -> 29/04/2028)
+                // ddmyyyy (ej: 2942028 -> 29/04/2028)
                 $d2 = (int) substr($limpio, 0, 2);
                 $mes2 = (int) substr($limpio, 2, 1);
                 $anio2 = (int) substr($limpio, 3, 4);
@@ -296,13 +296,13 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                     return sprintf('%04d-%02d-%02d', $anio2, $mes2, $d2);
                 }
             } elseif ($len === 6) {
-                // MMYYYY (ej: 042028 -> 30/04/2028)
+                // mmyyyy (ej: 042028 -> 30/04/2028)
                 $mesM = (int) substr($limpio, 0, 2);
                 $anioM = (int) substr($limpio, 2, 4);
                 if ($mesM >= 1 && $mesM <= 12 && $anioM >= 1990 && $anioM <= 2100) {
                     return Carbon::createFromDate($anioM, $mesM, 1)->endOfMonth()->format('Y-m-d');
                 }
-                // DDMMYY (ej: 290428 -> 29/04/2028)
+                // ddmmyy (ej: 290428 -> 29/04/2028)
                 $dShort = (int) substr($limpio, 0, 2);
                 $mesShort = (int) substr($limpio, 2, 2);
                 $anioShort = 2000 + (int) substr($limpio, 4, 2);
@@ -310,7 +310,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                     return sprintf('%04d-%02d-%02d', $anioShort, $mesShort, $dShort);
                 }
             } elseif ($len === 5 && (int) $limpio < 32874) {
-                // MYYYY menor al rango de serial Excel (ej: 12030 -> 01/2030)
+                // myyyy menor al rango de serial excel (ej: 12030 -> 01/2030)
                 $mes5 = (int) substr($limpio, 0, 1);
                 $anio5 = (int) substr($limpio, 1, 4);
                 if ($mes5 >= 1 && $mes5 <= 9 && $anio5 >= 1990 && $anio5 <= 2100) {
@@ -319,7 +319,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             }
         }
 
-        // Serial numérico de Excel válido entre 1990-01-01 (32874) y 2100-12-31 (73415)
+        // serial numerico de excel valido entre 1990-01-01 (32874) y 2100-12-31 (73415)
         if (is_numeric($valor) && (float) $valor >= 32874 && (float) $valor <= 73415 && ! str_contains($valor, '.')) {
             try {
                 return $this->validarFechaSql(ExcelDate::excelToDateTimeObject((float) $valor)->format('Y-m-d'));
@@ -327,7 +327,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             }
         }
 
-        // 1. Formato Mes y Año de 4 dígitos: M.YYYY, MM/YYYY, MM-YYYY (ej: '1.2030', '01/2030', '12-2028')
+        // 1. formato mes y ano de 4 digitos: m.yyyy, mm/yyyy, mm-yyyy (ej: '1.2030', '01/2030', '12-2028')
         if (preg_match('/^(\d{1,2})[\/\-\.\s](\d{4})$/', $limpio, $m)) {
             $mes = (int) $m[1];
             $anio = (int) $m[2];
@@ -336,7 +336,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             }
         }
 
-        // 2. Formato Año de 4 dígitos y Mes: YYYY.MM, YYYY/MM, YYYY-MM (ej: '2030.01', '2030/1')
+        // 2. formato ano de 4 digitos y mes: yyyy.mm, yyyy/mm, yyyy-mm (ej: '2030.01', '2030/1')
         if (preg_match('/^(\d{4})[\/\-\.\s](\d{1,2})$/', $limpio, $m)) {
             $anio = (int) $m[1];
             $mes = (int) $m[2];
@@ -345,7 +345,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             }
         }
 
-        // 3. Formato Día, Mes y Año completo con separadores /, - o . (con día o mes de 1 o 2 dígitos)
+        // 3. formato dia, mes y ano completo con separadores /, - o . (con dia o mes de 1 o 2 digitos)
         if (preg_match('/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/', $limpio, $m)) {
             $d = (int) $m[1];
             $mes = (int) $m[2];
@@ -353,7 +353,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             if ($anio < 100) {
                 $anio += 2000;
             }
-            // Si el segundo número > 12 y el primero <= 12, vino en formato MM/DD/YYYY
+            // si el segundo numero > 12 y el primero <= 12, vino en formato mm/dd/yyyy
             if ($mes > 12 && $d <= 12) {
                 [$d, $mes] = [$mes, $d];
             }
@@ -362,7 +362,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             }
         }
 
-        // 4. Formato Mes y Año corto: MM/YY (ej: '01/30', '12-28')
+        // 4. formato mes y ano corto: mm/yy (ej: '01/30', '12-28')
         if (preg_match('/^(\d{1,2})[\/\-\.](\d{2})$/', $limpio, $m)) {
             $mes = (int) $m[1];
             $anio = 2000 + (int) $m[2];
@@ -371,7 +371,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             }
         }
 
-        // 5. Meses en español (ej: 'ene-2030', 'enero 2030', 'dic/28', '15-ene-2028')
+        // 5. meses en espanol (ej: 'ene-2030', 'enero 2030', 'dic/28', '15-ene-2028')
         $mesesEs = [
             'enero' => 1, 'ene' => 1,
             'febrero' => 2, 'feb' => 2,
@@ -403,7 +403,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             }
         }
 
-        // 6. Formatos estándar de Carbon
+        // 6. formatos estandar de carbon
         foreach (['d/m/Y', 'd-m-Y', 'Y-m-d', 'd.m.Y', 'Y/m/d'] as $formato) {
             try {
                 $fecha = Carbon::createFromFormat($formato, $limpio);
@@ -418,7 +418,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             }
         }
 
-        // 7. Si fue leído como flotante de Excel en rango válido (1990..2100)
+        // 7. si fue leido como flotante de excel en rango valido (1990..2100)
         if (is_numeric($limpio) && (float) $limpio >= 32874 && (float) $limpio <= 73415) {
             try {
                 return $this->validarFechaSql(ExcelDate::excelToDateTimeObject((float) $limpio)->format('Y-m-d'));
@@ -429,7 +429,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         try {
             return $this->validarFechaSql(Carbon::parse($limpio)->format('Y-m-d'));
         } catch (\Throwable) {
-            // Si el texto no representa una fecha reconocible, devolver null para no bloquear toda la carga
+            // si el texto no representa una fecha reconocible, devolver null para no bloquear toda la carga
             return null;
         }
     }
@@ -457,19 +457,19 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
 
         if (is_numeric($valor)) {
             $num = (int) floor((float) $valor);
-            // Evitar que códigos concatenados por error en Excel (> 50 millones) inflen el inventario
+            // evitar que codigos concatenados por error en excel (> 50 millones) inflen el inventario
             return ($num >= 0 && $num <= 50000000) ? $num : 0;
         }
 
         $str = trim((string) $valor);
 
-        // Soportar únicamente formato numérico con separador de miles válido (ej: '1.500', '12.000')
+        // soportar unicamente formato numerico con separador de miles valido (ej: '1.500', '12.000')
         if (preg_match('/^\d{1,3}(\.\d{3})+$/', $str)) {
             $num = (int) str_replace('.', '', $str);
             return ($num >= 0 && $num <= 50000000) ? $num : 0;
         }
 
-        // Si la celda contiene texto o varios números separados (que Excel ignora en AUTOSUMA), contar como 0
+        // si la celda contiene texto o varios numeros separados (que excel ignora en autosuma), contar como 0
         return 0;
     }
 
@@ -483,7 +483,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             return (float) $valor;
         }
 
-        // Limpiar símbolos de moneda o separadores comunes si vienen formateados
+        // limpiar simbolos de moneda o separadores comunes si vienen formateados
         if (is_string($valor)) {
             $limpio = str_replace(['$', ' ', '.'], '', $valor);
             $limpio = str_replace(',', '.', $limpio);

@@ -5,9 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    /**
-     * Run the migrations.
-     */
+    // run the migrations
     public function up(): void
     {
         Schema::create('solicitud_items', function (Blueprint $table) {
@@ -34,9 +32,7 @@ return new class extends Migration {
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+    // reverse the migrations
     public function down(): void
     {
         Schema::dropIfExists('solicitud_items');
