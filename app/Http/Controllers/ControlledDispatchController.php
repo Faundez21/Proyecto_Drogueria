@@ -150,8 +150,8 @@ class ControlledDispatchController extends Controller
             return redirect()->back()->withInput()->with('error', $errorDespacho);
         }
 
-        // Los controlados siempre van a un CESFAM de la red (despacho interno)
-        $validated['clasificacion'] = 'Interno';
+        // los controlados siempre van a un cesfam de la red (despacho externo)
+        $validated['clasificacion'] = 'Externo';
         $destino = $estRegistrado['nombre'];
 
         DB::beginTransaction();

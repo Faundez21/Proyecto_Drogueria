@@ -93,7 +93,7 @@
             </td>
             <td class="doc-meta">
                 <div class="doc-box">
-                    <p class="doc-type-label">Guía de Despacho {{ strtoupper($despacho->clasificacion ?? 'INTERNA') }}</p>
+                    <p class="doc-type-label">Guía de Despacho {{ strtoupper($despacho->clasificacion ?? 'EXTERNA') }}</p>
                     <p class="doc-correlativo">N° {{ $despacho->correlativo }}</p>
                     <p class="doc-date">Fecha Despacho: {{ \Carbon\Carbon::parse($despacho->fecha_despacho)->format('d/m/Y') }}</p>
                 </div>
@@ -108,7 +108,7 @@
                 <th>Establecimiento Destino</th>
                 <td style="font-weight: 800; color: #0369a1;">{{ $despacho->establecimiento_destino }}</td>
                 <th>Clasificación Guía</th>
-                <td>{{ strtoupper($despacho->clasificacion ?? 'Despacho Interno') }}</td>
+                <td>{{ strtoupper($despacho->clasificacion ?? 'Despacho Externo') }}</td>
             </tr>
             <tr>
                 <th>Dirección Entrega</th>
@@ -118,7 +118,7 @@
             </tr>
             @if (! empty($despacho->motivo_traspaso))
                 <tr>
-                    <th>Traspaso Interno</th>
+                    <th>Traspaso sin solicitud</th>
                     <td colspan="3">Sin solicitud previa. Motivo: {{ $despacho->motivo_traspaso }}</td>
                 </tr>
             @endif
