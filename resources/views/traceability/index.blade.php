@@ -96,6 +96,7 @@
                             <option value="Despacho Controlado" {{ request('tipo_movimiento') == 'Despacho Controlado' ? 'selected' : '' }}>Despacho Controlado</option>
                         @endif
                         <option value="Cambio de estado" {{ request('tipo_movimiento') == 'Cambio de estado' ? 'selected' : '' }}>Cambio de Estado (Cuarentena / Merma)</option>
+                        <option value="Edición de recepción" {{ request('tipo_movimiento') == 'Edición de recepción' ? 'selected' : '' }}>Edición de recepción</option>
                     </select>
                 </div>
 
@@ -153,6 +154,8 @@
                                     $badgeBg = 'bg-blue-50'; $badgeText = 'text-blue-700'; $badgeBorder = 'border-blue-200';
                                 } elseif($mov->tipo_movimiento == 'Despacho Controlado') {
                                     $badgeBg = 'bg-rose-50'; $badgeText = 'text-rose-700'; $badgeBorder = 'border-rose-200';
+                                } elseif($mov->tipo_movimiento == 'Edición de recepción') {
+                                    $badgeBg = 'bg-violet-50'; $badgeText = 'text-violet-700'; $badgeBorder = 'border-violet-200';
                                 }
                                 $responsableMov = $mov->user ? trim($mov->user->name . ' ' . ($mov->user->last_name ?? '')) : null;
                             @endphp
@@ -415,6 +418,8 @@
 
                     let html = '<div class="relative pl-6 border-l-2 border-slate-200 space-y-7">';
                     
+                    // escapa textos escritos por usuarios (motivos, documentos)
+                    const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
                     data.timeline.forEach((mov) => {
                         let badgeBg = 'bg-amber-50 text-amber-700 border-amber-200';
                         let dotColor = 'bg-amber-500 ring-amber-50';
@@ -427,6 +432,9 @@
                         } else if (mov.tipo === 'Despacho Controlado') {
                             badgeBg = 'bg-rose-50 text-rose-700 border-rose-200';
                             dotColor = 'bg-rose-500 ring-rose-50';
+                        } else if (mov.tipo === 'Edición de recepción') {
+                            badgeBg = 'bg-violet-50 text-violet-700 border-violet-200';
+                            dotColor = 'bg-violet-500 ring-violet-50';
                         }
                         
                         html += `
@@ -439,8 +447,8 @@
                                     </span>
                                     <p class="font-mono text-[11px] font-bold text-slate-400">${mov.fecha}</p>
                                 </div>
-                                <h4 class="text-[13px] font-black text-slate-800 leading-tight">${mov.origen_destino}</h4>
-                                <p class="text-[11.5px] font-medium text-slate-500 mt-1">Ref: <span class="text-slate-700 font-bold">${mov.documento}</span>${mov.responsable ? ` · <span class="text-teal-700 font-semibold">Resp: ${mov.responsable}</span>` : ''}</p>
+                                <h4 class="text-[13px] font-black text-slate-800 leading-tight">${esc(mov.origen_destino)}</h4>
+                                <p class="text-[11.5px] font-medium text-slate-500 mt-1">Ref: <span class="text-slate-700 font-bold">${esc(mov.documento)}</span>${mov.responsable ? ` · <span class="text-teal-700 font-semibold">Resp: ${esc(mov.responsable)}</span>` : ''}</p>
                             </div>
                         </div>`;
                     });

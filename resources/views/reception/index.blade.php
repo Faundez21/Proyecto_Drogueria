@@ -112,10 +112,36 @@
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Razón Social / Nombre Proveedor <span class="text-rose-500">*</span></label>
                             <select name="provider_id" id="provider_select" required class="w-full max-w-full truncate bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                                 <option value="" disabled selected>Seleccione proveedor...</option>
+                                <option value="__nuevo__">＋ Proveedor nuevo (no está en la lista)</option>
                                 @foreach($providers as $provider)
                                     <option value="{{ $provider->id }}" data-rut="{{ $provider->rut ?? $provider->nit ?? '' }}">{{ trim($provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor') }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- datos del proveedor nuevo: se registra al confirmar la recepcion -->
+                    <div id="bloque_proveedor_nuevo" class="hidden mt-4 p-4 rounded-xl border border-teal-200 bg-teal-50/40 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">RUT <span class="text-rose-500">*</span></label>
+                            <input type="text" name="proveedor_nuevo[rut]" maxlength="20" placeholder="Ej: 76.123.456-7" autocomplete="off" class="campo-prov-nuevo w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-mono-das">
+                        </div>
+                        <div>
+                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Razón social <span class="text-rose-500">*</span></label>
+                            <input type="text" name="proveedor_nuevo[nombre]" id="prov_nuevo_nombre" maxlength="255" autocomplete="off" class="campo-prov-nuevo w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
+                        </div>
+                        <div>
+                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoría <span class="text-rose-500">*</span></label>
+                            <select name="proveedor_nuevo[categoria]" class="campo-prov-nuevo w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
+                                <option value="" disabled selected>Seleccione categoría...</option>
+                                @foreach(\App\Http\Controllers\ProviderController::CATEGORIAS as $catProv)
+                                    <option value="{{ $catProv }}">{{ $catProv }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Correo <span class="text-rose-500">*</span></label>
+                            <input type="email" name="proveedor_nuevo[correo]" maxlength="255" placeholder="contacto@proveedor.cl" autocomplete="off" class="campo-prov-nuevo w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
                         </div>
                     </div>
                 </div>
@@ -127,61 +153,8 @@
                             <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                             <div>
                                 <h3 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider">3. Detalle de Producto(s) (Medicamentos, Insumos y Estupefacientes)</h3>
-                                <p class="text-[11.5px] text-slate-500">Seleccione el grupo o agregue filas directamente clasificadas por tipo de producto.</p>
+                                <p class="text-[11.5px] text-slate-500">Busca cada producto recibido y completa su lote, vencimiento y cantidad.</p>
                             </div>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <button type="button" onclick="agregarFilaPorGrupo('Medicamentos')" class="text-xs font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-lg transition-colors border border-teal-200 cursor-pointer inline-flex items-center gap-1.5 shadow-2xs">
-                                <span class="w-2 h-2 rounded-full bg-teal-500"></span>
-                                + Medicamento
-                            </button>
-                            <button type="button" onclick="agregarFilaPorGrupo('Insumos')" class="text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors border border-indigo-200 cursor-pointer inline-flex items-center gap-1.5 shadow-2xs">
-                                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                                + Insumo
-                            </button>
-                            <button type="button" onclick="agregarFilaPorGrupo('Estupefacientes')" class="text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-colors border border-rose-200 cursor-pointer inline-flex items-center gap-1.5 shadow-2xs">
-                                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-                                + Estupefaciente
-                            </button>
-                            <button type="button" id="btn_add_product" class="text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors border border-slate-300 cursor-pointer shadow-2xs">
-                                + Agregar Producto
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Resumen visual por grupo de productos en recepción -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-                        <div class="bg-teal-50/60 border border-teal-200 rounded-xl px-4 py-3 flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">MED</span>
-                                <div>
-                                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-teal-800">Medicamentos</p>
-                                    <p class="text-[11px] text-teal-600">{{ isset($productosAgrupados['Medicamentos']) ? $productosAgrupados['Medicamentos']->count() : 0 }} en catálogo</p>
-                                </div>
-                            </div>
-                            <span id="count_grupo_medicamentos" class="px-2.5 py-1 rounded-full text-[12px] font-black bg-white text-teal-700 border border-teal-200 shadow-2xs">0 ítem(s)</span>
-                        </div>
-
-                        <div class="bg-indigo-50/60 border border-indigo-200 rounded-xl px-4 py-3 flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">INS</span>
-                                <div>
-                                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-800">Insumos</p>
-                                    <p class="text-[11px] text-indigo-600">{{ isset($productosAgrupados['Insumos']) ? $productosAgrupados['Insumos']->count() : 0 }} en catálogo</p>
-                                </div>
-                            </div>
-                            <span id="count_grupo_insumos" class="px-2.5 py-1 rounded-full text-[12px] font-black bg-white text-indigo-700 border border-indigo-200 shadow-2xs">0 ítem(s)</span>
-                        </div>
-
-                        <div class="bg-rose-50/60 border border-rose-200 rounded-xl px-4 py-3 flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">EST</span>
-                                <div>
-                                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-800">Estupefacientes</p>
-                                    <p class="text-[11px] text-rose-600">{{ isset($productosAgrupados['Estupefacientes']) ? $productosAgrupados['Estupefacientes']->count() : 0 }} en catálogo</p>
-                                </div>
-                            </div>
-                            <span id="count_grupo_estupefacientes" class="px-2.5 py-1 rounded-full text-[12px] font-black bg-white text-rose-700 border border-rose-200 shadow-2xs">0 ítem(s)</span>
                         </div>
                     </div>
 
@@ -189,27 +162,9 @@
                     <div id="productos_container" class="space-y-4">
                         <!-- molde de producto -->
                         <div class="producto-item relative border border-slate-200 bg-slate-50/50 p-4 rounded-xl shadow-sm transition-colors duration-200" data-grupo-actual="Todos">
-                            <!-- Barra superior de clasificación visual por fila -->
-                            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-200/80 pr-8">
-                                <div class="flex flex-wrap items-center gap-1.5">
-                                    <span class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Filtrar catálogo:</span>
-                                    <button type="button" onclick="filtrarGrupoFila(this, 'Todos')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-800 text-white transition-all cursor-pointer" data-grupo="Todos">
-                                        Todos
-                                    </button>
-                                    <button type="button" onclick="filtrarGrupoFila(this, 'Medicamentos')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-white text-teal-700 border border-teal-200 hover:bg-teal-50 transition-all cursor-pointer" data-grupo="Medicamentos">
-                                        Medicamentos
-                                    </button>
-                                    <button type="button" onclick="filtrarGrupoFila(this, 'Insumos')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50 transition-all cursor-pointer" data-grupo="Insumos">
-                                        Insumos
-                                    </button>
-                                    <button type="button" onclick="filtrarGrupoFila(this, 'Estupefacientes')" class="btn-filtro-grupo px-2.5 py-1 rounded-md text-[11px] font-bold bg-white text-rose-700 border border-rose-200 hover:bg-rose-50 transition-all cursor-pointer" data-grupo="Estupefacientes">
-                                        Estupefacientes
-                                    </button>
-                                </div>
-
-                                <span class="badge-grupo-producto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold uppercase tracking-wider bg-slate-200 text-slate-600">
-                                    Sin clasificar
-                                </span>
+                            <!-- grupo del producto elegido (aparece al elegirlo) -->
+                            <div class="flex justify-end pr-8 min-h-[26px] mb-1">
+                                <span class="badge-grupo-producto hidden inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold uppercase tracking-wider bg-slate-200 text-slate-600"></span>
                             </div>
 
                             <button type="button" class="btn-remove-product hidden absolute top-3.5 right-3.5 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer" title="Eliminar fila">
@@ -219,8 +174,15 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div class="lg:col-span-2 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Producto <span class="text-rose-500">*</span></label>
-                                    <select name="product_id[]" required onchange="onProductoReceptionChange(this)" class="select-producto-recepcion w-full max-w-full truncate bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
+                                    <div class="buscador-producto relative">
+                                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-[13px] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                        <input type="text" class="input-buscar-producto w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none block py-2.5 pl-9 pr-3 text-[13px]"
+                                            placeholder="Escribe para buscar un producto..." autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-label="Buscar producto"
+                                            onfocus="abrirBuscadorProducto(this, true)" oninput="abrirBuscadorProducto(this, false)" onkeydown="teclaBuscadorProducto(event, this)" onblur="cerrarBuscadorProductoLuego(this)">
+                                        <ul class="lista-buscar-producto hidden absolute z-30 left-0 right-0 mt-1 max-h-72 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg py-1" role="listbox"></ul>
+                                    <select name="product_id[]" required onchange="onProductoReceptionChange(this)" tabindex="-1" aria-hidden="true" class="select-producto-recepcion sr-only">
                                         <option value="" disabled selected>Buscar producto por grupo...</option>
+                                        <option value="__nuevo__">＋ Producto nuevo (no está en la lista)</option>
                                         <optgroup label="Medicamentos (Fármacos)" data-optgroup="Medicamentos">
                                             @foreach($productosAgrupados['Medicamentos'] ?? [] as $product)
                                                 @php $nomLimpio = trim(preg_replace('/\s+/', ' ', $product->nombre ?? '')); @endphp
@@ -246,6 +208,15 @@
                                             @endforeach
                                         </optgroup>
                                     </select>
+                                    </div>
+                                    <!-- producto que no esta en el catalogo: se crea al confirmar la recepcion -->
+                                    <div class="campo-producto-nuevo hidden mt-2">
+                                        <input type="text" name="producto_nuevo[]" maxlength="1000" autocomplete="off"
+                                            oninput="actualizarResumenNombreNuevo(this)"
+                                            placeholder="Escribe el nombre completo del producto nuevo"
+                                            class="input-producto-nuevo w-full bg-white border border-teal-300 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2.5 px-3.5 text-[13px] outline-none">
+                                        <p class="text-[11.5px] text-slate-500 mt-1">Se agregará al catálogo al confirmar la recepción. Elige también su categoría.</p>
+                                    </div>
                                 </div>
                                 <div class="lg:col-span-2 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Categoría / Clasificación <span class="text-rose-500">*</span></label>
@@ -284,7 +255,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">F. Vencimiento <span class="text-rose-500">*</span></label>
-                                    <input type="date" name="fecha_vencimiento[]" min="{{ date('Y-m-d') }}" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
+                                    <input type="date" name="fecha_vencimiento[]" min="{{ date('Y-m-d') }}" data-min="{{ date('Y-m-d') }}" required class="input-vencimiento w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
                                 </div>
                                 <div>
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Cantidad <span class="text-rose-500">*</span></label>
@@ -294,10 +265,22 @@
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Valor Neto Unit. ($ CLP)</label>
                                     <input type="number" name="valor_unitario[]" step="1" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="calc-price w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-mono-das font-semibold">
                                 </div>
+                                <div>
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Estado al ingresar</label>
+                                    <select name="estado_ingreso[]" onchange="onEstadoIngresoChange(this)" class="select-estado-ingreso w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
+                                        <option value="Disponible" selected>Disponible</option>
+                                        <option value="Cuarentena">Cuarentena</option>
+                                        <option value="Merma">Merma</option>
+                                    </select>
+                                </div>
+                                <div class="campo-motivo-ingreso hidden sm:col-span-1 lg:col-span-3">
+                                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Motivo <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="motivo_ingreso[]" maxlength="1000" placeholder="Ej: envase dañado, falta certificado, llegó vencido" class="input-motivo-ingreso w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px]">
+                                </div>
                             </div>
 
-                            <!-- Distribución Física en Bodega -->
-                            <div class="mt-6 pt-4 pb-4 px-4 sm:px-5 border border-dashed border-slate-300/90 bg-slate-50/90 rounded-2xl shadow-2xs">
+                            <!-- ubicacion en bodega (una merma no se ubica) -->
+                            <div class="bloque-ubicacion mt-6 pt-4 pb-4 px-4 sm:px-5 border border-dashed border-slate-300/90 bg-slate-50/90 rounded-2xl shadow-2xs">
                                 <div class="flex flex-wrap items-center justify-between gap-2 mb-3.5 pb-2.5 border-b border-slate-200/70">
                                     <span class="text-[12px] font-bold text-slate-700 flex items-center gap-1.5 uppercase tracking-wide">
                                         <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -352,6 +335,10 @@
                             </div>
                         </div>
                     </div>
+                    <button type="button" id="btn_add_product" class="mt-4 w-full py-3 rounded-xl border-2 border-dashed border-slate-300 text-[13px] font-bold text-slate-600 hover:border-teal-400 hover:text-teal-700 hover:bg-teal-50/40 transition-colors cursor-pointer inline-flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Agregar otro producto
+                    </button>
 
                     <!-- gran total recepcion -->
                     <div class="mt-4 bg-teal-50/80 border border-teal-200/80 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
@@ -453,7 +440,7 @@
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap" style="width: 120px;">Fecha</th>
                                 <th class="px-4 py-3 font-semibold">Proveedor</th>
                                 <th class="px-4 py-3 font-semibold" style="width: 220px;">Ítems</th>
-                                <th class="px-4 py-3 font-semibold text-center" style="width: 130px;">Acciones</th>
+                                <th class="px-4 py-3 font-semibold text-center" style="width: 190px;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-[13px] text-slate-700">
@@ -491,6 +478,11 @@
                                     <button onclick="openDetailModal({{ json_encode($rec) }}, '{{ addslashes($rec->provider->name ?? $rec->provider->nombre ?? 'N/A') }}', '{{ $rec->provider->rut ?? 'N/A' }}', '{{ route('reception.pdf', $rec->id) }}')" class="text-teal-600 hover:text-teal-800 font-medium bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-md text-xs cursor-pointer whitespace-nowrap">
                                         Ver Detalle
                                     </button>
+                                    @can('ver.recepcion')
+                                    <button type="button" onclick="openEditReception({{ $rec->id }})" class="ml-1 text-slate-600 hover:text-slate-800 font-medium bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-md text-xs cursor-pointer whitespace-nowrap">
+                                        Editar
+                                    </button>
+                                    @endcan
                                 </td>
                             </tr>
                             @empty
@@ -503,6 +495,90 @@
                     <button onclick="closeHistoryModal()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50">Cerrar Historial</button>
                 </div>
             </div>
+    </div>
+
+    <!-- modal 3: editar recepcion -->
+    <div id="editReceptionModal" style="z-index: 85;" class="fixed inset-0 hidden bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="edit_rec_titulo">
+        <form id="editReceptionForm" class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col my-auto" novalidate>
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <h3 id="edit_rec_titulo" class="text-lg font-bold text-slate-800">Editar recepción</h3>
+                <button type="button" onclick="closeEditReception()" class="text-slate-400 hover:text-slate-600 cursor-pointer" aria-label="Cerrar">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 min-h-0 space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Fecha de recepción <span class="text-rose-500">*</span></label>
+                        <input type="date" name="fecha_recepcion" max="{{ date('Y-m-d') }}" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none block py-2.5 px-3.5 text-[13px]">
+                    </div>
+                    <div>
+                        <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Tipo de documento <span class="text-rose-500">*</span></label>
+                        <select name="tipo_documento" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none block py-2.5 px-3.5 text-[13px]">
+                            <option value="Factura">Factura</option>
+                            <option value="Guia">Guía de Despacho</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">N° del documento <span class="text-rose-500">*</span></label>
+                        <input type="text" name="numero_documento" required maxlength="255" class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none block py-2.5 px-3.5 text-[13px]">
+                    </div>
+                    <div>
+                        <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Orden de compra / referencia</label>
+                        <input type="text" name="orden_compra" maxlength="255" class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none block py-2.5 px-3.5 text-[13px]">
+                    </div>
+                    <div>
+                        <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Origen de la mercadería <span class="text-rose-500">*</span></label>
+                        <select name="origen" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none block py-2.5 px-3.5 text-[13px]">
+                            <option value="CENABAST">CENABAST</option>
+                            <option value="COMPRA DIRECTA DAS">COMPRA DIRECTA DAS</option>
+                            <option value="SSTHNO">SERVICIO DE SALUD TALCAHUANO</option>
+                            <option value="Traspaso">Traspaso</option>
+                            <option value="Donacion">Donación</option>
+                            <option value="Prestamo">Préstamo</option>
+                            <option value="Canje">Canje</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Proveedor <span class="text-rose-500">*</span></label>
+                        <select name="provider_id" required class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none block py-2.5 px-3.5 text-[13px]">
+                            @foreach($providers as $provider)
+                                <option value="{{ $provider->id }}">{{ trim($provider->name ?? 'Proveedor') }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-[12.5px] font-bold text-slate-700 uppercase tracking-wider mb-2">Productos recibidos</h4>
+                    <div class="border border-slate-200 rounded-xl overflow-x-auto">
+                        <table class="w-full min-w-[720px] text-left text-[13px]">
+                            <thead class="bg-slate-50 text-[11.5px] uppercase text-slate-500">
+                                <tr>
+                                    <th class="px-3 py-2.5 font-semibold">Producto</th>
+                                    <th class="px-3 py-2.5 font-semibold" style="width: 150px;">Lote</th>
+                                    <th class="px-3 py-2.5 font-semibold" style="width: 160px;">Vencimiento</th>
+                                    <th class="px-3 py-2.5 font-semibold" style="width: 110px;">Cantidad</th>
+                                    <th class="px-3 py-2.5 font-semibold" style="width: 130px;">Valor neto unit.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="edit_rec_items" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                    <p class="text-[11.5px] text-slate-500 mt-2">Si ya se despacharon unidades de un lote, solo se puede subir su cantidad.</p>
+                </div>
+
+                <div>
+                    <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">Motivo de la edición <span class="text-rose-500">*</span></label>
+                    <input type="text" name="motivo" required maxlength="300" placeholder="Ej: error de digitación en el lote de la factura" class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none block py-2.5 px-3.5 text-[13px]">
+                    <p class="text-[11.5px] text-slate-500 mt-1">Cada cambio queda registrado en Trazabilidad con tu nombre y este motivo.</p>
+                </div>
+            </div>
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-end gap-2">
+                <button type="button" onclick="closeEditReception()" class="px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-[13px] font-medium hover:bg-slate-50 cursor-pointer">Cancelar</button>
+                <button type="submit" id="edit_rec_guardar" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[13px] font-bold cursor-pointer disabled:opacity-60">Guardar cambios</button>
+            </div>
+        </form>
     </div>
 
     <!-- modal 2: detalle -->
@@ -597,6 +673,10 @@
 
         function obtenerNombreCompletoOpcion(opt) {
             if (!opt) return '';
+            if (opt.value === '__nuevo__') {
+                const campo = opt.closest('.producto-item')?.querySelector('.input-producto-nuevo');
+                return (campo?.value || '').trim() || 'Producto nuevo';
+            }
             return (opt.getAttribute('data-nombre-completo') || opt.getAttribute('title') || opt.textContent || '').trim();
         }
 
@@ -649,8 +729,9 @@
                 badge.textContent = 'Estupefaciente / Controlado';
             } else {
                 card.classList.add('border-slate-200', 'bg-slate-50/50');
-                badge.classList.add('bg-slate-200', 'text-slate-600');
-                badge.textContent = 'Sin clasificar';
+                // sin producto elegido no se muestra etiqueta
+                badge.classList.add('hidden');
+                badge.textContent = '';
             }
 
             actualizarContadoresGrupos();
@@ -700,7 +781,7 @@
 
             const selectedOpt = selectProd.options[selectProd.selectedIndex];
             if (grupo !== 'Todos') {
-                if (!selectedOpt || !selectedOpt.value || selectedOpt.getAttribute('data-grupo') !== grupo) {
+                if (!selectedOpt || !selectedOpt.value || (selectedOpt.value !== '__nuevo__' && selectedOpt.getAttribute('data-grupo') !== grupo)) {
                     selectProd.selectedIndex = 0;
                     const selectCat = card.querySelector('.select-categoria-recepcion');
                     if (grupo === 'Estupefacientes') {
@@ -715,11 +796,184 @@
             } else if (!selectedOpt || !selectedOpt.value) {
                 actualizarEstiloCardGrupo(card, 'Todos');
             }
+            actualizarCampoProductoNuevo(card);
+        }
+
+        // muestra el campo del nombre cuando se elige producto nuevo
+        function actualizarCampoProductoNuevo(card) {
+            const campo = card?.querySelector('.campo-producto-nuevo');
+            const input = card?.querySelector('.input-producto-nuevo');
+            const select = card?.querySelector('.select-producto-recepcion');
+            if (!campo || !input || !select) return;
+            const esNuevo = select.value === '__nuevo__';
+            campo.classList.toggle('hidden', !esNuevo);
+            input.required = esNuevo;
+            if (!esNuevo) input.value = '';
+        }
+
+        function actualizarResumenNombreNuevo(input) {
+            // revisa de nuevo la ubicacion al escribir el nombre
+            const card = input.closest('.producto-item');
+            if (card && window.LoteStatus && window.LoteStatus.Ubicacion) {
+                window.LoteStatus.Ubicacion.actualizarIndicadorVisual?.(obtenerConfigUbicacionFila(card));
+            }
+        }
+
+        // buscador de producto: al elegir uno se fija el selector original que se envia
+        const normalizarBusqueda = t => (t || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+        const ETIQUETA_GRUPO = {
+            Medicamentos: ['Medicamento', 'bg-teal-50 text-teal-700 border-teal-200'],
+            Insumos: ['Insumo', 'bg-indigo-50 text-indigo-700 border-indigo-200'],
+            Estupefacientes: ['Controlado', 'bg-rose-50 text-rose-700 border-rose-200'],
+        };
+
+        function textoOpcionProducto(opt) {
+            return (opt.getAttribute('data-nombre-completo') || opt.textContent || '').replace(/\s*\(Controlado\)\s*$/, '').trim();
+        }
+
+        function sincronizarTextoBuscador(card) {
+            const input = card?.querySelector('.input-buscar-producto');
+            const select = card?.querySelector('.select-producto-recepcion');
+            if (!input || !select) return;
+            const opt = select.options[select.selectedIndex];
+            if (!opt || !opt.value) input.value = '';
+            else if (opt.value === '__nuevo__') input.value = '＋ Producto nuevo';
+            else input.value = textoOpcionProducto(opt);
+        }
+
+        function abrirBuscadorProducto(input, alEnfocar) {
+            const card = input.closest('.producto-item');
+            const select = card.querySelector('.select-producto-recepcion');
+            const lista = card.querySelector('.lista-buscar-producto');
+            if (alEnfocar) input.select();
+
+            // al enfocar con un producto ya elegido se muestra la lista completa
+            const elegido = select.options[select.selectedIndex];
+            const texto = alEnfocar && elegido && elegido.value ? '' : input.value;
+            const q = normalizarBusqueda(texto);
+            const opciones = Array.from(select.querySelectorAll('optgroup option'));
+            const hallados = (q ? opciones.filter(o => normalizarBusqueda(textoOpcionProducto(o)).includes(q)) : opciones).slice(0, 60);
+
+            lista.replaceChildren();
+            const agregar = (texto, etiqueta, valor, nuevoNombre) => {
+                const li = document.createElement('li');
+                li.setAttribute('role', 'option');
+                li.dataset.valor = valor;
+                if (nuevoNombre) li.dataset.nuevoNombre = nuevoNombre;
+                li.className = 'opcion-producto flex items-center justify-between gap-3 px-3 py-2 text-[13px] text-slate-700 cursor-pointer hover:bg-teal-50';
+                const span = document.createElement('span');
+                span.className = 'min-w-0 truncate';
+                span.textContent = texto;
+                li.appendChild(span);
+                if (etiqueta) {
+                    const tag = document.createElement('span');
+                    tag.className = 'shrink-0 px-1.5 py-0.5 rounded border text-[10.5px] font-bold ' + etiqueta[1];
+                    tag.textContent = etiqueta[0];
+                    li.appendChild(tag);
+                }
+                // mousedown para elegir antes de que el campo pierda el foco
+                li.addEventListener('mousedown', ev => { ev.preventDefault(); elegirProductoBuscador(card, valor, nuevoNombre); });
+                lista.appendChild(li);
+            };
+
+            hallados.forEach(o => agregar(textoOpcionProducto(o), ETIQUETA_GRUPO[o.getAttribute('data-grupo')] || null, o.value));
+            if (q && hallados.length === 0) {
+                const vacio = document.createElement('li');
+                vacio.className = 'px-3 py-2 text-[12.5px] text-slate-500';
+                vacio.textContent = 'No hay productos que coincidan con «' + texto.trim() + '».';
+                lista.appendChild(vacio);
+            }
+            agregar(q ? '＋ Agregar «' + texto.trim() + '» como producto nuevo' : '＋ Producto nuevo (no está en la lista)', null, '__nuevo__', q ? texto.trim() : '');
+
+            lista.classList.remove('hidden');
+            input.setAttribute('aria-expanded', 'true');
+            lista.dataset.activo = '-1';
+        }
+
+        function elegirProductoBuscador(card, valor, nuevoNombre) {
+            const select = card.querySelector('.select-producto-recepcion');
+            select.value = valor;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            if (valor === '__nuevo__' && nuevoNombre) {
+                const campo = card.querySelector('.input-producto-nuevo');
+                if (campo) campo.value = nuevoNombre;
+            }
+            cerrarBuscadorProducto(card);
+            sincronizarTextoBuscador(card);
+            if (valor === '__nuevo__') card.querySelector('.input-producto-nuevo')?.focus();
+        }
+
+        function cerrarBuscadorProducto(card) {
+            const lista = card.querySelector('.lista-buscar-producto');
+            lista?.classList.add('hidden');
+            card.querySelector('.input-buscar-producto')?.setAttribute('aria-expanded', 'false');
+        }
+
+        function cerrarBuscadorProductoLuego(input) {
+            const card = input.closest('.producto-item');
+            setTimeout(() => { cerrarBuscadorProducto(card); sincronizarTextoBuscador(card); }, 150);
+        }
+
+        function teclaBuscadorProducto(ev, input) {
+            const card = input.closest('.producto-item');
+            const lista = card.querySelector('.lista-buscar-producto');
+            const opciones = Array.from(lista.querySelectorAll('.opcion-producto'));
+            let activo = parseInt(lista.dataset.activo || '-1', 10);
+            if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+                ev.preventDefault();
+                if (lista.classList.contains('hidden')) abrirBuscadorProducto(input, false);
+                activo = ev.key === 'ArrowDown' ? Math.min(activo + 1, opciones.length - 1) : Math.max(activo - 1, 0);
+                opciones.forEach((o, i) => o.classList.toggle('bg-teal-50', i === activo));
+                opciones[activo]?.scrollIntoView({ block: 'nearest' });
+                lista.dataset.activo = String(activo);
+            } else if (ev.key === 'Enter') {
+                ev.preventDefault(); // no enviar el formulario
+                const elegida = opciones[activo >= 0 ? activo : 0];
+                if (elegida) elegirProductoBuscador(card, elegida.dataset.valor, elegida.dataset.nuevoNombre);
+            } else if (ev.key === 'Escape') {
+                cerrarBuscadorProducto(card);
+                sincronizarTextoBuscador(card);
+            }
+        }
+
+        // muestra el motivo y ajusta vencimiento y ubicacion segun el estado elegido
+        function onEstadoIngresoChange(select) {
+            const card = select.closest('.producto-item');
+            if (!card) return;
+            const estado = select.value || 'Disponible';
+            const motivo = card.querySelector('.campo-motivo-ingreso');
+            const inputMotivo = card.querySelector('.input-motivo-ingreso');
+            motivo?.classList.toggle('hidden', estado === 'Disponible');
+            if (inputMotivo) {
+                inputMotivo.required = estado !== 'Disponible';
+                if (estado === 'Disponible') inputMotivo.value = '';
+            }
+            const vence = card.querySelector('.input-vencimiento');
+            if (vence) {
+                if (estado === 'Merma') vence.removeAttribute('min');
+                else vence.setAttribute('min', vence.dataset.min || '');
+            }
+            const ubicacion = card.querySelector('.bloque-ubicacion');
+            ubicacion?.classList.toggle('hidden', estado === 'Merma');
+            if (estado === 'Merma') {
+                ubicacion?.querySelectorAll('select').forEach(sel => { sel.value = ''; });
+            }
         }
 
         function onProductoReceptionChange(selectProd) {
             const card = selectProd.closest('.producto-item');
             const opt = selectProd.options[selectProd.selectedIndex];
+            actualizarCampoProductoNuevo(card);
+            sincronizarTextoBuscador(card);
+            if (opt && opt.value === '__nuevo__') {
+                // sin historial la categoria la elige la persona
+                const grupoFiltro = card.getAttribute('data-grupo-actual') || 'Todos';
+                const selectCat = card.querySelector('.select-categoria-recepcion');
+                if (selectCat) selectCat.value = grupoFiltro !== 'Todos' ? grupoFiltro : '';
+                actualizarEstiloCardGrupo(card, grupoFiltro);
+                card.querySelector('.input-producto-nuevo')?.focus();
+                return;
+            }
             if (!opt || !opt.value) {
                 actualizarEstiloCardGrupo(card, 'Todos');
                 return;
@@ -782,6 +1036,20 @@
             actualizarEstiloCardGrupo(card, grupo);
         }
 
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('.select-producto-recepcion')?.closest('form');
+            form?.addEventListener('reset', () => setTimeout(() => {
+                document.querySelectorAll('.producto-item').forEach(card => {
+                    actualizarCampoProductoNuevo(card);
+                    sincronizarTextoBuscador(card);
+                    actualizarEstiloCardGrupo(card, 'Todos');
+                    const estado = card.querySelector('.select-estado-ingreso');
+                    if (estado) onEstadoIngresoChange(estado);
+                });
+                window.actualizarProveedorNuevo?.();
+            }, 0));
+        });
+
         function actualizarContadoresGrupos() {
             let med = 0, ins = 0, est = 0;
             document.querySelectorAll('.producto-item').forEach(card => {
@@ -791,7 +1059,7 @@
                 const optCat = selCat ? selCat.options[selCat.selectedIndex] : null;
 
                 let grp = null;
-                if (optProd && optProd.value) {
+                if (optProd && optProd.value && optProd.value !== '__nuevo__') {
                     grp = optProd.getAttribute('data-grupo');
                 } else if (optCat && optCat.value) {
                     grp = optCat.getAttribute('data-grupo');
@@ -825,6 +1093,10 @@
 
             clone.querySelectorAll('input').forEach(inp => inp.value = '');
             clone.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
+            clone.querySelector('.lista-buscar-producto')?.replaceChildren();
+            actualizarCampoProductoNuevo(clone);
+            const estadoClone = clone.querySelector('.select-estado-ingreso');
+            if (estadoClone) { estadoClone.value = 'Disponible'; onEstadoIngresoChange(estadoClone); }
 
             const btnRemove = clone.querySelector('.btn-remove-product');
             btnRemove.classList.remove('hidden');
@@ -969,6 +1241,11 @@
         }
 
         // Aviso de éxito con el resumen de la recepción
+        // escapa textos escritos por el usuario antes de mostrarlos como html
+        function escHtml(t) {
+            return String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
         function mostrarSweetAlertRecepcionExitosa(recData, recargarAlCerrar = false) {
             if (!recData) return;
 
@@ -980,10 +1257,10 @@
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">RECEPCIÓN CONFORME</span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
-                            <p><strong>Proveedor:</strong> ${recData.proveedor || 'N/A'}</p>
-                            <p><strong>Documento:</strong> ${recData.documento || 'N/A'}</p>
+                            <p><strong>Proveedor:</strong> ${escHtml(recData.proveedor || 'N/A')}</p>
+                            <p><strong>Documento:</strong> ${escHtml(recData.documento || 'N/A')}</p>
                             ${recData.fecha_recepcion ? `<p><strong>Fecha:</strong> ${recData.fecha_recepcion}</p>` : ''}
-                            ${recData.origen ? `<p><strong>Origen:</strong> ${recData.origen}</p>` : ''}
+                            ${recData.origen ? `<p><strong>Origen:</strong> ${escHtml(recData.origen)}</p>` : ''}
                             <p><strong>Total Recepcionado:</strong> ${Number(recData.total_unidades || 0).toLocaleString('es-CL')} uds. (${recData.total_items || 0} producto${recData.total_items === 1 ? '' : 's'})</p>
                             <p><strong>Total c/IVA:</strong> <span class="font-bold text-teal-800">$ ${Math.round(recData.valor_total || 0).toLocaleString('es-CL')}</span></p>
                         </div>
@@ -1005,13 +1282,13 @@
                                 ${(recData.items || []).map(it => `
                                     <tr class="hover:bg-slate-50">
                                         <td class="p-2 font-medium text-slate-800">
-                                            ${it.producto}
+                                            ${escHtml(it.producto)}
                                             <div class="flex flex-wrap gap-1 mt-0.5">
-                                                ${it.tipo ? `<span class="text-[10px] text-slate-500 font-normal">${it.tipo}</span>` : ''}
-                                                ${it.programa && it.programa !== 'Sin programa' ? `<span class="px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[9.5px] font-bold">${it.programa}</span>` : ''}
+                                                ${it.tipo ? `<span class="text-[10px] text-slate-500 font-normal">${escHtml(it.tipo)}</span>` : ''}
+                                                ${it.programa && it.programa !== 'Sin programa' ? `<span class="px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[9.5px] font-bold">${escHtml(it.programa)}</span>` : ''}
                                             </div>
                                         </td>
-                                        <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${it.lote || 'S/L'}</td>
+                                        <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${escHtml(it.lote || 'S/L')}</td>
                                         <td class="p-2 text-center text-slate-600">${it.vencimiento || 'N/A'}</td>
                                         <td class="p-2 text-center">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-[10.5px] font-bold ${it.ubicacion && it.ubicacion !== 'P.A' ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-slate-100 text-slate-500'}">
@@ -1063,8 +1340,18 @@
             // 1. logica autocompletar proveedor
             const providerSelect = document.getElementById('provider_select');
             const rutInput = document.getElementById('rut_proveedor_display');
+            // muestra los campos del proveedor nuevo cuando se elige esa opcion
+            window.actualizarProveedorNuevo = function () {
+                const esNuevo = providerSelect.value === '__nuevo__';
+                const bloque = document.getElementById('bloque_proveedor_nuevo');
+                bloque.classList.toggle('hidden', !esNuevo);
+                bloque.querySelectorAll('.campo-prov-nuevo').forEach(c => { c.required = esNuevo; });
+                rutInput.closest('div').classList.toggle('hidden', esNuevo);
+            };
             providerSelect.addEventListener('change', function() {
                 rutInput.value = this.options[this.selectedIndex].getAttribute('data-rut') || '';
+                window.actualizarProveedorNuevo();
+                if (this.value === '__nuevo__') document.querySelector('[name="proveedor_nuevo[rut]"]')?.focus();
             });
 
             // 2. logica dinamica de productos y totales
@@ -1144,7 +1431,12 @@
                 const docTipo = form.querySelector('[name="tipo_documento"]')?.value || 'Documento';
                 const docNum = form.querySelector('[name="numero_documento"]')?.value || '';
                 const provSelect = document.getElementById('provider_select');
-                const provName = provSelect && provSelect.selectedIndex >= 0 ? provSelect.options[provSelect.selectedIndex]?.text.trim() : 'Proveedor';
+                const provNuevo = provSelect?.value === '__nuevo__';
+                const provName = provNuevo
+                    ? ((document.getElementById('prov_nuevo_nombre')?.value || '').trim() || 'Proveedor nuevo')
+                    : (provSelect && provSelect.selectedIndex >= 0 ? provSelect.options[provSelect.selectedIndex]?.text.trim() : 'Proveedor');
+                // el nombre escrito se muestra como texto, no como html
+                const escaparHtml = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
                 const productCards = form.querySelectorAll('.producto-item');
                 let itemsCount = 0;
@@ -1222,7 +1514,7 @@
 
                 Swal.fire({
                     title: '¿Confirmar Acta de Recepción?',
-                    html: `Se registrará la recepción de <strong>${itemsCount}</strong> producto(s)${textoUnidades} del proveedor <strong>${provName}</strong> (${docTipo} N° ${docNum}).`,
+                    html: `Se registrará la recepción de <strong>${itemsCount}</strong> producto(s)${textoUnidades} del proveedor <strong>${escaparHtml(provName)}</strong>${provNuevo ? ' (se registrará como proveedor nuevo)' : ''} (${escaparHtml(docTipo)} N° ${escaparHtml(docNum)}).`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#0d9488',
@@ -1326,6 +1618,105 @@
         function openHistoryModal() { llevarModalAlFrente('historyModal').classList.remove('hidden'); }
         function closeHistoryModal() { document.getElementById('historyModal').classList.add('hidden'); }
 
+        // datos de cada recepcion para el formulario de edicion
+        const RECEPCIONES_EDITABLES = @json($recepcionesEditables ?? []);
+        let recepcionEnEdicion = null;
+
+        function openEditReception(id) {
+            const rec = RECEPCIONES_EDITABLES[id];
+            if (!rec) return;
+            recepcionEnEdicion = rec;
+            const form = document.getElementById('editReceptionForm');
+            form.reset();
+            document.getElementById('edit_rec_titulo').textContent = 'Editar recepción · Acta N° ' + rec.correlativo;
+            form.fecha_recepcion.value = rec.fecha_recepcion || '';
+            form.tipo_documento.value = rec.tipo_documento || 'Factura';
+            form.numero_documento.value = rec.numero_documento || '';
+            form.orden_compra.value = rec.orden_compra || '';
+            form.origen.value = rec.origen || '';
+            // un proveedor inactivo no esta en la lista: se agrega para no perderlo
+            const selProv = form.provider_id;
+            if (rec.provider_id && !selProv.querySelector('option[value="' + rec.provider_id + '"]')) {
+                selProv.add(new Option(rec.proveedor || 'Proveedor', rec.provider_id));
+            }
+            selProv.value = rec.provider_id || '';
+
+            const tbody = document.getElementById('edit_rec_items');
+            tbody.replaceChildren();
+            const claseCampo = 'w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2 px-2.5 text-[13px] outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500';
+            rec.items.forEach(it => {
+                const tr = document.createElement('tr');
+                const tdNombre = document.createElement('td');
+                tdNombre.className = 'px-3 py-2.5 font-medium text-slate-800';
+                tdNombre.textContent = it.producto;
+                tr.appendChild(tdNombre);
+                const campos = [
+                    ['lote', 'text', it.lote || '', { maxLength: 255, placeholder: 'S/L' }],
+                    ['fecha_vencimiento', 'date', it.fecha_vencimiento || '', { required: true }],
+                    ['cantidad', 'number', it.cantidad, { required: true, min: 1, step: 1 }],
+                    ['valor_unitario', 'number', it.valor_unitario, { min: 0, step: 1 }],
+                ];
+                campos.forEach(([nombre, tipo, valor, attrs]) => {
+                    const td = document.createElement('td');
+                    td.className = 'px-3 py-2';
+                    const inp = document.createElement('input');
+                    inp.type = tipo;
+                    inp.name = 'items[' + it.id + '][' + nombre + ']';
+                    inp.value = valor ?? '';
+                    inp.className = claseCampo + (tipo === 'number' ? ' font-mono-das' : '');
+                    Object.assign(inp, attrs);
+                    td.appendChild(inp);
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+
+            llevarModalAlFrente('editReceptionModal').classList.remove('hidden');
+        }
+
+        function closeEditReception() {
+            document.getElementById('editReceptionModal').classList.add('hidden');
+            recepcionEnEdicion = null;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('editReceptionForm');
+            form?.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                if (!recepcionEnEdicion) return;
+                if (!form.checkValidity()) { form.reportValidity(); return; }
+                const boton = document.getElementById('edit_rec_guardar');
+                boton.disabled = true;
+                try {
+                    const datos = new FormData(form);
+                    datos.append('_method', 'PUT');
+                    const token = document.querySelector('#receptionForm input[name="_token"]')?.value || '';
+                    const resp = await fetch('{{ url('reception') }}/' + recepcionEnEdicion.id, {
+                        method: 'POST',
+                        body: datos,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': token },
+                    });
+                    const data = await resp.json().catch(() => ({}));
+                    if (resp.ok && data.ok) {
+                        closeEditReception();
+                        await Swal.fire({ icon: 'success', title: 'Recepción actualizada', text: data.message, confirmButtonColor: '#0d9488' });
+                        window.location.reload();
+                        return;
+                    }
+                    let msg = data.message || 'No se pudo guardar la edición.';
+                    if (data.errors) {
+                        const k = Object.keys(data.errors)[0];
+                        if (k && data.errors[k][0]) msg = data.errors[k][0];
+                    }
+                    Swal.fire({ icon: 'error', title: 'No se pudo editar', text: msg, confirmButtonColor: '#e11d48' });
+                } catch (err) {
+                    Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo contactar al servidor.', confirmButtonColor: '#e11d48' });
+                } finally {
+                    boton.disabled = false;
+                }
+            });
+        });
+
         function openDetailModal(data, providerName, providerRut, pdfUrl) {
             llevarModalAlFrente('detailModal');
             document.getElementById('m_correlativo').innerText = '#' + data.correlativo;
@@ -1368,11 +1759,11 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td class="px-4 py-3">
-                            <strong>${item.product ? item.product.nombre : 'Prod Eliminado'}</strong><br>
-                            <span class="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-bold border ${g.badgeClass}">${item.tipo_producto || key}</span>
-                            ${item.programa ? `<span class="inline-block mt-0.5 ml-1 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">${item.programa}</span>` : ''}
+                            <strong>${escHtml(item.product ? item.product.nombre : 'Prod Eliminado')}</strong><br>
+                            <span class="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-bold border ${g.badgeClass}">${escHtml(item.tipo_producto || key)}</span>
+                            ${item.programa ? `<span class="inline-block mt-0.5 ml-1 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">${escHtml(item.programa)}</span>` : ''}
                         </td>
-                        <td class="px-4 py-3">${item.lote || 'S/L'}<br><span class="text-[10px] text-slate-500">${item.fecha_vencimiento ? (item.fecha_vencimiento.includes('-') ? item.fecha_vencimiento.split('T')[0].split('-').reverse().join('/') : item.fecha_vencimiento) : 'N/A'}</span></td>
+                        <td class="px-4 py-3">${escHtml(item.lote || 'S/L')}<br><span class="text-[10px] text-slate-500">${item.fecha_vencimiento ? (item.fecha_vencimiento.includes('-') ? item.fecha_vencimiento.split('T')[0].split('-').reverse().join('/') : item.fecha_vencimiento) : 'N/A'}</span></td>
                         <td class="px-4 py-3 text-center font-bold">${item.cantidad}</td>
                         <td class="px-4 py-3 text-right font-mono-das font-bold">$${Math.round(parseFloat(item.valor_total_item || 0)).toLocaleString('es-CL')}</td>
                     `;

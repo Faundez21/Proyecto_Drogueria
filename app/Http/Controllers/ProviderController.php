@@ -94,7 +94,7 @@ class ProviderController extends Controller
     }
 
     /** Categorías de proveedor permitidas (las mismas del formulario). */
-    private const CATEGORIAS = [
+    public const CATEGORIAS = [
         'Fármacos y medicamentos',
         'Insumos clínicos',
         'Equipamiento mayor',
