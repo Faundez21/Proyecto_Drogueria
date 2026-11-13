@@ -145,6 +145,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ReceptionController::class, 'index'])->name('index');
         Route::post('/guardar', [ReceptionController::class, 'store'])->name('store');
         Route::get('/{reception}/pdf', [ReceptionController::class, 'downloadPdf'])->name('pdf');
+        Route::put('/{reception}', [ReceptionController::class, 'update'])->name('update');
     });
 
     // modulo de proveedores

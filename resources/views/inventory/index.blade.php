@@ -32,13 +32,6 @@
             </svg>
             Carga Masiva
         </button>
-        <button type="button" onclick="openDeposit()"
-            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
-            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Ingreso Manual
-        </button>
     </div>
 @endsection
 
@@ -788,206 +781,6 @@
                             <span>Validar y Procesar Carga Masiva</span>
                         </button>
                     </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal: ingreso manual -->
-        <div id="DepositModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-0 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-bold text-white tracking-wide">Ingreso Manual Directo de Producto</h2>
-                            <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro individual con trazabilidad inmediata en bodega.</p>
-                        </div>
-                    </div>
-                    <button type="button" onclick="closeDeposit()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-
-                <div class="p-4 sm:p-6 sm:p-8 overflow-y-auto bg-slate-50/50 flex-1">
-                    @if(isset($errors) && $errors->any() && session('open_modal') !== 'import')
-                        <div class="mb-6 bg-rose-50 border-l-4 border-rose-600 border border-rose-200 rounded-xl p-4 shadow-sm">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                <div>
-                                    <h4 class="text-[13px] font-extrabold text-rose-900">No se pudo completar el ingreso manual:</h4>
-                                    <ul class="mt-1 list-disc list-inside text-[12px] text-rose-700 font-medium space-y-0.5">
-                                        @foreach($errors->all() as $err)
-                                            <li>{{ $err }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <datalist id="catalogoProductosManual">
-                        @foreach($productosLista ?? [] as $prodItem)
-                            <option value="{{ $prodItem }}"></option>
-                        @endforeach
-                    </datalist>
-
-                    <datalist id="catalogoProveedoresRutManual">
-                        @foreach($proveedoresActivos ?? [] as $provItem)
-                            <option value="{{ $provItem->rut }}">{{ $provItem->name }}</option>
-                        @endforeach
-                    </datalist>
-
-                    <datalist id="catalogoProveedoresNombreManual">
-                        @foreach($proveedoresActivos ?? [] as $provItem)
-                            <option value="{{ $provItem->name }}">{{ $provItem->rut }}</option>
-                        @endforeach
-                    </datalist>
-
-                    <form action="{{ Route::has('inventory.store') ? route('inventory.store') : '#' }}" method="POST" id="manualDepositForm" novalidate onsubmit="return validateIngresoDirecto(event)">
-                        @csrf
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-                            <div class="sm:col-span-2">
-                                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-1">
-                                    <span class="w-5 h-5 rounded-full bg-teal-600 text-white text-[11px] font-bold flex items-center justify-center">1</span>
-                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Datos del Documento y Proveedor</h4>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">N° Correlativo Interno</label>
-                                <input type="number" min="1" step="1" name="correlativo_interno" value="{{ old('correlativo_interno') }}" placeholder="Autogenerado si se deja vacío" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Fecha Recepción <span class="text-rose-500">*</span></label>
-                                <input type="date" name="fecha_recepcion" required value="{{ old('fecha_recepcion', date('Y-m-d')) }}" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Tipo Documento <span class="text-rose-500">*</span></label>
-                                <select name="tipo_documento" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="" disabled {{ old('tipo_documento') ? '' : 'selected' }}>Seleccione...</option>
-                                    <option value="Factura Electrónica" {{ old('tipo_documento') == 'Factura Electrónica' ? 'selected' : '' }}>Factura Electrónica</option>
-                                    <option value="Factura" {{ old('tipo_documento') == 'Factura' ? 'selected' : '' }}>Factura</option>
-                                    <option value="Guía de Despacho" {{ old('tipo_documento') == 'Guía de Despacho' ? 'selected' : '' }}>Guía de Despacho</option>
-                                    <option value="Orden de Compra" {{ old('tipo_documento') == 'Orden de Compra' ? 'selected' : '' }}>Orden de Compra</option>
-                                    <option value="Acta de Recepción" {{ old('tipo_documento') == 'Acta de Recepción' ? 'selected' : '' }}>Acta de Recepción / Traspaso</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">N° Documento <span class="text-rose-500">*</span></label>
-                                <input type="text" name="numero_documento" value="{{ old('numero_documento') }}" placeholder="Ej. 104590" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">RUT Proveedor</label>
-                                <input type="text" id="manualRutProveedor" name="rut_proveedor" list="catalogoProveedoresRutManual" oninput="syncManualProvider('rut', this.value)" value="{{ old('rut_proveedor') }}" placeholder="Ej. 61.608.700-2" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Razón Social Proveedor / Origen</label>
-                                <input type="text" id="manualRazonSocial" name="razon_social" list="catalogoProveedoresNombreManual" oninput="syncManualProvider('name', this.value)" value="{{ old('razon_social') }}" placeholder="Ej. CENABAST / Laboratorio Chile" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                            </div>
-
-                            <div class="sm:col-span-2 mt-3">
-                                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-1">
-                                    <span class="w-5 h-5 rounded-full bg-teal-600 text-white text-[11px] font-bold flex items-center justify-center">2</span>
-                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Detalle Técnico del Producto y Ubicación</h4>
-                                </div>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Producto / Principio Activo <span class="text-rose-500">*</span></label>
-                                <input type="text" name="producto" list="catalogoProductosManual" value="{{ old('producto') }}" placeholder="Escriba o seleccione del catálogo (Ej. PARACETAMOL 500MG COMPRIMIDOS)" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Categoría <span class="text-rose-500">*</span></label>
-                                <select name="categoria" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="" disabled {{ old('categoria') ? '' : 'selected' }}>Seleccionar...</option>
-                                    @foreach ($categoriasLista ?? [] as $catOpt)
-                                        <option value="{{ $catOpt }}" {{ old('categoria') == $catOpt ? 'selected' : '' }}>{{ $catOpt }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Estado de Ingreso <span class="text-rose-500">*</span></label>
-                                <select name="estado" id="manualEstadoSelect" onchange="toggleManualEstadoHelp(this.value)" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-semibold text-slate-800">
-                                    <option value="Disponible" {{ old('estado', 'Disponible') == 'Disponible' ? 'selected' : '' }}>Disponible (Visible en Inventario Principal)</option>
-                                    <option value="Cuarentena" {{ old('estado') == 'Cuarentena' ? 'selected' : '' }}>En Cuarentena (Enviar a Revisión Técnica)</option>
-                                </select>
-                                <p id="manualEstadoHelpText" class="hidden text-[11px] text-amber-700 font-semibold mt-1">
-                                    Nota: Los lotes en Cuarentena se gestionan en la vista "Cuarentena" hasta su liberación.
-                                </p>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Pasillo Ubicación</label>
-                                <select name="pasillo" id="manual_pasillo" onchange="onManualUbicacionChange('pasillo')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Pasillo...</option>
-                                    @foreach ($pasillosLista ?? [] as $pasillo)
-                                        <option value="{{ $pasillo }}" {{ old('pasillo') == $pasillo ? 'selected' : '' }}>{{ $pasillo }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Estante Ubicación</label>
-                                <select name="estante" id="manual_estante" onchange="onManualUbicacionChange('estante')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Estante...</option>
-                                    @foreach ($estantesLista ?? [] as $estante)
-                                        <option value="{{ $estante }}" {{ old('estante') == $estante ? 'selected' : '' }}>{{ $estante }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Nivel</label>
-                                <select name="nivel" id="manual_nivel" onchange="onManualUbicacionChange('nivel')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Nivel...</option>
-                                    @foreach ($nivelesLista ?? [] as $nivel)
-                                        <option value="{{ $nivel }}" {{ old('nivel') == $nivel ? 'selected' : '' }}>{{ $nivel }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Posición</label>
-                                <select name="posicion" id="manual_posicion" onchange="onManualUbicacionChange('posicion')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Posición...</option>
-                                    @foreach ($posicionesLista ?? [] as $posicion)
-                                        <option value="{{ $posicion }}" {{ old('posicion') == $posicion ? 'selected' : '' }}>{{ $posicion }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa</label>
-                                <input type="text" name="programa" list="programasManualList" value="{{ old('programa') }}" placeholder="Programa de salud" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                                <datalist id="programasManualList">
-                                    @foreach($programasLista ?? [] as $progOpt)
-                                        <option value="{{ $progOpt }}"></option>
-                                    @endforeach
-                                </datalist>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Lote / Serie</label>
-                                <input type="text" name="lote" value="{{ old('lote') }}" placeholder="Ej. L-4893 (o S/L)" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono font-bold" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Fecha Vencimiento</label>
-                                <input type="date" name="fecha_vencimiento" value="{{ old('fecha_vencimiento') }}" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Cantidad a Ingresar <span class="text-rose-500">*</span></label>
-                                <input type="number" name="cantidad" value="{{ old('cantidad') }}" placeholder="Ej. 500" min="1" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Valor Neto Unitario ($ CLP)</label>
-                                <div class="relative">
-                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-slate-400">$</span>
-                                    <input type="number" name="valor_neto_unitario" value="{{ old('valor_neto_unitario') ? (int) old('valor_neto_unitario') : '' }}" placeholder="0" min="0" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full rounded-lg border border-slate-300 bg-white pl-8 pr-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800 font-mono-das" />
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl shrink-0">
-                    <button type="button" onclick="closeDeposit()" class="px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar</button>
-                    <button type="submit" id="manualDepositSubmitBtn" form="manualDepositForm" class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm text-[13px] font-bold cursor-pointer inline-flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span id="manualDepositSubmitText">Confirmar Ingreso</span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -1754,11 +1547,12 @@
         }
 
         function openDeposit() {
-            document.getElementById('DepositModal').classList.remove('hidden');
+            // el ingreso manual ahora se hace en recepcion
+            document.getElementById('DepositModal')?.classList.remove('hidden');
         }
 
         function closeDeposit() {
-            document.getElementById('DepositModal').classList.add('hidden');
+            document.getElementById('DepositModal')?.classList.add('hidden');
         }
 
         // Lógica filtros avanzados merma
