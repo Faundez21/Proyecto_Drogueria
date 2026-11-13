@@ -146,7 +146,7 @@
                     </div>
                 </div>
 
-                <!-- seccion 3: multiples productos separados por Medicamentos, Insumos y Estupefacientes -->
+                <!-- seccion 3: multiples productos separados por medicamentos, insumos y estupefacientes -->
                 <div class="p-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                         <div class="flex items-center gap-2">
@@ -634,7 +634,7 @@
                         </div>
                     </div>
 
-                    <!-- Firma modal -->
+                    <!-- firma modal -->
                     <div class="flex justify-center mt-4">
                         <div class="bg-white p-3 rounded-lg border border-slate-200 text-center h-24 w-64">
                             <p class="text-[11px] text-slate-500 font-semibold mb-1 uppercase">Firma Recepción</p>
@@ -762,7 +762,7 @@
 
             const prevValue = selectProd.value;
 
-            // Los optgroups se borran del DOM: con .hidden el desplegable nativo deja huecos en blanco
+            // los optgroups se borran del dom: con .hidden el desplegable nativo deja huecos en blanco
             selectProd.querySelectorAll('optgroup').forEach(og => og.remove());
 
             selectProd._optgroupsBackup.forEach(ogTemplate => {
@@ -1240,8 +1240,7 @@
             iframe.src = url;
         }
 
-        // Aviso de éxito con el resumen de la recepción
-        // escapa textos escritos por el usuario antes de mostrarlos como html
+        // aviso de exito con el resumen de la recepcion escapa textos escritos por el usuario antes de mostrarlos como html
         function escHtml(t) {
             return String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
@@ -1333,7 +1332,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar copia maestra de los optgroups al cargar la vista
+            // inicializar copia maestra de los optgroups al cargar la vista
             const firstProdSelect = document.querySelector('.select-producto-recepcion');
             asegurarRespaldoOptgroups(firstProdSelect);
 
@@ -1404,7 +1403,7 @@
                 actualizarContadoresGrupos();
             });
 
-            // 5. Confirmación y envío con SweetAlert inmediato de Resumen de Recepción
+            // 5. confirmacion y envio con sweetalert inmediato de resumen de recepcion
             let receptionSubmitAction = 'save_only';
 
             document.querySelectorAll('.btn-submit-reception').forEach(btn => {
@@ -1498,7 +1497,7 @@
 
                 const textoUnidades = totalUnidades > 0 ? ` (${totalUnidades.toLocaleString('es-CL')} unidades en total)` : '';
 
-                // Resumen armado desde el formulario como respaldo inmediato
+                // resumen armado desde el formulario como respaldo inmediato
                 const fallbackSummary = {
                     correlativo: correlativoVal,
                     fecha_recepcion: fechaRecVal ? fechaRecVal.split('-').reverse().join('/') : '',
@@ -1541,7 +1540,7 @@
                         actionInput.value = receptionSubmitAction;
                     }
 
-                    // Mostrar estado de carga mientras se guarda
+                    // mostrar estado de carga mientras se guarda
                     Swal.fire({
                         title: 'Registrando Recepción...',
                         text: 'Guardando productos en inventario y trazabilidad.',
@@ -1569,12 +1568,12 @@
                             const data = await response.json();
 
                             if (response.ok && data.ok) {
-                                // Muestra el resumen apenas responde el servidor
+                                // muestra el resumen apenas responde el servidor
                                 mostrarSweetAlertRecepcionExitosa(data.detail || fallbackSummary, true);
                                 return;
                             }
 
-                            // Manejo de errores de validación o servidor
+                            // manejo de errores de validacion o servidor
                             let errorMsg = data.message || 'Verifique los datos ingresados.';
                             if (data.errors) {
                                 const firstKey = Object.keys(data.errors)[0];
@@ -1590,7 +1589,7 @@
                                 confirmButtonText: 'Revisar formulario'
                             });
                         } else if (response.ok) {
-                            // Si el controlador respondió con redirección tradicional
+                            // si el controlador respondio con redireccion tradicional
                             mostrarSweetAlertRecepcionExitosa(fallbackSummary, true);
                         } else {
                             throw new Error('Error en la respuesta del servidor.');
@@ -1608,8 +1607,7 @@
             });
         });
 
-        // 6. modales (historial y detalle)
-        // Los modales se mueven al <body> al abrirse para que queden por encima del menú lateral
+        // 6. modales (historial y detalle) los modales se mueven al <body> al abrirse para que queden por encima del menu lateral
         function llevarModalAlFrente(id) {
             const el = document.getElementById(id);
             if (el && el.parentElement !== document.body) document.body.appendChild(el);
@@ -1783,7 +1781,7 @@
         }
         function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
 
-        // Respaldo adicional si se accede por redirección de sesión
+        // respaldo adicional si se accede por redireccion de sesion
         @if (session('reception_success_detail'))
             document.addEventListener('DOMContentLoaded', function() {
                 const recData = @json(session('reception_success_detail'));

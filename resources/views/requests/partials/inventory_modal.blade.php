@@ -1,11 +1,11 @@
-{{-- Modal: Inventario de Solicitudes (Establecimientos o CESFAM), independiente del Inventario de Droguería --}}
+{{-- modal: inventario de solicitudes (establecimientos o cesfam), independiente del inventario de drogueria --}}
 @role('Administrador')
     <div id="RequestInventoryModal"
         class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all"
         onclick="if(event.target === this) closeRequestInventoryModal()">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-7xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
 
-            <!-- Cabecera Oscura del Modal -->
+            <!-- cabecera oscura del modal -->
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
                 <div>
                     <h2 class="text-lg font-bold text-white tracking-wide">
@@ -23,7 +23,7 @@
                 </button>
             </div>
 
-            <!-- barra de directorio y filtros, igual que en Inventario -->
+            <!-- barra de directorio y filtros, igual que en inventario -->
             <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center shrink-0">
                 <h3 class="text-[15px] font-bold text-slate-800">
                     Directorio de Productos ({{ $esVistaCesfam ? 'CESFAM' : 'Establecimientos' }})
@@ -39,11 +39,11 @@
                 </button>
             </div>
 
-            <!-- Panel de Filtros Avanzados -->
+            <!-- panel de filtros avanzados -->
             <div id="req-filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner shrink-0">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
 
-                    <!-- Búsqueda con Dropdown -->
+                    <!-- busqueda con dropdown -->
                     <div class="xl:col-span-2 relative" id="reqSearchContainer">
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Buscar</label>
                         <input type="text" id="reqFilterSearch"
@@ -70,7 +70,7 @@
                         </div>
                     </div>
 
-                    <!-- Establecimiento / CESFAM -->
+                    <!-- establecimiento / cesfam -->
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
                             {{ $esVistaCesfam ? 'CESFAM' : 'Establecimiento' }}
@@ -84,7 +84,7 @@
                         </select>
                     </div>
 
-                    <!-- Categoría -->
+                    <!-- categoria -->
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Categoría</label>
                         <select id="reqFilterCategoria" onchange="applyReqInventoryFilters()"
@@ -97,7 +97,7 @@
                         </select>
                     </div>
 
-                    <!-- Programa -->
+                    <!-- programa -->
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Programa</label>
                         <select id="reqFilterPrograma" onchange="applyReqInventoryFilters()"
@@ -109,7 +109,7 @@
                         </select>
                     </div>
 
-                    <!-- Ordenar por -->
+                    <!-- ordenar por -->
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Ordenar por</label>
                         <select id="reqFilterOrder" onchange="applyReqInventoryFilters()"
@@ -134,7 +134,7 @@
                 </div>
             </div>
 
-            <!-- Alerta Verde de Filtros Activos -->
+            <!-- alerta verde de filtros activos -->
             <div id="reqActiveFilterAlert"
                 class="hidden px-5 py-3 bg-teal-50 border-b border-teal-200 flex justify-between items-center text-xs text-teal-800 font-bold shrink-0">
                 <span class="flex items-center gap-2">
@@ -150,7 +150,7 @@
                 </button>
             </div>
 
-            <!-- Cuerpo de la Tabla -->
+            <!-- cuerpo de la tabla -->
             <div class="overflow-y-auto overflow-x-auto flex-1 bg-white">
                 @php
                     $groupedReqInventories = collect($inventarioSolicitudes ?? [])->groupBy(function ($item) {
@@ -198,10 +198,13 @@
                                     $primerItem = $itemsGrupo->first();
                                     $programaPrincipal = $itemsGrupo->pluck('programa')->filter()->first() ?? '';
 
-                                    // Para el stock actual de cada establecimiento tomamos el último reportado por establecimiento
-                                    $stockActualTotal = $itemsGrupo
-                                        ->groupBy(fn ($it) => $it->request->establecimiento ?? 'General')
-                                        ->sum(fn ($porEst) => (int) ($porEst->first()->stock_actual ?? 0));
+                                    // stock actual real de cada establecimiento; si no tiene saldo se usa el ultimo declarado
+                                    $saldosProducto = $saldosEstablecimientos[$primerItem->product_id] ?? [];
+                                    $stockPorEstablecimiento = $itemsGrupo
+                                        ->groupBy(fn ($it) => \App\Services\EstablishmentStockService::nombreCanonico($it->request->establecimiento ?? 'General'))
+                                        ->map(fn ($porEst, $est) => $saldosProducto[mb_strtolower($est)] ?? (int) ($porEst->first()->stock_actual ?? 0))
+                                        ->sortKeys();
+                                    $stockActualTotal = (int) $stockPorEstablecimiento->sum();
 
                                     $totalSolicitado = (int) $itemsGrupo->sum('cantidad_solicitada');
                                     $totalDespachado = (int) $itemsGrupo->sum('cantidad_despachada');
@@ -303,6 +306,14 @@
                                                         Desglose de Inventario por {{ $esVistaCesfam ? 'CESFAM' : 'Establecimiento' }}
                                                     </span>
                                                 </div>
+                                                <div class="px-4 py-3 border-b border-slate-200 flex flex-wrap items-center gap-2">
+                                                    <span class="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 mr-1">Stock actual</span>
+                                                    @foreach ($stockPorEstablecimiento as $estStock => $cantStock)
+                                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11.5px] font-semibold border {{ $cantStock > 0 ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' }}">
+                                                            {{ $estStock }}: <strong>{{ number_format($cantStock, 0, ',', '.') }}</strong> uds.
+                                                        </span>
+                                                    @endforeach
+                                                </div>
                                                 <div class="overflow-x-auto">
                                                     <table class="w-full text-left whitespace-nowrap">
                                                         <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 text-[10px] tracking-wider">
@@ -311,7 +322,7 @@
                                                                 <th class="px-4 py-3">Fecha Solicitud</th>
                                                                 <th class="px-4 py-3">Responsable</th>
                                                                 <th class="px-4 py-3">Programa</th>
-                                                                <th class="px-4 py-3 text-center">Stock Actual</th>
+                                                                <th class="px-4 py-3 text-center">Stock declarado</th>
                                                                 <th class="px-4 py-3 text-center">Cant. Solicitada</th>
                                                                 <th class="px-4 py-3 text-center">Cant. Despachada</th>
                                                                 <th class="px-4 py-3 text-center">Estado</th>
@@ -396,7 +407,7 @@
                 </table>
             </div>
 
-            <!-- Pie del Modal -->
+            <!-- pie del modal -->
             <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end shrink-0">
                 <button type="button" onclick="closeRequestInventoryModal()"
                     class="px-6 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">
@@ -507,7 +518,7 @@
                 }
             });
 
-            // Ordenamiento
+            // ordenamiento
             masterRows.sort((a, b) => {
                 if (order === 'nombre_asc') {
                     return (a.dataset.productName || '').localeCompare(b.dataset.productName || '');
@@ -528,7 +539,7 @@
                 if (subrow) tbody.appendChild(subrow);
             });
 
-            // Actualizar alerta de filtro activo
+            // actualizar alerta de filtro activo
             const activeLabels = [];
             if (search) activeLabels.push('Búsqueda: ' + document.getElementById('reqFilterSearch').value);
             if (est) {

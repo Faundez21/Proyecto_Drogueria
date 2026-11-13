@@ -24,20 +24,20 @@
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
 
-    <!-- SweetAlert2 -->
+    <!-- sweetalert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- cambios de estado de lote: Disponible, Cuarentena y Merma -->
+    <!-- cambios de estado de lote: disponible, cuarentena y merma -->
     <script src="{{ asset('js/lotes/lote-status.js') }}?v={{ @filemtime(public_path('js/lotes/lote-status.js')) }}"></script>
 
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}?v={{ @filemtime(public_path('css/dark-mode.css')) }}">
 
     <style>
-        /* Asegurar que SweetAlert2 siempre esté por encima de cualquier modal, drawer o backdrop */
+        /* asegurar que sweetalert2 siempre este por encima de cualquier modal, drawer o backdrop */
         .swal2-container {
             z-index: 9999999 !important;
         }
 
-        /* Desplegable de búsqueda de productos con autocompletado (#searchDropdown) */
+        /* desplegable de busqueda de productos con autocompletado (#searchdropdown) */
         #searchDropdown {
             min-width: 100% !important;
             width: max-content !important;
@@ -110,7 +110,7 @@
             transition: opacity 0.15s ease-out, transform 0.15s ease-out;
         }
 
-        /* --- Animaciones del Sidebar --- */
+        /* animaciones del sidebar */
         .flow-rail {
             position: relative;
         }
@@ -208,7 +208,7 @@
             animation: pulse-dot 2s ease-in-out infinite;
         }
 
-        /* Loading spinner para el buscador */
+        /* loading spinner para el buscador */
         .loader {
             border: 2px solid #f3f3f3;
             border-top: 2px solid #0d9488;
@@ -228,7 +228,7 @@
             }
         }
 
-        /* Estilo para los resultados de busqueda con flechas */
+        /* estilo para los resultados de busqueda con flechas */
         .search-result-item:focus,
         .search-result-item.active {
             background-color: #f0fdfa !important;
@@ -254,7 +254,7 @@
             border-radius: 3px;
         }
 
-        /* Ajuste de fuente para modales de SweetAlert */
+        /* ajuste de fuente para modales de sweetalert */
         .swal2-popup {
             font-family: 'IBM Plex Sans', sans-serif !important;
         }
@@ -385,7 +385,7 @@
 
                     @endcanany
 
-                    <!-- Paso 2: almacenamiento -->
+                    <!-- paso 2: almacenamiento -->
                     @canany(['ver.inventario', 'ver.distribucion', 'ver.cuarentena'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
@@ -439,7 +439,7 @@
 
                     @endcanany
 
-                    <!-- Paso 3: salida -->
+                    <!-- paso 3: salida -->
                     @canany(['ver.despacho', 'ver.despacho_controlado', 'ver.solicitudes', 'ver.solicitudes_cesfam'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
@@ -468,7 +468,7 @@
                                 </a>
                                 @endcan
                                 @can('ver.despacho_controlado')
-                                    <!-- Submenú controlado -->
+                                    <!-- submenu controlado -->
                                     <div class="relative pl-6">
                                         <div class="absolute left-3.5 top-0 bottom-4 w-px bg-slate-700/60"></div>
                                         <div class="absolute left-3.5 top-1/2 w-2.5 h-px bg-slate-700/60"></div>
@@ -520,7 +520,7 @@
                         </div>
                     </div>
                     @endcanany
-                    <!-- Paso 4: control -->
+                    <!-- paso 4: control -->
                     @canany(['ver.trazabilidad', 'ver.reportes'])
                     <div class="flow-section">
                         <div class="flex items-center gap-2 mb-2 px-2">
@@ -556,7 +556,7 @@
 
                     @endcanany
 
-                    <!-- Administración -->
+                    <!-- administracion -->
                     @role('Administrador')
                         <div class="pt-6 pb-4 border-t border-slate-800">
                             <p class="text-[11.5px] font-semibold tracking-wide uppercase px-2 mb-2 text-slate-500">
@@ -585,7 +585,7 @@
             </aside>
             <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
 
-                <!-- Barra superior -->
+                <!-- barra superior -->
                 <header class="h-[70px] flex items-center justify-between px-4 sm:px-6 z-10 shrink-0 sticky top-0"
                     style="background-color: var(--nav-bg); border-bottom: 1px solid var(--border-light); box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
 
@@ -599,7 +599,7 @@
                         </button>
                     </div>
 
-                    <!-- Buscador interactivo (Ctrl + K) -->
+                    <!-- buscador interactivo (ctrl + k) -->
                     <div class="flex-1 max-w-2xl mx-4">
                         <div onclick="openSearchModal()"
                             class="hidden sm:flex items-center justify-between w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white hover:border-teal-500/50 hover:shadow-md transition-all duration-200 text-slate-500 cursor-pointer group">
@@ -623,7 +623,7 @@
                     </div>
 
                     <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
-                        <!-- Botón de búsqueda móvil (< sm) -->
+                        <!-- boton de busqueda movil (< sm) -->
                         <button onclick="openSearchModal()" type="button"
                             class="sm:hidden p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer"
                             title="Buscar en el sistema">
@@ -633,7 +633,7 @@
                             </svg>
                         </button>
 
-                        <!-- Botón modo claro / oscuro -->
+                        <!-- boton modo claro / oscuro -->
                         <button onclick="toggleTheme()" type="button" id="theme-toggle-btn"
                             class="theme-toggle shrink-0 cursor-pointer"
                             title="Cambiar modo claro / oscuro" aria-label="Cambiar modo claro / oscuro">
@@ -655,7 +655,7 @@
                             </svg>
                             <div class="text-[13px] font-mono-das tracking-tight" id="live-clock"></div>
                         </div>
-                        <!-- Notificaciones dinámicas -->
+                        <!-- notificaciones dinamicas -->
                         <div class="relative" id="notifications-menu-container">
                             <button onclick="toggleNotifications()" type="button"
                                 class="relative p-2 rounded-md text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer">
@@ -685,7 +685,7 @@
                                     </button>
                                 </div>
 
-                                <!-- Selector de Pestañas: Pendientes y Vistas -->
+                                <!-- selector de pestanas: pendientes y vistas -->
                                 <div class="flex border-b border-slate-200/80 bg-slate-50/70 p-1.5 gap-1.5 text-[12px] font-bold">
                                     <button id="tab-notif-pendientes" type="button" onclick="cambiarTabNotificaciones('pendientes')"
                                         class="notif-tab-active flex-1 py-1.5 px-3 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 bg-white text-teal-700 shadow-2xs border border-slate-200/60 cursor-pointer">
@@ -699,12 +699,12 @@
                                     </button>
                                 </div>
 
-                                <!-- Lista pendientes -->
+                                <!-- lista pendientes -->
                                 <div id="notif-list" class="max-h-[340px] overflow-y-auto p-2 space-y-1 sidebar-scroll">
                                     <div class="p-4 text-center text-slate-400 text-xs">Cargando alertas...</div>
                                 </div>
 
-                                <!-- Lista vistas -->
+                                <!-- lista vistas -->
                                 <div id="notif-read-list" class="hidden max-h-[340px] overflow-y-auto p-2 space-y-1 sidebar-scroll bg-slate-50/30">
                                     <div class="p-4 text-center text-slate-400 text-xs">No hay notificaciones vistas.</div>
                                 </div>
@@ -869,9 +869,14 @@
 
     <!-- scripts que usan todas las vistas -->
     <script>
-        // --- Configuración global de SweetAlert2 ---
+        // escapa texto guardado en la base antes de insertarlo como html
+        function escHtmlGlobal(t) {
+            return String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
 
-        // Instancia global para los avisos tipo toast
+        // configuracion global de sweetalert2
+
+        // instancia global para los avisos tipo toast
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -884,7 +889,7 @@
             }
         });
 
-        // Muestra los mensajes flash de Laravel como ventana
+        // muestra los mensajes flash de laravel como ventana
         @if (session('lote_status_success'))
             if (window.LoteStatus && window.LoteStatus.core) {
                 window.LoteStatus.core.mostrarExito(@json(session('lote_status_success')));
@@ -927,9 +932,9 @@
             });
         @endif
 
-        // Confirmación antes de cerrar sesión
+        // confirmacion antes de cerrar sesion
         function confirmLogout() {
-            // Cerramos el menú flotante para que no interfiera visualmente
+            // cerramos el menu flotante para que no interfiera visualmente
             const userMenu = document.getElementById('user-menu');
             if (userMenu) closeMenu(userMenu);
 
@@ -938,12 +943,12 @@
                 text: "Tendrá que volver a ingresar sus credenciales para acceder al sistema.",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#0D9488', // Teal 600 (var--accent)
-                cancelButtonColor: '#E11D48', // Rose 600 (var--danger)
+                confirmButtonColor: '#0D9488', // teal 600 (var--accent)
+                cancelButtonColor: '#E11D48', // rose 600 (var--danger)
                 confirmButtonText: 'Sí, cerrar sesión',
                 cancelButtonText: 'Cancelar',
-                reverseButtons: true, // Pone el botón de confirmar a la derecha
-                focusCancel: true // Foco en el botón cancelar para evitar clics accidentales
+                reverseButtons: true, // pone el boton de confirmar a la derecha
+                focusCancel: true // foco en el boton cancelar para evitar clics accidentales
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.getElementById('logout-form').submit();
@@ -951,18 +956,18 @@
             });
         }
 
-        // Busqueda Global 
+        // busqueda global
         let searchTimeout = null;
         let selectedSearchIndex = -1;
         let searchResultsCount = 0;
-        let searchAbortController = null; // Nuevo controlador de interrupción
+        let searchAbortController = null; // nuevo controlador de interrupcion
 
-        // Helper para escapar caracteres especiales de Regex
+        // helper para escapar caracteres especiales de regex
         function escapeRegExp(string) {
             return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
-        // Limpiar búsqueda
+        // limpiar busqueda
         function clearSearch() {
             const input = document.getElementById('global-search-input');
             input.value = '';
@@ -974,17 +979,17 @@
             const resultsContainer = document.getElementById('search-results');
             const loader = document.getElementById('search-loader');
             const clearBtn = document.getElementById('search-clear-btn');
-            selectedSearchIndex = -1; // Reset flechas
+            selectedSearchIndex = -1; // reset flechas
             const cleanQuery = query.trim();
 
-            // Mostrar u ocultar el botón "X"
+            // mostrar u ocultar el boton "x"
             if (cleanQuery.length > 0) {
                 clearBtn.classList.remove('hidden');
             } else {
                 clearBtn.classList.add('hidden');
             }
 
-            // Cancelar la petición anterior si existe
+            // cancelar la peticion anterior si existe
             if (searchAbortController) {
                 searchAbortController.abort();
             }
@@ -996,13 +1001,13 @@
                 return;
             }
 
-            // Ocultar X y mostrar loader temporalmente
+            // ocultar x y mostrar loader temporalmente
             clearBtn.classList.add('hidden');
             loader.classList.remove('hidden');
 
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
-                // Instanciar el nuevo AbortController
+                // instanciar el nuevo abortcontroller
                 searchAbortController = new AbortController();
 
                 fetch(`/api/global-search?q=${encodeURIComponent(cleanQuery)}`, {
@@ -1014,7 +1019,7 @@
                     })
                     .then(data => {
                         loader.classList.add('hidden');
-                        clearBtn.classList.remove('hidden'); // Restaurar botón X
+                        clearBtn.classList.remove('hidden'); // restaurar boton x
                         searchResultsCount = data.length;
 
                         if (data.length === 0) {
@@ -1029,8 +1034,8 @@
 
                         let html = '';
                         let currentType = '';
-                        // escapeRegExp evita que un carácter especial rompa la expresión regular
-                        const safeQuery = escapeRegExp(cleanQuery);
+                        // escaperegexp evita que un caracter especial rompa la expresion regular
+                        const safeQuery = escapeRegExp(escHtmlGlobal(cleanQuery));
                         const regex = new RegExp(`(${safeQuery})`, 'gi');
 
                         data.forEach((item, index) => {
@@ -1038,20 +1043,21 @@
                                 html += `
                                     <div class="px-3 py-2 mt-2 flex items-center gap-2">
                                         <div class="h-px bg-slate-100 flex-1"></div>
-                                        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono-das">${item.type}</span>
+                                        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono-das">${escHtmlGlobal(item.type)}</span>
                                         <div class="h-px bg-slate-100 flex-1"></div>
                                     </div>`;
                                 currentType = item.type;
                             }
 
-                            // Resalta el texto buscado dentro de cada resultado
-                            const highlightedTitle = item.title ? item.title.replace(regex,
+                            // resalta el texto buscado dentro de cada resultado
+                            // se escapa primero y se resalta despues, asi el texto guardado nunca se interpreta como html
+                            const highlightedTitle = item.title ? escHtmlGlobal(item.title).replace(regex,
                                 '<span class="highlight-text">$1</span>') : 'N/A';
-                            const highlightedSubtitle = item.subtitle ? item.subtitle.replace(regex,
+                            const highlightedSubtitle = item.subtitle ? escHtmlGlobal(item.subtitle).replace(regex,
                                 '<span class="highlight-text">$1</span>') : '';
 
                             html += `
-                                <a href="${item.url}" id="search-item-${index}" class="search-result-item flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 transition-all duration-200 border border-transparent mt-0.5 group">
+                                <a href="${escHtmlGlobal(item.url)}" id="search-item-${index}" class="search-result-item flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-teal-50 text-slate-700 hover:text-teal-900 transition-all duration-200 border border-transparent mt-0.5 group">
                                     <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
                                         <span class="p-1.5 rounded-md bg-slate-100 text-slate-500 transition-colors group-hover:bg-teal-100/50 group-hover:text-teal-600 shrink-0">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg>
@@ -1071,7 +1077,7 @@
                         resultsContainer.innerHTML = html;
                     })
                     .catch((error) => {
-                        // Ignorar el error si la petición fue abortada por tipear rápido
+                        // ignorar el error si la peticion fue abortada por tipear rapido
                         if (error.name === 'AbortError') return;
 
                         loader.classList.add('hidden');
@@ -1082,10 +1088,10 @@
                                 <span class="text-[12px] text-rose-500 font-medium">Error de conexión al buscar.</span>
                             </div>`;
                     });
-            }, 300); // 300ms de debounce es un estándar ideal
+            }, 300); // 300ms de debounce es un estandar ideal
         }
 
-        // --- Navegación por teclado en la búsqueda ---
+        // navegacion por teclado en la busqueda
         function handleSearchKeydown(e) {
             if (searchResultsCount === 0) return;
 
@@ -1109,7 +1115,7 @@
                 const activeEl = document.getElementById(`search-item-${selectedSearchIndex}`);
                 if (activeEl) {
                     activeEl.classList.add('active');
-                    // Mantiene centrada la opción activa al navegar con el teclado
+                    // mantiene centrada la opcion activa al navegar con el teclado
                     activeEl.scrollIntoView({
                         block: 'center',
                         behavior: 'smooth'
@@ -1118,7 +1124,7 @@
             }
         }
 
-        // --- Notificaciones ---
+        // notificaciones
         let currentNotifKeys = [];
         let currentNotifTab = 'pendientes';
 
@@ -1162,7 +1168,7 @@
 
                     currentNotifKeys = (data.data || []).map(n => n.id).filter(Boolean);
 
-                    // Contador de la campana
+                    // contador de la campana
                     if (data.count > 0) {
                         badge.classList.remove('hidden');
                         badge.textContent = data.count > 9 ? '9+' : data.count;
@@ -1171,11 +1177,11 @@
                         badge.textContent = '0';
                     }
 
-                    // Contadores de cada pestaña
+                    // contadores de cada pestana
                     if (count) count.textContent = data.count;
                     if (readCount) readCount.textContent = data.read_count || 0;
 
-                    // Botón de marcar todas
+                    // boton de marcar todas
                     if (btnMarcarTodas) {
                         if (data.count > 0 && currentNotifTab === 'pendientes') {
                             btnMarcarTodas.classList.remove('hidden');
@@ -1184,23 +1190,23 @@
                         }
                     }
 
-                    // Lista de pendientes
+                    // lista de pendientes
                     if (data.count > 0) {
                         let html = '';
                         data.data.forEach(n => {
                             html += `
-                            <div class="group relative flex items-start gap-2 p-2 rounded-xl transition-colors hover:bg-slate-50 border-b border-slate-100 last:border-0" data-notif-id="${n.id}">
-                                <a href="${n.url}" onclick="onNotifClick('${n.id}')" class="flex-1 flex gap-2.5 min-w-0">
+                            <div class="group relative flex items-start gap-2 p-2 rounded-xl transition-colors hover:bg-slate-50 border-b border-slate-100 last:border-0" data-notif-id="${escHtmlGlobal(n.id)}">
+                                <a href="${escHtmlGlobal(n.url)}" onclick="onNotifClick(${escHtmlGlobal(JSON.stringify(String(n.id)))})" class="flex-1 flex gap-2.5 min-w-0">
                                     <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${n.bg} ${n.color}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${n.icon}</svg>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-[12.5px] font-bold text-slate-800 leading-snug">${n.title}</p>
-                                        <p class="text-[11px] font-medium mt-0.5 leading-snug text-slate-500">${n.message}</p>
+                                        <p class="text-[12.5px] font-bold text-slate-800 leading-snug">${escHtmlGlobal(n.title)}</p>
+                                        <p class="text-[11px] font-medium mt-0.5 leading-snug text-slate-500">${escHtmlGlobal(n.message)}</p>
                                         <p class="text-[10px] font-mono font-bold mt-1 text-slate-400">${n.time}</p>
                                     </div>
                                 </a>
-                                <button onclick="marcarNotificacionVista(event, '${n.id}')" type="button"
+                                <button onclick="marcarNotificacionVista(event, ${escHtmlGlobal(JSON.stringify(String(n.id)))})" type="button"
                                     class="shrink-0 p-1.5 text-slate-400 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
                                     title="Marcar como vista">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1215,26 +1221,26 @@
                             '<div class="p-6 text-center text-slate-400 text-[12px] font-medium flex flex-col items-center justify-center gap-1.5"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>¡Está al día! No hay alertas pendientes.</span></div>';
                     }
 
-                    // Lista de las ya vistas
+                    // lista de las ya vistas
                     if (data.read_count > 0 && Array.isArray(data.read_data)) {
                         let htmlVistas = '';
                         data.read_data.forEach(n => {
                             htmlVistas += `
-                            <div class="group relative flex items-start gap-2 p-2 rounded-xl transition-colors hover:bg-slate-100/70 border-b border-slate-100 last:border-0 opacity-80 hover:opacity-100" data-notif-read-id="${n.id}">
-                                <a href="${n.url}" class="flex-1 flex gap-2.5 min-w-0">
+                            <div class="group relative flex items-start gap-2 p-2 rounded-xl transition-colors hover:bg-slate-100/70 border-b border-slate-100 last:border-0 opacity-80 hover:opacity-100" data-notif-read-id="${escHtmlGlobal(n.id)}">
+                                <a href="${escHtmlGlobal(n.url)}" class="flex-1 flex gap-2.5 min-w-0">
                                     <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-slate-100 text-slate-500">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${n.icon}</svg>
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-1.5">
-                                            <p class="text-[12px] font-bold text-slate-700 leading-snug">${n.title}</p>
+                                            <p class="text-[12px] font-bold text-slate-700 leading-snug">${escHtmlGlobal(n.title)}</p>
                                             <span class="inline-block text-[9.5px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 font-semibold border border-slate-200/60">Vista</span>
                                         </div>
-                                        <p class="text-[11px] font-normal mt-0.5 leading-snug text-slate-500">${n.message}</p>
+                                        <p class="text-[11px] font-normal mt-0.5 leading-snug text-slate-500">${escHtmlGlobal(n.message)}</p>
                                         <p class="text-[10px] font-mono font-medium mt-1 text-slate-400">${n.read_at_human || 'Vista recientemente'}</p>
                                     </div>
                                 </a>
-                                <button onclick="desmarcarNotificacionVista(event, '${n.id}')" type="button"
+                                <button onclick="desmarcarNotificacionVista(event, ${escHtmlGlobal(JSON.stringify(String(n.id)))})" type="button"
                                     class="shrink-0 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
                                     title="Restaurar a pendientes">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1352,7 +1358,7 @@
         });
 
 
-        /* --- Control del Sidebar --- */
+        /* control del sidebar */
         function toggleTheme() {
             const isDark = document.documentElement.classList.toggle('dark');
             try { localStorage.setItem('das-theme', isDark ? 'dark' : 'light'); } catch (e) {}
@@ -1366,7 +1372,7 @@
             overlay.classList.toggle('hidden');
         }
 
-        /* --- Control de Menús Desplegables --- */
+        /* control de menus desplegables */
         function toggleMenu(menuId) {
             const menu = document.getElementById(menuId);
             const otherMenuId = menuId === 'notifications-menu' ? 'user-menu' : 'notifications-menu';
@@ -1404,7 +1410,7 @@
             toggleMenu('user-menu');
         }
 
-        /* --- Búsqueda Ctrl + K Atajos --- */
+        /* busqueda ctrl + k atajos */
         function openSearchModal() {
             const modal = document.getElementById('search-modal');
             const card = document.getElementById('search-modal-card');
@@ -1454,7 +1460,7 @@
             }
         });
 
-        /* --- Cierre por clic fuera del contenedor --- */
+        /* cierre por clic fuera del contenedor */
         document.addEventListener('click', (event) => {
             ['notifications', 'user'].forEach(type => {
                 const container = document.getElementById(`${type}-menu-container`);
@@ -1472,7 +1478,7 @@
             });
         });
 
-        /* --- Reloj en tiempo real --- */
+        /* reloj en tiempo real */
         function updateClock() {
             const clockElement = document.getElementById('live-clock');
             if (clockElement) {

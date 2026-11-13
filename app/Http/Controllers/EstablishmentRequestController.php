@@ -7,6 +7,7 @@ use App\Models\EstablishmentRequest;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\InventoryService;
+use App\Services\EstablishmentStockService;
 use App\Services\SolicitudService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class EstablishmentRequestController extends Controller
         $controlados = InventoryService::controlados();
         $metadatos = InventoryService::mapaMetadatosProductos();
 
-        // Solo Medicamentos e Insumos (sin estupefacientes)
+        // solo medicamentos e insumos (sin estupefacientes)
         $products = Product::whereNotIn('nombre', $controlados)
             ->orderBy('nombre')
             ->get()
@@ -40,7 +41,7 @@ class EstablishmentRequestController extends Controller
             $prod->programa_sugerido = $prog;
         }
 
-        // Solo establecimientos que NO son CESFAM
+        // solo establecimientos que no son cesfam
         $establecimientos = array_values(array_filter(
             InventoryService::establecimientos(),
             fn (array $est) => ($est['tipo'] ?? '') !== 'CESFAM'
@@ -67,12 +68,15 @@ class EstablishmentRequestController extends Controller
         ];
         $nombresEstablecimientosQuery = array_values(array_unique(array_merge($nombresEstablecimientos, $nombresHistoricos)));
 
-        // Inventario propio de los Establecimientos registrado en las solicitudes
+        // inventario propio de los establecimientos registrado en las solicitudes
         $inventarioSolicitudes = EstablishmentItem::with(['request', 'product'])
             ->whereHas('request', fn ($q) => $q->whereIn('establecimiento', $nombresEstablecimientosQuery))
             ->whereHas('product', fn ($q) => $q->whereNotIn('nombre', $controlados))
             ->orderByDesc('id')
             ->get();
+
+        // stock actual real de cada establecimiento
+        $saldosEstablecimientos = EstablishmentStockService::saldosPorProducto();
 
         $productosLista = $products->pluck('nombre')
             ->merge($inventarioSolicitudes->map(fn ($item) => $item->product->nombre ?? null))
@@ -87,7 +91,7 @@ class EstablishmentRequestController extends Controller
 
         $consumoMapa = SolicitudService::mapaConsumoYStock($nombresEstablecimientosQuery);
 
-        // Solicitudes pendientes exclusivas para Establecimientos (no-CESFAM, medicamentos e insumos no controlados)
+        // solicitudes pendientes exclusivas para establecimientos (no-cesfam, medicamentos e insumos no controlados)
         $solicitudesPendientesRaw = EstablishmentRequest::with(['items.product', 'assignedUser'])
             ->whereIn('establecimiento', $nombresEstablecimientosQuery)
             ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
@@ -135,6 +139,7 @@ class EstablishmentRequestController extends Controller
             'controlados',
             'establecimientos',
             'inventarioSolicitudes',
+            'saldosEstablecimientos',
             'productosLista',
             'programasLista',
             'categoriasLista',
@@ -155,7 +160,7 @@ class EstablishmentRequestController extends Controller
         $controlados = InventoryService::controlados();
         $metadatos = InventoryService::mapaMetadatosProductos();
 
-        // Medicamentos, insumos y estupefacientes
+        // medicamentos, insumos y estupefacientes
         $products = Product::orderBy('nombre')->get();
 
         foreach ($products as $prod) {
@@ -166,7 +171,7 @@ class EstablishmentRequestController extends Controller
             $prod->programa_sugerido = $prog;
         }
 
-        // Solo establecimientos tipo CESFAM
+        // solo establecimientos tipo cesfam
         $establecimientos = array_values(array_filter(
             InventoryService::establecimientos(),
             fn (array $est) => ($est['tipo'] ?? '') === 'CESFAM'
@@ -189,11 +194,14 @@ class EstablishmentRequestController extends Controller
         ];
         $nombresCesfamQuery = array_values(array_unique(array_merge($nombresCesfam, $nombresCesfamHistoricos)));
 
-        // Inventario propio de los CESFAM registrado en las solicitudes
+        // inventario propio de los cesfam registrado en las solicitudes
         $inventarioSolicitudes = EstablishmentItem::with(['request', 'product'])
             ->whereHas('request', fn ($q) => $q->whereIn('establecimiento', $nombresCesfamQuery))
             ->orderByDesc('id')
             ->get();
+
+        // stock actual real de cada establecimiento
+        $saldosEstablecimientos = EstablishmentStockService::saldosPorProducto();
 
         $productosLista = $products->pluck('nombre')
             ->merge($inventarioSolicitudes->map(fn ($item) => $item->product->nombre ?? null))
@@ -208,7 +216,7 @@ class EstablishmentRequestController extends Controller
 
         $consumoMapa = SolicitudService::mapaConsumoYStock($nombresCesfamQuery);
 
-        // Solicitudes pendientes exclusivas para CESFAM (medicamentos, insumos y fármacos controlados)
+        // solicitudes pendientes exclusivas para cesfam (medicamentos, insumos y farmacos controlados)
         $solicitudesPendientesRaw = EstablishmentRequest::with(['items.product', 'assignedUser'])
             ->whereIn('establecimiento', $nombresCesfamQuery)
             ->whereIn('estado', ['Pendiente', 'Asignada', 'Parcial'])
@@ -252,6 +260,7 @@ class EstablishmentRequestController extends Controller
             'controlados',
             'establecimientos',
             'inventarioSolicitudes',
+            'saldosEstablecimientos',
             'productosLista',
             'programasLista',
             'categoriasLista',
@@ -300,14 +309,34 @@ class EstablishmentRequestController extends Controller
 
         $esCesfam = InventoryService::esCesfam($validated['establecimiento']);
 
-        // Solo los CESFAM pueden solicitar estupefacientes
+        $rechazar = function (string $mensaje, int $codigo = 422) use ($request) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['ok' => false, 'message' => $mensaje], $codigo);
+            }
+
+            return back()->with('error', $mensaje)->withInput();
+        };
+
+        // el permiso se revisa segun el tipo real del establecimiento, no segun la pantalla de origen
+        $permisoNecesario = $esCesfam ? 'ver.solicitudes_cesfam' : 'ver.solicitudes';
+        if (! $request->user()?->can($permisoNecesario)) {
+            return $rechazar('No tiene permiso para registrar solicitudes de este establecimiento.', 403);
+        }
+
+        // cada fila debe traer producto, consumo, stock y cantidad
+        $filas = count($validated['producto']);
+        foreach (['consumo_anterior', 'stock_actual', 'cantidad_solicitada'] as $lista) {
+            if (count($validated[$lista] ?? []) !== $filas) {
+                return $rechazar('Faltan datos en alguno de los productos. Revise cada fila.');
+            }
+        }
+
+        // solo los cesfam pueden solicitar estupefacientes
         foreach ($validated['producto'] as $productId) {
             $nombre = Product::find($productId)->nombre ?? '';
 
             if (InventoryService::esControlado($nombre) && (! $esCesfam || ($validated['tipo_vista'] ?? '') === 'establecimientos')) {
-                return back()
-                    ->with('error', "El establecimiento '{$validated['establecimiento']}' solo puede solicitar medicamentos e insumos no estupefacientes.")
-                    ->withInput();
+                return $rechazar("El establecimiento '{$validated['establecimiento']}' solo puede solicitar medicamentos e insumos no estupefacientes.");
             }
         }
 
@@ -342,6 +371,15 @@ class EstablishmentRequestController extends Controller
                 'cantidad_solicitada' => (int) $validated['cantidad_solicitada'][$index],
                 'cantidad_despachada' => 0,
             ]);
+
+            // el stock declarado pasa a ser el saldo real del establecimiento
+            EstablishmentStockService::declarar(
+                $validated['establecimiento'],
+                (int) $productId,
+                $nombreProd,
+                (int) $validated['stock_actual'][$index],
+                $establishmentRequest->id
+            );
 
             $itemsResumen[] = [
                 'producto' => $nombreProd,
@@ -383,10 +421,7 @@ class EstablishmentRequestController extends Controller
             ->with('solicitud_success_detail', $solicitudDetail);
     }
 
-    /**
-     * Permite al Administrador asignar o desasignar una solicitud a un trabajador desde Despacho,
-     * recalculando automáticamente el estado de la solicitud (Pendiente <-> Asignada / Parcial / Despachado).
-     */
+    // permite al administrador asignar o desasignar una solicitud a un trabajador desde despacho, recalculando automaticamente el estado de la solicitud
     public function assign(Request $request, EstablishmentRequest $establishmentRequest)
     {
         $validated = $request->validate([
@@ -438,9 +473,7 @@ class EstablishmentRequestController extends Controller
         );
     }
 
-    /**
-     * Genera el informe PDF de solicitudes pendientes exclusivo para Establecimientos de Salud (Solo Administrador).
-     */
+    // genera el informe pdf de solicitudes pendientes exclusivo para establecimientos de salud (solo administrador)
     public function pendingEstablecimientosPdf(Request $request)
     {
         if (! auth()->user() || ! auth()->user()->hasRole('Administrador')) {
@@ -463,7 +496,7 @@ class EstablishmentRequestController extends Controller
 
         $solicitudId = $request->input('solicitud_id') ?: $request->input('request_id');
 
-        // Descarga de una sola solicitud
+        // descarga de una sola solicitud
         if ($solicitudId) {
             $solicitud = EstablishmentRequest::with(['items.product', 'assignedUser'])
                 ->whereIn('establecimiento', $nombresQuery)
@@ -489,7 +522,7 @@ class EstablishmentRequestController extends Controller
             return $pdf->stream($nombreArchivo);
         }
 
-        // Listado consolidado
+        // listado consolidado
         $centroFiltro = trim((string) ($request->input('centro') ?: $request->input('establecimiento')));
         $fechaDesde = $request->input('fecha_desde');
         $fechaHasta = $request->input('fecha_hasta');
@@ -558,9 +591,7 @@ class EstablishmentRequestController extends Controller
         return $pdf->stream($nombreArchivo);
     }
 
-    /**
-     * Genera el informe PDF de solicitudes pendientes exclusivo para CESFAM (Solo Administrador).
-     */
+    // genera el informe pdf de solicitudes pendientes exclusivo para cesfam (solo administrador)
     public function pendingCesfamPdf(Request $request)
     {
         if (! auth()->user() || ! auth()->user()->hasRole('Administrador')) {
@@ -581,7 +612,7 @@ class EstablishmentRequestController extends Controller
 
         $solicitudId = $request->input('solicitud_id') ?: $request->input('request_id');
 
-        // Si se solicita la descarga o visualización de una solicitud individual
+        // si se solicita la descarga o visualizacion de una solicitud individual
         if ($solicitudId) {
             $solicitud = EstablishmentRequest::with(['items.product', 'assignedUser'])
                 ->whereIn('establecimiento', $nombresQuery)
@@ -607,7 +638,7 @@ class EstablishmentRequestController extends Controller
             return $pdf->stream($nombreArchivo);
         }
 
-        // Si es el listado consolidado / filtrado
+        // si es el listado consolidado / filtrado
         $centroFiltro = trim((string) ($request->input('centro') ?: $request->input('establecimiento')));
         $fechaDesde = $request->input('fecha_desde');
         $fechaHasta = $request->input('fecha_hasta');

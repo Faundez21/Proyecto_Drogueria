@@ -1,9 +1,4 @@
-/* =====================================================================
-   MODO OSCURO - Droguería DAS
-   Se activa con la clase "dark" en <html>. Sobrescribe las utilidades
-   claras de Tailwind para que todas las vistas se adapten sin tocarlas.
-   Paleta:  fondo #1A2332 · tarjeta #243044 · sutil #202B3D · elevado #2C3A52
-   ===================================================================== */
+/* modo oscuro - drogueria das se activa con la clase "dark" en <html> */
 
 html.dark {
     color-scheme: dark;
@@ -17,7 +12,7 @@ html.dark {
 html.dark body { background-color: #1A2332; color: #E2E8F0; }
 html.dark ::selection { background: rgba(20, 184, 166, .5); color: #fff; }
 
-/* ---------- Superficies neutras ---------- */
+/* superficies neutras */
 html.dark .bg-white,
 html.dark .focus\:bg-white:focus { background-color: #243044; }
 html.dark .bg-white\/90,
@@ -41,7 +36,7 @@ html.dark .hover\:bg-slate-100:hover, html.dark .hover\:bg-gray-100:hover,
 html.dark .hover\:bg-slate-100\/70:hover { background-color: #32425C; }
 html.dark .hover\:bg-slate-200:hover, html.dark .hover\:bg-slate-200\/50:hover { background-color: #3A4B68; }
 
-/* ---------- Texto neutro ---------- */
+/* texto neutro */
 html.dark .text-slate-900, html.dark .text-slate-800, html.dark .text-gray-900, html.dark .text-gray-800 { color: #F1F5F9; }
 html.dark .text-slate-700, html.dark .text-gray-700 { color: #E2E8F0; }
 html.dark .text-slate-600, html.dark .text-gray-600 { color: #CBD5E1; }
@@ -52,7 +47,7 @@ html.dark .hover\:text-slate-600:hover, html.dark .hover\:text-gray-900:hover,
 html.dark .hover\:text-gray-800:hover, html.dark .hover\:text-gray-700:hover,
 html.dark .group:hover .group-hover\:text-slate-700 { color: #F8FAFC; }
 
-/* ---------- Bordes y divisores ---------- */
+/* bordes y divisores */
 html.dark .border-slate-50, html.dark .border-slate-100, html.dark .border-gray-100 { border-color: #2F3D55; }
 html.dark .border-slate-200, html.dark .border-slate-200\/60, html.dark .border-slate-200\/80,
 html.dark .border-slate-200\/90, html.dark .border-gray-200 { border-color: #364560; }
@@ -64,7 +59,7 @@ html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #2
 html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: #364560; }
 html.dark .ring-slate-200 { --tw-ring-color: #364560; }
 
-/* ---------- Formularios ---------- */
+/* formularios */
 html.dark input, html.dark select, html.dark textarea { color: #E2E8F0; }
 html.dark input::placeholder, html.dark textarea::placeholder { color: #7586A0; }
 html.dark input:disabled, html.dark select:disabled, html.dark textarea:disabled,
@@ -74,12 +69,12 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator { filter: invert
 html.dark option { background-color: #243044; color: #E2E8F0; }
 html.dark input[type="checkbox"], html.dark input[type="radio"] { accent-color: #14B8A6; }
 
-/* ---------- Botones primarios oscuros (slate-800) ---------- */
+/* botones primarios oscuros (slate-800) */
 html.dark button.bg-slate-800, html.dark a.bg-slate-800 { background-color: #0F766E; }
 html.dark button.bg-slate-800:hover, html.dark a.bg-slate-800:hover,
 html.dark button.hover\:bg-slate-900:hover, html.dark a.hover\:bg-slate-900:hover { background-color: #115E59; }
 
-/* ---------- Tintes de color (fondos) ---------- */
+/* tintes de color (fondos) */
 html.dark .bg-emerald-50, html.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, .2); }
 html.dark .bg-teal-50, html.dark .bg-teal-100,
 html.dark .bg-teal-50\/30, html.dark .bg-teal-50\/60, html.dark .bg-teal-50\/70, html.dark .bg-teal-50\/80 { background-color: rgba(20, 184, 166, .2); }
@@ -105,7 +100,7 @@ html.dark .hover\:bg-indigo-50:hover, html.dark .hover\:bg-indigo-100:hover, htm
 html.dark .focus\:bg-indigo-100:focus { background-color: rgba(99, 102, 241, .32); }
 html.dark .hover\:bg-purple-100:hover { background-color: rgba(168, 85, 247, .32); }
 
-/* ---------- Texto con color ---------- */
+/* texto con color */
 html.dark .text-emerald-600, html.dark .text-emerald-700, html.dark .text-emerald-800, html.dark .text-emerald-900, html.dark .text-green-600 { color: #6EE7B7; }
 html.dark .text-teal-600, html.dark .text-teal-700, html.dark .text-teal-800, html.dark .text-teal-900,
 html.dark .hover\:text-teal-600:hover, html.dark .hover\:text-teal-700:hover, html.dark .hover\:text-teal-800:hover, html.dark .hover\:text-teal-900:hover,
@@ -124,7 +119,7 @@ html.dark .text-indigo-600, html.dark .text-indigo-700, html.dark .text-indigo-8
 html.dark .hover\:text-indigo-800:hover, html.dark .group:hover .group-hover\:text-indigo-600 { color: #A5B4FC; }
 html.dark .text-purple-600, html.dark .text-purple-700, html.dark .text-purple-800 { color: #D8B4FE; }
 
-/* ---------- Bordes con color ---------- */
+/* bordes con color */
 html.dark .border-emerald-100, html.dark .border-emerald-200 { border-color: rgba(16, 185, 129, .5); }
 html.dark .border-teal-100, html.dark .border-teal-200, html.dark .border-teal-200\/80, html.dark .border-teal-300,
 html.dark .group:hover .group-hover\:border-teal-200 { border-color: rgba(20, 184, 166, .5); }
@@ -142,13 +137,13 @@ html.dark .hover\:border-emerald-200:hover { border-color: rgba(16, 185, 129, .6
 html.dark .hover\:border-indigo-200:hover, html.dark .hover\:border-indigo-300:hover { border-color: rgba(99, 102, 241, .6); }
 html.dark .decoration-indigo-300 { text-decoration-color: rgba(99, 102, 241, .6); }
 
-/* ---------- Anillos (líneas de tiempo) ---------- */
+/* anillos (lineas de tiempo) */
 html.dark .ring-amber-50 { --tw-ring-color: rgba(245, 158, 11, .2); }
 html.dark .ring-blue-50 { --tw-ring-color: rgba(59, 130, 246, .2); }
 html.dark .ring-emerald-50 { --tw-ring-color: rgba(16, 185, 129, .2); }
 html.dark .ring-rose-50 { --tw-ring-color: rgba(244, 63, 94, .2); }
 
-/* ---------- Degradados claros ---------- */
+/* degradados claros */
 html.dark .from-slate-50 { --tw-gradient-from: #202B3D; --tw-gradient-to: rgb(32 43 61 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
 html.dark .from-slate-100 { --tw-gradient-from: #2C3A52; --tw-gradient-to: rgb(44 58 82 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
 html.dark .from-teal-50 { --tw-gradient-from: #1B3A40; --tw-gradient-to: rgb(27 58 64 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
@@ -157,7 +152,7 @@ html.dark .to-white { --tw-gradient-to: #243044; }
 html.dark .to-indigo-50 { --tw-gradient-to: #27305A; }
 html.dark .to-slate-300 { --tw-gradient-to: #364763; }
 
-/* ---------- Sombras ---------- */
+/* sombras */
 html.dark .shadow, html.dark .shadow-sm, html.dark .shadow-md, html.dark .shadow-lg,
 html.dark .shadow-xl, html.dark .shadow-2xl, html.dark .shadow-xs {
     --tw-shadow-color: rgba(0, 0, 0, .55);
@@ -166,7 +161,7 @@ html.dark .shadow-xl, html.dark .shadow-2xl, html.dark .shadow-xs {
 }
 html.dark .shadow-inner { --tw-shadow: inset 0 2px 6px rgba(0, 0, 0, .45); }
 
-/* ---------- Componentes propios del layout ---------- */
+/* componentes propios del layout */
 html.dark .search-result-item:focus,
 html.dark .search-result-item.active { background-color: rgba(20, 184, 166, .16) !important; border-color: rgba(20, 184, 166, .45) !important; }
 html.dark .search-result-item:focus svg.shrink-0,
@@ -175,7 +170,7 @@ html.dark .highlight-text { background-color: rgba(20, 184, 166, .3); color: #99
 html.dark .loader { border-color: #364560; border-top-color: #14B8A6; }
 html.dark .sidebar-scroll::-webkit-scrollbar-thumb { background: #45577A; }
 
-/* ---------- SweetAlert2 ---------- */
+/* sweetalert2 */
 .swal2-container {
     z-index: 9999999 !important;
 }
@@ -220,23 +215,23 @@ html.dark .swal2-html-container .text-slate-700 { color: #E2E8F0 !important; }
 html.dark .swal2-html-container .text-slate-600 { color: #CBD5E1 !important; }
 html.dark .swal2-html-container .text-slate-500 { color: #94A3B8 !important; }
 
-/* ---------- Barras de desplazamiento ---------- */
+/* barras de desplazamiento */
 html.dark ::-webkit-scrollbar { width: 10px; height: 10px; }
 html.dark ::-webkit-scrollbar-track { background: #1A2332; }
 html.dark ::-webkit-scrollbar-thumb { background: #364763; border-radius: 8px; border: 2px solid #1A2332; }
 html.dark ::-webkit-scrollbar-thumb:hover { background: #4A5E80; }
 
-/* ---------- Botón de tema ---------- */
+/* boton de tema */
 .theme-icon-sun { display: none; }
 html.dark .theme-icon-sun { display: block; }
 html.dark .theme-icon-moon { display: none; }
 
-/* ---------- Impresión: siempre en claro ---------- */
+/* impresion: siempre en claro */
 @media print {
     html.dark body { background: #fff !important; color: #000 !important; }
 }
 
-/* ---------- Barra lateral más suave ---------- */
+/* barra lateral mas suave */
 html.dark {
     --sidebar-bg: #1C2639;
     --sidebar-hover: #2A374F;
@@ -247,12 +242,12 @@ html.dark aside .border-slate-800 { border-color: #2C3A52; }
 html.dark aside .bg-slate-800 { background-color: #2A374F; }
 html.dark .flow-rail::before { background: #3A4B68; }
 
-/* ---------- Fondos oscuros de encabezados y modales ---------- */
+/* fondos oscuros de encabezados y modales */
 html.dark .bg-slate-800:not(button):not(a) { background-color: #2C3A52; }
 html.dark .bg-slate-700:not(button):not(a) { background-color: #364763; }
 html.dark .bg-slate-700.text-white { background-color: #364763; }
 
-/* ---------- Botón de tema (encabezado) ---------- */
+/* boton de tema (encabezado) */
 .theme-toggle {
     width: 38px; height: 38px;
     display: inline-flex; align-items: center; justify-content: center;
@@ -266,34 +261,34 @@ html.dark .bg-slate-700.text-white { background-color: #364763; }
 html.dark .theme-toggle { background: #2C3A52; border-color: #45577A; color: #FBBF24; }
 html.dark .theme-toggle:hover { background: #364763; color: #FCD34D; border-color: #5A6E92; transform: rotate(12deg); }
 
-/* ---------- Mapa de distribución ---------- */
+/* mapa de distribucion */
 html.dark .bg-\[\#eef2f6\] { background-color: #1A2332; }
 html.dark .glass-panel { background-color: rgba(30, 41, 59, .96); border-color: #364560; }
 html.dark .bg-\[\#1e293b\] { background-color: #1A2332; }
 html.dark .rack-marker { border-color: rgba(255, 255, 255, .25); }
 html.dark #warehouse-wrapper { background: #1A2332; }
 
-/* ---------- Tablas: filas y cabeceras ---------- */
+/* tablas: filas y cabeceras */
 html.dark table thead { background-color: #202B3D; }
 html.dark tbody tr { border-color: #2F3D55; }
 html.dark table th { color: #A8B6CA; }
 
-/* ---------- Tarjetas de estado e indicadores con texto sobre tinte ---------- */
+/* tarjetas de estado e indicadores con texto sobre tinte */
 html.dark .text-emerald-500 { color: #34D399; }
 html.dark .text-amber-500 { color: #FBBF24; }
 html.dark .text-rose-500 { color: #FB7185; }
 html.dark .text-teal-500 { color: #2DD4BF; }
 html.dark .text-blue-500 { color: #60A5FA; }
 
-/* ---------- Login ---------- */
+/* login */
 html.dark body.login-page,
 html.dark .bg-gradient-to-br.from-slate-100 { background-image: linear-gradient(135deg, #1A2332, #0F1623); }
 html.dark .login-theme-toggle { position: fixed; top: 16px; right: 16px; z-index: 50; }
 .login-theme-toggle { position: fixed; top: 16px; right: 16px; z-index: 50; }
 
-/* ---------- Paneles/modales sobre fondo con desenfoque ---------- */
+/* paneles/modales sobre fondo con desenfoque */
 html.dark .bg-slate-900\/70, html.dark .bg-slate-900\/75, html.dark .bg-slate-900\/80 { background-color: rgba(8, 12, 22, .78); }
-/* ---------- Grises (login y vistas con text-gray) ---------- */
+/* grises (login y vistas con text-gray) */
 html.dark .text-gray-500 { color: #A8B6CA; }
 html.dark .text-gray-400 { color: #8D9CB3; }
 html.dark .text-gray-300, html.dark .text-gray-200 { color: #CBD5E1; }
@@ -302,7 +297,7 @@ html.dark .bg-gray-200 { background-color: #364763; }
 html.dark .bg-blue-900 { background-color: #1E3A5F; }
 html.dark .bg-slate-900:not(button):not(a) { background-color: #1E293B; }
 
-/* ---------- Tarjetas de etiquetas QR físicas (siempre fondo blanco puro y texto negro para legibilidad e impresión) ---------- */
+/* tarjetas de etiquetas qr fisicas (siempre fondo blanco puro y texto negro para legibilidad e impresion) */
 html.dark #qrPrintableCard {
     background-color: #FFFFFF !important;
     color: #000000 !important;
@@ -329,7 +324,7 @@ html.dark #qrPrintableCard img {
     background-color: #FFFFFF !important;
 }
 
-/* ---------- Contenedores de visualización de QR (ej: Dashboard y paneles de lote) ---------- */
+/* contenedores de visualizacion de qr (ej: dashboard y paneles de lote) */
 html.dark #qr-container,
 html.dark .qr-container,
 html.dark [id*="qr-container"] {
@@ -345,7 +340,7 @@ html.dark img[src*="qr"] {
     border-radius: 8px;
 }
 
-/* ---------- Modales y Visor de Escáner QR en Modo Oscuro (Dispatch, Controlled Dispatch, Dashboard) ---------- */
+/* modales y visor de escaner qr en modo oscuro (dispatch, controlled dispatch, dashboard) */
 html.dark #scannerModal > div,
 html.dark #scannerModal > div > div,
 html.dark #scannerModalDashboard > div,
@@ -369,7 +364,7 @@ html.dark #scannerVisualContainer {
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 24px rgba(0, 0, 0, 0.85) !important;
 }
 
-/* Motor nativo HTML5 QR Scanner en modo oscuro */
+/* motor nativo html5 qr scanner en modo oscuro */
 html.dark #reader-feed,
 html.dark #reader-dashboard-feed {
     background-color: #000000 !important;
@@ -396,7 +391,7 @@ html.dark #reader-dashboard-feed button {
     padding: 6px 12px !important;
 }
 
-/* Barra de estado y botones del modal de escaneo */
+/* barra de estado y botones del modal de escaneo */
 html.dark #scannerStatusTxt {
     color: #E2E8F0 !important;
 }
@@ -415,7 +410,7 @@ html.dark #scannerModalDashboard p {
     color: #94A3B8;
 }
 
-/* Footer de los modales de escaneo */
+/* footer de los modales de escaneo */
 html.dark #scannerModal .border-t,
 html.dark #scannerModalDashboard .border-t {
     border-color: #2F3D55 !important;
@@ -433,7 +428,7 @@ html.dark #scannerModalDashboard button[onclick*="closeDashboardScanner"]:hover 
     color: #FFFFFF !important;
 }
 
-/* ---------- Modal Actualizar Estado y Ubicación de Lote en Modo Oscuro ---------- */
+/* modal actualizar estado y ubicacion de lote en modo oscuro */
 html.dark #editLoteModal > div > div,
 html.dark #editLoteModal form {
     background-color: #1E293B !important;
@@ -473,14 +468,14 @@ html.dark #editLoteModal button[onclick*="closeEditLote"] {
     border-color: #475569 !important;
 }
 
-/* CENTRO DE ALERTAS - MODO OSCURO */
+/* centro de alertas - modo oscuro */
 html.dark #notifications-menu {
     background-color: #1A2434 !important;
     border-color: #2F3E56 !important;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.65), 0 8px 10px -6px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Encabezado del menú de alertas */
+/* encabezado del menu de alertas */
 html.dark #notifications-menu > div:first-child {
     background-color: #141D2B !important;
     border-color: #243144 !important;
@@ -495,7 +490,7 @@ html.dark #btn-marcar-todas-notif:hover {
     color: #5EEAD4 !important;
 }
 
-/* Barra de pestañas del Centro de Alertas */
+/* barra de pestanas del centro de alertas */
 html.dark #notifications-menu .bg-slate-50\/70 {
     background-color: #111823 !important;
     border-color: #243144 !important;
@@ -520,7 +515,7 @@ html.dark #notif-read-count {
     color: #CBD5E1 !important;
 }
 
-/* Listas de alertas (Pendientes y Vistas) */
+/* listas de alertas (pendientes y vistas) */
 html.dark #notif-list,
 html.dark #notif-read-list {
     background-color: #1A2434 !important;
@@ -534,7 +529,7 @@ html.dark #notif-read-list > div:hover {
     background-color: #222E40 !important;
 }
 
-/* Títulos y textos de alertas */
+/* titulos y textos de alertas */
 html.dark #notif-list p.text-slate-800,
 html.dark #notif-read-list p.text-slate-700 {
     color: #F8FAFC !important;
@@ -548,14 +543,14 @@ html.dark #notif-read-list p.text-slate-400 {
     color: #64748B !important;
 }
 
-/* Insignia "Vista" */
+/* insignia "vista" */
 html.dark #notif-read-list span.bg-slate-100 {
     background-color: #243347 !important;
     color: #94A3B8 !important;
     border: 1px solid #2F3E56 !important;
 }
 
-/* Botones de acción dentro de las alertas */
+/* botones de accion dentro de las alertas */
 html.dark #notif-list button {
     color: #64748B !important;
 }
@@ -571,7 +566,7 @@ html.dark #notif-read-list button:hover {
     background-color: rgba(99, 102, 241, 0.18) !important;
 }
 
-/* Estados vacíos */
+/* estados vacios */
 html.dark #notif-list svg.text-slate-300,
 html.dark #notif-read-list svg.text-slate-300 {
     color: #475569 !important;
@@ -581,13 +576,13 @@ html.dark #notif-read-list .text-slate-400 {
     color: #94A3B8 !important;
 }
 
-/* ---------- Blindaje de modales fijos contra márgenes no deseados (space-y-*) ---------- */
+/* blindaje de modales fijos contra margenes no deseados (space-y-*) */
 div[id$="Modal"], div[id*="modal"], div[id*="Modal"] {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 }
 
-/* ---------- Diseño Base y Scroll para Modales de Historial (#HistoryModal) ---------- */
+/* diseno base y scroll para modales de historial (#historymodal) */
 #HistoryModal:not(.hidden) {
     display: flex !important;
     align-items: center !important;
@@ -664,7 +659,7 @@ div[id$="Modal"], div[id*="modal"], div[id*="Modal"] {
     flex-shrink: 0 !important;
 }
 
-/* ---------- Modales de Historial y Mantenedores en Modo Oscuro ---------- */
+/* modales de historial y mantenedores en modo oscuro */
 html.dark #HistoryModal > div,
 html.dark #createModal > div,
 html.dark #showModal > div,
@@ -730,7 +725,7 @@ html.dark #editModal button[onclick*="closeEdit"]:hover {
     background-color: #32425C !important;
     color: #FFFFFF !important;
 }
-/* MODALES DE DESPACHO REALIZADO CON ÉXITO Y SOLICITUD MIXTA (CLARO + OSCURO) */
+/* modales de despacho realizado con exito y solicitud mixta (claro + oscuro) */
 .das-swal-summary {
     background-color: #f8fafc;
     border: 1px solid #cbd5e1;
@@ -794,7 +789,7 @@ html.dark #editModal button[onclick*="closeEdit"]:hover {
     letter-spacing: 0.03em;
 }
 
-/* Tabla de productos despachados en el modal */
+/* tabla de productos despachados en el modal */
 .das-swal-section-title {
     font-size: 0.69rem;
     font-weight: 800;
@@ -840,7 +835,7 @@ html.dark #editModal button[onclick*="closeEdit"]:hover {
     color: #1e293b;
 }
 
-/* Banner de Solicitud Mixta (Modo Claro base) */
+/* banner de solicitud mixta (modo claro base) */
 .das-swal-mixed-banner {
     background: linear-gradient(135deg, #fffbeb 0%, #fff1f2 100%);
     border: 1px solid #fbbf24;
@@ -902,7 +897,7 @@ html.dark #editModal button[onclick*="closeEdit"]:hover {
     color: #0f766e;
 }
 
-/* Lista de píldoras de productos en alerta de Solicitud Mixta */
+/* lista de pildoras de productos en alerta de solicitud mixta */
 .das-swal-pill-list {
     list-style: none;
     padding: 0;
@@ -925,7 +920,7 @@ html.dark #editModal button[onclick*="closeEdit"]:hover {
     color: #115e59;
 }
 
-/* MODO OSCURO: Modales de Despacho Exitoso y Solicitud Mixta */
+/* modo oscuro: modales de despacho exitoso y solicitud mixta */
 html.dark .das-swal-summary {
     background: linear-gradient(145deg, #111827 0%, #162235 100%) !important;
     border: 1px solid #2e4057 !important;
@@ -1005,7 +1000,7 @@ html.dark .das-swal-qty-rose {
     color: #fb7185 !important;
 }
 
-/* Banner de Solicitud Mixta en Modo Oscuro */
+/* banner de solicitud mixta en modo oscuro */
 html.dark .das-swal-mixed-banner,
 html.dark .swal2-html-container .from-amber-50.to-rose-50 {
     background: linear-gradient(135deg, rgba(120, 53, 15, 0.38) 0%, rgba(136, 19, 55, 0.38) 100%) !important;
@@ -1046,7 +1041,7 @@ html.dark .das-swal-mixed-banner-teal .das-swal-mixed-cta {
     color: #5eead4 !important;
 }
 
-/* Lista de píldoras en Modo Oscuro */
+/* lista de pildoras en modo oscuro */
 html.dark .das-swal-pill-item {
     background-color: rgba(15, 23, 42, 0.78) !important;
     border-color: rgba(251, 113, 133, 0.45) !important;
@@ -1058,7 +1053,7 @@ html.dark .das-swal-pill-item-teal {
     color: #ccfbf1 !important;
 }
 
-/* Insignias "Mixta" en tablas y tarjetas de solicitudes */
+/* insignias "mixta" en tablas y tarjetas de solicitudes */
 html.dark .das-badge-mixta-amber,
 html.dark .from-teal-50.to-amber-50 {
     background: linear-gradient(135deg, rgba(20, 184, 166, 0.22) 0%, rgba(245, 158, 11, 0.25) 100%) !important;
@@ -1074,7 +1069,7 @@ html.dark .from-teal-50.to-rose-50 {
     border-color: rgba(251, 113, 133, 0.45) !important;
 }
 
-/* Botones de acción en SweetAlert2 en Modo Oscuro */
+/* botones de accion en sweetalert2 en modo oscuro */
 html.dark .swal2-actions button.swal2-confirm,
 html.dark .swal2-actions button.swal2-deny,
 html.dark .swal2-actions button.swal2-cancel {
@@ -1084,7 +1079,7 @@ html.dark .swal2-actions button.swal2-cancel {
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
 }
 
-/* Modales #SolicitudesModal y #SolicitudesControladoModal en Modo Oscuro */
+/* modales #solicitudesmodal y #solicitudescontroladomodal en modo oscuro */
 html.dark #SolicitudesModal > div,
 html.dark #SolicitudesControladoModal > div {
     background-color: #1E293B !important;
@@ -1115,7 +1110,7 @@ html.dark #SolicitudesModal tr[id^="solicitud-"] > td > div > div {
     border-color: #2E4057 !important;
 }
 
-/* Modales de Solicitudes Pendientes (Establecimientos y CESFAM) en Modo Oscuro */
+/* modales de solicitudes pendientes (establecimientos y cesfam) en modo oscuro */
 html.dark #PendingRequestsEstablecimientosModal > div,
 html.dark #PendingRequestsCesfamModal > div {
     background-color: #0F172A !important;
@@ -1191,7 +1186,7 @@ html.dark #PendingRequestsCesfamModal tr[id^="cesfam-detail-"] tbody tr {
     border-color: #1E293B !important;
 }
 
-/* Barra de métricas y notificaciones de descarga individual en Modo Oscuro */
+/* barra de metricas y notificaciones de descarga individual en modo oscuro */
 html.dark #PendingRequestsEstablecimientosModal .bg-slate-100\/90,
 html.dark #PendingRequestsCesfamModal .bg-slate-100\/90 {
     background-color: #111C2E !important;
@@ -1213,7 +1208,7 @@ html.dark #PendingRequestsCesfamModal .bg-teal-500\/10 {
     color: #5EEAD4 !important;
 }
 
-/* Desplegables de búsqueda de productos (#searchDropdown) en modo oscuro */
+/* desplegables de busqueda de productos (#searchdropdown) en modo oscuro */
 html.dark #searchDropdown {
     background-color: #0F172A !important;
     border-color: #334155 !important;
@@ -1231,7 +1226,7 @@ html.dark #searchDropdown .search-item:hover {
     color: #38BDF8 !important;
 }
 
-/* Opciones de select para que no se corten en modo oscuro */
+/* opciones de select para que no se corten en modo oscuro */
 html.dark select option {
     background-color: #0F172A !important;
     color: #F8FAFC !important;

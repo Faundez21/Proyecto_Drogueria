@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('inventories', function (Blueprint $table) {
             $table->id();
 
-            // Datos del Documento y Origen
+            // datos del documento y origen
             $table->integer('correlativo_interno')->nullable();
             $table->date('fecha_recepcion');
             $table->string('tipo_documento');
@@ -19,11 +19,11 @@ return new class extends Migration
             $table->string('orden_compra')->nullable();
             $table->string('origen_mercaderia');
 
-            // Datos del Proveedor
+            // datos del proveedor
             $table->string('rut_proveedor');
             $table->string('razon_social');
 
-            // Detalle del Producto
+            // detalle del producto
             $table->string('producto');
             $table->string('categoria');
             $table->string('lote')->nullable();
@@ -32,11 +32,11 @@ return new class extends Migration
             $table->integer('minimo')->default(0);
             $table->decimal('valor_neto_unitario', 15, 2)->default(0);
 
-            // Estado del Lote (Disponible, Cuarentena, Merma)
+            // estado del lote (disponible, cuarentena, merma)
             $table->string('estado')->default('Disponible');
             $table->text('motivo')->nullable();
 
-            // Ubicación física
+            // ubicacion fisica
             $table->string('pasillo')->nullable();
             $table->string('estante')->nullable();
 

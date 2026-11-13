@@ -74,10 +74,12 @@ class ProviderController extends Controller
         ];
         $nombreMesActual = $mesesNombres[$mesActual] . ' ' . $anioActual;
 
-        $perPage = $request->input('per_page', 10);
+        // solo se aceptan los tamanos de pagina que ofrece la vista
+        $perPage = (int) $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 25, 50, 100], true) ? $perPage : 10;
         $providers = $query->paginate($perPage)->withQueryString();
 
-        // Lista reducida para el autocompletado del buscador
+        // lista reducida para el autocompletado del buscador
         $allProviders = Provider::select('name', 'rut')->get();
 
         return view('providers.index', compact(
@@ -93,7 +95,7 @@ class ProviderController extends Controller
         ));
     }
 
-    /** Categorías de proveedor permitidas (las mismas del formulario). */
+    // categorias de proveedor permitidas (las mismas del formulario)
     public const CATEGORIAS = [
         'Fármacos y medicamentos',
         'Insumos clínicos',
@@ -101,10 +103,7 @@ class ProviderController extends Controller
         'Dispositivos médicos',
     ];
 
-    /**
-     * Regla de validación del RUT: dígito verificador correcto y que no esté registrado
-     * en otro proveedor, aunque esté escrito con otro formato (con o sin puntos).
-     */
+    // rut con digito verificador correcto y no registrado en otro proveedor, con o sin puntos
     private function reglaRut(?int $ignorarId = null): array
     {
         return ['required', 'string', 'max:20', function ($attribute, $value, $fail) use ($ignorarId) {

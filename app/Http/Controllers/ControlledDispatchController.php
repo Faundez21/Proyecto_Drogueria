@@ -8,6 +8,7 @@ use App\Models\EstablishmentRequest;
 use App\Models\Inventory;
 use App\Models\User;
 use App\Services\InventoryService;
+use App\Services\EstablishmentStockService;
 use App\Services\SolicitudService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -79,18 +80,7 @@ class ControlledDispatchController extends Controller
         ));
     }
 
-    /**
-     * Emite una guía de despacho de estupefacientes y psicotrópicos.
-     *
-     * Funciona igual que el despacho normal, pero con tres restricciones que
-     * vienen de la normativa: solo acepta productos reconocidos como
-     * controlados, la solicitud tiene que venir de un CESFAM y el destino debe
-     * ser ese mismo CESFAM. Además permite anotar las series de las recetas
-     * cheque que respaldan la entrega.
-     *
-     * Sus guías llevan correlativo propio, GDC-AAAA-XXXX, separado del de las
-     * guías normales.
-     */
+    // emite una guia de despacho de estupefacientes y psicotropicos
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -119,7 +109,7 @@ class ControlledDispatchController extends Controller
         ]);
 
 
-        // Validaciones de destino, solicitud y firmas
+        // validaciones de destino, solicitud y firmas
         $errorDespacho = null;
         $solicitudVinculada = ! empty($validated['establishment_request_id'])
             ? EstablishmentRequest::find($validated['establishment_request_id'])
@@ -162,6 +152,16 @@ class ControlledDispatchController extends Controller
             if (! $firmaRecibe && ! empty($validated['establishment_request_id'])) {
                 $firmaRecibe = EstablishmentRequest::where('id', $validated['establishment_request_id'])
                     ->value('firma_solicitante');
+            }
+
+            // se bloquea la solicitud y se revisa de nuevo para que dos despachos simultaneos no la sobrepasen
+            $solicitudBloqueada = EstablishmentRequest::with('items.product')->lockForUpdate()->find($solicitudVinculada->id);
+            if (! $solicitudBloqueada || ! in_array($solicitudBloqueada->estado, ['Pendiente', 'Asignada', 'Parcial'], true)) {
+                throw new \RuntimeException('La solicitud ya fue despachada por otro usuario. Recargue la página.');
+            }
+            $exceso = SolicitudService::excesoSobrePendiente($solicitudBloqueada, $validated['productos'], $validated['cantidades']);
+            if ($exceso) {
+                throw new \RuntimeException($exceso);
             }
 
             $nextId = (int) ControlledDispatch::lockForUpdate()->max('id') + 1;
@@ -216,6 +216,12 @@ class ControlledDispatchController extends Controller
                         'origen_destino' => 'Hacia: ' . $destino,
                         'documento_respaldo' => 'Guía Controlada N° ' . $correlativo,
                     ]);
+
+                    // el cesfam que recibe suma estas unidades a su stock
+                    EstablishmentStockService::ingresar(
+                        $destino, $batch->product_id ?? InventoryService::productoId($nombreProducto), $nombreProducto,
+                        (int) $asignacion['cantidad'], 'Guía Controlada N° ' . $correlativo . ' desde la droguería'
+                    );
 
                     $itemsControlados[] = [
                         'producto' => $nombreProducto,

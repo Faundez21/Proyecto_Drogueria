@@ -86,7 +86,7 @@ class TraceabilityController extends Controller
             return response()->json(['timeline' => [], 'details' => null]);
         }
 
-        // Hay lotes con el mismo número en productos distintos, por eso se filtra por ambos
+        // hay lotes con el mismo numero en productos distintos, por eso se filtra por ambos
         $timeline = StockMovement::with('user')
             ->where('lote', $lote)
             ->where('producto', $producto)
@@ -126,19 +126,30 @@ class TraceabilityController extends Controller
         ]);
     }
 
+    // un texto que empieza con = + - @ excel lo toma como formula: se le antepone un apostrofo
+    private static function textoSeguro($valor): string
+    {
+        $texto = (string) $valor;
+
+        return preg_match('/^[=+\-@\t\r]/', $texto) ? "'" . $texto : $texto;
+    }
+
     private function exportExcelStyled($movements)
     {
         $filename = 'Reporte_Trazabilidad_Lotes_' . date('Y-m-d_H-i') . '.xls';
 
         $totalMovimientos = count($movements);
-        $totalUnidadesMovidas = collect($movements)->sum('cantidad');
+        // unidades que realmente entraron o salieron (los cambios de estado y reubicaciones no mueven unidades)
+        $totalUnidadesMovidas = collect($movements)
+            ->whereIn('tipo_movimiento', ['Recepción', 'Despacho', 'Despacho Controlado', 'Despacho interno', 'Edición de recepción'])
+            ->sum(fn ($m) => abs((int) $m->cantidad));
         $totalRecepciones = collect($movements)->where('tipo_movimiento', 'Recepción')->count();
         $totalDespachos = collect($movements)->whereIn('tipo_movimiento', ['Despacho', 'Despacho Controlado'])->count();
 
         $html = '<meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">';
         $html .= '<table border="1" style="font-family: Calibri, Arial, sans-serif; border-collapse: collapse; border-color: #cbd5e1;">';
 
-        // Encabezado del Excel
+        // encabezado del excel
         $html .= '<tr>';
         $html .= '<td colspan="8" style="background-color: #0f766e; color: #ffffff; font-size: 16px; font-weight: bold; padding: 10px; text-align: left;">';
         $html .= 'DROGUERÍA COMUNAL DAS - I. MUNICIPALIDAD DE TALCAHUANO';
@@ -151,7 +162,7 @@ class TraceabilityController extends Controller
         $html .= '</td>';
         $html .= '</tr>';
 
-        // Fila de totales del encabezado
+        // fila de totales del encabezado
         $html .= '<tr style="background-color: #f8fafc; font-size: 11px; text-align: center; height: 26px;">';
         $html .= '<td colspan="2" style="padding: 6px;"><strong>Total Eventos:</strong> ' . number_format($totalMovimientos, 0, ',', '.') . '</td>';
         $html .= '<td colspan="2" style="padding: 6px; color: #047857;"><strong>Recepciones:</strong> ' . number_format($totalRecepciones, 0, ',', '.') . '</td>';
@@ -187,17 +198,17 @@ class TraceabilityController extends Controller
 
             $html .= '<tr style="text-align: center; font-size: 11px; ' . $bgRow . '">';
             $html .= '<td style="padding: 6px;">' . Carbon::parse($mov->fecha_hora)->format('d/m/Y H:i') . '</td>';
-            $html .= '<td style="padding: 6px; text-align: left; font-weight: bold; color: #0f172a;">' . e($mov->producto) . '</td>';
-            $html .= '<td style="padding: 6px; mso-number-format:\'@\'; font-family: Consolas, monospace; font-weight: bold;">' . e($mov->lote) . '</td>';
+            $html .= '<td style="padding: 6px; text-align: left; font-weight: bold; color: #0f172a;">' . e(self::textoSeguro($mov->producto)) . '</td>';
+            $html .= '<td style="padding: 6px; mso-number-format:\'@\'; font-family: Consolas, monospace; font-weight: bold;">' . e(self::textoSeguro($mov->lote)) . '</td>';
             $html .= '<td style="padding: 6px;">' . $fechaVence . '</td>';
-            $html .= '<td style="padding: 6px; ' . $colorMovimiento . '">' . e($mov->tipo_movimiento) . '</td>';
+            $html .= '<td style="padding: 6px; ' . $colorMovimiento . '">' . e(self::textoSeguro($mov->tipo_movimiento)) . '</td>';
             $html .= '<td style="padding: 6px; font-weight: bold; mso-number-format:\'#,##0\';">' . (int) $mov->cantidad . '</td>';
-            $html .= '<td style="padding: 6px; text-align: left;">' . e($mov->origen_destino) . '</td>';
-            $html .= '<td style="padding: 6px; font-weight: bold; color: #334155;">' . e($mov->documento_respaldo) . '</td>';
+            $html .= '<td style="padding: 6px; text-align: left;">' . e(self::textoSeguro($mov->origen_destino)) . '</td>';
+            $html .= '<td style="padding: 6px; font-weight: bold; color: #334155;">' . e(self::textoSeguro($mov->documento_respaldo)) . '</td>';
             $html .= '</tr>';
         }
 
-        // Fila de totales al final
+        // fila de totales al final
         $html .= '<tr style="background-color: #ccfbf1; color: #134e4a; font-weight: bold; font-size: 11px; height: 28px;">';
         $html .= '<td colspan="5" style="text-align: right; padding: 6px 10px;">TOTAL UNIDADES MOVILIZADAS EN EL PERÍODO:</td>';
         $html .= '<td style="text-align: center; padding: 6px; mso-number-format:\'#,##0\';">' . (int) $totalUnidadesMovidas . '</td>';

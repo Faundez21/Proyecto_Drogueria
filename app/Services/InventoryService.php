@@ -17,16 +17,13 @@ use Illuminate\Support\Facades\DB;
 
 class InventoryService
 {
-    /** Caché en memoria (por petición) de los resultados de esControlado(). */
+    // cache en memoria (por peticion) de los resultados de escontrolado()
     private static array $cacheControlado = [];
 
-    /** Caché en memoria (por petición) de la lista ampliada de nombres controlados. */
+    // cache en memoria (por peticion) de la lista ampliada de nombres controlados
     private static ?array $cacheListaControlados = null;
 
-    /**
-     * Normaliza un texto para compararlo: minúsculas, sin tildes, sin la marca
-     * "(Controlado)" y con un solo espacio entre palabras.
-     */
+    // normaliza un texto para compararlo: minusculas, sin tildes, sin la marca "(controlado)" y con un solo espacio entre palabras
     public static function normalizarTexto(string $texto): string
     {
         $texto = mb_strtolower(trim($texto));
@@ -40,14 +37,7 @@ class InventoryService
         return trim((string) $texto);
     }
 
-    /**
-     * Indica si un producto es un fármaco controlado (estupefaciente o psicotrópico).
-     *
-     * Además de la coincidencia exacta con la lista oficial, detecta por similitud:
-     * basta con que el nombre contenga un principio activo controlado (por ejemplo
-     * "MORFINA CLORHIDRATO 10 MG/ML AMPOLLA" o "CLONAZEPAM 2.0 MG COMPRIMIDOS"),
-     * tolerando pequeños errores de tipeo ("CLONAZEPAN", "METILFENIDTO").
-     */
+    // indica si un producto es un farmaco controlado (estupefaciente o psicotropico)
     public static function esControlado(string $producto): bool
     {
         $nombreNorm = self::normalizarTexto($producto);
@@ -65,14 +55,14 @@ class InventoryService
 
     private static function detectarControlado(string $nombreNorm): bool
     {
-        // 1. Coincidencia exacta con la lista oficial de controlados
+        // 1. coincidencia exacta con la lista oficial de controlados
         foreach (config('drogueria.controlados', []) as $ctrl) {
             if (self::normalizarTexto((string) $ctrl) === $nombreNorm) {
                 return true;
             }
         }
 
-        // 2. Frases que identifican un controlado (ej. "Recetas Cheque")
+        // 2. frases que identifican un controlado (ej. "recetas cheque")
         foreach (config('drogueria.frases_controlados', []) as $frase) {
             $frase = self::normalizarTexto((string) $frase);
             if ($frase !== '' && str_contains($nombreNorm, $frase)) {
@@ -80,7 +70,7 @@ class InventoryService
             }
         }
 
-        // 3. Similitud por principio activo, palabra por palabra
+        // 3. similitud por principio activo, palabra por palabra
         $principios = array_map(
             fn ($p) => self::normalizarTexto((string) $p),
             config('drogueria.principios_controlados', [])
@@ -101,7 +91,7 @@ class InventoryService
                     return true;
                 }
 
-                // Tolerancia a errores de tipeo: 1 letra en palabras cortas, 2 en largas
+                // tolerancia a errores de tipeo: 1 letra en palabras cortas, 2 en largas
                 $tolerancia = strlen($principio) >= 9 ? 2 : 1;
                 if (abs(strlen($palabra) - strlen($principio)) <= $tolerancia
                     && levenshtein($palabra, $principio) <= $tolerancia) {
@@ -113,19 +103,13 @@ class InventoryService
         return false;
     }
 
-    /**
-     * Lista oficial de controlados definida en config/drogueria.php.
-     */
+    // lista oficial de controlados definida en config/drogueria.php
     public static function controladosOficiales(): array
     {
         return config('drogueria.controlados', []);
     }
 
-    /**
-     * Lista ampliada de nombres de productos controlados: la lista oficial más todos
-     * los productos del catálogo e inventario que se detectan como controlados por
-     * similitud. Se usa en los filtros whereIn / whereNotIn de todo el sistema.
-     */
+    // lista oficial de controlados mas los productos detectados por similitud, para filtros whereIn
     public static function controlados(): array
     {
         if (self::$cacheListaControlados !== null) {
@@ -139,7 +123,7 @@ class InventoryService
                 ->merge(Product::query()->pluck('nombre'))
                 ->merge(Inventory::query()->whereNotNull('producto')->distinct()->pluck('producto'));
         } catch (\Throwable $e) {
-            // Si la base de datos aún no está disponible (ej. durante migraciones), usar solo la lista oficial
+            // si la base de datos aun no esta disponible (ej. durante migraciones), usar solo la lista oficial
         }
 
         return self::$cacheListaControlados = $nombres
@@ -150,18 +134,13 @@ class InventoryService
             ->all();
     }
 
-    /**
-     * Limpia la caché de la lista ampliada (por ejemplo, después de crear productos nuevos).
-     */
+    // limpia la cache de la lista ampliada (por ejemplo, despues de crear productos nuevos)
     public static function limpiarCacheControlados(): void
     {
         self::$cacheListaControlados = null;
     }
 
-    /**
-     * Clasifica un producto en uno de los 3 grandes grupos:
-     * 'Estupefacientes', 'Insumos' o 'Medicamentos'.
-     */
+    // clasifica un producto en uno de los 3 grandes grupos: 'estupefacientes', 'insumos' o 'medicamentos'
     public static function clasificarGrupoProducto(string $producto, ?string $categoria = null): string
     {
         if (self::esControlado($producto)) {
@@ -226,10 +205,7 @@ class InventoryService
         return config('drogueria.establecimientos');
     }
 
-    /**
-     * Busca un establecimiento de la red por su nombre exacto (sin importar mayúsculas)
-     * y devuelve sus datos (nombre, tipo, dirección), o null si no está registrado.
-     */
+    // busca un establecimiento de la red por su nombre exacto (sin importar mayusculas) y devuelve sus datos (nombre, tipo, direccion), o null si no esta
     public static function establecimientoRegistrado(?string $nombre): ?array
     {
         $buscado = mb_strtolower(trim((string) $nombre));
@@ -246,24 +222,18 @@ class InventoryService
         return null;
     }
 
-    /**
-     * Descuenta stock del inventario.
-     * Si se indica un lote concreto consume solo ese lote; si no,
-     * aplica FEFO (primero vence, primero sale) repartiendo entre lotes.
-     *
-     * @return array<int, array{inventory: Inventory, cantidad: int}>
-     */
+    // descuenta stock del inventario
     public static function consumir(string $producto, int $cantidad, ?string $lote = null, array $estadosPermitidos = ['Disponible']): array
     {
         $lote = self::normalizarLote($lote);
 
-        // Antes de despachar, cualquier lote vencido pasa automáticamente a Merma
+        // antes de despachar, cualquier lote vencido pasa automaticamente a merma
         self::moverVencidosAMerma();
 
         $lotes = Inventory::where('producto', $producto)
             ->whereIn('estado', $estadosPermitidos)
             ->where('cantidad', '>', 0)
-            // Nunca se despachan lotes vencidos (se permite el mismo día de vencimiento)
+            // nunca se despachan lotes vencidos (se permite el mismo dia de vencimiento)
             ->where(function ($q) {
                 $q->whereNull('fecha_vencimiento')
                     ->orWhereDate('fecha_vencimiento', '>=', now()->toDateString());
@@ -305,16 +275,10 @@ class InventoryService
         return $asignaciones;
     }
 
-    /** Evita revisar los vencimientos más de una vez en la misma petición. */
+    // evita revisar los vencimientos mas de una vez en la misma peticion
     private static bool $vencidosRevisados = false;
 
-    /**
-     * Mueve automáticamente a Merma todos los lotes vencidos que sigan en
-     * Disponible o Cuarentena, y registra el cambio en el Kardex (trazabilidad).
-     * Un lote se considera vencido desde el día siguiente a su fecha de vencimiento.
-     *
-     * Devuelve la cantidad de lotes movidos.
-     */
+    // mueve automaticamente a merma todos los lotes vencidos que sigan en disponible o cuarentena, y registra el cambio en el kardex (trazabilidad)
     public static function moverVencidosAMerma(bool $forzar = false): int
     {
         if (self::$vencidosRevisados && ! $forzar) {
@@ -357,9 +321,7 @@ class InventoryService
         return $vencidos->count();
     }
 
-    /**
-     * Registra (crea o acumula) el lote recibido en inventario.
-     */
+    // registra (crea o acumula) el lote recibido en inventario
     public static function ingresar(array $datos): Inventory
     {
         $datos = self::resolverRelaciones($datos);
@@ -387,10 +349,21 @@ class InventoryService
                     $q->where('lote', $lote);
                 }
             })
+            // solo se juntan unidades con el mismo vencimiento, para no alterar el orden fefo
+            ->where(function ($q) use ($fechaVence) {
+                $fechaVence ? $q->whereDate('fecha_vencimiento', $fechaVence) : $q->whereNull('fecha_vencimiento');
+            })
             ->lockForUpdate()
             ->first();
 
         if ($batch) {
+            // si el lote ya tiene ubicacion se conserva; las unidades nuevas se guardan junto a las existentes
+            $tieneUbicacion = ! empty($batch->estante) && strtoupper((string) $batch->estante) !== 'P.A';
+            if ($tieneUbicacion) {
+                foreach (['pasillo', 'estante', 'nivel', 'posicion', 'aisle_id', 'shelf_id', 'level_id', 'position_id'] as $campoUbicacion) {
+                    $datos[$campoUbicacion] = $batch->{$campoUbicacion};
+                }
+            }
             $batch->increment('cantidad', (int) ($datos['cantidad'] ?? 0));
             $batch->fill([
                 'categoria' => (!empty($datos['categoria']) && $datos['categoria'] !== 'General') ? $datos['categoria'] : ($batch->categoria ?: ($datos['categoria'] ?? 'General')),
@@ -423,9 +396,7 @@ class InventoryService
         return Inventory::create($datos);
     }
 
-    /**
-     * Resuelve las llaves foráneas de producto, proveedor y ubicación física a partir de los textos.
-     */
+    // resuelve las llaves foraneas de producto, proveedor y ubicacion fisica a partir de los textos
     public static function resolverRelaciones(array $datos): array
     {
         if (empty($datos['product_id']) && ! empty($datos['producto'])) {
@@ -441,8 +412,7 @@ class InventoryService
             }
         }
 
-        // Si viene una ubicación nueva, se limpian las relaciones anteriores para que el lote
-        // no siga "amarrado" al estante viejo (ej. al moverlo a P.A). Abajo se vuelven a resolver.
+        // si viene una ubicacion nueva, se limpian las relaciones anteriores para que el lote no siga "amarrado" al estante viejo (ej
         if (array_key_exists('estante', $datos)) {
             foreach (['shelf_id', 'level_id', 'position_id'] as $fk) {
                 if (! array_key_exists($fk, $datos)) {
@@ -508,9 +478,7 @@ class InventoryService
         return $lote;
     }
 
-    /**
-     * Registra un movimiento de trazabilidad enlazado al lote y usuario.
-     */
+    // registra un movimiento de trazabilidad enlazado al lote y usuario
     public static function registrarMovimiento(Inventory $inventory, array $datos): void
     {
         $inventory->movements()->create($datos + [
@@ -522,10 +490,7 @@ class InventoryService
         ]);
     }
 
-    /**
-     * Sincroniza todos los productos de controlados e inventario (incluyendo carga masiva)
-     * hacia el catálogo maestro de Products.
-     */
+    // sincroniza todos los productos de controlados e inventario (incluyendo carga masiva) hacia el catalogo maestro de products
     public static function sincronizarProductosDesdeInventario(): void
     {
         foreach (self::controladosOficiales() as $ctrlNombre) {
@@ -548,10 +513,7 @@ class InventoryService
         }
     }
 
-    /**
-     * Devuelve un mapa con la categoría y programa sugeridos por producto (por ID y por nombre en minúsculas)
-     * combinando Inventario (incluyendo Carga Masiva) e Historial de Recepciones / Solicitudes.
-     */
+    // devuelve un mapa con la categoria y programa sugeridos por producto (por id y por nombre en minusculas) combinando inventario (incluyendo carga
     public static function mapaMetadatosProductos(): array
     {
         $categoriasPorNombre = [];
@@ -635,13 +597,7 @@ class InventoryService
         ];
     }
 
-    /**
-     * Mapa de Programa => IDs de los productos asociados a ese programa.
-     *
-     * Se arma con el Inventario y con el histórico de Solicitudes, de modo que un
-     * mismo producto puede aparecer en varios programas. La clave va en minúsculas
-     * para poder compararla sin importar cómo esté escrito el programa.
-     */
+    // mapa de programa => ids de los productos asociados a ese programa
     public static function productosPorPrograma(): array
     {
         $mapa = [];
@@ -679,10 +635,7 @@ class InventoryService
         return array_map(fn ($ids) => array_values($ids), $mapa);
     }
 
-    /**
-     * Devuelve la lista consolidada y sin duplicados de todos los Programas.
-     * Sale únicamente de los datos reales: Inventario, Carga Masiva y Solicitudes.
-     */
+    // devuelve la lista consolidada y sin duplicados de todos los programas. sale unicamente de los datos reales: inventario, carga masiva y solicitudes
     public static function programasLista(iterable $extras = []): Collection
     {
         $enInventario = Inventory::whereNotNull('programa')
@@ -717,10 +670,7 @@ class InventoryService
         return collect($resultado)->values();
     }
 
-    /**
-     * Devuelve la lista consolidada de Categorías.
-     * Sale únicamente de los datos reales: Inventario, Carga Masiva y Recepciones.
-     */
+    // devuelve la lista consolidada de categorias. sale unicamente de los datos reales: inventario, carga masiva y recepciones
     public static function categoriasLista(bool $incluirControlados = true): Collection
     {
         $enInventario = Inventory::whereNotNull('categoria')
@@ -767,13 +717,7 @@ class InventoryService
         return $sinPrefijo !== '' ? $sinPrefijo : $val;
     }
 
-    /**
-     * Cuenta los lotes con stock (cantidad > 0, en cualquier estado) guardados en una
-     * ubicación física. Se usa para impedir eliminar pasillos, estantes, niveles o
-     * posiciones que todavía tienen productos dentro.
-     *
-     * @param  string  $tipo  'pasillo' | 'estante' | 'nivel' | 'posicion'
-     */
+    // cuenta los lotes con stock (cantidad > 0, en cualquier estado) guardados en una ubicacion fisica
     public static function lotesEnUbicacion(string $tipo, $modelo): int
     {
         $query = Inventory::where('cantidad', '>', 0);
@@ -834,15 +778,7 @@ class InventoryService
         return $query->count();
     }
 
-    /**
-     * Verifica que una ubicación física exista en el mapa de bodega (Distribución).
-     *
-     * - Si no se indica estante (vacío o "P.A"), la ubicación queda "por asignar" y es válida.
-     * - Si se indica estante, debe existir; si además se indica pasillo, el estante debe pertenecer a ese pasillo.
-     * - Si se indica nivel y/o posición, deben existir dentro de ese estante / nivel.
-     *
-     * Devuelve null si la ubicación es válida, o un mensaje de error en español si no lo es.
-     */
+    // verifica que una ubicacion fisica exista en el mapa de bodega (distribucion)
     public static function validarUbicacion(?string $pasillo, ?string $estante, ?string $nivel = null, ?string $posicion = null): ?string
     {
         $pasillo = trim((string) $pasillo);
@@ -904,10 +840,7 @@ class InventoryService
         return $sinPrefijo !== '' ? $sinPrefijo : $val;
     }
 
-    /**
-     * Devuelve toda la estructura jerárquica de distribución física (Pasillo -> Estante -> Nivel -> Posición)
-     * junto con todas las ubicaciones actualmente ocupadas por lotes activos en bodega.
-     */
+    // devuelve toda la estructura jerarquica de distribucion fisica (pasillo -> estante -> nivel -> posicion) junto con todas las ubicaciones actualmente
     public static function datosDistribucionFisica(): array
     {
         $shelves = Shelf::with(['aisle', 'levels.positions'])->orderBy('name')->get();
@@ -928,7 +861,7 @@ class InventoryService
         $posicionesMant = Position::distinct()->orderBy('name')->pluck('name')->map(fn ($v) => self::normalizarPosicion((string) $v))->filter();
         $posicionesLista = $posicionesMant->merge($posicionesInv)->unique()->sort(SORT_NATURAL)->values();
 
-        // Lotes activos que ocupan una ubicación física en bodega
+        // lotes activos que ocupan una ubicacion fisica en bodega
         $lotesUbicados = Inventory::where('estado', '!=', 'Merma')
             ->where('cantidad', '>', 0)
             ->whereNotNull('estante')
@@ -951,7 +884,7 @@ class InventoryService
             ];
         })->values();
 
-        // Construir jerarquía completa por estante (Mantenedor + ubicaciones históricas de Inventario)
+        // construir jerarquia completa por estante (mantenedor + ubicaciones historicas de inventario)
         $mapaEstantes = [];
 
         foreach ($shelves as $s) {
@@ -987,7 +920,7 @@ class InventoryService
             ];
         }
 
-        // Integrar también estantes/niveles/posiciones presentes en Inventario para que ningún estante quede huérfano
+        // integrar tambien estantes/niveles/posiciones presentes en inventario para que ningun estante quede huerfano
         $ubicacionesInvRaw = Inventory::whereNotNull('estante')
             ->where('estante', '!=', '')
             ->where('estante', '!=', 'P.A')
@@ -1059,15 +992,7 @@ class InventoryService
         ];
     }
 
-    /**
-     * Verifica si una POSICIÓN física (Estante + Nivel + Posición) ya está ocupada por otro lote activo en bodega.
-     *
-     * Reglas:
-     * - Una posición la ocupa un solo lote (salvo que sea el mismo producto y lote, que acumula stock).
-     * - Un nivel sin posición indicada es un espacio compartido: varios lotes pueden quedar ahí,
-     *   y lo que limita es la capacidad del estante (ver verificarCapacidadEstante).
-     * - Un lote guardado sin posición ya NO bloquea las posiciones de su nivel.
-     */
+    // verifica si una posicion fisica (estante + nivel + posicion) ya esta ocupada por otro lote activo en bodega
     public static function verificarUbicacionOcupada(
         ?string $estante,
         ?string $nivel,
@@ -1095,7 +1020,7 @@ class InventoryService
         foreach ($candidatos as $cand) {
             if ($mismoProducto !== null && mb_strtolower(trim($cand->producto)) === mb_strtolower(trim($mismoProducto))) {
                 if (self::normalizarLote($cand->lote) === $loteNorm) {
-                    // Es el mismo producto y lote (acumulación de stock en el mismo lote), no hay conflicto
+                    // es el mismo producto y lote (acumulacion de stock en el mismo lote), no hay conflicto
                     continue;
                 }
             }
@@ -1113,10 +1038,7 @@ class InventoryService
         return null;
     }
 
-    /**
-     * Revisa la capacidad máxima (en unidades) del estante. Capacidad 0 o vacía = sin límite.
-     * Devuelve un mensaje si al agregar $cantidad unidades se supera la capacidad, o null si cabe.
-     */
+    // revisa la capacidad maxima (en unidades) del estante
     public static function verificarCapacidadEstante(?string $estante, int $cantidad, ?int $ignorarId = null): ?string
     {
         $est = trim((string) $estante);

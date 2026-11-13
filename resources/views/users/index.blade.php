@@ -50,7 +50,7 @@
         }
     @endphp
 
-    <!-- Migas de pan -->
+    <!-- migas de pan -->
     <div class="flex items-center gap-2 text-[13px] text-slate-500 mb-6 px-1">
         <span class="text-slate-400 font-semibold">04</span>
         <span>Configuración</span>
@@ -60,7 +60,7 @@
         <span class="font-semibold text-slate-800">Usuarios y Permisos</span>
     </div>
 
-    <!-- Alertas de sesión -->
+    <!-- alertas de sesion -->
     @if (session('success'))
         <div class="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-xl shadow-xs flex items-center justify-between gap-3">
             <div class="flex items-center gap-3">
@@ -90,7 +90,7 @@
         </div>
     @endif
 
-    <!-- Tarjetas KPI de Resumen -->
+    <!-- tarjetas kpi de resumen -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex items-center justify-between">
             <div>
@@ -150,10 +150,10 @@
         </div>
     </div>
 
-    <!-- Directorio y Filtros de Usuarios -->
+    <!-- directorio y filtros de usuarios -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
 
-        <!-- Cabecera con buscador y filtros en vivo -->
+        <!-- cabecera con buscador y filtros en vivo -->
         <div class="p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
@@ -318,7 +318,7 @@
                                 </div>
                             </td>
 
-                            <!-- Solicitudes asignadas -->
+                            <!-- solicitudes asignadas -->
                             <td class="px-6 py-4 text-center">
                                 <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
                                     @if (($user->solicitudes_activas_count ?? 0) > 0)
@@ -426,13 +426,13 @@
         </div>
     </div>
 
-    <!-- Modal Roles y Accesos -->
+    <!-- modal roles y accesos -->
     <div id="RolesModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
             class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
 
-            <!-- Cabecera del Modal -->
+            <!-- cabecera del modal -->
             <div class="px-6 py-5 bg-slate-900 text-white flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-3.5">
                     <div class="w-11 h-11 bg-indigo-500/20 border border-indigo-400/30 rounded-xl flex items-center justify-center text-indigo-300 shadow-sm shrink-0">
@@ -461,10 +461,10 @@
                 </button>
             </div>
 
-            <!-- Cuerpo scrolleable -->
+            <!-- cuerpo scrolleable -->
             <div class="p-6 overflow-y-auto space-y-6 flex-1 bg-slate-50/50">
 
-                <!-- Listado de roles -->
+                <!-- listado de roles -->
                 <div>
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest">Roles Configurados en el Sistema</h3>
@@ -558,7 +558,7 @@
                     </div>
                 </div>
 
-                <!-- Formulario de rol (crear/editar) -->
+                <!-- formulario de rol (crear/editar) -->
                 <div id="roleFormBox" class="hidden bg-white border-2 border-indigo-200 rounded-2xl p-5 shadow-md">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-100">
                         <div>
@@ -648,7 +648,7 @@
                     </form>
                 </div>
 
-                <!-- Botón para crear rol nuevo -->
+                <!-- boton para crear rol nuevo -->
                 <button type="button" id="btnNewRole" onclick="openRoleForm(null)"
                     class="w-full py-3.5 border-2 border-dashed border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50/40 text-indigo-600 font-bold text-[13px] rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-2 bg-white">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -667,7 +667,7 @@
         </div>
     </div>
 
-    <!-- Modal Solicitudes de Recuperación -->
+    <!-- modal solicitudes de recuperacion -->
     <div id="RecoveryModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -732,7 +732,7 @@
         </div>
     </div>
 
-    <!-- Modal crear / editar usuario -->
+    <!-- modal crear / editar usuario -->
     <div id="UserModal"
         class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
         <div
@@ -1303,7 +1303,7 @@
                 passwordInput.setCustomValidity('');
             }
 
-            // Validar que el rol tenga al menos 1 vista asignada
+            // validar que el rol tenga al menos 1 vista asignada
             const roleSelect = document.getElementById('role');
             const selectedRole = roleSelect ? roleSelect.value : '';
 
@@ -1358,7 +1358,7 @@
             return false;
         }
 
-        // Compatibilidad por si se llama con el nombre anterior
+        // compatibilidad por si se llama con el nombre anterior
         const validateUserEmail = validateUserModal;
 
         document.addEventListener('DOMContentLoaded', function() {

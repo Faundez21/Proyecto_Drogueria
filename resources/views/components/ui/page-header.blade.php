@@ -1,7 +1,4 @@
-{{-- Encabezado común de página: ruta pequeña, título, descripción y acciones a la derecha.
-     Uso: <x-ui.page-header title="Despacho" crumb="Salida" description="...">
-              <x-slot:actions> ... botones ... </x-slot:actions>
-          </x-ui.page-header> --}}
+{{-- encabezado de pagina: ruta, titulo, descripcion y acciones a la derecha --}}
 @props(['title', 'crumb' => null, 'description' => null])
 <div {{ $attributes->merge(['class' => 'das-page-header mb-4']) }}>
     <div class="min-w-0">

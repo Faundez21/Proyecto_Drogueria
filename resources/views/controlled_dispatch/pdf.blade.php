@@ -7,7 +7,7 @@
         @page { margin: 28px 36px 45px 36px; }
         body { font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif; font-size: 10.5px; color: #1e293b; line-height: 1.4; }
         
-        /* Cabecera Institucional Controlados (Carmesí) */
+        /* cabecera institucional controlados (carmesi) */
         .top-accent { height: 5px; background-color: #be123c; width: 100%; margin-bottom: 12px; border-radius: 2px; }
         .header-table { width: 100%; border-bottom: 2px solid #be123c; padding-bottom: 12px; margin-bottom: 14px; border-collapse: collapse; }
         .logo-container { width: 55%; vertical-align: middle; }
@@ -22,21 +22,21 @@
         .doc-correlativo { font-size: 14px; font-weight: 900; color: #881337; margin: 0 0 3px 0; font-family: 'Courier New', monospace; }
         .doc-date { font-size: 8.5px; color: #475569; margin: 0; font-weight: 600; }
 
-        /* Alerta Sanitaria */
+        /* alerta sanitaria */
         .sanitary-banner { background-color: #fff1f2; border: 1px solid #fecdd3; border-left: 4px solid #be123c; padding: 6px 10px; margin-bottom: 10px; font-size: 8.5px; color: #881337; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
 
-        /* Secciones y Tablas de Información */
+        /* secciones y tablas de informacion */
         .section-header { background-color: #f8fafc; color: #be123c; font-size: 9.5px; font-weight: 800; text-transform: uppercase; padding: 5px 10px; margin: 10px 0 5px 0; border-left: 4px solid #be123c; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; letter-spacing: 0.5px; }
         .info-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
         .info-table th { background-color: #fff1f2; color: #881337; font-size: 8.5px; font-weight: 800; text-transform: uppercase; text-align: left; padding: 6px 8px; border: 1px solid #fecdd3; width: 20%; letter-spacing: 0.3px; }
         .info-table td { font-size: 10px; color: #0f172a; font-weight: 600; padding: 6px 8px; border: 1px solid #cbd5e1; width: 30%; }
 
-        /* Recetas Cheque Box */
+        /* recetas cheque box */
         .cheque-box { border: 1.5px solid #f59e0b; background-color: #fffbeb; padding: 8px 10px; border-radius: 5px; margin: 8px 0; }
         .cheque-title { font-size: 9px; font-weight: 900; color: #b45309; text-transform: uppercase; margin: 0 0 3px 0; }
         .cheque-content { font-family: 'Courier New', monospace; font-size: 10.5px; font-weight: 700; color: #78350f; margin: 0; }
 
-        /* Tabla de Artículos */
+        /* tabla de articulos */
         .items-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
         .items-table th { background-color: #be123c; color: #ffffff; font-size: 8.5px; font-weight: 800; text-transform: uppercase; text-align: center; padding: 7px 6px; border: 1px solid #9f1239; letter-spacing: 0.3px; }
         .items-table td { font-size: 9.5px; color: #1e293b; padding: 6px 6px; border: 1px solid #cbd5e1; text-align: center; vertical-align: middle; }
@@ -49,7 +49,7 @@
         .total-label { font-size: 10px; font-weight: 900; color: #881337; text-transform: uppercase; text-align: right; }
         .total-amount { font-size: 11.5px; font-weight: 900; color: #be123c; text-align: center; }
 
-        /* Firmas */
+        /* firmas */
         .signatures-wrapper { margin-top: 34px; width: 100%; page-break-inside: avoid; }
         .signatures-table { width: 100%; border-collapse: collapse; }
         .signature-box { width: 48%; text-align: center; vertical-align: bottom; padding: 6px; }
@@ -59,7 +59,7 @@
         .signature-title { font-size: 9.5px; font-weight: 800; color: #881337; margin: 0; text-transform: uppercase; }
         .signature-subtitle { font-size: 8.5px; color: #64748b; margin: 2px 0 0 0; }
 
-        /* Pie de página */
+        /* pie de pagina */
         .footer { position: fixed; bottom: -25px; left: 0; right: 0; height: 22px; text-align: left; font-size: 8px; color: #64748b; border-top: 1px solid #cbd5e1; padding-top: 4px; }
     </style>
 </head>

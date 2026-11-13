@@ -28,7 +28,7 @@ class GlobalSearchController extends Controller
         $results = [];
         $searchTerm = '%' . $query . '%';
 
-        // Lotes en bodega (solo si el usuario tiene ver.inventario)
+        // lotes en bodega (solo si el usuario tiene ver.inventario)
         if ($user->can('ver.inventario')) {
             try {
                 $inventario = DB::table('inventories')
@@ -56,7 +56,7 @@ class GlobalSearchController extends Controller
             } catch (\Exception $e) {
             }
 
-            // Catálogo maestro de productos
+            // catalogo maestro de productos
             try {
                 $productos = DB::table('products')
                     ->where('nombre', 'LIKE', $searchTerm)
@@ -78,7 +78,7 @@ class GlobalSearchController extends Controller
             }
         }
 
-        // Proveedores (solo si el usuario tiene ver.proveedores)
+        // proveedores (solo si el usuario tiene ver.proveedores)
         if ($user->can('ver.proveedores')) {
             try {
                 $proveedores = DB::table('providers')
@@ -103,7 +103,7 @@ class GlobalSearchController extends Controller
             }
         }
 
-        // Solicitudes de establecimientos y CESFAM
+        // solicitudes de establecimientos y cesfam
         if ($user->can('ver.despacho') || $user->can('ver.solicitudes') || $user->can('ver.solicitudes_cesfam')) {
             try {
                 $solicitudes = DB::table('establishment_requests')
@@ -153,7 +153,7 @@ class GlobalSearchController extends Controller
 
             $puedeVerControlados = $user->hasRole('Administrador') || $user->can('ver.despacho_controlado');
 
-            // Solicitudes asignadas al usuario, o pendientes de asignar si es administrador
+            // solicitudes asignadas al usuario, o pendientes de asignar si es administrador
             if ($user->can('ver.despacho')) {
                 $misSolicitudes = DB::table('establishment_requests')
                     ->where('assigned_user_id', $user->id)
@@ -199,7 +199,7 @@ class GlobalSearchController extends Controller
             }
 
             if ($user->hasRole('Administrador')) {
-                // Avisos de recuperación de clave, solo para el módulo de usuarios
+                // avisos de recuperacion de clave, solo para el modulo de usuarios
                 $clavesPendientes = DB::table('password_reset_tokens')
                     ->where('status', 'pending')
                     ->count();
@@ -218,9 +218,7 @@ class GlobalSearchController extends Controller
                 }
             }
 
-            // Las alertas de lotes se agrupan en un resumen por tipo (antes se mostraban solo algunos lotes sueltos
-            // y la campana no reflejaba el total). La clave incluye el conteo para que el aviso vuelva a aparecer
-            // como pendiente cuando cambia la cantidad de lotes afectados.
+            // las alertas de lotes se agrupan en un resumen por tipo (antes se mostraban solo algunos lotes sueltos y la campana no reflejaba el total)
             $iconoAlerta = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>';
             $hoy = Carbon::now()->startOfDay();
 
@@ -253,7 +251,7 @@ class GlobalSearchController extends Controller
                     ];
                 }
 
-                // Mismo criterio que la tarjeta "Alerta FEFO (≤ 30 días)" del panel principal
+                // mismo criterio que la tarjeta "alerta fefo (≤ 30 dias)" del panel principal
                 $porVencerQuery = (clone $baseVenc)
                     ->where('fecha_vencimiento', '>=', $hoy->toDateString())
                     ->where('fecha_vencimiento', '<=', Carbon::now()->addDays(30)->toDateString());

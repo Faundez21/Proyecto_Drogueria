@@ -28,7 +28,7 @@ class ReceptionController extends Controller
             Product::firstOrCreate(['nombre' => $ctrlNombre]);
         }
 
-        // Los productos que entraron por carga masiva o ingreso directo también deben aparecer acá
+        // los productos que entraron por carga masiva o ingreso directo tambien deben aparecer aca
         $productosEnInventario = Inventory::whereNotNull('producto')
             ->where('producto', '!=', '')
             ->distinct()
@@ -41,7 +41,7 @@ class ReceptionController extends Controller
         $providers = Provider::where('status', 'activo')->orderBy('name')->get();
         $products = Product::orderBy('nombre')->get();
 
-        // Categoría y programa sugeridos para cada producto, sacados de lo que ya está cargado
+        // categoria y programa sugeridos para cada producto, sacados de lo que ya esta cargado
         $categoriasPorNombre = [];
         $categoriasPorId = [];
         $programasPorNombre = [];
@@ -108,8 +108,7 @@ class ReceptionController extends Controller
                 : ($prod->grupo_recepcion === 'Estupefacientes' ? 'Estupefacientes' : ($prod->grupo_recepcion === 'Insumos' ? 'Insumos' : 'Medicamentos'));
         }
 
-        // Categorías existentes en Inventario y Carga Masiva, agrupadas por clasificación.
-        // No hay listas fijas en código: todo sale de los datos cargados.
+        // categorias existentes en inventario y carga masiva, agrupadas por clasificacion. no hay listas fijas en codigo: todo sale de los datos cargados
         $categoriasAgrupadas = [
             'Medicamentos' => [],
             'Insumos' => [],
@@ -148,7 +147,7 @@ class ReceptionController extends Controller
 
         $categoriasAgrupadas = array_filter($categoriasAgrupadas, fn ($lista) => ! empty($lista));
 
-        // Programas existentes en Inventario y Carga Masiva (sin listas fijas en código)
+        // programas existentes en inventario y carga masiva (sin listas fijas en codigo)
         $programasLista = Inventory::whereNotNull('programa')
             ->where('programa', '!=', '')
             ->distinct()
@@ -167,7 +166,7 @@ class ReceptionController extends Controller
 
         $receptions = Reception::with(['provider', 'items.product'])->orderBy('created_at', 'desc')->get();
 
-        // Asociar el programa registrado en inventario a cada ítem de recepción para el historial
+        // asociar el programa registrado en inventario a cada item de recepcion para el historial
         $invPorRecepcion = Inventory::whereNotNull('reception_id')
             ->whereNotNull('programa')
             ->where('programa', '!=', '')
@@ -236,7 +235,7 @@ class ReceptionController extends Controller
 
     public function store(Request $request)
     {
-        // Los campos vacíos llegan como cadena vacía y hacen fallar las reglas de fecha, por eso se pasan a null
+        // los campos vacios llegan como cadena vacia y hacen fallar las reglas de fecha, por eso se pasan a null
         if ($request->has('fecha_vencimiento') && is_array($request->fecha_vencimiento)) {
             $fechas = array_map(function ($val) {
                 if (is_string($val)) {
@@ -259,7 +258,7 @@ class ReceptionController extends Controller
             'orden_compra' => ['nullable', 'string', 'max:255'],
             'origen' => ['required', 'string', 'max:255'],
             'provider_id' => ['required', function ($attr, $val, $fail) {
-                // __nuevo__ = proveedor que se registra en esta misma recepcion
+                // nuevo__ = proveedor que se registra en esta misma recepcion
                 if ($val !== '__nuevo__' && ! Provider::where('id', $val)->where('status', 'activo')->exists()) {
                     $fail('El proveedor seleccionado no existe o está inactivo.');
                 }
@@ -273,7 +272,7 @@ class ReceptionController extends Controller
             'action' => ['nullable', 'string', 'in:save,save_only,save_and_download'],
             'product_id' => ['required', 'array', 'min:1'],
             'product_id.*' => ['required', function ($attr, $val, $fail) {
-                // __nuevo__ = producto que se crea en esta misma recepcion
+                // nuevo__ = producto que se crea en esta misma recepcion
                 if ($val !== '__nuevo__' && (! ctype_digit((string) $val) || ! Product::whereKey($val)->exists())) {
                     $fail('Uno de los productos seleccionados no existe.');
                 }
@@ -371,7 +370,7 @@ class ReceptionController extends Controller
             ];
         }
 
-        // Evitar ingresar dos veces el mismo documento (misma factura o guía del mismo proveedor)
+        // evitar ingresar dos veces el mismo documento (misma factura o guia del mismo proveedor)
         $documentoDuplicado = $proveedorNuevo ? null : Reception::where('provider_id', $validated['provider_id'])
             ->whereRaw('LOWER(TRIM(tipo_documento)) = ?', [mb_strtolower(trim($validated['tipo_documento']))])
             ->whereRaw('LOWER(TRIM(numero_documento)) = ?', [mb_strtolower(trim($validated['numero_documento']))])
@@ -386,7 +385,7 @@ class ReceptionController extends Controller
             return redirect()->back()->withInput()->with('error', $msgError);
         }
 
-        // Validar que cada ubicación indicada exista en el mapa de bodega
+        // validar que cada ubicacion indicada exista en el mapa de bodega
         foreach ($validated['product_id'] as $index => $prodId) {
             if ($estadoFila($index) === 'Merma') {
                 continue;
@@ -409,7 +408,7 @@ class ReceptionController extends Controller
             }
         }
 
-        // Dos lotes no pueden quedar en la misma casilla, ni siquiera dentro de la misma acta
+        // dos lotes no pueden quedar en la misma casilla, ni siquiera dentro de la misma acta
         $ubicacionesEnActa = [];
         $unidadesPorEstante = [];
         foreach ($validated['product_id'] as $index => $prodId) {
@@ -443,7 +442,7 @@ class ReceptionController extends Controller
                 return redirect()->back()->withInput()->with('error', $msgError);
             }
 
-            // Capacidad del estante: se suman las unidades de todas las filas que van al mismo estante
+            // capacidad del estante: se suman las unidades de todas las filas que van al mismo estante
             $estKeyCap = mb_strtolower($estCheck);
             $unidadesPorEstante[$estKeyCap] = ($unidadesPorEstante[$estKeyCap] ?? 0) + (int) ($validated['cantidad_unitaria'][$index] ?? 0);
             $msgCapacidad = InventoryService::verificarCapacidadEstante($estCheck, $unidadesPorEstante[$estKeyCap]);
@@ -478,8 +477,12 @@ class ReceptionController extends Controller
             $provider = $proveedorNuevo ? Provider::create($proveedorNuevo) : Provider::findOrFail($validated['provider_id']);
             $nombreProveedor = $provider->name ?? $provider->nombre ?? $provider->razon_social ?? 'Proveedor';
             $idsProductos = $validated['product_id'];
+            // dos filas con el mismo producto nuevo usan un solo producto
+            $creados = [];
             foreach ($nombresNuevos as $index => $nombre) {
-                $idsProductos[$index] = Product::create(['nombre' => $nombre])->id;
+                $clave = mb_strtolower($nombre);
+                $creados[$clave] ??= Product::create(['nombre' => $nombre])->id;
+                $idsProductos[$index] = $creados[$clave];
             }
 
             $reception = Reception::create([
@@ -521,8 +524,7 @@ class ReceptionController extends Controller
                     ? 'Estupefacientes'
                     : ($tipoSolicitado ?: $grupoProducto);
 
-                // El inventario guarda la misma categoría que la recepción:
-                // la que eligió el usuario o, si no eligió, su grupo de clasificación.
+                // el inventario guarda la misma categoria que la recepcion: la que eligio el usuario o, si no eligio, su grupo de clasificacion
                 $categoriaInventario = $categoriaRecepcion;
 
                 $total_neto_recepcion += $subtotal;
@@ -771,6 +773,11 @@ class ReceptionController extends Controller
                 $cambiaLote = $loteAntes !== $loteNuevo;
                 $cambiaVence = $venceAntes !== $venceNuevo;
                 $destino = $batch;
+
+                // un lote disponible no puede quedar con un vencimiento ya pasado
+                if ($cambiaVence && $batch->estado === 'Disponible' && strtotime($venceNuevo) < strtotime(date('Y-m-d'))) {
+                    throw new \RuntimeException("El vencimiento de «{$nombre}» quedaría en el pasado. Un lote vencido debe pasar a Merma desde Inventario.");
+                }
 
                 if ($cambiaLote || $cambiaVence) {
                     if ($cambiaLote) {

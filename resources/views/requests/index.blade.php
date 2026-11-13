@@ -151,7 +151,7 @@
                                 class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                         </div>
 
-                        <!-- N° Solicitud oculto pero funcional -->
+                        <!-- n° solicitud oculto pero funcional -->
                         <div class="hidden">
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                 N° Solicitud
@@ -423,8 +423,8 @@
     </div>
 
     @include('requests.partials.inventory_modal', [
-        'modalTitle' => 'Inventario de Establecimientos (Solicitudes)',
-        'modalSubtitle' => 'Directorio de medicamentos e insumos declarados por los establecimientos en sus solicitudes.',
+        'modalTitle' => 'Inventario de Establecimientos',
+        'modalSubtitle' => 'Stock actual de cada establecimiento: lo declarado, más lo recibido, menos los despachos internos.',
         'esVistaCesfam' => false,
     ])
 
@@ -442,8 +442,9 @@
             return (opt.getAttribute('data-nombre-completo') || opt.getAttribute('title') || opt.textContent || '').trim();
         }
 
-        // ---- Filtrado de productos según el Programa seleccionado ----
+        // filtrado de productos segun el programa seleccionado
         const PRODUCTOS_POR_PROGRAMA = @json($productosPorPrograma ?? []);
+        const PRODUCTOS_CON_PROGRAMA = new Set(Object.values(PRODUCTOS_POR_PROGRAMA).flat().map(String));
         let OPCIONES_PRODUCTO_HTML = null;
 
         function guardarOpcionesProducto(select) {
@@ -472,7 +473,8 @@
 
                 prodSelect.querySelectorAll('optgroup').forEach(grupo => {
                     grupo.querySelectorAll('option').forEach(op => {
-                        if (op.value && !permitidosSet.has(String(op.value))) {
+                        // un producto que no pertenece a ningun programa se puede pedir con cualquiera
+                        if (op.value && !permitidosSet.has(String(op.value)) && PRODUCTOS_CON_PROGRAMA.has(String(op.value))) {
                             op.remove();
                         }
                     });
@@ -484,8 +486,7 @@
                 const n = prodSelect.querySelectorAll('optgroup option').length;
 
                 if (n === 0) {
-                    // El programa existe pero ninguno de sus productos aplica en esta vista:
-                    // se vuelve al listado completo para no dejar el selector vacío.
+                    // el programa existe pero ninguno de sus productos aplica en esta vista: se vuelve al listado completo para no dejar el selector vacio
                     prodSelect.innerHTML = OPCIONES_PRODUCTO_HTML;
                     if (aviso) {
                         aviso.textContent = 'Ningún producto de este programa está disponible aquí: se muestran todos.';
@@ -507,7 +508,7 @@
                 }
             }
 
-            // se conserva la selección anterior si el producto sigue disponible
+            // se conserva la seleccion anterior si el producto sigue disponible
             const sigueDisponible = seleccionado &&
                 Array.from(prodSelect.options).some(op => op.value === seleccionado);
 
@@ -729,23 +730,25 @@
             });
 
             function mostrarSweetAlertSolicitudExitosa(solData, recargarAlCerrar = false) {
+            // los textos escritos a mano se muestran como texto
+            const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
                 if (!solData) return;
 
                 const htmlDetail = `
                     <div class="text-left text-xs text-slate-700">
                         <div class="p-3.5 bg-teal-50/70 border border-teal-200 rounded-xl mb-3 space-y-1.5">
                             <div class="flex items-center justify-between pb-2 mb-1.5 border-b border-teal-200/80">
-                                <span class="font-extrabold text-teal-900 text-sm">Solicitud N° ${solData.numero_solicitud || ''}</span>
+                                <span class="font-extrabold text-teal-900 text-sm">Solicitud N° ${esc(solData.numero_solicitud || '')}</span>
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">SOLICITUD REGISTRADA CON ÉXITO</span>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
-                                <p><strong>Establecimiento:</strong> ${solData.establecimiento || 'N/A'}</p>
-                                <p><strong>Tipo:</strong> ${solData.tipo || 'Establecimiento'}</p>
-                                <p><strong>Fecha Solicitud:</strong> ${solData.fecha_solicitud || 'N/A'}</p>
-                                <p><strong>Responsable:</strong> ${solData.responsable || 'N/A'}${solData.cargo && solData.cargo !== 'N/A' ? ` (${solData.cargo})` : ''}</p>
+                                <p><strong>Establecimiento:</strong> ${esc(solData.establecimiento || 'N/A')}</p>
+                                <p><strong>Tipo:</strong> ${esc(solData.tipo || 'Establecimiento')}</p>
+                                <p><strong>Fecha Solicitud:</strong> ${esc(solData.fecha_solicitud || 'N/A')}</p>
+                                <p><strong>Responsable:</strong> ${esc(solData.responsable || 'N/A')}${solData.cargo && solData.cargo !== 'N/A' ? ` (${esc(solData.cargo)})` : ''}</p>
                                 <p><strong>Total Productos:</strong> ${solData.total_items || 0} producto(s)</p>
                                 <p><strong>Total Unidades:</strong> <span class="font-bold text-teal-800">${Number(solData.total_unidades || 0).toLocaleString('es-CL')} unidades</span></p>
-                                ${solData.observaciones ? `<p class="col-span-1 sm:col-span-2 text-slate-500 italic mt-0.5"><strong>Obs:</strong> ${solData.observaciones}</p>` : ''}
+                                ${solData.observaciones ? `<p class="col-span-1 sm:col-span-2 text-slate-500 italic mt-0.5"><strong>Obs:</strong> ${esc(solData.observaciones)}</p>` : ''}
                             </div>
                         </div>
 
@@ -764,8 +767,8 @@
                                 <tbody class="divide-y divide-slate-100 bg-white">
                                     ${(solData.items || []).map(it => `
                                         <tr class="hover:bg-slate-50">
-                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
-                                            <td class="p-2 text-center text-slate-600 font-mono text-[11px]">${it.programa || 'General'}</td>
+                                            <td class="p-2 font-medium text-slate-800">${esc(it.producto)}</td>
+                                            <td class="p-2 text-center text-slate-600 font-mono text-[11px]">${esc(it.programa || 'General')}</td>
                                             <td class="p-2 text-center text-slate-500">${Number(it.consumo_anterior || 0).toLocaleString('es-CL')}</td>
                                             <td class="p-2 text-center text-slate-500">${Number(it.stock_actual || 0).toLocaleString('es-CL')}</td>
                                             <td class="p-2 text-right font-bold text-teal-700">${Number(it.cantidad_solicitada || 0).toLocaleString('es-CL')} u.</td>
@@ -823,7 +826,7 @@
                 const totalProds = document.getElementById('total_productos')?.textContent.trim() || '0';
                 const totalUnits = document.getElementById('total_unidades')?.textContent.trim() || '0';
 
-                // Resumen de respaldo por si el backend responde sin detail
+                // resumen de respaldo por si el backend responde sin detail
                 const fallbackItems = [];
                 form.querySelectorAll('.producto-item').forEach(row => {
                     const selProd = row.querySelector('.select-producto');
