@@ -15,141 +15,33 @@
 
     <div class="w-full px-4 sm:px-6 pt-0 pb-6 space-y-5">
 
-        <!-- saludo y tareas comunes -->
-        <div>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Hola, {{ auth()->user()->name }}</h1>
-            <p class="text-[13.5px] font-medium text-slate-500 mt-0.5">{{ ucfirst(now()->locale('es')->isoFormat('dddd D [de] MMMM')) }} · Droguería DAS</p>
-        </div>
+        <!-- cabecera -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Panel Principal</h1>
+                <p class="text-[13px] font-medium text-slate-500 mt-0.5">Estado operativo de Droguería Central, Establecimientos y CESFAM</p>
+            </div>
 
-        <section>
-            <h2 class="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-2.5">¿Qué necesitas hacer?</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-3">
-                @can('ver.recepcion')
-                <a href="{{ route('reception.index') }}" class="dash-accion group flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:border-teal-400 hover:shadow-sm transition-all text-left cursor-pointer">
-                    <span class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                    </span>
-                    <span class="min-w-0">
-                        <span class="block text-[14px] font-bold text-slate-800 group-hover:text-teal-700">Recibir mercadería</span>
-                        <span class="block text-[12px] text-slate-500 leading-snug mt-0.5">Registrar lo que llega de un proveedor</span>
-                    </span>
-                </a>
-                @endcan
-                @can('ver.despacho')
-                <a href="{{ route('dispatch.index') }}" class="dash-accion group flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:border-indigo-400 hover:shadow-sm transition-all text-left cursor-pointer">
-                    <span class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
-                    </span>
-                    <span class="min-w-0">
-                        <span class="block text-[14px] font-bold text-slate-800 group-hover:text-indigo-700">Despachar un pedido</span>
-                        <span class="block text-[12px] text-slate-500 leading-snug mt-0.5">Atender las solicitudes de los centros</span>
-                    </span>
-                </a>
+            <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                @can('ver.solicitudes_cesfam')
+                    <a href="{{ route('requests.cesfam') }}" class="px-3.5 py-2 rounded-xl text-[12px] font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors">
+                        + Solicitud CESFAM
+                    </a>
                 @endcan
                 @can('ver.solicitudes')
-                <a href="{{ route('requests.index') }}" class="dash-accion group flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:border-sky-400 hover:shadow-sm transition-all text-left cursor-pointer">
-                    <span class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </span>
-                    <span class="min-w-0">
-                        <span class="block text-[14px] font-bold text-slate-800 group-hover:text-sky-700">Solicitud de establecimiento</span>
-                        <span class="block text-[12px] text-slate-500 leading-snug mt-0.5">Pedido de un CECOSF, posta o SAR</span>
-                    </span>
-                </a>
+                    <a href="{{ route('requests.index') }}" class="px-3.5 py-2 rounded-xl text-[12px] font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition-colors">
+                        + Solicitud Establecimiento
+                    </a>
                 @endcan
-                @can('ver.solicitudes_cesfam')
-                <a href="{{ route('requests.cesfam') }}" class="dash-accion group flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:border-purple-400 hover:shadow-sm transition-all text-left cursor-pointer">
-                    <span class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </span>
-                    <span class="min-w-0">
-                        <span class="block text-[14px] font-bold text-slate-800 group-hover:text-purple-700">Solicitud de CESFAM</span>
-                        <span class="block text-[12px] text-slate-500 leading-snug mt-0.5">Pedido de un CESFAM, incluye controlados</span>
-                    </span>
-                </a>
-                @endcan
-                @can('ver.distribucion')
-                <a href="{{ route('distribution.index') }}" class="dash-accion group flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:border-amber-400 hover:shadow-sm transition-all text-left cursor-pointer">
-                    <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </span>
-                    <span class="min-w-0">
-                        <span class="block text-[14px] font-bold text-slate-800 group-hover:text-amber-700">Buscar un producto</span>
-                        <span class="block text-[12px] text-slate-500 leading-snug mt-0.5">Dónde está en bodega y cuánto queda</span>
-                    </span>
-                </a>
-                @else
-                <button type="button" onclick="openSearchModal()" class="dash-accion group flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:border-amber-400 hover:shadow-sm transition-all text-left cursor-pointer">
-                    <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </span>
-                    <span class="min-w-0">
-                        <span class="block text-[14px] font-bold text-slate-800 group-hover:text-amber-700">Buscar un producto</span>
-                        <span class="block text-[12px] text-slate-500 leading-snug mt-0.5">Busca por nombre, lote o proveedor</span>
-                    </span>
-                </button>
-                @endcan
-                <button type="button" onclick="openDashboardScanner()" class="dash-accion group flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:border-slate-400 hover:shadow-sm transition-all text-left cursor-pointer">
-                    <span class="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 border border-slate-100 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                    </span>
-                    <span class="min-w-0">
-                        <span class="block text-[14px] font-bold text-slate-800 group-hover:text-slate-700">Escanear un QR</span>
-                        <span class="block text-[12px] text-slate-500 leading-snug mt-0.5">Ver un lote escaneando su etiqueta</span>
-                    </span>
+                <button type="button" onclick="openDashboardScanner()"
+                    class="items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white dark:bg-teal-700 dark:hover:bg-teal-600 px-4 py-2 rounded-xl text-[12.5px] font-bold transition-all shadow-sm cursor-pointer inline-flex">
+                    <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                    </svg>
+                    Escanear QR
                 </button>
             </div>
-        </section>
-
-        <!-- pendientes de hoy, solo lo que no esta en cero -->
-        @php
-            $pendientesHoy = [];
-            if (auth()->user()->can('ver.inventario') && ($proximosVencer ?? 0) > 0) {
-                $pendientesHoy[] = ['tono' => 'rose', 'numero' => $proximosVencer, 'titulo' => $proximosVencer == 1 ? 'lote por vencer' : 'lotes por vencer', 'detalle' => 'en los próximos 30 días', 'accion' => 'Revisar', 'url' => route('inventory.index', ['order_by' => 'vencimiento'])];
-            }
-            if (auth()->user()->can('ver.cuarentena') && ($cantidadCuarentena ?? 0) > 0) {
-                $pendientesHoy[] = ['tono' => 'amber', 'numero' => $cantidadCuarentena, 'titulo' => $cantidadCuarentena == 1 ? 'lote en cuarentena' : 'lotes en cuarentena', 'detalle' => 'esperan que decidas si se liberan o se descartan', 'accion' => 'Decidir', 'url' => route('quarantine.index')];
-            }
-            if (auth()->user()->hasRole('Administrador') && ($solicitudesSinAsignarCount ?? 0) > 0) {
-                $pendientesHoy[] = ['tono' => 'indigo', 'numero' => $solicitudesSinAsignarCount, 'titulo' => $solicitudesSinAsignarCount == 1 ? 'solicitud sin asignar' : 'solicitudes sin asignar', 'detalle' => 'ningún bodeguero las tiene a cargo', 'accion' => 'Asignar', 'url' => route('dispatch.index')];
-            }
-            if (auth()->user()->can('ver.despacho') && ($solicitudesPorDespacharCount ?? 0) > 0) {
-                $pendientesHoy[] = ['tono' => 'teal', 'numero' => $solicitudesPorDespacharCount, 'titulo' => $solicitudesPorDespacharCount == 1 ? 'pedido por despachar' : 'pedidos por despachar', 'detalle' => 'de los centros de salud', 'accion' => 'Despachar', 'url' => route('dispatch.index')];
-            }
-            // clases completas para que tailwind las compile
-            $tonos = [
-                'rose' => ['caja' => 'border-rose-200 bg-rose-50', 'num' => 'text-rose-600'],
-                'amber' => ['caja' => 'border-amber-200 bg-amber-50', 'num' => 'text-amber-600'],
-                'indigo' => ['caja' => 'border-indigo-200 bg-indigo-50', 'num' => 'text-indigo-600'],
-                'teal' => ['caja' => 'border-teal-200 bg-teal-50', 'num' => 'text-teal-600'],
-            ];
-        @endphp
-        <section>
-            <h2 class="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-2.5">Requiere atención hoy</h2>
-            @if (count($pendientesHoy) > 0)
-                <div class="grid gap-3 lg:grid-cols-2">
-                    @foreach ($pendientesHoy as $pend)
-                        <a href="{{ $pend['url'] }}"
-                            class="group flex items-center gap-3.5 rounded-xl border {{ $tonos[$pend['tono']]['caja'] }} px-4 py-3.5 hover:shadow-sm transition-shadow">
-                            <span class="text-[28px] leading-none font-black {{ $tonos[$pend['tono']]['num'] }}">{{ number_format($pend['numero'], 0, ',', '.') }}</span>
-                            <span class="flex-1 min-w-0">
-                                <span class="block text-[13.5px] font-bold text-slate-800">{{ $pend['titulo'] }}</span>
-                                <span class="block text-[12px] text-slate-600">{{ $pend['detalle'] }}</span>
-                            </span>
-                            <span class="shrink-0 text-[12.5px] font-bold {{ $tonos[$pend['tono']]['num'] }} group-hover:underline">{{ $pend['accion'] }} →</span>
-                        </a>
-                    @endforeach
-                </div>
-            @else
-                <p class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13.5px] text-emerald-800 font-semibold">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Todo al día: no hay lotes por vencer, lotes en cuarentena ni pedidos esperando.
-                </p>
-            @endif
-        </section>
-
-        <!-- guia de configuracion inicial, solo admin -->
-        @include('dashboard.partials.primeros-pasos')
+        </div>
 
         <!-- solicitudes asignadas al usuario -->
         @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
@@ -203,25 +95,9 @@
             </div>
         @endif
 
-        <h2 class="text-[13px] font-bold text-slate-500 uppercase tracking-wider -mb-2">Resumen</h2>
-
-        <!-- filtros plegados, abiertos si hay alguno activo -->
-        <details class="dash-filtros group" {{ $hayFiltrosActivos ? 'open' : '' }}>
-            <summary class="flex flex-wrap items-center gap-2 cursor-pointer select-none list-none">
-                <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-xs text-[12.5px] font-bold text-slate-700 hover:border-teal-400 transition-colors">
-                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                    Filtrar
-                </span>
-                <span class="text-[12.5px] text-slate-500">
-                    Mostrando: <strong class="text-slate-700">{{ $periodoTexto }}</strong> ·
-                    <strong class="text-slate-700">{{ !empty($establecimiento) ? $establecimiento : (($tipo_establecimiento ?? '') === 'cesfam' ? 'solo CESFAM' : (($tipo_establecimiento ?? '') === 'establecimiento' ? 'solo establecimientos' : 'toda la red')) }}</strong>{{ !empty($programa) ? ' · ' . $programa : '' }}
-                </span>
-                @if ($hayFiltrosActivos)
-                    <a href="{{ route('dashboard.index') }}" class="text-[12px] font-semibold text-rose-600 hover:underline">Quitar filtros</a>
-                @endif
-            </summary>
+        <!-- barra de filtros -->
         <form method="GET" action="{{ route('dashboard.index') }}" id="dashboardFilterForm"
-            class="mt-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
+            class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
                 <div>
                     <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Período</label>
@@ -306,64 +182,35 @@
                 </button>
             </div>
         </form>
-        </details>
 
-        <!-- indicadores clave -->
-        @php
-            $hayPedidosPeriodo = ($totalUnidadesSolicitadas ?? 0) > 0;
-            $porcentajeEntregado = $hayPedidosPeriodo ? min(100, $porcentajeCumplimientoRed ?? 0) : 0;
-            $colorCumplimiento = $porcentajeEntregado >= 80 ? 'bg-emerald-500' : ($porcentajeEntregado >= 50 ? 'bg-amber-500' : 'bg-rose-500');
-            $fmt = fn ($n) => number_format((float) $n, 0, ',', '.');
-        @endphp
+        <!-- KPIs de bodega central -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="{{ route('inventory.index') }}" class="dash-kpi bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:border-teal-300 transition-colors flex flex-col gap-1">
-                <span class="text-[12.5px] font-semibold text-slate-500">Stock en bodega</span>
-                <span class="text-[26px] leading-tight font-black text-slate-900">${{ $fmt($valorInventario) }}</span>
-                <span class="text-[12.5px] text-slate-500">{{ $fmt($unidadesTotales) }} unidades disponibles</span>
+            <a href="{{ route('inventory.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Inventario en Bodega</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">${{ number_format($valorInventario, 0, ',', '.') }}</h3>
+                    <p class="text-[11px] font-bold text-teal-600 mt-0.5">{{ number_format($unidadesTotales, 0, ',', '.') }} unidades disponibles</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
             </a>
 
-            <a href="{{ route('traceability.index') }}" class="dash-kpi bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:border-teal-300 transition-colors flex flex-col gap-1">
-                <span class="text-[12.5px] font-semibold text-slate-500">Despachos · {{ mb_strtolower($periodoTexto) }}</span>
-                <span class="text-[26px] leading-tight font-black text-slate-900">{{ $fmt($despachosPeriodo) }}</span>
-                <span class="text-[12.5px] text-slate-500">y {{ $fmt($recepcionesPeriodo) }} {{ $recepcionesPeriodo == 1 ? 'recepción' : 'recepciones' }} en el mismo período</span>
+            <a href="{{ route('traceability.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Actividad ({{ $periodoTexto }})</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($despachosPeriodo, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">despachos</span></h3>
+                    <p class="text-[11px] font-bold text-emerald-600 mt-0.5">{{ number_format($recepcionesPeriodo, 0, ',', '.') }} recepciones registradas</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                </div>
             </a>
 
-            <a href="{{ route('dispatch.index') }}" class="dash-kpi bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:border-teal-300 transition-colors flex flex-col gap-1">
-                <span class="text-[12.5px] font-semibold text-slate-500">Pedidos por despachar</span>
-                <span class="text-[26px] leading-tight font-black text-slate-900">{{ $fmt($solicitudesPorDespacharCount ?? 0) }}</span>
-                <span class="text-[12.5px] text-slate-500">
-                    @if (($solicitudesPorDespacharCount ?? 0) > 0)
-                        {{ $solicitudesAsignadasCount ?? 0 }} con bodeguero · {{ $solicitudesSinAsignarCount ?? 0 }} sin asignar
-                    @else
-                        Ningún pedido esperando
-                    @endif
-                </span>
-            </a>
-
-            <div class="dash-kpi bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col gap-1"
-                title="Unidades entregadas sobre unidades pedidas por los centros de salud en el período elegido.">
-                <span class="text-[12.5px] font-semibold text-slate-500">Pedidos entregados</span>
-                @if ($hayPedidosPeriodo)
-                    <span class="text-[26px] leading-tight font-black text-slate-900">{{ rtrim(rtrim(number_format($porcentajeEntregado, 1, ',', '.'), '0'), ',') }}%</span>
-                    <span class="h-1.5 rounded-full bg-slate-100 overflow-hidden" role="progressbar" aria-valuenow="{{ $porcentajeEntregado }}" aria-valuemin="0" aria-valuemax="100">
-                        <span class="block h-full rounded-full {{ $colorCumplimiento }}" style="width: {{ $porcentajeEntregado }}%"></span>
-                    </span>
-                    <span class="text-[12.5px] text-slate-500">{{ $fmt($totalUnidadesEntregadasSolicitudes ?? 0) }} de {{ $fmt($totalUnidadesSolicitadas) }} unidades pedidas</span>
-                @else
-                    <span class="text-[26px] leading-tight font-black text-slate-300">—</span>
-                    <span class="text-[12.5px] text-slate-500">Sin pedidos en este período</span>
-                @endif
-            </div>
-        </div>
-
-        <!-- resto de indicadores -->
-        <details class="dash-mas-indicadores group">
-            <summary class="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-teal-700 hover:text-teal-900 cursor-pointer select-none list-none">
-                <svg class="w-4 h-4 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                <span class="group-open:hidden">Ver más indicadores</span>
-                <span class="hidden group-open:inline">Ocultar indicadores</span>
-            </summary>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
             <a href="{{ route('inventory.index', ['order_by' => 'vencimiento']) }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-l-4 border-l-rose-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
                 <div>
                     <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Alerta FEFO (&le; 30 Días)</p>
@@ -389,7 +236,10 @@
                     </svg>
                 </div>
             </a>
+        </div>
 
+        <!-- KPIs de establecimientos y CESFAM -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-purple-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
                 title="Solicitudes de medicamentos generadas exclusivamente por centros CESFAM en este período. 'Pendientes' indica pedidos aún en preparación o entrega.">
                 <div>
@@ -422,11 +272,40 @@
                     </svg>
                 </div>
             </div>
-            </div>
-        </details>
-        </div>
 
-        <h2 class="px-4 sm:px-6 text-[13px] font-bold text-slate-500 uppercase tracking-wider mt-2 mb-3">Detalle</h2>
+            <a href="{{ route('dispatch.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-indigo-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
+                title="Pedidos de la red pendientes de ser surtidos o despachados en bodega central.">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Pedidos por Surtir</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ number_format($solicitudesPorDespacharCount ?? 0, 0, ',', '.') }} <span class="text-xs font-bold text-slate-500">en cola</span></h3>
+                    <p class="text-[11px] font-bold text-indigo-600 mt-0.5">
+                        {{ $solicitudesAsignadasCount ?? 0 }} con bodeguero · {{ $solicitudesSinAsignarCount ?? 0 }} sin asignar
+                    </p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                    </svg>
+                </div>
+            </a>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-emerald-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
+                title="Nivel de Servicio: porcentaje de unidades entregadas respecto al total solicitado en los pedidos de este período. 'Stock en centros' corresponde al saldo físico declarado por los centros al pedir.">
+                <div>
+                    <p class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider">Cumplimiento de Pedidos</p>
+                    <h3 class="text-xl font-black text-slate-900 mt-1">{{ $porcentajeCumplimientoRed ?? 0 }}% <span class="text-xs font-bold text-slate-500">abastecido</span></h3>
+                    <p class="text-[11px] font-bold text-emerald-600 mt-0.5">
+                        {{ number_format($totalUnidadesEntregadasSolicitudes ?? 0, 0, ',', '.') }} / {{ number_format($totalUnidadesSolicitadas ?? 0, 0, ',', '.') }} uds. <span class="text-slate-400 font-normal">| Centros: {{ number_format($stockDeclaradoRed ?? 0, 0, ',', '.') }} u.</span>
+                    </p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        </div>
 
         <!-- dos columnas: pestañas a la izquierda, QR y accesos a la derecha -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -434,15 +313,15 @@
             <!-- columna izquierda: pestañas de centros, movimientos y cuarentena -->
             <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
                 <!-- Barra de Pestañas -->
-                <div class="px-5 pt-4 pb-3 border-b border-slate-100 flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-3 bg-slate-50/60">
-                    <div class="inline-flex bg-slate-200/70 p-1 rounded-xl gap-1 max-w-full overflow-x-auto whitespace-nowrap">
+                <div class="px-5 pt-4 pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
+                    <div class="inline-flex bg-slate-200/70 p-1 rounded-xl gap-1">
                         <button type="button" id="tabBtn_centros" onclick="switchDashTab('centros')"
                             class="px-3.5 py-1.5 rounded-lg text-[12px] font-extrabold bg-white text-slate-800 shadow-xs transition-all cursor-pointer">
-                            Centros de salud ({{ count($resumenEstablecimientos ?? []) }})
+                            Establecimientos y CESFAM ({{ count($resumenEstablecimientos ?? []) }})
                         </button>
                         <button type="button" id="tabBtn_movimientos" onclick="switchDashTab('movimientos')"
                             class="px-3.5 py-1.5 rounded-lg text-[12px] font-bold text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
-                            Movimientos ({{ count($recentMovements ?? []) }})
+                            Últimos Movimientos ({{ count($recentMovements ?? []) }})
                         </button>
                         <button type="button" id="tabBtn_cuarentena" onclick="switchDashTab('cuarentena')"
                             class="px-3.5 py-1.5 rounded-lg text-[12px] font-bold text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
@@ -451,12 +330,7 @@
                     </div>
 
                     <!-- Buscador rápido para la pestaña de Centros -->
-                    <div id="dashSearchCentrosWrap" class="flex flex-wrap items-center gap-3">
-                        <label class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-slate-600 cursor-pointer select-none">
-                            <input type="checkbox" id="soloCentrosConPedidos" checked onchange="filtrarTablaCentrosDash()"
-                                class="rounded border-slate-300 text-teal-600 focus:ring-teal-500/30">
-                            Solo centros con pedidos
-                        </label>
+                    <div id="dashSearchCentrosWrap" class="flex items-center gap-2">
                         <input type="text" id="buscadorTablaCentros" oninput="filtrarTablaCentrosDash()"
                             placeholder="Buscar CESFAM o centro..."
                             class="bg-white border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-[12px] font-medium outline-none focus:border-teal-500 w-full sm:w-48">
@@ -479,7 +353,6 @@
                         <tbody class="divide-y divide-slate-100" id="tbodyResumenCentros">
                             @forelse ($resumenEstablecimientos ?? [] as $rowCentro)
                                 <tr class="fila-centro-dash hover:bg-slate-50/80 transition-colors"
-                                    data-con-pedidos="{{ $rowCentro->total_solicitudes > 0 ? '1' : '0' }}"
                                     data-nombre="{{ mb_strtolower($rowCentro->nombre . ' ' . $rowCentro->tipo) }}">
                                     <td class="px-4 py-3 font-bold text-slate-800">
                                         <a href="{{ route('dashboard.index', ['establecimiento' => $rowCentro->nombre, 'periodo' => $periodo]) }}"
@@ -532,11 +405,6 @@
                             @endforelse
                         </tbody>
                     </table>
-                    <p id="centrosSinPedidos" class="hidden px-4 py-8 text-center text-[13px] text-slate-500">
-                        Ningún centro tiene pedidos en este período.
-                        <button type="button" class="font-semibold text-teal-700 hover:underline cursor-pointer"
-                            onclick="document.getElementById('soloCentrosConPedidos').checked = false; filtrarTablaCentrosDash();">Ver los {{ count($resumenEstablecimientos ?? []) }} centros</button>
-                    </p>
                 </div>
 
                 <!-- pestaña 2: ultimos movimientos de bodega -->
@@ -675,6 +543,63 @@
                             <p class="text-[12px] font-medium">Sin lotes registrados aún.</p>
                         </div>
                     @endif
+                </div>
+
+                <!-- Accesos directos -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                    <div class="flex items-center justify-between mb-3.5">
+                        <h2 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Accesos Directos</h2>
+                        <span class="text-[10.5px] font-semibold text-slate-400">Módulos</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <a href="{{ route('reception.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-slate-800 block leading-tight">Recepción</span>
+                                <span class="text-[10px] text-slate-500 truncate block">Ingreso de stock</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('dispatch.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-slate-800 block leading-tight">Despacho</span>
+                                <span class="text-[10px] text-slate-500 truncate block">Salida de pedidos</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('inventory.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-slate-800 block leading-tight">Inventario</span>
+                                <span class="text-[10px] text-slate-500 truncate block">Kardex y stock</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('reports.index') }}" class="group p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl transition-colors flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-slate-800 block leading-tight">Reportes</span>
+                                <span class="text-[10px] text-slate-500 truncate block">Actas y balances</span>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -838,18 +763,11 @@
 
         function filtrarTablaCentrosDash() {
             const q = (document.getElementById('buscadorTablaCentros')?.value || '').toLowerCase().trim();
-            const soloConPedidos = document.getElementById('soloCentrosConPedidos')?.checked;
-            let visibles = 0;
             document.querySelectorAll('.fila-centro-dash').forEach(row => {
                 const nombre = row.getAttribute('data-nombre') || '';
-                const oculta = (q !== '' && !nombre.includes(q)) || (soloConPedidos && row.dataset.conPedidos !== '1');
-                row.classList.toggle('hidden', oculta);
-                if (!oculta) visibles++;
+                row.classList.toggle('hidden', q !== '' && !nombre.includes(q));
             });
-            const aviso = document.getElementById('centrosSinPedidos');
-            if (aviso) aviso.classList.toggle('hidden', visibles > 0 || q !== '' || !soloConPedidos);
         }
-        document.addEventListener('DOMContentLoaded', filtrarTablaCentrosDash);
 
         let html5QrScanner = null;
         let availableCameras = [];

@@ -27,7 +27,7 @@ class UserController extends Controller
         'cuarentena' => 'Cuarentena',
         'distribucion' => 'Distribución',
         'solicitudes' => 'Solicitudes Establecimientos',
-        'solicitudes_cesfam' => 'Solicitudes CESFAM',
+        'solicitudes_cesfam' => 'Solicitudes Cesfam',
         'despacho' => 'Despacho Normal',
         'despacho_controlado' => 'Despacho Controlado',
         'trazabilidad' => 'Trazabilidad',
@@ -68,7 +68,7 @@ class UserController extends Controller
             'color' => 'teal',
             'items' => [
                 'solicitudes' => ['label' => 'Solicitudes Establecimientos', 'desc' => 'Pedidos de medicamentos e insumos (no estupefacientes)'],
-                'solicitudes_cesfam' => ['label' => 'Solicitudes CESFAM', 'desc' => 'Pedidos de medicamentos, insumos y estupefacientes para CESFAM'],
+                'solicitudes_cesfam' => ['label' => 'Solicitudes Cesfam', 'desc' => 'Pedidos de medicamentos, insumos y estupefacientes para CESFAM'],
                 'despacho' => ['label' => 'Despacho Normal', 'desc' => 'Emisión de guías de despacho FEFO y atención de solicitudes'],
                 'despacho_controlado' => ['label' => 'Despacho Controlado', 'desc' => 'Despacho exclusivo de fármacos controlados y estupefacientes'],
             ],
@@ -258,7 +258,7 @@ class UserController extends Controller
         $rol = Role::create(['name' => $validated['name']]);
         $this->sincronizarAccesos($rol, $validated['modulos']);
 
-        return redirect()->route('users.index', ['ver' => 'roles'])->with('success', "Rol '{$rol->name}' creado con sus accesos.");
+        return redirect()->route('users.index')->with('success', "Rol '{$rol->name}' creado con sus accesos.");
     }
 
     public function updateRole(Request $request, Role $role)
@@ -266,7 +266,7 @@ class UserController extends Controller
         // El rol Administrador es del sistema: su nombre no se puede cambiar,
         // porque el acceso total y el módulo de Usuarios dependen de él.
         if ($role->name === 'Administrador' && trim((string) $request->input('name')) !== 'Administrador') {
-            return redirect()->route('users.index', ['ver' => 'roles'])->with('error', 'El rol «Administrador» es del sistema y no se puede renombrar.');
+            return redirect()->route('users.index')->with('error', 'El rol «Administrador» es del sistema y no se puede renombrar.');
         }
 
         $rules = [
@@ -296,22 +296,22 @@ class UserController extends Controller
 
         $this->sincronizarAccesos($role, $modulos);
 
-        return redirect()->route('users.index', ['ver' => 'roles'])->with('success', "Rol '{$role->name}' actualizado correctamente.");
+        return redirect()->route('users.index')->with('success', "Rol '{$role->name}' actualizado correctamente.");
     }
 
     public function destroyRole(Role $role)
     {
         if (in_array($role->name, ['Administrador', 'Usuario'])) {
-            return redirect()->route('users.index', ['ver' => 'roles'])->with('error', 'Los roles del sistema no se pueden eliminar.');
+            return redirect()->route('users.index')->with('error', 'Los roles del sistema no se pueden eliminar.');
         }
 
         if ($role->users()->count() > 0) {
-            return redirect()->route('users.index', ['ver' => 'roles'])->with('error', "El rol '{$role->name}' tiene usuarios asignados. Reasígnalos primero.");
+            return redirect()->route('users.index')->with('error', "El rol '{$role->name}' tiene usuarios asignados. Reasígnalos primero.");
         }
 
         $role->delete();
 
-        return redirect()->route('users.index', ['ver' => 'roles'])->with('success', 'Rol eliminado correctamente.');
+        return redirect()->route('users.index')->with('success', 'Rol eliminado correctamente.');
     }
 
     private function sincronizarAccesos(Role $rol, array $modulos): void

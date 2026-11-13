@@ -10,7 +10,7 @@
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
             </path>
         </svg>
-        Historial de despachos
+        Bandeja de Despachos e Historial
     </button>
 @endsection
 
@@ -46,6 +46,65 @@
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <p class="text-sm font-bold text-emerald-800">{{ session('success') }}</p>
+        </div>
+    @endif
+
+    <!-- Solicitudes asignadas al usuario logueado -->
+    @if (isset($misSolicitudesAsignadas) && count($misSolicitudesAsignadas) > 0)
+        <div class="mb-6 bg-gradient-to-r from-teal-50 via-white to-indigo-50 border border-teal-200 rounded-2xl p-4 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3 class="text-[13.5px] font-extrabold text-slate-800">
+                            Tienes {{ count($misSolicitudesAsignadas) }} solicitud(es) asignada(s) para despachar
+                        </h3>
+                        <p class="text-[11.5px] text-slate-500">
+                            Haz clic en "Cargar en Formulario" para preparar el despacho automáticamente o revisa el detalle en "Ver Solicitudes".
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="openSolicitudes('mias')"
+                    class="px-3.5 py-2 rounded-xl text-[12px] font-bold bg-white hover:bg-teal-50 text-teal-700 border border-teal-200 shadow-sm transition-colors cursor-pointer shrink-0">
+                    Ver mis asignadas
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                @foreach ($misSolicitudesAsignadas as $miSol)
+                    @php
+                        $esCesfamMiSol = \App\Services\InventoryService::esCesfam($miSol->establecimiento);
+                    @endphp
+                    <div class="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-mono font-extrabold text-[12px] text-slate-800">{{ $miSol->numero_solicitud }}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $esCesfamMiSol ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700' }}">
+                                    {{ $esCesfamMiSol ? 'CESFAM' : 'Establecimiento' }}
+                                </span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-indigo-100 text-indigo-700">
+                                    {{ $miSol->estado }}
+                                </span>
+                            </div>
+                            <p class="text-[12.5px] font-bold text-slate-800 truncate mt-0.5" title="{{ $miSol->establecimiento }}">
+                                {{ $miSol->establecimiento }}
+                            </p>
+                            <p class="text-[11px] text-slate-500">
+                                {{ $miSol->items->count() }} producto(s) · {{ \Carbon\Carbon::parse($miSol->fecha_solicitud)->format('d/m/Y') }}
+                            </p>
+                        </div>
+                        <button type="button" onclick="usarSolicitud({{ $miSol->id }})"
+                            class="px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-sm transition-colors cursor-pointer shrink-0">
+                            Cargar
+                        </button>
+                    </div>
+                @endforeach
+            </div>
         </div>
     @endif
 
@@ -89,33 +148,30 @@
         </div>
     </div>
 
-    <!-- paso 1: solicitudes por despachar -->
-    @include('dispatch.partials.solicitudes-por-despachar', [
-        'solicitudesPanel' => $solicitudes,
-        'controlados' => false,
-        'fnUsar' => 'usarSolicitud',
-        'fnVerTodas' => 'openSolicitudes()',
-        'permitirSinSolicitud' => true,
-        'idFormulario' => 'formulario-despacho',
-    ])
-
-    <!-- paso 2: formulario de despacho -->
-    <div id="formulario-despacho" class="scroll-mt-24 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col transition-shadow">
+    <!-- formulario principal de despacho -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
 
         <!-- cabecera de la tarjeta del formulario -->
-        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row sm:items-center gap-4">
-            <span class="w-8 h-8 rounded-full bg-teal-600 text-white text-[14px] font-bold flex items-center justify-center shrink-0">2</span>
-            <div class="flex-1 min-w-0">
-                <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Completa y confirma el despacho</h2>
-                <p class="text-[12px] text-slate-500 mt-0.5">Revisa destino, productos y cantidades; luego firman quien despacha y quien recibe.</p>
+        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex items-center gap-4">
+            <div class="w-10 h-10 bg-[#0f968c]/10 text-[#0f968c] rounded-xl flex items-center justify-center shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Registro de Despacho</h2>
+                <p class="text-[12px] text-slate-500 mt-0.5">Complete los datos del documento, cliente, productos a
+                    despachar y firmas.</p>
             </div>
             <button type="button" onclick="openSolicitudes()"
-                class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded text-[13px] font-semibold text-white bg-[#0f968c] hover:bg-teal-700 shadow-sm transition-all duration-200 cursor-pointer">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2zM13 3v4h4"></path>
                 </svg>
-                Elegir otra solicitud
+                Ver Solicitudes
                 @if ($totalActivas > 0)
                     <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold bg-white/20 text-white">
                         {{ $totalActivas }}
@@ -173,7 +229,7 @@
                 <div class="flex flex-col justify-center items-end">
                     <h4
                         class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 w-full md:w-auto text-left md:text-right">
-                        N° Correlativo Automático</h4>
+                        N° Correlativo Automatico</h4>
                     <input type="text" name="correlativo_despacho" value="{{ $correlativo }}" readonly
                         class="w-full md:w-48 bg-slate-100 border border-slate-300 text-slate-800 text-lg font-mono font-extrabold rounded-xl text-center py-2 focus:outline-none cursor-default shadow-inner">
                 </div>
@@ -182,7 +238,7 @@
             <!-- seccion de destino y logistica con clasificacion -->
             <div class="p-6 bg-white border-b border-slate-100">
                 <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide mb-4">1. Tipo, Destino y
-                    Logística</h3>
+                    Logistica</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
 
@@ -284,7 +340,7 @@
                     <div id="div_motivo_traspaso" class="md:col-span-4 hidden">
                         <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl">
                             <label for="motivo_traspaso" class="block text-[12px] font-bold text-amber-900 mb-1">Motivo del traspaso interno <span class="text-rose-500">*</span></label>
-                            <p class="text-[11.5px] text-amber-800 mb-2">Este despacho no viene de una solicitud. Indica el motivo. Si quien recibe no está presente, puede firmar después desde «Historial de despachos» y la guía quedará como «Pendiente de recepción».</p>
+                            <p class="text-[11.5px] text-amber-800 mb-2">Este despacho no viene de una solicitud. Indica el motivo. Si quien recibe no está presente, puede firmar después desde la bandeja de despachos y la guía quedará como «Pendiente de recepción».</p>
                             <input type="text" name="motivo_traspaso" id="motivo_traspaso" maxlength="500"
                                 placeholder="Ej: Reposición urgente por quiebre de stock."
                                 class="w-full bg-white border border-amber-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
@@ -449,12 +505,10 @@
             <td data-label="Programa" class="col-programa px-3 py-2.5 border-r border-slate-100 align-middle max-w-0">
                 <select name="programas[]" required
                     class="w-full max-w-full truncate bg-white border border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
-                    {{-- general es el valor por defecto cuando el lote no tiene programa --}}
-                    <option value="General" selected>General (sin programa)</option>
                     @foreach ($programasLista ?? [] as $idxProg => $progOpt)
                         @php $progLimpio = trim(preg_replace('/\s+/', ' ', $progOpt ?? '')); @endphp
-                        @if($progLimpio !== '' && mb_strtolower($progLimpio) !== 'general')
-                            <option value="{{ $progLimpio }}">{{ $progLimpio }}</option>
+                        @if($progLimpio !== '')
+                            <option value="{{ $progLimpio }}" {{ $idxProg === 0 ? 'selected' : '' }}>{{ $progLimpio }}</option>
                         @endif
                     @endforeach
                 </select>
@@ -897,7 +951,7 @@
             <!-- cabecera de modal historico -->
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-bold text-white tracking-wide">Historial de despachos</h2>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Bandeja Histórica de Despachos</h2>
                     <p class="text-[12px] text-slate-300 mt-1 uppercase tracking-wider font-semibold">Trazabilidad de guías
                         emitidas y stock rebajado</p>
                 </div>
@@ -1332,7 +1386,7 @@
                             </div>
                             <p class="das-swal-meta"><strong>Destino:</strong> ${dispData.destino}</p>
                             <p class="das-swal-meta"><strong>Clasificación:</strong> ${dispData.clasificacion}${dispData.es_traspaso ? ' (traspaso interno)' : ''}</p>
-                            ${dispData.pendiente_recepcion ? '<p class="das-swal-meta font-semibold text-amber-700">Pendiente de recepción: quien recibe debe firmar desde «Historial de despachos».</p>' : ''}
+                            ${dispData.pendiente_recepcion ? '<p class="das-swal-meta font-semibold text-amber-700">Pendiente de recepción: quien recibe debe firmar desde la bandeja de despachos.</p>' : ''}
                             <p class="das-swal-meta"><strong>Fecha de Emisión:</strong> ${dispData.fecha}</p>
                             <p class="das-swal-meta"><strong>Total Unidades Despachadas:</strong> ${Number(dispData.total_unidades || 0).toLocaleString('es-CL')} uds. (${dispData.total_items} producto${dispData.total_items === 1 ? '' : 's'})</p>
                         </div>
