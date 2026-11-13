@@ -63,8 +63,10 @@ class ControlledDispatchController extends Controller
 
         $establecimientos = InventoryService::establecimientos();
         $programasLista = InventoryService::programasLista();
+        $consumoDeclarado = SolicitudService::consumoDeclaradoPorNombre();
 
         return view('controlled_dispatch.index', compact(
+            'consumoDeclarado',
             'correlativo',
             'dispatches',
             'inventarioDisponible',

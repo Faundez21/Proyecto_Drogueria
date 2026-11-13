@@ -285,8 +285,8 @@ class EstablishmentRequestController extends Controller
             'programa' => 'nullable|array',
             'programa.*' => 'nullable|string',
 
-            'consumo_anterior' => 'nullable|array',
-            'consumo_anterior.*' => 'nullable|integer|min:0',
+            'consumo_anterior' => 'required|array',
+            'consumo_anterior.*' => 'required|integer|min:0',
 
             'stock_actual' => 'required|array',
             'stock_actual.*' => 'required|integer|min:0',
@@ -295,6 +295,7 @@ class EstablishmentRequestController extends Controller
             'cantidad_solicitada.*' => 'required|integer|min:1',
         ], [
             'firma_recibe.required' => 'Debe firmar la solicitud antes de enviarla.',
+            'consumo_anterior.*.required' => 'Indique el consumo mensual de cada producto.',
         ]);
 
         $esCesfam = InventoryService::esCesfam($validated['establecimiento']);
@@ -327,10 +328,8 @@ class EstablishmentRequestController extends Controller
 
         $itemsResumen = [];
         foreach ($validated['producto'] as $index => $productId) {
-            $consumoVal = $validated['consumo_anterior'][$index] ?? null;
-            if ($consumoVal === null || $consumoVal === '') {
-                $consumoVal = SolicitudService::calcularConsumoAnterior($validated['establecimiento'], (int) $productId);
-            }
+            // consumo mensual informado por el establecimiento
+            $consumoVal = (int) $validated['consumo_anterior'][$index];
 
             $product = Product::find($productId);
             $nombreProd = $product ? $product->nombre : "Producto #{$productId}";

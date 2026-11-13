@@ -230,6 +230,11 @@ class SolicitudService
                 ];
             }
 
+            // consumo mensual informado en la solicitud mas reciente
+            if (! array_key_exists('ultimo_consumo_declarado', $mapa[$est][$prodId]) && $item->consumo_anterior !== null) {
+                $mapa[$est][$prodId]['ultimo_consumo_declarado'] = (int) $item->consumo_anterior;
+            }
+
             if ($mapa[$est][$prodId]['ultimo_stock_declarado'] === null && $item->stock_actual !== null) {
                 $mapa[$est][$prodId]['ultimo_stock_declarado'] = (int) $item->stock_actual;
             }
@@ -253,8 +258,30 @@ class SolicitudService
                 $resultado[$est][$prodId] = [
                     'consumo_anterior' => (int) $consumo,
                     'ultimo_stock' => $datos['ultimo_stock_declarado'],
+                    'ultimo_consumo' => $datos['ultimo_consumo_declarado'] ?? null,
                 ];
             }
+        }
+
+        return $resultado;
+    }
+
+    // ultimo consumo mensual informado por establecimiento y nombre de producto
+    public static function consumoDeclaradoPorNombre(): array
+    {
+        $resultado = [];
+        $items = EstablishmentItem::with(['request:id,establecimiento', 'product:id,nombre'])
+            ->whereNotNull('consumo_anterior')
+            ->orderByDesc('id')
+            ->get();
+
+        foreach ($items as $item) {
+            $est = trim((string) ($item->request->establecimiento ?? ''));
+            $nombre = trim(preg_replace('/\s+/', ' ', (string) ($item->product->nombre ?? '')));
+            if ($est === '' || $nombre === '' || isset($resultado[$est][$nombre])) {
+                continue;
+            }
+            $resultado[$est][$nombre] = (int) $item->consumo_anterior;
         }
 
         return $resultado;
