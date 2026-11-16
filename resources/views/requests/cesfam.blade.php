@@ -485,8 +485,8 @@
 
                 prodSelect.querySelectorAll('optgroup').forEach(grupo => {
                     grupo.querySelectorAll('option').forEach(op => {
-                        // un producto que no pertenece a ningun programa se puede pedir con cualquiera
-                        if (op.value && !permitidosSet.has(String(op.value)) && PRODUCTOS_CON_PROGRAMA.has(String(op.value))) {
+                        // con un programa elegido solo quedan los productos registrados en ese programa
+                        if (op.value && !permitidosSet.has(String(op.value))) {
                             op.remove();
                         }
                     });
@@ -511,7 +511,11 @@
                     aviso.classList.remove('hidden');
                 }
             } else if (aviso) {
-                if (prog) {
+                if (prog === 'general') {
+                    // general no es un programa propio: se puede pedir cualquier producto
+                    aviso.textContent = '';
+                    aviso.classList.add('hidden');
+                } else if (prog) {
                     aviso.textContent = 'Este programa aún no tiene productos registrados: se muestran todos.';
                     aviso.classList.remove('hidden');
                 } else {
