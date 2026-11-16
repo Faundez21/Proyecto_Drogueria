@@ -1769,7 +1769,9 @@
                 const vacia = document.createElement('option');
                 vacia.value = '';
                 vacia.disabled = true;
-                vacia.selected = true;
+                // como atributo, para que las filas copiadas de la plantilla partan sin producto elegido
+                // (si no, con un solo producto el navegador lo marca solo y no se llenan lote ni vencimiento)
+                vacia.setAttribute('selected', '');
                 vacia.textContent = !origen ? 'Primero elija de qué establecimiento sale...'
                     : (items.length ? 'Seleccione producto del establecimiento...' : 'Este establecimiento no tiene stock registrado');
                 const opciones = [vacia, ...items.map(it => {
@@ -1786,7 +1788,7 @@
                     o.setAttribute('data-lote', primerLote ? primerLote.lote : 'S/L');
                     o.setAttribute('data-vence', primerLote && primerLote.fecha_vencimiento ? primerLote.fecha_vencimiento : '');
                     o.setAttribute('data-stock', it.cantidad);
-                    o.setAttribute('data-programa', '');
+                    o.setAttribute('data-programa', it.programa || '');
                     return o;
                 })];
                 plantilla.replaceChildren(...opciones);
