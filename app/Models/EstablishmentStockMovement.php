@@ -9,7 +9,7 @@ class EstablishmentStockMovement extends Model
 {
     protected $fillable = [
         'establishment_stock_id', 'user_id', 'tipo', 'cantidad', 'saldo',
-        'referencia', 'dispatch_id', 'establishment_request_id',
+        'referencia', 'dispatch_id', 'establishment_request_id', 'lote', 'fecha_vencimiento',
     ];
 
     public function stock()

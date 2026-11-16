@@ -304,7 +304,7 @@
                     <div id="div_externo" class="md:col-span-2 hidden min-w-0 space-y-3">
                         <div>
                             <label for="establecimiento_origen" class="block text-[12px] font-bold text-slate-700 mb-1.5">Sale del stock de <span class="text-rose-500">*</span></label>
-                            <select id="establecimiento_origen" onchange="aplicarOrigenProductos()" class="w-full max-w-full truncate bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
+                            <select id="establecimiento_origen" onchange="aplicarOrigenProductos(); excluirOrigenDeDestinos()" class="w-full max-w-full truncate bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
                                 <option value="" disabled selected>Seleccione el establecimiento de origen...</option>
                                 @foreach (\App\Services\InventoryService::establecimientos() as $estOrigen)
                                     @php $conStock = count($stockEstablecimientos[$estOrigen['nombre']] ?? []); @endphp
@@ -326,6 +326,7 @@
                                 <option value="Otro">Otro</option>
                             </select>
                             <input type="text" id="establecimiento_externo" list="destinos_red"
+                                oninput="autocompletarDireccionDestino()" onchange="autocompletarDireccionDestino()"
                                 placeholder="Nombre institución/destino..."
                                 class="w-full sm:w-3/5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
                         </div>
@@ -333,13 +334,13 @@
 
                     <datalist id="destinos_red">
                         @foreach (\App\Services\InventoryService::establecimientos() as $estRed)
-                            <option value="{{ $estRed['nombre'] }}">
+                            <option value="{{ $estRed['nombre'] }}" data-direccion="{{ $estRed['direccion'] ?? '' }}">
                         @endforeach
                     </datalist>
 
                     <div class="md:col-span-2">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Dirección Destino</label>
-                        <input type="text" name="direccion_destino" id="direccion_destino"
+                        <input type="text" name="direccion_destino" id="direccion_destino" oninput="this.dataset.auto = ''"
                             placeholder="Esperando clasificación..." readonly
                             class="w-full bg-slate-50 border border-slate-300 text-slate-500 font-medium rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-inner transition-all">
                     </div>
@@ -1717,6 +1718,8 @@
                 inpDir.classList.add('bg-slate-50', 'cursor-not-allowed');
                 inpDir.classList.remove('bg-white');
                 inpDir.placeholder = "Se autocompletará al seleccionar destino...";
+                inpDir.dataset.auto = '';
+                avisarDestinoIgualOrigen();
 
                 actualizarDireccionInterna();
             } else if (val === 'Interno') {
@@ -1739,7 +1742,10 @@
                 inpDir.classList.remove('bg-slate-50', 'cursor-not-allowed');
                 inpDir.classList.add('bg-white');
                 inpDir.value = '';
-                inpDir.placeholder = 'Ingrese la dirección manualmente...';
+                inpDir.dataset.auto = '';
+                inpDir.placeholder = 'Se completa al elegir un establecimiento de la red, o ingrésela manualmente...';
+                excluirOrigenDeDestinos();
+                autocompletarDireccionDestino();
             }
 
             actualizarModoTraspaso();
@@ -1763,19 +1769,26 @@
                 const vacia = document.createElement('option');
                 vacia.value = '';
                 vacia.disabled = true;
-                vacia.selected = true;
+                // como atributo, para que las filas copiadas de la plantilla partan sin producto elegido
+                // (si no, con un solo producto el navegador lo marca solo y no se llenan lote ni vencimiento)
+                vacia.setAttribute('selected', '');
                 vacia.textContent = !origen ? 'Primero elija de qué establecimiento sale...'
                     : (items.length ? 'Seleccione producto del establecimiento...' : 'Este establecimiento no tiene stock registrado');
                 const opciones = [vacia, ...items.map(it => {
                     const o = document.createElement('option');
                     o.value = it.producto;
+                    // sale primero el lote que vence antes (fefo), igual que en bodega
+                    const primerLote = (it.lotes || [])[0] || null;
+                    const otrosLotes = (it.lotes || []).length - 1 + (it.sin_lote > 0 && primerLote ? 1 : 0);
                     o.textContent = it.producto + ' (Disp: ' + it.cantidad + ')';
-                    o.title = o.textContent;
+                    o.title = it.producto + ' (Disp: ' + it.cantidad + ')' + (primerLote
+                        ? ' · Lote ' + primerLote.lote + ': ' + primerLote.cantidad + ' uds.' + (otrosLotes > 0 ? ' Si pide más, se completa con los siguientes lotes.' : '')
+                        : ' · Sin lote registrado');
                     o.setAttribute('data-nombre-completo', it.producto);
-                    o.setAttribute('data-lote', 'S/L');
-                    o.setAttribute('data-vence', '');
+                    o.setAttribute('data-lote', primerLote ? primerLote.lote : 'S/L');
+                    o.setAttribute('data-vence', primerLote && primerLote.fecha_vencimiento ? primerLote.fecha_vencimiento : '');
                     o.setAttribute('data-stock', it.cantidad);
-                    o.setAttribute('data-programa', '');
+                    o.setAttribute('data-programa', it.programa || '');
                     return o;
                 })];
                 plantilla.replaceChildren(...opciones);
@@ -1787,6 +1800,49 @@
             modoProductosActual = modo;
             while (tbody.children.length > 0) tbody.children[0].remove();
             addRow();
+        }
+
+        // despacho interno: si el destino es un establecimiento de la red se rellena su direccion; si es otro, se escribe a mano
+        function autocompletarDireccionDestino() {
+            if (document.getElementById('clasificacion_select').value !== 'Interno') return;
+            const destino = (document.getElementById('establecimiento_externo').value || '').trim().toLowerCase();
+            const inpDir = document.getElementById('direccion_destino');
+            const opcion = Array.from(document.querySelectorAll('#destinos_red option'))
+                .find(o => !o.disabled && o.value.trim().toLowerCase() === destino);
+            const direccion = opcion ? (opcion.getAttribute('data-direccion') || '').trim() : '';
+
+            if (direccion) {
+                inpDir.value = direccion;
+                inpDir.dataset.auto = '1';
+            } else if (inpDir.dataset.auto === '1') {
+                // se borra solo la direccion que puso el sistema, nunca una escrita a mano
+                inpDir.value = '';
+                inpDir.dataset.auto = '';
+            }
+            avisarDestinoIgualOrigen();
+        }
+
+        // el establecimiento de origen no aparece como destino del mismo traspaso
+        function excluirOrigenDeDestinos() {
+            const origen = (document.getElementById('establecimiento_origen')?.value || '').trim().toLowerCase();
+            document.querySelectorAll('#destinos_red option').forEach(o => {
+                o.disabled = origen !== '' && o.value.trim().toLowerCase() === origen;
+            });
+            avisarDestinoIgualOrigen();
+        }
+
+        function destinoIgualOrigen() {
+            if (document.getElementById('clasificacion_select')?.value !== 'Interno') return false;
+            const origen = (document.getElementById('establecimiento_origen')?.value || '').trim().toLowerCase();
+            const destino = (document.getElementById('establecimiento_externo')?.value || '').trim().toLowerCase();
+            return origen !== '' && origen === destino;
+        }
+
+        function avisarDestinoIgualOrigen() {
+            const inp = document.getElementById('establecimiento_externo');
+            if (!inp) return;
+            inp.setCustomValidity(destinoIgualOrigen() ? 'El destino no puede ser el mismo establecimiento desde donde sale el stock.' : '');
+            inp.classList.toggle('border-rose-400', destinoIgualOrigen());
         }
 
         // funcion para buscar la direccion del cesfam elegido y rellenar el input readonly
