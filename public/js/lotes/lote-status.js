@@ -1475,7 +1475,15 @@
                             this.normKey(initialUbicacion.estante) === this.normKey(infoEstante.estante) &&
                             this.normKey(this.normNivel(initialUbicacion.nivel)) === this.normKey(nivStr);
 
-                        if (evNiv.completamenteOcupado && !esNivelInicial) {
+                        const sinPosiciones = !Array.isArray(nObj.posiciones) || nObj.posiciones.length === 0;
+                        if (sinPosiciones) {
+                            // toda ubicacion debe llevar posicion: un nivel sin posiciones creadas no se puede elegir
+                            // (salvo que sea donde ya esta el lote, para no borrar su ubicacion al abrir el modal)
+                            opt.disabled = !esNivelInicial;
+                            opt.textContent = esNivelInicial
+                                ? `Nivel ${nivStr} (ubicación actual · sin posiciones)`
+                                : `Nivel ${nivStr} — sin posiciones (créelas en Distribución)`;
+                        } else if (evNiv.completamenteOcupado && !esNivelInicial) {
                             opt.disabled = true;
                             const resumenOc = evNiv.ocupantes.slice(0, 2).map((o) => `${o.producto} (Lote ${o.lote})`).join(', ');
                             opt.textContent = `Nivel ${nivStr} — ⛔ OCUPADO (${resumenOc || 'En uso'})`;
@@ -1496,26 +1504,13 @@
                         }
                         selectNivel.appendChild(opt);
                     });
-                } else if (estanteVal && Array.isArray(window.todosLosNiveles)) {
-                    window.todosLosNiveles.forEach((nivRaw) => {
-                        const nivStr = this.normNivel(nivRaw);
-                        if (!nivStr) return;
-                        const evNiv = this.evaluarNivel(estanteVal, nivStr, window.todosLasPosiciones || [], opts);
-                        const opt = document.createElement('option');
-                        opt.value = nivStr;
-                        if (evNiv.completamenteOcupado) {
-                            opt.disabled = true;
-                            opt.textContent = `Nivel ${nivStr} — ⛔ OCUPADO (En uso)`;
-                        } else if (evNiv.ocupadasCount > 0) {
-                            opt.textContent = `Nivel ${nivStr} (${evNiv.disponiblesCount} disp.)`;
-                        } else {
-                            opt.textContent = `Nivel ${nivStr}`;
-                        }
-                        if (this.normKey(nivStr) === this.normKey(prevNivel) && !opt.disabled) {
-                            opt.selected = true;
-                        }
-                        selectNivel.appendChild(opt);
-                    });
+                } else if (estanteVal) {
+                    // un estante sin niveles creados en Distribucion no ofrece niveles: la ubicacion no se podria completar
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.disabled = true;
+                    opt.textContent = 'Este estante no tiene niveles creados';
+                    selectNivel.appendChild(opt);
                 }
             }
 
@@ -1667,7 +1662,42 @@
             }
         },
 
+        // si se eligio alguna parte de la ubicacion, dice que campo falta ('el nivel', 'la posición'...) o null si esta completa o vacia
+        faltante(selectPasillo, selectEstante, selectNivel, selectPosicion) {
+            const pas = this.normStr(selectPasillo?.value);
+            const est = this.normStr(selectEstante?.value);
+            const niv = this.normNivel(selectNivel?.value);
+            const pos = this.normPos(selectPosicion?.value);
+            const vacio = (v) => !v || v.toUpperCase() === 'P.A';
+            if (vacio(pas) && vacio(est) && !niv && !pos) return null;
+            const tieneOpciones = (sel) => !!sel && Array.from(sel.options).some((o) => o.value && !o.disabled);
+            if (vacio(pas)) return 'el pasillo';
+            if (vacio(est)) return 'el estante';
+            if (!niv) return tieneOpciones(selectNivel) ? 'el nivel' : 'un estante que tenga niveles creados';
+            if (!pos) return tieneOpciones(selectPosicion) ? 'la posición' : 'un nivel que tenga posiciones creadas';
+            return null;
+        },
+
+        async avisarUbicacionIncompleta(falta, producto = '') {
+            await Swal.fire({
+                icon: 'warning',
+                title: 'Ubicación incompleta',
+                html: `${producto ? `<p style="margin-bottom:6px"><strong>${esc(producto)}</strong></p>` : ''}Seleccione ${esc(falta)} para completar la ubicación.<br><span style="font-size:12.5px;color:#64748b">Si no quiere asignar ubicación, deje el pasillo y el estante vacíos.</span>`,
+                confirmButtonColor: COLORS.teal,
+            });
+        },
+
         async validarSeleccionEnModal(ctx) {
+            // cambiar la ubicacion exige elegirla completa
+            if (huboCambioUbicacion(ctx)) {
+                const sel = (id) => document.getElementById(id);
+                const falta = this.faltante(sel('modal_edit_pasillo'), sel('modal_edit_estante'), sel('modal_edit_nivel'), sel('modal_edit_posicion'));
+                if (falta) {
+                    await this.avisarUbicacionIncompleta(falta, ctx.producto);
+                    return false;
+                }
+            }
+
             const est = this.normStr(ctx.ubicacion?.estante);
             const niv = this.normNivel(ctx.ubicacion?.nivel);
             const pos = this.normPos(ctx.ubicacion?.posicion);

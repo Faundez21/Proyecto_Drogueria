@@ -411,8 +411,16 @@ class InventoryController extends Controller
             $request->json()?->remove('posicion');
         }
 
-        // si se indica una ubicacion nueva, debe existir en el mapa de bodega
-        if ($request->filled('estante') || ($request->filled('pasillo') && ! $pasilloIgual)) {
+        // si se indica una ubicacion nueva, debe existir en el mapa de bodega y venir completa.
+        // guardar el lote sin tocar su ubicacion no la vuelve a validar (lotes antiguos sin nivel siguen editables)
+        $mismoValor = fn ($campo, $actual, $norm = null) => ! $request->has($campo)
+            || mb_strtolower(trim((string) ($norm ? $norm($request->input($campo)) : $request->input($campo))))
+                === mb_strtolower(trim((string) ($norm ? $norm($actual) : $actual)));
+        $ubicacionSinCambios = $mismoValor('pasillo', $inventory->pasillo)
+            && $mismoValor('estante', $inventory->estante)
+            && $mismoValor('nivel', $inventory->nivel, fn ($v) => InventoryService::normalizarNivel($v))
+            && $mismoValor('posicion', $inventory->posicion, fn ($v) => InventoryService::normalizarPosicion($v));
+        if (! $ubicacionSinCambios && ($request->filled('estante') || $request->filled('pasillo') || $request->filled('nivel') || $request->filled('posicion'))) {
             $errorUbicacion = InventoryService::validarUbicacion(
                 $request->input('pasillo'),
                 $request->input('estante'),
