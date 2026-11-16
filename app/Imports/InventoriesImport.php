@@ -137,7 +137,7 @@ class InventoriesImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         $estante = trim((string) ($row['estante'] ?? '')) ?: null;
         $nivel = trim((string) ($row['nivel'] ?? '')) ?: null;
         $posicion = trim((string) ($row['posicion'] ?? '')) ?: null;
-        if (($pasillo || $estante) && InventoryService::validarUbicacion($pasillo, $estante, $nivel, $posicion)) {
+        if (($pasillo || $estante) && InventoryService::validarUbicacion($pasillo, $estante, $nivel, $posicion, false)) {
             $this->ubicacionesInvalidas[] = $filaExcel;
             $pasillo = $estante = $nivel = $posicion = null;
         }
