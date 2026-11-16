@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\EstablishmentStock;
+use App\Models\Inventory;
 use App\Models\EstablishmentStockLot;
 use App\Models\EstablishmentStockMovement;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -229,13 +230,22 @@ class EstablishmentStockService
     public static function disponiblePorEstablecimiento(): array
     {
         $resultado = [];
-        EstablishmentStock::with(['lotes' => fn ($q) => $q->where('cantidad', '>', 0)])
+        $saldos = EstablishmentStock::with(['lotes' => fn ($q) => $q->where('cantidad', '>', 0)])
             ->where('cantidad', '>', 0)
             ->orderBy('producto')
-            ->get()
+            ->get();
+
+        // programa de cada producto segun el inventario de bodega (el registro mas reciente manda)
+        $programas = Inventory::whereIn('product_id', $saldos->pluck('product_id')->filter()->unique())
+            ->whereNotNull('programa')
+            ->where('programa', '!=', '')
+            ->orderBy('id')
+            ->pluck('programa', 'product_id');
+
+        $saldos
             // los controlados no salen por despacho interno
             ->reject(fn ($s) => InventoryService::esControlado($s->producto))
-            ->each(function ($s) use (&$resultado) {
+            ->each(function ($s) use (&$resultado, $programas) {
                 $lotes = $s->lotes->sortBy([
                     fn ($a, $b) => self::claveVencimiento($a) <=> self::claveVencimiento($b),
                     fn ($a, $b) => $a->id <=> $b->id,
@@ -252,6 +262,7 @@ class EstablishmentStockService
                     'producto' => $s->producto,
                     'cantidad' => $disponible,
                     'sin_lote' => max(0, $sinLote),
+                    'programa' => trim((string) ($programas[$s->product_id] ?? '')),
                     'lotes' => $vigentes->map(fn ($l) => [
                         'lote' => $l->lote,
                         'fecha_vencimiento' => $l->fecha_vencimiento?->format('Y-m-d'),
