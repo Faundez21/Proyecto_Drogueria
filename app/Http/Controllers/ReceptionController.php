@@ -350,6 +350,23 @@ class ReceptionController extends Controller
         }
         $nombreFila = fn ($i) => $nombresNuevos[$i] ?? (Product::find($validated['product_id'][$i])?->nombre ?? ('Producto #' . $validated['product_id'][$i]));
 
+        // un producto que no es controlado no puede recepcionarse con una categoria de estupefacientes
+        foreach ($validated['product_id'] as $index => $prodId) {
+            if (isset($nombresNuevos[$index]) || ! ctype_digit((string) $prodId)) {
+                continue;
+            }
+            $tipoFila = $validated['tipo_producto'][$index] ?? null;
+            if (InventoryService::clasificarGrupoProducto('', $tipoFila) !== 'Estupefacientes') {
+                continue;
+            }
+            $nombreProd = $nombreFila($index);
+            if (InventoryService::esControlado($nombreProd) || $this->tieneCategoriaControlada((int) $prodId)) {
+                continue;
+            }
+
+            return $responderError("«{$nombreProd}» no está registrado como estupefaciente o controlado. Elija una categoría de Medicamentos o Insumos.");
+        }
+
         // proveedor nuevo: mismas reglas que en el modulo de proveedores
         $proveedorNuevo = null;
         if ($validated['provider_id'] === '__nuevo__') {
@@ -901,5 +918,13 @@ class ReceptionController extends Controller
         $pdf = Pdf::loadView('reception.pdf', compact('reception'));
 
         return $pdf->download("recepcion_{$reception->numero_documento}.pdf");
+    }
+
+    // el producto ya tuvo una categoria de controlados en inventario o en una recepcion anterior
+    private function tieneCategoriaControlada(int $productId): bool
+    {
+        return Inventory::where('product_id', $productId)->whereNotNull('categoria')->pluck('categoria')
+            ->merge(ReceptionItem::where('product_id', $productId)->whereNotNull('tipo_producto')->pluck('tipo_producto'))
+            ->contains(fn ($cat) => InventoryService::clasificarGrupoProducto('', $cat) === 'Estupefacientes');
     }
 }

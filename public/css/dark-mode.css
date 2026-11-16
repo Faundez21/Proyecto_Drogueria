@@ -64,8 +64,11 @@ html.dark input, html.dark select, html.dark textarea { color: #E2E8F0; }
 html.dark input::placeholder, html.dark textarea::placeholder { color: #7586A0; }
 html.dark input:disabled, html.dark select:disabled, html.dark textarea:disabled,
 html.dark input[readonly] { color: #94A3B8; }
+/* con color-scheme oscuro el navegador ya dibuja el icono claro; invertirlo lo dejaba oscuro sobre fondo oscuro */
+html.dark input[type="date"], html.dark input[type="time"], html.dark input[type="datetime-local"] { color-scheme: dark; }
 html.dark input[type="date"]::-webkit-calendar-picker-indicator,
-html.dark input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(.8); cursor: pointer; }
+html.dark input[type="time"]::-webkit-calendar-picker-indicator,
+html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: none; opacity: .9; cursor: pointer; }
 html.dark option { background-color: #243044; color: #E2E8F0; }
 html.dark input[type="checkbox"], html.dark input[type="radio"] { accent-color: #14B8A6; }
 

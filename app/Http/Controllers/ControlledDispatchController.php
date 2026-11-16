@@ -220,7 +220,8 @@ class ControlledDispatchController extends Controller
                     // el cesfam que recibe suma estas unidades a su stock
                     EstablishmentStockService::ingresar(
                         $destino, $batch->product_id ?? InventoryService::productoId($nombreProducto), $nombreProducto,
-                        (int) $asignacion['cantidad'], 'Guía Controlada N° ' . $correlativo . ' desde la droguería'
+                        (int) $asignacion['cantidad'], 'Guía Controlada N° ' . $correlativo . ' desde la droguería',
+                        null, $batch->lote, $batch->fecha_vencimiento
                     );
 
                     $itemsControlados[] = [

@@ -14,6 +14,11 @@ class EstablishmentStock extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function lotes()
+    {
+        return $this->hasMany(EstablishmentStockLot::class);
+    }
+
     public function movimientos()
     {
         return $this->hasMany(EstablishmentStockMovement::class);
