@@ -851,8 +851,19 @@
             const elegido = select.options[select.selectedIndex];
             const texto = alEnfocar && elegido && elegido.value ? '' : input.value;
             const q = normalizarBusqueda(texto);
-            const opciones = Array.from(select.querySelectorAll('optgroup option'));
-            const hallados = (q ? opciones.filter(o => normalizarBusqueda(textoOpcionProducto(o)).includes(q)) : opciones).slice(0, 60);
+            // con una categoria elegida se muestran primero sus productos y luego el resto de su grupo
+            const filtro = filtroCategoriaRecepcion(card);
+            let opciones = Array.from(select.querySelectorAll('optgroup option'));
+            if (filtro) {
+                const deCategoria = opciones.filter(o => filtro.esGrupo
+                    ? o.getAttribute('data-grupo') === filtro.grupo
+                    : (o.getAttribute('data-categoria') || '').trim().toLowerCase() === filtro.categoria);
+                const restoGrupo = filtro.esGrupo ? [] : opciones.filter(o => o.getAttribute('data-grupo') === filtro.grupo && !deCategoria.includes(o));
+                opciones = deCategoria.concat(restoGrupo);
+            }
+            const coincidentes = q ? opciones.filter(o => normalizarBusqueda(textoOpcionProducto(o)).includes(q)) : opciones;
+            const LIMITE_LISTA = 200;
+            const hallados = coincidentes.slice(0, LIMITE_LISTA);
 
             lista.replaceChildren();
             const agregar = (texto, etiqueta, valor, nuevoNombre) => {
@@ -877,11 +888,23 @@
             };
 
             hallados.forEach(o => agregar(textoOpcionProducto(o), ETIQUETA_GRUPO[o.getAttribute('data-grupo')] || null, o.value));
+            if (filtro && hallados.length) {
+                const aviso = document.createElement('li');
+                aviso.className = 'px-3 pt-1 pb-1.5 text-[11px] font-semibold text-slate-500 border-b border-slate-100';
+                aviso.textContent = filtro.esGrupo ? 'Productos de ' + filtro.etiqueta : 'Productos de la categoría ' + filtro.etiqueta + ' primero';
+                lista.prepend(aviso);
+            }
             if (q && hallados.length === 0) {
                 const vacio = document.createElement('li');
                 vacio.className = 'px-3 py-2 text-[12.5px] text-slate-500';
                 vacio.textContent = 'No hay productos que coincidan con «' + texto.trim() + '».';
                 lista.appendChild(vacio);
+            }
+            if (coincidentes.length > hallados.length) {
+                const mas = document.createElement('li');
+                mas.className = 'px-3 py-2 text-[12px] text-slate-500 italic';
+                mas.textContent = 'Se muestran ' + hallados.length + ' de ' + coincidentes.length + ' productos. Escriba para acotar la búsqueda.';
+                lista.appendChild(mas);
             }
             agregar(q ? '＋ Agregar «' + texto.trim() + '» como producto nuevo' : '＋ Producto nuevo (no está en la lista)', null, '__nuevo__', q ? texto.trim() : '');
 
@@ -1028,12 +1051,55 @@
             actualizarEstiloCardGrupo(card, grupo);
         }
 
+        // categoria elegida en la fila, para filtrar el buscador de productos
+        function filtroCategoriaRecepcion(card) {
+            const selCat = card.querySelector('.select-categoria-recepcion');
+            const opt = selCat ? selCat.options[selCat.selectedIndex] : null;
+            if (!opt || !opt.value) return null;
+            const grupo = opt.getAttribute('data-grupo') || 'Medicamentos';
+            const categoria = opt.value.trim().toLowerCase();
+            return {
+                grupo,
+                categoria,
+                etiqueta: (opt.textContent || opt.value).trim(),
+                // elegir el nombre del grupo (ej. "Medicamentos") equivale a filtrar por todo el grupo
+                esGrupo: categoria === grupo.toLowerCase(),
+            };
+        }
+
         function onCategoriaReceptionChange(selectCat) {
             const card = selectCat.closest('.producto-item');
             const opt = selectCat.options[selectCat.selectedIndex];
             if (!opt || !opt.value) return;
             const grupo = opt.getAttribute('data-grupo') || 'Medicamentos';
+            const categoriaElegida = selectCat.value;
+
+            // el filtro de grupo de la fila sigue a la categoria, para que sus productos esten disponibles
+            const grupoFiltro = card.getAttribute('data-grupo-actual') || 'Todos';
+            const btnGrupo = card.querySelector(`.btn-filtro-grupo[data-grupo="${grupo}"]`);
+            if (grupoFiltro !== 'Todos' && grupoFiltro !== grupo && btnGrupo) {
+                filtrarGrupoFila(btnGrupo, grupo);
+                selectCat.value = categoriaElegida;
+            }
+
+            // un producto de otro grupo no puede quedar con esta categoria (ej. un insumo como estupefaciente)
+            const selProd = card.querySelector('.select-producto-recepcion');
+            const optProd = selProd ? selProd.options[selProd.selectedIndex] : null;
+            if (optProd && optProd.value && optProd.value !== '__nuevo__' && optProd.getAttribute('data-grupo') !== grupo) {
+                const nombre = optProd.getAttribute('data-nombre-completo') || optProd.textContent;
+                selProd.selectedIndex = 0;
+                actualizarCampoProductoNuevo(card);
+                sincronizarTextoBuscador(card);
+                if (window.Swal) {
+                    Swal.fire({
+                        toast: true, position: 'top-end', icon: 'info', timer: 4500, showConfirmButton: false,
+                        title: 'Se quitó «' + nombre.trim() + '»',
+                        text: 'No corresponde a la categoría ' + (opt.textContent || '').trim() + '. Elija un producto de esa categoría.',
+                    });
+                }
+            }
             actualizarEstiloCardGrupo(card, grupo);
+            actualizarContadoresGrupos?.();
         }
 
         document.addEventListener('DOMContentLoaded', function () {

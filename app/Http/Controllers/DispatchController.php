@@ -231,52 +231,57 @@ class DispatchController extends Controller
                 $cantidadFila = (int) $validated['cantidades'][$index];
                 $productoId = InventoryService::productoId($nombreProducto);
 
-                // interno: se descuenta del establecimiento de origen, la bodega central no se toca
+                // interno: se descuenta del establecimiento de origen por lote (fefo), la bodega central no se toca
                 if ($origenRegistrado) {
-                    EstablishmentStockService::retirar(
+                    $lotesSalida = EstablishmentStockService::retirar(
                         $origenRegistrado['nombre'], $productoId, $nombreProducto, $cantidadFila,
-                        "Guía N° {$correlativo} hacia {$destino}", $dispatch->id
+                        "Guía N° {$correlativo} hacia {$destino}", $dispatch->id,
+                        $validated['lotes'][$index] ?? null
                     );
-                    if ($estRegistrado) {
-                        EstablishmentStockService::ingresar(
-                            $estRegistrado['nombre'], $productoId, $nombreProducto, $cantidadFila,
-                            "Guía N° {$correlativo} desde {$origenRegistrado['nombre']}", $dispatch->id
-                        );
+
+                    foreach ($lotesSalida as $salida) {
+                        if ($estRegistrado) {
+                            EstablishmentStockService::ingresar(
+                                $estRegistrado['nombre'], $productoId, $nombreProducto, $salida['cantidad'],
+                                "Guía N° {$correlativo} desde {$origenRegistrado['nombre']}", $dispatch->id,
+                                $salida['lote'], $salida['fecha_vencimiento']
+                            );
+                        }
+
+                        // queda en trazabilidad aunque no salga de un lote de bodega
+                        StockMovement::create([
+                            'inventory_id' => null,
+                            'user_id' => Auth::id(),
+                            'producto' => $nombreProducto,
+                            'lote' => $salida['lote'],
+                            'fecha_vencimiento' => $salida['fecha_vencimiento'],
+                            'tipo_movimiento' => 'Despacho interno',
+                            'cantidad' => -$salida['cantidad'],
+                            'fecha_hora' => now(),
+                            'origen_destino' => mb_substr("Desde: {$origenRegistrado['nombre']} · Hacia: {$destino}", 0, 500),
+                            'documento_respaldo' => 'Guía N° ' . $correlativo,
+                            'estado_lote' => 'Establecimiento',
+                        ]);
+
+                        DispatchItem::create([
+                            'dispatch_id' => $dispatch->id,
+                            'inventory_id' => null,
+                            'product_id' => $productoId,
+                            'producto' => $nombreProducto,
+                            'lote' => $salida['lote'],
+                            'fecha_vencimiento' => $salida['fecha_vencimiento'],
+                            'programa' => $validated['programas'][$index] ?? 'General',
+                            'cantidad' => $salida['cantidad'],
+                        ]);
+
+                        $itemsDespachados[] = [
+                            'producto' => $nombreProducto,
+                            'lote' => $salida['lote'],
+                            'cantidad' => $salida['cantidad'],
+                            'vencimiento' => $salida['fecha_vencimiento'] ? date('d/m/Y', strtotime($salida['fecha_vencimiento'])) : 'N/A',
+                            'programa' => $validated['programas'][$index] ?? 'General',
+                        ];
                     }
-
-                    // queda en trazabilidad aunque no salga de un lote de bodega
-                    StockMovement::create([
-                        'inventory_id' => null,
-                        'user_id' => Auth::id(),
-                        'producto' => $nombreProducto,
-                        'lote' => 'S/L',
-                        'fecha_vencimiento' => null,
-                        'tipo_movimiento' => 'Despacho interno',
-                        'cantidad' => -$cantidadFila,
-                        'fecha_hora' => now(),
-                        'origen_destino' => mb_substr("Desde: {$origenRegistrado['nombre']} · Hacia: {$destino}", 0, 500),
-                        'documento_respaldo' => 'Guía N° ' . $correlativo,
-                        'estado_lote' => 'Establecimiento',
-                    ]);
-
-                    DispatchItem::create([
-                        'dispatch_id' => $dispatch->id,
-                        'inventory_id' => null,
-                        'product_id' => $productoId,
-                        'producto' => $nombreProducto,
-                        'lote' => 'S/L',
-                        'fecha_vencimiento' => null,
-                        'programa' => $validated['programas'][$index] ?? 'General',
-                        'cantidad' => $cantidadFila,
-                    ]);
-
-                    $itemsDespachados[] = [
-                        'producto' => $nombreProducto,
-                        'lote' => 'S/L',
-                        'cantidad' => $cantidadFila,
-                        'vencimiento' => 'N/A',
-                        'programa' => $validated['programas'][$index] ?? 'General',
-                    ];
 
                     continue;
                 }
@@ -314,7 +319,8 @@ class DispatchController extends Controller
                     if ($validated['clasificacion'] === 'Externo' && $estRegistrado) {
                         EstablishmentStockService::ingresar(
                             $estRegistrado['nombre'], $batch->product_id ?? $productoId, $nombreProducto, (int) $asignacion['cantidad'],
-                            "Guía N° {$correlativo} desde la droguería", $dispatch->id
+                            "Guía N° {$correlativo} desde la droguería", $dispatch->id,
+                            $batch->lote, $batch->fecha_vencimiento
                         );
                     }
 
