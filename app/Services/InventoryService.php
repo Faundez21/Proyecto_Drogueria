@@ -625,13 +625,7 @@ class InventoryService
             ->get()
             ->each(fn ($reg) => $agregar($reg->programa, $reg->product_id));
 
-        EstablishmentItem::select('product_id', 'programa')
-            ->whereNotNull('product_id')
-            ->whereNotNull('programa')
-            ->where('programa', '!=', '')
-            ->get()
-            ->each(fn ($item) => $agregar($item->programa, $item->product_id));
-
+        // solo el inventario define a que programa pertenece un producto: una solicitud antigua con el programa equivocado no lo asocia
         return array_map(fn ($ids) => array_values($ids), $mapa);
     }
 
