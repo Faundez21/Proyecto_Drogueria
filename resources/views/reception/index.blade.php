@@ -1557,6 +1557,25 @@
                     return;
                 }
 
+                // una ubicacion a medias no se acepta: o se elige completa o se deja sin ubicacion
+                for (const card of productCards) {
+                    const prodSel = card.querySelector('select[name="product_id[]"]');
+                    if (!prodSel || !prodSel.value) continue;
+                    if (card.querySelector('.select-estado-ingreso')?.value === 'Merma') continue;
+                    const falta = window.LoteStatus?.Ubicacion?.faltante(
+                        card.querySelector('select[name="pasillo[]"]'),
+                        card.querySelector('select[name="estante[]"]'),
+                        card.querySelector('select[name="nivel[]"]'),
+                        card.querySelector('select[name="posicion[]"]')
+                    );
+                    if (falta) {
+                        const nombreProd = obtenerNombreCompletoOpcion(prodSel.options[prodSel.selectedIndex]) || 'Producto';
+                        window.LoteStatus.Ubicacion.avisarUbicacionIncompleta(falta, nombreProd);
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        return;
+                    }
+                }
+
                 if (itemsCount === 0) {
                     itemsCount = productCards.length;
                 }
