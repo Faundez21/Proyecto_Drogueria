@@ -773,7 +773,8 @@ class InventoryService
     }
 
     // verifica que una ubicacion fisica exista en el mapa de bodega (distribucion)
-    public static function validarUbicacion(?string $pasillo, ?string $estante, ?string $nivel = null, ?string $posicion = null): ?string
+    // con $exigirCompleta, una ubicacion indicada debe traer pasillo, estante, nivel y posicion
+    public static function validarUbicacion(?string $pasillo, ?string $estante, ?string $nivel = null, ?string $posicion = null, bool $exigirCompleta = true): ?string
     {
         $pasillo = trim((string) $pasillo);
         $estante = trim((string) $estante);
@@ -787,8 +788,17 @@ class InventoryService
             if (! $sinPasillo && ! Aisle::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower($pasillo)])->exists()) {
                 return "El pasillo «{$pasillo}» no existe en el mapa de bodega.";
             }
+            if ($exigirCompleta && ! $sinPasillo) {
+                return "Seleccione el estante del {$pasillo}. Si no quiere asignar ubicación, deje el pasillo vacío.";
+            }
+            if ($exigirCompleta && ($nivelNorm !== '' || $posNorm !== '')) {
+                return 'Para indicar un nivel o una posición también debe seleccionar el pasillo y el estante.';
+            }
 
             return null;
+        }
+        if ($exigirCompleta && $sinPasillo) {
+            return "Seleccione el pasillo del estante «{$estante}».";
         }
 
         $shelf = Shelf::with(['aisle', 'levels.positions'])
@@ -805,7 +815,17 @@ class InventoryService
         }
 
         if ($nivelNorm === '') {
-            return $posNorm === '' ? null : 'Para indicar una posición también debe indicar el nivel.';
+            if ($posNorm !== '') {
+                return 'Para indicar una posición también debe indicar el nivel.';
+            }
+
+            if (! $exigirCompleta) {
+                return null;
+            }
+
+            return $shelf->levels->isNotEmpty()
+                ? "Seleccione el nivel del estante «{$shelf->name}»."
+                : "El estante «{$shelf->name}» no tiene niveles creados. Créelos en Distribución o deje el lote sin ubicación.";
         }
 
         $level = $shelf->levels->first(fn ($l) => mb_strtolower(self::normalizarNivel((string) $l->number)) === mb_strtolower($nivelNorm));
@@ -818,6 +838,11 @@ class InventoryService
             if (! $existePos) {
                 return "La posición «{$posNorm}» no existe en el nivel {$nivelNorm} del estante «{$shelf->name}».";
             }
+        }
+        if ($posNorm === '' && $exigirCompleta) {
+            return $level->positions->isNotEmpty()
+                ? "Seleccione la posición en el nivel {$nivelNorm} del estante «{$shelf->name}»."
+                : "El nivel {$nivelNorm} del estante «{$shelf->name}» no tiene posiciones creadas. Créelas en Distribución o elija otro nivel.";
         }
 
         return null;
