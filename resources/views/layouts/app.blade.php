@@ -654,7 +654,7 @@
                                     inventario,
                                     lotes o catálogo...</span>
                             </div>
-                            <div class="flex items-center gap-1">
+                            <div class="hidden lg:flex items-center gap-1">
                                 <kbd
                                     class="font-mono-das text-[10px] px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-400 group-hover:border-slate-400 transition-colors">Ctrl</kbd>
                                 <kbd

@@ -173,16 +173,16 @@
                     });
                 @endphp
 
-                <table class="w-full text-left border-collapse min-w-[900px]">
+                <table class="w-full text-left border-collapse sm:min-w-[560px] 2xl:min-w-[900px]">
                     <thead>
                         <tr class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
-                            <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Producto Principal</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Programa</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock Físico Acumulado</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 w-14 text-center whitespace-nowrap"><span class="hidden sm:inline">Detalle</span></th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Producto Principal</th>
+                            <th scope="col" class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Categoría</th>
+                            <th scope="col" class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Programa</th>
+                            <th scope="col" class="hidden lg:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap"><span class="hidden sm:inline">Stock Físico Acumulado</span><span class="sm:hidden">Stock</span></th>
+                            <th scope="col" class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
                         </tr>
                     </thead>
 
@@ -215,7 +215,7 @@
                                 <tr id="product-row-{{ $groupKey }}"
                                     class="product-master-row hover:bg-slate-50 transition-colors group cursor-pointer"
                                     onclick="toggleLotes('{{ $groupKey }}')">
-                                    <td class="px-6 py-4 text-center relative">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4 text-center relative">
                                         <div
                                             class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors">
                                         </div>
@@ -230,13 +230,20 @@
                                             </svg>
                                         </button>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4">
                                         <span class="font-bold text-slate-800">{{ $nombreProducto }}</span>
+                                        @php $programaResumen = is_object($primerLote) ? ($primerLote->programa ?? '') : ''; @endphp
+                                        <div class="2xl:hidden mt-1.5 flex flex-wrap items-center gap-1.5">
+                                            <span class="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold bg-white text-slate-600 border border-slate-200 whitespace-nowrap">{{ $categoriaLote }}</span>
+                                            <span class="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold {{ $programaResumen ? 'bg-indigo-50 text-indigo-700 border-indigo-100' : 'bg-slate-50 text-slate-400 border-slate-100' }} border whitespace-nowrap">{{ $programaResumen ?: 'Sin programa' }}</span>
+                                            <span class="lg:hidden text-[11px] font-semibold uppercase text-slate-400 whitespace-nowrap">{{ $lotes->count() }} lote(s)</span>
+                                            <span class="sm:hidden text-[11px] font-bold text-slate-700 font-mono-das whitespace-nowrap">$ {{ number_format($valorTotalProducto, 0, ',', '.') }}</span>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4">
                                         <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white text-slate-600 border border-slate-200 shadow-sm whitespace-nowrap">{{ $categoriaLote }}</span>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4">
                                         @php $programaProducto = is_object($primerLote) ? ($primerLote->programa ?? '') : ''; @endphp
                                         @if ($programaProducto)
                                             <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm whitespace-nowrap">{{ $programaProducto }}</span>
@@ -244,29 +251,29 @@
                                             <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-medium bg-slate-50 text-slate-400 border border-slate-100 shadow-sm whitespace-nowrap">Sin programa</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="hidden lg:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         <span class="font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">{{ $lotes->count() }}</span>
                                         <span class="text-slate-400 text-[11.5px] font-semibold uppercase ml-1">Lote(s)</span>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         @if ($stockTotalProducto > 10)
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} Unidades
+                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} <span class="hidden sm:inline">Unidades</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @elseif($stockTotalProducto > 0)
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} Unid. (Bajo)
+                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} <span class="hidden sm:inline">Unid. (Bajo)</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                                0 Unidades (Agotado)
+                                                0 <span class="hidden sm:inline">Unidades (Agotado)</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-[12.5px] font-bold bg-slate-50 text-slate-800 border border-slate-200 shadow-sm whitespace-nowrap font-mono-das">
                                             $ {{ number_format($valorTotalProducto, 0, ',', '.') }}
                                         </span>
@@ -275,7 +282,7 @@
 
                                 <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-50/50 shadow-inner">
                                     <td colspan="7" class="p-0 border-b border-slate-200">
-                                        <div class="py-4 pr-6 pl-14">
+                                        <div class="py-3 sm:py-4 px-2 sm:pr-6 sm:pl-14">
                                             <div
                                                 class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                                                 <div

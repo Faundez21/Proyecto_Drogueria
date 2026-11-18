@@ -157,17 +157,17 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:ver.distribucion')->group(function () {
         // crear, editar y borrar la estructura de bodega es solo para administradores
         Route::middleware('role:Administrador')->group(function () {
-            Route::resource('aisle', AisleController::class)->except(['index', 'show']);
-            Route::resource('shelf', ShelfController::class)->except(['index', 'show']);
-            Route::resource('level', LevelController::class)->except(['index', 'show']);
-            Route::resource('position', PositionController::class)->except(['index', 'show']);
+            Route::resource('aisle', AisleController::class)->only(['store', 'update', 'destroy']);
+            Route::resource('shelf', ShelfController::class)->only(['store', 'update', 'destroy']);
+            Route::resource('level', LevelController::class)->only(['store', 'update', 'destroy']);
+            Route::resource('position', PositionController::class)->only(['store', 'update', 'destroy']);
         });
 
-        // se registran despues para que /create no se confunda con un id
-        Route::resource('aisle', AisleController::class)->only(['index', 'show']);
-        Route::resource('shelf', ShelfController::class)->only(['index', 'show']);
-        Route::resource('level', LevelController::class)->only(['index', 'show']);
-        Route::resource('position', PositionController::class)->only(['index', 'show']);
+        // la creacion y edicion se hacen en modales del listado
+        Route::resource('aisle', AisleController::class)->only(['index']);
+        Route::resource('shelf', ShelfController::class)->only(['index']);
+        Route::resource('level', LevelController::class)->only(['index']);
+        Route::resource('position', PositionController::class)->only(['index']);
         Route::post('/shelf/{id}/update-position', [ShelfController::class, 'updatePosition'])
             ->name('shelf.updatePosition');
     });

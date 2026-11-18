@@ -33,12 +33,6 @@ class LevelController extends Controller
         return view('distribution.maintainers.level.index', compact('levels', 'shelves', 'counts'));
     }
 
-    // show the form for creating a new resource
-    public function create()
-    {
-        // seccion
-    }
-
     // store a newly created resource in storage
     public function store(Request $request)
     {
@@ -56,18 +50,6 @@ class LevelController extends Controller
 
 
         return redirect()->route('level.index')->with('success', 'Nivel creado exitosamente.');
-    }
-
-    // display the specified resource
-    public function show(string $id)
-    {
-        // seccion
-    }
-
-    // show the form for editing the specified resource
-    public function edit(string $id)
-    {
-        // seccion
     }
 
     // update the specified resource in storage

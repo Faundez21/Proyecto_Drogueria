@@ -240,7 +240,7 @@
                 <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide mb-4">1. Tipo, Destino y
                     Logística</h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
                     <!-- clasificacion interno/externo -->
                     <div class="md:col-span-2 min-w-0">
@@ -345,7 +345,7 @@
                             class="w-full bg-slate-50 border border-slate-300 text-slate-500 font-medium rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block py-2 px-3 text-[13px] shadow-inner transition-all">
                     </div>
 
-                    <div class="md:col-span-4">
+                    <div class="md:col-span-2 lg:col-span-4">
                         <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Condiciones Transporte y
                             Observaciones</label>
                         <input type="text" name="condiciones_transporte"
@@ -354,7 +354,7 @@
                     </div>
 
                     <!-- traspaso sin solicitud: despacho externo a la red sin solicitud previa -->
-                    <div id="div_motivo_traspaso" class="md:col-span-4 hidden">
+                    <div id="div_motivo_traspaso" class="md:col-span-2 lg:col-span-4 hidden">
                         <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl">
                             <label for="motivo_traspaso" class="block text-[12px] font-bold text-amber-900 mb-1">Motivo del traspaso sin solicitud <span class="text-rose-500">*</span></label>
                             <p class="text-[11.5px] text-amber-800 mb-2">Este despacho no viene de una solicitud. Indique el motivo. Si quien recibe no está presente, puede firmar después desde la bandeja de despachos y la guía quedará como «Pendiente de recepción».</p>
