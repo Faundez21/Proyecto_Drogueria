@@ -224,17 +224,17 @@
                     });
                 @endphp
 
-                <table class="w-full text-left border-collapse min-w-[900px]">
+                <table class="w-full text-left border-collapse sm:min-w-[560px] 2xl:min-w-[900px]">
                     <thead>
                         <tr class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
-                            <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Producto Principal</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Programa</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">QR</th>
+                            <th scope="col" class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Producto Principal</th>
+                            <th scope="col" class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Categoría</th>
+                            <th scope="col" class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Programa</th>
+                            <th scope="col" class="hidden lg:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">Stock</th>
+                            <th scope="col" class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">QR</th>
                         </tr>
                     </thead>
 
@@ -285,19 +285,26 @@
                                 @endphp
 
                                 <tr id="product-row-{{ $groupKey }}" data-product-name="{{ strtolower(trim($nombreProducto)) }}" class="product-master-row hover:bg-slate-50 transition-colors group cursor-pointer" onclick="toggleLotes('{{ $groupKey }}')">
-                                    <td class="px-6 py-4 text-center relative">
+                                    <td class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center relative">
                                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors"></div>
                                         <button type="button" class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-teal-100 group-hover:text-teal-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200 group-hover:border-teal-200" id="icon-{{ $groupKey }}">
                                             <svg class="w-4 h-4 transform transition-transform duration-300" id="arrow-{{ $groupKey }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                         </button>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4">
                                         <span class="font-bold text-slate-800">{{ $nombreProducto }}</span>
+                                        @php $programaResumen = data_get($primerLote, 'programa') ?? (is_object($primerLote) ? ($primerLote->programa ?? '') : ''); @endphp
+                                        <div class="2xl:hidden mt-1.5 flex flex-wrap items-center gap-1.5">
+                                            <span class="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold bg-white text-slate-600 border border-slate-200 whitespace-nowrap">{{ $categoriaLote }}</span>
+                                            <span class="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold {{ $programaResumen ? 'bg-indigo-50 text-indigo-700 border-indigo-100' : 'bg-slate-50 text-slate-400 border-slate-100' }} border whitespace-nowrap">{{ $programaResumen ?: 'Sin programa' }}</span>
+                                            <span class="lg:hidden text-[11px] font-semibold uppercase text-slate-400 whitespace-nowrap">{{ $lotes->count() }} lote(s)</span>
+                                            <span class="sm:hidden text-[11px] font-bold text-slate-700 font-mono-das whitespace-nowrap">$ {{ number_format($valorTotalProducto, 0, ',', '.') }}</span>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4">
                                         <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white text-slate-600 border border-slate-200 shadow-sm whitespace-nowrap">{{ $categoriaLote }}</span>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4">
                                         @php $programaProducto = data_get($primerLote, 'programa') ?? (is_object($primerLote) ? ($primerLote->programa ?? '') : ''); @endphp
                                         @if ($programaProducto)
                                             <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm whitespace-nowrap">{{ $programaProducto }}</span>
@@ -305,34 +312,34 @@
                                             <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-medium bg-slate-50 text-slate-400 border border-slate-100 shadow-sm whitespace-nowrap">Sin programa</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="hidden lg:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         <span class="font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">{{ $lotes->count() }}</span>
                                         <span class="text-slate-400 text-[11.5px] font-semibold uppercase ml-1">Lote(s)</span>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         @if ($stockTotalProducto > 10)
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} Unidades
+                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} <span class="hidden sm:inline">Unidades</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @elseif($stockTotalProducto > 0)
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} Unid. (Bajo)
+                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} <span class="hidden sm:inline">Unid. (Bajo)</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                                0 Unidades (Agotado)
+                                                0 <span class="hidden sm:inline">Unidades (Agotado)</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-[12.5px] font-bold bg-slate-50 text-slate-800 border border-slate-200 shadow-sm whitespace-nowrap font-mono-das">
                                             $ {{ number_format($valorTotalProducto, 0, ',', '.') }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-center" onclick="event.stopPropagation()">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4 text-center" onclick="event.stopPropagation()">
                                         <button type="button" onclick="openQRModal('{{ e($proxLoteId) }}', '{{ e($nombreProducto) }}', '{{ e($proxLoteCodigo) }}', '{{ e($proxLoteVencText) }}', '{{ $proxLoteStock }}', 'Droguería DAS')" class="p-2 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold" title="Generar Etiqueta QR del lote más próximo a vencer">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                         </button>
@@ -341,7 +348,7 @@
 
                                 <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-50/50 shadow-inner">
                                     <td colspan="8" class="p-0 border-b border-slate-200">
-                                        <div class="py-4 pr-6 pl-14">
+                                        <div class="py-3 sm:py-4 px-2 sm:pr-6 sm:pl-14">
                                             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                                                 <div class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
                                                     <span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
@@ -1626,6 +1633,14 @@
         function closeMerma() {
             document.getElementById('mermaModal').classList.add('hidden');
         }
+
+        // escape cierra el modal abierto que esta mas arriba (edicion de lote primero)
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape' || document.querySelector('.swal2-container')) return;
+            const modales = [['editLoteModal', closeEditLote], ['qrModal', closeQRModal], ['mermaModal', closeMerma], ['importModal', closeImport], ['HistoryModal', closeHistory], ['DepositModal', closeDeposit]];
+            const abierto = modales.find(([id]) => { const el = document.getElementById(id); return el && !el.classList.contains('hidden'); });
+            if (abierto) abierto[1]();
+        });
 
         function filterMermas() {
             const search = normalizeText(document.getElementById('mermaSearchInput')?.value || '');

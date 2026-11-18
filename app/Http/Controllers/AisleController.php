@@ -30,12 +30,6 @@ class AisleController extends Controller
     }
 
 
-    public function create()
-    {
-        // direccion del menu de crear pasillo
-
-    }
-
 
     public function store(Request $request)
     {
@@ -58,17 +52,6 @@ class AisleController extends Controller
         return redirect()->route('aisle.index')->with('success', 'Pasillo creado exitosamente.');
     }
 
-    // display the specified resource
-    public function show($id)
-    {
-
-    }
-
-
-    public function edit(string $id)
-    {
-        return view('distribution.maintainers.aisle.edit');
-    }
 
     // update the specified resource in storage
     public function update(Request $request, string $id)

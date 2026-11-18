@@ -125,23 +125,23 @@
 
         <!-- tabla principal -->
         <div class="overflow-x-auto w-full">
-            <table class="w-full text-left border-collapse table-fixed" style="min-width:780px">
+            <table class="w-full text-left border-collapse lg:table-fixed lg:min-w-[780px]">
                 <colgroup>
                     <col style="width: 29%">
                     <col style="width: 14%">
-                    <col style="width: 20%">
-                    <col style="width: 11%">
-                    <col style="width: 120px">
+                    <col class="hidden lg:table-column" style="width: 20%">
+                    <col class="hidden lg:table-column" style="width: 11%">
+                    <col class="hidden lg:table-column" style="width: 120px">
                     <col style="width: 136px">
                 </colgroup>
                 <thead>
                     <tr class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 bg-slate-50 border-b border-slate-200">
-                        <th class="px-4 py-3 leading-tight">Lote / Producto</th>
-                        <th class="px-3 py-3 leading-tight">Tipo Movimiento</th>
-                        <th class="px-3 py-3 leading-tight">Origen / Destino</th>
-                        <th class="px-3 py-3 leading-tight">Fecha / Hora</th>
-                        <th class="px-3 py-3 text-center leading-tight">Estado Lote</th>
-                        <th class="pl-3 pr-5 py-3 text-center leading-tight">Acciones</th>
+                        <th class="px-3 lg:px-4 py-3 leading-tight">Lote / Producto</th>
+                        <th class="px-2 lg:px-3 py-3 leading-tight">Tipo<span class="hidden lg:inline"> Movimiento</span></th>
+                        <th class="hidden lg:table-cell px-3 py-3 leading-tight">Origen / Destino</th>
+                        <th class="hidden lg:table-cell px-3 py-3 leading-tight">Fecha / Hora</th>
+                        <th class="hidden lg:table-cell px-3 py-3 text-center leading-tight">Estado Lote</th>
+                        <th class="pl-2 pr-3 lg:pl-3 lg:pr-5 py-3 text-center leading-tight"><span class="hidden lg:inline">Acciones</span></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-[13px]">
@@ -163,23 +163,25 @@
                                 $responsableMov = $mov->user ? trim($mov->user->name . ' ' . ($mov->user->last_name ?? '')) : null;
                             @endphp
                             <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-4 py-3">
+                                <td class="px-3 lg:px-4 py-3">
                                     <div class="flex items-center gap-2.5">
                                         <div class="w-9 h-9 rounded-xl flex items-center justify-center font-mono font-bold text-[11px] text-teal-700 bg-teal-50 shrink-0 border border-teal-100">
                                             {{ Str::limit($mov->lote, 4, '') }}
                                         </div>
                                         <div class="min-w-0">
-                                            <p class="font-extrabold text-[13px] leading-snug text-slate-800 truncate" title="{{ $mov->producto }}">{{ $mov->producto }}</p>
-                                            <p class="font-mono text-[10.5px] font-semibold text-slate-500 mt-0.5 truncate">Lote: {{ $mov->lote }} · Vence: {{ $mov->fecha_vencimiento ? \Carbon\Carbon::parse($mov->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</p>
+                                            <p class="font-extrabold text-[13px] leading-snug text-slate-800 lg:truncate" title="{{ $mov->producto }}">{{ $mov->producto }}</p>
+                                            <p class="font-mono text-[10.5px] font-semibold text-slate-500 mt-0.5 lg:truncate">Lote: {{ $mov->lote }} · Vence: {{ $mov->fecha_vencimiento ? \Carbon\Carbon::parse($mov->fecha_vencimiento)->format('d/m/Y') : 'N/A' }}</p>
+                                            {{-- en movil el origen y el estado van bajo el producto --}}
+                                            <p class="lg:hidden text-[11px] font-semibold text-slate-600 mt-1 leading-snug">{{ $mov->origen_destino }} · {{ \Carbon\Carbon::parse($mov->fecha_hora)->format('d/m/Y H:i') }} · <span class="uppercase text-slate-400">{{ in_array(strtolower($mov->estado_lote ?? ''), ['cuarentena', 'establecimiento', 'merma']) ? ucfirst(strtolower($mov->estado_lote)) : 'Vigente' }}</span></p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-3 py-3">
-                                    <span class="inline-flex px-2.5 py-1 rounded-lg text-[10px] leading-tight font-extrabold uppercase tracking-wide {{ $badgeBg }} {{ $badgeText }} {{ $badgeBorder }} border">
+                                <td class="px-2 lg:px-3 py-3">
+                                    <span class="inline-flex px-2 lg:px-2.5 py-1 rounded-lg text-[10px] leading-tight font-extrabold uppercase tracking-wide {{ $badgeBg }} {{ $badgeText }} {{ $badgeBorder }} border">
                                         {{ $mov->tipo_movimiento }} ({{ $mov->cantidad > 0 ? '+'.$mov->cantidad : $mov->cantidad }})
                                     </span>
                                 </td>
-                                <td class="px-3 py-3">
+                                <td class="hidden lg:table-cell px-3 py-3">
                                     <div class="flex flex-col min-w-0">
                                         <span class="text-slate-800 font-bold text-[12.5px] leading-snug">{{ $mov->origen_destino }}</span>
                                         <span class="text-[10.5px] font-medium text-slate-500 leading-snug">
@@ -190,11 +192,11 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-3 py-3 font-mono text-[11.5px] font-semibold text-slate-600 leading-tight">
+                                <td class="hidden lg:table-cell px-3 py-3 font-mono text-[11.5px] font-semibold text-slate-600 leading-tight">
                                     {{ \Carbon\Carbon::parse($mov->fecha_hora)->format('d/m/Y') }}
                                     <span class="block text-[10.5px] text-slate-400">{{ \Carbon\Carbon::parse($mov->fecha_hora)->format('H:i') }} hrs</span>
                                 </td>
-                                <td class="px-3 py-3 text-center">
+                                <td class="hidden lg:table-cell px-3 py-3 text-center">
                                     @if(strtolower($mov->estado_lote) == 'cuarentena')
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-200">
                                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Cuarentena
@@ -213,14 +215,14 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="pl-3 pr-5 py-3 text-center">
+                                <td class="pl-2 pr-3 lg:pl-3 lg:pr-5 py-3 text-center">
                                     @if($mov->tipo_movimiento === 'Despacho interno')
                                         {{-- sale del stock de un establecimiento: no hay lote de bodega que mostrar --}}
                                         <span class="text-[13px] text-slate-400 font-bold px-2" title="Salió del stock de un establecimiento: no hay lote de bodega">—</span>
                                     @else
                                     <button type="button" title="Ver ficha maestra del lote" onclick="openLotDetails({{ \Illuminate\Support\Js::from($mov->lote) }}, {{ \Illuminate\Support\Js::from($mov->producto) }})" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-teal-50 text-slate-700 hover:text-teal-700 border border-slate-200 hover:border-teal-300 rounded-md text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap">
                                         <svg class="w-3.5 h-3.5 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                        Ver ficha
+                                        <span class="hidden lg:inline">Ver ficha</span>
                                     </button>
                                     @endif
                                 </td>
