@@ -30,12 +30,6 @@ class AisleController extends Controller
     }
 
 
-    public function create()
-    {
-        //dirección del menú de crear pasillo
-
-    }
-
 
     public function store(Request $request)
     {
@@ -46,7 +40,7 @@ class AisleController extends Controller
         ]);
 
         if (Aisle::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($request->name))])->exists()) {
-            return redirect()->back()->withInput()->with('error', "Ya existe un pasillo llamado «" . trim($request->name) . "». Usa otro nombre.");
+            return redirect()->back()->withInput()->with('error', "Ya existe un pasillo llamado «" . trim($request->name) . "». Use otro nombre.");
         }
 
         Aisle::create([
@@ -58,23 +52,8 @@ class AisleController extends Controller
         return redirect()->route('aisle.index')->with('success', 'Pasillo creado exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
-    {
 
-    }
-
-
-    public function edit(string $id)
-    {
-        return view('distribution.maintainers.aisle.edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
+    // update the specified resource in storage
     public function update(Request $request, string $id)
     {
         $aisle = Aisle::findOrFail($id);
@@ -87,7 +66,7 @@ class AisleController extends Controller
         ]);
 
         if (Aisle::where('id', '!=', $aisle->id)->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($request->name))])->exists()) {
-            return redirect()->back()->withInput()->with('error', "Ya existe otro pasillo llamado «" . trim($request->name) . "». Usa otro nombre.");
+            return redirect()->back()->withInput()->with('error', "Ya existe otro pasillo llamado «" . trim($request->name) . "». Use otro nombre.");
         }
 
         $aisle->update([
@@ -104,9 +83,7 @@ class AisleController extends Controller
             ->with('success', 'Pasillo actualizado exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // remove the specified resource from storage
     public function destroy(string $id)
     {
         $aisle = Aisle::findOrFail($id);

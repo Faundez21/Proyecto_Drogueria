@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Solicitudes Cesfam')
+@section('title', 'Solicitudes CESFAM')
 @section('subtitle', 'Registro y gestión de solicitudes de medicamentos, insumos y estupefacientes para CESFAM.')
 
 @section('actions')
@@ -40,7 +40,7 @@
         <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
         </svg>
-        <span class="font-semibold text-slate-800">Solicitudes Cesfam</span>
+        <span class="font-semibold text-slate-800">Solicitudes CESFAM</span>
     </div>
 
     <div class="space-y-6">
@@ -151,7 +151,7 @@
                                 class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px]">
                         </div>
 
-                        <!-- N° Solicitud oculto pero funcional -->
+                        <!-- n° solicitud oculto pero funcional -->
                         <div class="hidden">
                             <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                 N° Solicitud
@@ -218,8 +218,8 @@
                                 </svg>
                             </button>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                                <div class="min-w-0">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                                <div class="lg:col-span-2 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Programa <span class="text-rose-500">*</span>
                                     </label>
@@ -235,7 +235,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="lg:col-span-2 min-w-0">
+                                <div class="sm:col-span-2 lg:col-span-4 min-w-0">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Producto <span class="text-rose-500">*</span>
                                     </label>
@@ -267,19 +267,18 @@
                                     <span class="block text-[10.5px] text-teal-600 font-medium mt-1 hidden aviso-programa"></span>
                                 </div>
 
-                                <div class="hidden">
+                                <div class="lg:col-span-2">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
-                                        Consumo mensual del mes anterior <span class="text-rose-500">*</span>
+                                        Consumo mensual <span class="text-rose-500">*</span>
                                     </label>
 
-                                    <input type="number" name="consumo_anterior[]" min="0" readonly
-                                        value="0"
-                                        placeholder="Se calculará automáticamente"
-                                        class="w-full bg-slate-100 border border-slate-200 text-slate-700 rounded-lg py-2.5 px-3.5 text-[13px] font-bold cursor-not-allowed input-consumo-anterior">
-                                    <span class="block text-[10.5px] text-slate-400 mt-1 info-consumo-anterior">Calculado según despachos del mes anterior</span>
+                                    <input type="number" name="consumo_anterior[]" min="0" step="1" required
+                                        placeholder="Ej: 30"
+                                        class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 px-3.5 text-[13px] font-semibold input-consumo-anterior">
+                                    <span class="block text-[10.5px] text-teal-600 font-medium mt-1 hidden info-consumo-anterior"></span>
                                 </div>
 
-                                <div>
+                                <div class="lg:col-span-2">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Cantidad en stock actualmente <span class="text-rose-500">*</span>
                                     </label>
@@ -290,7 +289,7 @@
                                     <span class="block text-[10.5px] text-teal-600 font-medium mt-1 hidden info-ultimo-stock"></span>
                                 </div>
 
-                                <div>
+                                <div class="lg:col-span-2">
                                     <label class="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
                                         Cantidad Solicitada <span class="text-rose-500">*</span>
                                     </label>
@@ -326,7 +325,7 @@
                         </label>
 
                         <textarea name="observaciones" rows="4"
-                            placeholder="Indique alguna observacion, requerimiento especial o informacion adicional..."
+                            placeholder="Indique alguna observación, requerimiento especial o información adicional..."
                             class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500/20 block py-2.5 px-3.5 text-[13px] resize-none"></textarea>
                     </div>
                 </div>
@@ -350,7 +349,7 @@
                     <div class="flex flex-col items-center">
 
                         <p class="text-[12px] font-semibold text-slate-600 mb-2">
-                            Firma Quien Solicita (CESFAM)
+                            Firma de quien solicita (CESFAM)
                         </p>
 
                         <input type="hidden" name="firma_recibe" id="firma_recibe_input">
@@ -436,8 +435,8 @@
     </div>
 
     @include('requests.partials.inventory_modal', [
-        'modalTitle' => 'Inventario de CESFAM (Solicitudes)',
-        'modalSubtitle' => 'Directorio de medicamentos, insumos y estupefacientes declarados por los CESFAM en sus solicitudes.',
+        'modalTitle' => 'Inventario de CESFAM',
+        'modalSubtitle' => 'Stock actual de cada CESFAM: lo declarado, más lo recibido, menos los despachos internos.',
         'esVistaCesfam' => true,
     ])
 
@@ -455,8 +454,9 @@
             return (opt.getAttribute('data-nombre-completo') || opt.getAttribute('title') || opt.textContent || '').trim();
         }
 
-        // ---- Filtrado de productos según el Programa seleccionado ----
+        // filtrado de productos segun el programa seleccionado
         const PRODUCTOS_POR_PROGRAMA = @json($productosPorPrograma ?? []);
+        const PRODUCTOS_CON_PROGRAMA = new Set(Object.values(PRODUCTOS_POR_PROGRAMA).flat().map(String));
         let OPCIONES_PRODUCTO_HTML = null;
 
         function guardarOpcionesProducto(select) {
@@ -485,6 +485,7 @@
 
                 prodSelect.querySelectorAll('optgroup').forEach(grupo => {
                     grupo.querySelectorAll('option').forEach(op => {
+                        // con un programa elegido solo quedan los productos registrados en ese programa
                         if (op.value && !permitidosSet.has(String(op.value))) {
                             op.remove();
                         }
@@ -497,8 +498,7 @@
                 const n = prodSelect.querySelectorAll('optgroup option').length;
 
                 if (n === 0) {
-                    // El programa existe pero ninguno de sus productos aplica en esta vista:
-                    // se vuelve al listado completo para no dejar el selector vacío.
+                    // el programa existe pero ninguno de sus productos aplica en esta vista: se vuelve al listado completo para no dejar el selector vacio
                     prodSelect.innerHTML = OPCIONES_PRODUCTO_HTML;
                     if (aviso) {
                         aviso.textContent = 'Ningún producto de este programa está disponible aquí: se muestran todos.';
@@ -511,7 +511,11 @@
                     aviso.classList.remove('hidden');
                 }
             } else if (aviso) {
-                if (prog) {
+                if (prog === 'general') {
+                    // general no es un programa propio: se puede pedir cualquier producto
+                    aviso.textContent = '';
+                    aviso.classList.add('hidden');
+                } else if (prog) {
                     aviso.textContent = 'Este programa aún no tiene productos registrados: se muestran todos.';
                     aviso.classList.remove('hidden');
                 } else {
@@ -520,7 +524,7 @@
                 }
             }
 
-            // se conserva la selección anterior si el producto sigue disponible
+            // se conserva la seleccion anterior si el producto sigue disponible
             const sigueDisponible = seleccionado &&
                 Array.from(prodSelect.options).some(op => op.value === seleccionado);
 
@@ -585,8 +589,10 @@
                 if (!inputConsumo) return;
 
                 if (!est || !prodId) {
-                    inputConsumo.value = 0;
-                    if (infoConsumo) infoConsumo.textContent = 'Seleccione CESFAM y producto';
+                    if (infoConsumo) {
+                        infoConsumo.classList.add('hidden');
+                        infoConsumo.textContent = '';
+                    }
                     if (infoStock) {
                         infoStock.classList.add('hidden');
                         infoStock.textContent = '';
@@ -595,13 +601,15 @@
                 }
 
                 const datos = (consumoMapa[est] && consumoMapa[est][prodId]) ? consumoMapa[est][prodId] : null;
-                const consumo = datos ? (parseInt(datos.consumo_anterior) || 0) : 0;
-                inputConsumo.value = consumo;
-
+                // muestra el ultimo consumo mensual informado como referencia
                 if (infoConsumo) {
-                    infoConsumo.textContent = consumo > 0
-                        ? `Consumo anterior registrado: ${consumo} uds.`
-                        : 'Sin despachos el mes anterior (0 uds.)';
+                    if (datos && datos.ultimo_consumo !== null && datos.ultimo_consumo !== undefined) {
+                        infoConsumo.textContent = `Último consumo informado: ${datos.ultimo_consumo} uds.`;
+                        infoConsumo.classList.remove('hidden');
+                    } else {
+                        infoConsumo.classList.add('hidden');
+                        infoConsumo.textContent = '';
+                    }
                 }
 
                 if (infoStock) {
@@ -660,7 +668,7 @@
                 const clone = firstItem.cloneNode(true);
 
                 clone.querySelectorAll('input').forEach(input => {
-                    input.value = input.name === 'consumo_anterior[]' ? '0' : '';
+                    input.value = '';
                 });
 
                 clone.querySelectorAll('select').forEach(select => {
@@ -671,6 +679,11 @@
                 if (infoStock) {
                     infoStock.classList.add('hidden');
                     infoStock.textContent = '';
+                }
+                const infoConsumoClone = clone.querySelector('.info-consumo-anterior');
+                if (infoConsumoClone) {
+                    infoConsumoClone.classList.add('hidden');
+                    infoConsumoClone.textContent = '';
                 }
 
                 const btnRemove = clone.querySelector('.btn-remove-product');
@@ -733,23 +746,25 @@
             });
 
             function mostrarSweetAlertSolicitudExitosa(solData, recargarAlCerrar = false) {
+            // los textos escritos a mano se muestran como texto
+            const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
                 if (!solData) return;
 
                 const htmlDetail = `
                     <div class="text-left text-xs text-slate-700">
                         <div class="p-3.5 bg-teal-50/70 border border-teal-200 rounded-xl mb-3 space-y-1.5">
                             <div class="flex items-center justify-between pb-2 mb-1.5 border-b border-teal-200/80">
-                                <span class="font-extrabold text-teal-900 text-sm">Solicitud N° ${solData.numero_solicitud || ''}</span>
+                                <span class="font-extrabold text-teal-900 text-sm">Solicitud N° ${esc(solData.numero_solicitud || '')}</span>
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">SOLICITUD CESFAM REGISTRADA</span>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
-                                <p><strong>Establecimiento:</strong> ${solData.establecimiento || 'N/A'}</p>
-                                <p><strong>Tipo:</strong> ${solData.tipo || 'CESFAM'}</p>
-                                <p><strong>Fecha Solicitud:</strong> ${solData.fecha_solicitud || 'N/A'}</p>
-                                <p><strong>Responsable:</strong> ${solData.responsable || 'N/A'}${solData.cargo && solData.cargo !== 'N/A' ? ` (${solData.cargo})` : ''}</p>
+                                <p><strong>Establecimiento:</strong> ${esc(solData.establecimiento || 'N/A')}</p>
+                                <p><strong>Tipo:</strong> ${esc(solData.tipo || 'CESFAM')}</p>
+                                <p><strong>Fecha Solicitud:</strong> ${esc(solData.fecha_solicitud || 'N/A')}</p>
+                                <p><strong>Responsable:</strong> ${esc(solData.responsable || 'N/A')}${solData.cargo && solData.cargo !== 'N/A' ? ` (${esc(solData.cargo)})` : ''}</p>
                                 <p><strong>Total Productos:</strong> ${solData.total_items || 0} producto(s)</p>
                                 <p><strong>Total Unidades:</strong> <span class="font-bold text-teal-800">${Number(solData.total_unidades || 0).toLocaleString('es-CL')} unidades</span></p>
-                                ${solData.observaciones ? `<p class="col-span-1 sm:col-span-2 text-slate-500 italic mt-0.5"><strong>Obs:</strong> ${solData.observaciones}</p>` : ''}
+                                ${solData.observaciones ? `<p class="col-span-1 sm:col-span-2 text-slate-500 italic mt-0.5"><strong>Obs:</strong> ${esc(solData.observaciones)}</p>` : ''}
                             </div>
                         </div>
 
@@ -768,8 +783,8 @@
                                 <tbody class="divide-y divide-slate-100 bg-white">
                                     ${(solData.items || []).map(it => `
                                         <tr class="hover:bg-slate-50">
-                                            <td class="p-2 font-medium text-slate-800">${it.producto}</td>
-                                            <td class="p-2 text-center text-slate-600 font-mono text-[11px]">${it.programa || 'General'}</td>
+                                            <td class="p-2 font-medium text-slate-800">${esc(it.producto)}</td>
+                                            <td class="p-2 text-center text-slate-600 font-mono text-[11px]">${esc(it.programa || 'General')}</td>
                                             <td class="p-2 text-center text-slate-500">${Number(it.consumo_anterior || 0).toLocaleString('es-CL')}</td>
                                             <td class="p-2 text-center text-slate-500">${Number(it.stock_actual || 0).toLocaleString('es-CL')}</td>
                                             <td class="p-2 text-right font-bold text-teal-700">${Number(it.cantidad_solicitada || 0).toLocaleString('es-CL')} u.</td>
@@ -809,7 +824,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Firma obligatoria',
-                        text: 'Debes firmar la solicitud antes de enviarla.',
+                        text: 'Debe firmar la solicitud antes de enviarla.',
                         confirmButtonColor: '#0d9488'
                     });
 
@@ -827,7 +842,7 @@
                 const totalProds = document.getElementById('total_productos')?.textContent.trim() || '0';
                 const totalUnits = document.getElementById('total_unidades')?.textContent.trim() || '0';
 
-                // Resumen de respaldo por si el backend responde sin detail
+                // resumen de respaldo por si el backend responde sin detail
                 const fallbackItems = [];
                 form.querySelectorAll('.producto-item').forEach(row => {
                     const selProd = row.querySelector('.select-producto');
@@ -905,7 +920,7 @@
                                 return;
                             }
 
-                            let errorMsg = data.message || 'Verifica los datos ingresados.';
+                            let errorMsg = data.message || 'Verifique los datos ingresados.';
                             if (data.errors) {
                                 const firstKey = Object.keys(data.errors)[0];
                                 if (firstKey && data.errors[firstKey][0]) {

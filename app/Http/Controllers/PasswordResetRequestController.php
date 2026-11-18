@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class PasswordResetRequestController extends Controller
 {
-    // El usuario pide la recuperación desde la ventana del login
+    // el usuario pide la recuperacion desde la ventana del login
     public function store(Request $request)
     {
         $request->validate([
@@ -31,7 +31,7 @@ class PasswordResetRequestController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // El administrador asigna la clave nueva a mano
+    // el administrador asigna la clave nueva a mano
     public function resetPassword(Request $request, $email)
     {
         $request->validate([

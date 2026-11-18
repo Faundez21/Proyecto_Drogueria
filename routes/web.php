@@ -26,7 +26,7 @@ use App\Http\Controllers\TraceabilityController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// rutas publicas. estas rutas son accesibles sin necesidad de iniciar sesion.
+// rutas publicas. estas rutas son accesibles sin necesidad de iniciar sesion
 
 // redireccion principal al login
 Route::redirect('/', '/login');
@@ -35,15 +35,12 @@ Route::redirect('/', '/login');
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate'])->middleware('throttle:10,1');
 
-// Enviar solicitud desde el Login (con throttle anti-abuso)
+// enviar solicitud desde el login (con throttle anti-abuso)
 Route::post('/password-reset-request', [PasswordResetRequestController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('password.request.store');
 
-/*
- rutas privadas (protegidas)
- todas estas rutas requieren que el usuario este autenticado (middleware auth).
-*/
+// rutas privadas (protegidas) todas estas rutas requieren que el usuario este autenticado (middleware auth)
 
 Route::middleware('auth')->group(function () {
 
@@ -57,10 +54,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/notifications/mark-all-read', [GlobalSearchController::class, 'markAllAsRead'])->name('global.notifications.mark_all_read');
     Route::post('/api/notifications/unmark-read', [GlobalSearchController::class, 'unmarkAsRead'])->name('global.notifications.unmark_read');
 
-    // usuarios y roles: solo entra el Administrador
+    // usuarios y roles: solo entra el administrador
     Route::middleware('role:Administrador')->group(function () {
 
-        // asignar contraseña por el administrador
+        // asignar contrasena por el administrador
         Route::post('/users/reset-password/{email}', [PasswordResetRequestController::class, 'resetPassword'])
             ->name('users.reset_password');
 
@@ -74,9 +71,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/roles/{role}', [UserController::class, 'destroyRole'])->name('roles.destroy');
     });
 
-    // solo administrador 
+    // solo administrador
     Route::middleware('role:Administrador')->group(function () {
-        // asignar solicitudes de establecimientos/cesfam a trabajadores desde Despacho
+        // asignar solicitudes de establecimientos/cesfam a trabajadores desde despacho
         Route::patch('/requests/{establishmentRequest}/assign', [EstablishmentRequestController::class, 'assign'])
             ->name('requests.assign');
     });
@@ -88,7 +85,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/controlled_dispatch/{id}/pdf', [ControlledDispatchController::class, 'pdf'])->name('controlled_dispatch.pdf');
     });
 
-    // cada ruta pide el permiso ver.<modulo> que se asigna al rol desde Usuarios 
+    // cada ruta pide el permiso ver.<modulo> que se asigna al rol desde usuarios
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('permission:ver.dashboard')->name('dashboard.index');
 
@@ -100,6 +97,8 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:ver.despacho')->name('dispatch.pdf');
     Route::get('/dispatch/solicitudes', [DispatchController::class, 'solicitudes'])
         ->middleware('permission:ver.despacho')->name('dispatch.solicitudes');
+    Route::post('/dispatch/{id}/recepcion', [DispatchController::class, 'registrarRecepcion'])
+        ->middleware('permission:ver.despacho')->name('dispatch.recepcion');
 
     Route::get('/traceability', [TraceabilityController::class, 'index'])
         ->middleware('permission:ver.trazabilidad')->name('traceability.index');
@@ -143,6 +142,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ReceptionController::class, 'index'])->name('index');
         Route::post('/guardar', [ReceptionController::class, 'store'])->name('store');
         Route::get('/{reception}/pdf', [ReceptionController::class, 'downloadPdf'])->name('pdf');
+        Route::put('/{reception}', [ReceptionController::class, 'update'])->name('update');
     });
 
     // modulo de proveedores
@@ -155,10 +155,19 @@ Route::middleware('auth')->group(function () {
 
     // rutas de mantenedores
     Route::middleware('permission:ver.distribucion')->group(function () {
-        Route::resource('aisle', AisleController::class);
-        Route::resource('shelf', ShelfController::class);
-        Route::resource('level', LevelController::class);
-        Route::resource('position', PositionController::class);
+        // crear, editar y borrar la estructura de bodega es solo para administradores
+        Route::middleware('role:Administrador')->group(function () {
+            Route::resource('aisle', AisleController::class)->only(['store', 'update', 'destroy']);
+            Route::resource('shelf', ShelfController::class)->only(['store', 'update', 'destroy']);
+            Route::resource('level', LevelController::class)->only(['store', 'update', 'destroy']);
+            Route::resource('position', PositionController::class)->only(['store', 'update', 'destroy']);
+        });
+
+        // la creacion y edicion se hacen en modales del listado
+        Route::resource('aisle', AisleController::class)->only(['index']);
+        Route::resource('shelf', ShelfController::class)->only(['index']);
+        Route::resource('level', LevelController::class)->only(['index']);
+        Route::resource('position', PositionController::class)->only(['index']);
         Route::post('/shelf/{id}/update-position', [ShelfController::class, 'updatePosition'])
             ->name('shelf.updatePosition');
     });
@@ -171,6 +180,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/quarantine', [QuarantineController::class, 'index'])
         ->middleware('permission:ver.cuarentena')->name('quarantine.index');
 
-    // codigos QR de etiquetas de inventario
+    // codigos qr de etiquetas de inventario
     Route::get('/qr/{inventory}/image', [QRController::class, 'image'])->name('qr.image');
 });

@@ -5,7 +5,7 @@
 
 @section('actions')
     <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
-        <!-- Botón Exportar a Excel -->
+        <!-- boton exportar a excel -->
         <button type="button" onclick="exportarReporte('excel')"
             class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -14,7 +14,7 @@
             Exportar a Excel
         </button>
 
-        <!-- Botón Exportar a PDF -->
+        <!-- boton exportar a pdf -->
         <button type="button" onclick="exportarReporte('pdf')"
             class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto">
             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -28,7 +28,7 @@
 @section('content')
     <div class="space-y-6">
 
-        <!-- Ruta de navegación -->
+        <!-- ruta de navegacion -->
         <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
             <span class="font-mono-das text-slate-400 font-semibold">04</span>
             <span>Control</span>
@@ -36,7 +36,7 @@
             <span class="font-medium text-slate-800">Reportes</span>
         </div>
 
-        <!-- KPI de Valorización -->
+        <!-- kpi de valorizacion -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="sm:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shrink-0">
@@ -56,10 +56,10 @@
             </div>
         </div>
 
-        <!-- Contenedor principal tabla Inventario -->
+        <!-- contenedor principal tabla inventario -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
 
-            <!-- Cabecera de la tabla y botón de filtros -->
+            <!-- cabecera de la tabla y boton de filtros -->
             <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
                 <h3 class="text-[15px] font-bold text-slate-800">Reporte Consolidado de Stock</h3>
                 <button type="button" id="toggle-filters-btn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors">
@@ -68,7 +68,7 @@
                 </button>
             </div>
 
-            <!-- Formulario de Filtros -->
+            <!-- formulario de filtros -->
             <form method="GET" action="{{ route('reports.index') }}" id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                     <div class="xl:col-span-2">
@@ -173,16 +173,16 @@
                     });
                 @endphp
 
-                <table class="w-full text-left border-collapse min-w-[900px]">
+                <table class="w-full text-left border-collapse sm:min-w-[560px] 2xl:min-w-[900px]">
                     <thead>
                         <tr class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
-                            <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Producto Principal</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Programa</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock Físico Acumulado</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 w-14 text-center whitespace-nowrap"><span class="hidden sm:inline">Detalle</span></th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Producto Principal</th>
+                            <th scope="col" class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Categoría</th>
+                            <th scope="col" class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Programa</th>
+                            <th scope="col" class="hidden lg:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap"><span class="hidden sm:inline">Stock Físico Acumulado</span><span class="sm:hidden">Stock</span></th>
+                            <th scope="col" class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
                         </tr>
                     </thead>
 
@@ -194,7 +194,7 @@
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                     </div>
                                     <p class="text-[14px] font-medium text-slate-600">No se encontraron registros para reportes.</p>
-                                    <p class="text-[13px] text-slate-400 mt-1">Intenta ajustando los filtros de búsqueda.</p>
+                                    <p class="text-[13px] text-slate-400 mt-1">Intente ajustar los filtros de búsqueda.</p>
                                 </td>
                             </tr>
                         @else
@@ -215,7 +215,7 @@
                                 <tr id="product-row-{{ $groupKey }}"
                                     class="product-master-row hover:bg-slate-50 transition-colors group cursor-pointer"
                                     onclick="toggleLotes('{{ $groupKey }}')">
-                                    <td class="px-6 py-4 text-center relative">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4 text-center relative">
                                         <div
                                             class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors">
                                         </div>
@@ -230,13 +230,20 @@
                                             </svg>
                                         </button>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4">
                                         <span class="font-bold text-slate-800">{{ $nombreProducto }}</span>
+                                        @php $programaResumen = is_object($primerLote) ? ($primerLote->programa ?? '') : ''; @endphp
+                                        <div class="2xl:hidden mt-1.5 flex flex-wrap items-center gap-1.5">
+                                            <span class="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold bg-white text-slate-600 border border-slate-200 whitespace-nowrap">{{ $categoriaLote }}</span>
+                                            <span class="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold {{ $programaResumen ? 'bg-indigo-50 text-indigo-700 border-indigo-100' : 'bg-slate-50 text-slate-400 border-slate-100' }} border whitespace-nowrap">{{ $programaResumen ?: 'Sin programa' }}</span>
+                                            <span class="lg:hidden text-[11px] font-semibold uppercase text-slate-400 whitespace-nowrap">{{ $lotes->count() }} lote(s)</span>
+                                            <span class="sm:hidden text-[11px] font-bold text-slate-700 font-mono-das whitespace-nowrap">$ {{ number_format($valorTotalProducto, 0, ',', '.') }}</span>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4">
                                         <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white text-slate-600 border border-slate-200 shadow-sm whitespace-nowrap">{{ $categoriaLote }}</span>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4">
                                         @php $programaProducto = is_object($primerLote) ? ($primerLote->programa ?? '') : ''; @endphp
                                         @if ($programaProducto)
                                             <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm whitespace-nowrap">{{ $programaProducto }}</span>
@@ -244,29 +251,29 @@
                                             <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-medium bg-slate-50 text-slate-400 border border-slate-100 shadow-sm whitespace-nowrap">Sin programa</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="hidden lg:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         <span class="font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">{{ $lotes->count() }}</span>
                                         <span class="text-slate-400 text-[11.5px] font-semibold uppercase ml-1">Lote(s)</span>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         @if ($stockTotalProducto > 10)
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} Unidades
+                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} <span class="hidden sm:inline">Unidades</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @elseif($stockTotalProducto > 0)
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} Unid. (Bajo)
+                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} <span class="hidden sm:inline">Unid. (Bajo)</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                                0 Unidades (Agotado)
+                                                0 <span class="hidden sm:inline">Unidades (Agotado)</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-[12.5px] font-bold bg-slate-50 text-slate-800 border border-slate-200 shadow-sm whitespace-nowrap font-mono-das">
                                             $ {{ number_format($valorTotalProducto, 0, ',', '.') }}
                                         </span>
@@ -275,7 +282,7 @@
 
                                 <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-50/50 shadow-inner">
                                     <td colspan="7" class="p-0 border-b border-slate-200">
-                                        <div class="py-4 pr-6 pl-14">
+                                        <div class="py-3 sm:py-4 px-2 sm:pr-6 sm:pl-14">
                                             <div
                                                 class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                                                 <div
@@ -411,7 +418,7 @@
                 </table>
             </div>
 
-            <!-- Paginación -->
+            <!-- paginacion -->
             @if(isset($inventories) && method_exists($inventories, 'hasPages') && $inventories->hasPages())
             <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 bg-white rounded-b-2xl">
                 <div class="text-[13px] text-slate-500 text-center sm:text-left font-medium">
@@ -465,7 +472,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Lógica visual para mostrar filtros si hay búsquedas activas
+            // logica visual para mostrar filtros si hay busquedas activas
             const btnToggleFilters = document.getElementById('toggle-filters-btn');
             const filtersPanel = document.getElementById('filters-panel');
 
@@ -480,7 +487,7 @@
             }
         });
 
-        // Lógica visual para el acordeón de Lotes
+        // logica visual para el acordeon de lotes
         function toggleLotes(key) {
             const row = document.getElementById('lotes-' + key);
             const arrow = document.getElementById('arrow-' + key);
@@ -505,7 +512,7 @@
             }
         }
 
-        // Función que atrapa los filtros actuales para enviarlos a Excel/PDF
+        // funcion que atrapa los filtros actuales para enviarlos a excel/pdf
         function exportarReporte(tipo) {
             const urlExcel = "{{ route('reports.excel') }}";
             const urlPdf = "{{ route('reports.pdf') }}";

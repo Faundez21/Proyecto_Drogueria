@@ -8,26 +8,26 @@ return new class extends Migration
 {
     public function up()
     {
-        // Tabla Cabecera del Despacho
+        // tabla cabecera del despacho
         Schema::create('dispatches', function (Blueprint $table) {
             $table->id();
-            $table->string('correlativo')->unique(); // Ej: GD-2026-0001
+            $table->string('correlativo')->unique(); // ej: gd-2026-0001
             $table->date('fecha_despacho');
-            $table->string('clasificacion')->default('Interno'); //Interno o Externo
+            $table->string('clasificacion')->default('Interno'); // interno o externo
             $table->string('estado_liberacion');
             $table->string('establecimiento_destino');
             $table->string('direccion_destino')->nullable();
             $table->string('condiciones_transporte')->nullable();
-            $table->longText('firma_despacha')->nullable(); //Firma base64
-            $table->longText('firma_recibe')->nullable(); //Firma base64
+            $table->longText('firma_despacha')->nullable(); // firma base64
+            $table->longText('firma_recibe')->nullable(); // firma base64
             $table->timestamps();
         });
 
-        // Tabla Detalle (Los productos que van en el camión)
+        // tabla detalle (los productos que van en el camion)
         Schema::create('dispatch_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('dispatch_id')->constrained('dispatches')->onDelete('cascade');
-            $table->string('producto'); // Guardamos el nombre para historial estático
+            $table->string('producto'); // guardamos el nombre para historial estatico
             $table->string('lote')->nullable();
             $table->date('fecha_vencimiento')->nullable();
             $table->string('programa');
