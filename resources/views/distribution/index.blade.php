@@ -48,6 +48,20 @@
                 width: 100%;
             }
 
+            /* pantalla completa de respaldo para celulares sin soporte de pantalla completa */
+            #warehouse-wrapper.mapa-pantalla-completa {
+                position: fixed !important;
+                inset: 0;
+                z-index: 9999;
+                width: 100vw;
+                height: 100vh !important;
+                height: 100dvh !important;
+                border-radius: 0 !important;
+            }
+
+            /* en pantalla tactil el dedo mueve el mapa, no la pagina */
+            #warehouse-3d-container canvas { touch-action: none; }
+
             #warehouse-3d-container {
                 width: 100%;
                 height: 100%;
@@ -764,10 +778,29 @@
                     },
                     toggleFullScreen() {
                         const wrapper = document.getElementById('warehouse-wrapper');
-                        if (!document.fullscreenElement) {
-                            wrapper.requestFullscreen().catch(err => console.error(err));
-                        } else {
+                        // respaldo: si el navegador no permite pantalla completa (iphone, algunos android), el mapa ocupa toda la ventana
+                        const alternarRespaldo = () => {
+                            const activo = wrapper.classList.toggle('mapa-pantalla-completa');
+                            document.body.style.overflow = activo ? 'hidden' : '';
+                        };
+                        if (wrapper.classList.contains('mapa-pantalla-completa')) {
+                            alternarRespaldo();
+                            return;
+                        }
+                        if (document.fullscreenElement) {
                             document.exitFullscreen();
+                            return;
+                        }
+                        const pedir = wrapper.requestFullscreen || wrapper.webkitRequestFullscreen;
+                        if (!pedir) {
+                            alternarRespaldo();
+                            return;
+                        }
+                        try {
+                            const r = pedir.call(wrapper);
+                            if (r && typeof r.catch === 'function') r.catch(() => alternarRespaldo());
+                        } catch (e) {
+                            alternarRespaldo();
                         }
                     },
                     handleSearch() {
@@ -3338,9 +3371,31 @@
                             };
                         });
 
+                        // en celular los controles 3d bloquean el "click" del dedo: un toque corto se convierte en click
+                        // (seleccionar estanteria/caja y, en modo mover, soltar la estanteria donde se levanta el dedo)
+                        let ultimoToqueMapa = 0;
+                        let inicioToqueMapa = 0;
+                        wrapper.addEventListener('pointerdown', (event) => {
+                            if (event.pointerType === 'touch') inicioToqueMapa = performance.now();
+                        });
+                        wrapper.addEventListener('pointerup', (event) => {
+                            if (event.pointerType !== 'touch' || !event.isPrimary) return;
+                            const esToqueCorto = performance.now() - inicioToqueMapa < 500;
+                            if (!isMoving && !esToqueCorto) return;
+                            ultimoToqueMapa = performance.now();
+                            const destino = document.elementFromPoint(event.clientX, event.clientY) || event.target;
+                            // sobre botones o paneles el navegador ya hace su propio click
+                            if (destino.closest('button, a, input, select, textarea, label, [role="button"]')) return;
+                            destino.dispatchEvent(new MouseEvent('click', {
+                                bubbles: true, cancelable: true, clientX: event.clientX, clientY: event.clientY
+                            }));
+                        });
+
                         wrapper.addEventListener('click', (event) => {
                             if (event.target.closest('header') || event.target.closest('aside') || event.target.closest(
                                     '.z-30') || event.target.closest('.bottom-6') || event.target.closest('.bottom-4')) return;
+                            // el navegador puede mandar ademas su propio click tras el toque: se ignora para no hacerlo dos veces
+                            if (event.isTrusted && performance.now() - ultimoToqueMapa < 700) return;
 
                             // si el usuario arrastro el mouse (> 5px) para girar o mover la camara, ignoramos el click
                             if (!isMoving && pointerDownCoords) {

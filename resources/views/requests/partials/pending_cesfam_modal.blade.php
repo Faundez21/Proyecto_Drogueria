@@ -19,6 +19,15 @@
             .pend-modal .pm-pie > span { display: none; }
             .pend-modal .pm-pie > button { width: 100%; padding-top: 10px; padding-bottom: 10px; }
         }
+        /* pantalla baja (celular en horizontal): todo el modal se desliza, con cabecera y pie fijos */
+        @media (max-height: 600px) {
+            .pend-modal { overflow-y: auto !important; }
+            .pend-modal .pm-cab { position: sticky; top: 0; z-index: 30; padding: 10px 16px; }
+            .pend-modal .pm-cab p, .pend-modal .pm-cab .w-10.h-10 { display: none; }
+            .pend-modal .pm-aviso { display: none !important; }
+            .pend-modal .pm-tabla { flex: none !important; overflow: visible !important; padding: 8px 12px; }
+            .pend-modal .pm-pie { position: sticky; bottom: 0; z-index: 30; padding: 10px 16px; }
+        }
     </style>
     <div id="PendingRequestsCesfamModal"
         class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 transition-all"
