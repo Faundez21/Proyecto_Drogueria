@@ -136,8 +136,8 @@
         }
 
         /* modales de bandejas y solicitudes en celular: todo el modal se desliza, con la cabecera y el boton de cerrar fijos,
-           asi la tabla no queda aplastada bajo los filtros */
-        @media (max-width: 639.98px) {
+           asi la tabla no queda aplastada bajo los filtros (tambien con el celular en horizontal) */
+        @media (max-width: 639.98px), (max-height: 600px) {
             #SolicitudesModal > div, #BandejaModal > div, #SolicitudesControladoModal > div { display: block !important; overflow-y: auto !important; }
             #SolicitudesModal > div > *, #BandejaModal > div > *, #SolicitudesControladoModal > div > * { max-height: none !important; }
             #SolicitudesModal > div > div:first-child, #BandejaModal > div > div:first-child, #SolicitudesControladoModal > div > div:first-child {
@@ -146,6 +146,8 @@
             #SolicitudesModal > div > div:first-child h2, #BandejaModal > div > div:first-child h2, #SolicitudesControladoModal > div > div:first-child h2 { font-size: 16px; line-height: 1.3; }
             #SolicitudesModal > div > div:first-child p, #BandejaModal > div > div:first-child p, #SolicitudesControladoModal > div > div:first-child p { display: none; }
             #SolicitudesModal > div > div:last-child, #BandejaModal > div > div:last-child { position: sticky; bottom: 0; z-index: 30; padding: 10px 16px; }
+        }
+        @media (max-width: 639.98px) {
             #SolicitudesModal > div > div:last-child button, #BandejaModal > div > div:last-child button { width: 100%; }
         }
 

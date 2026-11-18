@@ -615,6 +615,14 @@
 
                     <!-- tabla de productos modal -->
                     <div class="bg-white rounded-lg border border-slate-200 overflow-hidden mb-4">
+                        <style>
+                            /* en pantallas angostas la tabla se desliza hacia el lado en vez de cortar la columna subtotal */
+                            .detalle-items-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+                            .detalle-items-scroll table { min-width: 560px; }
+                            .detalle-items-scroll th, .detalle-items-scroll td:not(:first-child) { white-space: nowrap; }
+                            .detalle-items-scroll td:first-child { min-width: 200px; }
+                        </style>
+                        <div class="detalle-items-scroll">
                         <table class="w-full text-left text-[12px]">
                             <thead class="bg-slate-100 border-b border-slate-200 text-slate-600 uppercase font-semibold">
                                 <tr>
@@ -628,6 +636,7 @@
                                 <!-- filas inyectadas por js -->
                             </tbody>
                         </table>
+                        </div>
                         <div class="bg-teal-50 border-t border-teal-100 p-3 flex justify-between items-center">
                             <span class="text-teal-800 font-bold text-sm uppercase">Gran Total (IVA Inc.)</span>
                             <span class="text-teal-700 font-bold text-lg" id="m_total"></span>
@@ -1317,9 +1326,9 @@
             const htmlDetail = `
                 <div class="text-left text-xs text-slate-700">
                     <div class="p-3.5 bg-teal-50/70 border border-teal-200 rounded-xl mb-3 space-y-1.5">
-                        <div class="flex items-center justify-between pb-2 mb-1.5 border-b border-teal-200/80">
+                        <div class="flex flex-wrap items-center justify-between gap-2 pb-2 mb-1.5 border-b border-teal-200/80">
                             <span class="font-extrabold text-teal-900 text-sm">Acta de Recepción N° ${recData.correlativo || ''}</span>
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">RECEPCIÓN CONFORME</span>
+                            <span class="whitespace-nowrap px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">RECEPCIÓN CONFORME</span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
                             <p><strong>Proveedor:</strong> ${escHtml(recData.proveedor || 'N/A')}</p>
@@ -1332,8 +1341,21 @@
                     </div>
 
                     <p class="font-bold text-slate-700 mb-1.5 text-[11px] uppercase tracking-wide">Resumen de Productos Recepcionados:</p>
-                    <div class="max-h-56 overflow-y-auto border border-slate-200 rounded-lg shadow-inner">
-                        <table class="w-full text-[11.5px] text-left">
+                    <style>
+                        /* si el cuadro es angosto (celular, tablet vertical o ventana chica) cada producto se muestra como tarjeta:
+                           nombre arriba y sus datos debajo, en vez de columnas que parten las palabras */
+                        .rec-resumen-caja { container-type: inline-size; }
+                        .rec-resumen th:not(:first-child), .rec-resumen td:not(:first-child) { white-space: nowrap; }
+                        @container (max-width: 560px) {
+                            .rec-resumen thead { display: none; }
+                            .rec-resumen tr { display: block; padding: 10px 12px; }
+                            .rec-resumen td { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 3px 0 !important; text-align: left !important; }
+                            .rec-resumen td:first-child { display: block; padding-bottom: 6px !important; }
+                            .rec-resumen td[data-label]::before { content: attr(data-label); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #64748b; }
+                        }
+                    </style>
+                    <div class="rec-resumen-caja max-h-56 overflow-y-auto border border-slate-200 rounded-lg shadow-inner">
+                        <table class="rec-resumen w-full text-[11.5px] text-left">
                             <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
                                 <tr>
                                     <th class="p-2">Producto</th>
@@ -1353,14 +1375,14 @@
                                                 ${it.programa && it.programa !== 'Sin programa' ? `<span class="px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[9.5px] font-bold">${escHtml(it.programa)}</span>` : ''}
                                             </div>
                                         </td>
-                                        <td class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${escHtml(it.lote || 'S/L')}</td>
-                                        <td class="p-2 text-center text-slate-600">${it.vencimiento || 'N/A'}</td>
-                                        <td class="p-2 text-center">
+                                        <td data-label="Lote" class="p-2 text-center font-mono text-[11px] font-semibold text-slate-700">${escHtml(it.lote || 'S/L')}</td>
+                                        <td data-label="Vencimiento" class="p-2 text-center text-slate-600 whitespace-nowrap">${it.vencimiento || 'N/A'}</td>
+                                        <td data-label="Ubicación" class="p-2 text-center">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-[10.5px] font-bold ${it.ubicacion && it.ubicacion !== 'P.A' ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-slate-100 text-slate-500'}">
                                                 ${it.ubicacion || 'P.A'}
                                             </span>
                                         </td>
-                                        <td class="p-2 text-right font-bold text-teal-700">${Number(it.cantidad || 0).toLocaleString('es-CL')} u.</td>
+                                        <td data-label="Cantidad" class="p-2 text-right font-bold text-teal-700 whitespace-nowrap">${Number(it.cantidad || 0).toLocaleString('es-CL')} u.</td>
                                     </tr>
                                 `).join('')}
                             </tbody>

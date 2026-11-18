@@ -985,6 +985,16 @@
             /* en celular: el total y "cerrar" siempre a la vista; la tabla es lo unico que hace scroll
                y los filtros secundarios se abren con "Más filtros" */
             #mermaModal .merma-mas-filtros { display: none; }
+            /* tabla compacta en todos los tamanos: menos margen y textos largos en dos lineas, para que quepan las columnas */
+            #mermaModal .merma-tabla th, #mermaModal .merma-tabla td { padding: 10px 14px; }
+            #mermaModal .merma-tabla td.merma-prod { white-space: normal; min-width: 180px; max-width: 280px; line-height: 1.3; }
+            #mermaModal .merma-tabla td.merma-motivo { max-width: 200px; }
+            @media (min-width: 640px) and (max-width: 1199.98px) {
+                #mermaModal .merma-tabla th, #mermaModal .merma-tabla td { padding: 9px 10px; }
+                #mermaModal .merma-tabla td.merma-prod { min-width: 150px; max-width: 200px; }
+                #mermaModal .merma-tabla td.merma-motivo { max-width: 140px; }
+                #mermaModal .merma-tabla td[data-label="Fecha"] { white-space: normal; max-width: 90px; line-height: 1.3; }
+            }
             @media (max-width: 639.98px) {
                 #mermaModal .merma-header { padding: 12px 16px; }
                 #mermaModal .merma-header h2 { font-size: 16px; line-height: 1.3; }
@@ -1005,11 +1015,27 @@
                 #mermaModal .merma-filtros .merma-limpiar,
                 #mermaModal .merma-filtros .merma-limpiar button { width: 100%; }
                 #mermaModal .merma-tabla { flex: 1 1 auto; min-height: 0; max-height: none; }
+                /* tabla compacta: menos margen en cada celda y el nombre del producto en dos lineas, para deslizar menos hacia el lado */
+                #mermaModal .merma-tabla th, #mermaModal .merma-tabla td { padding: 8px 10px; }
+                #mermaModal .merma-tabla td.merma-prod { white-space: normal; min-width: 150px; max-width: 180px; line-height: 1.3; }
+                #mermaModal .merma-tabla td.merma-motivo { max-width: 130px; }
+                #mermaModal .merma-tabla td[data-label="Fecha"] { white-space: normal; min-width: 78px; max-width: 84px; line-height: 1.3; }
+                #mermaModal .merma-tabla td[data-label="Responsable"] { white-space: normal; min-width: 80px; max-width: 100px; line-height: 1.3; }
+                #mermaModal .merma-tabla td[data-label="Lote"] span, #mermaModal .merma-tabla td[data-label="Valor total"] span { font-size: 11px; padding: 2px 6px; }
                 #mermaModal .merma-pie { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 16px 12px; }
                 #mermaModal .merma-pie .merma-resumen { justify-content: space-between; flex-wrap: wrap; row-gap: 6px; font-size: 12px; }
                 #mermaModal .merma-pie #mermaTotalDisplay { margin-left: 6px; padding: 4px 10px; }
                 #mermaModal .merma-pie .merma-resumen > .w-px { display: none; }
                 #mermaModal .merma-pie button { width: 100%; padding-top: 10px; padding-bottom: 10px; }
+            }
+            /* pantalla baja (celular en horizontal): todo el modal se desliza, con la cabecera y el pie fijos */
+            @media (max-height: 600px) {
+                #mermaModal .merma-card { overflow-y: auto; }
+                #mermaModal .merma-header { position: sticky; top: 0; z-index: 30; padding: 10px 20px; }
+                #mermaModal .merma-header p { display: none; }
+                #mermaModal .merma-filtros { padding: 10px 20px; }
+                #mermaModal .merma-tabla { flex: none; max-height: none; min-height: 0; }
+                #mermaModal .merma-pie { position: sticky; bottom: 0; z-index: 30; padding: 10px 20px; }
             }
         </style>
         <div id="mermaModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
@@ -1121,20 +1147,20 @@
                                     $mValorTotal = ((float) $mStock) * $mValorUnitario;
                                 @endphp
                                 <tr class="merma-row hover:bg-rose-50/40 transition-colors" data-valor="{{ $mValorTotal }}" data-date="{{ $fechaISO }}" data-user="{{ $usuarioMerma }}">
-                                    <td class="px-6 py-3.5 text-slate-500 font-medium">{{ $fechaMerma }}</td>
-                                    <td class="px-6 py-3.5 font-bold text-slate-800 searchable">{{ $mNombre }}</td>
-                                    <td class="px-6 py-3.5 text-center searchable">
+                                    <td data-label="Fecha" class="px-6 py-3.5 text-slate-500 font-medium">{{ $fechaMerma }}</td>
+                                    <td class="merma-prod px-6 py-3.5 font-bold text-slate-800 searchable">{{ $mNombre }}</td>
+                                    <td data-label="Lote" class="px-6 py-3.5 text-center searchable">
                                         <span class="px-2.5 py-1 rounded bg-slate-200 text-slate-800 font-mono font-extrabold text-[12px] border border-slate-300">{{ $mLoteCodigo }}</span>
                                     </td>
-                                    <td class="px-6 py-3.5 text-slate-700 font-semibold searchable">{{ $usuarioMerma }}</td>
-                                    <td class="px-6 py-3.5 italic text-rose-600 max-w-[150px] truncate searchable" title="{{ $mMotivo }}">{{ $mMotivo }}</td>
-                                    <td class="px-6 py-3.5 text-center font-extrabold text-rose-600">{{ number_format($mStock, 0, ',', '.') }} u.</td>
-                                    <td class="px-6 py-3.5 text-center">
+                                    <td data-label="Responsable" class="px-6 py-3.5 text-slate-700 font-semibold searchable">{{ $usuarioMerma }}</td>
+                                    <td data-label="Motivo" class="merma-motivo px-6 py-3.5 italic text-rose-600 max-w-[150px] truncate searchable" title="{{ $mMotivo }}">{{ $mMotivo }}</td>
+                                    <td data-label="Cantidad" class="px-6 py-3.5 text-center font-extrabold text-rose-600">{{ number_format($mStock, 0, ',', '.') }} u.</td>
+                                    <td data-label="Valor total" class="px-6 py-3.5 text-center">
                                         <span class="inline-flex items-center px-2 py-1 rounded-lg text-[12px] font-bold bg-rose-100 text-rose-800 border border-rose-200 font-mono-das">
                                             - $ {{ number_format($mValorTotal, 0, ',', '.') }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-3.5 text-center">
+                                    <td data-label="Editar lote" class="px-6 py-3.5 text-center">
                                         <button type="button"
                                             onclick="openEditLote({{ \Illuminate\Support\Js::from($mLoteId) }}, {{ \Illuminate\Support\Js::from($mLoteCodigo) }}, {{ \Illuminate\Support\Js::from($mNombre) }}, 'Merma', {{ \Illuminate\Support\Js::from($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}, {{ \Illuminate\Support\Js::from($mObj->categoria ?? 'General') }}, {{ \Illuminate\Support\Js::from($mObj->programa ?? '') }}, '{{ $mValorUnitario }}', '{{ $mStock }}', {{ \Illuminate\Support\Js::from(data_get($mObj, 'pasillo') ?? '') }}, {{ \Illuminate\Support\Js::from(data_get($mObj, 'estante') ?? '') }}, {{ \Illuminate\Support\Js::from(data_get($mObj, 'nivel') ?? '') }}, {{ \Illuminate\Support\Js::from(data_get($mObj, 'posicion') ?? '') }})"
                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center justify-center" title="Editar Estado">
