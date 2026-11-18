@@ -125,14 +125,14 @@
 
         <!-- tabla principal -->
         <div class="overflow-x-auto w-full">
-            <table class="w-full text-left border-collapse table-fixed" style="min-width:700px">
+            <table class="w-full text-left border-collapse table-fixed" style="min-width:780px">
                 <colgroup>
                     <col style="width: 29%">
                     <col style="width: 14%">
                     <col style="width: 20%">
                     <col style="width: 11%">
-                    <col style="width: 12%">
-                    <col style="width: 14%">
+                    <col style="width: 120px">
+                    <col style="width: 136px">
                 </colgroup>
                 <thead>
                     <tr class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 bg-slate-50 border-b border-slate-200">
@@ -141,7 +141,7 @@
                         <th class="px-3 py-3 leading-tight">Origen / Destino</th>
                         <th class="px-3 py-3 leading-tight">Fecha / Hora</th>
                         <th class="px-3 py-3 text-center leading-tight">Estado Lote</th>
-                        <th class="px-3 py-3 text-right leading-tight">Acciones</th>
+                        <th class="pl-3 pr-5 py-3 text-center leading-tight">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-[13px]">
@@ -213,13 +213,13 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-3 py-3 text-right">
+                                <td class="pl-3 pr-5 py-3 text-center">
                                     @if($mov->tipo_movimiento === 'Despacho interno')
                                         {{-- sale del stock de un establecimiento: no hay lote de bodega que mostrar --}}
                                         <span class="text-[13px] text-slate-400 font-bold px-2" title="Salió del stock de un establecimiento: no hay lote de bodega">—</span>
                                     @else
-                                    <button type="button" title="Ver ficha maestra del lote" onclick="openLotDetails({{ \Illuminate\Support\Js::from($mov->lote) }}, {{ \Illuminate\Support\Js::from($mov->producto) }})" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-800 hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer shadow-sm whitespace-nowrap">
-                                        <svg class="w-3.5 h-3.5 text-teal-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    <button type="button" title="Ver ficha maestra del lote" onclick="openLotDetails({{ \Illuminate\Support\Js::from($mov->lote) }}, {{ \Illuminate\Support\Js::from($mov->producto) }})" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-teal-50 text-slate-700 hover:text-teal-700 border border-slate-200 hover:border-teal-300 rounded-md text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap">
+                                        <svg class="w-3.5 h-3.5 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                         Ver ficha
                                     </button>
                                     @endif

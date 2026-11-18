@@ -157,10 +157,10 @@
         <div class="p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <div class="flex items-center gap-2.5">
+                    <div class="flex items-start sm:items-center justify-between sm:justify-start gap-2.5">
                         <h3 class="text-[15px] font-extrabold text-slate-800">Directorio de Usuarios y Accesos</h3>
-                        <span id="contadorUsuariosFiltrados" class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-teal-50 text-teal-700 border border-teal-200">
-                            {{ $totalUsuarios }} usuario(s)
+                        <span id="contadorUsuariosFiltrados" class="shrink-0 whitespace-nowrap px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-teal-50 text-teal-700 border border-teal-200">
+                            {{ $totalUsuarios }} {{ $totalUsuarios == 1 ? 'usuario' : 'usuarios' }}
                         </span>
                     </div>
                     <p class="text-[12px] text-slate-500 mt-0.5">Filtre y gestione los funcionarios según su rol asignado o estado de cuenta.</p>
@@ -496,7 +496,7 @@
                                             {{ $esAdminRol ? 'Acceso Total (' . count($modulos) . ' vistas)' : count($permisosSlugs) . ' de ' . count($modulos) . ' vista(s)' }}
                                         </span>
                                         <span class="text-[10.5px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                                            {{ $rol->users_count ?? 0 }} usuario(s)
+                                            {{ $rol->users_count ?? 0 }} {{ ($rol->users_count ?? 0) == 1 ? 'usuario' : 'usuarios' }}
                                         </span>
                                     </div>
 
@@ -922,7 +922,7 @@
 
             const badge = document.getElementById('contadorUsuariosFiltrados');
             if (badge) {
-                badge.textContent = `${visibles} usuario(s)`;
+                badge.textContent = `${visibles} ${visibles === 1 ? 'usuario' : 'usuarios'}`;
             }
         }
 

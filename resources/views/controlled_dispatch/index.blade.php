@@ -92,7 +92,7 @@
     <div class="bg-white rounded-2xl border border-rose-200 shadow-sm overflow-hidden flex flex-col">
 
         <!-- cabecera de la tarjeta del formulario -->
-        <div class="px-6 py-5 border-b border-rose-100 bg-rose-50 flex items-center gap-4">
+        <div class="form-cab px-6 py-5 border-b border-rose-100 bg-rose-50 flex items-center gap-4">
             <div class="w-10 h-10 bg-rose-600/10 text-rose-600 rounded-xl flex items-center justify-center shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
