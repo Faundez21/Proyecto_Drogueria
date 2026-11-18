@@ -110,6 +110,45 @@
             transition: opacity 0.15s ease-out, transform 0.15s ease-out;
         }
 
+        /* menu lateral fijo solo desde 1280px; en tablets (tambien horizontal) se abre con el boton.
+           se define aqui para que funcione aunque no se haya recompilado tailwind */
+        @media (min-width: 1280px) {
+            #sidebar { transform: none !important; position: static; flex-shrink: 0; }
+            #sidebar-overlay { display: none !important; }
+            .xl\:hidden { display: none !important; }
+        }
+        @media (min-width: 1024px) and (max-width: 1279.98px) {
+            .tab-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+        }
+
+        /* botones de la cabecera de cada pagina: en celular uno bajo otro a todo el ancho, sin salirse de la pantalla */
+        @media (max-width: 639.98px) {
+            .page-acciones { width: 100%; flex-wrap: wrap; gap: 8px; }
+            .page-acciones > * { flex: 1 1 100%; min-width: 0; }
+        }
+
+        /* cabecera de los formularios de despacho: en celular el boton baja a su propia linea y el texto usa todo el ancho */
+        @media (max-width: 639.98px) {
+            .form-cab { flex-wrap: wrap; padding: 16px; gap: 12px; }
+            .form-cab > div:first-child { flex-shrink: 0; }
+            .form-cab > div:nth-child(2) { flex: 1 1 0; min-width: 0; }
+            .form-cab > button, .form-cab > a { flex: 1 1 100%; }
+        }
+
+        /* modales de bandejas y solicitudes en celular: todo el modal se desliza, con la cabecera y el boton de cerrar fijos,
+           asi la tabla no queda aplastada bajo los filtros */
+        @media (max-width: 639.98px) {
+            #SolicitudesModal > div, #BandejaModal > div, #SolicitudesControladoModal > div { display: block !important; overflow-y: auto !important; }
+            #SolicitudesModal > div > *, #BandejaModal > div > *, #SolicitudesControladoModal > div > * { max-height: none !important; }
+            #SolicitudesModal > div > div:first-child, #BandejaModal > div > div:first-child, #SolicitudesControladoModal > div > div:first-child {
+                position: sticky; top: 0; z-index: 30; padding: 12px 16px; gap: 12px;
+            }
+            #SolicitudesModal > div > div:first-child h2, #BandejaModal > div > div:first-child h2, #SolicitudesControladoModal > div > div:first-child h2 { font-size: 16px; line-height: 1.3; }
+            #SolicitudesModal > div > div:first-child p, #BandejaModal > div > div:first-child p, #SolicitudesControladoModal > div > div:first-child p { display: none; }
+            #SolicitudesModal > div > div:last-child, #BandejaModal > div > div:last-child { position: sticky; bottom: 0; z-index: 30; padding: 10px 16px; }
+            #SolicitudesModal > div > div:last-child button, #BandejaModal > div > div:last-child button { width: 100%; }
+        }
+
         /* animaciones del sidebar */
         .flow-rail {
             position: relative;
@@ -267,11 +306,11 @@
         <div class="flex h-screen overflow-hidden">
 
             <div id="sidebar-overlay"
-                class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300"
+                class="fixed inset-0 bg-slate-900/50 z-40 hidden xl:hidden backdrop-blur-sm transition-opacity duration-300"
                 onclick="toggleSidebar()"></div>
 
             <aside id="sidebar"
-                class="fixed inset-y-0 left-0 w-[260px] flex flex-col z-50 transform -translate-x-full lg:translate-x-0 lg:static lg:shrink-0 transition-transform duration-300 ease-in-out"
+                class="fixed inset-y-0 left-0 w-[260px] flex flex-col z-50 transform -translate-x-full xl:translate-x-0 xl:static xl:shrink-0 transition-transform duration-300 ease-in-out"
                 style="background-color: var(--sidebar-bg); box-shadow: 2px 0 8px rgba(0,0,0,0.15);">
 
                 <div class="h-[70px] flex items-center px-5 shrink-0 relative border-b border-slate-800 bg-[#0F172A]">
@@ -289,7 +328,7 @@
                     </a>
 
                     <button onclick="toggleSidebar()"
-                        class="absolute right-4 lg:hidden p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+                        class="absolute right-4 xl:hidden p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                             </path>
@@ -591,7 +630,7 @@
 
                     <div class="flex items-center gap-4">
                         <button onclick="toggleSidebar()"
-                            class="p-2 -ml-2 rounded-md lg:hidden text-slate-500 hover:bg-slate-100 transition-colors">
+                            class="p-2 -ml-2 rounded-md xl:hidden text-slate-500 hover:bg-slate-100 transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 6h16M4 12h16M4 18h16"></path>
@@ -792,7 +831,7 @@
                                 </div>
 
                                 @hasSection('actions')
-                                    <div class="flex items-center gap-3 shrink-0">
+                                    <div class="page-acciones flex items-center gap-3 shrink-0">
                                         @yield('actions')
                                     </div>
                                 @endif
@@ -1358,7 +1397,7 @@
         });
 
 
-        /* control del sidebar */
+        /* control del sidebar: bajo 1280px (tablets, tambien en horizontal) el menu se oculta y se abre con el boton */
         function toggleTheme() {
             const isDark = document.documentElement.classList.toggle('dark');
             try { localStorage.setItem('das-theme', isDark ? 'dark' : 'light'); } catch (e) {}
@@ -1474,7 +1513,7 @@
 
         document.querySelectorAll('#sidebar nav a').forEach(link => {
             link.addEventListener('click', () => {
-                if (window.innerWidth < 1024) toggleSidebar();
+                if (window.innerWidth < 1280) toggleSidebar();
             });
         });
 
