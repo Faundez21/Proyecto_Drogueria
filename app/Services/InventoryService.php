@@ -265,8 +265,8 @@ class InventoryService
             }
 
             $tomar = min($pendiente, (int) $batch->cantidad);
+            // decrement ya actualiza la cantidad del modelo en memoria
             $batch->decrement('cantidad', $tomar);
-            $batch->cantidad -= $tomar;
 
             $asignaciones[] = ['inventory' => $batch, 'cantidad' => $tomar];
             $pendiente -= $tomar;
