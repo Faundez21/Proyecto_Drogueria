@@ -12,9 +12,7 @@ use App\Models\Shelf;
 
 class PositionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // display a listing of the resource
     public function index()
     {
         $positions = Position::with('level.shelf.aisle')
@@ -39,17 +37,7 @@ class PositionController extends Controller
         );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+    // store a newly created resource in storage
     public function store(Request $request)
     {
         $request->validate([
@@ -67,25 +55,7 @@ class PositionController extends Controller
         return redirect()->route('position.index')->with('success', 'Posición creada exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
+    // update the specified resource in storage
     public function update(Request $request, string $id)
     {
         $position = Position::findOrFail($id);
@@ -108,9 +78,7 @@ class PositionController extends Controller
             ->with('success', 'Posición actualizada exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // remove the specified resource from storage
     public function destroy(string $id)
     {
         $position = Position::with('level.shelf')->findOrFail($id);

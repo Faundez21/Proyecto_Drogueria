@@ -1,12 +1,41 @@
-{{-- Modal: Solicitudes Pendientes para Establecimientos (Solo Administrador) --}}
+{{-- modal: solicitudes pendientes para establecimientos (solo administrador) --}}
 @role('Administrador')
+    <style>
+        /* celular: cabecera, controles y resumen compactos para que la tabla tenga espacio */
+        @media (max-width: 639.98px) {
+            .pend-modal .pm-cab { padding: 12px 14px; }
+            .pend-modal .pm-cab p, .pend-modal .pm-cab .w-10.h-10 { display: none; }
+            .pend-modal .pm-busq { padding: 10px 12px; }
+            .pend-modal .pm-ctrl { align-self: stretch; width: 100%; }
+            .pend-modal .pm-ctrl > button, .pend-modal .pm-ctrl > div { flex: 1 1 0; min-width: 0; }
+            .pend-modal .pm-ctrl > div > button { width: 100%; justify-content: center; }
+            .pend-modal .pm-ctrl button { font-size: 12px; padding: 7px 10px; }
+            .pend-modal .pm-resumen { padding: 8px 12px; gap: 6px; }
+            .pend-modal .pm-resumen > div:first-child { gap: 6px; }
+            .pend-modal .pm-resumen > div:first-child > div { padding: 3px 8px; }
+            .pend-modal .pm-aviso { display: none !important; }
+            .pend-modal .pm-tabla { padding: 8px; }
+            .pend-modal .pm-pie { padding: 10px 12px; }
+            .pend-modal .pm-pie > span { display: none; }
+            .pend-modal .pm-pie > button { width: 100%; padding-top: 10px; padding-bottom: 10px; }
+        }
+        /* pantalla baja (celular en horizontal): todo el modal se desliza, con cabecera y pie fijos */
+        @media (max-height: 600px) {
+            .pend-modal { overflow-y: auto !important; }
+            .pend-modal .pm-cab { position: sticky; top: 0; z-index: 30; padding: 10px 16px; }
+            .pend-modal .pm-cab p, .pend-modal .pm-cab .w-10.h-10 { display: none; }
+            .pend-modal .pm-aviso { display: none !important; }
+            .pend-modal .pm-tabla { flex: none !important; overflow: visible !important; padding: 8px 12px; }
+            .pend-modal .pm-pie { position: sticky; bottom: 0; z-index: 30; padding: 10px 16px; }
+        }
+    </style>
     <div id="PendingRequestsEstablecimientosModal"
         class="hidden fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 transition-all"
         onclick="if(event.target === this) closePendingRequestsEstablecimientosModal()">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-7xl max-h-[94vh] flex flex-col overflow-hidden my-auto animate-fade-in text-slate-800 dark:text-slate-100">
+        <div class="pend-modal bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-7xl max-h-[94vh] flex flex-col overflow-hidden my-auto animate-fade-in text-slate-800 dark:text-slate-100">
 
-            <!-- Cabecera del Modal -->
-            <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
+            <!-- cabecera del modal -->
+            <div class="pm-cab px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-teal-400 shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +68,7 @@
             </div>
 
             <!-- buscador y controles de la barra superior -->
-            <div class="p-4 sm:p-5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0 space-y-3">
+            <div class="pm-busq p-4 sm:p-5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0 space-y-3">
                 <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
                     <div class="relative flex-1 max-w-lg">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
@@ -52,8 +81,8 @@
                             class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-[13px] text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all shadow-sm">
                     </div>
 
-                    <!-- Controles: Filtros Avanzados y Menú Exportar Listado -->
-                    <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                    <!-- controles: filtros avanzados y menu exportar listado -->
+                    <div class="pm-ctrl flex items-center gap-2 self-end sm:self-auto shrink-0">
                         <button type="button" onclick="togglePendingEstabAdvancedFilters()" id="btnToggleEstabAdvanced"
                             class="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-700 rounded-lg text-[12.5px] font-semibold text-slate-700 dark:text-slate-200 transition-all cursor-pointer shadow-sm">
                             <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,7 +134,7 @@
                 <div id="pendingEstabAdvancedPanel" class="hidden pt-3 border-t border-slate-200 dark:border-slate-800 animate-fade-in">
                     <div class="p-3.5 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-700/60 shadow-xs">
                         <div class="flex flex-col md:flex-row items-end gap-3 w-full">
-                            <!-- Filtro Establecimiento -->
+                            <!-- filtro establecimiento -->
                             <div class="flex-1 w-full md:w-auto min-w-0 md:min-w-[260px]">
                                 <label for="pendingEstabFilterCentro" class="block text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1.5 uppercase tracking-wider">
                                     Establecimiento Solicitante
@@ -183,7 +212,7 @@
             </div>
 
             <!-- resumen de metricas y aviso de descarga -->
-            <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-[12px]">
+            <div class="pm-resumen px-5 py-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-[12px]">
                 <!-- metricas del encabezado -->
                 <div class="flex flex-wrap items-center gap-2">
                     <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
@@ -204,14 +233,14 @@
                 </div>
 
                 <!-- aviso de descarga -->
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 text-teal-800 dark:text-teal-300 font-medium text-[11.5px] shadow-xs">
+                <div class="pm-aviso inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 text-teal-800 dark:text-teal-300 font-medium text-[11.5px] shadow-xs">
                     <svg class="text-teal-600 dark:text-teal-400 shrink-0 inline-block shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;transition:transform .2s" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 18c1.5-2 2.5-2 3 0s1.5 1 2.5-1 2 .5 2.5 1"/></svg>
                     <span>Cada solicitud puede ser visualizada, descargada e impresa de forma individual con la firma oficial de su solicitante.</span>
                 </div>
             </div>
 
             <!-- tabla de solicitudes pendientes -->
-            <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
+            <div class="pm-tabla flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
                 <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
                     <table class="w-full text-left text-[12.5px] border-collapse" id="pendingEstabTable">
                         <thead>
@@ -292,7 +321,7 @@
                                             </span>
                                         </td>
 
-                                        <!-- Acciones individuales: ver, descargar, imprimir -->
+                                        <!-- acciones individuales: ver, descargar, imprimir -->
                                         <td class="py-3 px-3 text-center whitespace-nowrap">
                                             <div class="inline-flex items-center gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
                                                 <button type="button" onclick="viewSingleEstabPdf({{ $sol->id }})"
@@ -325,7 +354,7 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Fila Desplegable con Detalle de Productos -->
+                                    <!-- fila desplegable con detalle de productos -->
                                     <tr id="estab-detail-{{ $sol->id }}" class="hidden bg-slate-50/60 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800">
                                         <td colspan="9" class="p-3 sm:p-4">
                                             <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 sm:p-4 shadow-inner">
@@ -401,8 +430,8 @@
                 </div>
             </div>
 
-            <!-- Pie del Modal -->
-            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/90 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center shrink-0">
+            <!-- pie del modal -->
+            <div class="pm-pie px-6 py-4 bg-slate-50 dark:bg-slate-800/90 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center shrink-0">
                 <span class="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium">
                     Red de Salud DAS Talcahuano · Solicitudes de Pedido Oficiales
                 </span>
@@ -414,7 +443,7 @@
         </div>
     </div>
 
-    <!-- iframe oculto para imprimir el PDF sin salir de la vista -->
+    <!-- iframe oculto para imprimir el pdf sin salir de la vista -->
     <iframe id="pendingEstabPrintIframe" class="hidden" style="display:none; width:0; height:0; border:0;"></iframe>
 
     <script>
@@ -609,7 +638,7 @@
             return qs ? ('?' + qs) : '';
         }
 
-        // Acciones Individuales
+        // acciones individuales
         function viewSingleEstabPdf(solicitudId) {
             const url = "{{ route('requests.pending.establecimientos.pdf') }}?solicitud_id=" + solicitudId;
             window.open(url, '_blank');
@@ -638,7 +667,7 @@
             }
         }
 
-        // Acciones Globales Batch
+        // acciones globales batch
         function viewPendingEstabPdf() {
             const url = "{{ route('requests.pending.establecimientos.pdf') }}" + buildPendingEstabQueryString();
             window.open(url, '_blank');

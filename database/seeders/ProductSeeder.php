@@ -6,14 +6,9 @@ use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
 {
-    /**
-     * Catálogo de productos.
-     *
-     * Vacío a propósito: estos datos se cargan desde la propia plataforma
-     * o mediante la Carga Masiva de Inventario.
-     */
+    // catalogo de productos
     public function run(): void
     {
-        //
+        // seccion
     }
 }

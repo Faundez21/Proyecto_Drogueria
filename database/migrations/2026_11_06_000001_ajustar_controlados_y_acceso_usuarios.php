@@ -7,13 +7,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * 1. Marca como "Fármacos Controlados" los lotes de inventario que ya existían
-     *    y que corresponden a controlados detectados por similitud de nombre
-     *    (ej. "MORFINA CLORHIDRATO 10 MG/ML AMPOLLA" que estaba como "Fármacos").
-     * 2. Quita el permiso "ver.usuarios" de todos los roles: el módulo de Usuarios
-     *    y Roles ahora es exclusivo del rol Administrador.
-     */
+    // 1. marca como "farmacos controlados" los lotes de inventario que ya existian y que corresponden a controlados detectados por similitud de nombre (ej
     public function up(): void
     {
         if (Schema::hasTable('inventories')) {
@@ -49,6 +43,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // No se revierte: las categorías corregidas y el acceso exclusivo de administradores se mantienen.
+        // no se revierte: las categorias corregidas y el acceso exclusivo de administradores se mantienen
     }
 };

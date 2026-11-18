@@ -32,20 +32,13 @@
             </svg>
             Carga Masiva
         </button>
-        <button type="button" onclick="openDeposit()"
-            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200 text-[13px] font-bold shadow-sm hover:shadow cursor-pointer">
-            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Ingreso Manual
-        </button>
     </div>
 @endsection
 
 @section('content')
     <div class="space-y-6">
 
-        <!-- Ruta de navegación -->
+        <!-- ruta de navegacion -->
         <div class="hidden sm:flex items-center gap-2 text-[12.5px] text-slate-500 -mt-2">
             <span class="font-mono-das text-slate-400 font-semibold">02</span>
             <span>Almacenamiento</span>
@@ -55,10 +48,10 @@
             <span class="font-medium text-slate-800">Inventario</span>
         </div>
 
-        <!-- Contenedor principal tabla Inventario -->
+        <!-- contenedor principal tabla inventario -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm flex flex-col">
 
-            <!-- Cabecera de la tabla y botón de filtros -->
+            <!-- cabecera de la tabla y boton de filtros -->
             <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
                 <h3 class="text-[15px] font-bold text-slate-800">Directorio de Productos</h3>
                 <button type="button" id="toggle-filters-btn"
@@ -86,12 +79,12 @@
                 $estantesUnicos = collect($estantesLista ?? [])->filter()->unique()->sort();
             @endphp
 
-            <!-- Formulario de Filtros -->
+            <!-- formulario de filtros -->
             <form method="GET" action="{{ Route::has('inventory.index') ? route('inventory.index') : '#' }}"
                 id="filters-panel" class="hidden bg-slate-50/50 border-b border-slate-200 p-5 shadow-inner">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
 
-                    <!-- Búsqueda con Dropdown -->
+                    <!-- busqueda con dropdown -->
                     <div class="xl:col-span-2 relative" id="searchContainer">
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Buscar</label>
                         <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
@@ -130,7 +123,7 @@
 
                     <div>
                         <label class="block text-[11.5px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Pasillo</label>
-                        <select name="pasillo" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-[13px] bg-white">
+                        <select name="pasillo" id="pasilloSelect" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-[13px] bg-white">
                             <option value="">Todos</option>
                             @foreach ($pasillosUnicos as $pasillo)
                                 <option value="{{ $pasillo }}" {{ request('pasillo') == $pasillo ? 'selected' : '' }}>{{ $pasillo }}</option>
@@ -231,17 +224,17 @@
                     });
                 @endphp
 
-                <table class="w-full text-left border-collapse min-w-[900px]">
+                <table class="w-full text-left border-collapse sm:min-w-[560px] 2xl:min-w-[900px]">
                     <thead>
                         <tr class="text-[12px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-b border-slate-200">
-                            <th scope="col" class="px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Producto Principal</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Categoría</th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap">Programa</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Stock</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">QR</th>
+                            <th scope="col" class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 w-14 text-center whitespace-nowrap">Detalle</th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Producto Principal</th>
+                            <th scope="col" class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Categoría</th>
+                            <th scope="col" class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4 whitespace-nowrap">Programa</th>
+                            <th scope="col" class="hidden lg:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">Lotes Activos</th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">Stock</th>
+                            <th scope="col" class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">Valor Total</th>
+                            <th scope="col" class="px-2.5 sm:px-4 xl:px-6 py-4 text-center whitespace-nowrap">QR</th>
                         </tr>
                     </thead>
 
@@ -292,19 +285,26 @@
                                 @endphp
 
                                 <tr id="product-row-{{ $groupKey }}" data-product-name="{{ strtolower(trim($nombreProducto)) }}" class="product-master-row hover:bg-slate-50 transition-colors group cursor-pointer" onclick="toggleLotes('{{ $groupKey }}')">
-                                    <td class="px-6 py-4 text-center relative">
+                                    <td class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center relative">
                                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-teal-500 transition-colors"></div>
                                         <button type="button" class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 group-hover:bg-teal-100 group-hover:text-teal-700 flex items-center justify-center transition-colors mx-auto shadow-sm border border-slate-200 group-hover:border-teal-200" id="icon-{{ $groupKey }}">
                                             <svg class="w-4 h-4 transform transition-transform duration-300" id="arrow-{{ $groupKey }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                         </button>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4">
                                         <span class="font-bold text-slate-800">{{ $nombreProducto }}</span>
+                                        @php $programaResumen = data_get($primerLote, 'programa') ?? (is_object($primerLote) ? ($primerLote->programa ?? '') : ''); @endphp
+                                        <div class="2xl:hidden mt-1.5 flex flex-wrap items-center gap-1.5">
+                                            <span class="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold bg-white text-slate-600 border border-slate-200 whitespace-nowrap">{{ $categoriaLote }}</span>
+                                            <span class="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold {{ $programaResumen ? 'bg-indigo-50 text-indigo-700 border-indigo-100' : 'bg-slate-50 text-slate-400 border-slate-100' }} border whitespace-nowrap">{{ $programaResumen ?: 'Sin programa' }}</span>
+                                            <span class="lg:hidden text-[11px] font-semibold uppercase text-slate-400 whitespace-nowrap">{{ $lotes->count() }} lote(s)</span>
+                                            <span class="sm:hidden text-[11px] font-bold text-slate-700 font-mono-das whitespace-nowrap">$ {{ number_format($valorTotalProducto, 0, ',', '.') }}</span>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4">
                                         <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white text-slate-600 border border-slate-200 shadow-sm whitespace-nowrap">{{ $categoriaLote }}</span>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="hidden 2xl:table-cell px-2.5 sm:px-4 xl:px-6 py-4">
                                         @php $programaProducto = data_get($primerLote, 'programa') ?? (is_object($primerLote) ? ($primerLote->programa ?? '') : ''); @endphp
                                         @if ($programaProducto)
                                             <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm whitespace-nowrap">{{ $programaProducto }}</span>
@@ -312,34 +312,34 @@
                                             <span class="inline-flex px-3 py-1.5 rounded-lg text-[12px] font-medium bg-slate-50 text-slate-400 border border-slate-100 shadow-sm whitespace-nowrap">Sin programa</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="hidden lg:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         <span class="font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">{{ $lotes->count() }}</span>
                                         <span class="text-slate-400 text-[11.5px] font-semibold uppercase ml-1">Lote(s)</span>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         @if ($stockTotalProducto > 10)
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} Unidades
+                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} <span class="hidden sm:inline">Unidades</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @elseif($stockTotalProducto > 0)
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} Unid. (Bajo)
+                                                {{ number_format($stockTotalProducto, 0, ',', '.') }} <span class="hidden sm:inline">Unid. (Bajo)</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                            <span class="inline-flex items-center gap-1.5 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11.5px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                                0 Unidades (Agotado)
+                                                0 <span class="hidden sm:inline">Unidades (Agotado)</span><span class="sm:hidden">u.</span>
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="hidden sm:table-cell px-2.5 sm:px-4 xl:px-6 py-4 text-center">
                                         <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-[12.5px] font-bold bg-slate-50 text-slate-800 border border-slate-200 shadow-sm whitespace-nowrap font-mono-das">
                                             $ {{ number_format($valorTotalProducto, 0, ',', '.') }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-center" onclick="event.stopPropagation()">
+                                    <td class="px-2.5 sm:px-4 xl:px-6 py-4 text-center" onclick="event.stopPropagation()">
                                         <button type="button" onclick="openQRModal('{{ e($proxLoteId) }}', '{{ e($nombreProducto) }}', '{{ e($proxLoteCodigo) }}', '{{ e($proxLoteVencText) }}', '{{ $proxLoteStock }}', 'Droguería DAS')" class="p-2 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold" title="Generar Etiqueta QR del lote más próximo a vencer">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                         </button>
@@ -348,7 +348,7 @@
 
                                 <tr id="lotes-{{ $groupKey }}" class="lotes-subrow hidden bg-slate-50/50 shadow-inner">
                                     <td colspan="8" class="p-0 border-b border-slate-200">
-                                        <div class="py-4 pr-6 pl-14">
+                                        <div class="py-3 sm:py-4 px-2 sm:pr-6 sm:pl-14">
                                             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                                                 <div class="px-4 py-2 bg-slate-700 text-white flex justify-between items-center">
                                                     <span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
@@ -476,7 +476,7 @@
                                                                     </td>
                                                                     <td class="px-4 py-3 text-center">
                                                                         <div class="inline-flex items-center justify-center">
-                                                                            <button type="button" onclick="openEditLote('{{ e($loteId) }}', '{{ e($loteCodigo) }}', '{{ e($nombreProducto) }}', '{{ e($estadoActualStr) }}', '{{ e($loteMotivo) }}', '{{ e($loteCategoria) }}', '{{ e($lotePrograma) }}', '{{ $valorUnitarioLote }}', '{{ $stockLote }}', '{{ e($pasilloVal ?? '') }}', '{{ e($estanteVal ?? '') }}', '{{ e(data_get($loteData, 'nivel') ?? '') }}', '{{ e(data_get($loteData, 'posicion') ?? '') }}')" class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Editar Estado y Ubicación">
+                                                                            <button type="button" onclick="openEditLote({{ \Illuminate\Support\Js::from($loteId) }}, {{ \Illuminate\Support\Js::from($loteCodigo) }}, {{ \Illuminate\Support\Js::from($nombreProducto) }}, {{ \Illuminate\Support\Js::from($estadoActualStr) }}, {{ \Illuminate\Support\Js::from($loteMotivo) }}, {{ \Illuminate\Support\Js::from($loteCategoria) }}, {{ \Illuminate\Support\Js::from($lotePrograma) }}, '{{ $valorUnitarioLote }}', '{{ $stockLote }}', {{ \Illuminate\Support\Js::from($pasilloVal ?? '') }}, {{ \Illuminate\Support\Js::from($estanteVal ?? '') }}, {{ \Illuminate\Support\Js::from(data_get($loteData, 'nivel') ?? '') }}, {{ \Illuminate\Support\Js::from(data_get($loteData, 'posicion') ?? '') }})" class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer" title="Editar Estado y Ubicación">
                                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                                             </button>
                                                                         </div>
@@ -496,7 +496,7 @@
                 </table>
             </div>
 
-            <!-- Paginación -->
+            <!-- paginacion -->
             @if (isset($inventories) && method_exists($inventories, 'hasPages') && $inventories->hasPages())
                 <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 bg-white rounded-b-2xl">
                     <div class="text-[13px] text-slate-500 text-center sm:text-left font-medium">
@@ -549,7 +549,7 @@
         </div>
     </div>
 
-        <!-- Modal: Historial de Movimientos -->
+        <!-- modal: historial de movimientos -->
         <div id="HistoryModal"
             class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-7xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -586,7 +586,7 @@
                                     $cant = data_get($itemObj, 'stock_total') ?? (data_get($itemObj, 'cantidad') ?? 0);
                                     $loteCodigo = data_get($itemObj, 'lote') ?? (data_get($itemObj, 'loteRef.lote') ?? 'S/L');
 
-                                    // Se usa created_at porque es la fecha en que el lote entró al inventario
+                                    // se usa created_at porque es la fecha en que el lote entro al inventario
                                     $rawDate = data_get($itemObj, 'created_at') ?? data_get($itemObj, 'updated_at');
                                     if ($rawDate) {
                                         try {
@@ -598,7 +598,7 @@
                                         $fechaFormateada = 'Sin Registro';
                                     }
 
-                                    // Usuario responsable
+                                    // usuario responsable
                                     $uName = data_get($itemObj, 'user.name') ?? (data_get($itemObj, 'usuario.name') ?? data_get($itemObj, 'causer.name'));
                                     $uLast = data_get($itemObj, 'user.last_name') ?? (data_get($itemObj, 'usuario.last_name') ?? data_get($itemObj, 'causer.last_name'));
 
@@ -684,7 +684,7 @@
             </div>
         </div>
 
-        <!-- Modal: importar carga masiva -->
+        <!-- modal: importar carga masiva -->
         <div id="importModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-0 flex flex-col w-full max-w-lg max-h-[92vh] overflow-hidden my-auto">
                 <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
@@ -753,7 +753,7 @@
                             <span id="fileNameLabel">Seleccionar o arrastrar archivo aquí</span>
                         </label>
 
-                        <!-- Tarjeta de vista previa del archivo seleccionado -->
+                        <!-- tarjeta de vista previa del archivo seleccionado -->
                         <div id="selectedFileCard" class="hidden w-full bg-teal-50/70 border border-teal-200 rounded-xl p-3 flex items-center justify-between gap-3 text-left">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <span id="selectedFileExtBadge" class="px-2 py-1 rounded-md bg-teal-600 text-white font-mono text-[10px] font-extrabold uppercase shrink-0">XLSX</span>
@@ -767,7 +767,7 @@
                             </button>
                         </div>
 
-                        <!-- permite reimportar un Excel que ya se habia subido -->
+                        <!-- permite reimportar un excel que ya se habia subido -->
                         <div id="forceReimportContainer" class="hidden w-full bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-left">
                             <label class="flex items-start gap-2 cursor-pointer">
                                 <input type="checkbox" name="force_reimport" id="forceReimportCheck" value="1" class="mt-0.5 rounded border-amber-400 text-teal-600 focus:ring-teal-500">
@@ -792,207 +792,7 @@
             </div>
         </div>
 
-        <!-- Modal: ingreso manual -->
-        <div id="DepositModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-0 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-slate-800 flex justify-between items-center shrink-0">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-bold text-white tracking-wide">Ingreso Manual Directo de Producto</h2>
-                            <p class="text-[12px] text-slate-300 mt-0.5 font-medium">Registro individual con trazabilidad inmediata en bodega.</p>
-                        </div>
-                    </div>
-                    <button type="button" onclick="closeDeposit()" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-
-                <div class="p-4 sm:p-6 sm:p-8 overflow-y-auto bg-slate-50/50 flex-1">
-                    @if(isset($errors) && $errors->any() && session('open_modal') !== 'import')
-                        <div class="mb-6 bg-rose-50 border-l-4 border-rose-600 border border-rose-200 rounded-xl p-4 shadow-sm">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                <div>
-                                    <h4 class="text-[13px] font-extrabold text-rose-900">No se pudo completar el ingreso manual:</h4>
-                                    <ul class="mt-1 list-disc list-inside text-[12px] text-rose-700 font-medium space-y-0.5">
-                                        @foreach($errors->all() as $err)
-                                            <li>{{ $err }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <datalist id="catalogoProductosManual">
-                        @foreach($productosLista ?? [] as $prodItem)
-                            <option value="{{ $prodItem }}"></option>
-                        @endforeach
-                    </datalist>
-
-                    <datalist id="catalogoProveedoresRutManual">
-                        @foreach($proveedoresActivos ?? [] as $provItem)
-                            <option value="{{ $provItem->rut }}">{{ $provItem->name }}</option>
-                        @endforeach
-                    </datalist>
-
-                    <datalist id="catalogoProveedoresNombreManual">
-                        @foreach($proveedoresActivos ?? [] as $provItem)
-                            <option value="{{ $provItem->name }}">{{ $provItem->rut }}</option>
-                        @endforeach
-                    </datalist>
-
-                    <form action="{{ Route::has('inventory.store') ? route('inventory.store') : '#' }}" method="POST" id="manualDepositForm" novalidate onsubmit="return validateIngresoDirecto(event)">
-                        @csrf
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-                            <div class="sm:col-span-2">
-                                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-1">
-                                    <span class="w-5 h-5 rounded-full bg-teal-600 text-white text-[11px] font-bold flex items-center justify-center">1</span>
-                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Datos del Documento y Proveedor</h4>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">N° Correlativo Interno</label>
-                                <input type="number" min="1" step="1" name="correlativo_interno" value="{{ old('correlativo_interno') }}" placeholder="Autogenerado si se deja vacío" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Fecha Recepción <span class="text-rose-500">*</span></label>
-                                <input type="date" name="fecha_recepcion" required value="{{ old('fecha_recepcion', date('Y-m-d')) }}" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Tipo Documento <span class="text-rose-500">*</span></label>
-                                <select name="tipo_documento" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="" disabled {{ old('tipo_documento') ? '' : 'selected' }}>Seleccione...</option>
-                                    <option value="Factura Electrónica" {{ old('tipo_documento') == 'Factura Electrónica' ? 'selected' : '' }}>Factura Electrónica</option>
-                                    <option value="Factura" {{ old('tipo_documento') == 'Factura' ? 'selected' : '' }}>Factura</option>
-                                    <option value="Guía de Despacho" {{ old('tipo_documento') == 'Guía de Despacho' ? 'selected' : '' }}>Guía de Despacho</option>
-                                    <option value="Orden de Compra" {{ old('tipo_documento') == 'Orden de Compra' ? 'selected' : '' }}>Orden de Compra</option>
-                                    <option value="Acta de Recepción" {{ old('tipo_documento') == 'Acta de Recepción' ? 'selected' : '' }}>Acta de Recepción / Traspaso</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">N° Documento <span class="text-rose-500">*</span></label>
-                                <input type="text" name="numero_documento" value="{{ old('numero_documento') }}" placeholder="Ej. 104590" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">RUT Proveedor</label>
-                                <input type="text" id="manualRutProveedor" name="rut_proveedor" list="catalogoProveedoresRutManual" oninput="syncManualProvider('rut', this.value)" value="{{ old('rut_proveedor') }}" placeholder="Ej. 61.608.700-2" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Razón Social Proveedor / Origen</label>
-                                <input type="text" id="manualRazonSocial" name="razon_social" list="catalogoProveedoresNombreManual" oninput="syncManualProvider('name', this.value)" value="{{ old('razon_social') }}" placeholder="Ej. CENABAST / Laboratorio Chile" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                            </div>
-
-                            <div class="sm:col-span-2 mt-3">
-                                <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-1">
-                                    <span class="w-5 h-5 rounded-full bg-teal-600 text-white text-[11px] font-bold flex items-center justify-center">2</span>
-                                    <h4 class="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Detalle Técnico del Producto y Ubicación</h4>
-                                </div>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Producto / Principio Activo <span class="text-rose-500">*</span></label>
-                                <input type="text" name="producto" list="catalogoProductosManual" value="{{ old('producto') }}" placeholder="Escriba o seleccione del catálogo (Ej. PARACETAMOL 500MG COMPRIMIDOS)" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Categoría <span class="text-rose-500">*</span></label>
-                                <select name="categoria" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="" disabled {{ old('categoria') ? '' : 'selected' }}>Seleccionar...</option>
-                                    @foreach ($categoriasLista ?? [] as $catOpt)
-                                        <option value="{{ $catOpt }}" {{ old('categoria') == $catOpt ? 'selected' : '' }}>{{ $catOpt }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Estado de Ingreso <span class="text-rose-500">*</span></label>
-                                <select name="estado" id="manualEstadoSelect" onchange="toggleManualEstadoHelp(this.value)" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-semibold text-slate-800">
-                                    <option value="Disponible" {{ old('estado', 'Disponible') == 'Disponible' ? 'selected' : '' }}>Disponible (Visible en Inventario Principal)</option>
-                                    <option value="Cuarentena" {{ old('estado') == 'Cuarentena' ? 'selected' : '' }}>En Cuarentena (Enviar a Revisión Técnica)</option>
-                                </select>
-                                <p id="manualEstadoHelpText" class="hidden text-[11px] text-amber-700 font-semibold mt-1">
-                                    Nota: Los lotes en Cuarentena se gestionan en la vista "Cuarentena" hasta su liberación.
-                                </p>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Pasillo Ubicación</label>
-                                <select name="pasillo" id="manual_pasillo" onchange="onManualUbicacionChange('pasillo')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Pasillo...</option>
-                                    @foreach ($pasillosLista ?? [] as $pasillo)
-                                        <option value="{{ $pasillo }}" {{ old('pasillo') == $pasillo ? 'selected' : '' }}>{{ $pasillo }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Estante Ubicación</label>
-                                <select name="estante" id="manual_estante" onchange="onManualUbicacionChange('estante')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Estante...</option>
-                                    @foreach ($estantesLista ?? [] as $estante)
-                                        <option value="{{ $estante }}" {{ old('estante') == $estante ? 'selected' : '' }}>{{ $estante }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Nivel</label>
-                                <select name="nivel" id="manual_nivel" onchange="onManualUbicacionChange('nivel')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Nivel...</option>
-                                    @foreach ($nivelesLista ?? [] as $nivel)
-                                        <option value="{{ $nivel }}" {{ old('nivel') == $nivel ? 'selected' : '' }}>{{ $nivel }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Posición</label>
-                                <select name="posicion" id="manual_posicion" onchange="onManualUbicacionChange('posicion')" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm">
-                                    <option value="">Seleccione Posición...</option>
-                                    @foreach ($posicionesLista ?? [] as $posicion)
-                                        <option value="{{ $posicion }}" {{ old('posicion') == $posicion ? 'selected' : '' }}>{{ $posicion }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Programa</label>
-                                <input type="text" name="programa" list="programasManualList" value="{{ old('programa') }}" placeholder="Programa de salud" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                                <datalist id="programasManualList">
-                                    @foreach($programasLista ?? [] as $progOpt)
-                                        <option value="{{ $progOpt }}"></option>
-                                    @endforeach
-                                </datalist>
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Lote / Serie</label>
-                                <input type="text" name="lote" value="{{ old('lote') }}" placeholder="Ej. L-4893 (o S/L)" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-mono font-bold" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Fecha Vencimiento</label>
-                                <input type="date" name="fecha_vencimiento" value="{{ old('fecha_vencimiento') }}" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Cantidad a Ingresar <span class="text-rose-500">*</span></label>
-                                <input type="number" name="cantidad" value="{{ old('cantidad') }}" placeholder="Ej. 500" min="1" required class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800" />
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-[12px] font-bold text-slate-700 mb-1">Valor Neto Unitario ($ CLP)</label>
-                                <div class="relative">
-                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-slate-400">$</span>
-                                    <input type="number" name="valor_neto_unitario" value="{{ old('valor_neto_unitario') ? (int) old('valor_neto_unitario') : '' }}" placeholder="0" min="0" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full rounded-lg border border-slate-300 bg-white pl-8 pr-3.5 py-2 text-[13px] outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-sm font-bold text-slate-800 font-mono-das" />
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="px-6 py-4 bg-white border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl shrink-0">
-                    <button type="button" onclick="closeDeposit()" class="px-5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-[13px] font-bold shadow-sm cursor-pointer">Cancelar</button>
-                    <button type="submit" id="manualDepositSubmitBtn" form="manualDepositForm" class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors shadow-sm text-[13px] font-bold cursor-pointer inline-flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span id="manualDepositSubmitText">Confirmar Ingreso</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal: etiqueta QR -->
+        <!-- modal: etiqueta qr -->
         <style>
             @media print {
                 body * {
@@ -1071,7 +871,7 @@
             </div>
         </div>
 
-        <!-- Modal: editar Lote -->
+        <!-- modal: editar lote -->
         <div id="editLoteModal" class="hidden fixed inset-0 z-[10000] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 transition-all">
             <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-0 w-full max-w-lg max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden my-auto">
                 <div class="px-4 sm:px-6 py-4 bg-slate-800 flex justify-between items-center shrink-0 border-b border-slate-700">
@@ -1115,7 +915,7 @@
                             </div>
                         </div>
 
-                        <!-- Ubicación Física en Bodega (Distribución) -->
+                        <!-- ubicacion fisica en bodega (distribucion) -->
                         <div class="bg-slate-50 dark:bg-slate-800/80 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                             <label class="block text-[11.5px] sm:text-[12px] font-bold text-slate-700 dark:text-slate-200 mb-2.5 flex items-center gap-1.5 uppercase tracking-wide">
                                 <svg class="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -1187,10 +987,67 @@
             </div>
         </div>
 
-        <!-- Modal: ver mermas -->
+        <!-- modal: ver mermas -->
+        <style>
+            /* en celular: el total y "cerrar" siempre a la vista; la tabla es lo unico que hace scroll
+               y los filtros secundarios se abren con "Más filtros" */
+            #mermaModal .merma-mas-filtros { display: none; }
+            /* tabla compacta en todos los tamanos: menos margen y textos largos en dos lineas, para que quepan las columnas */
+            #mermaModal .merma-tabla th, #mermaModal .merma-tabla td { padding: 10px 14px; }
+            #mermaModal .merma-tabla td.merma-prod { white-space: normal; min-width: 180px; max-width: 280px; line-height: 1.3; }
+            #mermaModal .merma-tabla td.merma-motivo { max-width: 200px; }
+            @media (min-width: 640px) and (max-width: 1199.98px) {
+                #mermaModal .merma-tabla th, #mermaModal .merma-tabla td { padding: 9px 10px; }
+                #mermaModal .merma-tabla td.merma-prod { min-width: 150px; max-width: 200px; }
+                #mermaModal .merma-tabla td.merma-motivo { max-width: 140px; }
+                #mermaModal .merma-tabla td[data-label="Fecha"] { white-space: normal; max-width: 90px; line-height: 1.3; }
+            }
+            @media (max-width: 639.98px) {
+                #mermaModal .merma-header { padding: 12px 16px; }
+                #mermaModal .merma-header h2 { font-size: 16px; line-height: 1.3; }
+                #mermaModal .merma-header p { display: none; }
+                #mermaModal .merma-filtros { padding: 12px 16px; gap: 10px 12px; }
+                #mermaModal .merma-filtros .merma-buscar { flex: 1 1 0; min-width: 0; }
+                #mermaModal .merma-mas-filtros { display: inline-flex; }
+                #mermaModal .merma-filtros:not(.abierto) .merma-fecha,
+                #mermaModal .merma-filtros:not(.abierto) .merma-resp,
+                #mermaModal .merma-filtros:not(.abierto) .merma-limpiar { display: none; }
+                #mermaModal .merma-filtros .merma-fecha { width: calc(50% - 6px); flex: 0 0 calc(50% - 6px); }
+                #mermaModal .merma-filtros .merma-buscar { order: 1; }
+                #mermaModal .merma-filtros .merma-mas-filtros { order: 2; }
+                #mermaModal .merma-filtros .merma-fecha,
+                #mermaModal .merma-filtros .merma-resp,
+                #mermaModal .merma-filtros .merma-limpiar { order: 3; }
+                #mermaModal .merma-filtros::after { content: ''; order: 2; flex-basis: 100%; height: 0; }
+                #mermaModal .merma-filtros .merma-limpiar,
+                #mermaModal .merma-filtros .merma-limpiar button { width: 100%; }
+                #mermaModal .merma-tabla { flex: 1 1 auto; min-height: 0; max-height: none; }
+                /* tabla compacta: menos margen en cada celda y el nombre del producto en dos lineas, para deslizar menos hacia el lado */
+                #mermaModal .merma-tabla th, #mermaModal .merma-tabla td { padding: 8px 10px; }
+                #mermaModal .merma-tabla td.merma-prod { white-space: normal; min-width: 150px; max-width: 180px; line-height: 1.3; }
+                #mermaModal .merma-tabla td.merma-motivo { max-width: 130px; }
+                #mermaModal .merma-tabla td[data-label="Fecha"] { white-space: normal; min-width: 78px; max-width: 84px; line-height: 1.3; }
+                #mermaModal .merma-tabla td[data-label="Responsable"] { white-space: normal; min-width: 80px; max-width: 100px; line-height: 1.3; }
+                #mermaModal .merma-tabla td[data-label="Lote"] span, #mermaModal .merma-tabla td[data-label="Valor total"] span { font-size: 11px; padding: 2px 6px; }
+                #mermaModal .merma-pie { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 16px 12px; }
+                #mermaModal .merma-pie .merma-resumen { justify-content: space-between; flex-wrap: wrap; row-gap: 6px; font-size: 12px; }
+                #mermaModal .merma-pie #mermaTotalDisplay { margin-left: 6px; padding: 4px 10px; }
+                #mermaModal .merma-pie .merma-resumen > .w-px { display: none; }
+                #mermaModal .merma-pie button { width: 100%; padding-top: 10px; padding-bottom: 10px; }
+            }
+            /* pantalla baja (celular en horizontal): todo el modal se desliza, con la cabecera y el pie fijos */
+            @media (max-height: 600px) {
+                #mermaModal .merma-card { overflow-y: auto; }
+                #mermaModal .merma-header { position: sticky; top: 0; z-index: 30; padding: 10px 20px; }
+                #mermaModal .merma-header p { display: none; }
+                #mermaModal .merma-filtros { padding: 10px 20px; }
+                #mermaModal .merma-tabla { flex: none; max-height: none; min-height: 0; }
+                #mermaModal .merma-pie { position: sticky; bottom: 0; z-index: 30; padding: 10px 20px; }
+            }
+        </style>
         <div id="mermaModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-rose-800 flex justify-between items-center shrink-0">
+            <div class="merma-card bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
+                <div class="merma-header px-6 py-5 bg-rose-800 flex justify-between items-center gap-3 shrink-0">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-xl bg-rose-700 border border-rose-600 flex items-center justify-center text-white">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -1206,20 +1063,25 @@
                 </div>
 
                 <!-- filtros avanzados de mermas -->
-                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end z-20 shadow-inner shrink-0">
-                    <div class="flex-1 min-w-[200px]">
+                <div class="merma-filtros px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end z-20 shadow-inner shrink-0">
+                    <div class="merma-buscar flex-1 min-w-[200px]">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Buscar Texto</label>
                         <input type="text" id="mermaSearchInput" onkeyup="filterMermas()" placeholder="Producto, lote o motivo..." class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
                     </div>
-                    <div class="w-full sm:w-auto">
+                    <button type="button" class="merma-mas-filtros items-center gap-1.5 px-3 py-2 bg-white border border-slate-300 text-slate-600 rounded-lg text-[12.5px] font-bold shadow-sm whitespace-nowrap"
+                        onclick="const f = this.closest('.merma-filtros'); f.classList.toggle('abierto'); this.querySelector('span').textContent = f.classList.contains('abierto') ? 'Menos filtros' : 'Más filtros';">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                        <span>Más filtros</span>
+                    </button>
+                    <div class="merma-fecha w-full sm:w-auto">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Desde</label>
                         <input type="date" id="mermaDateFrom" onchange="filterMermas()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
                     </div>
-                    <div class="w-full sm:w-auto">
+                    <div class="merma-fecha w-full sm:w-auto">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Hasta</label>
                         <input type="date" id="mermaDateTo" onchange="filterMermas()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
                     </div>
-                    <div class="w-full sm:w-[200px]">
+                    <div class="merma-resp w-full sm:w-[200px]">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Responsable</label>
                         <select id="mermaUserFilter" onchange="filterMermas()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
                             <option value="">Todos los usuarios</option>
@@ -1236,14 +1098,14 @@
                             @endforeach
                         </select>
                     </div>
-                    <div>
+                    <div class="merma-limpiar">
                         <button type="button" onclick="clearMermaFilters()" class="px-4 py-2 bg-white border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors text-[13px] font-bold shadow-sm">
                             Limpiar
                         </button>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto flex-1 max-h-[55vh] bg-white">
+                <div class="merma-tabla overflow-x-auto flex-1 max-h-[55vh] bg-white">
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
                         <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm z-10">
                             <tr>
@@ -1263,7 +1125,7 @@
                                     $mObj = is_object($mItem) ? $mItem : (object) $mItem;
                                     $rawDateMerma = data_get($mObj, 'updated_at') ?? data_get($mObj, 'created_at');
 
-                                    // Para filtros en JS
+                                    // para filtros en js
                                     $fechaISO = '';
                                     if ($rawDateMerma) {
                                         try {
@@ -1292,22 +1154,22 @@
                                     $mValorTotal = ((float) $mStock) * $mValorUnitario;
                                 @endphp
                                 <tr class="merma-row hover:bg-rose-50/40 transition-colors" data-valor="{{ $mValorTotal }}" data-date="{{ $fechaISO }}" data-user="{{ $usuarioMerma }}">
-                                    <td class="px-6 py-3.5 text-slate-500 font-medium">{{ $fechaMerma }}</td>
-                                    <td class="px-6 py-3.5 font-bold text-slate-800 searchable">{{ $mNombre }}</td>
-                                    <td class="px-6 py-3.5 text-center searchable">
+                                    <td data-label="Fecha" class="px-6 py-3.5 text-slate-500 font-medium">{{ $fechaMerma }}</td>
+                                    <td class="merma-prod px-6 py-3.5 font-bold text-slate-800 searchable">{{ $mNombre }}</td>
+                                    <td data-label="Lote" class="px-6 py-3.5 text-center searchable">
                                         <span class="px-2.5 py-1 rounded bg-slate-200 text-slate-800 font-mono font-extrabold text-[12px] border border-slate-300">{{ $mLoteCodigo }}</span>
                                     </td>
-                                    <td class="px-6 py-3.5 text-slate-700 font-semibold searchable">{{ $usuarioMerma }}</td>
-                                    <td class="px-6 py-3.5 italic text-rose-600 max-w-[150px] truncate searchable" title="{{ $mMotivo }}">{{ $mMotivo }}</td>
-                                    <td class="px-6 py-3.5 text-center font-extrabold text-rose-600">{{ number_format($mStock, 0, ',', '.') }} u.</td>
-                                    <td class="px-6 py-3.5 text-center">
+                                    <td data-label="Responsable" class="px-6 py-3.5 text-slate-700 font-semibold searchable">{{ $usuarioMerma }}</td>
+                                    <td data-label="Motivo" class="merma-motivo px-6 py-3.5 italic text-rose-600 max-w-[150px] truncate searchable" title="{{ $mMotivo }}">{{ $mMotivo }}</td>
+                                    <td data-label="Cantidad" class="px-6 py-3.5 text-center font-extrabold text-rose-600">{{ number_format($mStock, 0, ',', '.') }} u.</td>
+                                    <td data-label="Valor total" class="px-6 py-3.5 text-center">
                                         <span class="inline-flex items-center px-2 py-1 rounded-lg text-[12px] font-bold bg-rose-100 text-rose-800 border border-rose-200 font-mono-das">
                                             - $ {{ number_format($mValorTotal, 0, ',', '.') }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-3.5 text-center">
+                                    <td data-label="Editar lote" class="px-6 py-3.5 text-center">
                                         <button type="button"
-                                            onclick="openEditLote('{{ e($mLoteId) }}', '{{ e($mLoteCodigo) }}', '{{ e($mNombre) }}', 'Merma', '{{ e($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}', '{{ e($mObj->categoria ?? 'General') }}', '{{ e($mObj->programa ?? '') }}', '{{ $mValorUnitario }}', '{{ $mStock }}', '{{ e(data_get($mObj, 'pasillo') ?? '') }}', '{{ e(data_get($mObj, 'estante') ?? '') }}', '{{ e(data_get($mObj, 'nivel') ?? '') }}', '{{ e(data_get($mObj, 'posicion') ?? '') }}')"
+                                            onclick="openEditLote({{ \Illuminate\Support\Js::from($mLoteId) }}, {{ \Illuminate\Support\Js::from($mLoteCodigo) }}, {{ \Illuminate\Support\Js::from($mNombre) }}, 'Merma', {{ \Illuminate\Support\Js::from($mMotivo != 'Sin motivo especificado' ? $mMotivo : '') }}, {{ \Illuminate\Support\Js::from($mObj->categoria ?? 'General') }}, {{ \Illuminate\Support\Js::from($mObj->programa ?? '') }}, '{{ $mValorUnitario }}', '{{ $mStock }}', {{ \Illuminate\Support\Js::from(data_get($mObj, 'pasillo') ?? '') }}, {{ \Illuminate\Support\Js::from(data_get($mObj, 'estante') ?? '') }}, {{ \Illuminate\Support\Js::from(data_get($mObj, 'nivel') ?? '') }}, {{ \Illuminate\Support\Js::from(data_get($mObj, 'posicion') ?? '') }})"
                                             class="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white rounded-lg transition-all border border-teal-200 shadow-sm cursor-pointer inline-flex items-center justify-center" title="Editar Estado">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                         </button>
@@ -1335,12 +1197,12 @@
                     </table>
                 </div>
 
-                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center shrink-0">
-                    <div class="text-[13px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-3">
-                        <span>Mostrando <span id="mermasCount" class="text-rose-600 font-black">0</span> res.</span>
+                <div class="merma-pie px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center gap-3 shrink-0">
+                    <div class="merma-resumen text-[13px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-3">
+                        <span class="whitespace-nowrap">Mostrando <span id="mermasCount" class="text-rose-600 font-black">0</span> res.</span>
                         <div class="h-4 w-px bg-slate-300"></div>
-                        <span>Valor Total:
-                            <span id="mermaTotalDisplay" class="inline-flex items-center px-3 py-1.5 rounded-lg text-[13px] font-extrabold bg-rose-600 text-white font-mono-das ml-2 shadow-sm">
+                        <span class="whitespace-nowrap">Valor Total:
+                            <span id="mermaTotalDisplay" class="inline-flex items-center whitespace-nowrap px-3 py-1.5 rounded-lg text-[13px] font-extrabold bg-rose-600 text-white font-mono-das ml-2 shadow-sm">
                                 $ 0
                             </span>
                         </span>
@@ -1638,13 +1500,13 @@
             const nivClean = window.LoteStatus?.Ubicacion ? window.LoteStatus.Ubicacion.normNivel(nivel) : (nivel || '');
             const posClean = window.LoteStatus?.Ubicacion ? window.LoteStatus.Ubicacion.normPos(posicion) : (posicion || '');
 
-            // Guardar valores iniciales para detectar reubicación física exacta
+            // guardar valores iniciales para detectar reubicacion fisica exacta
             form.dataset.initialPasillo = pasClean;
             form.dataset.initialEstante = estClean;
             form.dataset.initialNivel = nivClean;
             form.dataset.initialPosicion = posClean;
 
-            // Precargar campos de ubicación física y sincronizar niveles/posiciones del estante
+            // precargar campos de ubicacion fisica y sincronizar niveles/posiciones del estante
             const selPas = document.getElementById('modal_edit_pasillo');
             if (selPas) selPas.value = pasClean;
 
@@ -1681,7 +1543,7 @@
 
             toggleMotivoField(selectedVal);
 
-            // Si el modal de merma está abierto, lo ocultamos para que no colisionen
+            // si el modal de merma esta abierto, lo ocultamos para que no colisionen
             closeMerma();
             document.getElementById('editLoteModal').classList.remove('hidden');
         }
@@ -1754,14 +1616,15 @@
         }
 
         function openDeposit() {
-            document.getElementById('DepositModal').classList.remove('hidden');
+            // el ingreso manual ahora se hace en recepcion
+            document.getElementById('DepositModal')?.classList.remove('hidden');
         }
 
         function closeDeposit() {
-            document.getElementById('DepositModal').classList.add('hidden');
+            document.getElementById('DepositModal')?.classList.add('hidden');
         }
 
-        // Lógica filtros avanzados merma
+        // logica filtros avanzados merma
         function openMerma() {
             document.getElementById('mermaModal').classList.remove('hidden');
             filterMermas();
@@ -1770,6 +1633,14 @@
         function closeMerma() {
             document.getElementById('mermaModal').classList.add('hidden');
         }
+
+        // escape cierra el modal abierto que esta mas arriba (edicion de lote primero)
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape' || document.querySelector('.swal2-container')) return;
+            const modales = [['editLoteModal', closeEditLote], ['qrModal', closeQRModal], ['mermaModal', closeMerma], ['importModal', closeImport], ['HistoryModal', closeHistory], ['DepositModal', closeDeposit]];
+            const abierto = modales.find(([id]) => { const el = document.getElementById(id); return el && !el.classList.contains('hidden'); });
+            if (abierto) abierto[1]();
+        });
 
         function filterMermas() {
             const search = normalizeText(document.getElementById('mermaSearchInput')?.value || '');
@@ -1785,27 +1656,27 @@
             let totalValue = 0;
 
             rows.forEach(row => {
-                // Validación de la búsqueda
+                // validacion de la busqueda
                 const searchables = row.querySelectorAll('.searchable');
                 let rowText = '';
                 searchables.forEach(td => rowText += normalizeText(td.textContent) + ' ');
                 const matchSearch = rowText.includes(search);
 
-                // Validación del usuario
+                // validacion del usuario
                 const rowUser = row.getAttribute('data-user') || '';
                 const matchUser = userFilter === '' || rowUser === userFilter;
 
-                // Validación de las fechas
-                const rowDateStr = row.getAttribute('data-date'); // YYYY-MM-DD
+                // validacion de las fechas
+                const rowDateStr = row.getAttribute('data-date'); // yyyy-mm-dd
                 let matchDate = true;
                 if (rowDateStr) {
                     if (dateFrom && rowDateStr < dateFrom) matchDate = false;
                     if (dateTo && rowDateStr > dateTo) matchDate = false;
                 } else if (dateFrom || dateTo) {
-                    matchDate = false; // Si no tiene fecha y hay filtro de fecha
+                    matchDate = false; // si no tiene fecha y hay filtro de fecha
                 }
 
-                // Aplicar el filtro
+                // aplicar el filtro
                 if (matchSearch && matchUser && matchDate) {
                     row.style.display = '';
                     visibleCount++;
@@ -1815,12 +1686,12 @@
                 }
             });
 
-            // Qué mostrar cuando no quedan filas
+            // que mostrar cuando no quedan filas
             if (rows.length > 0 && filteredEmptyRow) {
                 filteredEmptyRow.style.display = visibleCount === 0 ? '' : 'none';
             }
 
-            // Actualizar contadores
+            // actualizar contadores
             document.getElementById('mermasCount').textContent = visibleCount;
             document.getElementById('mermaTotalDisplay').textContent = '$ ' + totalValue.toLocaleString('es-CL', {
                 minimumFractionDigits: 0,
@@ -1987,7 +1858,7 @@
             const ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
             const allowed = ['xlsx', 'xls', 'csv'];
 
-            // Se valida el formato antes de subir nada
+            // se valida el formato antes de subir nada
             if (!allowed.includes(ext)) {
                 input.value = '';
                 if (card) card.classList.add('hidden');
@@ -2008,7 +1879,7 @@
                 return;
             }
 
-            // Tamaño máximo 20 MB
+            // tamano maximo 20 mb
             const maxBytes = 20 * 1024 * 1024;
             if (file.size > maxBytes) {
                 input.value = '';
@@ -2018,7 +1889,7 @@
                 return;
             }
 
-            // Tarjeta con el archivo elegido
+            // tarjeta con el archivo elegido
             if (label) {
                 label.textContent = 'Cambiar archivo seleccionado';
                 label.classList.add('text-teal-700');
@@ -2030,7 +1901,7 @@
                 if (sizeText) sizeText.textContent = formatBytes(file.size);
             }
 
-            // Avisa si ya se había subido este mismo archivo
+            // avisa si ya se habia subido este mismo archivo
             try {
                 const fileFingerprint = `${file.name}|${file.size}|${file.lastModified}`;
                 const historyRaw = localStorage.getItem('das_imported_files_history') || '{}';
@@ -2056,7 +1927,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Archivo Requerido',
-                    text: 'Debes seleccionar un archivo Excel (.xlsx, .xls) o CSV (.csv) antes de presionar Validar y Procesar.',
+                    text: 'Debe seleccionar un archivo Excel (.xlsx, .xls) o CSV (.csv) antes de presionar Validar y Procesar.',
                     confirmButtonColor: '#0d9488'
                 });
                 return false;
@@ -2089,7 +1960,7 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // La huella del archivo solo se guarda si el servidor confirma la importación
+                    // la huella del archivo solo se guarda si el servidor confirma la importacion
                     try {
                         const fileFingerprint = `${file.name}|${file.size}|${file.lastModified}`;
                         const nowStr = new Date().toLocaleDateString('es-CL') + ' ' + new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
@@ -2099,7 +1970,7 @@
                         }));
                     } catch (e) {}
 
-                    // Pantalla de carga para los archivos grandes
+                    // pantalla de carga para los archivos grandes
                     const overlay = document.getElementById('importLoadingOverlay');
                     const fileNameEl = document.getElementById('loadingFileName');
                     const fileSizeEl = document.getElementById('loadingFileSize');
@@ -2210,12 +2081,7 @@
             return false;
         }
 
-        /**
-         * Escenario INVENTARIO: confirmación previa + envío AJAX + SweetAlert2 de éxito.
-         * Delega automáticamente en LoteStatus.Cuarentena / LoteStatus.Merma según el estado elegido.
-         * La página solo se refresca DESPUÉS de que el usuario cierra la alerta de éxito.
-         * Lógica en: public/js/lotes/lote-status.js
-         */
+        /* inventario: confirma, envia por ajax y delega cuarentena o merma en lote-status.js */
         function confirmEditLoteInventario(event) {
             LoteStatus.Inventario.onSubmit(event);
             return false;

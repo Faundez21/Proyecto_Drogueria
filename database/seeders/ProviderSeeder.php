@@ -7,12 +7,7 @@ use Illuminate\Database\Seeder;
 
 class ProviderSeeder extends Seeder
 {
-    /**
-     * Proveedores habituales de la droguería.
-     *
-     * Usa el RUT como clave: si el proveedor ya existe, actualiza sus datos
-     * en vez de duplicarlo, así el seeder se puede correr más de una vez.
-     */
+    // proveedores habituales de la drogueria
     public function run(): void
     {
         $proveedores = [

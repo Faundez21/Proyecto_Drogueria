@@ -17,9 +17,9 @@
                 </svg>
             </div>
             
-            <h2 class="text-xl font-black text-slate-800 mb-2">Renueva tu suscripción</h2>
+            <h2 class="text-xl font-black text-slate-800 mb-2">Renueve su suscripción</h2>
             <p class="text-[13px] font-medium text-slate-500 max-w-md mx-auto mb-6 leading-relaxed">
-                Has superado el límite de operaciones o necesitas actualizar tu plan para seguir utilizando este módulo administrativo.
+                Ha superado el límite de operaciones o necesita actualizar su plan para seguir utilizando este módulo administrativo.
             </p>
             
             <div class="flex flex-col sm:flex-row gap-3">

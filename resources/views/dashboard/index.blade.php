@@ -22,7 +22,20 @@
                 <p class="text-[13px] font-medium text-slate-500 mt-0.5">Estado operativo de Droguería Central, Establecimientos y CESFAM</p>
             </div>
 
-            <div class="flex items-center gap-2.5 w-full sm:w-auto">
+            <style>
+                /* pantallas altas (tablet vertical, monitores grandes): la tabla de centros crece hasta el final de la pantalla
+                   en vez de dejar un espacio vacio abajo */
+                @media (min-height: 900px) {
+                    .dash-tabpanel { max-height: max(420px, calc(100vh - 740px)) !important; }
+                }
+                /* celular: las dos solicitudes lado a lado y escanear qr abajo a todo el ancho */
+                @media (max-width: 639.98px) {
+                    .dash-acciones { flex-wrap: wrap; align-items: stretch; }
+                    .dash-acciones > a { flex: 1 1 0; min-width: 0; text-align: center; display: flex; align-items: center; justify-content: center; padding: 9px 8px; }
+                    .dash-acciones > button { flex: 1 1 100%; padding-top: 10px; padding-bottom: 10px; }
+                }
+            </style>
+            <div class="dash-acciones flex items-center gap-2.5 w-full sm:w-auto">
                 @can('ver.solicitudes_cesfam')
                     <a href="{{ route('requests.cesfam') }}" class="px-3.5 py-2 rounded-xl text-[12px] font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors">
                         + Solicitud CESFAM
@@ -56,10 +69,10 @@
                         </div>
                         <div>
                             <h2 class="text-[13.5px] font-extrabold text-slate-800">
-                                Tienes {{ count($misSolicitudesAsignadas) }} solicitud(es) asignada(s) para despachar
+                                Tiene {{ count($misSolicitudesAsignadas) }} solicitud(es) asignada(s) para despachar
                             </h2>
                             <p class="text-[11.5px] text-slate-500">
-                                Haz clic en "Despachar" para cargar automáticamente los productos solicitados.
+                                Haga clic en "Despachar" para cargar automáticamente los productos solicitados.
                             </p>
                         </div>
                     </div>
@@ -183,7 +196,7 @@
             </div>
         </form>
 
-        <!-- KPIs de bodega central -->
+        <!-- kpis de bodega central -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <a href="{{ route('inventory.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3">
                 <div>
@@ -238,7 +251,7 @@
             </a>
         </div>
 
-        <!-- KPIs de establecimientos y CESFAM -->
+        <!-- kpis de establecimientos y cesfam -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 border-t-[3px] border-t-purple-500 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3"
                 title="Solicitudes de medicamentos generadas exclusivamente por centros CESFAM en este período. 'Pendientes' indica pedidos aún en preparación o entrega.">
@@ -307,12 +320,12 @@
         </div>
         </div>
 
-        <!-- dos columnas: pestañas a la izquierda, QR y accesos a la derecha -->
+        <!-- dos columnas: pestanas a la izquierda, qr y accesos a la derecha -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <!-- columna izquierda: pestañas de centros, movimientos y cuarentena -->
+            <!-- columna izquierda: pestanas de centros, movimientos y cuarentena -->
             <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
-                <!-- Barra de Pestañas -->
+                <!-- barra de pestanas -->
                 <div class="px-5 pt-4 pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
                     <div class="inline-flex bg-slate-200/70 p-1 rounded-xl gap-1">
                         <button type="button" id="tabBtn_centros" onclick="switchDashTab('centros')"
@@ -329,7 +342,7 @@
                         </button>
                     </div>
 
-                    <!-- Buscador rápido para la pestaña de Centros -->
+                    <!-- buscador rapido para la pestana de centros -->
                     <div id="dashSearchCentrosWrap" class="flex items-center gap-2">
                         <input type="text" id="buscadorTablaCentros" oninput="filtrarTablaCentrosDash()"
                             placeholder="Buscar CESFAM o centro..."
@@ -337,8 +350,8 @@
                     </div>
                 </div>
 
-                <!-- pestaña 1: establecimientos y CESFAM -->
-                <div id="tabPanel_centros" class="overflow-x-auto max-h-[420px]">
+                <!-- pestana 1: establecimientos y cesfam -->
+                <div id="tabPanel_centros" class="dash-tabpanel overflow-x-auto max-h-[420px]">
                     <table class="w-full text-left text-[12px] text-slate-600 whitespace-nowrap">
                         <thead class="text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-200 bg-slate-50 sticky top-0 z-10">
                             <tr>
@@ -407,8 +420,8 @@
                     </table>
                 </div>
 
-                <!-- pestaña 2: ultimos movimientos de bodega -->
-                <div id="tabPanel_movimientos" class="hidden p-5 max-h-[420px] overflow-y-auto">
+                <!-- pestana 2: ultimos movimientos de bodega -->
+                <div id="tabPanel_movimientos" class="dash-tabpanel hidden p-5 max-h-[420px] overflow-y-auto">
                     @if (count($recentMovements) > 0)
                         <div class="divide-y divide-slate-100">
                             @foreach ($recentMovements as $mov)
@@ -451,8 +464,8 @@
                     @endif
                 </div>
 
-                <!-- pestaña 3: lotes en cuarentena -->
-                <div id="tabPanel_cuarentena" class="hidden overflow-x-auto max-h-[420px]">
+                <!-- pestana 3: lotes en cuarentena -->
+                <div id="tabPanel_cuarentena" class="dash-tabpanel hidden overflow-x-auto max-h-[420px]">
                     <table class="w-full text-left text-[12px] text-slate-600">
                         <thead class="text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-200 bg-slate-50">
                             <tr>
@@ -489,9 +502,9 @@
                 </div>
             </div>
 
-            <!-- columna derecha: ultimo lote con su QR y accesos rapidos -->
+            <!-- columna derecha: ultimo lote con su qr y accesos rapidos -->
             <div class="flex flex-col gap-5">
-                <!-- Panel QR del Último Lote -->
+                <!-- panel qr del ultimo lote -->
                 <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 flex flex-col">
                     <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
                         <h2 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
@@ -545,7 +558,7 @@
                     @endif
                 </div>
 
-                <!-- Accesos directos -->
+                <!-- accesos directos -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
                     <div class="flex items-center justify-between mb-3.5">
                         <h2 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Accesos Directos</h2>
@@ -560,7 +573,7 @@
                             </div>
                             <div class="min-w-0">
                                 <span class="text-xs font-bold text-slate-800 block leading-tight">Recepción</span>
-                                <span class="text-[10px] text-slate-500 truncate block">Ingreso de stock</span>
+                                <span class="text-[10px] text-slate-500 block leading-snug">Ingreso de stock</span>
                             </div>
                         </a>
 
@@ -572,7 +585,7 @@
                             </div>
                             <div class="min-w-0">
                                 <span class="text-xs font-bold text-slate-800 block leading-tight">Despacho</span>
-                                <span class="text-[10px] text-slate-500 truncate block">Salida de pedidos</span>
+                                <span class="text-[10px] text-slate-500 block leading-snug">Salida de pedidos</span>
                             </div>
                         </a>
 
@@ -584,7 +597,7 @@
                             </div>
                             <div class="min-w-0">
                                 <span class="text-xs font-bold text-slate-800 block leading-tight">Inventario</span>
-                                <span class="text-[10px] text-slate-500 truncate block">Kardex y stock</span>
+                                <span class="text-[10px] text-slate-500 block leading-snug">Kardex y stock</span>
                             </div>
                         </a>
 
@@ -596,7 +609,7 @@
                             </div>
                             <div class="min-w-0">
                                 <span class="text-xs font-bold text-slate-800 block leading-tight">Reportes</span>
-                                <span class="text-[10px] text-slate-500 truncate block">Actas y balances</span>
+                                <span class="text-[10px] text-slate-500 block leading-snug">Actas y balances</span>
                             </div>
                         </a>
                     </div>
@@ -605,7 +618,7 @@
         </div>
     </div>
 
-    <!-- modal del escaner QR -->
+    <!-- modal del escaner qr -->
     <div id="scannerModalDashboard" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
         <div class="flex min-h-full items-center justify-center">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
@@ -808,7 +821,7 @@
                     html5QrScanner = new Html5Qrcode("reader-dashboard-feed");
                 }
 
-                // Detectar cámaras disponibles
+                // detectar camaras disponibles
                 try {
                     availableCameras = await Html5Qrcode.getCameras();
                     if (availableCameras && availableCameras.length > 1 && btnSwitch) {
@@ -827,7 +840,7 @@
                         <div class="text-center p-4">
                             <svg class="w-10 h-10 text-rose-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             <p class="text-sm font-bold text-white">No se pudo acceder a la cámara</p>
-                            <p class="text-xs text-slate-400 mt-1">Verifica los permisos en tu navegador o conecta una cámara.</p>
+                            <p class="text-xs text-slate-400 mt-1">Verifique los permisos en su navegador o conecte una cámara.</p>
                         </div>
                     `;
                 }

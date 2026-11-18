@@ -5,9 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    /**
-     * Run the migrations.
-     */
+    // run the migrations
     public function up()
     {
         Schema::create('shelves', function (Blueprint $table) {
@@ -17,7 +15,7 @@ return new class extends Migration {
             $table->string('family_category')->nullable();
             $table->text('description')->nullable();
 
-            // Coordenadas para el visor 3D
+            // coordenadas para el visor 3d
             $table->float('pos_x')->default(0);
             $table->float('pos_z')->default(0);
             $table->float('rotation')->default(0);
@@ -26,9 +24,7 @@ return new class extends Migration {
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+    // reverse the migrations
     public function down(): void
     {
         Schema::dropIfExists('shelves');

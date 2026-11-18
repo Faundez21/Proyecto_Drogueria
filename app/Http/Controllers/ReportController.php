@@ -11,14 +11,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
-    /**
-     * Construye la consulta base con los filtros aplicados
-     */
+    // construye la consulta base con los filtros aplicados
     private function buildInventoryQuery(Request $request)
     {
         $query = Inventory::where('estado', 'Disponible');
 
-        // Los controlados solo aparecen si el usuario tiene permiso para verlos
+        // los controlados solo aparecen si el usuario tiene permiso para verlos
         $user = auth()->user();
         $puedeVerControlados = $user && ($user->hasRole('Administrador') || $user->can('ver.despacho_controlado'));
 
@@ -37,7 +35,7 @@ class ReportController extends Controller
             });
         }
 
-        // La categoría se compara tal cual viene escrita en los datos
+        // la categoria se compara tal cual viene escrita en los datos
         if ($request->filled('categoria')) {
             $cat = trim((string) $request->input('categoria'));
             $esCatControlada = InventoryService::clasificarGrupoProducto('', $cat) === 'Estupefacientes';
@@ -136,14 +134,13 @@ class ReportController extends Controller
 
     public function exportPdf(Request $request)
     {
-        // El inventario completo no cabe en los 128 MB que trae PHP por defecto,
-        // así que se amplía el límite solo mientras dura esta descarga.
+        // el inventario completo no cabe en los 128 mb que trae php por defecto, asi que se amplia el limite solo mientras dura esta descarga
         @ini_set('memory_limit', '1024M');
         @set_time_limit(300);
 
         $query = $this->buildInventoryQuery($request);
 
-        // Si aun así son demasiados lotes, el PDF se recorta y avisa que descarguen el Excel.
+        // si aun asi son demasiados lotes, el pdf se recorta y avisa que descarguen el excel
         $limitePdf = 2500;
         $totalItems = (clone $query)->count();
         $isTruncated = $totalItems > $limitePdf;

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Controlados')
-@section('subtitle', 'Directorio y gestion de guias de despacho de farmacos controlados.')
+@section('subtitle', 'Directorio y gestión de guías de despacho de fármacos controlados.')
 
 @section('actions')
     <button type="button" onclick="openBandeja()"
@@ -78,7 +78,7 @@
         </div>
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
             <div>
-                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Historico Total</p>
+                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Histórico Total</p>
                 <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ collect($dispatches)->count() }}</h3>
             </div>
             <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600">
@@ -92,7 +92,7 @@
     <div class="bg-white rounded-2xl border border-rose-200 shadow-sm overflow-hidden flex flex-col">
 
         <!-- cabecera de la tarjeta del formulario -->
-        <div class="px-6 py-5 border-b border-rose-100 bg-rose-50 flex items-center gap-4">
+        <div class="form-cab px-6 py-5 border-b border-rose-100 bg-rose-50 flex items-center gap-4">
             <div class="w-10 h-10 bg-rose-600/10 text-rose-600 rounded-xl flex items-center justify-center shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -101,7 +101,7 @@
                 </svg>
             </div>
             <div class="flex-1">
-                <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Despacho de Farmacos Controlados</h2>
+                <h2 class="text-[16px] font-bold text-slate-800 tracking-tight">Despacho de Fármacos Controlados</h2>
                 <p class="text-[12px] text-slate-500 mt-0.5">Acceso restringido unicamente a estupefacientes y talonarios de
                     recetas cheque. Solo solicitudes de CESFAM.</p>
             </div>
@@ -119,7 +119,7 @@
                 @endif
                 @if ($totalMiasCtrl > 0)
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
-                        {{ $totalMiasCtrl }} asignada(s) a ti
+                        {{ $totalMiasCtrl }} asignada(s) a usted
                     </span>
                 @endif
             </button>
@@ -129,7 +129,7 @@
             @csrf
             <input type="hidden" name="establishment_request_id" id="establishment_request_id" value="">
 
-            <!-- Banner informativo cuando se carga una solicitud -->
+            <!-- banner informativo cuando se carga una solicitud -->
             <div id="banner_solicitud_activa" class="hidden mx-6 mt-5 p-4 bg-rose-50 border border-rose-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
@@ -152,7 +152,7 @@
                     <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Datos del Remitente</h4>
                     <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm">
                         <p class="text-[14px] font-extrabold text-slate-800">I. Municipalidad de Talcahuano</p>
-                        <p class="text-[12px] font-bold text-teal-700">Drogueria Comunal Central</p>
+                        <p class="text-[12px] font-bold text-teal-700">Droguería Comunal Central</p>
                         <p class="text-[11px] font-medium text-slate-500 mt-1 flex items-center gap-1.5">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -169,7 +169,7 @@
                 <div class="flex flex-col justify-center items-end">
                     <h4
                         class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 w-full md:w-auto text-left md:text-right">
-                        N° Correlativo Automatico</h4>
+                        N° Correlativo Automático</h4>
                     <input type="text" name="correlativo_despacho" value="{{ $correlativo }}" readonly
                         class="w-full md:w-48 bg-slate-100 border border-slate-300 text-rose-700 text-lg font-mono font-extrabold rounded-xl text-center py-2 focus:outline-none cursor-default shadow-inner">
                 </div>
@@ -178,20 +178,19 @@
             <!-- seccion de destino y logistica con clasificacion -->
             <div class="p-6 bg-white border-b border-slate-100">
                 <h3 class="text-[12px] font-extrabold text-slate-800 uppercase tracking-wide mb-4">1. Tipo, Destino y
-                    Logistica</h3>
+                    Logística</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
 
                     <!-- clasificacion interno/externo -->
                     <div class="md:col-span-2">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Clasificacion del Despacho <span
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Clasificación del Despacho <span
                                 class="text-rose-500">*</span></label>
                         <select name="clasificacion" id="clasificacion_select" onchange="toggleClasificacion()" required
                             class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
-                            <option value="" disabled selected>Seleccione la clasificacion...</option>
-                            <option value="Interno">Interno (Nivel Comunal / CESFAM)</option>
-                            <option value="Externo">Externo (Traspasos, Prestamos, Donaciones, etc.)</option>
+                            <option value="Externo" selected>Externo (Nivel Comunal / CESFAM)</option>
                         </select>
+                        <p class="text-[11px] text-slate-500 mt-1">Los fármacos controlados solo se despachan a un CESFAM de la red, a partir de su solicitud.</p>
                     </div>
 
                     <div class="md:col-span-1">
@@ -202,7 +201,7 @@
                     </div>
 
                     <div class="md:col-span-1">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Liberacion <span
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Liberación <span
                                 class="text-rose-500">*</span></label>
                         <select name="estado_liberacion" required
                             class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
@@ -213,7 +212,7 @@
 
                     <!-- div dinamico para destino interno -->
                     <div id="div_interno" class="md:col-span-2 hidden">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Interno)
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Establecimiento Destino (Externo)
                             <span class="text-rose-500">*</span></label>
                         <select id="establecimiento_interno" onchange="actualizarDireccionInterna()"
                             class="w-full bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
@@ -222,7 +221,7 @@
                                 data-direccion="Calle El Galgo, esquina Calle Coliumo, Villa Badaran, Talcahuano">CESFAM
                                 LOS CERROS</option>
                             <option value="CESFAM PAULINA AVENDAÑO PEREDA"
-                                data-direccion="Calle Carlos Dittborn 4100, Villa San Martin, Talcahuano">CESFAM PAULINA
+                                data-direccion="Calle Carlos Dittborn 4100, Villa San Martín, Talcahuano">CESFAM PAULINA
                                 AVENDAÑO PEREDA</option>
                             <option value="CESFAM SAN VICENTE" data-direccion="Calle Brasil 360, San Vicente, Talcahuano">
                                 CESFAM SAN VICENTE</option>
@@ -232,28 +231,10 @@
                         </select>
                     </div>
 
-                    <!-- div dinamico para destino externo -->
-                    <div id="div_externo" class="md:col-span-2 hidden">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Tipo y Destino Externo <span
-                                class="text-rose-500">*</span></label>
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <select id="tipo_externo"
-                                class="w-full sm:w-2/5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all cursor-pointer outline-none">
-                                <option value="" disabled selected>Tipo...</option>
-                                <option value="Traspaso">Traspaso</option>
-                                <option value="Prestamo">Prestamo</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                            <input type="text" id="establecimiento_externo"
-                                placeholder="Nombre institucion/destino..."
-                                class="w-full sm:w-3/5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-sm transition-all outline-none">
-                        </div>
-                    </div>
-
                     <div class="md:col-span-2">
-                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Direccion Destino</label>
+                        <label class="block text-[12px] font-bold text-slate-700 mb-1.5">Dirección Destino</label>
                         <input type="text" name="direccion_destino" id="direccion_destino"
-                            placeholder="Esperando clasificacion..." readonly
+                            placeholder="Esperando clasificación..." readonly
                             class="w-full bg-slate-50 border border-slate-300 text-slate-500 font-medium rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 block py-2 px-3 text-[13px] shadow-inner transition-all">
                     </div>
 
@@ -311,11 +292,12 @@
                         <thead
                             class="bg-slate-100/80 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10.5px]">
                             <tr>
-                                <th class="px-4 py-3.5 w-[36%]">Fármaco Controlado en Stock</th>
-                                <th class="px-4 py-3.5 w-[14%]">Lote</th>
-                                <th class="px-4 py-3.5 w-[15%]">Vencimiento (FEFO)</th>
-                                <th class="px-4 py-3.5 w-[15%]">Programa</th>
-                                <th class="px-4 py-3.5 w-[15%] text-center">Cantidad a Despachar</th>
+                                <th class="px-4 py-3.5 w-[30%]">Fármaco Controlado en Stock</th>
+                                <th class="px-4 py-3.5 w-[12%]">Lote</th>
+                                <th class="px-4 py-3.5 w-[14%]">Vencimiento (FEFO)</th>
+                                <th class="px-4 py-3.5 w-[14%]">Programa</th>
+                                <th class="px-4 py-3.5 w-[11%] text-center whitespace-normal leading-tight">Consumo mensual</th>
+                                <th class="px-4 py-3.5 w-[14%] text-center">Cantidad a Despachar</th>
                                 <th class="px-3 py-3.5 w-[5%] text-center"></th>
                             </tr>
                         </thead>
@@ -339,7 +321,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- firma despacha (bodega central) -->
                     <div class="flex flex-col items-center">
-                        <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma Quien Despacha (Q.F / Encargado)</p>
+                        <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma de quien despacha (Q.F. / Encargado)</p>
                         <input type="hidden" name="firma_despacha" id="firma_despacha_input">
                         <div
                             class="border-2 border-dashed border-slate-300 rounded-lg bg-white overflow-hidden shadow-sm w-full max-w-[400px]">
@@ -353,7 +335,7 @@
 
                     <!-- firma solicita/recibe (establecimiento) -->
                     <div class="flex flex-col items-center">
-                        <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma Quien Recibe (Establecimiento)</p>
+                        <p class="text-[12px] font-semibold text-slate-600 mb-2">Firma de quien recibe (Establecimiento)</p>
                         <input type="hidden" name="firma_recibe" id="firma_recibe_input">
                         <div
                             class="border-2 border-dashed border-rose-300 rounded-lg bg-white overflow-hidden shadow-sm w-full max-w-[400px]">
@@ -424,10 +406,14 @@
             <td data-label="Programa" class="col-programa px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <select name="programas[]" required
                     class="w-full bg-white border border-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 rounded-lg px-2.5 py-2 text-[12px] font-semibold text-slate-700 outline-none shadow-xs cursor-pointer transition-colors">
+                    <option value="" selected>Seleccione programa...</option>
                     @foreach ($programasLista ?? [] as $idxProg => $progOpt)
-                        <option value="{{ $progOpt }}" {{ $idxProg === 0 ? 'selected' : '' }}>{{ $progOpt }}</option>
+                        <option value="{{ $progOpt }}">{{ $progOpt }}</option>
                     @endforeach
                 </select>
+            </td>
+            <td data-label="Consumo mensual" class="col-consumo px-3 py-2.5 border-r border-slate-100 align-middle text-center">
+                <span class="consumo-mensual-despacho text-[13px] font-bold text-slate-400">—</span>
             </td>
             <td data-label="Cantidad" class="col-cantidad px-3.5 py-2.5 border-r border-slate-100 align-middle">
                 <div class="space-y-1">
@@ -462,7 +448,7 @@
 
             <div class="px-6 py-5 bg-slate-800 flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-bold text-white tracking-wide">Bandeja Historica de Controlados</h2>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Bandeja Histórica de Controlados</h2>
                     <p class="text-[12px] text-slate-300 mt-1 uppercase tracking-wider font-semibold">Trazabilidad estricta
                         de estupefacientes</p>
                 </div>
@@ -478,7 +464,7 @@
             <!-- cuadricula de filtros dinamicos -->
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-col gap-3">
                 <div class="flex justify-between items-center">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros de Busqueda</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros de Búsqueda</span>
                     <button type="button" onclick="limpiarFiltrosBandeja()"
                         class="text-[11px] font-bold text-rose-600 hover:text-rose-700 transition-colors">Limpiar
                         Filtros</button>
@@ -499,13 +485,13 @@
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Fecha
-                            Emision</label>
+                            Emisión</label>
                         <input type="date" id="filtroFecha" oninput="filtrarBandeja()"
                             class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-colors shadow-sm cursor-pointer">
                     </div>
                     <div>
                         <label
-                            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Clasificacion</label>
+                            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Clasificación</label>
                         <select id="filtroClasificacion" onchange="filtrarBandeja()"
                             class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-colors shadow-sm cursor-pointer">
                             <option value="">Todas</option>
@@ -539,8 +525,8 @@
                         <tr>
                             <th class="px-6 py-4 w-12">Detalle</th>
                             <th class="px-6 py-4">Correlativo GD</th>
-                            <th class="px-6 py-4">Fecha Emision</th>
-                            <th class="px-6 py-4">Clasificacion</th>
+                            <th class="px-6 py-4">Fecha Emisión</th>
+                            <th class="px-6 py-4">Clasificación</th>
                             <th class="px-6 py-4">Destino</th>
                             <th class="px-6 py-4 text-center">Estado</th>
                             <th class="px-6 py-4 text-center">Documento</th>
@@ -570,12 +556,12 @@
                                     {{ \Carbon\Carbon::parse($despacho->fecha_despacho)->format('d-m-Y') }}
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-600">
-                                    @if (strtolower($despacho->clasificacion) == 'interno')
+                                    @if (strtolower($despacho->clasificacion) == 'externo')
                                         <span
-                                            class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Interno</span>
+                                            class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded text-[10px] uppercase">Externo</span>
                                     @else
                                         <span
-                                            class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Externo' }}</span>
+                                            class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-1 rounded text-[10px] uppercase">{{ $despacho->clasificacion ?? 'Interno' }}</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 font-bold text-slate-800">
@@ -638,7 +624,7 @@
                                                         <th class="px-4 py-2.5">Producto</th>
                                                         <th class="px-4 py-2.5">Lote</th>
                                                         <th class="px-4 py-2.5">Vencimiento</th>
-                                                        <th class="px-4 py-2.5 text-center">Cant. Extraida</th>
+                                                        <th class="px-4 py-2.5 text-center">Cant. Extraída</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="divide-y divide-slate-100 text-slate-700">
@@ -663,7 +649,7 @@
                                             <div class="bg-white p-3 rounded-lg border border-slate-200 text-center">
                                                 <p
                                                     class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
-                                                    Firma Quien Despacha</p>
+                                                    Firma de quien despacha</p>
                                                 @if (isset($despacho->firma_despacha) && $despacho->firma_despacha)
                                                     <img src="{{ $despacho->firma_despacha }}" class="mx-auto max-h-16"
                                                         alt="Firma Despacho">
@@ -674,10 +660,10 @@
                                             <div class="bg-white p-3 rounded-lg border border-slate-200 text-center">
                                                 <p
                                                     class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
-                                                    Firma Quien Solicita/Recibe</p>
+                                                    Firma de quien solicita/recibe</p>
                                                 @if (isset($despacho->firma_recibe) && $despacho->firma_recibe)
                                                     <img src="{{ $despacho->firma_recibe }}" class="mx-auto max-h-16"
-                                                        alt="Firma Recepcion">
+                                                        alt="Firma Recepción">
                                                 @else
                                                     <p class="text-xs text-slate-400 italic py-2">No registrada</p>
                                                 @endif
@@ -688,7 +674,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-12 text-center text-slate-400 font-medium">No hay guias
+                                <td colspan="7" class="px-6 py-12 text-center text-slate-400 font-medium">No hay guías
                                     de despacho emitidas en la plataforma.</td>
                             </tr>
                         @endforelse
@@ -703,7 +689,7 @@
             </div>
         </div>
     </div>
-    <!-- modal del escaner QR del despacho controlado -->
+    <!-- modal del escaner qr del despacho controlado -->
     <div id="scannerModal" class="hidden fixed inset-0 z-[100] !m-0 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4 transition-all">
         <div class="flex min-h-full items-center justify-center">
             <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden text-left my-auto">
@@ -784,7 +770,7 @@
             <div class="px-6 py-5 bg-rose-700 flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-bold text-white tracking-wide">Solicitudes CESFAM con Estupefacientes</h2>
-                    <p class="text-[12px] text-rose-100 mt-0.5">Asigna solicitudes a los trabajadores y despacha los fármacos controlados solicitados por los CESFAM.</p>
+                    <p class="text-[12px] text-rose-100 mt-0.5">Asigne solicitudes a los trabajadores y despache los fármacos controlados solicitados por los CESFAM.</p>
                 </div>
                 <button type="button" onclick="closeSolicitudesControlado()"
                     class="text-rose-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-lg cursor-pointer">
@@ -795,7 +781,7 @@
                 </button>
             </div>
 
-            <!-- Filtros del modal controlado -->
+            <!-- filtros del modal controlado -->
             <div class="px-6 py-3.5 bg-slate-50 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div class="sm:col-span-2">
                     <label class="block text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-1">Buscar solicitud CESFAM</label>
@@ -979,7 +965,7 @@
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-    <!-- avisos con SweetAlert2 -->
+    <!-- avisos con sweetalert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -990,7 +976,7 @@
         const esControladoJS = (nombre) => @json($controlados).some(c => c.toLowerCase() === String(nombre ?? '')
             .trim().toLowerCase());
 
-        // Solicitudes (estupefacientes)
+        // solicitudes (estupefacientes)
         function openSolicitudesControlado() {
             filtrarSolicitudesControladoModal();
             document.getElementById('SolicitudesControladoModal').classList.remove('hidden');
@@ -1026,7 +1012,7 @@
 
             const confirmTitle = userId ? '¿Asignar Solicitud Controlada?' : '¿Desasignar Solicitud?';
             const confirmHtml = userId
-                ? `¿Deseas asignar la atención de esta solicitud controlada a <strong>${userName}</strong>?`
+                ? `¿Desea asignar la atención de esta solicitud controlada a <strong>${userName}</strong>?`
                 : 'La solicitud volverá al estado <strong>Pendiente</strong> sin responsable asignado.';
             const confirmBtnText = userId ? 'Sí, asignar' : 'Sí, desasignar';
 
@@ -1117,7 +1103,7 @@
             const solicitud = solicitudesControlado.find(s => s.id === id);
             if (!solicitud) return;
 
-            // Helper de normalización para matching insensible a mayúsculas, tildes y símbolos
+            // helper de normalizacion para matching insensible a mayusculas, tildes y simbolos
             const normText = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
 
             // marcar la solicitud de origen
@@ -1136,7 +1122,7 @@
 
             // clasificacion interna + establecimiento (matching insensible a mayusculas)
             const clasificacion = document.getElementById('clasificacion_select');
-            clasificacion.value = 'Interno';
+            clasificacion.value = 'Externo';
             toggleClasificacion();
 
             const selectEst = document.getElementById('establecimiento_interno');
@@ -1157,13 +1143,12 @@
                 selectEst.value = opcionEst.value;
                 actualizarDireccionInterna();
             } else if (solicitud.establecimiento) {
-                const selectClasif = document.getElementById('clasificacion_select');
-                if (selectClasif) {
-                    selectClasif.value = 'Externo';
-                    toggleClasificacion();
-                    const inputExt = document.getElementById('establecimiento_externo');
-                    if (inputExt) inputExt.value = solicitud.establecimiento;
-                }
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Destino no válido para controlados',
+                    text: `La solicitud es de «${solicitud.establecimiento}», que no es un CESFAM de la red. Los fármacos controlados solo se despachan a un CESFAM.`,
+                    confirmButtonColor: '#e11d48'
+                });
             }
 
             // condiciones de transporte / observaciones
@@ -1208,6 +1193,9 @@
                 if (opcion) {
                     selectProducto.value = opcion.value;
                     llenarDatosFila(selectProducto);
+                    // consumo mensual que informo el establecimiento en esta solicitud
+                    tr.dataset.consumoSolicitud = item.consumo_anterior ?? '';
+                    actualizarConsumoDespacho(tr);
                     const selectPrograma = tr.querySelector('select[name="programas[]"]');
                     if (selectPrograma && item.programa) {
                         const progNorm = normText(item.programa);
@@ -1245,7 +1233,7 @@
 
             closeSolicitudesControlado();
 
-            // Notificación toast de éxito al cargar
+            // notificacion toast de exito al cargar
             if (typeof Swal !== 'undefined' && normales.length === 0 && sinStock.length === 0) {
                 Swal.fire({
                     toast: true,
@@ -1301,6 +1289,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // los controlados siempre son despacho externo a un cesfam
+            if (typeof toggleClasificacion === 'function') toggleClasificacion();
+
             const padDespachaElem = document.getElementById('pad_despacha');
             const padRecibeElem = document.getElementById('pad_recibe');
             const padOptions = {
@@ -1389,7 +1380,7 @@
                                             Esta solicitud aún tiene <strong>${ctrlData.cant_normales_pendientes} producto(s) normal(es)</strong> pendiente(s) por despachar en el módulo de Despacho Normal.
                                         </p>
                                         <p class="das-swal-mixed-cta font-semibold text-[11.5px] mt-1.5">
-                                            ¿Deseas emitir el Despacho Normal ahora mismo?
+                                            ¿Desea emitir el Despacho Normal ahora mismo?
                                         </p>
                                     </div>
                                 </div>
@@ -1448,9 +1439,9 @@
                         return;
                     }
 
-                    const clasif = document.getElementById('clasificacion_select')?.value || 'Interno';
+                    const clasif = document.getElementById('clasificacion_select')?.value || 'Externo';
                     let destinatario = '';
-                    if (clasif === 'Externo') {
+                    if (clasif === 'Interno') {
                         const ext = (document.getElementById('establecimiento_externo')?.value || '').trim();
                         const tipoExt = (document.getElementById('tipo_externo')?.value || '').trim();
                         destinatario = (tipoExt ? tipoExt + ' - ' : '') + (ext || 'Destino Externo');
@@ -1591,25 +1582,25 @@
             const inpExtDest = document.getElementById('establecimiento_externo');
             const inpDir = document.getElementById('direccion_destino');
 
-            if (val === 'Interno') {
+            if (val === 'Externo') {
                 divInt.classList.remove('hidden');
-                divExt.classList.add('hidden');
+                divExt?.classList.add('hidden');
 
                 selInt.setAttribute('name', 'establecimiento_destino');
                 selInt.setAttribute('required', 'true');
 
-                selExtTipo.removeAttribute('name');
-                selExtTipo.removeAttribute('required');
-                inpExtDest.removeAttribute('name');
-                inpExtDest.removeAttribute('required');
+                selExtTipo?.removeAttribute('name');
+                selExtTipo?.removeAttribute('required');
+                inpExtDest?.removeAttribute('name');
+                inpExtDest?.removeAttribute('required');
 
                 inpDir.readOnly = true;
                 inpDir.classList.add('bg-slate-50', 'cursor-not-allowed');
                 inpDir.classList.remove('bg-white');
-                inpDir.placeholder = "Se autocompletara al seleccionar destino...";
+                inpDir.placeholder = "Se autocompletará al seleccionar destino...";
 
                 actualizarDireccionInterna();
-            } else if (val === 'Externo') {
+            } else if (val === 'Interno' && divExt) {
                 divInt.classList.add('hidden');
                 divExt.classList.remove('hidden');
 
@@ -1625,12 +1616,12 @@
                 inpDir.classList.remove('bg-slate-50', 'cursor-not-allowed');
                 inpDir.classList.add('bg-white');
                 inpDir.value = '';
-                inpDir.placeholder = 'Ingrese la direccion manually...';
+                inpDir.placeholder = 'Ingrese la dirección manualmente...';
             }
         }
 
         function actualizarDireccionInterna() {
-            if (document.getElementById('clasificacion_select').value !== 'Interno') return;
+            if (document.getElementById('clasificacion_select').value !== 'Externo') return;
 
             const select = document.getElementById('establecimiento_interno');
             const input = document.getElementById('direccion_destino');
@@ -1772,11 +1763,55 @@
             return tr;
         }
 
+        // ultimo consumo mensual informado por cada establecimiento, por producto
+        const normConsumo = t => (t || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+        const CONSUMO_DECLARADO = (() => {
+            const crudo = @json($consumoDeclarado ?? []);
+            const indice = {};
+            Object.keys(crudo).forEach(est => {
+                const porProducto = {};
+                Object.keys(crudo[est]).forEach(nom => { porProducto[normConsumo(nom)] = crudo[est][nom]; });
+                indice[normConsumo(est)] = porProducto;
+            });
+            return indice;
+        })();
+
+        // muestra en la fila el consumo mensual del establecimiento para ese producto
+        function actualizarConsumoDespacho(tr) {
+            const celda = tr?.querySelector('.consumo-mensual-despacho');
+            if (!celda) return;
+            let valor = tr.dataset.consumoSolicitud;
+            if (valor === undefined || valor === '') {
+                const haciaLaRed = document.getElementById('clasificacion_select')?.value === 'Externo';
+                const est = haciaLaRed ? (document.getElementById('establecimiento_interno')?.value || '') : '';
+                const sel = tr.querySelector('select[name="productos[]"]');
+                const opt = sel ? sel.options[sel.selectedIndex] : null;
+                const nombre = opt && opt.value ? (opt.getAttribute('data-nombre-completo') || opt.value) : '';
+                const porProducto = est ? CONSUMO_DECLARADO[normConsumo(est)] : null;
+                valor = porProducto && nombre ? porProducto[normConsumo(nombre)] : undefined;
+            }
+            const hay = valor !== undefined && valor !== null && valor !== '';
+            celda.textContent = hay ? Number(valor).toLocaleString('es-CL') + ' uds.' : '—';
+            celda.classList.toggle('text-slate-400', !hay);
+            celda.classList.toggle('text-slate-800', hay);
+        }
+
+        function actualizarConsumosDespacho() {
+            tbody.querySelectorAll('tr').forEach(actualizarConsumoDespacho);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('establecimiento_interno')?.addEventListener('change', actualizarConsumosDespacho);
+            document.getElementById('clasificacion_select')?.addEventListener('change', actualizarConsumosDespacho);
+        });
+
         function llenarDatosFila(selectElement) {
             let option = selectElement.options[selectElement.selectedIndex];
             if (!option || option.disabled) return;
 
             let tr = selectElement.closest('tr');
+            // al cambiar el producto deja de usarse el consumo de la solicitud
+            delete tr.dataset.consumoSolicitud;
             const nombreMovil = tr.querySelector('.producto-nombre-movil');
             if (nombreMovil) nombreMovil.textContent = option.getAttribute('data-nombre-completo') || option.value || '';
             let loteInput = tr.querySelector('input[name="lotes[]"]');
@@ -1829,6 +1864,7 @@
                 } catch (e) {}
             }
 
+            actualizarConsumoDespacho(tr);
             cantInput.focus();
         }
 
@@ -1866,7 +1902,7 @@
             }
         }
 
-        // Escáner QR
+        // escaner qr
         let html5QrScanner = null;
         let availableCameras = [];
         let currentCameraIndex = 0;
@@ -1891,7 +1927,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Aviso de Seguridad',
-                    text: 'Para usar la cámara necesitas acceder mediante localhost, 127.0.0.1 o HTTPS.',
+                    text: 'Para usar la cámara necesita acceder mediante localhost, 127.0.0.1 o HTTPS.',
                     confirmButtonColor: '#e11d48'
                 });
             }
@@ -1931,7 +1967,7 @@
                         <div class="text-center p-4">
                             <svg class="w-10 h-10 text-rose-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             <p class="text-sm font-bold text-white">No se pudo acceder a la cámara</p>
-                            <p class="text-xs text-slate-400 mt-1">Verifica los permisos en tu navegador o conecta una cámara.</p>
+                            <p class="text-xs text-slate-400 mt-1">Verifique los permisos en su navegador o conecte una cámara.</p>
                         </div>
                     `;
                 }
@@ -2035,7 +2071,7 @@
 
             let targetOption = null;
 
-            // 1. Coincidencia exacta de Producto Y Lote
+            // 1. coincidencia exacta de producto y lote
             if (prodTarget && loteTarget) {
                 const targetProdNorm = norm(prodTarget);
                 const targetLoteNorm = cleanLote(loteTarget);
@@ -2044,19 +2080,19 @@
                 });
             }
 
-            // 2. Coincidencia por Lote (si el lote es específico y distinto de S/L)
+            // 2. coincidencia por lote (si el lote es especifico y distinto de s/l)
             if (!targetOption && loteTarget && cleanLote(loteTarget) !== 'S/L') {
                 const targetLoteNorm = cleanLote(loteTarget);
                 targetOption = options.find(opt => cleanLote(opt.getAttribute('data-lote')) === targetLoteNorm);
             }
 
-            // 3. Coincidencia por Producto (primer lote disponible)
+            // 3. coincidencia por producto (primer lote disponible)
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => norm(opt.value) === targetProdNorm);
             }
 
-            // 4. Coincidencia parcial / difusa por Producto
+            // 4. coincidencia parcial / difusa por producto
             if (!targetOption && prodTarget) {
                 const targetProdNorm = norm(prodTarget);
                 targetOption = options.find(opt => {
@@ -2066,7 +2102,7 @@
             }
 
             if (targetOption) {
-                // Seleccionar índice exacto para no colisionar con productos duplicados
+                // seleccionar indice exacto para no colisionar con productos duplicados
                 targetOption.selected = true;
                 select.selectedIndex = targetOption.index;
                 select.value = targetOption.value;
@@ -2095,7 +2131,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Sin Stock en Fármacos Controlados',
-                    html: `El producto o lote <strong>${nombreBuscado}</strong> no figura con stock disponible en la bodega de <strong>Fármacos Controlados</strong>.<br><br><span class="text-xs text-slate-500">Recuerda que este módulo es exclusivo para estupefacientes y recetas cheque. Si es un producto común, búscalo en el módulo de Despacho general.</span>`,
+                    html: `El producto o lote <strong>${nombreBuscado}</strong> no figura con stock disponible en la bodega de <strong>Fármacos Controlados</strong>.<br><br><span class="text-xs text-slate-500">Recuerde que este módulo es exclusivo para estupefacientes y recetas cheque. Si es un producto común, búsquelo en el módulo de Despacho general.</span>`,
                     confirmButtonColor: '#e11d48'
                 });
                 if (!emptySelect && tbody.children.length > 1) tr.remove();
@@ -2103,7 +2139,7 @@
         }
 
         function onScanFailure(error) {
-            // Se ignora silenciosamente para no saturar la consola en cada frame fallido
+            // se ignora silenciosamente para no saturar la consola en cada frame fallido
         }
 
         @if (session('controlled_dispatch_success_detail'))
@@ -2117,7 +2153,7 @@
     </script>
 
     <style>
-        /* ===== Detalle de extracción en celular: cada fila se muestra como tarjeta ===== */
+        /* detalle de extraccion en celular: cada fila se muestra como tarjeta */
         .producto-nombre-movil { display: none; }
         @media (max-width: 767px) {
             #productsTable { min-width: 0 !important; width: 100% !important; table-layout: auto !important; white-space: normal !important; }
@@ -2134,7 +2170,7 @@
             #productsTable select, #productsTable input { min-width: 0; }
             .producto-nombre-movil { display: block; font-size: 12px; font-weight: 700; line-height: 1.35; margin-top: 6px; white-space: normal; overflow-wrap: anywhere; }
             .producto-nombre-movil:empty { display: none; }
-            /* Modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
+            /* modales de solicitudes / bandeja: en celular se desplaza todo el modal, no solo la lista */
             #SolicitudesModal > div, #BandejaModal > div { overflow-y: auto !important; }
             #SolicitudesModal .max-h-\[60vh\], #BandejaModal .max-h-\[60vh\] { max-height: none !important; flex-shrink: 0; }
         }

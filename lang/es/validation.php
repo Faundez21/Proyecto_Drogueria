@@ -14,8 +14,8 @@ return [
     |
     */
 
-    'accepted' => 'Debes aceptar :attribute.',
-    'accepted_if' => 'Debes aceptar :attribute cuando :other sea :value.',
+    'accepted' => 'Debe aceptar :attribute.',
+    'accepted_if' => 'Debe aceptar :attribute cuando :other sea :value.',
     'active_url' => 'El campo :attribute no es una URL válida.',
     'after' => 'El campo :attribute debe ser una fecha posterior a :date.',
     'after_or_equal' => 'El campo :attribute debe ser una fecha posterior o igual a :date.',
@@ -123,7 +123,7 @@ return [
         'mixed' => 'La contraseña debe contener al menos una mayúscula y una minúscula.',
         'numbers' => 'La contraseña debe contener al menos un número.',
         'symbols' => 'La contraseña debe contener al menos un símbolo.',
-        'uncompromised' => 'La contraseña ingresada apareció en una filtración de datos. Elige otra.',
+        'uncompromised' => 'La contraseña ingresada apareció en una filtración de datos. Elija otra.',
     ],
     'present' => 'El campo :attribute debe estar presente.',
     'present_if' => 'El campo :attribute debe estar presente cuando :other sea :value.',
@@ -179,7 +179,7 @@ return [
             'unique' => 'Este correo ya está registrado por otro usuario.',
         ],
         'excel' => [
-            'required' => 'Debes seleccionar el archivo Excel que quieres cargar.',
+            'required' => 'Debe seleccionar el archivo Excel que desea cargar.',
             'mimes' => 'El archivo debe ser un Excel (.xlsx o .xls).',
         ],
     ],

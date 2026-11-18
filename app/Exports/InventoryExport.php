@@ -103,18 +103,26 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
         }
 
         return [
-            $producto,
-            $inventory->categoria ?? 'General',
-            $inventory->lote ?? 'S/L',
+            self::textoSeguro($producto),
+            self::textoSeguro($inventory->categoria ?? 'General'),
+            self::textoSeguro($inventory->lote ?? 'S/L'),
             $fechaVencimiento,
-            $pasillo,
-            $estante,
-            $inventory->programa ?? 'General DAS',
+            self::textoSeguro($pasillo),
+            self::textoSeguro($estante),
+            self::textoSeguro($inventory->programa ?? 'General DAS'),
             $stock,
             (int) round($valorUnitario, 0),
             (int) round($valorTotal, 0),
             $estado
         ];
+    }
+
+    // un texto que empieza con = + - @ excel lo toma como formula: se le antepone un apostrofo
+    private static function textoSeguro($valor)
+    {
+        $texto = (string) $valor;
+
+        return preg_match('/^[=+\-@\t\r]/', $texto) ? "'" . $texto : $texto;
     }
 
     public function styles(Worksheet $sheet): array
@@ -135,7 +143,7 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
                 $sheet = $event->sheet->getDelegate();
                 $highestRow = $sheet->getHighestRow();
 
-                // Encabezado en las filas 1 a 3; la celda A1 queda libre para el logo
+                // encabezado en las filas 1 a 3; la celda a1 queda libre para el logo
                 $sheet->mergeCells('A1:K1');
                 $sheet->setCellValue('A1', 'DROGUERÍA COMUNAL DAS - I. MUNICIPALIDAD DE TALCAHUANO');
                 $sheet->getStyle('A1')->applyFromArray([
@@ -175,7 +183,7 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
                         ],
                     ]);
 
-                    // Filas alternadas en gris para que se lean mejor
+                    // filas alternadas en gris para que se lean mejor
                     for ($r = 5; $r <= $highestRow; $r++) {
                         $sheet->getRowDimension($r)->setRowHeight(20);
                         if ($r % 2 === 0) {
@@ -193,7 +201,7 @@ class InventoryExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
                     $sheet->getStyle("H5:H{$highestRow}")->getNumberFormat()->setFormatCode('#,##0');
                     $sheet->getStyle("I5:J{$highestRow}")->getNumberFormat()->setFormatCode('$#,##0');
 
-                    // Fila de totales al final
+                    // fila de totales al final
                     $totalRow = $highestRow + 1;
                     $sheet->mergeCells("A{$totalRow}:G{$totalRow}");
                     $sheet->setCellValue("A{$totalRow}", 'TOTAL GENERAL CONSOLIDADO DEL REPORTE:');
