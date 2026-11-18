@@ -132,9 +132,4 @@ class QuarantineController extends Controller
             'valorTotalRetenido'
         ));
     }
-
-    public function update(Request $request, string $id)
-    {
-   
-    }
 }
