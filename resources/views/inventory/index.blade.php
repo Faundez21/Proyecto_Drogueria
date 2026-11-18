@@ -981,9 +981,40 @@
         </div>
 
         <!-- modal: ver mermas -->
+        <style>
+            /* en celular: el total y "cerrar" siempre a la vista; la tabla es lo unico que hace scroll
+               y los filtros secundarios se abren con "Más filtros" */
+            #mermaModal .merma-mas-filtros { display: none; }
+            @media (max-width: 639.98px) {
+                #mermaModal .merma-header { padding: 12px 16px; }
+                #mermaModal .merma-header h2 { font-size: 16px; line-height: 1.3; }
+                #mermaModal .merma-header p { display: none; }
+                #mermaModal .merma-filtros { padding: 12px 16px; gap: 10px 12px; }
+                #mermaModal .merma-filtros .merma-buscar { flex: 1 1 0; min-width: 0; }
+                #mermaModal .merma-mas-filtros { display: inline-flex; }
+                #mermaModal .merma-filtros:not(.abierto) .merma-fecha,
+                #mermaModal .merma-filtros:not(.abierto) .merma-resp,
+                #mermaModal .merma-filtros:not(.abierto) .merma-limpiar { display: none; }
+                #mermaModal .merma-filtros .merma-fecha { width: calc(50% - 6px); flex: 0 0 calc(50% - 6px); }
+                #mermaModal .merma-filtros .merma-buscar { order: 1; }
+                #mermaModal .merma-filtros .merma-mas-filtros { order: 2; }
+                #mermaModal .merma-filtros .merma-fecha,
+                #mermaModal .merma-filtros .merma-resp,
+                #mermaModal .merma-filtros .merma-limpiar { order: 3; }
+                #mermaModal .merma-filtros::after { content: ''; order: 2; flex-basis: 100%; height: 0; }
+                #mermaModal .merma-filtros .merma-limpiar,
+                #mermaModal .merma-filtros .merma-limpiar button { width: 100%; }
+                #mermaModal .merma-tabla { flex: 1 1 auto; min-height: 0; max-height: none; }
+                #mermaModal .merma-pie { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 16px 12px; }
+                #mermaModal .merma-pie .merma-resumen { justify-content: space-between; flex-wrap: wrap; row-gap: 6px; font-size: 12px; }
+                #mermaModal .merma-pie #mermaTotalDisplay { margin-left: 6px; padding: 4px 10px; }
+                #mermaModal .merma-pie .merma-resumen > .w-px { display: none; }
+                #mermaModal .merma-pie button { width: 100%; padding-top: 10px; padding-bottom: 10px; }
+            }
+        </style>
         <div id="mermaModal" class="hidden fixed inset-0 z-[9999] !m-0 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 transition-all">
-            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
-                <div class="px-6 py-5 bg-rose-800 flex justify-between items-center shrink-0">
+            <div class="merma-card bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden my-auto">
+                <div class="merma-header px-6 py-5 bg-rose-800 flex justify-between items-center gap-3 shrink-0">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-xl bg-rose-700 border border-rose-600 flex items-center justify-center text-white">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -999,20 +1030,25 @@
                 </div>
 
                 <!-- filtros avanzados de mermas -->
-                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end z-20 shadow-inner shrink-0">
-                    <div class="flex-1 min-w-[200px]">
+                <div class="merma-filtros px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end z-20 shadow-inner shrink-0">
+                    <div class="merma-buscar flex-1 min-w-[200px]">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Buscar Texto</label>
                         <input type="text" id="mermaSearchInput" onkeyup="filterMermas()" placeholder="Producto, lote o motivo..." class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
                     </div>
-                    <div class="w-full sm:w-auto">
+                    <button type="button" class="merma-mas-filtros items-center gap-1.5 px-3 py-2 bg-white border border-slate-300 text-slate-600 rounded-lg text-[12.5px] font-bold shadow-sm whitespace-nowrap"
+                        onclick="const f = this.closest('.merma-filtros'); f.classList.toggle('abierto'); this.querySelector('span').textContent = f.classList.contains('abierto') ? 'Menos filtros' : 'Más filtros';">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                        <span>Más filtros</span>
+                    </button>
+                    <div class="merma-fecha w-full sm:w-auto">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Desde</label>
                         <input type="date" id="mermaDateFrom" onchange="filterMermas()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
                     </div>
-                    <div class="w-full sm:w-auto">
+                    <div class="merma-fecha w-full sm:w-auto">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Hasta</label>
                         <input type="date" id="mermaDateTo" onchange="filterMermas()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
                     </div>
-                    <div class="w-full sm:w-[200px]">
+                    <div class="merma-resp w-full sm:w-[200px]">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Responsable</label>
                         <select id="mermaUserFilter" onchange="filterMermas()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-[13px] outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all shadow-sm">
                             <option value="">Todos los usuarios</option>
@@ -1029,14 +1065,14 @@
                             @endforeach
                         </select>
                     </div>
-                    <div>
+                    <div class="merma-limpiar">
                         <button type="button" onclick="clearMermaFilters()" class="px-4 py-2 bg-white border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors text-[13px] font-bold shadow-sm">
                             Limpiar
                         </button>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto flex-1 max-h-[55vh] bg-white">
+                <div class="merma-tabla overflow-x-auto flex-1 max-h-[55vh] bg-white">
                     <table class="w-full text-left text-[13px] text-slate-600 whitespace-nowrap">
                         <thead class="bg-white text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200 sticky top-0 shadow-sm z-10">
                             <tr>
@@ -1128,12 +1164,12 @@
                     </table>
                 </div>
 
-                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center shrink-0">
-                    <div class="text-[13px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-3">
-                        <span>Mostrando <span id="mermasCount" class="text-rose-600 font-black">0</span> res.</span>
+                <div class="merma-pie px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center gap-3 shrink-0">
+                    <div class="merma-resumen text-[13px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-3">
+                        <span class="whitespace-nowrap">Mostrando <span id="mermasCount" class="text-rose-600 font-black">0</span> res.</span>
                         <div class="h-4 w-px bg-slate-300"></div>
-                        <span>Valor Total:
-                            <span id="mermaTotalDisplay" class="inline-flex items-center px-3 py-1.5 rounded-lg text-[13px] font-extrabold bg-rose-600 text-white font-mono-das ml-2 shadow-sm">
+                        <span class="whitespace-nowrap">Valor Total:
+                            <span id="mermaTotalDisplay" class="inline-flex items-center whitespace-nowrap px-3 py-1.5 rounded-lg text-[13px] font-extrabold bg-rose-600 text-white font-mono-das ml-2 shadow-sm">
                                 $ 0
                             </span>
                         </span>

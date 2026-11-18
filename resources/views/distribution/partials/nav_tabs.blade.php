@@ -8,7 +8,7 @@
     ];
 @endphp
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 tab-grid-3 xl:grid-cols-5 gap-3.5">
     <!-- mapa 3d distribucion -->
     <a href="{{ route('distribution.index') }}"
         class="group relative flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 shadow-sm {{ $activeTab === 'distribution' ? 'bg-slate-900 border-slate-900 text-white shadow-md ring-2 ring-teal-500/30' : 'bg-white border-slate-200/80 text-slate-700 hover:border-teal-300 hover:shadow-md' }}">

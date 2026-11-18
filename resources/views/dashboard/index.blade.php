@@ -22,7 +22,15 @@
                 <p class="text-[13px] font-medium text-slate-500 mt-0.5">Estado operativo de Droguería Central, Establecimientos y CESFAM</p>
             </div>
 
-            <div class="flex items-center gap-2.5 w-full sm:w-auto">
+            <style>
+                /* celular: las dos solicitudes lado a lado y escanear qr abajo a todo el ancho */
+                @media (max-width: 639.98px) {
+                    .dash-acciones { flex-wrap: wrap; align-items: stretch; }
+                    .dash-acciones > a { flex: 1 1 0; min-width: 0; text-align: center; display: flex; align-items: center; justify-content: center; padding: 9px 8px; }
+                    .dash-acciones > button { flex: 1 1 100%; padding-top: 10px; padding-bottom: 10px; }
+                }
+            </style>
+            <div class="dash-acciones flex items-center gap-2.5 w-full sm:w-auto">
                 @can('ver.solicitudes_cesfam')
                     <a href="{{ route('requests.cesfam') }}" class="px-3.5 py-2 rounded-xl text-[12px] font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors">
                         + Solicitud CESFAM
@@ -560,7 +568,7 @@
                             </div>
                             <div class="min-w-0">
                                 <span class="text-xs font-bold text-slate-800 block leading-tight">Recepción</span>
-                                <span class="text-[10px] text-slate-500 truncate block">Ingreso de stock</span>
+                                <span class="text-[10px] text-slate-500 block leading-snug">Ingreso de stock</span>
                             </div>
                         </a>
 
@@ -572,7 +580,7 @@
                             </div>
                             <div class="min-w-0">
                                 <span class="text-xs font-bold text-slate-800 block leading-tight">Despacho</span>
-                                <span class="text-[10px] text-slate-500 truncate block">Salida de pedidos</span>
+                                <span class="text-[10px] text-slate-500 block leading-snug">Salida de pedidos</span>
                             </div>
                         </a>
 
@@ -584,7 +592,7 @@
                             </div>
                             <div class="min-w-0">
                                 <span class="text-xs font-bold text-slate-800 block leading-tight">Inventario</span>
-                                <span class="text-[10px] text-slate-500 truncate block">Kardex y stock</span>
+                                <span class="text-[10px] text-slate-500 block leading-snug">Kardex y stock</span>
                             </div>
                         </a>
 
@@ -596,7 +604,7 @@
                             </div>
                             <div class="min-w-0">
                                 <span class="text-xs font-bold text-slate-800 block leading-tight">Reportes</span>
-                                <span class="text-[10px] text-slate-500 truncate block">Actas y balances</span>
+                                <span class="text-[10px] text-slate-500 block leading-snug">Actas y balances</span>
                             </div>
                         </a>
                     </div>
