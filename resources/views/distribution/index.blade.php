@@ -663,7 +663,7 @@
             function warehouseApp() {
                 return {
                     viewMode: '3D',
-                    sidebarOpen: window.innerWidth >= 640,
+                    sidebarOpen: window.innerWidth >= 1024,
                     tooltipVisible: false,
                     rackData: {},
                     searchQuery: '',
