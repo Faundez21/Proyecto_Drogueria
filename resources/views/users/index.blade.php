@@ -157,7 +157,7 @@
         <div class="p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <div class="flex items-start sm:items-center justify-between sm:justify-start gap-2.5">
+                    <div class="flex items-center gap-2.5">
                         <h3 class="text-[15px] font-extrabold text-slate-800">Directorio de Usuarios y Accesos</h3>
                         <span id="contadorUsuariosFiltrados" class="shrink-0 whitespace-nowrap px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-teal-50 text-teal-700 border border-teal-200">
                             {{ $totalUsuarios }} {{ $totalUsuarios == 1 ? 'usuario' : 'usuarios' }}
