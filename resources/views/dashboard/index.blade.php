@@ -23,6 +23,11 @@
             </div>
 
             <style>
+                /* pantallas altas (tablet vertical, monitores grandes): la tabla de centros crece hasta el final de la pantalla
+                   en vez de dejar un espacio vacio abajo */
+                @media (min-height: 900px) {
+                    .dash-tabpanel { max-height: max(420px, calc(100vh - 740px)) !important; }
+                }
                 /* celular: las dos solicitudes lado a lado y escanear qr abajo a todo el ancho */
                 @media (max-width: 639.98px) {
                     .dash-acciones { flex-wrap: wrap; align-items: stretch; }
@@ -346,7 +351,7 @@
                 </div>
 
                 <!-- pestana 1: establecimientos y cesfam -->
-                <div id="tabPanel_centros" class="overflow-x-auto max-h-[420px]">
+                <div id="tabPanel_centros" class="dash-tabpanel overflow-x-auto max-h-[420px]">
                     <table class="w-full text-left text-[12px] text-slate-600 whitespace-nowrap">
                         <thead class="text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-200 bg-slate-50 sticky top-0 z-10">
                             <tr>
@@ -416,7 +421,7 @@
                 </div>
 
                 <!-- pestana 2: ultimos movimientos de bodega -->
-                <div id="tabPanel_movimientos" class="hidden p-5 max-h-[420px] overflow-y-auto">
+                <div id="tabPanel_movimientos" class="dash-tabpanel hidden p-5 max-h-[420px] overflow-y-auto">
                     @if (count($recentMovements) > 0)
                         <div class="divide-y divide-slate-100">
                             @foreach ($recentMovements as $mov)
@@ -460,7 +465,7 @@
                 </div>
 
                 <!-- pestana 3: lotes en cuarentena -->
-                <div id="tabPanel_cuarentena" class="hidden overflow-x-auto max-h-[420px]">
+                <div id="tabPanel_cuarentena" class="dash-tabpanel hidden overflow-x-auto max-h-[420px]">
                     <table class="w-full text-left text-[12px] text-slate-600">
                         <thead class="text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-200 bg-slate-50">
                             <tr>
