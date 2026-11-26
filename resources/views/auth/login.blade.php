@@ -323,9 +323,15 @@
 
             </div>
 
-            <div class="mt-8 lg:absolute lg:bottom-8 w-full text-center">
+            <div class="mt-8 lg:absolute lg:bottom-6 w-full text-center space-y-1">
                 <p class="text-[11px] sm:text-xs text-gray-400">
-                    &copy; {{ date('Y') }} Droguería DAS. Todos los derechos reservados.
+                    &copy; {{ date('Y') }} <strong class="font-semibold text-gray-500">Droguería DAS</strong> · Gestión y Trazabilidad Farmacéutica
+                </p>
+                <p class="text-[11px] text-gray-400 flex items-center justify-center gap-1.5">
+                    <span>Desarrollado por</span>
+                    <span class="font-mono text-[10.5px] px-2 py-0.5 rounded-md bg-gray-200/70 text-gray-600 font-medium border border-gray-300/60">
+                        C. Faúndez · D. Bustos · N. Sanhueza
+                    </span>
                 </p>
             </div>
         </div>

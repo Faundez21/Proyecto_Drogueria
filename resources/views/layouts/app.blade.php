@@ -813,8 +813,8 @@
                     </div>
                 </header>
 
-                <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-                    <div class="max-w-[1600px] mx-auto space-y-6">
+                <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col">
+                    <div class="max-w-[1600px] w-full mx-auto space-y-6 flex-1">
 
 
                         <!-- encabezado de la pagina, con su titulo y sus botones -->
@@ -845,6 +845,19 @@
                             @yield('content')
                         </div>
                     </div>
+
+                    <footer class="max-w-[1600px] w-full mx-auto mt-10 pt-5 pb-2 border-t border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11.5px] text-slate-400 dark:text-slate-500 shrink-0">
+                        <div class="flex items-center gap-2 text-center sm:text-left">
+                            <span class="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+                            <span>&copy; {{ date('Y') }} <strong class="font-semibold text-slate-600 dark:text-slate-400">Droguería DAS</strong> · Gestión y Trazabilidad Farmacéutica</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-wrap justify-center">
+                            <span>Desarrollado por</span>
+                            <span class="font-mono-das text-[11px] px-2.5 py-0.5 rounded-md bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium border border-slate-300/60 dark:border-slate-700">
+                                C. Faúndez · D. Bustos · N. Sanhueza
+                            </span>
+                        </div>
+                    </footer>
                 </main>
             </div>
 
