@@ -73,9 +73,9 @@ class QuarantineController extends Controller
         }
 
         // totales calculados sobre todo el resultado, no solo la pagina actual
-        $totalLotesGlobal = (clone $query)->count();
-        $totalUnidadesGlobal = (int) (clone $query)->sum('cantidad');
-        $valorTotalRetenido = (float) ((clone $query)->selectRaw('SUM(cantidad * valor_neto_unitario) as total')->value('total') ?? 0);
+        $totalLotesGlobal = (clone $query)->reorder()->count();
+        $totalUnidadesGlobal = (int) (clone $query)->reorder()->sum('cantidad');
+        $valorTotalRetenido = (float) ((clone $query)->reorder()->selectRaw('SUM(cantidad * valor_neto_unitario) as total')->value('total') ?? 0);
 
         $inventories = $query->paginate(15)->withQueryString();
 
