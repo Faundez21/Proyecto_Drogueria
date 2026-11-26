@@ -321,18 +321,20 @@
                     </button>
                 </p>
 
-                <div class="mt-8 pt-5 border-t border-gray-200 text-center space-y-1.5">
-                    <p class="text-[11px] sm:text-xs text-gray-400">
-                        &copy; {{ date('Y') }} <strong class="font-semibold text-gray-500">Droguería DAS</strong> · Gestión y Trazabilidad Farmacéutica
-                    </p>
-                    <p class="text-[11px] text-gray-400 flex items-center justify-center gap-1.5 flex-wrap">
-                        <span>Desarrollado por</span>
-                        <span class="font-mono text-[10.5px] px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 font-medium border border-gray-300">
-                            C. Faúndez · D. Bustos · N. Sanhueza
-                        </span>
-                    </p>
-                </div>
+            </div>
 
+            <div class="mt-8 lg:absolute lg:bottom-8 w-full text-center px-4">
+                <p class="text-[11.5px] text-gray-400 tracking-wide">
+                    &copy; {{ date('Y') }} <span class="font-semibold text-gray-500">Droguería Comunal DAS</span> &middot; Gestión y Trazabilidad Farmacéutica
+                </p>
+                <p class="text-[11px] text-gray-400 mt-1 tracking-wide">
+                    <span class="uppercase text-[10px] tracking-widest text-gray-400/80 font-semibold mr-1.5">Ingeniería y Desarrollo</span>
+                    <span class="font-semibold text-gray-500">C. Faúndez</span>
+                    <span class="text-blue-500 font-bold mx-1">&middot;</span>
+                    <span class="font-semibold text-gray-500">D. Bustos</span>
+                    <span class="text-blue-500 font-bold mx-1">&middot;</span>
+                    <span class="font-semibold text-gray-500">N. Sanhueza</span>
+                </p>
             </div>
         </div>
     </div>

@@ -299,6 +299,104 @@
         .swal2-popup {
             font-family: 'IBM Plex Sans', sans-serif !important;
         }
+
+        /* footer institucional */
+        .das-app-footer {
+            margin-top: 2.25rem;
+            padding: 1rem 1.25rem;
+            border-radius: 0.875rem;
+            background-color: rgba(255, 255, 255, 0.65);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem 1.5rem;
+            font-size: 12px;
+            color: #64748b;
+            backdrop-filter: blur(6px);
+        }
+        .das-app-footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            flex-wrap: wrap;
+        }
+        .das-app-footer-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 9999px;
+            background-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+            flex-shrink: 0;
+        }
+        .das-app-footer-title {
+            font-weight: 700;
+            color: #334155;
+            letter-spacing: -0.01em;
+        }
+        .das-app-footer-sep {
+            color: #cbd5e1;
+            user-select: none;
+        }
+        .das-app-footer-credits {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .das-app-footer-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+        .das-app-footer-authors {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-weight: 600;
+            color: #475569;
+            font-size: 12px;
+        }
+        .das-app-footer-authors span.author-dot {
+            color: #0d9488;
+            font-weight: 800;
+        }
+        html.dark .das-app-footer {
+            background-color: rgba(15, 23, 42, 0.45);
+            border-color: rgba(51, 65, 85, 0.65);
+            color: #94a3b8;
+        }
+        html.dark .das-app-footer-title {
+            color: #e2e8f0;
+        }
+        html.dark .das-app-footer-sep {
+            color: #334155;
+        }
+        html.dark .das-app-footer-label {
+            color: #64748b;
+        }
+        html.dark .das-app-footer-authors {
+            color: #cbd5e1;
+        }
+        html.dark .das-app-footer-dot {
+            background-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18);
+        }
+        @media (max-width: 640px) {
+            .das-app-footer {
+                flex-direction: column;
+                text-align: center;
+                justify-content: center;
+                padding: 0.875rem 1rem;
+            }
+            .das-app-footer-brand,
+            .das-app-footer-credits {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -845,16 +943,22 @@
                             @yield('content')
                         </div>
 
-                        <footer class="pt-5 pb-2 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11.5px] text-slate-400">
-                            <div class="flex items-center gap-2 text-center sm:text-left">
-                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
-                                <span>&copy; {{ date('Y') }} <strong class="font-semibold text-slate-600">Droguería DAS</strong> · Gestión y Trazabilidad Farmacéutica</span>
+                        <footer class="das-app-footer">
+                            <div class="das-app-footer-brand">
+                                <span class="das-app-footer-dot"></span>
+                                <span class="das-app-footer-title">Droguería Comunal DAS</span>
+                                <span class="das-app-footer-sep">|</span>
+                                <span>Sistema de Gestión y Trazabilidad Farmacéutica &copy; {{ date('Y') }}</span>
                             </div>
-                            <div class="flex items-center gap-1.5 flex-wrap justify-center">
-                                <span>Desarrollado por</span>
-                                <span class="font-mono-das text-[11px] px-2.5 py-0.5 rounded-md bg-slate-200/70 text-slate-600 font-medium border border-slate-300">
-                                    C. Faúndez · D. Bustos · N. Sanhueza
-                                </span>
+                            <div class="das-app-footer-credits">
+                                <span class="das-app-footer-label">Ingeniería y Desarrollo</span>
+                                <div class="das-app-footer-authors">
+                                    <span>C. Faúndez</span>
+                                    <span class="author-dot">&middot;</span>
+                                    <span>D. Bustos</span>
+                                    <span class="author-dot">&middot;</span>
+                                    <span>N. Sanhueza</span>
+                                </div>
                             </div>
                         </footer>
                     </div>
