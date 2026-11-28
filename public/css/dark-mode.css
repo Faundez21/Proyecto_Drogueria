@@ -60,7 +60,13 @@ html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: #3
 html.dark .ring-slate-200 { --tw-ring-color: #364560; }
 
 /* formularios */
-html.dark input, html.dark select, html.dark textarea { color: #E2E8F0; }
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+html.dark select,
+html.dark textarea {
+    background-color: #202B3D;
+    border-color: #45577A;
+    color: #E2E8F0;
+}
 html.dark input::placeholder, html.dark textarea::placeholder { color: #7586A0; }
 html.dark input:disabled, html.dark select:disabled, html.dark textarea:disabled,
 html.dark input[readonly] { color: #94A3B8; }
@@ -70,7 +76,30 @@ html.dark input[type="date"]::-webkit-calendar-picker-indicator,
 html.dark input[type="time"]::-webkit-calendar-picker-indicator,
 html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: none; opacity: .9; cursor: pointer; }
 html.dark option { background-color: #243044; color: #E2E8F0; }
-html.dark input[type="checkbox"], html.dark input[type="radio"] { accent-color: #14B8A6; }
+html.dark input[type="checkbox"], html.dark input[type="radio"] {
+    accent-color: #14B8A6;
+    color: #0D9488;
+    background-color: #1E293B;
+    border-color: #475569;
+}
+html.dark input[type="checkbox"]:checked, html.dark input[type="radio"]:checked {
+    color: #0D9488;
+    background-color: #0D9488;
+    border-color: #14B8A6;
+}
+input[type="checkbox"].role-modulo:checked,
+input[type="checkbox"].accent-indigo-600:checked {
+    color: #4F46E5;
+    background-color: #4F46E5;
+    border-color: #4F46E5;
+}
+html.dark input[type="checkbox"].role-modulo:checked,
+html.dark input[type="checkbox"].accent-indigo-600:checked {
+    accent-color: #6366F1;
+    color: #6366F1;
+    background-color: #6366F1;
+    border-color: #818CF8;
+}
 
 /* botones primarios oscuros (slate-800) */
 html.dark button.bg-slate-800, html.dark a.bg-slate-800 { background-color: #0F766E; }
