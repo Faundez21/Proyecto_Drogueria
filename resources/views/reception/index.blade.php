@@ -1475,7 +1475,8 @@
 
             // 3. funcionalidad de firma digital
             const padOptions = { penColor: 'rgb(15, 23, 42)', backgroundColor: 'rgba(255, 255, 255, 1)' };
-            const signatureRec = new SignaturePad(document.getElementById('pad_receptor'), padOptions);
+            const padRecElem = document.getElementById('pad_receptor');
+            const signatureRec = window.crearSignaturePad ? window.crearSignaturePad(padRecElem, padOptions) : new SignaturePad(padRecElem, padOptions);
 
             // 4. limpieza del formulario completo
             document.getElementById('btn_limpiar').addEventListener('click', function(e) {

@@ -1299,8 +1299,8 @@
                 backgroundColor: 'rgba(255, 255, 255, 1)'
             };
 
-            if (padDespachaElem) signatureDespacha = new SignaturePad(padDespachaElem, padOptions);
-            if (padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
+            if (padDespachaElem) signatureDespacha = window.crearSignaturePad ? window.crearSignaturePad(padDespachaElem, padOptions) : new SignaturePad(padDespachaElem, padOptions);
+            if (padRecibeElem) signatureRecibe = window.crearSignaturePad ? window.crearSignaturePad(padRecibeElem, padOptions) : new SignaturePad(padRecibeElem, padOptions);
 
             const form = document.getElementById('despachoControladoForm');
             let despachoControladoSubmitAction = 'save_only';

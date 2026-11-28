@@ -300,6 +300,17 @@
             font-family: 'IBM Plex Sans', sans-serif !important;
         }
 
+        /* lienzos de firma tactil (hidpi, sin desfase ni scroll accidental en movil/tablet) */
+        canvas[id^="pad_"] {
+            display: block;
+            width: 100%;
+            height: 155px;
+            touch-action: none !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
+
         /* footer institucional */
         .das-app-footer {
             margin-top: 2.25rem;
@@ -1262,6 +1273,87 @@
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') closeAboutSystemModal();
                 });
+
+                // crea y calibra un signaturepad optimizado para pantallas tactiles (hidpi/retina, trazo suave y sin desfase)
+                window.crearSignaturePad = function(canvas, extraOpts = {}) {
+                    if (!canvas || typeof SignaturePad === 'undefined') return null;
+
+                    const opts = Object.assign({
+                        penColor: 'rgb(15, 23, 42)',
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        minWidth: 0.9,
+                        maxWidth: 2.3,
+                        throttle: 8,
+                        minDistance: 1.5,
+                        velocityFilterWeight: 0.65
+                    }, extraOpts);
+
+                    const pad = new SignaturePad(canvas, opts);
+                    let loadedDataUrl = null;
+
+                    const origClear = pad.clear.bind(pad);
+                    pad.clear = function() {
+                        loadedDataUrl = null;
+                        return origClear();
+                    };
+
+                    const origFromDataURL = pad.fromDataURL.bind(pad);
+                    pad.fromDataURL = function(dataUrl, options = {}) {
+                        loadedDataUrl = dataUrl;
+                        const rect = canvas.getBoundingClientRect();
+                        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                        const merged = Object.assign({
+                            ratio: ratio,
+                            width: rect.width || (canvas.width / ratio) || 400,
+                            height: rect.height || (canvas.height / ratio) || 155
+                        }, options);
+                        return origFromDataURL(dataUrl, merged);
+                    };
+
+                    function calibrarDimensiones() {
+                        const rect = canvas.getBoundingClientRect();
+                        const cssW = rect.width || canvas.offsetWidth;
+                        const cssH = rect.height || canvas.offsetHeight || 155;
+                        if (!cssW || cssW <= 0 || !cssH || cssH <= 0) return;
+
+                        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                        const targetW = Math.round(cssW * ratio);
+                        const targetH = Math.round(cssH * ratio);
+
+                        if (canvas.width === targetW && canvas.height === targetH) return;
+
+                        const trazosPrevios = !pad.isEmpty() ? pad.toData() : null;
+                        const urlPrevia = (!trazosPrevios || trazosPrevios.length === 0) ? loadedDataUrl : null;
+
+                        canvas.width = targetW;
+                        canvas.height = targetH;
+                        const ctx = canvas.getContext('2d');
+                        if (ctx) {
+                            ctx.scale(ratio, ratio);
+                        }
+
+                        origClear();
+                        if (trazosPrevios && trazosPrevios.length > 0) {
+                            pad.fromData(trazosPrevios);
+                        } else if (urlPrevia) {
+                            pad.fromDataURL(urlPrevia);
+                        }
+                    }
+
+                    calibrarDimensiones();
+
+                    if (typeof ResizeObserver !== 'undefined') {
+                        const ro = new ResizeObserver(() => calibrarDimensiones());
+                        ro.observe(canvas);
+                    } else {
+                        window.addEventListener('resize', calibrarDimensiones);
+                    }
+
+                    canvas.addEventListener('pointerdown', calibrarDimensiones, { passive: true });
+                    canvas.addEventListener('touchstart', calibrarDimensiones, { passive: true });
+
+                    return pad;
+                };
             </script>
 
             <!-- modal de busqueda, se maneja con el teclado -->
