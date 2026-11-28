@@ -247,7 +247,11 @@ html.dark .swal2-html-container .text-slate-700 { color: #E2E8F0 !important; }
 html.dark .swal2-html-container .text-slate-600 { color: #CBD5E1 !important; }
 html.dark .swal2-html-container .text-slate-500 { color: #94A3B8 !important; }
 
-/* barras de desplazamiento */
+/* barras de desplazamiento (mismo ancho 10px en claro y oscuro para evitar saltos de layout al alternar el tema) */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #F1F5F9; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 8px; border: 2px solid #F1F5F9; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
 html.dark ::-webkit-scrollbar { width: 10px; height: 10px; }
 html.dark ::-webkit-scrollbar-track { background: #1A2332; }
 html.dark ::-webkit-scrollbar-thumb { background: #364763; border-radius: 8px; border: 2px solid #1A2332; }
