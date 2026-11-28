@@ -128,7 +128,7 @@
                         Limpiar Filtros
                     </button>
                     <button type="button" onclick="applyReqInventoryFilters()"
-                        class="px-4 py-2 rounded-lg text-[12.5px] font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-md transition-all cursor-pointer">
+                        class="px-4 py-2 rounded-lg text-[12.5px] font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-md transition-all cursor-pointer">
                         Aplicar Filtros
                     </button>
                 </div>

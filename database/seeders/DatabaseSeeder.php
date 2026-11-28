@@ -6,14 +6,10 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    // datos minimos: roles y permisos, un administrador y la planta base de la bodega (pasillos, estanterias, niveles y posiciones)
+    // datos minimos: roles, permisos y usuario administrador
     public function run()
     {
         $this->call(RoleSeeder::class);
         $this->call(UserSeeder::class);
-        $this->call(ProviderSeeder::class);
-        $this->call(DistributionSeeder::class);
-        $this->call(LevelSeeder::class);
-        $this->call(PositionSeeder::class);
     }
 }

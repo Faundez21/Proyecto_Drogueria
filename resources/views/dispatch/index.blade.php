@@ -221,7 +221,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            Blanco Encalada 450, Talcahuano
+                            Brasil 360, San Vicente, Talcahuano
                         </p>
                     </div>
                 </div>
@@ -1377,8 +1377,8 @@
                 backgroundColor: 'rgba(255, 255, 255, 1)'
             };
 
-            if (padDespachaElem) signatureDespacha = new SignaturePad(padDespachaElem, padOptions);
-            if (padRecibeElem) signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
+            if (padDespachaElem) signatureDespacha = window.crearSignaturePad ? window.crearSignaturePad(padDespachaElem, padOptions) : new SignaturePad(padDespachaElem, padOptions);
+            if (padRecibeElem) signatureRecibe = window.crearSignaturePad ? window.crearSignaturePad(padRecibeElem, padOptions) : new SignaturePad(padRecibeElem, padOptions);
 
             // asignacion de firmas a los inputs ocultos antes del submit con confirmacion sweetalert2 y ajax
             const form = document.getElementById('despachoForm');
@@ -2610,7 +2610,9 @@
                 reverseButtons: true,
                 didOpen: () => {
                     const canvas = document.getElementById('pad_recepcion_posterior');
-                    pad = new SignaturePad(canvas, { penColor: 'rgb(15, 23, 42)', backgroundColor: 'rgba(255, 255, 255, 1)' });
+                    pad = window.crearSignaturePad
+                        ? window.crearSignaturePad(canvas, { penColor: 'rgb(15, 23, 42)', backgroundColor: 'rgba(255, 255, 255, 1)' })
+                        : new SignaturePad(canvas, { penColor: 'rgb(15, 23, 42)', backgroundColor: 'rgba(255, 255, 255, 1)' });
                     document.getElementById('btn_limpiar_recepcion_posterior').addEventListener('click', () => pad.clear());
                 },
                 preConfirm: async () => {

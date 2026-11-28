@@ -87,7 +87,7 @@
                     <div style="display: inline-block; vertical-align: middle;">
                         <h2 class="logo-title">DROGUERÍA COMUNAL DAS</h2>
                         <p class="logo-subtitle">I. Municipalidad de Talcahuano · Dirección de Administración de Salud</p>
-                        <p class="logo-address">Blanco Encalada 450, Talcahuano · Distribución y Logística Sanitaria</p>
+                        <p class="logo-address">Brasil 360, San Vicente, Talcahuano · Distribución y Logística Sanitaria</p>
                     </div>
                 </div>
             </td>

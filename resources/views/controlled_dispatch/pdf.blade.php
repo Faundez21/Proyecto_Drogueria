@@ -85,7 +85,7 @@
                     <div style="display: inline-block; vertical-align: middle;">
                         <h2 class="logo-title">DROGUERÍA COMUNAL DAS</h2>
                         <p class="logo-subtitle">I. Municipalidad de Talcahuano · Unidad de Estupefacientes y Psicotrópicos</p>
-                        <p class="logo-address">Blanco Encalada 450, Talcahuano · Control Sanitario D.S. N° 404 / 405 MINSAL</p>
+                        <p class="logo-address">Brasil 360, San Vicente, Talcahuano · Control Sanitario D.S. N° 404 / 405 MINSAL</p>
                     </div>
                 </div>
             </td>

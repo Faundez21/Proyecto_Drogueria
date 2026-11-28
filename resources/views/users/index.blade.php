@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Usuarios y Permisos')
+@section('title', 'Usuarios y Permisoss')
 @section('subtitle', 'Administración de cuentas de funcionarios, roles de acceso por vista y recuperación de contraseñas.')
 
 @section('actions')
@@ -590,7 +590,7 @@
                                 Rol <span class="text-rose-500">*</span></label>
                             <input type="text" id="role_name" name="name" required
                                 placeholder="Ej. Bodeguero, Encargado CESFAM, Químico Farmacéutico..."
-                                class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-[13px] font-semibold">
+                                class="w-full px-4 py-2.5 bg-white text-slate-800 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-[13px] font-semibold">
                         </div>
 
                         <div class="space-y-4 mb-5">
@@ -616,7 +616,7 @@
                                                 <input type="checkbox" name="modulos[]" value="{{ $key }}"
                                                     data-modulo="{{ $key }}"
                                                     onchange="updateRoleSelectedCount()"
-                                                    class="w-4 h-4 mt-0.5 accent-indigo-600 rounded role-modulo shrink-0">
+                                                    class="w-4 h-4 mt-0.5 text-indigo-600 accent-indigo-600 rounded role-modulo shrink-0">
                                                 <div class="min-w-0">
                                                     <div class="flex items-center gap-1.5 flex-wrap">
                                                         <span class="text-[12.5px] font-bold text-slate-800">{{ $info['label'] }}</span>
