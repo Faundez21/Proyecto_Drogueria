@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Usuarios y Permisoss')
+@section('title', 'Usuarios y Permisos')
 @section('subtitle', 'Administración de cuentas de funcionarios, roles de acceso por vista y recuperación de contraseñas.')
 
 @section('actions')
