@@ -86,6 +86,7 @@ class ReportController extends Controller
         $inventories = $query->paginate(10)->withQueryString();
 
         $valorTotal = (clone $this->buildInventoryQuery($request))
+            ->reorder()
             ->selectRaw('SUM(cantidad * valor_neto_unitario) as total')
             ->value('total') ?? 0;
 

@@ -184,6 +184,22 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- placa glassmorphism de creditos en el panel izquierdo -->
+                <div style="margin-top:2.25rem;padding:0.85rem 1.15rem;border-radius:0.875rem;background:rgba(15, 23, 42, 0.42);backdrop-filter:blur(10px);border:1px solid rgba(147, 197, 253, 0.22);display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;font-size:12px;color:#dbeafe;font-weight:600;">
+                        <span style="width:7px;height:7px;border-radius:9999px;background-color:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,0.22);display:inline-block;"></span>
+                        <span>Droguería Comunal DAS &middot; Talcahuano</span>
+                    </div>
+                    <div style="font-size:11.5px;color:#bfdbfe;">
+                        <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#93c5fd;font-weight:700;margin-right:6px;">Desarrollado por</span>
+                        <strong style="color:#ffffff;font-weight:600;">Cristóbal Faúndez</strong>
+                        <span style="color:#38bdf8;margin:0 4px;">&middot;</span>
+                        <strong style="color:#ffffff;font-weight:600;">Diego Bustos</strong>
+                        <span style="color:#38bdf8;margin:0 4px;">&middot;</span>
+                        <strong style="color:#ffffff;font-weight:600;">Nicolás Sanhueza</strong>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -323,9 +339,17 @@
 
             </div>
 
-            <div class="mt-8 lg:absolute lg:bottom-8 w-full text-center">
-                <p class="text-[11px] sm:text-xs text-gray-400">
-                    &copy; {{ date('Y') }} Droguería DAS. Todos los derechos reservados.
+            <div class="mt-8 lg:absolute lg:bottom-8 w-full text-center px-4">
+                <p class="text-[11.5px] text-gray-400 tracking-wide">
+                    &copy; {{ date('Y') }} <span class="font-semibold text-gray-500">Droguería Comunal DAS</span> &middot; Dirección de Administración de Salud Talcahuano
+                </p>
+                <p class="text-[11px] text-gray-400 mt-1 tracking-wide">
+                    <span class="uppercase text-[10px] tracking-widest text-gray-400/80 font-semibold mr-1.5">Desarrollado por</span>
+                    <span class="font-semibold text-gray-500">Cristóbal Faúndez</span>
+                    <span class="text-blue-500 font-bold mx-1">&middot;</span>
+                    <span class="font-semibold text-gray-500">Diego Bustos</span>
+                    <span class="text-blue-500 font-bold mx-1">&middot;</span>
+                    <span class="font-semibold text-gray-500">Nicolás Sanhueza</span>
                 </p>
             </div>
         </div>

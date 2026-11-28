@@ -554,7 +554,7 @@
                 backgroundColor: 'rgba(255, 255, 255, 1)'
             };
 
-            signatureRecibe = new SignaturePad(padRecibeElem, padOptions);
+            signatureRecibe = window.crearSignaturePad ? window.crearSignaturePad(padRecibeElem, padOptions) : new SignaturePad(padRecibeElem, padOptions);
 
             const container = document.getElementById('productos_container');
             const establecimientoSelect = document.getElementById('establecimiento_select');

@@ -299,6 +299,311 @@
         .swal2-popup {
             font-family: 'IBM Plex Sans', sans-serif !important;
         }
+
+        /* lienzos de firma tactil (hidpi, sin desfase ni scroll accidental en movil/tablet) */
+        canvas[id^="pad_"] {
+            display: block;
+            width: 100%;
+            height: 155px;
+            touch-action: none !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
+
+        /* footer institucional */
+        .das-app-footer {
+            margin-top: 2.25rem;
+            padding: 1rem 1.25rem;
+            border-radius: 0.875rem;
+            background-color: rgba(255, 255, 255, 0.65);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem 1.5rem;
+            font-size: 12px;
+            color: #64748b;
+            backdrop-filter: blur(6px);
+        }
+        .das-app-footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            flex-wrap: wrap;
+        }
+        .das-app-footer-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 9999px;
+            background-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+            flex-shrink: 0;
+        }
+        .das-app-footer-title {
+            font-weight: 700;
+            color: #334155;
+            letter-spacing: -0.01em;
+        }
+        .das-app-footer-sep {
+            color: #cbd5e1;
+            user-select: none;
+        }
+        .das-app-footer-credits {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .das-app-footer-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+        .das-app-footer-authors {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 600;
+            color: #475569;
+            font-size: 12px;
+            flex-wrap: wrap;
+        }
+        .das-app-footer-author-item {
+            transition: color 0.18s ease;
+            cursor: pointer;
+        }
+        .das-app-footer-author-item:hover {
+            color: #0d9488;
+        }
+        .das-app-footer-authors span.author-dot {
+            color: #0d9488;
+            font-weight: 800;
+        }
+        .das-app-footer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10.5px;
+            font-weight: 600;
+            background-color: rgba(13, 148, 136, 0.1);
+            color: #0f766e;
+            border: 1px solid rgba(13, 148, 136, 0.25);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .das-app-footer-badge:hover {
+            background-color: rgba(13, 148, 136, 0.18);
+            border-color: rgba(13, 148, 136, 0.45);
+            transform: translateY(-1px);
+        }
+        /* mini footer fijo en el sidebar */
+        .das-sidebar-footer {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid #1e293b;
+            background-color: rgba(2, 6, 23, 0.35);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            flex-shrink: 0;
+        }
+        .das-sidebar-footer:hover {
+            background-color: rgba(30, 41, 59, 0.65);
+        }
+        .das-sidebar-footer-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 10.5px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+        .das-sidebar-footer-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .das-sidebar-footer-version {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background-color: rgba(13, 148, 136, 0.16);
+            color: #2dd4bf;
+            border: 1px solid rgba(45, 212, 191, 0.22);
+        }
+        .das-sidebar-footer-devs {
+            margin-top: 0.35rem;
+            font-size: 10.5px;
+            color: #64748b;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .das-sidebar-footer:hover .das-sidebar-footer-devs {
+            color: #cbd5e1;
+        }
+        /* modal acerca del sistema */
+        .das-about-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background-color: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .das-about-overlay.hidden {
+            display: none !important;
+        }
+        .das-about-card {
+            width: 100%;
+            max-width: 520px;
+            border-radius: 1.125rem;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+        }
+        .das-about-header {
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .das-about-body {
+            padding: 1.25rem 1.5rem;
+        }
+        .das-about-dev-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.625rem;
+            margin-top: 0.75rem;
+        }
+        .das-about-dev-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+        .das-about-dev-item:hover {
+            border-color: #0d9488;
+            transform: translateX(3px);
+        }
+        .das-about-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 0.625rem;
+            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+            color: #ffffff;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 700;
+            font-size: 12.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);
+        }
+        .das-about-meta {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            background-color: #f1f5f9;
+            font-size: 11.5px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        .das-about-footer {
+            padding: 0.875rem 1.5rem;
+            background-color: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11.5px;
+            color: #64748b;
+        }
+        html.dark .das-app-footer {
+            background-color: rgba(15, 23, 42, 0.45);
+            border-color: rgba(51, 65, 85, 0.65);
+            color: #94a3b8;
+        }
+        html.dark .das-app-footer-title {
+            color: #e2e8f0;
+        }
+        html.dark .das-app-footer-sep {
+            color: #334155;
+        }
+        html.dark .das-app-footer-label {
+            color: #64748b;
+        }
+        html.dark .das-app-footer-authors {
+            color: #cbd5e1;
+        }
+        html.dark .das-app-footer-author-item:hover {
+            color: #2dd4bf;
+        }
+        html.dark .das-app-footer-badge {
+            background-color: rgba(20, 184, 166, 0.14);
+            color: #2dd4bf;
+            border-color: rgba(45, 212, 191, 0.28);
+        }
+        html.dark .das-app-footer-badge:hover {
+            background-color: rgba(20, 184, 166, 0.24);
+            border-color: rgba(45, 212, 191, 0.5);
+        }
+        html.dark .das-app-footer-dot {
+            background-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18);
+        }
+        html.dark .das-about-card {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+        html.dark .das-about-dev-item {
+            background-color: rgba(15, 23, 42, 0.65);
+            border-color: #334155;
+        }
+        html.dark .das-about-dev-item:hover {
+            border-color: #14b8a6;
+        }
+        html.dark .das-about-meta {
+            background-color: rgba(15, 23, 42, 0.5);
+            color: #94a3b8;
+        }
+        html.dark .das-about-footer {
+            background-color: #0f172a;
+            border-top-color: #334155;
+            color: #94a3b8;
+        }
+        @media (max-width: 640px) {
+            .das-app-footer {
+                flex-direction: column;
+                text-align: center;
+                justify-content: center;
+                padding: 0.875rem 1rem;
+            }
+            .das-app-footer-brand,
+            .das-app-footer-credits {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -623,6 +928,20 @@
                         </div>
                     @endrole
                 </nav>
+
+                <!-- pie fijo del sidebar con estado y creditos -->
+                <div class="das-sidebar-footer" onclick="openAboutSystemModal()" title="Ver información del sistema y equipo de desarrollo">
+                    <div class="das-sidebar-footer-top">
+                        <span class="das-sidebar-footer-status">
+                            <span class="das-app-footer-dot" style="width:6px;height:6px;"></span>
+                            <span>Sistema Operativo</span>
+                        </span>
+                        <span class="das-sidebar-footer-version">v1.0</span>
+                    </div>
+                    <div class="das-sidebar-footer-devs">
+                        C. Faúndez &middot; D. Bustos &middot; N. Sanhueza
+                    </div>
+                </div>
             </aside>
             <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
 
@@ -844,9 +1163,198 @@
                         <div class="w-full">
                             @yield('content')
                         </div>
+
+                        <footer class="das-app-footer">
+                            <div class="das-app-footer-brand">
+                                <span class="das-app-footer-dot"></span>
+                                <span class="das-app-footer-title">Droguería Comunal DAS</span>
+                                <span class="das-app-footer-sep">|</span>
+                                <span>Dirección de Administración de Salud Talcahuano &copy; {{ date('Y') }}</span>
+                            </div>
+                            <div class="das-app-footer-credits">
+                                <span class="das-app-footer-label">Desarrollado por</span>
+                                <div class="das-app-footer-authors" onclick="openAboutSystemModal()" title="Ver ficha técnica y créditos del sistema">
+                                    <span class="das-app-footer-author-item">Cristóbal Faúndez</span>
+                                    <span class="author-dot">&middot;</span>
+                                    <span class="das-app-footer-author-item">Diego Bustos</span>
+                                    <span class="author-dot">&middot;</span>
+                                    <span class="das-app-footer-author-item">Nicolás Sanhueza</span>
+                                </div>
+                                <button type="button" onclick="openAboutSystemModal()" class="das-app-footer-badge" title="Acerca del sistema">
+                                    <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>v1.0 &middot; Créditos</span>
+                                </button>
+                            </div>
+                        </footer>
                     </div>
                 </main>
             </div>
+
+            <!-- modal: acerca del sistema y equipo de desarrollo -->
+            <div id="aboutSystemModal" class="das-about-overlay hidden" onclick="if(event.target === this) closeAboutSystemModal()">
+                <div class="das-about-card">
+                    <div class="das-about-header">
+                        <div style="display:flex;align-items:center;gap:0.875rem;">
+                            <div style="width:42px;height:42px;border-radius:0.75rem;background-color:#0f172a;border:1px solid #334155;display:flex;align-items:center;justify-content:center;padding:6px;flex-shrink:0;">
+                                <img src="{{ asset('images/favicon.svg') }}" alt="Logo DAS" style="width:100%;height:100%;object-fit:contain;">
+                            </div>
+                            <div>
+                                <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                                    <h3 style="font-size:16px;font-weight:700;color:#ffffff;margin:0;line-height:1.2;">Droguería Comunal DAS</h3>
+                                    <span class="das-sidebar-footer-version">v1.0.0</span>
+                                </div>
+                                <p style="font-size:12px;color:#94a3b8;margin:4px 0 0 0;">Sistema de Gestión, Logística y Trazabilidad Farmacéutica</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="closeAboutSystemModal()" style="color:#94a3b8;background:rgba(255,255,255,0.06);border:none;border-radius:0.5rem;padding:6px;cursor:pointer;" aria-label="Cerrar">
+                            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="das-about-body">
+                        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#0d9488;">
+                            Equipo de Desarrollo
+                        </div>
+                        <div class="das-about-dev-grid">
+                            <div class="das-about-dev-item">
+                                <div style="display:flex;align-items:center;gap:0.75rem;">
+                                    <div class="das-about-avatar">CF</div>
+                                    <div>
+                                        <div class="das-app-footer-title" style="font-size:13.5px;">Cristóbal Faúndez</div>
+                                        <div style="font-size:11.5px;color:#64748b;">Desarrollador de Software</div>
+                                    </div>
+                                </div>
+                                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0d9488;font-weight:600;">cfaundez</span>
+                            </div>
+                            <div class="das-about-dev-item">
+                                <div style="display:flex;align-items:center;gap:0.75rem;">
+                                    <div class="das-about-avatar">DB</div>
+                                    <div>
+                                        <div class="das-app-footer-title" style="font-size:13.5px;">Diego Bustos</div>
+                                        <div style="font-size:11.5px;color:#64748b;">Desarrollador de Software</div>
+                                    </div>
+                                </div>
+                                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0d9488;font-weight:600;">dbustos</span>
+                            </div>
+                            <div class="das-about-dev-item">
+                                <div style="display:flex;align-items:center;gap:0.75rem;">
+                                    <div class="das-about-avatar">NS</div>
+                                    <div>
+                                        <div class="das-app-footer-title" style="font-size:13.5px;">Nicolás Sanhueza</div>
+                                        <div style="font-size:11.5px;color:#64748b;">Desarrollador de Software</div>
+                                    </div>
+                                </div>
+                                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0d9488;font-weight:600;">nsanhueza</span>
+                            </div>
+                        </div>
+                        <div class="das-about-meta">
+                            <strong class="das-app-footer-title" style="font-size:11.5px;">I. Municipalidad de Talcahuano &middot; Dirección de Administración de Salud (DAS)</strong><br>
+                            Plataforma integral para control de inventario por lote (FEFO), recepciones, cuarentena sanitaria, distribución 2D/3D, solicitudes de la red asistencial y despachos regulados.
+                        </div>
+                    </div>
+                    <div class="das-about-footer">
+                        <span>&copy; {{ date('Y') }} Droguería Comunal DAS &middot; Talcahuano</span>
+                        <button type="button" onclick="closeAboutSystemModal()" style="padding:6px 14px;border-radius:0.5rem;background-color:#0d9488;color:#ffffff;font-weight:600;font-size:12px;border:none;cursor:pointer;">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <script>
+                function openAboutSystemModal() {
+                    document.getElementById('aboutSystemModal')?.classList.remove('hidden');
+                }
+                function closeAboutSystemModal() {
+                    document.getElementById('aboutSystemModal')?.classList.add('hidden');
+                }
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') closeAboutSystemModal();
+                });
+
+                // crea y calibra un signaturepad optimizado para pantallas tactiles (hidpi/retina, trazo suave y sin desfase)
+                window.crearSignaturePad = function(canvas, extraOpts = {}) {
+                    if (!canvas || typeof SignaturePad === 'undefined') return null;
+
+                    const opts = Object.assign({
+                        penColor: 'rgb(15, 23, 42)',
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        minWidth: 0.9,
+                        maxWidth: 2.3,
+                        throttle: 8,
+                        minDistance: 1.5,
+                        velocityFilterWeight: 0.65
+                    }, extraOpts);
+
+                    const pad = new SignaturePad(canvas, opts);
+                    let loadedDataUrl = null;
+
+                    const origClear = pad.clear.bind(pad);
+                    pad.clear = function() {
+                        loadedDataUrl = null;
+                        return origClear();
+                    };
+
+                    const origFromDataURL = pad.fromDataURL.bind(pad);
+                    pad.fromDataURL = function(dataUrl, options = {}) {
+                        loadedDataUrl = dataUrl;
+                        const rect = canvas.getBoundingClientRect();
+                        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                        const merged = Object.assign({
+                            ratio: ratio,
+                            width: rect.width || (canvas.width / ratio) || 400,
+                            height: rect.height || (canvas.height / ratio) || 155
+                        }, options);
+                        return origFromDataURL(dataUrl, merged);
+                    };
+
+                    function calibrarDimensiones() {
+                        const rect = canvas.getBoundingClientRect();
+                        const cssW = rect.width || canvas.offsetWidth;
+                        const cssH = rect.height || canvas.offsetHeight || 155;
+                        if (!cssW || cssW <= 0 || !cssH || cssH <= 0) return;
+
+                        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                        const targetW = Math.round(cssW * ratio);
+                        const targetH = Math.round(cssH * ratio);
+
+                        if (canvas.width === targetW && canvas.height === targetH) return;
+
+                        const trazosPrevios = !pad.isEmpty() ? pad.toData() : null;
+                        const urlPrevia = (!trazosPrevios || trazosPrevios.length === 0) ? loadedDataUrl : null;
+
+                        canvas.width = targetW;
+                        canvas.height = targetH;
+                        const ctx = canvas.getContext('2d');
+                        if (ctx) {
+                            ctx.scale(ratio, ratio);
+                        }
+
+                        origClear();
+                        if (trazosPrevios && trazosPrevios.length > 0) {
+                            pad.fromData(trazosPrevios);
+                        } else if (urlPrevia) {
+                            pad.fromDataURL(urlPrevia);
+                        }
+                    }
+
+                    calibrarDimensiones();
+
+                    if (typeof ResizeObserver !== 'undefined') {
+                        const ro = new ResizeObserver(() => calibrarDimensiones());
+                        ro.observe(canvas);
+                    } else {
+                        window.addEventListener('resize', calibrarDimensiones);
+                    }
+
+                    canvas.addEventListener('pointerdown', calibrarDimensiones, { passive: true });
+                    canvas.addEventListener('touchstart', calibrarDimensiones, { passive: true });
+
+                    return pad;
+                };
+            </script>
 
             <!-- modal de busqueda, se maneja con el teclado -->
 
